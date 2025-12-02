@@ -1,0 +1,208 @@
+import { useState } from "react";
+import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { 
+  LayoutDashboard, 
+  Users, 
+  Car, 
+  DollarSign, 
+  Calculator,
+  Wrench,
+  ClipboardList,
+  Eye,
+  Key,
+  Briefcase,
+  CreditCard,
+  Settings,
+  BookOpen,
+  GraduationCap,
+  Star,
+  LogOut,
+  Menu,
+  X
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { AuthGuard } from "./auth-guard";
+
+interface AdminLayoutProps {
+  children: React.ReactNode;
+}
+
+const sidebarItems = [
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/admins", label: "Admins", icon: Users },
+  { href: "/admin/clients", label: "Clients", icon: Users },
+  { href: "/admin/cars", label: "Cars", icon: Car },
+  { href: "/admin/income-expenses", label: "Income and Expenses", icon: DollarSign },
+  { href: "/admin/payments", label: "Client Payments", icon: CreditCard },
+  { href: "/admin/totals", label: "Totals", icon: Calculator },
+  { href: "/admin/earnings", label: "Earnings Calculator", icon: Calculator },
+  { href: "/admin/maintenance", label: "Car Maintenance", icon: Wrench },
+  { href: "/admin/forms", label: "Forms", icon: ClipboardList, badge: 105 },
+  { href: "/admin/view-client", label: "View as a Client", icon: Eye },
+  { href: "/admin/view-employee", label: "View as an Employee", icon: Eye },
+  { href: "/admin/car-rental", label: "Car Rental", icon: Key },
+  { href: "/admin/hr", label: "Human Resources", icon: Briefcase },
+  { href: "/admin/payroll", label: "Payroll", icon: DollarSign },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/turo-guide", label: "Turo Guide", icon: BookOpen },
+  { href: "/admin/training-manual", label: "Training Manual", icon: GraduationCap },
+  { href: "/admin/testimonials", label: "Client Testimonials", icon: Star },
+];
+
+function AdminLayoutContent({ children }: AdminLayoutProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [location, setLocation] = useLocation();
+
+  const { data } = useQuery({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
+
+  const user = data?.user;
+
+  const handleLogout = async () => {
+    try {
+      await apiRequest("POST", "/api/auth/logout");
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      setLocation("/admin/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-[#0a0a0a]">
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-50 flex flex-col bg-[#0a0a0a] border-r border-[#1a1a1a] transition-all duration-300",
+        sidebarOpen ? "w-64" : "w-20",
+        mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
+        <div className="flex items-center justify-between h-16 px-4 border-b border-[#1a1a1a]">
+          <Link href="/admin" className="flex items-center gap-2">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-[#EAEB80] tracking-[0.3em] font-light">
+                  ═══
+                </span>
+                <span className={cn(
+                  "font-semibold text-[#EAEB80] tracking-wider text-sm italic",
+                  !sidebarOpen && "hidden"
+                )}>
+                  GOLDEN
+                </span>
+                <span className="text-[10px] text-[#EAEB80] tracking-[0.3em] font-light">
+                  ═══
+                </span>
+              </div>
+              {sidebarOpen && (
+                <span className="text-[10px] text-[#EAEB80] tracking-[0.25em] text-center">
+                  LUXURY AUTO
+                </span>
+              )}
+            </div>
+          </Link>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="lg:hidden text-gray-400 hover:text-white"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto py-2">
+          {sidebarItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location === item.href || (item.href !== "/admin" && location.startsWith(item.href));
+            
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 mx-2 px-3 py-2 rounded transition-colors relative",
+                  isActive 
+                    ? "bg-[#EAEB80]/10 text-[#EAEB80]" 
+                    : "text-gray-400 hover:bg-[#1a1a1a] hover:text-white"
+                )}
+                onClick={() => setMobileMenuOpen(false)}
+                data-testid={`link-admin-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                {sidebarOpen && (
+                  <>
+                    <span className="text-sm">{item.label}</span>
+                    {item.badge && (
+                      <span className="ml-auto bg-red-500 text-white text-xs font-medium px-1.5 py-0.5 rounded-full min-w-[24px] text-center">
+                        {item.badge}
+                      </span>
+                    )}
+                  </>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="p-4 border-t border-[#1a1a1a]">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full px-3 py-2 rounded text-gray-400 hover:bg-[#1a1a1a] hover:text-white transition-colors"
+            data-testid="button-logout"
+          >
+            <LogOut className="w-4 h-4" />
+            {sidebarOpen && <span className="text-sm">Logout</span>}
+          </button>
+        </div>
+      </aside>
+
+      <div className={cn(
+        "flex-1 flex flex-col transition-all duration-300",
+        sidebarOpen ? "lg:ml-64" : "lg:ml-20"
+      )}>
+        <header className="h-14 bg-[#0a0a0a] border-b border-[#1a1a1a] flex items-center justify-between px-4 lg:px-6">
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="lg:hidden text-gray-400 hover:text-white"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="hidden lg:flex text-gray-400 hover:text-white"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-4">
+            {user && (
+              <span className="text-sm text-gray-400">
+                {user.firstName} {user.lastName}
+              </span>
+            )}
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-auto p-6 bg-[#0a0a0a]">
+          {children}
+        </main>
+      </div>
+
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+export function AdminLayout({ children }: AdminLayoutProps) {
+  return (
+    <AuthGuard>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </AuthGuard>
+  );
+}

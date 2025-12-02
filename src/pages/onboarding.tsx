@@ -1,0 +1,1010 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { Check, ArrowRight, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import { buildApiUrl } from "@/lib/queryClient";
+
+const onboardingSchema = z.object({
+  date: z.string().min(1, "Date is required"),
+  tshirtSize: z.string().min(1, "T-Shirt Size is required"),
+  firstNameOwner: z.string().min(2, "First name is required"),
+  lastNameOwner: z.string().min(2, "Last name is required"),
+  phoneOwner: z.string().min(10, "Phone is required"),
+  emailOwner: z.string().email("Valid email is required"),
+  representative: z.string().min(1, "Representative is required"),
+  heardAboutUs: z.string().min(1, "How you heard about us is required"),
+  streetAddress: z.string().min(1, "Street address is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State is required"),
+  zipCode: z.string().min(1, "Zip code is required"),
+  birthday: z.string().min(1, "Birthday is required"),
+  emergencyContactName: z.string().min(1, "Emergency contact name is required"),
+  emergencyContactPhone: z.string().min(10, "Emergency contact phone is required"),
+  vehicleYear: z.string().min(1, "Vehicle year is required"),
+  vehicleMake: z.string().min(1, "Vehicle make is required"),
+  vehicleModel: z.string().min(1, "Vehicle model is required"),
+  vehicleTrim: z.string().min(1, "Vehicle trim is required"),
+  vehicleMiles: z.string().min(1, "Vehicle miles is required"),
+  exteriorColor: z.string().min(1, "Exterior color is required"),
+  interiorColor: z.string().min(1, "Interior color is required"),
+  titleType: z.string().min(1, "Title type is required"),
+  vinNumber: z.string().min(1, "VIN number is required"),
+  licensePlate: z.string().min(1, "License plate is required"),
+  registrationExpiration: z.string().min(1, "Registration expiration is required"),
+  vehicleRecall: z.string().min(1, "Vehicle recall is required"),
+  numberOfSeats: z.string().min(1, "Number of seats is required"),
+  numberOfDoors: z.string().min(1, "Number of doors is required"),
+  skiRacks: z.string().min(1, "Ski racks is required"),
+  skiCrossBars: z.string().min(1, "Ski cross bars is required"),
+  roofRails: z.string().min(1, "Roof rails is required"),
+  lastOilChange: z.string().min(1, "Last oil change is required"),
+  oilType: z.string().min(1, "Oil type is required"),
+  freeDealershipOilChanges: z.string().min(1, "Free dealership oil changes is required"),
+  oilPackageDetails: z.string().optional(),
+  dealershipAddress: z.string().optional(),
+  fuelType: z.string().min(1, "Fuel type is required"),
+  tireSize: z.string().min(1, "Tire size is required"),
+  insuranceProvider: z.string().min(1, "Insurance provider is required"),
+  insurancePhone: z.string().min(10, "Insurance phone is required"),
+  policyNumber: z.string().min(1, "Policy number is required"),
+  insuranceExpiration: z.string().min(1, "Insurance expiration is required"),
+  purchasePrice: z.string().min(1, "Purchase price is required"),
+  interestRate: z.string().min(1, "Interest rate is required"),
+  monthlyPayment: z.string().min(1, "Monthly payment is required"),
+  downPayment: z.string().min(1, "Down payment is required"),
+  transportCityToCity: z.string().min(1, "Transport option is required"),
+  ultimateGoal: z.string().min(1, "Ultimate goal is required"),
+  bankName: z.string().min(1, "Bank name is required"),
+  taxClassification: z.string().min(1, "Tax classification is required"),
+  routingNumber: z.string().min(9, "Routing number is required"),
+  accountNumber: z.string().min(1, "Account number is required"),
+  businessName: z.string().optional(),
+  ein: z.string().optional(),
+  ssn: z.string().min(1, "SSN is required"),
+  carManufacturerWebsite: z.string().url("Valid URL is required"),
+  carManufacturerUsername: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+  confirmAgreement: z.boolean().refine((val) => val === true, "You must confirm"),
+});
+
+type OnboardingFormData = z.infer<typeof onboardingSchema>;
+
+const steps = [
+  { id: 1, title: "GOLDEN LUXURY AUTO'S NEW CLIENT ONBOARDING FORM" },
+  { id: 2, title: "OWNER INFORMATION" },
+  { id: 3, title: "CAR INFORMATION" },
+  { id: 4, title: "VEHICLE INSURANCE INFO" },
+  { id: 5, title: "VEHICLE PURCHASE INFO" },
+  { id: 6, title: "ACH DIRECT DEPOSIT PAYMENT INFORMATION" },
+  { id: 7, title: "TURO GO QUALIFICATION" },
+];
+
+function generateRandomData(): OnboardingFormData {
+  const firstNames = ["John", "Sarah", "Michael", "Emma", "David"];
+  const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones"];
+  const rng = () => Math.floor(Math.random() * 1000000);
+  
+  return {
+    date: new Date().toISOString().split("T")[0],
+    tshirtSize: ["S", "M", "L", "XL"][Math.floor(Math.random() * 4)],
+    firstNameOwner: firstNames[Math.floor(Math.random() * firstNames.length)],
+    lastNameOwner: lastNames[Math.floor(Math.random() * lastNames.length)],
+    phoneOwner: `555-${Math.floor(Math.random() * 9000000) + 1000000}`,
+    emailOwner: `user${rng()}@example.com`,
+    representative: "John Smith",
+    heardAboutUs: "Friend",
+    streetAddress: "123 Main Street",
+    city: "Los Angeles",
+    state: "CA",
+    zipCode: "90001",
+    birthday: "1990-01-15",
+    emergencyContactName: "Jane Doe",
+    emergencyContactPhone: "555-9876543",
+    vehicleYear: "2023",
+    vehicleMake: "Mercedes-Benz",
+    vehicleModel: "C-Class",
+    vehicleTrim: "Premium",
+    vehicleMiles: "15000",
+    exteriorColor: "Black",
+    interiorColor: "Tan",
+    titleType: "Clean",
+    vinNumber: "1HGCV41JXMN109186",
+    licensePlate: "ABC1234",
+    registrationExpiration: "2025-12-31",
+    vehicleRecall: "No",
+    numberOfSeats: "5",
+    numberOfDoors: "4",
+    skiRacks: "No",
+    skiCrossBars: "No",
+    roofRails: "Yes",
+    lastOilChange: "2024-01-15",
+    oilType: "5W-30",
+    freeDealershipOilChanges: "2",
+    oilPackageDetails: "Premium oil",
+    dealershipAddress: "456 Oak Street",
+    fuelType: "Gasoline",
+    tireSize: "225/45R17",
+    insuranceProvider: "State Farm",
+    insurancePhone: "555-9876543",
+    policyNumber: "POL123456",
+    insuranceExpiration: "2025-12-31",
+    purchasePrice: "50000",
+    interestRate: "3.5",
+    monthlyPayment: "750",
+    downPayment: "10000",
+    transportCityToCity: "Yes",
+    ultimateGoal: "Personal use and potential rental income",
+    bankName: "Wells Fargo",
+    taxClassification: "Individual",
+    routingNumber: "021000021",
+    accountNumber: "123456789",
+    businessName: "My Business",
+    ein: "12-3456789",
+    ssn: "123-45-6789",
+    carManufacturerWebsite: "https://www.mercedes-benz.com",
+    carManufacturerUsername: "testuser",
+    password: "TestPassword123",
+    confirmAgreement: true,
+  };
+}
+
+export default function Onboarding() {
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [expandedSteps, setExpandedSteps] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
+  const { toast } = useToast();
+
+  const form = useForm<OnboardingFormData>({
+    resolver: zodResolver(onboardingSchema),
+    defaultValues: {
+      date: "",
+      tshirtSize: "",
+      firstNameOwner: "",
+      lastNameOwner: "",
+      phoneOwner: "",
+      emailOwner: "",
+      representative: "",
+      heardAboutUs: "",
+      streetAddress: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      birthday: "",
+      emergencyContactName: "",
+      emergencyContactPhone: "",
+      vehicleYear: "",
+      vehicleMake: "",
+      vehicleModel: "",
+      vehicleTrim: "",
+      vehicleMiles: "",
+      exteriorColor: "",
+      interiorColor: "",
+      titleType: "",
+      vinNumber: "",
+      licensePlate: "",
+      registrationExpiration: "",
+      vehicleRecall: "",
+      numberOfSeats: "",
+      numberOfDoors: "",
+      skiRacks: "",
+      skiCrossBars: "",
+      roofRails: "",
+      lastOilChange: "",
+      oilType: "",
+      freeDealershipOilChanges: "",
+      fuelType: "",
+      tireSize: "",
+      insuranceProvider: "",
+      insurancePhone: "",
+      policyNumber: "",
+      insuranceExpiration: "",
+      purchasePrice: "",
+      interestRate: "",
+      monthlyPayment: "",
+      downPayment: "",
+      transportCityToCity: "",
+      ultimateGoal: "",
+      bankName: "",
+      taxClassification: "",
+      routingNumber: "",
+      accountNumber: "",
+      ssn: "",
+      carManufacturerWebsite: "",
+      carManufacturerUsername: "",
+      password: "",
+      confirmAgreement: false,
+    },
+  });
+
+  const fillWithRandomData = () => {
+    form.reset(generateRandomData());
+    toast({
+      title: "Form Filled",
+      description: "All fields filled with random test data.",
+    });
+  };
+
+  const toggleStep = (stepId: number) => {
+    setExpandedSteps(prev =>
+      prev.includes(stepId) ? prev.filter(s => s !== stepId) : [...prev, stepId]
+    );
+  };
+
+  const onSubmit = async (data: OnboardingFormData) => {
+    console.log("=".repeat(80));
+    console.log("🌐 [FRONTEND] Form submission started");
+    console.log("📋 [FRONTEND] Form data keys:", Object.keys(data));
+    console.log("📋 [FRONTEND] Sample form data:", {
+      firstNameOwner: data.firstNameOwner,
+      emailOwner: data.emailOwner,
+      vehicleMake: data.vehicleMake,
+      vehicleModel: data.vehicleModel,
+    });
+    
+    setIsSubmitting(true);
+    try {
+      const endpoint = buildApiUrl("/api/onboarding/submit");
+      console.log("📤 [FRONTEND] Sending POST request to", endpoint);
+      const requestBody = JSON.stringify(data);
+      console.log("📦 [FRONTEND] Request body length:", requestBody.length, "characters");
+      
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: requestBody,
+        credentials: "include",
+      });
+
+      console.log("📥 [FRONTEND] Response received");
+      console.log("📊 [FRONTEND] Response status:", response.status);
+      console.log("📊 [FRONTEND] Response statusText:", response.statusText);
+      console.log("📊 [FRONTEND] Response ok:", response.ok);
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("❌ [FRONTEND] Response error:", error);
+        throw new Error(error.message || "Submission failed");
+      }
+
+      const responseData = await response.json();
+      console.log("✅ [FRONTEND] Response data:", responseData);
+      console.log("🆔 [FRONTEND] Submission ID:", responseData.id);
+      console.log("=".repeat(80));
+
+      setIsSubmitted(true);
+      window.location.href = "/onboarding/thank-you";
+    } catch (error: any) {
+      console.error("❌ [FRONTEND] Submission error:");
+      console.error("Error type:", error?.constructor?.name);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+      console.log("=".repeat(80));
+      
+      toast({
+        title: "Submission Failed",
+        description: error.message || "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a]">
+        <Navbar />
+        <main className="pt-20 lg:pt-24">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <Card className="bg-card border-white/10 text-center">
+              <CardContent className="py-16">
+                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
+                  <Check className="w-10 h-10 text-primary" />
+                </div>
+                <h2 className="font-serif text-3xl font-medium text-foreground mb-4">Thank You!</h2>
+                <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                  Your information has been submitted successfully. One of our luxury automotive specialists will contact you within 24 hours.
+                </p>
+                <Button onClick={() => window.location.href = "/fleet"} data-testid="button-browse-fleet">
+                  Browse Our Fleet
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a]">
+      <Navbar />
+      <main className="pt-20 lg:pt-24 pb-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-2">Golden Luxury Auto</h1>
+            <p className="text-gray-400">Client Onboarding Form</p>
+          </div>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {steps.map((step) => (
+                <Card key={step.id} className="bg-[#111111] border-[#EAEB80]/20 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleStep(step.id)}
+                    className="w-full flex items-center justify-between p-4 hover:bg-[#1a1a1a] transition-colors"
+                  >
+                    <span className="text-base font-semibold text-[#EAEB80]">
+                      {step.id}. {step.title}
+                    </span>
+                    {expandedSteps.includes(step.id) ? (
+                      <ChevronUp className="w-5 h-5 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                    )}
+                  </button>
+
+                  {expandedSteps.includes(step.id) && (
+                    <CardContent className="p-4 space-y-4 border-t border-[#EAEB80]/20">
+                      {step.id === 1 && (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="date" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Date *</FormLabel>
+                                <FormControl>
+                                  <Input type="date" {...field} className="bg-[#0a0a0a] border-gray-700" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="tshirtSize" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">T-Shirt Size *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {["XS", "S", "M", "L", "XL", "XXL"].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="firstNameOwner" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Vehicle Owner First Name *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="lastNameOwner" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Vehicle Owner Last Name *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="phoneOwner" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Vehicle Owner Phone Number *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="emailOwner" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Vehicle Owner Email Address *</FormLabel>
+                                <FormControl><Input {...field} type="email" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="representative" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Golden Luxury Auto Representative *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="John Smith">John Smith</SelectItem>
+                                    <SelectItem value="Sarah Johnson">Sarah Johnson</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="heardAboutUs" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">How did you hear about us? *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Friend">Friend</SelectItem>
+                                    <SelectItem value="Google">Google</SelectItem>
+                                    <SelectItem value="Social Media">Social Media</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                        </>
+                      )}
+                      {step.id === 2 && (
+                        <>
+                          <FormField control={form.control} name="streetAddress" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">Street Address *</FormLabel>
+                              <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="city" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">City *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="state" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">State *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="zipCode" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Zip Code *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="birthday" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Birthday *</FormLabel>
+                                <FormControl><Input type="date" {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="emergencyContactName" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Emergency Contact Name *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="emergencyContactPhone" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Emergency Contact Phone *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                        </>
+                      )}
+                      {step.id === 3 && (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="vehicleYear" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Vehicle Year *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="vehicleMake" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Vehicle Make *</FormLabel>
+                                <FormControl><Input {...field} placeholder="e.g., Mercedes-Benz" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="vehicleModel" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Vehicle Model *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="vehicleTrim" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Vehicle Trim *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="vehicleMiles" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Vehicle Miles *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="exteriorColor" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Exterior Color *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="interiorColor" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Interior Color *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="titleType" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Title Type *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Clean">Clean</SelectItem>
+                                    <SelectItem value="Salvage">Salvage</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="vinNumber" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">VIN Number *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="licensePlate" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">License Plate *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="registrationExpiration" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Registration Expiration *</FormLabel>
+                                <FormControl><Input type="date" {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="vehicleRecall" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Vehicle Recall *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Yes">Yes</SelectItem>
+                                    <SelectItem value="No">No</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="numberOfSeats" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Number of Seats *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {[2, 4, 5, 6, 7, 8].map(n => (<SelectItem key={n} value={String(n)}>{n}</SelectItem>))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="numberOfDoors" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Number of Doors *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="2">2</SelectItem>
+                                    <SelectItem value="4">4</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="skiRacks" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Ski Racks *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Yes">Yes</SelectItem>
+                                    <SelectItem value="No">No</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="skiCrossBars" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Ski Cross Bars *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Yes">Yes</SelectItem>
+                                    <SelectItem value="No">No</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="roofRails" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Roof Rails *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Yes">Yes</SelectItem>
+                                    <SelectItem value="No">No</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="lastOilChange" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Last Oil Change *</FormLabel>
+                                <FormControl><Input type="date" {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="oilType" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Oil Type *</FormLabel>
+                                <FormControl><Input {...field} placeholder="e.g., 5W-30" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="freeDealershipOilChanges" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Free Dealership Oil Changes *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {[0, 1, 2, 3, 4, 5].map(n => (<SelectItem key={n} value={String(n)}>{n}</SelectItem>))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="fuelType" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Fuel Type *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Gasoline">Gasoline</SelectItem>
+                                    <SelectItem value="Diesel">Diesel</SelectItem>
+                                    <SelectItem value="Electric">Electric</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="tireSize" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Tire Size *</FormLabel>
+                                <FormControl><Input {...field} placeholder="e.g., 225/45R17" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                        </>
+                      )}
+                      {step.id === 4 && (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="insuranceProvider" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Insurance Provider *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="insurancePhone" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Insurance Phone *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="policyNumber" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Policy # *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="insuranceExpiration" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Expiration *</FormLabel>
+                                <FormControl><Input type="date" {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <FormItem>
+                            <FormLabel className="text-gray-300">Insurance Card *</FormLabel>
+                            <div className="border-2 border-dashed border-[#EAEB80]/30 rounded-lg p-8 text-center">
+                              <p className="text-[#EAEB80] text-sm">Drag & drop files here or click to browse</p>
+                              <p className="text-gray-500 text-xs mt-1">Supports images and PDF files</p>
+                            </div>
+                          </FormItem>
+                        </>
+                      )}
+                      {step.id === 5 && (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="purchasePrice" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Purchase Price *</FormLabel>
+                                <FormControl><Input {...field} placeholder="e.g., 50000" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="interestRate" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Interest Rate *</FormLabel>
+                                <FormControl><Input {...field} placeholder="e.g., 3.5" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="monthlyPayment" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Monthly Payment *</FormLabel>
+                                <FormControl><Input {...field} placeholder="e.g., 750" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="downPayment" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Down Payment *</FormLabel>
+                                <FormControl><Input {...field} placeholder="e.g., 10000" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <FormField control={form.control} name="transportCityToCity" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">Transport vehicle city to city?</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Yes">Yes</SelectItem>
+                                  <SelectItem value="No">No</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                          <FormField control={form.control} name="ultimateGoal" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">What is your ultimate goal? *</FormLabel>
+                              <FormControl><Textarea {...field} placeholder="Tell us about your goals..." className="bg-[#0a0a0a] border-gray-700 resize-none" rows={4} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                        </>
+                      )}
+                      {step.id === 6 && (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="bankName" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Bank Name *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="taxClassification" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Tax Classification *</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Individual">Individual</SelectItem>
+                                    <SelectItem value="Business">Business</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="routingNumber" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Routing Number *</FormLabel>
+                                <FormControl><Input {...field} placeholder="9 digits" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="accountNumber" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Account Number *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <FormField control={form.control} name="ssn" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">SSN *</FormLabel>
+                              <FormControl><Input {...field} placeholder="XXX-XX-XXXX" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                        </>
+                      )}
+                      {step.id === 7 && (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="carManufacturerWebsite" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Car Manufacturer Website *</FormLabel>
+                                <FormControl><Input {...field} placeholder="https://..." className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control} name="carManufacturerUsername" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">Car Manufacturer Username *</FormLabel>
+                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )} />
+                          </div>
+                          <FormField control={form.control} name="password" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-300">Password *</FormLabel>
+                              <FormControl><Input type="password" {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                          <div className="bg-[#0a0a0a] border border-gray-700 rounded p-4">
+                            <p className="text-sm text-gray-400 mb-4">After you submit, we will send the DocuSign agreement to your email</p>
+                            <FormField control={form.control} name="confirmAgreement" render={({ field }) => (
+                              <FormItem className="flex items-center space-x-2">
+                                <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                <FormLabel className="text-gray-300 font-normal">Confirm. Send My Agreement</FormLabel>
+                              </FormItem>
+                            )} />
+                          </div>
+                        </>
+                      )}
+                    </CardContent>
+                  )}
+                </Card>
+              ))}
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-[#EAEB80]/20">
+                <Button
+                  type="button"
+                  onClick={fillWithRandomData}
+                  variant="outline"
+                  className="bg-[#EAEB80]/10 border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/20"
+                  disabled={isSubmitting}
+                  data-testid="button-fill-random"
+                >
+                  Fill Out All Fields With Random Data (For Testing)
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-bold w-full sm:w-auto sm:ml-auto"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                      Submitting...
+                    </>
+                ) : (
+                    <>
+                    Submit
+                    <Check className="ml-2 w-4 h-4" />
+                    </>
+                )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
