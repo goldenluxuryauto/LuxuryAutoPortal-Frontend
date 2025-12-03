@@ -1,9 +1,7 @@
 /**
  * PDF.js Worker Configuration
  * 
- * Uses the worker file from the public directory.
- * This ensures the worker is always loaded from the same origin, avoiding
- * all CORS and MIME type issues with CDN workers.
+ * Uses CDN worker for reliability. The backend worker path can have MIME type issues.
  * 
  * IMPORTANT: This module MUST be imported as a side-effect import:
  *   import "@/lib/pdf-config";
@@ -12,17 +10,17 @@
  * this module and the side effects (worker configuration) won't run.
  */
 
-// Use pdfjs-dist directly to override any CDN defaults
+// Use pdfjs-dist directly
 import * as pdfjs from "pdfjs-dist";
-import { getApiBaseUrl } from "./queryClient";
 
-// Force local worker – this overrides ANY CDN attempt
-const workerSrc = `${getApiBaseUrl()}/pdf.worker.min.js`;
+// Use CDN worker - more reliable than local worker due to MIME type issues
+// Using unpkg CDN which serves correct MIME types
+const workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 // Log the worker source for debugging
 if (typeof window !== "undefined") {
-  console.log("Worker forced to local:", workerSrc);
+  console.log("PDF.js Worker configured:", workerSrc);
 }
 
 // Export the configured pdfjs instance for use in components (if needed)

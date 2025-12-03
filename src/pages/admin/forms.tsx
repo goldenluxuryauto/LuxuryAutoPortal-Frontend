@@ -4,6 +4,9 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import ContractManagement from "./ContractManagement";
+import CarOnboarding from "./CarOnboarding";
+import CarOffboarding from "./CarOffboarding";
 import {
   Dialog,
   DialogContent,
@@ -58,6 +61,7 @@ interface OnboardingSubmission {
   vehicleYear: string;
   vehicleMake: string;
   vehicleModel: string;
+  vinNumber?: string;
   createdAt: string;
   status: string;
   contractStatus?: "pending" | "sent" | "opened" | "signed" | "declined" | null;
@@ -259,7 +263,7 @@ export default function FormsPage() {
   };
 
   const toggleItem = (itemId: string) => {
-    if (itemId === "lyc") {
+    if (itemId === "lyc" || itemId === "contract" || itemId === "car-on" || itemId === "car-off") {
       setExpandedItems(prev =>
         prev.includes(itemId)
           ? prev.filter(id => id !== itemId)
@@ -416,9 +420,9 @@ export default function FormsPage() {
       icon: ClipboardList,
       items: [
         { id: "lyc", title: "Client Onboarding Form LYC", icon: FileText },
-        { id: "contract", title: "Contract / Agreement", icon: FileText, comingSoon: true },
-        { id: "car-on", title: "Car On-boarding", icon: Car, comingSoon: true },
-        { id: "car-off", title: "Car Off-boarding", icon: LogOut, comingSoon: true },
+        { id: "contract", title: "Contract / Agreement", icon: FileText },
+        { id: "car-on", title: "Car On-boarding", icon: Car },
+        { id: "car-off", title: "Car Off-boarding", icon: LogOut },
       ],
     },
   ];
@@ -455,7 +459,7 @@ export default function FormsPage() {
                       {section.items.map((item) => {
                         const ItemIcon = item.icon;
                         const isItemExpanded = expandedItems.includes(item.id);
-                        const canExpand = item.id === "lyc" && !item.comingSoon;
+                        const canExpand = (item.id === "lyc" || item.id === "contract" || item.id === "car-on" || item.id === "car-off") && !item.comingSoon;
 
                         return (
                           <div key={item.id}>
@@ -504,6 +508,27 @@ export default function FormsPage() {
                               )}
                           </button>
 
+                            {/* Expanded content for Contract Management */}
+                            {isItemExpanded && item.id === "contract" && (
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4">
+                                <ContractManagement />
+                              </div>
+                            )}
+
+                            {/* Expanded content for Car On-boarding */}
+                            {isItemExpanded && item.id === "car-on" && (
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4">
+                                <CarOnboarding />
+                              </div>
+                            )}
+
+                            {/* Expanded content for Car Off-boarding */}
+                            {isItemExpanded && item.id === "car-off" && (
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4">
+                                <CarOffboarding />
+                              </div>
+                            )}
+
                             {/* Expanded content for LYC form */}
                             {isItemExpanded && item.id === "lyc" && (
                               <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
@@ -542,9 +567,11 @@ export default function FormsPage() {
                                           <th className="text-left py-3 px-4 text-gray-400 font-medium">Email</th>
                                           <th className="text-left py-3 px-4 text-gray-400 font-medium">Phone</th>
                                           <th className="text-left py-3 px-4 text-gray-400 font-medium">Vehicle</th>
+                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">VIN#</th>
                                           <th className="text-left py-3 px-4 text-gray-400 font-medium">Submitted</th>
                                           <th className="text-left py-3 px-4 text-gray-400 font-medium">Status</th>
                                           <th className="text-left py-3 px-4 text-gray-400 font-medium">Contract</th>
+                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">Car Onboarding Date</th>
                                           <th className="text-left py-3 px-4 text-gray-400 font-medium">Actions</th>
                                         </tr>
                                       </thead>
@@ -560,7 +587,10 @@ export default function FormsPage() {
                                             <td className="py-3 px-4 text-gray-300">{submission.emailOwner}</td>
                                             <td className="py-3 px-4 text-gray-300">{submission.phoneOwner}</td>
                                             <td className="py-3 px-4 text-gray-300">
-                                              {submission.vehicleYear} {submission.vehicleMake} {submission.vehicleModel}
+                                              {submission.vehicleMake} {submission.vehicleModel} {submission.vehicleYear}
+                                            </td>
+                                            <td className="py-3 px-4 text-gray-300 font-mono text-xs">
+                                              {submission.vinNumber || <span className="text-gray-500">N/A</span>}
                                             </td>
                                             <td className="py-3 px-4 text-gray-400">
                                               {new Date(submission.createdAt).toLocaleDateString()}
@@ -638,6 +668,12 @@ export default function FormsPage() {
                                                   </Badge>
                                                 )}
                                               </div>
+                                            </td>
+                                            <td className="py-3 px-4 text-gray-300">
+                                              {submission.contractSignedAt 
+                                                ? new Date(submission.contractSignedAt).toLocaleDateString()
+                                                : <span className="text-gray-500">Not signed</span>
+                                              }
                                             </td>
                                             <td className="py-3 px-4">
                                               <div className="flex items-center gap-2">
