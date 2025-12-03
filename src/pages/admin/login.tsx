@@ -44,17 +44,12 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <span className="text-[#EAEB80] text-xs tracking-[0.3em]">═══</span>
-            <span className="text-xl font-semibold text-[#EAEB80] tracking-wider italic">
-              GOLDEN
-            </span>
-            <span className="text-[#EAEB80] text-xs tracking-[0.3em]">═══</span>
-          </div>
-          <p className="text-[#EAEB80] text-[10px] tracking-[0.35em] uppercase">
-            LUXURY AUTO
-          </p>
-          <p className="text-gray-600 mt-6 text-sm">Admin Portal Login</p>
+          <img 
+            src="/logo.png" 
+            alt="Golden Luxury Auto" 
+            className="h-[240px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_15px_rgba(234,235,128,0.5)]"
+          />
+          <p className="text-gray-400 mt-6 text-sm">Admin Portal Login</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">

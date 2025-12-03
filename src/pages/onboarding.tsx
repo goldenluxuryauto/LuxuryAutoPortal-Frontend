@@ -334,9 +334,13 @@ export default function Onboarding() {
       <Navbar />
       <main className="pt-20 lg:pt-24 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-2">Golden Luxury Auto</h1>
-            <p className="text-gray-400">Client Onboarding Form</p>
+          <div className="mb-8 flex flex-col items-center">
+            <img 
+              src="/logo.png" 
+              alt="Golden Luxury Auto" 
+              className="h-[47px] md:h-[60px] lg:h-[73px] w-auto object-contain mb-4 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
+            />
+            <p className="text-gray-400 text-center">Client Onboarding Form</p>
           </div>
 
           <Form {...form}>

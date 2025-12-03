@@ -21,20 +21,14 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           <Link
             href="/"
-            className="flex items-center gap-3"
+            className="flex items-center"
             data-testid="link-logo"
           >
-            <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center">
-              <Car className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-semibold tracking-tight text-foreground">
-                Luxury Auto
-              </span>
-              <span className="text-xs text-muted-foreground tracking-widest uppercase">
-                Gallery
-              </span>
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Golden Luxury Auto" 
+              className="w-[140px] md:w-[180px] h-auto object-contain drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
+            />
           </Link>
 
           <div className="hidden lg:flex items-center gap-1">

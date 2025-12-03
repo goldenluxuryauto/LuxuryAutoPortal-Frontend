@@ -216,9 +216,11 @@ export default function SignContract() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-[#d4af37] mb-2">
-            Golden Luxury Auto
-          </h1>
+          <img 
+            src="/logo.png" 
+            alt="Golden Luxury Auto" 
+            className="h-[160px] md:h-[200px] w-auto mx-auto object-contain mb-4 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
+          />
           <p className="text-gray-300 text-lg">
             Contract Agreement for {contractData.firstNameOwner} {contractData.lastNameOwner}
           </p>

@@ -34,8 +34,13 @@ export default function AdminDashboard() {
     <AdminLayout>
       <div className="space-y-6">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-2">
-            Welcome to Golden Luxury Auto
+          <img 
+            src="/logo.png" 
+            alt="Golden Luxury Auto" 
+            className="h-[47px] md:h-[60px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
+          />
+          <h1 className="text-2xl font-semibold text-[#EAEB80] mb-2">
+            Welcome to the Portal
           </h1>
           <p className="text-gray-500 text-sm">
             Premium vehicle management portal for tracking clients, vehicles, and revenue.

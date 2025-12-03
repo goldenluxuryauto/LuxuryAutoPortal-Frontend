@@ -25,8 +25,11 @@ import {
   X,
   Send,
   FileCheck,
-  ExternalLink
+  ExternalLink,
+  Download,
+  Share2
 } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -60,6 +63,182 @@ interface OnboardingSubmission {
   contractStatus?: "pending" | "sent" | "opened" | "signed" | "declined" | null;
   contractSignedAt?: string | null;
   [key: string]: any; // For full submission details
+}
+
+// QR Code Section Component
+function QRCodeSection() {
+  const qrRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+  
+  // Get the current URL and remove /admin/forms if present, replace with /onboarding
+  const onboardingUrl = typeof window !== "undefined" 
+    ? `${window.location.origin}/onboarding`
+    : "/onboarding";
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Client Onboarding Form LYC",
+          text: "Fill out the Golden Luxury Auto client onboarding form",
+          url: onboardingUrl,
+        });
+        toast({
+          title: "Shared successfully",
+          description: "The form link has been shared.",
+        });
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          // Copy to clipboard as fallback
+          navigator.clipboard.writeText(onboardingUrl);
+          toast({
+            title: "Link copied",
+            description: "Onboarding form URL copied to clipboard.",
+          });
+        }
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(onboardingUrl);
+      toast({
+        title: "Link copied",
+        description: "Onboarding form URL copied to clipboard.",
+      });
+    }
+  };
+
+  const handleDownloadQR = () => {
+    if (!qrRef.current) return;
+    
+    const svgElement = qrRef.current.querySelector("svg");
+    if (!svgElement) return;
+
+    try {
+      // Convert SVG to canvas then to PNG
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      
+      const img = new Image();
+      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(svgBlob);
+      
+      img.onload = () => {
+        // Higher resolution for better quality
+        const scale = 2;
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        
+        // Fill with white background
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw the QR code
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // Convert to blob and download
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const downloadUrl = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = "Golden-Luxury-Auto-Onboarding-QR.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(downloadUrl);
+            
+            toast({
+              title: "QR Code downloaded",
+              description: "The QR code has been saved to your downloads.",
+            });
+          }
+          URL.revokeObjectURL(url);
+        }, "image/png");
+      };
+      
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        toast({
+          title: "Download failed",
+          description: "Failed to generate QR code image.",
+          variant: "destructive",
+        });
+      };
+      
+      img.src = url;
+    } catch (error) {
+      console.error("Error downloading QR code:", error);
+      toast({
+        title: "Download failed",
+        description: "An error occurred while downloading the QR code.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <Card className="bg-[#0a0a0a] border-[#EAEB80]/30 border-2">
+      <CardContent className="p-6">
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Left side: Title, subtitle, and QR code */}
+          <div className="flex-1 flex flex-col items-center lg:items-start">
+            <div className="mb-4 text-center lg:text-left">
+              <h2 className="text-xl font-semibold text-[#EAEB80] mb-2">
+                Client Onboarding Form LYC
+              </h2>
+              <p className="text-sm text-gray-400">
+                Fill out for new clients or share the QR code for them to complete
+              </p>
+            </div>
+            
+            {/* QR Code */}
+            <div 
+              ref={qrRef}
+              className="bg-white p-4 rounded-lg shadow-lg mb-4"
+            >
+              <QRCodeSVG
+                value={onboardingUrl}
+                size={200}
+                level="H"
+                includeMargin={false}
+              />
+            </div>
+            
+            {/* Download Button */}
+            <Button
+              onClick={handleDownloadQR}
+              variant="outline"
+              className="w-full lg:w-auto border-[#EAEB80]/50 text-[#EAEB80] hover:bg-[#EAEB80]/10 hover:border-[#EAEB80]"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download QR Code
+            </Button>
+          </div>
+
+          {/* Right side: Share section */}
+          <div className="flex-1 flex flex-col justify-center items-center lg:items-start">
+            <div className="mb-4">
+              <h3 className="text-lg font-medium text-white mb-2">
+                Share with New Clients
+              </h3>
+              <p className="text-sm text-gray-400 mb-4">
+                Send the onboarding form link directly to your clients via email, SMS, or messaging apps.
+              </p>
+              <Button
+                onClick={handleShare}
+                className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium w-full lg:w-auto"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share with Client
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function FormsPage() {
@@ -247,11 +426,6 @@ export default function FormsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-white mb-1">Forms</h1>
-          <p className="text-gray-500 text-sm">Manage client and vehicle forms</p>
-        </div>
-
         <Card className="bg-[#111111] border-[#EAEB80]/20">
           <CardContent className="p-0">
             {formSections.map((section) => {
@@ -265,10 +439,10 @@ export default function FormsPage() {
                     className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#1a1a1a] transition-colors"
                     data-testid={`button-section-${section.id}`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
                       <SectionIcon className="w-5 h-5 text-[#EAEB80]" />
                       <span className="text-white font-medium">{section.title}</span>
-                    </div>
+                    </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
                     {isExpanded ? (
                       <ChevronDown className="w-5 h-5 text-gray-400" />
                     ) : (
@@ -332,7 +506,10 @@ export default function FormsPage() {
 
                             {/* Expanded content for LYC form */}
                             {isItemExpanded && item.id === "lyc" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4">
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
+                                {/* QR Code Section */}
+                                <QRCodeSection />
+                                
                                 <div className="mb-4">
                                   <h3 className="text-sm font-medium text-white mb-3">Recent Submissions</h3>
                                   <div className="relative">
@@ -526,147 +703,369 @@ export default function FormsPage() {
 
       {/* Submission Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#1a1a1a] text-white">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
           <DialogHeader>
-            <DialogTitle className="text-white">Submission Details</DialogTitle>
+            <DialogTitle className="text-white text-2xl">Complete Submission Details</DialogTitle>
             <DialogDescription className="text-gray-400">
-              Full onboarding form submission information
+              Full onboarding form submission information - All data from database
             </DialogDescription>
           </DialogHeader>
           
           {submissionDetails?.data ? (
             <div className="space-y-6 mt-4">
-              {/* Owner Information */}
-              <div>
-                <h3 className="text-lg font-semibold text-[#EAEB80] mb-3">Owner Information</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-400">Name:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.firstNameOwner} {submissionDetails.data.lastNameOwner}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Email:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.emailOwner}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Phone:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.phoneOwner}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Birthday:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.birthday}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">T-Shirt Size:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.tshirtSize}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Representative:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.representative}</span>
-                  </div>
-                </div>
-              </div>
+              {/* Helper function to display value or "Not provided" */}
+              {(() => {
+                const formatValue = (value: any): string => {
+                  if (value === null || value === undefined || value === "") return "Not provided";
+                  return String(value);
+                };
+                
+                const formatDate = (dateStr: string | null | undefined): string => {
+                  if (!dateStr) return "Not provided";
+                  try {
+                    return new Date(dateStr).toLocaleString();
+                  } catch {
+                    return String(dateStr);
+                  }
+                };
+                
+                const formatCurrency = (value: string | null): string => {
+                  if (!value) return "Not provided";
+                  const num = parseFloat(value);
+                  if (isNaN(num)) return value;
+                  return `$${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                };
+                
+                const data = submissionDetails.data;
+                
+                return (
+                  <>
+                    {/* Personal Information */}
+                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                        Personal Information
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-400 block mb-1">Full Name:</span>
+                          <span className="text-white font-medium">{formatValue(data.firstNameOwner)} {formatValue(data.lastNameOwner)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Email:</span>
+                          <span className="text-white">{formatValue(data.emailOwner)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Phone:</span>
+                          <span className="text-white">{formatValue(data.phoneOwner)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Date of Birth:</span>
+                          <span className="text-white">{formatValue(data.birthday)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">T-Shirt Size:</span>
+                          <span className="text-white">{formatValue(data.tshirtSize)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">SSN (Last 4):</span>
+                          <span className="text-white">{formatValue(data.ssn) ? data.ssn?.slice(-4) || "Not provided" : "Not provided"}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Representative:</span>
+                          <span className="text-white">{formatValue(data.representative)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">How Did You Hear About Us:</span>
+                          <span className="text-white">{formatValue(data.heardAboutUs)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Emergency Contact Name:</span>
+                          <span className="text-white">{formatValue(data.emergencyContactName)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Emergency Contact Phone:</span>
+                          <span className="text-white">{formatValue(data.emergencyContactPhone)}</span>
+                        </div>
+                      </div>
+                    </div>
 
-              {/* Address */}
-              <div>
-                <h3 className="text-lg font-semibold text-[#EAEB80] mb-3">Address</h3>
-                <div className="text-sm text-white">
-                  {submissionDetails.data.streetAddress}<br />
-                  {submissionDetails.data.city}, {submissionDetails.data.state} {submissionDetails.data.zipCode}
-                </div>
-              </div>
+                    {/* Address Information */}
+                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                        Address Information
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="md:col-span-2">
+                          <span className="text-gray-400 block mb-1">Street Address:</span>
+                          <span className="text-white">{formatValue(data.streetAddress)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">City:</span>
+                          <span className="text-white">{formatValue(data.city)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">State:</span>
+                          <span className="text-white">{formatValue(data.state)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Zip Code:</span>
+                          <span className="text-white">{formatValue(data.zipCode)}</span>
+                        </div>
+                      </div>
+                    </div>
 
-              {/* Vehicle Information */}
-              <div>
-                <h3 className="text-lg font-semibold text-[#EAEB80] mb-3">Vehicle Information</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-400">Year:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.vehicleYear}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Make:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.vehicleMake}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Model:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.vehicleModel}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Trim:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.vehicleTrim}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">VIN:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.vinNumber}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">License Plate:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.licensePlate}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Miles:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.vehicleMiles}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Exterior Color:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.exteriorColor}</span>
-                  </div>
-                </div>
-              </div>
+                    {/* Vehicle Information */}
+                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                        Vehicle Information
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-400 block mb-1">Year:</span>
+                          <span className="text-white">{formatValue(data.vehicleYear)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Make:</span>
+                          <span className="text-white">{formatValue(data.vehicleMake)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Model:</span>
+                          <span className="text-white">{formatValue(data.vehicleModel)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Trim:</span>
+                          <span className="text-white">{formatValue(data.vehicleTrim)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">VIN Number:</span>
+                          <span className="text-white font-mono text-xs">{formatValue(data.vinNumber)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">License Plate:</span>
+                          <span className="text-white">{formatValue(data.licensePlate)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Mileage:</span>
+                          <span className="text-white">{formatValue(data.vehicleMiles)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Exterior Color:</span>
+                          <span className="text-white">{formatValue(data.exteriorColor)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Interior Color:</span>
+                          <span className="text-white">{formatValue(data.interiorColor)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Title Type:</span>
+                          <span className="text-white">{formatValue(data.titleType)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Registration Expiration:</span>
+                          <span className="text-white">{formatValue(data.registrationExpiration)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Fuel Type:</span>
+                          <span className="text-white">{formatValue(data.fuelType)}</span>
+                        </div>
+                      </div>
+                    </div>
 
-              {/* Financial Information */}
-              <div>
-                <h3 className="text-lg font-semibold text-[#EAEB80] mb-3">Financial Information</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-400">Purchase Price:</span>
-                    <span className="ml-2 text-white">${submissionDetails.data.purchasePrice}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Monthly Payment:</span>
-                    <span className="ml-2 text-white">${submissionDetails.data.monthlyPayment}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Down Payment:</span>
-                    <span className="ml-2 text-white">${submissionDetails.data.downPayment}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Interest Rate:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.interestRate}%</span>
-                  </div>
-                </div>
-              </div>
+                    {/* Financial Information */}
+                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                        Financial Information
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-400 block mb-1">Purchase Price:</span>
+                          <span className="text-white font-medium">{formatCurrency(data.purchasePrice)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Down Payment:</span>
+                          <span className="text-white font-medium">{formatCurrency(data.downPayment)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Monthly Payment:</span>
+                          <span className="text-white font-medium">{formatCurrency(data.monthlyPayment)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Interest Rate:</span>
+                          <span className="text-white">{formatValue(data.interestRate)}%</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Transport City to City:</span>
+                          <span className="text-white">{formatValue(data.transportCityToCity)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Ultimate Goal:</span>
+                          <span className="text-white">{formatValue(data.ultimateGoal)}</span>
+                        </div>
+                      </div>
+                    </div>
 
-              {/* Banking Information */}
-              <div>
-                <h3 className="text-lg font-semibold text-[#EAEB80] mb-3">Banking Information</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-400">Bank Name:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.bankName}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Tax Classification:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.taxClassification}</span>
-                  </div>
-                </div>
-              </div>
+                    {/* Banking Information */}
+                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                        Banking Information
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-400 block mb-1">Bank Name:</span>
+                          <span className="text-white">{formatValue(data.bankName)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Tax Classification:</span>
+                          <span className="text-white">{formatValue(data.taxClassification)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Routing Number:</span>
+                          <span className="text-white font-mono">{formatValue(data.routingNumber)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Account Number:</span>
+                          <span className="text-white font-mono">{formatValue(data.accountNumber)}</span>
+                        </div>
+                        {data.businessName && (
+                          <div>
+                            <span className="text-gray-400 block mb-1">Business Name:</span>
+                            <span className="text-white">{formatValue(data.businessName)}</span>
+                          </div>
+                        )}
+                        {data.ein && (
+                          <div>
+                            <span className="text-gray-400 block mb-1">EIN:</span>
+                            <span className="text-white font-mono">{formatValue(data.ein)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
-              {/* Insurance Information */}
-              <div>
-                <h3 className="text-lg font-semibold text-[#EAEB80] mb-3">Insurance Information</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-400">Provider:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.insuranceProvider}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Policy Number:</span>
-                    <span className="ml-2 text-white">{submissionDetails.data.policyNumber}</span>
-                  </div>
-                </div>
-              </div>
+                    {/* Insurance Information */}
+                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                        Insurance Information
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-400 block mb-1">Provider:</span>
+                          <span className="text-white">{formatValue(data.insuranceProvider)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Policy Number:</span>
+                          <span className="text-white">{formatValue(data.policyNumber)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Insurance Phone:</span>
+                          <span className="text-white">{formatValue(data.insurancePhone)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Insurance Expiration:</span>
+                          <span className="text-white">{formatValue(data.insuranceExpiration)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Contract Status */}
+                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                        Contract Status & Details
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-400 block mb-1">Contract Status:</span>
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "mt-1",
+                              data.contractStatus === "signed"
+                                ? "border-green-500/50 text-green-400 bg-green-500/10"
+                                : data.contractStatus === "sent"
+                                ? "border-blue-500/50 text-blue-400 bg-blue-500/10"
+                                : data.contractStatus === "opened"
+                                ? "border-yellow-500/50 text-yellow-400 bg-yellow-500/10"
+                                : data.contractStatus === "declined"
+                                ? "border-red-500/50 text-red-400 bg-red-500/10"
+                                : "border-gray-500/50 text-gray-400 bg-gray-500/10"
+                            )}
+                          >
+                            {formatValue(data.contractStatus || "Not sent")}
+                          </Badge>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Contract Token:</span>
+                          <span className="text-white font-mono text-xs break-all">{formatValue(data.contractToken)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Contract Sent At:</span>
+                          <span className="text-white">{formatDate(data.contractSentAt)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Contract Signed At:</span>
+                          <span className="text-white">{formatDate(data.contractSignedAt)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Reminder Count:</span>
+                          <span className="text-white font-medium">{data.reminderCount || 0} / 3</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Last Reminder Sent:</span>
+                          <span className="text-white">{formatDate(data.lastReminderSentAt)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Next Reminder Due:</span>
+                          <span className="text-white">{formatDate(data.nextReminderDueAt)}</span>
+                        </div>
+                        {data.contractStatus === "signed" && (
+                          <div className="md:col-span-2">
+                            <Button
+                              onClick={() => {
+                                window.open(buildApiUrl(`/signed-contracts/submission_${data.id}.pdf`), "_blank");
+                              }}
+                              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              Download Signed PDF
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Signature Image */}
+                      {data.contractStatus === "signed" && data.signatureData && (
+                        <div className="mt-4 pt-4 border-t border-[#EAEB80]/30">
+                          <span className="text-gray-400 block mb-2">Digital Signature:</span>
+                          <div className="bg-white p-4 rounded border border-[#EAEB80]/30">
+                            <img 
+                              src={data.signatureData} 
+                              alt="Client Signature" 
+                              className="max-w-full h-auto"
+                              style={{ maxHeight: "200px" }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Timestamps */}
+                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                        Timestamps
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-400 block mb-1">Created At:</span>
+                          <span className="text-white">{formatDate(data.createdAt)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">Last Updated:</span>
+                          <span className="text-white">{formatDate(data.updatedAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           ) : (
             <div className="flex items-center justify-center py-8">

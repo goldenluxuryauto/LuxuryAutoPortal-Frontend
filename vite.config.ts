@@ -17,6 +17,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  optimizeDeps: {
+    include: ["qrcode.react"],
+  },
   css: {
     postcss: "./postcss.config.cjs",
   },

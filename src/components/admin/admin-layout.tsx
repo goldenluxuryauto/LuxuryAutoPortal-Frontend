@@ -82,27 +82,14 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       )}>
         <div className="flex items-center justify-between h-16 px-4 border-b border-[#1a1a1a]">
           <Link href="/admin" className="flex items-center gap-2">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1">
-                <span className="text-[10px] text-[#EAEB80] tracking-[0.3em] font-light">
-                  ═══
-                </span>
-                <span className={cn(
-                  "font-semibold text-[#EAEB80] tracking-wider text-sm italic",
-                  !sidebarOpen && "hidden"
-                )}>
-                  GOLDEN
-                </span>
-                <span className="text-[10px] text-[#EAEB80] tracking-[0.3em] font-light">
-                  ═══
-                </span>
-              </div>
-              {sidebarOpen && (
-                <span className="text-[10px] text-[#EAEB80] tracking-[0.25em] text-center">
-                  LUXURY AUTO
-                </span>
+            <img 
+              src="/logo.png" 
+              alt="Golden Luxury Auto" 
+              className={cn(
+                "object-contain transition-all duration-300 drop-shadow-[0_0_8px_rgba(234,235,128,0.3)]",
+                sidebarOpen ? "w-[180px] md:w-[200px]" : "w-[40px]"
               )}
-            </div>
+            />
           </Link>
           <button
             onClick={() => setMobileMenuOpen(false)}
