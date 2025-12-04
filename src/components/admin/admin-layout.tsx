@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { 
@@ -19,7 +19,8 @@ import {
   Star,
   LogOut,
   Menu,
-  X
+  X,
+  User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -29,23 +30,32 @@ interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-const sidebarItems = [
+interface SidebarItem {
+  href: string;
+  label: string;
+  icon: any;
+  badge?: number;
+  roles?: ("admin" | "client" | "employee")[];
+}
+
+const allSidebarItems: SidebarItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/admins", label: "Admins", icon: Users },
-  { href: "/admin/clients", label: "Clients", icon: Users },
+  { href: "/admin/admins", label: "Admins", icon: Users, roles: ["admin"] },
+  { href: "/admin/clients", label: "Clients", icon: Users, roles: ["admin"] },
   { href: "/admin/cars", label: "Cars", icon: Car },
-  { href: "/admin/income-expenses", label: "Income and Expenses", icon: DollarSign },
-  { href: "/admin/payments", label: "Client Payments", icon: CreditCard },
+  { href: "/admin/profile", label: "Profile", icon: User, roles: ["client"] },
+  { href: "/admin/income-expenses", label: "Income and Expenses", icon: DollarSign, roles: ["admin"] },
+  { href: "/admin/payments", label: "Client Payments", icon: CreditCard, roles: ["admin"] },
   { href: "/admin/totals", label: "Totals", icon: Calculator },
   { href: "/admin/earnings", label: "Earnings Calculator", icon: Calculator },
   { href: "/admin/maintenance", label: "Car Maintenance", icon: Wrench },
   { href: "/admin/forms", label: "Forms", icon: ClipboardList, badge: 105 },
-  { href: "/admin/view-client", label: "View as a Client", icon: Eye },
-  { href: "/admin/view-employee", label: "View as an Employee", icon: Eye },
-  { href: "/admin/car-rental", label: "Car Rental", icon: Key },
-  { href: "/admin/hr", label: "Human Resources", icon: Briefcase },
-  { href: "/admin/payroll", label: "Payroll", icon: DollarSign },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/view-client", label: "View as a Client", icon: Eye, roles: ["admin"] },
+  { href: "/admin/view-employee", label: "View as an Employee", icon: Eye, roles: ["admin"] },
+  { href: "/admin/car-rental", label: "Car Rental", icon: Key, roles: ["admin"] },
+  { href: "/admin/hr", label: "Human Resources", icon: Briefcase, roles: ["admin"] },
+  { href: "/admin/payroll", label: "Payroll", icon: DollarSign, roles: ["admin"] },
+  { href: "/admin/settings", label: "Settings", icon: Settings, roles: ["admin"] },
   { href: "/admin/turo-guide", label: "Turo Guide", icon: BookOpen },
   { href: "/admin/training-manual", label: "Training Manual", icon: GraduationCap },
   { href: "/admin/testimonials", label: "Client Testimonials", icon: Star },
@@ -62,6 +72,23 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   });
 
   const user = data?.user;
+
+  // Filter sidebar items based on user role
+  const sidebarItems = useMemo(() => {
+    if (!user) return [];
+
+    const userRole = user.isAdmin ? "admin" : user.isClient ? "client" : user.isEmployee ? "employee" : null;
+    
+    return allSidebarItems.filter((item) => {
+      // If no roles specified, show to all
+      if (!item.roles || item.roles.length === 0) {
+        return true;
+      }
+      
+      // If roles specified, check if user's role is included
+      return userRole && item.roles.includes(userRole);
+    });
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -165,7 +192,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           <div className="flex items-center gap-4">
             {user && (
               <span className="text-sm text-gray-400">
-                {user.firstName} {user.lastName}
+                {user.firstName} {user.lastName} ({user.roleName})
               </span>
             )}
           </div>

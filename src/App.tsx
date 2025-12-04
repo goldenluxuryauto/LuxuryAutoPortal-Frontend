@@ -13,7 +13,10 @@ import AdminDashboard from "@/pages/admin/dashboard";
 import AdminsPage from "@/pages/admin/admins";
 import ClientsPage from "@/pages/admin/clients";
 import FormsPage from "@/pages/admin/forms";
+import ProfilePage from "@/pages/admin/profile";
+import CarsPage from "@/pages/admin/cars";
 import SignContract from "@/pages/sign-contract";
+import Signup from "@/pages/signup";
 
 function Router() {
   return (
@@ -23,11 +26,14 @@ function Router() {
       <Route path="/onboarding" component={Onboarding} />
       <Route path="/contact" component={Contact} />
       <Route path="/sign-contract/:token" component={SignContract} />
+      <Route path="/signup" component={Signup} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/admins" component={AdminsPage} />
       <Route path="/admin/clients" component={ClientsPage} />
       <Route path="/admin/forms" component={FormsPage} />
+      <Route path="/admin/profile" component={ProfilePage} />
+      <Route path="/admin/cars" component={CarsPage} />
       <Route component={NotFound} />
     </Switch>
   );

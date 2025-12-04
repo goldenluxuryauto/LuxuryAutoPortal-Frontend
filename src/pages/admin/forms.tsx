@@ -43,6 +43,7 @@ interface FormItem {
   title: string;
   icon: any;
   comingSoon?: boolean;
+  externalUrl?: string | null;
 }
 
 interface FormSection {
@@ -254,6 +255,26 @@ export default function FormsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fetch form visibility for current user's role
+  const { data: formVisibilityData } = useQuery<{
+    roleId: number;
+    roleName: string;
+    isAdmin: boolean;
+    isEmployee: boolean;
+    isClient: boolean;
+    formVisibility: Record<string, { isVisible: boolean; externalUrl?: string | null }>;
+  }>({
+    queryKey: ["/api/admin/form-visibility"],
+    queryFn: async () => {
+      const response = await fetch(buildApiUrl("/api/admin/form-visibility"), {
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Failed to fetch form visibility");
+      return response.json();
+    },
+    retry: false,
+  });
+
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => 
       prev.includes(sectionId) 
@@ -413,19 +434,66 @@ export default function FormsPage() {
     updateStatusMutation.mutate({ id, status: "rejected" });
   };
 
-  const formSections: FormSection[] = [
+  // Filter form items based on visibility
+  const getFormSections = (): FormSection[] => {
+    const allItems: FormItem[] = [
+      { id: "lyc", title: "Client Onboarding Form LYC", icon: FileText },
+      { id: "contract", title: "Contract / Agreement", icon: FileText },
+      { id: "car-on", title: "Car On-boarding", icon: Car },
+      { id: "car-off", title: "Car Off-boarding", icon: LogOut },
+    ];
+
+    // If admin, show all forms
+    if (formVisibilityData?.isAdmin) {
+      return [
     {
       id: "client-onboarding",
       title: "Client Onboarding Form",
       icon: ClipboardList,
-      items: [
-        { id: "lyc", title: "Client Onboarding Form LYC", icon: FileText },
-        { id: "contract", title: "Contract / Agreement", icon: FileText },
-        { id: "car-on", title: "Car On-boarding", icon: Car },
-        { id: "car-off", title: "Car Off-boarding", icon: LogOut },
-      ],
-    },
-  ];
+          items: allItems,
+        },
+      ];
+    }
+
+    // For non-admin roles, filter based on form visibility
+    const visibleItems: FormItem[] = allItems
+      .map((item) => {
+        // Map form IDs to form names in database
+        const formNameMap: Record<string, string> = {
+          lyc: "Client Onboarding Form LYC",
+          contract: "Contract / Agreement",
+          "car-on": "Car On-boarding",
+          "car-off": "Car Off-boarding",
+        };
+
+        const formName = formNameMap[item.id];
+        if (!formName) return null;
+
+        // Check visibility
+        const visibility = formVisibilityData?.formVisibility?.[formName];
+        if (!visibility || !visibility.isVisible) {
+          return null; // Hide form
+        }
+
+        // Add external URL if available
+        return {
+          ...item,
+          externalUrl: visibility.externalUrl ?? null,
+        } as FormItem;
+      })
+      .filter((item): item is FormItem => item !== null);
+
+    return [
+      {
+        id: "client-onboarding",
+        title: "Client Onboarding Form",
+        icon: ClipboardList,
+        items: visibleItems,
+      },
+    ];
+  };
+
+  const formSections = getFormSections();
 
   return (
     <AdminLayout>
@@ -463,6 +531,29 @@ export default function FormsPage() {
 
                         return (
                           <div key={item.id}>
+                          {item.externalUrl ? (
+                            // External link - redirect for clients
+                            <a
+                              href={item.externalUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={cn(
+                                "w-full flex items-center justify-between px-5 py-3.5 transition-colors border-t border-[#1a1a1a]",
+                                "hover:bg-[#1a1a1a] cursor-pointer"
+                              )}
+                              data-testid={`button-form-${item.id}`}
+                            >
+                              <div className="flex items-center gap-3 pl-6">
+                                <ItemIcon className="w-4 h-4 text-[#EAEB80]" />
+                                <span className="text-sm text-[#EAEB80]">
+                                  {item.title}
+                                </span>
+                                <ExternalLink className="w-3 h-3 text-gray-500 ml-1" />
+                              </div>
+                              <ChevronRight className="w-4 h-4 text-gray-500" />
+                            </a>
+                          ) : (
+                            // Internal form - expandable
                           <button
                             className={cn(
                               "w-full flex items-center justify-between px-5 py-3.5 transition-colors border-t border-[#1a1a1a]",
@@ -507,6 +598,7 @@ export default function FormsPage() {
                             )} />
                               )}
                           </button>
+                          )}
 
                             {/* Expanded content for Contract Management */}
                             {isItemExpanded && item.id === "contract" && (

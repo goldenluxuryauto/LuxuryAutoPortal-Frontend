@@ -2,11 +2,24 @@ import { useQuery } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Car, Users, DollarSign, TrendingUp, Mail, Phone, Clock, MessageCircle, CheckCircle } from "lucide-react";
+import QuickLinks from "@/components/admin/QuickLinks";
 
 export default function AdminDashboard() {
+  // Fetch user role information
+  const { data: userData } = useQuery({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
+
+  const user = userData?.user;
+  const isAdmin = user?.isAdmin || false;
+  const isClient = user?.isClient || false;
+  const isEmployee = user?.isEmployee || false;
+
   const { data: stats, isLoading } = useQuery({
     queryKey: ["/api/admin/dashboard"],
     retry: false,
+    enabled: !!user, // Only fetch if user is authenticated
   });
 
   const quickStartSteps = [
@@ -30,6 +43,32 @@ export default function AdminDashboard() {
     chat: "Live chat available",
   };
 
+  // Role-specific welcome messages
+  const getWelcomeMessage = () => {
+    if (isAdmin) {
+      return {
+        title: "Welcome to the Admin Portal",
+        description: "Premium vehicle management portal for tracking clients, vehicles, and revenue.",
+      };
+    } else if (isClient) {
+      return {
+        title: "Welcome to Your Dashboard",
+        description: "Manage your vehicles, view your account information, and access your resources.",
+      };
+    } else if (isEmployee) {
+      return {
+        title: "Welcome to the Employee Portal",
+        description: "Access your assigned tasks and resources.",
+      };
+    }
+    return {
+      title: "Welcome to the Portal",
+      description: "Premium vehicle management portal.",
+    };
+  };
+
+  const welcome = getWelcomeMessage();
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -40,77 +79,164 @@ export default function AdminDashboard() {
             className="h-[47px] md:h-[60px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
           />
           <h1 className="text-2xl font-semibold text-[#EAEB80] mb-2">
-            Welcome to the Portal
+            {welcome.title}
           </h1>
           <p className="text-gray-500 text-sm">
-            Premium vehicle management portal for tracking clients, vehicles, and revenue.
+            {welcome.description}
           </p>
+          {user && (
+            <p className="text-gray-600 text-xs mt-2">
+              Logged in as {user.firstName} {user.lastName} ({user.roleName})
+            </p>
+          )}
         </div>
 
+        {/* Role-based stats cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <Car className="w-4 h-4 text-[#EAEB80]" />
-                <span className="text-sm text-gray-400">Active Vehicles</span>
-              </div>
-              <p className="text-3xl font-bold text-white" data-testid="stat-vehicles">
-                {isLoading ? "..." : stats?.activeVehicles || 24}
-              </p>
-            </CardContent>
-          </Card>
+          {/* Show all stats for admins */}
+          {isAdmin && (
+            <>
+              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Car className="w-4 h-4 text-[#EAEB80]" />
+                    <span className="text-sm text-gray-400">Active Vehicles</span>
+                  </div>
+                  <p className="text-3xl font-bold text-white" data-testid="stat-vehicles">
+                    {isLoading ? "..." : stats?.activeVehicles || 24}
+                  </p>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <Users className="w-4 h-4 text-[#EAEB80]" />
-                <span className="text-sm text-gray-400">Total Clients</span>
-              </div>
-              <p className="text-3xl font-bold text-white" data-testid="stat-clients">
-                {isLoading ? "..." : stats?.totalClients || 18}
-              </p>
-            </CardContent>
-          </Card>
+              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="w-4 h-4 text-[#EAEB80]" />
+                    <span className="text-sm text-gray-400">Total Clients</span>
+                  </div>
+                  <p className="text-3xl font-bold text-white" data-testid="stat-clients">
+                    {isLoading ? "..." : stats?.totalClients || 18}
+                  </p>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <DollarSign className="w-4 h-4 text-[#EAEB80]" />
-                <span className="text-sm text-gray-400">Monthly Revenue</span>
-              </div>
-              <p className="text-3xl font-bold text-white" data-testid="stat-revenue">
-                ${isLoading ? "..." : ((stats?.monthlyRevenue || 42500) / 1000).toFixed(1)}K
-              </p>
-            </CardContent>
-          </Card>
+              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <DollarSign className="w-4 h-4 text-[#EAEB80]" />
+                    <span className="text-sm text-gray-400">Monthly Revenue</span>
+                  </div>
+                  <p className="text-3xl font-bold text-white" data-testid="stat-revenue">
+                    ${isLoading ? "..." : ((stats?.monthlyRevenue || 42500) / 1000).toFixed(1)}K
+                  </p>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="w-4 h-4 text-[#EAEB80]" />
-                <span className="text-sm text-gray-400">Growth Rate</span>
-              </div>
-              <p className="text-3xl font-bold text-[#EAEB80]" data-testid="stat-growth">
-                +{isLoading ? "..." : stats?.growthRate || 23}%
-              </p>
-            </CardContent>
-          </Card>
+              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp className="w-4 h-4 text-[#EAEB80]" />
+                    <span className="text-sm text-gray-400">Growth Rate</span>
+                  </div>
+                  <p className="text-3xl font-bold text-[#EAEB80]" data-testid="stat-growth">
+                    +{isLoading ? "..." : stats?.growthRate || 23}%
+                  </p>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {/* Show limited stats for clients */}
+          {isClient && (
+            <>
+              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Car className="w-4 h-4 text-[#EAEB80]" />
+                    <span className="text-sm text-gray-400">My Vehicles</span>
+                  </div>
+                  <p className="text-3xl font-bold text-white" data-testid="stat-vehicles">
+                    {isLoading ? "..." : stats?.activeVehicles || 0}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <DollarSign className="w-4 h-4 text-[#EAEB80]" />
+                    <span className="text-sm text-gray-400">My Earnings</span>
+                  </div>
+                  <p className="text-3xl font-bold text-white" data-testid="stat-revenue">
+                    ${isLoading ? "..." : ((stats?.monthlyRevenue || 0) / 1000).toFixed(1)}K
+                  </p>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {/* Show limited stats for employees */}
+          {isEmployee && !isAdmin && !isClient && (
+            <>
+              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Car className="w-4 h-4 text-[#EAEB80]" />
+                    <span className="text-sm text-gray-400">Assigned Vehicles</span>
+                  </div>
+                  <p className="text-3xl font-bold text-white" data-testid="stat-vehicles">
+                    {isLoading ? "..." : stats?.activeVehicles || 0}
+                  </p>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card className="bg-[#111111] border-[#EAEB80]/20">
-            <CardContent className="p-5">
-              <h3 className="text-base font-semibold text-white mb-4">Quick Start</h3>
-              <ol className="space-y-3">
-                {quickStartSteps.map((step, index) => (
-                  <li key={index} className="flex items-start gap-3 text-sm text-gray-400">
-                    <span className="text-[#EAEB80] font-medium">{index + 1}.</span>
-                    <span>{step}</span>
+          {/* Show Quick Start only for admins */}
+          {isAdmin && (
+            <Card className="bg-[#111111] border-[#EAEB80]/20">
+              <CardContent className="p-5">
+                <h3 className="text-base font-semibold text-white mb-4">Quick Start</h3>
+                <ol className="space-y-3">
+                  {quickStartSteps.map((step, index) => (
+                    <li key={index} className="flex items-start gap-3 text-sm text-gray-400">
+                      <span className="text-[#EAEB80] font-medium">{index + 1}.</span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Show Quick Start for clients with different steps */}
+          {isClient && (
+            <Card className="bg-[#111111] border-[#EAEB80]/20">
+              <CardContent className="p-5">
+                <h3 className="text-base font-semibold text-white mb-4">Quick Start</h3>
+                <ol className="space-y-3">
+                  <li className="flex items-start gap-3 text-sm text-gray-400">
+                    <span className="text-[#EAEB80] font-medium">1.</span>
+                    <span>View your vehicles in the Cars section</span>
                   </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
+                  <li className="flex items-start gap-3 text-sm text-gray-400">
+                    <span className="text-[#EAEB80] font-medium">2.</span>
+                    <span>Check your earnings and totals</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-gray-400">
+                    <span className="text-[#EAEB80] font-medium">3.</span>
+                    <span>Access forms and resources</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-gray-400">
+                    <span className="text-[#EAEB80] font-medium">4.</span>
+                    <span>Update your profile information</span>
+                  </li>
+                </ol>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="bg-[#111111] border-[#EAEB80]/20">
             <CardContent className="p-5">
@@ -149,6 +275,12 @@ export default function AdminDashboard() {
               </ul>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Quick Links */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-white">Quick Links</h2>
+          <QuickLinks />
         </div>
       </div>
     </AdminLayout>
