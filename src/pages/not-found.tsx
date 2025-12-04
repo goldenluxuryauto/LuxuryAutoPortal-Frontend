@@ -1,19 +1,35 @@
 import { useLocation } from "wouter";
 import { ArrowLeft, Construction } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 import SignContract from "@/pages/sign-contract";
+import { useEffect, useRef } from "react";
 
 export default function NotFound() {
   const [location, setLocation] = useLocation();
-  const [canGoBack, setCanGoBack] = useState(false);
+  const previousLocationRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Check if there's history to go back to
-    // If the referrer exists and is from the same origin, we can go back
+    // Store the referrer (previous page) when component mounts
     const referrer = document.referrer;
-    const sameOrigin = referrer && new URL(referrer).origin === window.location.origin;
-    setCanGoBack(sameOrigin && window.history.length > 1);
+    if (referrer) {
+      try {
+        const referrerUrl = new URL(referrer);
+        const currentUrl = new URL(window.location.href);
+        
+        // Only store if referrer is from the same origin
+        if (referrerUrl.origin === currentUrl.origin) {
+          previousLocationRef.current = referrerUrl.pathname + referrerUrl.search;
+        }
+      } catch (e) {
+        // Invalid URL, ignore
+      }
+    }
+    
+    // Also try to get from sessionStorage (set by router or other components)
+    const storedPrevious = sessionStorage.getItem("previousLocation");
+    if (storedPrevious && !previousLocationRef.current) {
+      previousLocationRef.current = storedPrevious;
+    }
   }, []);
 
   // Check if this is actually a sign-contract route
@@ -23,9 +39,18 @@ export default function NotFound() {
   }
 
   const handleBack = () => {
-    if (canGoBack && window.history.length > 1) {
+    // Priority 1: Use stored previous location from referrer (most reliable)
+    if (previousLocationRef.current && previousLocationRef.current !== location) {
+      setLocation(previousLocationRef.current);
+      return;
+    }
+    
+    // Priority 2: Try browser history back
+    // This will navigate to the previous page in browser history
+    try {
       window.history.back();
-    } else {
+    } catch (e) {
+      // If history.back() fails, fall back to home
       setLocation("/");
     }
   };
@@ -52,7 +77,7 @@ export default function NotFound() {
           data-testid="button-back"
         >
           <ArrowLeft className="mr-2 w-4 h-4" />
-          {canGoBack ? "Go Back" : "Back to Home"}
+          Back
         </Button>
       </div>
     </div>
