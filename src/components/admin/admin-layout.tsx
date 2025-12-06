@@ -35,6 +35,7 @@ interface SidebarItem {
   label: string;
   icon: any;
   badge?: number;
+  badgeKey?: string;
   roles?: ("admin" | "client" | "employee")[];
 }
 
@@ -65,6 +66,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location, setLocation] = useLocation();
+  const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({});
 
   const { data } = useQuery({
     queryKey: ["/api/auth/me"],
@@ -72,6 +74,40 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   });
 
   const user = data?.user;
+
+  // Fetch badge counts
+  useQuery({
+    queryKey: ["sidebar-badges"],
+    queryFn: async () => {
+      const counts: Record<string, number> = {};
+      
+      // Fetch clients count (active clients)
+      try {
+        const clientsResponse = await fetch("/api/clients?limit=1", { credentials: "include" });
+        if (clientsResponse.ok) {
+          const clientsData = await clientsResponse.json();
+          counts["/admin/clients"] = clientsData.pagination?.total || 0;
+        }
+      } catch (e) {
+        counts["/admin/clients"] = 0;
+      }
+      
+      // Fetch available cars count (active cars from glav1_car)
+      try {
+        const carsResponse = await fetch("/api/cars?status=available", { credentials: "include" });
+        if (carsResponse.ok) {
+          const carsData = await carsResponse.json();
+          counts["/admin/cars"] = carsData.data?.length || 0;
+        }
+      } catch (e) {
+        counts["/admin/cars"] = 0;
+      }
+      
+      setBadgeCounts(counts);
+      return counts;
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
 
   // Filter sidebar items based on user role
   const sidebarItems = useMemo(() => {
@@ -148,9 +184,9 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 {sidebarOpen && (
                   <>
                     <span className="text-sm">{item.label}</span>
-                    {item.badge && (
-                      <span className="ml-auto bg-red-500 text-white text-xs font-medium px-1.5 py-0.5 rounded-full min-w-[24px] text-center">
-                        {item.badge}
+                    {(item.badge || (item.badgeKey && badgeCounts[item.href])) && (item.badge || badgeCounts[item.href] || 0) > 0 && (
+                      <span className="ml-auto bg-[#EAEB80] text-black text-xs font-medium px-1.5 py-0.5 rounded-full min-w-[24px] text-center">
+                        {item.badge || badgeCounts[item.href] || 0}
                       </span>
                     )}
                   </>

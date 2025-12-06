@@ -12,9 +12,12 @@ import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminsPage from "@/pages/admin/admins";
 import ClientsPage from "@/pages/admin/clients";
+import ClientDetailPage from "@/pages/admin/client-detail";
 import FormsPage from "@/pages/admin/forms";
 import ProfilePage from "@/pages/admin/profile";
 import CarsPage from "@/pages/admin/cars";
+import CarDetailPage from "@/pages/admin/car-detail";
+import IncomeExpensesPage from "@/pages/admin/income-expenses";
 import SignContract from "@/pages/sign-contract";
 import Signup from "@/pages/signup";
 
@@ -31,9 +34,12 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/admins" component={AdminsPage} />
       <Route path="/admin/clients" component={ClientsPage} />
+      <Route path="/admin/clients/:id" component={ClientDetailPage} />
       <Route path="/admin/forms" component={FormsPage} />
       <Route path="/admin/profile" component={ProfilePage} />
       <Route path="/admin/cars" component={CarsPage} />
+      <Route path="/admin/cars/:id" component={CarDetailPage} />
+      <Route path="/admin/income-expenses" component={IncomeExpensesPage} />
       <Route component={NotFound} />
     </Switch>
   );

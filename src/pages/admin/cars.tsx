@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -68,6 +69,7 @@ const carSchema = z.object({
 type CarFormData = z.infer<typeof carSchema>;
 
 export default function CarsPage() {
+  const [, setLocation] = useLocation();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isOffboardModalOpen, setIsOffboardModalOpen] = useState(false);
@@ -116,7 +118,10 @@ export default function CarsPage() {
       const response = await fetch(url, {
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to fetch cars");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Database connection failed" }));
+        throw new Error(errorData.error || "Failed to fetch cars");
+      }
       return response.json();
     },
     retry: false,
@@ -394,25 +399,28 @@ export default function CarsPage() {
                 <thead>
                   <tr className="border-b border-[#2a2a2a]">
                     <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
-                      VIN
-                    </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
-                      Make/Model
-                    </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
-                      Plate
-                    </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
                       Year
                     </th>
                     <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
-                      Mileage
+                      Make
+                    </th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                      Model
+                    </th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                      VIN
+                    </th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                      License Plate
+                    </th>
+                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                      Color
                     </th>
                     <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
                       Status
                     </th>
                     <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
-                      Owner
+                      Assigned To
                     </th>
                     <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
                       Actions
@@ -422,88 +430,124 @@ export default function CarsPage() {
                 <tbody className="divide-y divide-[#2a2a2a]">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={8} className="px-6 py-8 text-center text-gray-400">
+                      <td colSpan={9} className="px-6 py-8 text-center text-gray-400">
                         <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                       </td>
                     </tr>
                   ) : cars.length > 0 ? (
-                    cars.map((car) => (
-                      <tr key={car.id} className="hover:bg-[#252525] transition-colors">
-                        <td className="px-6 py-4">
-                          <span className="text-white font-mono text-sm">{car.vin}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-white font-medium">{car.makeModel}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-gray-400">
-                            {car.licensePlate || <span className="text-gray-600">N/A</span>}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-gray-400">{car.year || "N/A"}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-gray-400">
-                            {car.mileage.toLocaleString()} mi
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <Badge variant="outline" className={getStatusBadgeColor(car.status)}>
-                            {car.status.replace("_", " ").toUpperCase()}
-                          </Badge>
-                        </td>
-                        <td className="px-6 py-4">
-                          {car.owner ? (
-                            <div>
-                              <div className="text-white text-sm">
-                                {car.owner.firstName} {car.owner.lastName}
+                    cars.map((car) => {
+                      // Parse make/model from makeModel field
+                      // Format from backend: "Acura MDX" or "MDX" (if make is null)
+                      const makeModelParts = car.makeModel ? car.makeModel.trim().split(/\s+/) : [];
+                      const yearPart = makeModelParts[0] && /^\d{4}$/.test(makeModelParts[0]) ? makeModelParts[0] : null;
+                      // If first part is year, skip it
+                      const startIdx = yearPart ? 1 : 0;
+                      // If only one part and it's not a year, it's likely just the model (make is null)
+                      let make = "N/A";
+                      let model = "N/A";
+                      if (makeModelParts.length > startIdx) {
+                        if (makeModelParts.length === startIdx + 1) {
+                          // Only model, no make
+                          model = makeModelParts[startIdx];
+                        } else {
+                          // Has make and model
+                          make = makeModelParts[startIdx];
+                          model = makeModelParts.slice(startIdx + 1).join(" ");
+                        }
+                      }
+                      
+                      return (
+                        <tr 
+                          key={car.id} 
+                          className="hover:bg-[#252525] transition-colors cursor-pointer group"
+                          onClick={() => setLocation(`/admin/cars/${car.id}`)}
+                        >
+                          <td className="px-6 py-4">
+                            <span className="text-white">{car.year || yearPart || "N/A"}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-white font-medium">{make}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-white">{model}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-white font-mono text-sm">{car.vin}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-gray-400">
+                              {car.licensePlate || <span className="text-gray-600">N/A</span>}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-gray-400">N/A</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <Badge variant="outline" className={getStatusBadgeColor(car.status)}>
+                              {car.status === "available" ? "Available" : car.status === "in_use" ? "Rented" : car.status === "maintenance" ? "Maintenance" : "Off Fleet"}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-4">
+                            {car.owner ? (
+                              <div>
+                                <div className="text-white text-sm">
+                                  {car.owner.firstName} {car.owner.lastName}
+                                </div>
+                                {car.owner.email && (
+                                  <div className="text-gray-500 text-xs">{car.owner.email}</div>
+                                )}
                               </div>
-                              {car.owner.email && (
-                                <div className="text-gray-500 text-xs">{car.owner.email}</div>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-gray-600 text-sm">No owner</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-gray-400 hover:text-white"
-                              onClick={() => handleEditClick(car)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            {car.status === "available" && (
+                            ) : (
+                              <span className="text-gray-600 text-sm">Unassigned</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-gray-400 hover:text-orange-400"
-                                onClick={() => handleOffboardClick(car)}
-                                title="Off-board vehicle"
+                                className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditClick(car);
+                                }}
                               >
-                                <LogOut className="w-4 h-4" />
+                                <Edit className="w-4 h-4" />
                               </Button>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-gray-400 hover:text-red-400"
-                              onClick={() => handleDeleteClick(car.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
+                              {car.status === "available" && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-gray-400 hover:text-orange-400"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOffboardClick(car);
+                                  }}
+                                  title="Off-board vehicle"
+                                >
+                                  <LogOut className="w-4 h-4" />
+                                </Button>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-gray-400 hover:text-red-400"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteClick(car.id);
+                                }}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
-                      <td colSpan={8} className="px-6 py-8 text-center text-gray-400">
-                        No cars found
+                      <td colSpan={9} className="px-6 py-8 text-center text-gray-400">
+                        No cars found. Try adjusting your search or filters.
                       </td>
                     </tr>
                   )}
