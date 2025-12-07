@@ -30,11 +30,17 @@ import {
   X,
 } from "lucide-react";
 import { Document, Page } from "react-pdf";
+import * as pdfjsLib from "pdfjs-dist";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import { cn } from "@/lib/utils";
 import "@/lib/pdf-config"; // Configure PDF.js worker
 import { pdfjs } from "@/lib/pdf-config";
+
+// Ensure worker is set correctly before Document components load
+// Use CDN URL matching react-pdf's pdfjs-dist version (4.8.69)
+pdfjsLib.GlobalWorkerOptions.workerSrc = 
+  'https://unpkg.com/pdfjs-dist@4.8.69/build/pdf.worker.min.mjs';
 
 interface Contract {
   id: number;

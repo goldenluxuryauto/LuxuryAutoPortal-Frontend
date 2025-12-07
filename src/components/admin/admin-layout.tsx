@@ -68,8 +68,13 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const [location, setLocation] = useLocation();
   const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({});
 
-  const { data } = useQuery({
+  const { data } = useQuery<{ user?: any }>({
     queryKey: ["/api/auth/me"],
+    queryFn: async () => {
+      const response = await fetch("/api/auth/me", { credentials: "include" });
+      if (!response.ok) throw new Error("Not authenticated");
+      return response.json();
+    },
     retry: false,
   });
 

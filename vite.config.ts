@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -17,11 +17,15 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["qrcode.react"],
+    esbuildOptions: {
+      target: "es2022", // Support top-level await for pdfjs-dist v4.x
+    },
   },
   css: {
     postcss: "./postcss.config.cjs",
   },
   build: {
+    target: "es2022", // Support top-level await for pdfjs-dist v4.x
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
