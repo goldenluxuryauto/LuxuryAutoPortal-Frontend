@@ -2,6 +2,7 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 // Use empty string for relative URLs (works with Vite proxy in dev, and same-origin in production)
 const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const getApiBaseUrl = () => API_BASE_URL;
 
@@ -25,6 +26,7 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+/*
 export async function apiRequest(
   method: string,
   url: string,
@@ -40,6 +42,29 @@ export async function apiRequest(
   await throwIfResNotOk(res);
   return res;
 }
+*/
+
+
+export async function apiRequest(
+  method: string,
+  path: string,  // Changed from 'url' to 'path' for clarity
+  data?: unknown | undefined,
+): Promise<Response> {
+  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';  // Use env var in production, fallback for local
+  const fullUrl = `${baseUrl}${path}`;  // Prepend base to path (e.g., /api/auth/login → full backend URL)
+  console.log('API call to:', fullUrl);  // Debug log (remove later if not needed)
+
+  const res = await fetch(fullUrl, {
+    method,
+    headers: data ? { "Content-Type": "application/json" } : {},
+    body: data ? JSON.stringify(data) : undefined,
+    credentials: "include",
+  });
+
+  await throwIfResNotOk(res);
+  return res;
+}
+
 
 type UnauthorizedBehavior = "returnNull" | "throw";
 export const getQueryFn: <T>(options: {
