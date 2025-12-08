@@ -71,7 +71,8 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const { data } = useQuery<{ user?: any }>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      const response = await fetch("/api/auth/me", { credentials: "include" });
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/auth/me`, { credentials: "include" });
       if (!response.ok) throw new Error("Not authenticated");
       return response.json();
     },
@@ -84,11 +85,12 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   useQuery({
     queryKey: ["sidebar-badges"],
     queryFn: async () => {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const counts: Record<string, number> = {};
       
       // Fetch clients count (active clients)
       try {
-        const clientsResponse = await fetch("/api/clients?limit=1", { credentials: "include" });
+        const clientsResponse = await fetch(`${apiUrl}/api/clients?limit=1`, { credentials: "include" });
         if (clientsResponse.ok) {
           const clientsData = await clientsResponse.json();
           counts["/admin/clients"] = clientsData.pagination?.total || 0;
@@ -99,7 +101,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       
       // Fetch available cars count (active cars from glav1_car)
       try {
-        const carsResponse = await fetch("/api/cars?status=available", { credentials: "include" });
+        const carsResponse = await fetch(`${apiUrl}/api/cars?status=available`, { credentials: "include" });
         if (carsResponse.ok) {
           const carsData = await carsResponse.json();
           counts["/admin/cars"] = carsData.data?.length || 0;
