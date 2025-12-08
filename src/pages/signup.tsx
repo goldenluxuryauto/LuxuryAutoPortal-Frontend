@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,13 +29,28 @@ export default function Signup() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
+  // Get email from URL query parameter if present
+  const urlParams = new URLSearchParams(window.location.search);
+  const emailFromUrl = urlParams.get('email') || '';
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
+    defaultValues: {
+      email: emailFromUrl,
+    },
   });
+
+  // Pre-fill email if provided in URL
+  useEffect(() => {
+    if (emailFromUrl) {
+      setValue('email', emailFromUrl);
+    }
+  }, [emailFromUrl, setValue]);
 
   const signupMutation = useMutation({
     mutationFn: async (data: Omit<SignupFormData, "confirmPassword">) => {
@@ -75,8 +91,15 @@ export default function Signup() {
             alt="Golden Luxury Auto"
             className="h-[200px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_15px_rgba(234,235,128,0.5)]"
           />
-          <h1 className="text-2xl font-semibold text-white mb-2">Create Account</h1>
-          <p className="text-gray-400 text-sm">Sign up to access your account</p>
+          <h1 className="text-2xl font-semibold text-white mb-2">Create Your Account</h1>
+          <p className="text-gray-400 text-sm">
+            {emailFromUrl ? "Welcome! Complete your registration below" : "Sign up to access your account"}
+          </p>
+          {emailFromUrl && (
+            <p className="text-[#EAEB80] text-sm mt-2">
+              ✓ Your email has been pre-filled
+            </p>
+          )}
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -116,14 +139,17 @@ export default function Signup() {
 
           <div className="space-y-2">
             <Label htmlFor="email" className="text-gray-400 text-sm">
-              Email
+              Email {emailFromUrl && <span className="text-[#EAEB80] text-xs">(pre-filled)</span>}
             </Label>
             <Input
               id="email"
               type="email"
               {...register("email")}
-              className="bg-[#111111] border-[#222222] text-white focus:border-[#EAEB80] focus:ring-[#EAEB80] h-11"
+              className={`bg-[#111111] border-[#222222] text-white focus:border-[#EAEB80] focus:ring-[#EAEB80] h-11 ${
+                emailFromUrl ? 'cursor-not-allowed opacity-75' : ''
+              }`}
               placeholder="john.doe@example.com"
+              readOnly={!!emailFromUrl}
             />
             {errors.email && (
               <p className="text-red-400 text-xs">{errors.email.message}</p>

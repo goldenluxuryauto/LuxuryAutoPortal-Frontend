@@ -830,7 +830,7 @@ export default function Onboarding() {
                           <div className="grid grid-cols-2 gap-4">
                             <FormField control={form.control} name="purchasePrice" render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-gray-300">Purchase Price *</FormLabel>
+                                <FormLabel className="text-gray-300">Plate #*</FormLabel>
                                 <FormControl><Input {...field} placeholder="e.g., 50000" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
                                 <FormMessage />
                               </FormItem>

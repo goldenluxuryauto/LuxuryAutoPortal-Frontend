@@ -1006,7 +1006,7 @@ export default function FormsPage() {
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400 block mb-1">Purchase Price:</span>
+                          <span className="text-gray-400 block mb-1">Plate #:</span>
                           <span className="text-white font-medium">{formatCurrency(data.purchasePrice)}</span>
                         </div>
                         <div>

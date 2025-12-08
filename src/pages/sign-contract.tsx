@@ -55,38 +55,46 @@ export default function SignContract() {
   const signMutation = useMutation({
     mutationFn: async (action: "sign" | "decline") => {
       if (action === "sign") {
-        let pdfDataUrl: string;
-        
         if (signPdfFnRef.current) {
           // Generate flattened PDF with all annotations
           const signedPdfBlob = await signPdfFnRef.current();
           
-          // Convert blob to base64 for backend compatibility
-          const arrayBuffer = await signedPdfBlob.arrayBuffer();
-          const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-          pdfDataUrl = `data:application/pdf;base64,${base64}`;
+          // Send PDF as FormData (more efficient than base64)
+          const formData = new FormData();
+          formData.append('pdfFile', signedPdfBlob, 'signed-contract.pdf');
+          formData.append('isFlattenedPdf', 'true');
+
+          const response = await fetch(buildApiUrl(`/api/contract/sign/${token}`), {
+            method: "POST",
+            body: formData, // Send as multipart/form-data
+            credentials: "include",
+          });
+
+          const result = await response.json();
+          if (!response.ok || !result.success) {
+            throw new Error(result.error || "Failed to sign contract");
+          }
+          return result;
         } else {
           // If PDF editor not ready, send empty signature (backend will use template)
-          pdfDataUrl = "";
-        }
+          const response = await fetch(buildApiUrl(`/api/contract/sign/${token}`), {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              signatureData: "",
+              isFlattenedPdf: false,
+            }),
+            credentials: "include",
+          });
 
-        const response = await fetch(buildApiUrl(`/api/contract/sign/${token}`), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            signatureData: pdfDataUrl, // Send flattened PDF as signature data
-            isFlattenedPdf: true, // Flag to indicate this is a full PDF, not just signature
-        }),
-        credentials: "include",
-      });
-
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-          throw new Error(result.error || "Failed to sign contract");
+          const result = await response.json();
+          if (!response.ok || !result.success) {
+            throw new Error(result.error || "Failed to sign contract");
+          }
+          return result;
         }
-        return result;
       } else {
         // Decline
         const response = await fetch(buildApiUrl(`/api/contract/decline/${token}`), {
