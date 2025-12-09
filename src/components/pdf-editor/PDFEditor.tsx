@@ -4,6 +4,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 import SignatureCanvas from "react-signature-canvas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -61,6 +62,7 @@ const TextAnnotationBox = memo(({
   onEdit, 
   onChange, 
   onBlur,
+  onRemove,
   onPositionChange,
   onSizeChange
 }: { 
@@ -70,6 +72,7 @@ const TextAnnotationBox = memo(({
   onEdit: () => void;
   onChange: (text: string) => void;
   onBlur: () => void;
+  onRemove: () => void;
   onPositionChange: (x: number, y: number) => void;
   onSizeChange: (width: number, height: number) => void;
 }) => {
@@ -77,6 +80,7 @@ const TextAnnotationBox = memo(({
   const [isResizing, setIsResizing] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const resizeStartRef = useRef({ width: 0, height: 0, mouseX: 0, mouseY: 0 });
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (isEditing) return;
@@ -114,7 +118,7 @@ const TextAnnotationBox = memo(({
         const deltaX = e.clientX - resizeStartRef.current.mouseX;
         const deltaY = e.clientY - resizeStartRef.current.mouseY;
         const newWidth = Math.max(100, resizeStartRef.current.width + deltaX / scale);
-        const newHeight = Math.max(30, resizeStartRef.current.height + deltaY / scale);
+        const newHeight = Math.max(20, resizeStartRef.current.height + deltaY / scale);
         onSizeChange(newWidth, newHeight);
       }
     };
@@ -133,13 +137,21 @@ const TextAnnotationBox = memo(({
     };
   }, [isDragging, isResizing, scale, onPositionChange, onSizeChange]);
 
+  // Position cursor at the start when editing begins
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.setSelectionRange(0, 0);
+    }
+  }, [isEditing]);
+
   return (
     <div
       className={cn(
-        "absolute rounded group",
+        "absolute rounded group annotation-box transition-all duration-200",
         isEditing 
-          ? "border-2 border-blue-600 bg-white/95 shadow-lg" 
-          : "border border-transparent bg-transparent hover:border-blue-300 hover:bg-white/10 cursor-move"
+          ? "border-2 border-black bg-white/95 shadow-lg" 
+          : "border-0 bg-transparent hover:border hover:border-gray-300 hover:bg-white/5 cursor-move"
       )}
       style={{
         left: `${annotation.x * scale}px`,
@@ -147,13 +159,18 @@ const TextAnnotationBox = memo(({
         width: `${annotation.width * scale}px`,
         height: `${annotation.height * scale}px`,
         minWidth: "100px",
-        minHeight: "30px",
+        minHeight: "20px",
         zIndex: isEditing ? 1000 : 999,
         padding: "1px",
       }}
       onMouseDown={handleMouseDown}
       onClick={(e) => {
         e.stopPropagation();
+        // Don't trigger edit if clicking on delete button or resize handle
+        const target = e.target as HTMLElement;
+        if (target.closest('button[title="Remove text"]') || target.closest('.cursor-se-resize')) {
+          return;
+        }
         if (!isEditing && !isDragging && !isResizing) {
           onEdit();
         }
@@ -161,6 +178,7 @@ const TextAnnotationBox = memo(({
     >
       {isEditing ? (
         <input
+          ref={inputRef}
           type="text"
           value={annotation.text}
           onChange={(e) => {
@@ -180,18 +198,18 @@ const TextAnnotationBox = memo(({
               onBlur();
             }
           }}
-          className="w-full h-full border-none outline-none bg-transparent font-sans text-center"
-          autoFocus
+          className="w-full h-full border-none outline-none bg-transparent font-sans text-left"
           style={{ 
             fontFamily: "Inter, system-ui, sans-serif",
             fontSize: `${annotation.fontSize}pt`,
             color: annotation.color,
             padding: "1px",
+            textAlign: "left",
           }}
         />
       ) : (
         <div
-          className="w-full h-full flex items-center justify-center overflow-hidden pointer-events-none text-center"
+          className="w-full h-full flex items-center overflow-hidden pointer-events-none text-left"
           style={{ 
             fontFamily: "Inter, system-ui, sans-serif",
             fontSize: `${annotation.fontSize}pt`,
@@ -200,19 +218,44 @@ const TextAnnotationBox = memo(({
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            textAlign: "left",
           }}
         >
           {annotation.text || ""}
         </div>
       )}
       
-      {/* Resize Handle - only visible when hovering and not editing */}
-      {!isEditing && (
+      {/* Resize Handle - only visible when editing */}
+      {isEditing && (
         <div
-          className="absolute bottom-0 right-0 w-4 h-4 bg-blue-500 cursor-se-resize rounded-tl hover:bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute bottom-0 right-0 w-4 h-4 bg-black cursor-se-resize rounded-tl hover:bg-gray-700 transition-colors"
           onMouseDown={handleResizeMouseDown}
           onClick={(e) => e.stopPropagation()}
         />
+      )}
+      
+      {/* Delete button - only visible when editing */}
+      {isEditing && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onRemove();
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 transition-colors cursor-pointer"
+          style={{
+            zIndex: 1001,
+            pointerEvents: 'auto',
+          }}
+          title="Remove text"
+        >
+          <X className="w-3 h-3" />
+        </button>
       )}
     </div>
   );
@@ -316,10 +359,10 @@ const SignatureAnnotationBox = memo(({
   return (
     <div
       className={cn(
-        "absolute rounded group",
+        "absolute rounded group annotation-box transition-all duration-200",
         isSelected
-          ? "border-2 border-green-600 bg-white/95 shadow-lg cursor-move" 
-          : "border border-transparent bg-transparent hover:border-green-300 hover:bg-white/10 cursor-move"
+          ? "border-2 border-black bg-white/5 shadow-lg cursor-move" 
+          : "border-0 bg-transparent hover:border hover:border-gray-300 hover:bg-white/5 cursor-move"
       )}
       style={{
         left: `${annotation.x * scale}px`,
@@ -340,6 +383,10 @@ const SignatureAnnotationBox = memo(({
         alt="Signature"
         className="w-full h-full object-contain pointer-events-none"
         draggable={false}
+        style={{ 
+          opacity: isSelected ? 1 : 0.95,
+          filter: isSelected ? 'none' : 'none'
+        }}
       />
       
       {/* Delete button - only visible when selected */}
@@ -347,19 +394,20 @@ const SignatureAnnotationBox = memo(({
         <button
           onClick={(e) => {
             e.stopPropagation();
+            e.preventDefault();
             onRemove();
           }}
-          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 z-10"
+          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 transition-colors z-10"
           title="Remove signature"
         >
           <X className="w-3 h-3" />
         </button>
       )}
       
-      {/* Resize Handle - only visible when hovering and selected */}
+      {/* Resize Handle - only visible when selected */}
       {isSelected && (
         <div
-          className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 cursor-se-resize rounded-tl hover:bg-green-600 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute bottom-0 right-0 w-4 h-4 bg-black cursor-se-resize rounded-tl hover:bg-gray-700 transition-colors"
           onMouseDown={handleResizeMouseDown}
           onClick={(e) => e.stopPropagation()}
         />
@@ -393,6 +441,7 @@ const PDFPageWithAnnotations = memo(({
   onTextEdit,
   onTextChange,
   onTextBlur,
+  onTextRemove,
   onTextPositionChange,
   onTextSizeChange,
   onSignatureSelect,
@@ -411,6 +460,7 @@ const PDFPageWithAnnotations = memo(({
   onTextEdit: (id: string) => void;
   onTextChange: (id: string, text: string) => void;
   onTextBlur: () => void;
+  onTextRemove: (id: string) => void;
   onTextPositionChange: (id: string, x: number, y: number) => void;
   onTextSizeChange: (id: string, width: number, height: number) => void;
   onSignatureSelect: (id: string) => void;
@@ -445,6 +495,7 @@ const PDFPageWithAnnotations = memo(({
             onEdit={() => onTextEdit(annotation.id)}
             onChange={(newText) => onTextChange(annotation.id, newText)}
             onBlur={onTextBlur}
+            onRemove={() => onTextRemove(annotation.id)}
             onPositionChange={(x, y) => onTextPositionChange(annotation.id, x, y)}
             onSizeChange={(width, height) => onTextSizeChange(annotation.id, width, height)}
           />
@@ -474,6 +525,7 @@ const PDFPageWithAnnotations = memo(({
     prevProps.pageNumber === nextProps.pageNumber &&
     prevProps.scale === nextProps.scale &&
     prevProps.editingTextId === nextProps.editingTextId &&
+    prevProps.selectedSignatureId === nextProps.selectedSignatureId &&
     prevProps.tool === nextProps.tool &&
     prevProps.textAnnotations === nextProps.textAnnotations &&
     prevProps.signatureAnnotations === nextProps.signatureAnnotations
@@ -498,6 +550,7 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
   const [pendingSignature, setPendingSignature] = useState<string | null>(null);
   const [signaturePlacementMode, setSignaturePlacementMode] = useState(false);
   
+  const { toast } = useToast();
   const containerRef = useRef<HTMLDivElement>(null);
   const signatureCanvasRef = useRef<SignatureCanvas>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -529,6 +582,14 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
     );
   }, []);
 
+  // Handle text annotation removal with useCallback
+  const handleTextRemove = useCallback((annotationId: string) => {
+    setTextAnnotations((prev) =>
+      prev.filter((ann) => ann.id !== annotationId)
+    );
+    setEditingTextId(null);
+  }, []);
+
   // Handle text position change (drag)
   const handleTextPositionChange = useCallback((annotationId: string, x: number, y: number) => {
     setTextAnnotations((prev) =>
@@ -547,7 +608,7 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
         if (ann.id === annotationId) {
           // Calculate font size based on box height
           // Use height as the primary factor, ensuring text fills the space
-          const newFontSize = Math.max(8, Math.min(48, Math.floor(height * 0.4)));
+          const newFontSize = Math.max(6, Math.min(20, Math.floor(height * 0.9)));
           return { ...ann, width, height, fontSize: newFontSize };
         }
         return ann;
@@ -612,8 +673,8 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
     const x = ((e.clientX - rect.left) / scale) - 20;
     const y = ((e.clientY - rect.top) / scale) - 10;
     
-    const initialHeight = 60;
-    const initialFontSize = Math.floor(initialHeight * 0.4); // 24pt for 60px height
+    const initialHeight = 20;
+    const initialFontSize = Math.floor(initialHeight * 0.9); // 18pt for 20px height
     
     const newText: TextAnnotation = {
       id: `text-${Date.now()}`,
@@ -632,89 +693,139 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
     setTool("select");
   }, [tool, scale]);
 
-  // Signature tool
+  // Signature tool - place signature on PDF click
   const handleSignatureClick = useCallback((e: React.MouseEvent<HTMLDivElement>, pageNum: number) => {
-    console.log('handleSignatureClick called', { signaturePlacementMode, hasPendingSignature: !!pendingSignature });
+    console.log('🖱️ handleSignatureClick called', { 
+      signaturePlacementMode, 
+      hasPendingSignature: !!pendingSignature,
+      tool 
+    });
     
     if (!signaturePlacementMode || !pendingSignature) {
-      console.log('Exiting early - no placement mode or no pending signature');
+      console.log('❌ Exiting early - no placement mode or no pending signature');
       return;
     }
     
     e.stopPropagation();
     
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / scale) - 75;
-    const y = ((e.clientY - rect.top) / scale) - 37.5;
+    // Adjust position to match cursor hotspot (20, 40)
+    const x = ((e.clientX - rect.left) / scale) - 20;
+    const y = ((e.clientY - rect.top) / scale) - 40;
     
-    console.log('Creating signature at', { x, y, pageNum });
+    console.log('✅ Creating signature at', { x, y, pageNum, scale });
     
-    const newSignature: SignatureAnnotation = {
-      id: `sig-${Date.now()}`,
-      x,
-      y,
-      width: 150,
-      height: 75,
-      page: pageNum,
-      imageData: pendingSignature,
+    // Create a temporary image to get actual dimensions
+    const img = new Image();
+    img.src = pendingSignature;
+    
+    // Wait for image to load to get proper dimensions
+    img.onload = () => {
+      const aspectRatio = img.width / img.height;
+      let width = 200; // Default width for typed signatures
+      let height = width / aspectRatio;
+      
+      // For handwritten signatures (more square), use smaller width
+      if (aspectRatio < 2) {
+        width = 140;
+        height = width / aspectRatio;
+      }
+      
+      const newSignature: SignatureAnnotation = {
+        id: `sig-${Date.now()}`,
+        x,
+        y,
+        width,
+        height,
+        page: pageNum,
+        imageData: pendingSignature,
+      };
+      
+      setSignatureAnnotations((prev) => [...prev, newSignature]);
+      // DO NOT select the signature after placement - keeps it clean
+      setSelectedSignatureId(null);
+      
+      // Show success toast with smooth animation
+      toast({
+        title: "✅ Signature added",
+        description: "Your signature has been placed on the document.",
+        duration: 2000,
+        className: "bg-[#EAEB80] text-[#1a1a1a] border-[#EAEB80]",
+      });
+      
+      console.log('✅ Signature placed successfully - no selection border!');
     };
     
-    setSignatureAnnotations((prev) => [...prev, newSignature]);
-    setSelectedSignatureId(newSignature.id);
+    // Clear state immediately (don't wait for image load)
     setPendingSignature(null);
     setSignaturePlacementMode(false);
     setTool("select");
     document.body.style.cursor = "default";
-    
-    console.log('Signature created successfully');
-  }, [scale, pendingSignature, signaturePlacementMode]);
+  }, [scale, pendingSignature, signaturePlacementMode, tool, toast]);
 
   // Signature modal handlers
   const handleDrawSignature = () => {
     if (signatureCanvasRef.current && !signatureCanvasRef.current.isEmpty()) {
-      const dataUrl = signatureCanvasRef.current.toDataURL();
-      console.log('Draw signature confirmed');
+      // Export with transparent background (PNG with transparency)
+      const signatureDataURL = signatureCanvasRef.current.toDataURL("image/png");
+      console.log('✅ Draw signature confirmed - transparent PNG created');
       
-      // Set states in correct order
-      setPendingSignature(dataUrl);
+      // Set pending signature FIRST
+      setPendingSignature(signatureDataURL);
       setSignaturePlacementMode(true);
-      setTool("select"); // Make sure tool is NOT "text"
-      document.body.style.cursor = "crosshair";
+      setTool("signature"); // Special tool mode for signature placement
+      
+      // Set cursor to crosshair (plus cursor) - professional and clean
+      document.body.style.cursor = 'crosshair';
+      console.log('✅ Cursor set to crosshair (plus)');
       
       // Close modal after state is set
       setTimeout(() => {
         setSignatureModalOpen(false);
-        console.log('Modal closed, placement mode active');
-      }, 0);
+        console.log('✅ Modal closed - ready to place signature');
+      }, 50); // Small delay to ensure state updates
     }
   };
 
   const handleTypeSignature = () => {
     if (typedSignature.trim()) {
-      console.log('Type signature confirmed');
+      console.log('✅ Type signature confirmed');
       
-      // Create signature image from text
+      // Create signature image from text with transparent background
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       if (ctx) {
-        canvas.width = 300;
-        canvas.height = 100;
-        ctx.font = "italic 40px 'Brush Script MT', cursive";
-        ctx.fillStyle = "#000000";
-        ctx.fillText(typedSignature, 20, 60);
-        const dataUrl = canvas.toDataURL();
+        // Measure text to get proper dimensions
+        ctx.font = "italic 48px 'Brush Script MT', 'Dancing Script', cursive";
+        const metrics = ctx.measureText(typedSignature);
+        const textWidth = metrics.width;
+        const textHeight = 60; // Approximate height for 48px font
         
-        // Set states in correct order
-        setPendingSignature(dataUrl);
+        // Set canvas size to fit text with padding
+        canvas.width = textWidth + 40; // 20px padding on each side
+        canvas.height = textHeight + 20; // 10px padding top/bottom
+        
+        // Redraw with proper font (context resets after size change)
+        ctx.font = "italic 48px 'Brush Script MT', 'Dancing Script', cursive";
+        ctx.fillStyle = "#000000";
+        ctx.textBaseline = "middle";
+        ctx.fillText(typedSignature, 20, canvas.height / 2);
+        const signatureDataURL = canvas.toDataURL("image/png"); // PNG with transparency
+        
+        // Set pending signature FIRST
+        setPendingSignature(signatureDataURL);
         setSignaturePlacementMode(true);
-        setTool("select"); // Make sure tool is NOT "text"
-        document.body.style.cursor = "crosshair";
+        setTool("signature"); // Special tool mode for signature placement
+        
+        // Set cursor to crosshair (plus cursor) - professional and clean
+        document.body.style.cursor = 'crosshair';
+        console.log('✅ Cursor set to crosshair (plus)');
         
         // Close modal after state is set
         setTimeout(() => {
           setSignatureModalOpen(false);
-          console.log('Modal closed, placement mode active');
-        }, 0);
+          console.log('✅ Modal closed - ready to place signature');
+        }, 50);
       }
     }
   };
@@ -724,21 +835,24 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
-        console.log('Upload signature confirmed');
+        const signatureDataURL = event.target?.result as string;
+        console.log('✅ Upload signature confirmed');
         
-        // Set states in correct order
-        setSignatureImage(dataUrl);
-        setPendingSignature(dataUrl);
+        // Set pending signature FIRST
+        setSignatureImage(signatureDataURL);
+        setPendingSignature(signatureDataURL);
         setSignaturePlacementMode(true);
-        setTool("select"); // Make sure tool is NOT "text"
-        document.body.style.cursor = "crosshair";
+        setTool("signature"); // Special tool mode for signature placement
+        
+        // Set cursor to crosshair (plus cursor) - professional and clean
+        document.body.style.cursor = 'crosshair';
+        console.log('✅ Cursor set to crosshair (plus)');
         
         // Close modal after state is set
         setTimeout(() => {
           setSignatureModalOpen(false);
-          console.log('Modal closed, placement mode active');
-        }, 0);
+          console.log('✅ Modal closed - ready to place signature');
+        }, 50);
       };
       reader.readAsDataURL(file);
     }
@@ -907,6 +1021,19 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
     }
   }, [handleFinalSign, onSignReady]);
 
+  // Maintain cursor state during signature placement mode
+  useEffect(() => {
+    if (signaturePlacementMode && pendingSignature) {
+      // Set cursor to crosshair (plus cursor) for professional placement
+      document.body.style.cursor = 'crosshair';
+      console.log('🖱️ Cursor set to crosshair');
+    } else if (tool === "text") {
+      document.body.style.cursor = "crosshair";
+    } else {
+      document.body.style.cursor = "default";
+    }
+  }, [signaturePlacementMode, pendingSignature, tool]);
+
   // Cleanup cursor on unmount
   useEffect(() => {
     return () => {
@@ -915,9 +1042,29 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
   }, []);
 
   return (
-    <div className="relative w-full h-full bg-gray-100">
-      {/* Floating Toolbar */}
-      <div className="absolute top-4 right-4 z-50 flex flex-col items-end gap-2">
+    <div 
+      className="relative w-full h-full bg-gray-100"
+      onClick={(e) => {
+        // Deselect annotations when clicking on empty space
+        if (e.target === e.currentTarget) {
+          setEditingTextId(null);
+          setSelectedSignatureId(null);
+          console.log('✅ Deselected all annotations - clicked empty space');
+        }
+      }}
+    >
+      {/* Global styles to remove any canvas outlines */}
+      <style>{`
+        canvas {
+          outline: none !important;
+          border: none !important;
+        }
+        canvas:focus {
+          outline: none !important;
+        }
+      `}</style>
+      {/* Fixed Toolbar - stays visible during scroll */}
+      <div className="fixed top-4 right-4 z-[60] flex flex-col items-end gap-2">
         {/* Placement mode indicator */}
         {tool === "text" && (
           <div className="bg-[#EAEB80] text-[#1a1a1a] px-4 py-2 rounded-lg shadow-xl flex items-center gap-2 animate-pulse">
@@ -939,7 +1086,7 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
         {signaturePlacementMode && (
           <div className="bg-[#EAEB80] text-[#1a1a1a] px-4 py-2 rounded-lg shadow-xl flex items-center gap-2 animate-pulse">
             <PenTool className="w-4 h-4" />
-            <span className="text-sm font-semibold">Click on PDF to place signature</span>
+            <span className="text-sm font-semibold">Click anywhere on the PDF to place your signature</span>
             <Button
               size="sm"
               variant="ghost"
@@ -986,8 +1133,6 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
           <PenTool className="w-4 h-4" />
         </Button>
 
-        <div className="w-px h-6 bg-[#EAEB80]/30 mx-1" />
-
         <Button
           variant="ghost"
           size="sm"
@@ -998,15 +1143,6 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
           <Download className="w-4 h-4" />
         </Button>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handlePrint}
-          className="text-[#EAEB80] hover:bg-[#EAEB80]/20"
-          title="Print"
-        >
-          <Printer className="w-4 h-4" />
-        </Button>
         </div>
       </div>
 
@@ -1023,7 +1159,11 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
           <div 
             className="flex flex-col items-center py-8"
             style={{ 
-              cursor: signaturePlacementMode ? "crosshair" : tool === "text" ? "crosshair" : "default" 
+              cursor: signaturePlacementMode && pendingSignature
+                ? "crosshair"
+                : tool === "text" 
+                  ? "crosshair" 
+                  : "default" 
             }}
           >
             <Document
@@ -1047,6 +1187,7 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
                     onTextEdit={handleTextEditCallback}
                     onTextChange={handleTextChange}
                     onTextBlur={handleTextBlurCallback}
+                    onTextRemove={handleTextRemove}
                     onTextPositionChange={handleTextPositionChange}
                     onTextSizeChange={handleTextSizeChange}
                     onSignatureSelect={setSelectedSignatureId}
@@ -1055,11 +1196,25 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
                     onSignatureSizeChange={handleSignatureSizeChange}
                     onPageClick={(e) => {
                       console.log('Page clicked', { signaturePlacementMode, tool, pageNumber });
-                      if (signaturePlacementMode) {
-                        console.log('Calling handleSignatureClick');
-                        handleSignatureClick(e, pageNumber);
-                      } else if (tool === "text") {
-                        handleTextClick(e, pageNumber);
+                      setSelectedSignatureId(null);
+                      
+                      // Check if clicked on empty space (not on annotation)
+                      const target = e.target as HTMLElement;
+                      const clickedOnAnnotation = target.closest('.annotation-box');
+                      
+                      if (!clickedOnAnnotation) {
+                        // Clicked on empty PDF space
+                        if (signaturePlacementMode) {
+                          console.log('Calling handleSignatureClick');
+                          handleSignatureClick(e, pageNumber);
+                        } else if (tool === "text") {
+                          handleTextClick(e, pageNumber);
+                        } else {
+                          // Deselect all when clicking empty space in select mode
+                          setEditingTextId(null);
+                          console.log('✅ Deselected all - clicked empty PDF space');
+                          setSelectedSignatureId(null);
+                        }
                       }
                     }}
                   />
@@ -1085,15 +1240,23 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
               // Use setTimeout to check state after signature handlers have run
               if (!signaturePlacementMode) {
                 setSignatureModalOpen(false);
+                // Clear the signature canvas when closing without confirming
+                signatureCanvasRef.current?.clear();
+                setTypedSignature("");
+                setSignatureImage(null);
               }
             }, 0);
           }
         }}
       >
-        <DialogContent className="bg-[#1a1a1a] border-[#EAEB80]/30 text-white max-w-2xl">
+        <DialogContent className="bg-[#1a1a1a] border-2 border-[#EAEB80]/30 text-white 
+             max-w-md w-[90vw] sm:max-w-lg shadow-2xl 
+             z-50 
+             sm:z-[100] 
+             md:z-[9999]">
           <DialogHeader>
-            <DialogTitle className="text-[#EAEB80]">Add Signature</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-[#EAEB80] text-xl font-semibold">Add Signature</DialogTitle>
+            <DialogDescription className="text-gray-400 text-sm">
               Choose how you want to add your signature
             </DialogDescription>
           </DialogHeader>
@@ -1112,7 +1275,7 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
             </TabsList>
 
             <TabsContent value="type" className="mt-4">
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <Input
                   placeholder="Type your name"
                   value={typedSignature}
@@ -1120,8 +1283,24 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
                   className="bg-[#2d2d2d] border-[#EAEB80]/30 text-white"
                 />
                 {typedSignature && (
-                  <div className="bg-white p-6 rounded">
-                    <p className="text-black italic text-3xl font-serif text-center">{typedSignature}</p>
+                  <div className="relative bg-white p-3 rounded-lg border-2 border-[#EAEB80] shadow-md w-fit mx-auto">
+                    {/* Checkered pattern to show transparency */}
+                    <div 
+                      className="absolute inset-0 rounded-lg"
+                      style={{
+                        backgroundImage: `
+                          linear-gradient(45deg, #f9f9f9 25%, transparent 25%),
+                          linear-gradient(-45deg, #f9f9f9 25%, transparent 25%),
+                          linear-gradient(45deg, transparent 75%, #f9f9f9 75%),
+                          linear-gradient(-45deg, transparent 75%, #f9f9f9 75%)
+                        `,
+                        backgroundSize: '12px 12px',
+                        backgroundPosition: '0 0, 0 6px, 6px -6px, -6px 0px',
+                      }}
+                    />
+                    <p className="relative text-black italic text-4xl font-serif leading-tight px-4 py-2" style={{ fontFamily: "'Brush Script MT', 'Dancing Script', cursive" }}>
+                      {typedSignature}
+                    </p>
                   </div>
                 )}
                 <Button
@@ -1129,31 +1308,52 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
                   disabled={!typedSignature.trim()}
                   className="w-full bg-[#EAEB80] text-[#1a1a1a] hover:bg-[#f4d03f] font-semibold"
                 >
-                  Use This Signature
+                  Confirm Signature
                 </Button>
-                <p className="text-sm text-gray-400 text-center">
-                  After clicking "Use This Signature", click anywhere on the PDF to place it
+                <p className="text-xs text-gray-400 text-center">
+                  After clicking "Confirm", click anywhere on the PDF to place your signature.
                 </p>
               </div>
             </TabsContent>
 
             <TabsContent value="draw" className="mt-4">
-              <div className="space-y-4">
-                <div className="bg-white rounded-lg p-4 border-2 border-gray-300">
+              <div className="space-y-3">
+                <div className="bg-white rounded-lg p-3 border-2 border-[#EAEB80] shadow-md relative">
+                  {/* Checkered pattern background to show transparency */}
+                  <div 
+                    className="absolute inset-3 rounded"
+                    style={{
+                      backgroundImage: `
+                        linear-gradient(45deg, #f9f9f9 25%, transparent 25%),
+                        linear-gradient(-45deg, #f9f9f9 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #f9f9f9 75%),
+                        linear-gradient(-45deg, transparent 75%, #f9f9f9 75%)
+                      `,
+                      backgroundSize: '12px 12px',
+                      backgroundPosition: '0 0, 0 6px, 6px -6px, -6px 0px',
+                      zIndex: 0
+                    }}
+                  />
                   <SignatureCanvas
                     ref={signatureCanvasRef}
                     canvasProps={{
-                      className: "w-full h-48 touch-none",
+                      className: "w-full h-32 touch-none relative z-10",
                       style: { touchAction: "none" },
                     }}
-                    backgroundColor="white"
+                    backgroundColor="rgba(255, 255, 255, 0)"
                     penColor="#000000"
                   />
                 </div>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
-                    onClick={() => signatureCanvasRef.current?.clear()}
+                    onClick={() => {
+                      signatureCanvasRef.current?.clear();
+                      // Also clear any pending signature state
+                      setPendingSignature(null);
+                      setSignaturePlacementMode(false);
+                      document.body.style.cursor = "default";
+                    }}
                     className="flex-1 border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10"
                   >
                     Clear
@@ -1163,17 +1363,17 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
                     disabled={signatureCanvasRef.current?.isEmpty()}
                     className="flex-1 bg-[#EAEB80] text-[#1a1a1a] hover:bg-[#f4d03f] font-semibold"
                   >
-                    Use This Signature
+                    Confirm Signature
                   </Button>
                 </div>
-                <p className="text-sm text-gray-400 text-center">
-                  Draw your signature above, then click "Use This Signature" and click on the PDF to place it
+                <p className="text-xs text-gray-400 text-center">
+                  Draw your signature above. After clicking "Confirm", click on the PDF to place it.
                 </p>
               </div>
             </TabsContent>
 
             <TabsContent value="upload" className="mt-4">
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -1182,8 +1382,22 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
                   className="hidden"
                 />
                 {signatureImage && (
-                  <div className="bg-white p-4 rounded border-2 border-gray-300">
-                    <img src={signatureImage} alt="Uploaded signature" className="max-w-full h-auto mx-auto max-h-48 object-contain" />
+                  <div className="relative bg-white p-3 rounded-lg border-2 border-[#EAEB80] shadow-md w-fit mx-auto max-w-full">
+                    {/* Checkered pattern to show transparency */}
+                    <div 
+                      className="absolute inset-3 rounded-lg"
+                      style={{
+                        backgroundImage: `
+                          linear-gradient(45deg, #f9f9f9 25%, transparent 25%),
+                          linear-gradient(-45deg, #f9f9f9 25%, transparent 25%),
+                          linear-gradient(45deg, transparent 75%, #f9f9f9 75%),
+                          linear-gradient(-45deg, transparent 75%, #f9f9f9 75%)
+                        `,
+                        backgroundSize: '12px 12px',
+                        backgroundPosition: '0 0, 0 6px, 6px -6px, -6px 0px',
+                      }}
+                    />
+                    <img src={signatureImage} alt="Uploaded signature" className="relative max-w-full h-auto mx-auto max-h-32 object-contain" />
                   </div>
                 )}
                 <Button
@@ -1193,8 +1407,8 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
                   <Upload className="w-4 h-4 mr-2" />
                   {signatureImage ? "Choose Different Image" : "Upload Signature Image"}
                 </Button>
-                <p className="text-sm text-gray-400 text-center">
-                  Upload an image of your signature, then click on the PDF to place it
+                <p className="text-xs text-gray-400 text-center">
+                  Upload a transparent PNG for best results. After upload, click on the PDF to place it.
                 </p>
               </div>
             </TabsContent>
