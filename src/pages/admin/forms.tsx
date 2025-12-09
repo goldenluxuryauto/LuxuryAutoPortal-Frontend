@@ -869,12 +869,23 @@ export default function FormsPage() {
                                                         variant="outline"
                                                         className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20"
                                                         onClick={() => {
-                                                          window.open(
-                                                            buildApiUrl(
-                                                              `/signed-contracts/submission_${submission.id}.pdf`
-                                                            ),
-                                                            "_blank"
-                                                          );
+                                                          // Use signed_contract_url from database if available
+                                                          if (
+                                                            submission.signedContractUrl
+                                                          ) {
+                                                            window.open(
+                                                              submission.signedContractUrl,
+                                                              "_blank"
+                                                            );
+                                                          } else {
+                                                            // Fallback to old pattern if URL not in database
+                                                            window.open(
+                                                              buildApiUrl(
+                                                                `/signed-contracts/submission_${submission.id}.pdf`
+                                                              ),
+                                                              "_blank"
+                                                            );
+                                                          }
                                                         }}
                                                       >
                                                         <ExternalLink className="w-3 h-3 mr-1" />
