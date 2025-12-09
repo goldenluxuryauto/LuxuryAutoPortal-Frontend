@@ -364,7 +364,7 @@ export default function ClientDetailPage() {
               <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-[#EAEB80] text-xl">Profile Information</CardTitle>
+                  <CardTitle className="text-[#EAEB80] text-xl">Profile Information</CardTitle>
                     <Button
                       onClick={handleTestDB}
                       variant="outline"
@@ -586,7 +586,7 @@ export default function ClientDetailPage() {
               <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-[#EAEB80] text-xl">Totals</CardTitle>
+                  <CardTitle className="text-[#EAEB80] text-xl">Totals</CardTitle>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -666,14 +666,14 @@ export default function ClientDetailPage() {
                     </div>
                   ) : (
                     <Accordion type="multiple" className="w-full space-y-2">
-                      {/* CAR MANAGEMENT AND CAR OWNER SPLIT */}
+                  {/* CAR MANAGEMENT AND CAR OWNER SPLIT */}
                       <AccordionItem value="split" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                            <span className="text-white font-medium">CAR MANAGEMENT AND CAR OWNER SPLIT</span>
-                          </div>
+                      <span className="text-white font-medium">CAR MANAGEMENT AND CAR OWNER SPLIT</span>
+                    </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
@@ -682,7 +682,7 @@ export default function ClientDetailPage() {
                               <span className="text-white font-medium">
                                 ${totals?.carManagementSplit?.toFixed(2) || "0.00"}
                               </span>
-                            </div>
+                  </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Car Owner Split</span>
                               <span className="text-white font-medium">
@@ -693,25 +693,25 @@ export default function ClientDetailPage() {
                         </AccordionContent>
                       </AccordionItem>
 
-                      {/* INCOME */}
+                  {/* INCOME */}
                       <AccordionItem value="income" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                            <span className="text-white font-medium">INCOME</span>
-                          </div>
+                      <span className="text-white font-medium">INCOME</span>
+                        </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Rental Income</span>
                               <span className="text-white">${totals?.income?.rentalIncome?.toFixed(2) || "0.00"}</span>
-                            </div>
+                      </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Delivery Income</span>
                               <span className="text-white">${totals?.income?.deliveryIncome?.toFixed(2) || "0.00"}</span>
-                            </div>
+                  </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Electric Prepaid Income</span>
                               <span className="text-white">${totals?.income?.electricPrepaidIncome?.toFixed(2) || "0.00"}</span>
@@ -778,25 +778,25 @@ export default function ClientDetailPage() {
                         </AccordionContent>
                       </AccordionItem>
 
-                      {/* OPERATING EXPENSES */}
+                  {/* OPERATING EXPENSES */}
                       <AccordionItem value="expenses" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
                             <span className="text-white font-medium">OPERATING EXPENSES (COGS - Per Vehicle)</span>
-                          </div>
+                        </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Auto Body Shop / Wreck</span>
                               <span className="text-white">${totals?.expenses?.autoBodyShop?.toFixed(2) || "0.00"}</span>
-                            </div>
+                      </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Alignment</span>
                               <span className="text-white">${totals?.expenses?.alignment?.toFixed(2) || "0.00"}</span>
-                            </div>
+                  </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Battery</span>
                               <span className="text-white">${totals?.expenses?.battery?.toFixed(2) || "0.00"}</span>
@@ -861,25 +861,25 @@ export default function ClientDetailPage() {
                         </AccordionContent>
                       </AccordionItem>
 
-                      {/* GLA PARKING FEE & LABOR CLEANING */}
+                  {/* GLA PARKING FEE & LABOR CLEANING */}
                       <AccordionItem value="gla" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                            <span className="text-white font-medium">GLA PARKING FEE & LABOR CLEANING</span>
-                          </div>
+                      <span className="text-white font-medium">GLA PARKING FEE & LABOR CLEANING</span>
+                        </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>GLA Labor - Cleaning</span>
                               <span className="text-white">${totals?.gla?.laborCleaning?.toFixed(2) || "0.00"}</span>
-                            </div>
+                      </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>GLA Parking Fee</span>
                               <span className="text-white">${totals?.gla?.parkingFee?.toFixed(2) || "0.00"}</span>
-                            </div>
+                  </div>
                             <div className="flex justify-between text-[#EAEB80] text-sm font-bold pt-2 border-t border-[#2a2a2a]">
                               <span>Total GLA Parking Fee & Labor Cleaning</span>
                               <span>${totals?.gla?.total?.toFixed(2) || "0.00"}</span>
@@ -888,37 +888,37 @@ export default function ClientDetailPage() {
                         </AccordionContent>
                       </AccordionItem>
 
-                      {/* HISTORY OF THE CARS */}
+                  {/* HISTORY OF THE CARS */}
                       <AccordionItem value="history" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                            <span className="text-white font-medium">HISTORY OF THE CARS</span>
-                          </div>
+                      <span className="text-white font-medium">HISTORY OF THE CARS</span>
+                        </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Days Rented</span>
                               <span className="text-white font-medium">{totals?.history?.daysRented || 0}</span>
-                            </div>
+                      </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Trips Taken</span>
                               <span className="text-white font-medium">{totals?.history?.tripsTaken || 0}</span>
-                            </div>
+                  </div>
                           </div>
                         </AccordionContent>
                       </AccordionItem>
 
-                      {/* PAYMENT HISTORY */}
+                  {/* PAYMENT HISTORY */}
                       <AccordionItem value="payments" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                            <span className="text-white font-medium">PAYMENT HISTORY</span>
-                          </div>
+                      <span className="text-white font-medium">PAYMENT HISTORY</span>
+                        </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
@@ -927,8 +927,8 @@ export default function ClientDetailPage() {
                               <span className="text-white font-semibold">
                                 ${totals?.payments?.total?.toFixed(2) || "0.00"}
                               </span>
-                            </div>
-                          </div>
+                      </div>
+                  </div>
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>

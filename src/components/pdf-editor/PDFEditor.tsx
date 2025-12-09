@@ -81,22 +81,25 @@ const TextAnnotationBox = memo(({
   const dragStartRef = useRef({ x: 0, y: 0, startX: 0, startY: 0 });
   const resizeStartRef = useRef({ width: 0, height: 0, mouseX: 0, mouseY: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
+  const measureRef = useRef<HTMLSpanElement>(null);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
     if (isEditing) return;
     e.stopPropagation();
     e.preventDefault();
     setIsDragging(true);
-    // Store initial mouse position and annotation position for 1:1 drag
+    // Store initial pointer position (screen coords) and annotation position (PDF coords)
     dragStartRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      startX: annotation.x * scale,
-      startY: annotation.y * scale
+      x: e.clientX,           // Initial mouse X in screen coordinates
+      y: e.clientY,           // Initial mouse Y in screen coordinates
+      startX: annotation.x,    // Initial annotation X in PDF coordinates
+      startY: annotation.y    // Initial annotation Y in PDF coordinates
     };
-  }, [isEditing, annotation.x, annotation.y, scale]);
+    // Capture pointer for smooth dragging
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, [isEditing, annotation.x, annotation.y]);
 
-  const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
+  const handleResizePointerDown = useCallback((e: React.PointerEvent) => {
     e.stopPropagation();
     e.preventDefault();
     setIsResizing(true);
@@ -106,43 +109,49 @@ const TextAnnotationBox = memo(({
       mouseX: e.clientX,
       mouseY: e.clientY
     };
+    // Capture pointer for smooth resizing
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
   }, [annotation.width, annotation.height]);
 
   useEffect(() => {
     if (!isDragging && !isResizing) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (e: PointerEvent) => {
       e.preventDefault();
       if (isDragging) {
-        // 1:1 drag - exact mouse movement, no lag
+        // Calculate mouse movement delta in screen coordinates
         const deltaX = e.clientX - dragStartRef.current.x;
         const deltaY = e.clientY - dragStartRef.current.y;
-        const newX = (dragStartRef.current.startX + deltaX) / scale;
-        const newY = (dragStartRef.current.startY + deltaY) / scale;
+        // Convert screen delta to PDF coordinates
+        const pdfDeltaX = deltaX / scale;
+        const pdfDeltaY = deltaY / scale;
+        // Add delta to initial PDF position for pixel-perfect 1:1 movement
+        const newX = dragStartRef.current.startX + pdfDeltaX;
+        const newY = dragStartRef.current.startY + pdfDeltaY;
         onPositionChange(newX, newY);
       } else if (isResizing) {
-        // 1:1 resize - exact mouse movement
+        // Instant resize - direct delta calculation
         const deltaX = e.clientX - resizeStartRef.current.mouseX;
         const deltaY = e.clientY - resizeStartRef.current.mouseY;
-        const newWidth = Math.max(100, resizeStartRef.current.width + deltaX / scale);
-        const newHeight = Math.max(20, resizeStartRef.current.height + deltaY / scale);
+        const newWidth = Math.max(annotation.fontSize, resizeStartRef.current.width + deltaX / scale); // Min width matches current font size
+        const newHeight = Math.max(14, resizeStartRef.current.height + deltaY / scale); // Min 14px (12px font + 2px padding)
         onSizeChange(newWidth, newHeight);
       }
     };
 
-    const handleMouseUp = () => {
+    const handlePointerUp = () => {
       setIsDragging(false);
       setIsResizing(false);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('pointermove', handlePointerMove);
+    document.addEventListener('pointerup', handlePointerUp);
     
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerup', handlePointerUp);
     };
-  }, [isDragging, isResizing, scale, onPositionChange, onSizeChange]);
+  }, [isDragging, isResizing, scale, onPositionChange, onSizeChange, annotation.fontSize]);
 
   // Position cursor at the start when editing begins
   useEffect(() => {
@@ -155,22 +164,24 @@ const TextAnnotationBox = memo(({
   return (
     <div
       className={cn(
-        "absolute rounded group annotation-box transition-all duration-200",
+        "absolute rounded group annotation-box",
+        !isDragging && "transition-all duration-200", // Only transition when not dragging
         isEditing 
-          ? "border-2 border-black bg-white/95 shadow-lg" 
-          : "border-0 bg-transparent hover:border hover:border-gray-300 hover:bg-white/5 cursor-move"
+          ? "border border-black bg-white/95 shadow-lg" 
+          : "border border-transparent bg-transparent hover:border hover:border-gray-300 hover:bg-white/5 cursor-move"
       )}
       style={{
         left: `${annotation.x * scale}px`,
         top: `${annotation.y * scale}px`,
         width: `${annotation.width * scale}px`,
         height: `${annotation.height * scale}px`,
-        minWidth: `${100 * scale}px`,
-        minHeight: `${20 * scale}px`,
+        minWidth: `${annotation.fontSize * scale}px`, // Min width matches current font size
+        minHeight: `${14 * scale}px`, // Min height for 12px font + 2px padding
         zIndex: isEditing ? 1000 : 999,
-        padding: "1px",
+        padding: "1px 0", // 1px top/bottom padding
+        transition: isDragging ? "none" : undefined, // Disable transition during drag for instant movement
       }}
-      onMouseDown={handleMouseDown}
+      onPointerDown={handlePointerDown}
       onClick={(e) => {
         e.stopPropagation();
         // Don't trigger edit if clicking on delete button or resize handle
@@ -184,48 +195,85 @@ const TextAnnotationBox = memo(({
       }}
     >
       {isEditing ? (
+        <>
+          {/* Hidden span for measuring text width */}
+          <span
+            ref={measureRef}
+            style={{
+              position: "absolute",
+              visibility: "hidden",
+              whiteSpace: "pre",
+              fontFamily: "'Courier New', monospace",
+              fontSize: `${annotation.fontSize}px`,
+              padding: "1px 1px 1px 1px",
+            }}
+          >
+            {annotation.text || " "}
+          </span>
         <input
-          ref={inputRef}
+            ref={inputRef}
           type="text"
           value={annotation.text}
-          onChange={(e) => {
-            e.stopPropagation();
-            onChange(e.target.value);
+            onChange={(e) => {
+              e.stopPropagation();
+              const newText = e.target.value;
+              onChange(newText);
+              
+              // Calculate width: (text.length * fontSize) - matches font size
+              const newWidth = Math.max(annotation.fontSize, newText.length * annotation.fontSize/5 );
+              // Only update width, keep height and font size unchanged when typing
+              onSizeChange(newWidth, annotation.height);
           }}
-          onBlur={(e) => {
-            e.stopPropagation();
-            onBlur();
-          }}
+            onBlur={(e) => {
+              e.stopPropagation();
+              // Final width calculation on blur: (text.length * fontSize)
+              if (annotation.text) {
+                const finalWidth = Math.max(annotation.fontSize, annotation.text.length * annotation.fontSize/5);
+                // Only update width, keep height and font size unchanged when typing
+                onSizeChange(finalWidth, annotation.height);
+              }
+              onBlur();
+            }}
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => {
             e.stopPropagation();
-            if (e.key === "Enter" || e.key === "Escape") {
-              e.preventDefault();
-              onBlur();
-            }
+              if (e.key === "Enter" || e.key === "Escape") {
+                e.preventDefault();
+                // Final width calculation before blur: (text.length * fontSize)
+                if (annotation.text) {
+                  const finalWidth = Math.max(annotation.fontSize, annotation.text.length * annotation.fontSize/5);
+                  // Only update width, keep height and font size unchanged when typing
+                  onSizeChange(finalWidth, annotation.height);
+                }
+                onBlur();
+              }
           }}
-          className="w-full h-full border-none outline-none bg-transparent font-sans text-left"
-          style={{ 
-            fontFamily: "Inter, system-ui, sans-serif",
-            fontSize: `${annotation.fontSize}pt`,
-            color: annotation.color,
-            padding: "1px",
-            textAlign: "left",
-          }}
+            className="h-full border-none outline-none bg-transparent text-left"
+            style={{ 
+              fontFamily: "'Courier New', monospace",
+              fontSize: `${annotation.fontSize}px`,
+              color: annotation.color,
+              padding: "1px 1px 1px 1px", // 1px top/bottom, 0px left/right
+              textAlign: "left",
+              width: "100%",
+              transition: "font-size 0.15s ease",
+            }}
         />
+        </>
       ) : (
         <div
           className="w-full h-full flex items-center overflow-hidden pointer-events-none text-left"
           style={{ 
-            fontFamily: "Inter, system-ui, sans-serif",
-            fontSize: `${annotation.fontSize}pt`,
+            fontFamily: "'Courier New', monospace",
+            fontSize: `${annotation.fontSize}px`,
             color: annotation.color,
-            padding: "1px",
+            padding: "1px 5px", // 1px top/bottom, 5px left/right
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
             textAlign: "left",
+            transition: "font-size 0.15s ease",
           }}
         >
           {annotation.text || ""}
@@ -236,7 +284,7 @@ const TextAnnotationBox = memo(({
       {isEditing && (
         <div
           className="absolute bottom-0 right-0 w-4 h-4 bg-black cursor-se-resize rounded-tl hover:bg-gray-700 transition-colors"
-          onMouseDown={handleResizeMouseDown}
+          onPointerDown={handleResizePointerDown}
           onClick={(e) => e.stopPropagation()}
         />
       )}
@@ -308,21 +356,23 @@ const SignatureAnnotationBox = memo(({
   const dragStartRef = useRef({ x: 0, y: 0, startX: 0, startY: 0 });
   const resizeStartRef = useRef({ width: 0, height: 0, mouseX: 0, mouseY: 0 });
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.stopPropagation();
     e.preventDefault();
     onSelect();
     setIsDragging(true);
-    // Store initial mouse position and annotation position for 1:1 drag
+    // Store initial pointer position (screen coords) and annotation position (PDF coords)
     dragStartRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      startX: annotation.x * scale,
-      startY: annotation.y * scale
+      x: e.clientX,           // Initial mouse X in screen coordinates
+      y: e.clientY,           // Initial mouse Y in screen coordinates
+      startX: annotation.x,   // Initial annotation X in PDF coordinates
+      startY: annotation.y   // Initial annotation Y in PDF coordinates
     };
-  }, [annotation.x, annotation.y, scale, onSelect]);
+    // Capture pointer for smooth dragging
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, [annotation.x, annotation.y, onSelect]);
 
-  const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
+  const handleResizePointerDown = useCallback((e: React.PointerEvent) => {
     e.stopPropagation();
     e.preventDefault();
     setIsResizing(true);
@@ -332,22 +382,28 @@ const SignatureAnnotationBox = memo(({
       mouseX: e.clientX,
       mouseY: e.clientY
     };
+    // Capture pointer for smooth resizing
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
   }, [annotation.width, annotation.height]);
 
   useEffect(() => {
     if (!isDragging && !isResizing) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (e: PointerEvent) => {
       e.preventDefault();
       if (isDragging) {
-        // 1:1 drag - exact mouse movement, no lag
+        // Calculate mouse movement delta in screen coordinates
         const deltaX = e.clientX - dragStartRef.current.x;
         const deltaY = e.clientY - dragStartRef.current.y;
-        const newX = (dragStartRef.current.startX + deltaX) / scale;
-        const newY = (dragStartRef.current.startY + deltaY) / scale;
+        // Convert screen delta to PDF coordinates
+        const pdfDeltaX = deltaX / scale;
+        const pdfDeltaY = deltaY / scale;
+        // Add delta to initial PDF position for pixel-perfect 1:1 movement
+        const newX = dragStartRef.current.startX + pdfDeltaX;
+        const newY = dragStartRef.current.startY + pdfDeltaY;
         onPositionChange(newX, newY);
       } else if (isResizing) {
-        // 1:1 resize - exact mouse movement
+        // Instant resize - direct delta calculation
         const deltaX = e.clientX - resizeStartRef.current.mouseX;
         const deltaY = e.clientY - resizeStartRef.current.mouseY;
         const newWidth = Math.max(50, resizeStartRef.current.width + deltaX / scale);
@@ -356,26 +412,27 @@ const SignatureAnnotationBox = memo(({
       }
     };
 
-    const handleMouseUp = () => {
+    const handlePointerUp = () => {
       setIsDragging(false);
       setIsResizing(false);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('pointermove', handlePointerMove);
+    document.addEventListener('pointerup', handlePointerUp);
     
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerup', handlePointerUp);
     };
   }, [isDragging, isResizing, scale, onPositionChange, onSizeChange]);
 
   return (
     <div
       className={cn(
-        "absolute rounded group annotation-box transition-all duration-200",
+        "absolute rounded group annotation-box",
+        !isDragging && "transition-all duration-200", // Only transition when not dragging
         isSelected
-          ? "border-2 border-black bg-white/5 shadow-lg cursor-move"
+          ? "border-2 border-black bg-white/5 shadow-lg cursor-move" 
           : "border-0 bg-transparent hover:border hover:border-gray-300 hover:bg-white/5 cursor-move"
       )}
       style={{
@@ -385,8 +442,9 @@ const SignatureAnnotationBox = memo(({
         height: `${annotation.height * scale}px`,
         zIndex: isSelected ? 1000 : 999,
         padding: "1px",
+        transition: isDragging ? "none" : undefined, // Disable transition during drag for instant movement
       }}
-      onMouseDown={handleMouseDown}
+      onPointerDown={handlePointerDown}
       onClick={(e) => {
         e.stopPropagation();
         onSelect();
@@ -422,7 +480,7 @@ const SignatureAnnotationBox = memo(({
       {isSelected && (
         <div
           className="absolute bottom-0 right-0 w-4 h-4 bg-black cursor-se-resize rounded-tl hover:bg-gray-700 transition-colors"
-          onMouseDown={handleResizeMouseDown}
+          onPointerDown={handleResizePointerDown}
           onClick={(e) => e.stopPropagation()}
         />
       )}
@@ -615,15 +673,30 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
     );
   }, []);
 
-  // Handle text size change (resize) - also adjust font size proportionally
+  // Handle text size change (resize) - font size controlled by height only
   const handleTextSizeChange = useCallback((annotationId: string, width: number, height: number) => {
     setTextAnnotations((prev) =>
       prev.map((ann) => {
         if (ann.id === annotationId) {
-          // Calculate font size based on box height
-          // Use height as the primary factor, ensuring text fills the space
-          const newFontSize = Math.max(6, Math.min(20, Math.floor(height * 0.9)));
-          return { ...ann, width, height, fontSize: newFontSize };
+          // If only width changed (typing), preserve font size and height
+          const heightChanged = Math.abs(height - ann.height) > 0.1;
+          const widthOnlyChange = !heightChanged && Math.abs(width - ann.width) > 0.1;
+          
+          if (widthOnlyChange) {
+            // Typing: only update width, preserve font size and height
+            return { ...ann, width };
+          }
+          
+          // Height changed: calculate font size from height
+          // Font size = height - 2px (subtract padding)
+          const newFontSize = Math.max(12, Math.min(80, Math.round(height - 2)));
+          
+          return { 
+            ...ann, 
+            width, 
+            height, 
+            fontSize: newFontSize,
+          };
         }
         return ann;
       })
@@ -687,9 +760,10 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
     const x = ((e.clientX - rect.left) / scale) - 20;
     const y = ((e.clientY - rect.top) / scale) - 10;
     
-    const initialHeight = 20;
-    const initialWidth = 100;
-    const initialFontSize = 24; // 24px font size
+    // Initial state: 20px width (1 char), 22px height (20px font + 2px padding), 20px font
+    const initialWidth = 20; // One character at 20px font
+    const initialFontSize = 20; // 20px font size fixed
+    const initialHeight = initialFontSize + 2; // Font size + 2px padding = 22px
     
     const newText: TextAnnotation = {
       id: `text-${Date.now()}`,
