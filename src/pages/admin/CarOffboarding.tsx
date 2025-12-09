@@ -108,7 +108,7 @@ export default function CarOffboarding() {
     },
   });
 
-  // Fetch active cars (can be off-boarded) - all cars that are not off_fleet
+  // Fetch active cars (can be off-boarded) from glav1_car table
   const { data: activeCarsData, isLoading: isLoadingActive } = useQuery<{
     success: boolean;
     data: Car[];
@@ -119,39 +119,25 @@ export default function CarOffboarding() {
       totalPages: number;
     };
   }>({
-    queryKey: ["/api/cars", "active", searchQuery, page, itemsPerPage],
+    queryKey: ["/api/cars/offboarding", searchQuery, page, itemsPerPage],
     enabled: activeTab === "active",
     placeholderData: keepPreviousData,
     queryFn: async () => {
       const params = new URLSearchParams();
-      // Don't filter by status - get all cars, then filter out off_fleet
-      // This ensures we get available, in_use, and maintenance cars
       if (searchQuery) {
         params.append("search", searchQuery);
       }
       params.append("page", page.toString());
       params.append("limit", itemsPerPage.toString());
-      const url = buildApiUrl(`/api/cars?${params.toString()}`);
+      const url = buildApiUrl(`/api/cars/offboarding?${params.toString()}`);
       const response = await fetch(url, {
         credentials: "include",
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: "Database connection failed" }));
-        throw new Error(errorData.error || "Failed to fetch active cars");
+        throw new Error(errorData.error || "Failed to fetch cars for offboarding");
       }
-      const data = await response.json();
-      // Filter out off_fleet cars - keep only active ones
-      const active = (data.data || []).filter(
-        (car: Car) => car.status !== "off_fleet"
-      );
-      return { 
-        success: true, 
-        data: active,
-        pagination: {
-          ...data.pagination,
-          total: active.length, // Adjust total to reflect filtered count
-        },
-      };
+      return response.json();
     },
     retry: false,
   });
@@ -215,6 +201,7 @@ export default function CarOffboarding() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/cars/offboarding"] });
       toast({
         title: "Success",
         description: "Vehicle off-boarded successfully",
@@ -332,25 +319,34 @@ export default function CarOffboarding() {
                   <TableHeader>
                     <TableRow className="border-b border-[#2a2a2a]">
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        ID
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                         VIN
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Make & Model
+                        Make
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Plate
+                        Model
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                         Year
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Mileage
+                        Color
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        License Plate
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                         Status
                       </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Current Driver
+                      </TableHead>
                       <TableHead className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Action
+                        Actions
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -360,13 +356,19 @@ export default function CarOffboarding() {
                       Array.from({ length: itemsPerPage }).map((_, i) => (
                         <TableRow key={i} className="border-b border-[#2a2a2a]">
                           <TableCell className="px-6 py-4">
+                            <div className="h-4 bg-gray-700 rounded animate-pulse w-12" />
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
                             <div className="h-4 bg-gray-700 rounded animate-pulse w-24" />
                           </TableCell>
                           <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-32" />
+                            <div className="h-4 bg-gray-700 rounded animate-pulse w-20" />
                           </TableCell>
                           <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-20" />
+                            <div className="h-4 bg-gray-700 rounded animate-pulse w-24" />
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="h-4 bg-gray-700 rounded animate-pulse w-16" />
                           </TableCell>
                           <TableCell className="px-6 py-4">
                             <div className="h-4 bg-gray-700 rounded animate-pulse w-16" />
@@ -377,67 +379,103 @@ export default function CarOffboarding() {
                           <TableCell className="px-6 py-4">
                             <div className="h-6 bg-gray-700 rounded animate-pulse w-20" />
                           </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <div className="h-4 bg-gray-700 rounded animate-pulse w-24" />
+                          </TableCell>
                           <TableCell className="px-6 py-4 text-right">
                             <div className="h-8 bg-gray-700 rounded animate-pulse w-24 ml-auto" />
                           </TableCell>
                         </TableRow>
                       ))
                     ) : activeCars.length > 0 ? (
-                      activeCars.map((car) => (
-                        <TableRow
-                          key={car.id}
-                          className="border-b border-[#2a2a2a] hover:bg-[#1a1a1a] transition-colors"
-                        >
-                          <TableCell className="px-6 py-4">
-                            <span className="text-white font-mono text-sm">
-                              {car.vin || "N/A"}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <span className="text-white font-medium">
-                              {car.makeModel || "N/A"}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <span className="text-gray-300">
-                              {car.licensePlate || <span className="text-gray-500">N/A</span>}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <span className="text-gray-300">
-                              {car.year || <span className="text-gray-500">N/A</span>}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <span className="text-gray-300">
-                              {car.mileage.toLocaleString()} mi
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            {getStatusBadge(car.status)}
-                          </TableCell>
-                          <TableCell className="px-6 py-4 text-right">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 px-3 hover:bg-red-500/20 text-red-500"
-                              onClick={() => handleOffboard(car)}
-                            >
-                              <LogOut className="w-4 h-4 mr-1" />
-                              Off-board
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))
+                      activeCars.map((car) => {
+                        // Parse make and model from makeModel string
+                        const makeModelParts = car.makeModel ? car.makeModel.split(" ") : [];
+                        const make = makeModelParts[0] || "N/A";
+                        const model = makeModelParts.slice(1).join(" ") || "N/A";
+                        
+                        return (
+                          <TableRow
+                            key={car.id}
+                            className="border-b border-[#2a2a2a] hover:bg-[#1a1a1a] transition-colors"
+                          >
+                            <TableCell className="px-6 py-4">
+                              <span className="text-white font-mono text-sm">
+                                {car.id}
+                              </span>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <span className="text-white font-mono text-sm">
+                                {car.vin || "N/A"}
+                              </span>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <span className="text-white font-medium">
+                                {make}
+                              </span>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <span className="text-white">
+                                {model}
+                              </span>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <span className="text-gray-300">
+                                {car.year || <span className="text-gray-500">N/A</span>}
+                              </span>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <span className="text-gray-300">
+                                {car.color || <span className="text-gray-500">N/A</span>}
+                              </span>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <span className="text-gray-300 font-mono text-sm">
+                                {car.licensePlate || <span className="text-gray-500">N/A</span>}
+                              </span>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              {getStatusBadge(car.status)}
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              {car.owner ? (
+                                <div>
+                                  <div className="text-white text-sm">
+                                    {car.owner.firstName} {car.owner.lastName}
+                                  </div>
+                                  {car.owner.email && (
+                                    <div className="text-gray-400 text-xs">
+                                      {car.owner.email}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-gray-500 text-sm">Unassigned</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="px-6 py-4 text-right">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 px-3 hover:bg-[#EAEB80]/20 text-[#EAEB80]"
+                                onClick={() => handleOffboard(car)}
+                              >
+                                <LogOut className="w-4 h-4 mr-1" />
+                                Off-board Car
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={7} className="px-6 py-12 text-center">
+                        <TableCell colSpan={10} className="px-6 py-12 text-center">
                           <div className="flex flex-col items-center justify-center">
-                            <p className="text-gray-400 text-lg mb-2">No active vehicles</p>
+                            <p className="text-gray-400 text-lg mb-2">No cars available for off-boarding</p>
                             <p className="text-gray-500 text-sm">
                               {searchQuery
                                 ? "Try adjusting your search"
-                                : "No vehicles are currently active"}
+                                : "No active vehicles found in glav1_car table"}
                             </p>
                           </div>
                         </TableCell>
