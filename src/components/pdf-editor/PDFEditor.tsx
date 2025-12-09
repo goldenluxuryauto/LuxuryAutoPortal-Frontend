@@ -78,7 +78,7 @@ const TextAnnotationBox = memo(({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0 });
+  const dragStartRef = useRef({ x: 0, y: 0, startX: 0, startY: 0 });
   const resizeStartRef = useRef({ width: 0, height: 0, mouseX: 0, mouseY: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -87,9 +87,12 @@ const TextAnnotationBox = memo(({
     e.stopPropagation();
     e.preventDefault();
     setIsDragging(true);
+    // Store initial mouse position and annotation position for 1:1 drag
     dragStartRef.current = {
-      x: e.clientX - annotation.x * scale,
-      y: e.clientY - annotation.y * scale
+      x: e.clientX,
+      y: e.clientY,
+      startX: annotation.x * scale,
+      startY: annotation.y * scale
     };
   }, [isEditing, annotation.x, annotation.y, scale]);
 
@@ -111,10 +114,14 @@ const TextAnnotationBox = memo(({
     const handleMouseMove = (e: MouseEvent) => {
       e.preventDefault();
       if (isDragging) {
-        const newX = (e.clientX - dragStartRef.current.x) / scale;
-        const newY = (e.clientY - dragStartRef.current.y) / scale;
+        // 1:1 drag - exact mouse movement, no lag
+        const deltaX = e.clientX - dragStartRef.current.x;
+        const deltaY = e.clientY - dragStartRef.current.y;
+        const newX = (dragStartRef.current.startX + deltaX) / scale;
+        const newY = (dragStartRef.current.startY + deltaY) / scale;
         onPositionChange(newX, newY);
       } else if (isResizing) {
+        // 1:1 resize - exact mouse movement
         const deltaX = e.clientX - resizeStartRef.current.mouseX;
         const deltaY = e.clientY - resizeStartRef.current.mouseY;
         const newWidth = Math.max(100, resizeStartRef.current.width + deltaX / scale);
@@ -158,8 +165,8 @@ const TextAnnotationBox = memo(({
         top: `${annotation.y * scale}px`,
         width: `${annotation.width * scale}px`,
         height: `${annotation.height * scale}px`,
-        minWidth: "100px",
-        minHeight: "20px",
+        minWidth: `${100 * scale}px`,
+        minHeight: `${20 * scale}px`,
         zIndex: isEditing ? 1000 : 999,
         padding: "1px",
       }}
@@ -298,7 +305,7 @@ const SignatureAnnotationBox = memo(({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0 });
+  const dragStartRef = useRef({ x: 0, y: 0, startX: 0, startY: 0 });
   const resizeStartRef = useRef({ width: 0, height: 0, mouseX: 0, mouseY: 0 });
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -306,9 +313,12 @@ const SignatureAnnotationBox = memo(({
     e.preventDefault();
     onSelect();
     setIsDragging(true);
+    // Store initial mouse position and annotation position for 1:1 drag
     dragStartRef.current = {
-      x: e.clientX - annotation.x * scale,
-      y: e.clientY - annotation.y * scale
+      x: e.clientX,
+      y: e.clientY,
+      startX: annotation.x * scale,
+      startY: annotation.y * scale
     };
   }, [annotation.x, annotation.y, scale, onSelect]);
 
@@ -330,10 +340,14 @@ const SignatureAnnotationBox = memo(({
     const handleMouseMove = (e: MouseEvent) => {
       e.preventDefault();
       if (isDragging) {
-        const newX = (e.clientX - dragStartRef.current.x) / scale;
-        const newY = (e.clientY - dragStartRef.current.y) / scale;
+        // 1:1 drag - exact mouse movement, no lag
+        const deltaX = e.clientX - dragStartRef.current.x;
+        const deltaY = e.clientY - dragStartRef.current.y;
+        const newX = (dragStartRef.current.startX + deltaX) / scale;
+        const newY = (dragStartRef.current.startY + deltaY) / scale;
         onPositionChange(newX, newY);
       } else if (isResizing) {
+        // 1:1 resize - exact mouse movement
         const deltaX = e.clientX - resizeStartRef.current.mouseX;
         const deltaY = e.clientY - resizeStartRef.current.mouseY;
         const newWidth = Math.max(50, resizeStartRef.current.width + deltaX / scale);
@@ -361,7 +375,7 @@ const SignatureAnnotationBox = memo(({
       className={cn(
         "absolute rounded group annotation-box transition-all duration-200",
         isSelected
-          ? "border-2 border-black bg-white/5 shadow-lg cursor-move" 
+          ? "border-2 border-black bg-white/5 shadow-lg cursor-move"
           : "border-0 bg-transparent hover:border hover:border-gray-300 hover:bg-white/5 cursor-move"
       )}
       style={{
@@ -674,14 +688,15 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
     const y = ((e.clientY - rect.top) / scale) - 10;
     
     const initialHeight = 20;
-    const initialFontSize = Math.floor(initialHeight * 0.9); // 18pt for 20px height
+    const initialWidth = 100;
+    const initialFontSize = 24; // 24px font size
     
     const newText: TextAnnotation = {
       id: `text-${Date.now()}`,
       x,
       y,
       text: "",
-      width: 200,
+      width: initialWidth,
       height: initialHeight,
       page: pageNum,
       fontSize: initialFontSize,
@@ -722,14 +737,8 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
     // Wait for image to load to get proper dimensions
     img.onload = () => {
       const aspectRatio = img.width / img.height;
-      let width = 200; // Default width for typed signatures
-      let height = width / aspectRatio;
-      
-      // For handwritten signatures (more square), use smaller width
-      if (aspectRatio < 2) {
-        width = 140;
-        height = width / aspectRatio;
-      }
+      const width = 100; // Fixed width: 100px
+      const height = width / aspectRatio; // Auto height to maintain aspect ratio
       
       const newSignature: SignatureAnnotation = {
         id: `sig-${Date.now()}`,

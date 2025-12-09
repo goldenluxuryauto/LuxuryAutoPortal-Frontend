@@ -24,8 +24,6 @@ import {
   Search,
   Loader2,
   Eye,
-  Check,
-  X,
   Send,
   FileCheck,
   ExternalLink,
@@ -432,57 +430,9 @@ export default function FormsPage() {
     enabled: !!selectedSubmission?.id && isDetailsOpen,
   });
 
-  // Update status mutation
-  const updateStatusMutation = useMutation({
-    mutationFn: async ({
-      id,
-      status,
-    }: {
-      id: number;
-      status: "approved" | "rejected";
-    }) => {
-      const response = await fetch(
-        buildApiUrl(`/api/onboarding/submissions/${id}/status`),
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ status }),
-        }
-      );
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to update status");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["onboarding-submissions"] });
-      toast({
-        title: "Status updated",
-        description: "Submission status has been updated successfully.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Update failed",
-        description: error.message || "Failed to update status",
-        variant: "destructive",
-      });
-    },
-  });
-
   const handleViewDetails = async (submission: OnboardingSubmission) => {
     setSelectedSubmission(submission);
     setIsDetailsOpen(true);
-  };
-
-  const handleApprove = (id: number) => {
-    updateStatusMutation.mutate({ id, status: "approved" });
-  };
-
-  const handleReject = (id: number) => {
-    updateStatusMutation.mutate({ id, status: "rejected" });
   };
 
   // Filter form items based on visibility
@@ -961,42 +911,6 @@ export default function FormsPage() {
                                                     title="View Details"
                                                   >
                                                     <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
-                                                  </Button>
-                                                  <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    className="h-8 w-8 p-0 hover:bg-green-500/20"
-                                                    onClick={() =>
-                                                      handleApprove(
-                                                        submission.id
-                                                      )
-                                                    }
-                                                    disabled={
-                                                      updateStatusMutation.isPending ||
-                                                      submission.status ===
-                                                        "approved"
-                                                    }
-                                                    title="Approve"
-                                                  >
-                                                    <Check className="w-4 h-4 text-green-500" />
-                                                  </Button>
-                                                  <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    className="h-8 w-8 p-0 hover:bg-red-500/20"
-                                                    onClick={() =>
-                                                      handleReject(
-                                                        submission.id
-                                                      )
-                                                    }
-                                                    disabled={
-                                                      updateStatusMutation.isPending ||
-                                                      submission.status ===
-                                                        "rejected"
-                                                    }
-                                                    title="Reject"
-                                                  >
-                                                    <X className="w-4 h-4 text-red-500" />
                                                   </Button>
                                                 </div>
                                               </td>

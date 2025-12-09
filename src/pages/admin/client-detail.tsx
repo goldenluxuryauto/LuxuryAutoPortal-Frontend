@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
@@ -40,9 +40,19 @@ import {
   ExternalLink,
   Folder,
   ChevronUp,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
+import QuickLinks from "@/components/admin/QuickLinks";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useToast } from "@/hooks/use-toast";
 
 interface ClientDetail {
   id: number;
@@ -90,20 +100,10 @@ interface ClientDetail {
 
 type Section = "profile" | "cars" | "totals" | "maintenance";
 
-const quickLinks = [
-  { label: "Off-boarding Form", url: "#" },
-  { label: "Schedule a Zoom Call", url: "#" },
-  { label: "List Another Car", url: "#" },
-  { label: "Book Your Car", url: "#" },
-  { label: "License & Registration or Insurance Updates", url: "#" },
-  { label: "Refer Somebody", url: "#" },
-  { label: "Client Experience", url: "#" },
-  { label: "Schedule a Car Detailing", url: "#" },
-];
-
 export default function ClientDetailPage() {
   const [, params] = useRoute("/admin/clients/:id");
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const clientId = params?.id ? parseInt(params.id, 10) : null;
   const [activeSection, setActiveSection] = useState<Section>("profile");
   const [expandedSections, setExpandedSections] = useState<Set<Section>>(
@@ -115,6 +115,12 @@ export default function ClientDetailPage() {
   const [maintenanceTypeFilter, setMaintenanceTypeFilter] = useState<string>("all");
   const [maintenanceStatusFilter, setMaintenanceStatusFilter] = useState<string>("all");
   const [maintenanceDateFilter, setMaintenanceDateFilter] = useState<string>("");
+  
+  // Totals filters
+  const [selectedCar, setSelectedCar] = useState<string>("all");
+  const [selectedYear, setSelectedYear] = useState<string>("2025");
+  const [fromYear, setFromYear] = useState<string>("2025");
+  const [toYear, setToYear] = useState<string>("2025");
 
   const { data, isLoading, error } = useQuery<{
     success: boolean;
@@ -127,14 +133,55 @@ export default function ClientDetailPage() {
       const response = await fetch(url, {
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to fetch client");
-      return response.json();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to fetch client: ${response.statusText}`);
+      }
+      const result = await response.json();
+      console.log("✅ [CLIENT DETAIL] Fetched client data:", result);
+      return result;
     },
     enabled: !!clientId,
     retry: false,
   });
 
+  // Show error toast when query fails
+  useEffect(() => {
+    if (error) {
+      console.error("❌ [CLIENT DETAIL] Error fetching client:", error);
+      toast({
+        title: "Error loading client",
+        description: error instanceof Error ? error.message : "Failed to load client details",
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
+
   const client = data?.data;
+
+  // Fetch totals data
+  const { data: totalsData, isLoading: totalsLoading } = useQuery<{
+    success: boolean;
+    data: any;
+  }>({
+    queryKey: ["/api/clients", clientId, "totals", selectedCar, selectedYear, fromYear, toYear],
+    queryFn: async () => {
+      if (!clientId) throw new Error("Invalid client ID");
+      const url = buildApiUrl(`/api/clients/${clientId}/totals?car=${selectedCar}&year=${selectedYear}&from=${fromYear}&to=${toYear}`);
+      const response = await fetch(url, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        // Return empty data if endpoint doesn't exist yet
+        return { success: true, data: null };
+      }
+      return response.json();
+    },
+    enabled: !!clientId && activeSection === "totals",
+    retry: false,
+  });
+
+  const totals = totalsData?.data || null;
 
   const toggleSection = (section: Section) => {
     setExpandedSections((prev) => {
@@ -183,11 +230,49 @@ export default function ClientDetailPage() {
     );
   }
 
+  // Test DB connection handler
+  const handleTestDB = async () => {
+    try {
+      const response = await fetch(buildApiUrl(`/api/test-db?clientId=${clientId}`), {
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (result.success) {
+        toast({
+          title: "✅ Database Connection Successful",
+          description: result.message || "Successfully connected to database",
+        });
+      } else {
+        toast({
+          title: "❌ Database Connection Failed",
+          description: result.error || "Failed to connect to database",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "❌ Database Connection Error",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (error || !client) {
     return (
       <AdminLayout>
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <p className="text-red-400 mb-4">Failed to load client details</p>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <p className="text-red-400 mb-4">
+            {error ? `Failed to load client details: ${error.message}` : "Client not found"}
+          </p>
+          {clientId && (
+            <Button
+              onClick={handleTestDB}
+              className="bg-blue-500 text-white hover:bg-blue-600 mb-2"
+            >
+              Test DB Connection
+            </Button>
+          )}
           <Button
             onClick={() => setLocation("/admin/clients")}
             className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
@@ -278,7 +363,17 @@ export default function ClientDetailPage() {
             {activeSection === "profile" && (
               <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
                 <CardHeader>
-                  <CardTitle className="text-[#EAEB80] text-xl">Profile Information</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-[#EAEB80] text-xl">Profile Information</CardTitle>
+                    <Button
+                      onClick={handleTestDB}
+                      variant="outline"
+                      size="sm"
+                      className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                    >
+                      Test DB Connection
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Contact Information */}
@@ -323,33 +418,10 @@ export default function ClientDetailPage() {
                     </div>
                   </div>
 
-                  {/* Quick Links */}
-                  <div className="pt-4 border-t border-[#2a2a2a]">
-                    <button
-                      onClick={() => setQuickLinksExpanded(!quickLinksExpanded)}
-                      className="w-full flex items-center justify-between mb-4"
-                    >
-                      <h3 className="text-sm font-medium text-[#EAEB80]">Quick Links</h3>
-                      {quickLinksExpanded ? (
-                        <ChevronDown className="w-4 h-4 text-[#EAEB80]" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 text-[#EAEB80]" />
-                      )}
-                    </button>
-                    {quickLinksExpanded && (
-                      <div className="space-y-2">
-                        {quickLinks.map((link, index) => (
-                          <a
-                            key={index}
-                            href={link.url}
-                            className="flex items-center gap-2 text-gray-300 hover:text-[#EAEB80] transition-colors text-sm py-1"
-                          >
-                            <ChevronRight className="w-4 h-4" />
-                            {link.label}
-                          </a>
-                        ))}
-                      </div>
-                    )}
+                  {/* Quick Access - 3-Card Section */}
+                  <div className="pt-6 border-t border-[#2a2a2a]">
+                    <h3 className="text-lg font-semibold text-[#EAEB80] mb-4">Quick Access</h3>
+                    <QuickLinks />
                   </div>
 
                   {/* View My Car */}
@@ -513,131 +585,354 @@ export default function ClientDetailPage() {
             {activeSection === "totals" && (
               <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
                 <CardHeader>
-                  <CardTitle className="text-[#EAEB80] text-xl">Totals</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-[#EAEB80] text-xl">Totals</CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-[#EAEB80] hover:bg-[#EAEB80]/20"
+                      onClick={() => {
+                        // Export functionality
+                        console.log("Export totals");
+                      }}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export
+                    </Button>
+                  </div>
+                  
+                  {/* Filters */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                    <Select value={selectedCar} onValueChange={setSelectedCar}>
+                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectValue placeholder="Car" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectItem value="all">All cars</SelectItem>
+                        {client?.cars?.map((car) => (
+                          <SelectItem key={car.id} value={car.id.toString()}>
+                            {car.make || ""} {car.model || ""} {car.year || ""}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={selectedYear} onValueChange={setSelectedYear}>
+                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectValue placeholder="Filter" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectItem value="2025">2025</SelectItem>
+                        <SelectItem value="2024">2024</SelectItem>
+                        <SelectItem value="2023">2023</SelectItem>
+                        <SelectItem value="2022">2022</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={fromYear} onValueChange={setFromYear}>
+                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectValue placeholder="From" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectItem value="2025">2025</SelectItem>
+                        <SelectItem value="2024">2024</SelectItem>
+                        <SelectItem value="2023">2023</SelectItem>
+                        <SelectItem value="2022">2022</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={toYear} onValueChange={setToYear}>
+                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectValue placeholder="To" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectItem value="2025">2025</SelectItem>
+                        <SelectItem value="2024">2024</SelectItem>
+                        <SelectItem value="2023">2023</SelectItem>
+                        <SelectItem value="2022">2022</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* CAR MANAGEMENT AND CAR OWNER SPLIT */}
-                  <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#2a2a2a]">
-                    <div className="flex items-center justify-between">
-                      <span className="text-white font-medium">CAR MANAGEMENT AND CAR OWNER SPLIT</span>
-                      <span className="text-[#EAEB80] font-semibold text-lg">$0.00</span>
+                  {totalsLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
                     </div>
-                  </div>
+                  ) : !totals ? (
+                    <div className="text-center py-12 text-gray-400">
+                      <Folder className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+                      <p>No data available</p>
+                    </div>
+                  ) : (
+                    <Accordion type="multiple" className="w-full space-y-2">
+                      {/* CAR MANAGEMENT AND CAR OWNER SPLIT */}
+                      <AccordionItem value="split" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                          <div className="flex items-center gap-2 w-full">
+                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
+                            <span className="text-white font-medium">CAR MANAGEMENT AND CAR OWNER SPLIT</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                          <div className="space-y-2 pt-2">
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Car Management Split</span>
+                              <span className="text-white font-medium">
+                                ${totals?.carManagementSplit?.toFixed(2) || "0.00"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Car Owner Split</span>
+                              <span className="text-white font-medium">
+                                ${totals?.carOwnerSplit?.toFixed(2) || "0.00"}
+                              </span>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
 
-                  {/* INCOME */}
-                  <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleTotalsCategory("income")}
-                      className="w-full flex items-center justify-between p-4 bg-[#1a1a1a] hover:bg-[#2a2a2a] transition-colors"
-                    >
-                      <span className="text-white font-medium">INCOME</span>
-                      {expandedTotals.has("income") ? (
-                        <ChevronUp className="w-4 h-4 text-[#EAEB80]" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-[#EAEB80]" />
-                      )}
-                    </button>
-                    {expandedTotals.has("income") && (
-                      <div className="p-4 space-y-2">
-                        <div className="flex justify-between text-gray-400 text-sm">
-                          <span>Total Income</span>
-                          <span>$0.00</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                      {/* INCOME */}
+                      <AccordionItem value="income" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                          <div className="flex items-center gap-2 w-full">
+                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
+                            <span className="text-white font-medium">INCOME</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                          <div className="space-y-2 pt-2">
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Rental Income</span>
+                              <span className="text-white">${totals?.income?.rentalIncome?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Delivery Income</span>
+                              <span className="text-white">${totals?.income?.deliveryIncome?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Electric Prepaid Income</span>
+                              <span className="text-white">${totals?.income?.electricPrepaidIncome?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Smoking Fines</span>
+                              <span className="text-white">${totals?.income?.smokingFines?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Gas Prepaid Income</span>
+                              <span className="text-white">${totals?.income?.gasPrepaidIncome?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Miles Income</span>
+                              <span className="text-white">${totals?.income?.milesIncome?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Ski Racks Income</span>
+                              <span className="text-white">${totals?.income?.skiRacksIncome?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Child Seat Income</span>
+                              <span className="text-white">${totals?.income?.childSeatIncome?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Coolers Income</span>
+                              <span className="text-white">${totals?.income?.coolersIncome?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Income Insurance and Client Wrecks</span>
+                              <span className="text-white">${totals?.income?.incomeInsurance?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Other Income</span>
+                              <span className="text-white">${totals?.income?.otherIncome?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Negative Balance Carry Over</span>
+                              <span className="text-white">${totals?.income?.negativeBalance?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm pt-2 border-t border-[#2a2a2a]">
+                              <span className="font-medium">Car Management Total Expenses</span>
+                              <span className="text-white font-semibold">
+                                ${totals?.income?.carManagementTotalExpenses?.toFixed(2) || "0.00"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span className="font-medium">Car Owner Total Expenses</span>
+                              <span className="text-white font-semibold">
+                                ${totals?.income?.carOwnerTotalExpenses?.toFixed(2) || "0.00"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span className="font-medium">Car Payment</span>
+                              <span className="text-white font-semibold">
+                                ${totals?.income?.carPayment?.toFixed(2) || "0.00"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-[#EAEB80] text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                              <span>Total Expenses</span>
+                              <span>${totals?.income?.totalExpenses?.toFixed(2) || "0.00"}</span>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
 
-                  {/* OPERATING EXPENSES */}
-                  <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleTotalsCategory("expenses")}
-                      className="w-full flex items-center justify-between p-4 bg-[#1a1a1a] hover:bg-[#2a2a2a] transition-colors"
-                    >
-                      <span className="text-white font-medium">OPERATING EXPENSES</span>
-                      {expandedTotals.has("expenses") ? (
-                        <ChevronUp className="w-4 h-4 text-[#EAEB80]" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-[#EAEB80]" />
-                      )}
-                    </button>
-                    {expandedTotals.has("expenses") && (
-                      <div className="p-4 space-y-2">
-                        <div className="flex justify-between text-gray-400 text-sm">
-                          <span>Total Expenses</span>
-                          <span>$0.00</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                      {/* OPERATING EXPENSES */}
+                      <AccordionItem value="expenses" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                          <div className="flex items-center gap-2 w-full">
+                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
+                            <span className="text-white font-medium">OPERATING EXPENSES (COGS - Per Vehicle)</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                          <div className="space-y-2 pt-2">
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Auto Body Shop / Wreck</span>
+                              <span className="text-white">${totals?.expenses?.autoBodyShop?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Alignment</span>
+                              <span className="text-white">${totals?.expenses?.alignment?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Battery</span>
+                              <span className="text-white">${totals?.expenses?.battery?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Brakes</span>
+                              <span className="text-white">${totals?.expenses?.brakes?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Car Payment</span>
+                              <span className="text-white">${totals?.expenses?.carPayment?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Car Insurance</span>
+                              <span className="text-white">${totals?.expenses?.carInsurance?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Car Seats</span>
+                              <span className="text-white">${totals?.expenses?.carSeats?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Cleaning Supplies / Tools</span>
+                              <span className="text-white">${totals?.expenses?.cleaningSupplies?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Emissions</span>
+                              <span className="text-white">${totals?.expenses?.emissions?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>GPS System</span>
+                              <span className="text-white">${totals?.expenses?.gpsSystem?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Keys & Fob</span>
+                              <span className="text-white">${totals?.expenses?.keysFob?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Labor - Detailing</span>
+                              <span className="text-white">${totals?.expenses?.laborDetailing?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Parking Airport (Reimbursed - GLA - Client Owner Rentals)</span>
+                              <span className="text-white">${totals?.expenses?.parkingAirport?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Uber/Lyft/Lime - Not Reimbursed</span>
+                              <span className="text-white">${totals?.expenses?.uberNotReimbursed?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Uber/Lyft/Lime - Reimbursed</span>
+                              <span className="text-white">${totals?.expenses?.uberReimbursed?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Gas - Service Run</span>
+                              <span className="text-white">${totals?.expenses?.gasServiceRun?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-[#EAEB80] text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                              <span>Total Operating Expenses (COGS - Per Vehicle)</span>
+                              <span>${totals?.expenses?.totalOperatingExpenses?.toFixed(2) || "0.00"}</span>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
 
-                  {/* GLA PARKING FEE & LABOR CLEANING */}
-                  <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleTotalsCategory("gla")}
-                      className="w-full flex items-center justify-between p-4 bg-[#1a1a1a] hover:bg-[#2a2a2a] transition-colors"
-                    >
-                      <span className="text-white font-medium">GLA PARKING FEE & LABOR CLEANING</span>
-                      {expandedTotals.has("gla") ? (
-                        <ChevronUp className="w-4 h-4 text-[#EAEB80]" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-[#EAEB80]" />
-                      )}
-                    </button>
-                    {expandedTotals.has("gla") && (
-                      <div className="p-4 space-y-2">
-                        <div className="flex justify-between text-gray-400 text-sm">
-                          <span>Total GLA Fees</span>
-                          <span>$0.00</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                      {/* GLA PARKING FEE & LABOR CLEANING */}
+                      <AccordionItem value="gla" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                          <div className="flex items-center gap-2 w-full">
+                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
+                            <span className="text-white font-medium">GLA PARKING FEE & LABOR CLEANING</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                          <div className="space-y-2 pt-2">
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>GLA Labor - Cleaning</span>
+                              <span className="text-white">${totals?.gla?.laborCleaning?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>GLA Parking Fee</span>
+                              <span className="text-white">${totals?.gla?.parkingFee?.toFixed(2) || "0.00"}</span>
+                            </div>
+                            <div className="flex justify-between text-[#EAEB80] text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                              <span>Total GLA Parking Fee & Labor Cleaning</span>
+                              <span>${totals?.gla?.total?.toFixed(2) || "0.00"}</span>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
 
-                  {/* HISTORY OF THE CARS */}
-                  <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleTotalsCategory("history")}
-                      className="w-full flex items-center justify-between p-4 bg-[#1a1a1a] hover:bg-[#2a2a2a] transition-colors"
-                    >
-                      <span className="text-white font-medium">HISTORY OF THE CARS</span>
-                      {expandedTotals.has("history") ? (
-                        <ChevronUp className="w-4 h-4 text-[#EAEB80]" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-[#EAEB80]" />
-                      )}
-                    </button>
-                    {expandedTotals.has("history") && (
-                      <div className="p-4 space-y-2">
-                        <div className="flex justify-between text-gray-400 text-sm">
-                          <span>Total History</span>
-                          <span>$0.00</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                      {/* HISTORY OF THE CARS */}
+                      <AccordionItem value="history" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                          <div className="flex items-center gap-2 w-full">
+                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
+                            <span className="text-white font-medium">HISTORY OF THE CARS</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                          <div className="space-y-2 pt-2">
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Days Rented</span>
+                              <span className="text-white font-medium">{totals?.history?.daysRented || 0}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>Trips Taken</span>
+                              <span className="text-white font-medium">{totals?.history?.tripsTaken || 0}</span>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
 
-                  {/* PAYMENT HISTORY */}
-                  <div className="border border-[#2a2a2a] rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleTotalsCategory("payments")}
-                      className="w-full flex items-center justify-between p-4 bg-[#1a1a1a] hover:bg-[#2a2a2a] transition-colors"
-                    >
-                      <span className="text-white font-medium">PAYMENT HISTORY</span>
-                      {expandedTotals.has("payments") ? (
-                        <ChevronUp className="w-4 h-4 text-[#EAEB80]" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-[#EAEB80]" />
-                      )}
-                    </button>
-                    {expandedTotals.has("payments") && (
-                      <div className="p-4 space-y-2">
-                        <div className="flex justify-between text-gray-400 text-sm">
-                          <span>Total Payments</span>
-                          <span>$0.00</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                      {/* PAYMENT HISTORY */}
+                      <AccordionItem value="payments" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                          <div className="flex items-center gap-2 w-full">
+                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
+                            <span className="text-white font-medium">PAYMENT HISTORY</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                          <div className="space-y-2 pt-2">
+                            <div className="flex justify-between text-gray-300 text-sm">
+                              <span>{fromYear} - {toYear}</span>
+                              <span className="text-white font-semibold">
+                                ${totals?.payments?.total?.toFixed(2) || "0.00"}
+                              </span>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  )}
                 </CardContent>
               </Card>
             )}
