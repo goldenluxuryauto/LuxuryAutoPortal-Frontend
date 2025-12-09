@@ -50,7 +50,7 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/totals", label: "Totals", icon: Calculator },
   { href: "/admin/earnings", label: "Earnings Calculator", icon: Calculator },
   { href: "/admin/maintenance", label: "Car Maintenance", icon: Wrench },
-  { href: "/admin/forms", label: "Forms", icon: ClipboardList, badge: 105 },
+  { href: "/admin/forms", label: "Forms", icon: ClipboardList },
   { href: "/admin/view-client", label: "View as a Client", icon: Eye, roles: ["admin"] },
   { href: "/admin/view-employee", label: "View as an Employee", icon: Eye, roles: ["admin"] },
   { href: "/admin/car-rental", label: "Car Rental", icon: Key, roles: ["admin"] },
