@@ -68,6 +68,7 @@ interface OnboardingSubmission {
   status: string;
   contractStatus?: "pending" | "sent" | "opened" | "signed" | "declined" | null;
   contractSignedAt?: string | null;
+  signedContractUrl?: string | null;
   isOffboarded?: boolean;
   carOffboardAt?: string | null;
   carOffboardReason?: string | null;
@@ -1558,12 +1559,17 @@ export default function FormsPage() {
                           <div className="md:col-span-2">
                             <Button
                               onClick={() => {
-                                window.open(
-                                  buildApiUrl(
-                                    `/signed-contracts/submission_${data.id}.pdf`
-                                  ),
-                                  "_blank"
-                                );
+                                if (data.signedContractUrl) {
+                                  window.open(data.signedContractUrl, "_blank");
+                                } else {
+                                  // Fallback to old pattern if URL not in database
+                                  window.open(
+                                    buildApiUrl(
+                                      `/signed-contracts/submission_${data.id}.pdf`
+                                    ),
+                                    "_blank"
+                                  );
+                                }
                               }}
                               className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
                             >
