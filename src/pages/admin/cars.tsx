@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
 import {
   Dialog,
   DialogContent,
@@ -76,6 +77,19 @@ export default function CarsPage() {
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  
+  // Load items per page from localStorage, default to 10
+  const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
+    const saved = localStorage.getItem("cars_limit");
+    return (saved ? parseInt(saved) : 10) as ItemsPerPage;
+  });
+
+  // Save to localStorage when itemsPerPage changes
+  useEffect(() => {
+    localStorage.setItem("cars_limit", itemsPerPage.toString());
+  }, [itemsPerPage]);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -104,8 +118,18 @@ export default function CarsPage() {
     },
   });
 
-  const { data: carsData, isLoading } = useQuery<{ success: boolean; data: Car[] }>({
-    queryKey: ["/api/cars", statusFilter, searchQuery],
+  const { data: carsData, isLoading } = useQuery<{
+    success: boolean;
+    data: Car[];
+    pagination?: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  }>({
+    queryKey: ["/api/cars", statusFilter, searchQuery, page, itemsPerPage],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const params = new URLSearchParams();
       if (statusFilter !== "all") {
@@ -114,6 +138,8 @@ export default function CarsPage() {
       if (searchQuery) {
         params.append("search", searchQuery);
       }
+      params.append("page", page.toString());
+      params.append("limit", itemsPerPage.toString());
       const url = buildApiUrl(`/api/cars?${params.toString()}`);
       const response = await fetch(url, {
         credentials: "include",
@@ -361,11 +387,17 @@ export default function CarsPage() {
                   type="text"
                   placeholder="Search by VIN, Plate, Owner, Make/Model/Year..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPage(1); // Reset to first page on search
+                  }}
                   className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600"
                 />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={statusFilter} onValueChange={(value) => {
+                setStatusFilter(value);
+                setPage(1); // Reset to first page on filter change
+              }}>
                 <SelectTrigger className="w-full md:w-[200px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -398,42 +430,43 @@ export default function CarsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#2a2a2a]">
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
-                      Year
-                    </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
-                      Make
-                    </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
-                      Model
-                    </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                       VIN
                     </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
-                      License Plate
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      Make & Model
                     </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      Year
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                       Color
                     </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      Mileage
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                       Status
                     </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
-                      Assigned To
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      Owner
                     </th>
-                    <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <th className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#2a2a2a]">
                   {isLoading ? (
-                    <tr>
-                      <td colSpan={9} className="px-6 py-8 text-center text-gray-400">
-                        <Loader2 className="w-6 h-6 animate-spin mx-auto" />
-                      </td>
-                    </tr>
+                    <>
+                      {[...Array(5)].map((_, i) => (
+                        <tr key={`skeleton-${i}`} className="border-b border-[#2a2a2a]">
+                          <td colSpan={8} className="px-6 py-4">
+                            <div className="h-4 bg-[#252525] rounded animate-pulse" />
+                          </td>
+                        </tr>
+                      ))}
+                    </>
                   ) : cars.length > 0 ? (
                     cars.map((car) => {
                       // Parse make/model from makeModel field
@@ -463,24 +496,19 @@ export default function CarsPage() {
                           onClick={() => setLocation(`/admin/cars/${car.id}`)}
                         >
                           <td className="px-6 py-4">
-                            <span className="text-white">{car.year || yearPart || "N/A"}</span>
+                            <span className="text-white font-mono text-sm">{car.vin || "N/A"}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-white font-medium">{make}</span>
+                            <span className="text-white font-medium">{car.makeModel || "N/A"}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-white">{model}</span>
+                            <span className="text-white">{car.year || "N/A"}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-white font-mono text-sm">{car.vin}</span>
+                            <span className="text-gray-400">{car.color || "N/A"}</span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-gray-400">
-                              {car.licensePlate || <span className="text-gray-600">N/A</span>}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-gray-400">N/A</span>
+                            <span className="text-gray-400">{car.mileage?.toLocaleString() || "0"}</span>
                           </td>
                           <td className="px-6 py-4">
                             <Badge variant="outline" className={getStatusBadgeColor(car.status)}>
@@ -511,6 +539,7 @@ export default function CarsPage() {
                                   e.stopPropagation();
                                   handleEditClick(car);
                                 }}
+                                title="Edit"
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -536,6 +565,7 @@ export default function CarsPage() {
                                   e.stopPropagation();
                                   handleDeleteClick(car.id);
                                 }}
+                                title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -546,14 +576,35 @@ export default function CarsPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={9} className="px-6 py-8 text-center text-gray-400">
-                        No cars found. Try adjusting your search or filters.
+                      <td colSpan={8} className="px-6 py-12 text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <p className="text-gray-400 text-lg">No cars found</p>
+                          <p className="text-gray-500 text-sm">Try adjusting your search or filters</p>
+                        </div>
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination */}
+            {carsData?.pagination && (
+              <TablePagination
+                totalItems={carsData.pagination.total}
+                itemsPerPage={itemsPerPage}
+                currentPage={page}
+                onPageChange={(newPage) => {
+                  setPage(newPage);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                onItemsPerPageChange={(newLimit) => {
+                  setItemsPerPage(newLimit);
+                  setPage(1); // Reset to first page when changing limit
+                }}
+                isLoading={isLoading}
+              />
+            )}
           </CardContent>
         </Card>
 

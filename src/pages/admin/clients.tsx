@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,6 +41,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Search, Loader2, Eye, ChevronLeft, ChevronRight, X, Plus, Trash2 } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
+import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -74,7 +75,17 @@ export default function ClientsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
-  const limit = 20;
+  
+  // Load items per page from localStorage, default to 10
+  const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
+    const saved = localStorage.getItem("clients_limit");
+    return (saved ? parseInt(saved) : 10) as ItemsPerPage;
+  });
+
+  // Save to localStorage when itemsPerPage changes
+  useEffect(() => {
+    localStorage.setItem("clients_limit", itemsPerPage.toString());
+  }, [itemsPerPage]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [deleteClientId, setDeleteClientId] = useState<number | null>(null);
   const { toast } = useToast();
@@ -90,13 +101,14 @@ export default function ClientsPage() {
       totalPages: number;
     };
   }>({
-    queryKey: ["/api/clients", searchQuery, statusFilter, page],
+    queryKey: ["/api/clients", searchQuery, statusFilter, page, itemsPerPage],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const params = new URLSearchParams();
       if (searchQuery) params.append("search", searchQuery);
       if (statusFilter !== "all") params.append("status", statusFilter);
       params.append("page", page.toString());
-      params.append("limit", limit.toString());
+      params.append("limit", itemsPerPage.toString());
 
       const url = buildApiUrl(`/api/clients?${params.toString()}`);
       const response = await fetch(url, {
@@ -255,7 +267,7 @@ export default function ClientsPage() {
               </div>
               <Select value={statusFilter} onValueChange={(value) => {
                 setStatusFilter(value);
-                setPage(1);
+                setPage(1); // Reset to first page when filter changes
               }}>
                 <SelectTrigger className="w-full md:w-[200px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
                   <SelectValue placeholder="Filter by status" />
@@ -402,37 +414,21 @@ export default function ClientsPage() {
             </div>
 
             {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
-              <div className="flex items-center justify-between px-6 py-4 border-t border-[#2a2a2a]">
-                <div className="text-sm text-gray-400">
-                  Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-                  {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
-                  {pagination.total} clients
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="text-gray-400 hover:text-white"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </Button>
-                  <span className="text-sm text-gray-400">
-                    Page {pagination.page} of {pagination.totalPages}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
-                    disabled={page === pagination.totalPages}
-                    className="text-gray-400 hover:text-white"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
+            {pagination && (
+              <TablePagination
+                totalItems={pagination.total}
+                itemsPerPage={itemsPerPage}
+                currentPage={page}
+                onPageChange={(newPage) => {
+                  setPage(newPage);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                onItemsPerPageChange={(newLimit) => {
+                  setItemsPerPage(newLimit);
+                  setPage(1); // Reset to first page when changing limit
+                }}
+                isLoading={isLoading}
+              />
             )}
           </CardContent>
         </Card>

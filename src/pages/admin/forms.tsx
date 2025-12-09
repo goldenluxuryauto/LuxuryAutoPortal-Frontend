@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +35,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
+import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
 
 interface FormItem {
   id: string;
@@ -260,6 +261,19 @@ export default function FormsPage() {
   const [selectedSubmission, setSelectedSubmission] =
     useState<OnboardingSubmission | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  
+  // Load items per page from localStorage, default to 10
+  const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
+    const saved = localStorage.getItem("submissions_limit");
+    return (saved ? parseInt(saved) : 10) as ItemsPerPage;
+  });
+
+  // Save to localStorage when itemsPerPage changes
+  useEffect(() => {
+    localStorage.setItem("submissions_limit", itemsPerPage.toString());
+  }, [itemsPerPage]);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -324,11 +338,12 @@ export default function FormsPage() {
       totalPages: number;
     };
   }>({
-    queryKey: ["onboarding-submissions", searchQuery],
+    queryKey: ["onboarding-submissions", searchQuery, page, itemsPerPage],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const params = new URLSearchParams({
-        page: "1",
-        limit: "20",
+        page: page.toString(),
+        limit: itemsPerPage.toString(),
       });
       if (searchQuery) {
         params.append("search", searchQuery);
@@ -931,13 +946,23 @@ export default function FormsPage() {
                                         )}
                                       </tbody>
                                     </table>
-                                    {submissionsData.pagination.totalPages >
-                                      1 && (
-                                      <div className="mt-4 text-center text-sm text-gray-400">
-                                        Showing {submissionsData.data.length} of{" "}
-                                        {submissionsData.pagination.total}{" "}
-                                        submissions
-                                      </div>
+                                    
+                                    {/* Pagination */}
+                                    {submissionsData.pagination && (
+                                      <TablePagination
+                                        totalItems={submissionsData.pagination.total}
+                                        itemsPerPage={itemsPerPage}
+                                        currentPage={page}
+                                        onPageChange={(newPage) => {
+                                          setPage(newPage);
+                                          window.scrollTo({ top: 0, behavior: "smooth" });
+                                        }}
+                                        onItemsPerPageChange={(newLimit) => {
+                                          setItemsPerPage(newLimit);
+                                          setPage(1); // Reset to first page when changing limit
+                                        }}
+                                        isLoading={isLoadingSubmissions}
+                                      />
                                     )}
                                   </div>
                                 ) : (
