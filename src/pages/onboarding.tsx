@@ -8,11 +8,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Check, ArrowRight, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import {
+  Check,
+  ArrowRight,
+  ChevronUp,
+  ChevronDown,
+  Loader2,
+} from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 
 const onboardingSchema = z.object({
@@ -30,7 +49,9 @@ const onboardingSchema = z.object({
   zipCode: z.string().min(1, "Zip code is required"),
   birthday: z.string().min(1, "Birthday is required"),
   emergencyContactName: z.string().min(1, "Emergency contact name is required"),
-  emergencyContactPhone: z.string().min(10, "Emergency contact phone is required"),
+  emergencyContactPhone: z
+    .string()
+    .min(10, "Emergency contact phone is required"),
   vehicleYear: z.string().min(1, "Vehicle year is required"),
   vehicleMake: z.string().min(1, "Vehicle make is required"),
   vehicleModel: z.string().min(1, "Vehicle model is required"),
@@ -41,7 +62,9 @@ const onboardingSchema = z.object({
   titleType: z.string().min(1, "Title type is required"),
   vinNumber: z.string().min(1, "VIN number is required"),
   licensePlate: z.string().min(1, "License plate is required"),
-  registrationExpiration: z.string().min(1, "Registration expiration is required"),
+  registrationExpiration: z
+    .string()
+    .min(1, "Registration expiration is required"),
   vehicleRecall: z.string().min(1, "Vehicle recall is required"),
   numberOfSeats: z.string().min(1, "Number of seats is required"),
   numberOfDoors: z.string().min(1, "Number of doors is required"),
@@ -50,7 +73,9 @@ const onboardingSchema = z.object({
   roofRails: z.string().min(1, "Roof rails is required"),
   lastOilChange: z.string().min(1, "Last oil change is required"),
   oilType: z.string().min(1, "Oil type is required"),
-  freeDealershipOilChanges: z.string().min(1, "Free dealership oil changes is required"),
+  freeDealershipOilChanges: z
+    .string()
+    .min(1, "Free dealership oil changes is required"),
   oilPackageDetails: z.string().optional(),
   dealershipAddress: z.string().optional(),
   fuelType: z.string().min(1, "Fuel type is required"),
@@ -75,7 +100,9 @@ const onboardingSchema = z.object({
   carManufacturerWebsite: z.string().url("Valid URL is required"),
   carManufacturerUsername: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
-  confirmAgreement: z.boolean().refine((val) => val === true, "You must confirm"),
+  confirmAgreement: z
+    .boolean()
+    .refine((val) => val === true, "You must confirm"),
 });
 
 type OnboardingFormData = z.infer<typeof onboardingSchema>;
@@ -94,7 +121,7 @@ function generateRandomData(): OnboardingFormData {
   const firstNames = ["John", "Sarah", "Michael", "Emma", "David"];
   const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones"];
   const rng = () => Math.floor(Math.random() * 1000000);
-  
+
   return {
     date: new Date().toISOString().split("T")[0],
     tshirtSize: ["S", "M", "L", "XL"][Math.floor(Math.random() * 4)],
@@ -162,7 +189,9 @@ function generateRandomData(): OnboardingFormData {
 export default function Onboarding() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [expandedSteps, setExpandedSteps] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
+  const [expandedSteps, setExpandedSteps] = useState<number[]>([
+    1, 2, 3, 4, 5, 6, 7,
+  ]);
   const { toast } = useToast();
 
   const form = useForm<OnboardingFormData>({
@@ -236,8 +265,10 @@ export default function Onboarding() {
   };
 
   const toggleStep = (stepId: number) => {
-    setExpandedSteps(prev =>
-      prev.includes(stepId) ? prev.filter(s => s !== stepId) : [...prev, stepId]
+    setExpandedSteps((prev) =>
+      prev.includes(stepId)
+        ? prev.filter((s) => s !== stepId)
+        : [...prev, stepId]
     );
   };
 
@@ -251,14 +282,18 @@ export default function Onboarding() {
       vehicleMake: data.vehicleMake,
       vehicleModel: data.vehicleModel,
     });
-    
+
     setIsSubmitting(true);
     try {
       const endpoint = buildApiUrl("/api/onboarding/submit");
       console.log("📤 [FRONTEND] Sending POST request to", endpoint);
       const requestBody = JSON.stringify(data);
-      console.log("📦 [FRONTEND] Request body length:", requestBody.length, "characters");
-      
+      console.log(
+        "📦 [FRONTEND] Request body length:",
+        requestBody.length,
+        "characters"
+      );
+
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -290,7 +325,7 @@ export default function Onboarding() {
       console.error("Error message:", error.message);
       console.error("Error stack:", error.stack);
       console.log("=".repeat(80));
-      
+
       toast({
         title: "Submission Failed",
         description: error.message || "Please try again later.",
@@ -312,11 +347,18 @@ export default function Onboarding() {
                 <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
                   <Check className="w-10 h-10 text-primary" />
                 </div>
-                <h2 className="font-serif text-3xl font-medium text-foreground mb-4">Thank You!</h2>
+                <h2 className="font-serif text-3xl font-medium text-foreground mb-4">
+                  Thank You!
+                </h2>
                 <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                  Your information has been submitted successfully. One of our luxury automotive specialists will contact you within 24 hours.
+                  Your information has been submitted successfully. One of our
+                  luxury automotive specialists will contact you within 24
+                  hours.
                 </p>
-                <Button onClick={() => window.location.href = "/fleet"} data-testid="button-browse-fleet">
+                <Button
+                  onClick={() => (window.location.href = "/fleet")}
+                  data-testid="button-browse-fleet"
+                >
                   Browse Our Fleet
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
@@ -335,9 +377,9 @@ export default function Onboarding() {
       <main className="pt-20 lg:pt-24 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 flex flex-col items-center">
-            <img 
-              src="/logo.png" 
-              alt="Golden Luxury Auto" 
+            <img
+              src="/logo.png"
+              alt="Golden Luxury Auto"
               className="h-[47px] md:h-[60px] lg:h-[73px] w-auto object-contain mb-4 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
             />
             <p className="text-gray-400 text-center">Client Onboarding Form</p>
@@ -346,7 +388,10 @@ export default function Onboarding() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {steps.map((step) => (
-                <Card key={step.id} className="bg-[#111111] border-[#EAEB80]/20 overflow-hidden">
+                <Card
+                  key={step.id}
+                  className="bg-[#111111] border-[#EAEB80]/20 overflow-hidden"
+                >
                   <button
                     type="button"
                     onClick={() => toggleStep(step.id)}
@@ -367,460 +412,950 @@ export default function Onboarding() {
                       {step.id === 1 && (
                         <>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="date" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Date *</FormLabel>
-                                <FormControl>
-                                  <Input type="date" {...field} className="bg-[#0a0a0a] border-gray-700" />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="tshirtSize" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">T-Shirt Size *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormField
+                              control={form.control}
+                              name="date"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Date *
+                                  </FormLabel>
                                   <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
+                                    <Input
+                                      type="date"
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    {["XS", "S", "M", "L", "XL", "XXL"].map(s => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="tshirtSize"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    T-Shirt Size *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {["XS", "S", "M", "L", "XL", "XXL"].map(
+                                        (s) => (
+                                          <SelectItem key={s} value={s}>
+                                            {s}
+                                          </SelectItem>
+                                        )
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="firstNameOwner" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Vehicle Owner First Name *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="lastNameOwner" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Vehicle Owner Last Name *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="firstNameOwner"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Vehicle Owner First Name *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="lastNameOwner"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Vehicle Owner Last Name *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="phoneOwner" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Vehicle Owner Phone Number *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="emailOwner" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Vehicle Owner Email Address *</FormLabel>
-                                <FormControl><Input {...field} type="email" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="phoneOwner"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Vehicle Owner Phone Number *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="emailOwner"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Vehicle Owner Email Address *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      type="email"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="representative" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Golden Luxury Auto Representative *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="John Smith">John Smith</SelectItem>
-                                    <SelectItem value="Sarah Johnson">Sarah Johnson</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="heardAboutUs" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">How did you hear about us? *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Friend">Friend</SelectItem>
-                                    <SelectItem value="Google">Google</SelectItem>
-                                    <SelectItem value="Social Media">Social Media</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="representative"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Golden Luxury Auto Representative *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Jay Barton">
+                                        Jay Barton
+                                      </SelectItem>
+                                      <SelectItem value="Jenn Mason">
+                                        Jenn Mason
+                                      </SelectItem>
+                                      <SelectItem value="Brynn Lunn">
+                                        Brynn Lunn
+                                      </SelectItem>
+                                      <SelectItem value="Other">
+                                        Other
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="heardAboutUs"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    How did you hear about us? *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Friend">
+                                        Friend
+                                      </SelectItem>
+                                      <SelectItem value="Google">
+                                        Google
+                                      </SelectItem>
+                                      <SelectItem value="Social Media">
+                                        Social Media
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                         </>
                       )}
                       {step.id === 2 && (
                         <>
-                          <FormField control={form.control} name="streetAddress" render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-300">Street Address *</FormLabel>
-                              <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )} />
+                          <FormField
+                            control={form.control}
+                            name="streetAddress"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">
+                                  Street Address *
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    className="bg-[#0a0a0a] border-gray-700"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="city" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">City *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="state" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">State *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="city"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    City *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="state"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    State *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="zipCode" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Zip Code *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="birthday" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Birthday *</FormLabel>
-                                <FormControl><Input type="date" {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="zipCode"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Zip Code *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="birthday"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Birthday *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="date"
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="emergencyContactName" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Emergency Contact Name *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="emergencyContactPhone" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Emergency Contact Phone *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="emergencyContactName"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Emergency Contact Name *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="emergencyContactPhone"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Emergency Contact Phone *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                         </>
                       )}
                       {step.id === 3 && (
                         <>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="vehicleYear" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Vehicle Year *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="vehicleMake" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Vehicle Make *</FormLabel>
-                                <FormControl><Input {...field} placeholder="e.g., Mercedes-Benz" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="vehicleModel" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Vehicle Model *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="vehicleTrim" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Vehicle Trim *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="vehicleMiles" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Vehicle Miles *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="exteriorColor" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Exterior Color *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="interiorColor" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Interior Color *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="titleType" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Title Type *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormField
+                              control={form.control}
+                              name="vehicleYear"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Vehicle Year *
+                                  </FormLabel>
                                   <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Clean">Clean</SelectItem>
-                                    <SelectItem value="Salvage">Salvage</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="vehicleMake"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Vehicle Make *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="e.g., Mercedes-Benz"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="vinNumber" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">VIN Number *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="licensePlate" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">License Plate *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="vehicleModel"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Vehicle Model *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="vehicleTrim"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Vehicle Trim *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="registrationExpiration" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Registration Expiration *</FormLabel>
-                                <FormControl><Input type="date" {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="vehicleRecall" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Vehicle Recall *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormField
+                              control={form.control}
+                              name="vehicleMiles"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Vehicle Miles *
+                                  </FormLabel>
                                   <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Yes">Yes</SelectItem>
-                                    <SelectItem value="No">No</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="exteriorColor"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Exterior Color *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="numberOfSeats" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Number of Seats *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormField
+                              control={form.control}
+                              name="interiorColor"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Interior Color *
+                                  </FormLabel>
                                   <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    {[2, 4, 5, 6, 7, 8].map(n => (<SelectItem key={n} value={String(n)}>{n}</SelectItem>))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="numberOfDoors" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Number of Doors *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
-                                      <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="2">2</SelectItem>
-                                    <SelectItem value="4">4</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="titleType"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Title Type *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Clean">
+                                        Clean
+                                      </SelectItem>
+                                      <SelectItem value="Salvage">
+                                        Salvage
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="skiRacks" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Ski Racks *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormField
+                              control={form.control}
+                              name="vinNumber"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    VIN Number *
+                                  </FormLabel>
                                   <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Yes">Yes</SelectItem>
-                                    <SelectItem value="No">No</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="skiCrossBars" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Ski Cross Bars *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="licensePlate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    License Plate *
+                                  </FormLabel>
                                   <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Yes">Yes</SelectItem>
-                                    <SelectItem value="No">No</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="roofRails" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Roof Rails *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormField
+                              control={form.control}
+                              name="registrationExpiration"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Registration Expiration *
+                                  </FormLabel>
                                   <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <Input
+                                      type="date"
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Yes">Yes</SelectItem>
-                                    <SelectItem value="No">No</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="lastOilChange" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Last Oil Change *</FormLabel>
-                                <FormControl><Input type="date" {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="vehicleRecall"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Vehicle Recall *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Yes">Yes</SelectItem>
+                                      <SelectItem value="No">No</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="oilType" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Oil Type *</FormLabel>
-                                <FormControl><Input {...field} placeholder="e.g., 5W-30" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="freeDealershipOilChanges" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Free Dealership Oil Changes *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {[0, 1, 2, 3, 4, 5].map(n => (<SelectItem key={n} value={String(n)}>{n}</SelectItem>))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="numberOfSeats"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Number of Seats *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {[2, 4, 5, 6, 7, 8].map((n) => (
+                                        <SelectItem key={n} value={String(n)}>
+                                          {n}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="numberOfDoors"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Number of Doors *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="2">2</SelectItem>
+                                      <SelectItem value="4">4</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="fuelType" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Fuel Type *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormField
+                              control={form.control}
+                              name="skiRacks"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Ski Racks *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Yes">Yes</SelectItem>
+                                      <SelectItem value="No">No</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="skiCrossBars"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Ski Cross Bars *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Yes">Yes</SelectItem>
+                                      <SelectItem value="No">No</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="roofRails"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Roof Rails *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Yes">Yes</SelectItem>
+                                      <SelectItem value="No">No</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="lastOilChange"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Last Oil Change *
+                                  </FormLabel>
                                   <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <Input
+                                      type="date"
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Gasoline">Gasoline</SelectItem>
-                                    <SelectItem value="Diesel">Diesel</SelectItem>
-                                    <SelectItem value="Electric">Electric</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="tireSize" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Tire Size *</FormLabel>
-                                <FormControl><Input {...field} placeholder="e.g., 225/45R17" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="oilType"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Oil Type *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="e.g., 5W-30"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="freeDealershipOilChanges"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Free Dealership Oil Changes *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {[0, 1, 2, 3, 4, 5].map((n) => (
+                                        <SelectItem key={n} value={String(n)}>
+                                          {n}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="fuelType"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Fuel Type *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Gasoline">
+                                        Gasoline
+                                      </SelectItem>
+                                      <SelectItem value="Diesel">
+                                        Diesel
+                                      </SelectItem>
+                                      <SelectItem value="Electric">
+                                        Electric
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="tireSize"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Tire Size *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="e.g., 225/45R17"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                         </>
                       )}
                       {step.id === 4 && (
                         <>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="insuranceProvider" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Insurance Provider *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="insurancePhone" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Insurance Phone *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="insuranceProvider"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Insurance Provider *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="insurancePhone"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Insurance Phone *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="policyNumber" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Policy # *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="insuranceExpiration" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Expiration *</FormLabel>
-                                <FormControl><Input type="date" {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="policyNumber"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Policy # *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="insuranceExpiration"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Expiration *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="date"
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <FormItem>
-                            <FormLabel className="text-gray-300">Insurance Card *</FormLabel>
+                            <FormLabel className="text-gray-300">
+                              Insurance Card *
+                            </FormLabel>
                             <div className="border-2 border-dashed border-[#EAEB80]/30 rounded-lg p-8 text-center">
-                              <p className="text-[#EAEB80] text-sm">Drag & drop files here or click to browse</p>
-                              <p className="text-gray-500 text-xs mt-1">Supports images and PDF files</p>
+                              <p className="text-[#EAEB80] text-sm">
+                                Drag & drop files here or click to browse
+                              </p>
+                              <p className="text-gray-500 text-xs mt-1">
+                                Supports images and PDF files
+                              </p>
                             </div>
                           </FormItem>
                         </>
@@ -828,145 +1363,327 @@ export default function Onboarding() {
                       {step.id === 5 && (
                         <>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="purchasePrice" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Plate #*</FormLabel>
-                                <FormControl><Input {...field} placeholder="e.g., 50000" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="interestRate" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Interest Rate *</FormLabel>
-                                <FormControl><Input {...field} placeholder="e.g., 3.5" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="purchasePrice"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Plate #*
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="e.g., 50000"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="interestRate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Interest Rate *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="e.g., 3.5"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="monthlyPayment" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Monthly Payment *</FormLabel>
-                                <FormControl><Input {...field} placeholder="e.g., 750" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="downPayment" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Down Payment *</FormLabel>
-                                <FormControl><Input {...field} placeholder="e.g., 10000" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="monthlyPayment"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Monthly Payment *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="e.g., 750"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="downPayment"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Down Payment *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="e.g., 10000"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
-                          <FormField control={form.control} name="transportCityToCity" render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-300">Transport vehicle city to city?</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormField
+                            control={form.control}
+                            name="transportCityToCity"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">
+                                  Transport vehicle city to city?
+                                </FormLabel>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Yes">Yes</SelectItem>
+                                    <SelectItem value="No">No</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="ultimateGoal"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">
+                                  What is your ultimate goal? *
+                                </FormLabel>
                                 <FormControl>
-                                  <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                  <Textarea
+                                    {...field}
+                                    placeholder="Tell us about your goals..."
+                                    className="bg-[#0a0a0a] border-gray-700 resize-none"
+                                    rows={4}
+                                  />
                                 </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Yes">Yes</SelectItem>
-                                  <SelectItem value="No">No</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )} />
-                          <FormField control={form.control} name="ultimateGoal" render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-300">What is your ultimate goal? *</FormLabel>
-                              <FormControl><Textarea {...field} placeholder="Tell us about your goals..." className="bg-[#0a0a0a] border-gray-700 resize-none" rows={4} /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )} />
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         </>
                       )}
                       {step.id === 6 && (
                         <>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="bankName" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Bank Name *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="taxClassification" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Tax Classification *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormField
+                              control={form.control}
+                              name="bankName"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Bank Name *
+                                  </FormLabel>
                                   <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Individual">Individual</SelectItem>
-                                    <SelectItem value="Business">Business</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="taxClassification"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Tax Classification *
+                                  </FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                        <SelectValue placeholder="Select" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Individual">
+                                        Individual
+                                      </SelectItem>
+                                      <SelectItem value="Business">
+                                        Business
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="routingNumber" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Routing Number *</FormLabel>
-                                <FormControl><Input {...field} placeholder="9 digits" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="accountNumber" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Account Number *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="routingNumber"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Routing Number *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="9 digits"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="accountNumber"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Account Number *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
-                          <FormField control={form.control} name="ssn" render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-300">SSN *</FormLabel>
-                              <FormControl><Input {...field} placeholder="XXX-XX-XXXX" className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )} />
+                          <FormField
+                            control={form.control}
+                            name="ssn"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">
+                                  SSN *
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    placeholder="XXX-XX-XXXX"
+                                    className="bg-[#0a0a0a] border-gray-700"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         </>
                       )}
                       {step.id === 7 && (
                         <>
                           <div className="grid grid-cols-2 gap-4">
-                            <FormField control={form.control} name="carManufacturerWebsite" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Car Manufacturer Website *</FormLabel>
-                                <FormControl><Input {...field} placeholder="https://..." className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control} name="carManufacturerUsername" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-gray-300">Car Manufacturer Username *</FormLabel>
-                                <FormControl><Input {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )} />
+                            <FormField
+                              control={form.control}
+                              name="carManufacturerWebsite"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Car Manufacturer Website *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="https://..."
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="carManufacturerUsername"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Car Manufacturer Username *
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                           </div>
-                          <FormField control={form.control} name="password" render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-300">Password *</FormLabel>
-                              <FormControl><Input type="password" {...field} className="bg-[#0a0a0a] border-gray-700" /></FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )} />
-                          <div className="bg-[#0a0a0a] border border-gray-700 rounded p-4">
-                            <p className="text-sm text-gray-400 mb-4">After you submit, we will send the DocuSign agreement to your email</p>
-                            <FormField control={form.control} name="confirmAgreement" render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2">
-                                <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                <FormLabel className="text-gray-300 font-normal">Confirm. Send My Agreement</FormLabel>
+                          <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">
+                                  Password *
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="password"
+                                    {...field}
+                                    className="bg-[#0a0a0a] border-gray-700"
+                                  />
+                                </FormControl>
+                                <FormMessage />
                               </FormItem>
-                            )} />
+                            )}
+                          />
+                          <div className="bg-[#0a0a0a] border border-gray-700 rounded p-4">
+                            <p className="text-sm text-gray-400 mb-4">
+                              After you submit, we will send the DocuSign
+                              agreement to your email
+                            </p>
+                            <FormField
+                              control={form.control}
+                              name="confirmAgreement"
+                              render={({ field }) => (
+                                <FormItem className="flex items-center space-x-2">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="text-gray-300 font-normal">
+                                    Confirm. Send My Agreement
+                                  </FormLabel>
+                                </FormItem>
+                              )}
+                            />
                           </div>
                         </>
                       )}
@@ -996,12 +1713,12 @@ export default function Onboarding() {
                       <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                       Submitting...
                     </>
-                ) : (
+                  ) : (
                     <>
-                    Submit
-                    <Check className="ml-2 w-4 h-4" />
+                      Submit
+                      <Check className="ml-2 w-4 h-4" />
                     </>
-                )}
+                  )}
                 </Button>
               </div>
             </form>
