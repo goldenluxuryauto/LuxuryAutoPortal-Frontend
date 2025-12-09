@@ -446,6 +446,9 @@ export default function CarsPage() {
                       Mileage
                     </th>
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      License Plate
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                       Status
                     </th>
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
@@ -461,7 +464,7 @@ export default function CarsPage() {
                     <>
                       {[...Array(5)].map((_, i) => (
                         <tr key={`skeleton-${i}`} className="border-b border-[#2a2a2a]">
-                          <td colSpan={8} className="px-6 py-4">
+                          <td colSpan={9} className="px-6 py-4">
                             <div className="h-4 bg-[#252525] rounded animate-pulse" />
                           </td>
                         </tr>
@@ -469,26 +472,6 @@ export default function CarsPage() {
                     </>
                   ) : cars.length > 0 ? (
                     cars.map((car) => {
-                      // Parse make/model from makeModel field
-                      // Format from backend: "Acura MDX" or "MDX" (if make is null)
-                      const makeModelParts = car.makeModel ? car.makeModel.trim().split(/\s+/) : [];
-                      const yearPart = makeModelParts[0] && /^\d{4}$/.test(makeModelParts[0]) ? makeModelParts[0] : null;
-                      // If first part is year, skip it
-                      const startIdx = yearPart ? 1 : 0;
-                      // If only one part and it's not a year, it's likely just the model (make is null)
-                      let make = "N/A";
-                      let model = "N/A";
-                      if (makeModelParts.length > startIdx) {
-                        if (makeModelParts.length === startIdx + 1) {
-                          // Only model, no make
-                          model = makeModelParts[startIdx];
-                        } else {
-                          // Has make and model
-                          make = makeModelParts[startIdx];
-                          model = makeModelParts.slice(startIdx + 1).join(" ");
-                        }
-                      }
-                      
                       return (
                         <tr 
                           key={car.id} 
@@ -509,6 +492,11 @@ export default function CarsPage() {
                           </td>
                           <td className="px-6 py-4">
                             <span className="text-gray-400">{car.mileage?.toLocaleString() || "0"}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-gray-400 font-mono text-sm">
+                              {car.licensePlate || <span className="text-gray-600">N/A</span>}
+                            </span>
                           </td>
                           <td className="px-6 py-4">
                             <Badge variant="outline" className={getStatusBadgeColor(car.status)}>
@@ -576,7 +564,7 @@ export default function CarsPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={8} className="px-6 py-12 text-center">
+                      <td colSpan={9} className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <p className="text-gray-400 text-lg">No cars found</p>
                           <p className="text-gray-500 text-sm">Try adjusting your search or filters</p>
