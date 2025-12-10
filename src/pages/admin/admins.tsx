@@ -34,7 +34,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, buildApiUrl } from "@/lib/queryClient";
-import { Plus, Pencil, Mail, Loader2, Trash2, ExternalLink } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import {
+  Plus,
+  Pencil,
+  Mail,
+  Loader2,
+  Trash2,
+  ExternalLink,
+} from "lucide-react";
 import { format } from "date-fns";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -72,7 +80,11 @@ const userSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters").optional().or(z.literal("")),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .optional()
+    .or(z.literal("")),
   roleId: z.number().int().positive("Role is required"),
 });
 
@@ -92,7 +104,9 @@ export default function AdminsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [isQuickLinkModalOpen, setIsQuickLinkModalOpen] = useState(false);
-  const [editingQuickLink, setEditingQuickLink] = useState<QuickLink | null>(null);
+  const [editingQuickLink, setEditingQuickLink] = useState<QuickLink | null>(
+    null
+  );
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -177,7 +191,11 @@ export default function AdminsPage() {
       if (password && password.length > 0) {
         payload.password = password;
       }
-      const response = await apiRequest("PUT", `/api/admin/users/${id}`, payload);
+      const response = await apiRequest(
+        "PUT",
+        `/api/admin/users/${id}`,
+        payload
+      );
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to update user");
@@ -272,8 +290,18 @@ export default function AdminsPage() {
   });
 
   const quickLinkUpdateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: QuickLinkFormData }) => {
-      const response = await apiRequest("PUT", `/api/admin/quick-links/${id}`, data);
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: QuickLinkFormData;
+    }) => {
+      const response = await apiRequest(
+        "PUT",
+        `/api/admin/quick-links/${id}`,
+        data
+      );
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to update quick link");
@@ -302,7 +330,10 @@ export default function AdminsPage() {
 
   const quickLinkDeleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await apiRequest("DELETE", `/api/admin/quick-links/${id}`);
+      const response = await apiRequest(
+        "DELETE",
+        `/api/admin/quick-links/${id}`
+      );
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to delete quick link");
@@ -353,9 +384,7 @@ export default function AdminsPage() {
   };
 
   const handleDeleteQuickLink = (id: number) => {
-    if (confirm("Are you sure you want to delete this quick link?")) {
-      quickLinkDeleteMutation.mutate(id);
-    }
+    quickLinkDeleteMutation.mutate(id);
   };
 
   const onQuickLinkSubmit = (data: QuickLinkFormData) => {
@@ -386,7 +415,9 @@ export default function AdminsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-white">Admins</h1>
-            <p className="text-gray-400 text-sm">Manage portal administrators</p>
+            <p className="text-gray-400 text-sm">
+              Manage portal administrators
+            </p>
           </div>
           <Button
             onClick={handleAddClick}
@@ -427,7 +458,10 @@ export default function AdminsPage() {
                 <tbody className="divide-y divide-[#2a2a2a]">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center text-gray-400">
+                      <td
+                        colSpan={6}
+                        className="px-6 py-8 text-center text-gray-400"
+                      >
                         Loading administrators...
                       </td>
                     </tr>
@@ -457,7 +491,10 @@ export default function AdminsPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <Badge variant="outline" className={getRoleBadgeColor(user.role)}>
+                          <Badge
+                            variant="outline"
+                            className={getRoleBadgeColor(user.role)}
+                          >
                             {user.role}
                           </Badge>
                         </td>
@@ -492,7 +529,10 @@ export default function AdminsPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center text-gray-400">
+                      <td
+                        colSpan={6}
+                        className="px-6 py-8 text-center text-gray-400"
+                      >
                         No administrators found
                       </td>
                     </tr>
@@ -518,14 +558,19 @@ export default function AdminsPage() {
             </DialogHeader>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4 mt-4"
+              >
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">First Name</FormLabel>
+                        <FormLabel className="text-gray-400">
+                          First Name
+                        </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -543,7 +588,9 @@ export default function AdminsPage() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Last Name</FormLabel>
+                        <FormLabel className="text-gray-400">
+                          Last Name
+                        </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -582,7 +629,8 @@ export default function AdminsPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-400">
-                        Password {editingUser && "(leave blank to keep current)"}
+                        Password{" "}
+                        {editingUser && "(leave blank to keep current)"}
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -604,7 +652,9 @@ export default function AdminsPage() {
                     <FormItem>
                       <FormLabel className="text-gray-400">Role</FormLabel>
                       <Select
-                        onValueChange={(value) => field.onChange(parseInt(value, 10))}
+                        onValueChange={(value) =>
+                          field.onChange(parseInt(value, 10))
+                        }
                         value={field.value?.toString() || ""}
                       >
                         <FormControl>
@@ -614,7 +664,10 @@ export default function AdminsPage() {
                         </FormControl>
                         <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
                           {roles?.map((role) => (
-                            <SelectItem key={role.id} value={role.id.toString()}>
+                            <SelectItem
+                              key={role.id}
+                              value={role.id.toString()}
+                            >
                               {role.name}
                             </SelectItem>
                           ))}
@@ -641,7 +694,9 @@ export default function AdminsPage() {
                   <Button
                     type="submit"
                     className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
-                    disabled={createMutation.isPending || updateMutation.isPending}
+                    disabled={
+                      createMutation.isPending || updateMutation.isPending
+                    }
                   >
                     {(createMutation.isPending || updateMutation.isPending) && (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -658,8 +713,12 @@ export default function AdminsPage() {
         <div className="mt-12 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-white">Quick Links Management</h2>
-              <p className="text-gray-400 text-sm">Manage quick links for Reports, Support, and Forms centers</p>
+              <h2 className="text-xl font-semibold text-white">
+                Quick Links Management
+              </h2>
+              <p className="text-gray-400 text-sm">
+                Manage quick links for Reports, Support, and Forms centers
+              </p>
             </div>
             <Button
               onClick={handleAddQuickLink}
@@ -696,13 +755,21 @@ export default function AdminsPage() {
                   <tbody className="divide-y divide-[#2a2a2a]">
                     {quickLinks && quickLinks.length > 0 ? (
                       quickLinks.map((link) => (
-                        <tr key={link.id} className="hover:bg-[#252525] transition-colors">
+                        <tr
+                          key={link.id}
+                          className="hover:bg-[#252525] transition-colors"
+                        >
                           <td className="px-6 py-4">
-                            <Badge variant="outline" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                            <Badge
+                              variant="outline"
+                              className="bg-blue-500/20 text-blue-400 border-blue-500/30"
+                            >
                               {link.category}
                             </Badge>
                           </td>
-                          <td className="px-6 py-4 text-white font-medium">{link.title}</td>
+                          <td className="px-6 py-4 text-white font-medium">
+                            {link.title}
+                          </td>
                           <td className="px-6 py-4">
                             <a
                               href={link.url}
@@ -710,24 +777,35 @@ export default function AdminsPage() {
                               rel="noopener noreferrer"
                               className="text-gray-400 hover:text-[#EAEB80] flex items-center gap-1 text-sm"
                             >
-                              {link.url.length > 40 ? `${link.url.substring(0, 40)}...` : link.url}
+                              {link.url.length > 40
+                                ? `${link.url.substring(0, 40)}...`
+                                : link.url}
                               <ExternalLink className="w-3 h-3" />
                             </a>
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex flex-wrap gap-2">
                               {link.visibleToAdmins && (
-                                <Badge variant="outline" className="bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/30 text-xs">
+                                <Badge
+                                  variant="outline"
+                                  className="bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/30 text-xs"
+                                >
                                   Admin
                                 </Badge>
                               )}
                               {link.visibleToClients && (
-                                <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+                                <Badge
+                                  variant="outline"
+                                  className="bg-green-500/20 text-green-400 border-green-500/30 text-xs"
+                                >
                                   Client
                                 </Badge>
                               )}
                               {link.visibleToEmployees && (
-                                <Badge variant="outline" className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs">
+                                <Badge
+                                  variant="outline"
+                                  className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs"
+                                >
                                   Employee
                                 </Badge>
                               )}
@@ -743,21 +821,33 @@ export default function AdminsPage() {
                               >
                                 <Pencil className="w-4 h-4" />
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-gray-400 hover:text-red-400"
-                                onClick={() => handleDeleteQuickLink(link.id)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                              <ConfirmDialog
+                                trigger={
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-gray-400 hover:text-red-400"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                }
+                                title="Delete Quick Link"
+                                description="Are you sure you want to delete this quick link?"
+                                confirmText="Delete"
+                                cancelText="Cancel"
+                                variant="destructive"
+                                onConfirm={() => handleDeleteQuickLink(link.id)}
+                              />
                             </div>
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="px-6 py-8 text-center text-gray-400">
+                        <td
+                          colSpan={5}
+                          className="px-6 py-8 text-center text-gray-400"
+                        >
                           No quick links found. Add one to get started.
                         </td>
                       </tr>
@@ -770,7 +860,10 @@ export default function AdminsPage() {
         </div>
 
         {/* Quick Link Modal */}
-        <Dialog open={isQuickLinkModalOpen} onOpenChange={setIsQuickLinkModalOpen}>
+        <Dialog
+          open={isQuickLinkModalOpen}
+          onOpenChange={setIsQuickLinkModalOpen}
+        >
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-md">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold">
@@ -784,7 +877,10 @@ export default function AdminsPage() {
             </DialogHeader>
 
             <Form {...quickLinkForm}>
-              <form onSubmit={quickLinkForm.handleSubmit(onQuickLinkSubmit)} className="space-y-4 mt-4">
+              <form
+                onSubmit={quickLinkForm.handleSubmit(onQuickLinkSubmit)}
+                className="space-y-4 mt-4"
+              >
                 <FormField
                   control={quickLinkForm.control}
                   name="category"
@@ -801,9 +897,15 @@ export default function AdminsPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                          <SelectItem value="Reports Center">Reports Center</SelectItem>
-                          <SelectItem value="Support Center">Support Center</SelectItem>
-                          <SelectItem value="Forms Center">Forms Center</SelectItem>
+                          <SelectItem value="Reports Center">
+                            Reports Center
+                          </SelectItem>
+                          <SelectItem value="Support Center">
+                            Support Center
+                          </SelectItem>
+                          <SelectItem value="Forms Center">
+                            Forms Center
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -922,9 +1024,13 @@ export default function AdminsPage() {
                   <Button
                     type="submit"
                     className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
-                    disabled={quickLinkCreateMutation.isPending || quickLinkUpdateMutation.isPending}
+                    disabled={
+                      quickLinkCreateMutation.isPending ||
+                      quickLinkUpdateMutation.isPending
+                    }
                   >
-                    {(quickLinkCreateMutation.isPending || quickLinkUpdateMutation.isPending) && (
+                    {(quickLinkCreateMutation.isPending ||
+                      quickLinkUpdateMutation.isPending) && (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     )}
                     {editingQuickLink ? "Update" : "Create"}

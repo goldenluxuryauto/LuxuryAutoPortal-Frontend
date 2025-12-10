@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, buildApiUrl } from "@/lib/queryClient";
+import { ArrowLeft, Home } from "lucide-react";
 
 export default function AdminLogin() {
   const [, setLocation] = useLocation();
@@ -15,8 +16,7 @@ export default function AdminLogin() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      const response = await fetch(`${apiUrl}/api/auth/login`, {
+      const response = await fetch(buildApiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.email, password: data.password }),
@@ -30,12 +30,25 @@ export default function AdminLogin() {
 
       return response.json();
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    onSuccess: async (data) => {
+      // Invalidate and refetch auth query to ensure session is loaded
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      
+      // Wait a moment for the session cookie to be set
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Refetch the auth query to verify session
+      try {
+        await queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
+      } catch (error) {
+        console.error("Failed to verify session after login:", error);
+      }
+      
       toast({
         title: "Welcome back!",
         description: `Logged in as ${data.user.firstName}`,
       });
+      
       setLocation("/admin");
     },
     onError: (error: any) => {
@@ -55,6 +68,20 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
+        {/* Back to Home Button */}
+        <div className="mb-6">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setLocation("/")}
+            className="text-gray-400 hover:text-[#EAEB80] hover:bg-[#1a1a1a] flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <Home className="w-4 h-4" />
+            Back to Home
+          </Button>
+        </div>
+
         <div className="text-center mb-10">
           <img 
             src="/logo.png" 

@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +44,10 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
-import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
+import {
+  TablePagination,
+  ItemsPerPage,
+} from "@/components/ui/table-pagination";
 
 interface FormItem {
   id: string;
@@ -266,7 +274,7 @@ export default function FormsPage() {
     useState<OnboardingSubmission | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [page, setPage] = useState(1);
-  
+
   // Load items per page from localStorage, default to 10
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
     const saved = localStorage.getItem("submissions_limit");
@@ -433,13 +441,24 @@ export default function FormsPage() {
 
   // Approve/Reject submission mutation
   const approvalMutation = useMutation({
-    mutationFn: async ({ id, action }: { id: number; action: "approve" | "reject" }) => {
-      const response = await fetch(buildApiUrl(`/api/onboarding/submissions/${id}/${action}`), {
-        method: "POST",
-        credentials: "include",
-      });
+    mutationFn: async ({
+      id,
+      action,
+    }: {
+      id: number;
+      action: "approve" | "reject";
+    }) => {
+      const response = await fetch(
+        buildApiUrl(`/api/onboarding/submissions/${id}/${action}`),
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: `Failed to ${action} submission` }));
+        const error = await response
+          .json()
+          .catch(() => ({ error: `Failed to ${action} submission` }));
         throw new Error(error.error || `Failed to ${action} submission`);
       }
       return response.json();
@@ -450,7 +469,7 @@ export default function FormsPage() {
         const isExistingClient = data.isExistingClient;
         toast({
           title: "✅ Submission Approved",
-          description: isExistingClient 
+          description: isExistingClient
             ? "🚗 Existing client detected - New car will be added to their account (no email sent)."
             : "📧 Create account email has been sent to the new client.",
         });
@@ -692,7 +711,8 @@ export default function FormsPage() {
                             {isItemExpanded && item.id === "car-on" && (
                               <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
                                 {/* Show form for clients, table for admins */}
-                                {formVisibilityData?.isAdmin || formVisibilityData?.isEmployee ? (
+                                {formVisibilityData?.isAdmin ||
+                                formVisibilityData?.isEmployee ? (
                                   <CarOnboarding />
                                 ) : (
                                   <CarOnboardingForm />
@@ -704,7 +724,8 @@ export default function FormsPage() {
                             {isItemExpanded && item.id === "car-off" && (
                               <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
                                 {/* Show form for clients, table for admins */}
-                                {formVisibilityData?.isAdmin || formVisibilityData?.isEmployee ? (
+                                {formVisibilityData?.isAdmin ||
+                                formVisibilityData?.isEmployee ? (
                                   <CarOffboarding />
                                 ) : (
                                   <CarOffboardingForm />
@@ -899,12 +920,12 @@ export default function FormsPage() {
                                                             );
                                                           } else {
                                                             // Fallback to old pattern if URL not in database
-                                                          window.open(
-                                                            buildApiUrl(
-                                                              `/signed-contracts/submission_${submission.id}.pdf`
-                                                            ),
-                                                            "_blank"
-                                                          );
+                                                            window.open(
+                                                              buildApiUrl(
+                                                                `/signed-contracts/submission_${submission.id}.pdf`
+                                                              ),
+                                                              "_blank"
+                                                            );
                                                           }
                                                         }}
                                                       >
@@ -994,7 +1015,7 @@ export default function FormsPage() {
                                                   >
                                                     <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
                                                   </Button>
-                                                  
+
                                                   {/* Always show Approve/Reject buttons for consistent layout */}
                                                   {/* Disable them if contract is not signed or already approved/rejected */}
                                                   <Button
@@ -1002,68 +1023,100 @@ export default function FormsPage() {
                                                     variant="ghost"
                                                     className="h-8 w-8 p-0 hover:bg-green-500/20"
                                                     onClick={() => {
-                                                      if (confirm(`Approve ${submission.firstNameOwner} ${submission.lastNameOwner}?\n\nNote: If this is a new client, they will receive a create account email.\nIf this is an existing client (email already registered), no email will be sent.`)) {
-                                                        approvalMutation.mutate({ id: submission.id, action: "approve" });
-                                                      }
+                                                      approvalMutation.mutate({
+                                                        id: submission.id,
+                                                        action: "approve",
+                                                      });
                                                     }}
                                                     disabled={
-                                                      submission.contractStatus !== "signed" || 
-                                                      submission.status === "approved" || 
-                                                      submission.status === "rejected" ||
+                                                      submission.contractStatus !==
+                                                        "signed" ||
+                                                      submission.status ===
+                                                        "approved" ||
+                                                      submission.status ===
+                                                        "rejected" ||
                                                       approvalMutation.isPending
                                                     }
                                                     title={
-                                                      submission.contractStatus !== "signed"
+                                                      submission.contractStatus !==
+                                                      "signed"
                                                         ? "Contract must be signed before approval"
-                                                        : submission.status === "approved"
+                                                        : submission.status ===
+                                                          "approved"
                                                         ? "Already approved"
-                                                        : submission.status === "rejected"
+                                                        : submission.status ===
+                                                          "rejected"
                                                         ? "Already rejected"
                                                         : "Approve submission"
                                                     }
                                                   >
-                                                    <CheckCircle className={cn(
-                                                      "w-4 h-4",
-                                                      submission.contractStatus === "signed" && 
-                                                      submission.status !== "approved" && 
-                                                      submission.status !== "rejected"
-                                                        ? "text-green-400 hover:text-green-300"
-                                                        : "text-gray-600"
-                                                    )} />
+                                                    <CheckCircle
+                                                      className={cn(
+                                                        "w-4 h-4",
+                                                        submission.contractStatus ===
+                                                          "signed" &&
+                                                          submission.status !==
+                                                            "approved" &&
+                                                          submission.status !==
+                                                            "rejected"
+                                                          ? "text-green-400 hover:text-green-300"
+                                                          : "text-gray-600"
+                                                      )}
+                                                    />
                                                   </Button>
                                                   <Button
                                                     size="sm"
                                                     variant="ghost"
                                                     className="h-8 w-8 p-0 hover:bg-red-500/20"
                                                     onClick={() => {
-                                                      if (confirm(`Reject ${submission.firstNameOwner} ${submission.lastNameOwner}?`)) {
-                                                        approvalMutation.mutate({ id: submission.id, action: "reject" });
+                                                      if (
+                                                        confirm(
+                                                          `Reject ${submission.firstNameOwner} ${submission.lastNameOwner}?`
+                                                        )
+                                                      ) {
+                                                        approvalMutation.mutate(
+                                                          {
+                                                            id: submission.id,
+                                                            action: "reject",
+                                                          }
+                                                        );
                                                       }
                                                     }}
                                                     disabled={
-                                                      submission.contractStatus !== "signed" || 
-                                                      submission.status === "approved" || 
-                                                      submission.status === "rejected" ||
+                                                      submission.contractStatus !==
+                                                        "signed" ||
+                                                      submission.status ===
+                                                        "approved" ||
+                                                      submission.status ===
+                                                        "rejected" ||
                                                       approvalMutation.isPending
                                                     }
                                                     title={
-                                                      submission.contractStatus !== "signed"
+                                                      submission.contractStatus !==
+                                                      "signed"
                                                         ? "Contract must be signed before rejection"
-                                                        : submission.status === "approved"
+                                                        : submission.status ===
+                                                          "approved"
                                                         ? "Already approved"
-                                                        : submission.status === "rejected"
+                                                        : submission.status ===
+                                                          "rejected"
                                                         ? "Already rejected"
                                                         : "Reject submission"
                                                     }
                                                   >
-                                                    <XCircle className={cn(
-                                                      "w-4 h-4",
-                                                      submission.contractStatus === "signed" && 
-                                                      submission.status !== "approved" && 
-                                                      submission.status !== "rejected"
-                                                        ? "text-red-400 hover:text-red-300"
-                                                        : "text-gray-600"
-                                                    )} />
+                                                    <XCircle
+                                                      className={cn(
+                                                        "w-4 h-4",
+                                                        submission.contractStatus ===
+                                                          "signed" &&
+                                                          submission.status !==
+                                                            "approved" &&
+                                                          submission.status !==
+                                                            "rejected"
+                                                          ? "text-red-400 hover:text-red-300"
+                                                          : "text-gray-600"
+                                                      )}
+                                                    />
                                                   </Button>
                                                 </div>
                                               </td>
@@ -1072,16 +1125,21 @@ export default function FormsPage() {
                                         )}
                                       </tbody>
                                     </table>
-                                    
+
                                     {/* Pagination */}
                                     {submissionsData.pagination && (
                                       <TablePagination
-                                        totalItems={submissionsData.pagination.total}
+                                        totalItems={
+                                          submissionsData.pagination.total
+                                        }
                                         itemsPerPage={itemsPerPage}
                                         currentPage={page}
                                         onPageChange={(newPage) => {
                                           setPage(newPage);
-                                          window.scrollTo({ top: 0, behavior: "smooth" });
+                                          window.scrollTo({
+                                            top: 0,
+                                            behavior: "smooth",
+                                          });
                                         }}
                                         onItemsPerPageChange={(newLimit) => {
                                           setItemsPerPage(newLimit);
@@ -1640,12 +1698,12 @@ export default function FormsPage() {
                                   window.open(data.signedContractUrl, "_blank");
                                 } else {
                                   // Fallback to old pattern if URL not in database
-                                window.open(
-                                  buildApiUrl(
-                                    `/signed-contracts/submission_${data.id}.pdf`
-                                  ),
-                                  "_blank"
-                                );
+                                  window.open(
+                                    buildApiUrl(
+                                      `/signed-contracts/submission_${data.id}.pdf`
+                                    ),
+                                    "_blank"
+                                  );
                                 }
                               }}
                               className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"

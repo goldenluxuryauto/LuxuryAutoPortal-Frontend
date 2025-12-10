@@ -10,6 +10,7 @@ import { ArrowLeft, Car, Upload, X, Loader2, Edit, Trash2 } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -53,7 +54,10 @@ interface CarDetail {
 }
 
 const carSchema = z.object({
-  vin: z.string().min(1, "VIN is required").max(17, "VIN must be 17 characters or less"),
+  vin: z
+    .string()
+    .min(1, "VIN is required")
+    .max(17, "VIN must be 17 characters or less"),
   makeModel: z.string().min(1, "Make & Model is required"),
   licensePlate: z.string().optional(),
   year: z.string().optional(),
@@ -144,10 +148,15 @@ export default function CarDetailPage() {
 
   const deletePhotoMutation = useMutation({
     mutationFn: async (photoPath: string) => {
-      const response = await fetch(buildApiUrl(`/api/cars/${carId}/photos/${encodeURIComponent(photoPath)}`), {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const response = await fetch(
+        buildApiUrl(
+          `/api/cars/${carId}/photos/${encodeURIComponent(photoPath)}`
+        ),
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to delete photo");
@@ -344,14 +353,19 @@ export default function CarDetailPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Mileage</p>
-                  <p className="text-white">{car.mileage.toLocaleString()} mi</p>
+                  <p className="text-white">
+                    {car.mileage.toLocaleString()} mi
+                  </p>
                 </div>
               </div>
               <div className="pt-4 border-t border-[#2a2a2a]">
                 <div className="flex items-center gap-4">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Status</p>
-                    <Badge variant="outline" className={getStatusBadgeColor(car.status)}>
+                    <Badge
+                      variant="outline"
+                      className={getStatusBadgeColor(car.status)}
+                    >
                       {car.status.replace("_", " ").toUpperCase()}
                     </Badge>
                   </div>
@@ -362,7 +376,9 @@ export default function CarDetailPage() {
                         {car.owner.firstName} {car.owner.lastName}
                       </p>
                       {car.owner.email && (
-                        <p className="text-gray-400 text-xs">{car.owner.email}</p>
+                        <p className="text-gray-400 text-xs">
+                          {car.owner.email}
+                        </p>
                       )}
                     </div>
                   )}
@@ -371,14 +387,18 @@ export default function CarDetailPage() {
               {car.offboardAt && (
                 <div className="pt-4 border-t border-[#2a2a2a]">
                   <p className="text-xs text-gray-500 mb-1">Off-boarded</p>
-                  <p className="text-white text-sm">{formatDate(car.offboardAt)}</p>
+                  <p className="text-white text-sm">
+                    {formatDate(car.offboardAt)}
+                  </p>
                   {car.offboardReason && (
                     <p className="text-gray-400 text-xs mt-1">
                       Reason: {car.offboardReason.replace("_", " ")}
                     </p>
                   )}
                   {car.offboardNote && (
-                    <p className="text-gray-400 text-xs mt-1">Note: {car.offboardNote}</p>
+                    <p className="text-gray-400 text-xs mt-1">
+                      Note: {car.offboardNote}
+                    </p>
                   )}
                 </div>
               )}
@@ -388,16 +408,22 @@ export default function CarDetailPage() {
           {/* Timestamps */}
           <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80] text-lg">Timestamps</CardTitle>
+              <CardTitle className="text-[#EAEB80] text-lg">
+                Timestamps
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
                 <p className="text-xs text-gray-500 mb-1">Created</p>
-                <p className="text-white text-sm">{formatDate(car.createdAt)}</p>
+                <p className="text-white text-sm">
+                  {formatDate(car.createdAt)}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Last Updated</p>
-                <p className="text-white text-sm">{formatDate(car.updatedAt)}</p>
+                <p className="text-white text-sm">
+                  {formatDate(car.updatedAt)}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -453,23 +479,30 @@ export default function CarDetailPage() {
                       alt={`Car photo ${index + 1}`}
                       className="w-full h-48 object-cover rounded-lg border border-[#2a2a2a]"
                     />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500/80 hover:bg-red-500 text-white"
-                      onClick={() => {
-                        if (confirm("Are you sure you want to delete this photo?")) {
-                          deletePhotoMutation.mutate(photo);
-                        }
-                      }}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+                    <ConfirmDialog
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500/80 hover:bg-red-500 text-white"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      }
+                      title="Delete Photo"
+                      description="Are you sure you want to delete this photo?"
+                      confirmText="Delete"
+                      cancelText="Cancel"
+                      variant="destructive"
+                      onConfirm={() => deletePhotoMutation.mutate(photo)}
+                    />
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 text-center py-8">No photos uploaded</p>
+              <p className="text-gray-400 text-center py-8">
+                No photos uploaded
+              </p>
             )}
           </CardContent>
         </Card>
@@ -490,14 +523,19 @@ export default function CarDetailPage() {
         <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold">Edit Car</DialogTitle>
+              <DialogTitle className="text-xl font-semibold">
+                Edit Car
+              </DialogTitle>
               <DialogDescription className="text-gray-400">
                 Update car information
               </DialogDescription>
             </DialogHeader>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4 mt-4"
+              >
                 <FormField
                   control={form.control}
                   name="vin"
@@ -521,7 +559,9 @@ export default function CarDetailPage() {
                   name="makeModel"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Make & Model *</FormLabel>
+                      <FormLabel className="text-gray-400">
+                        Make & Model *
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -539,7 +579,9 @@ export default function CarDetailPage() {
                     name="licensePlate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">License Plate</FormLabel>
+                        <FormLabel className="text-gray-400">
+                          License Plate
+                        </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -635,4 +677,3 @@ export default function CarDetailPage() {
     </AdminLayout>
   );
 }
-
