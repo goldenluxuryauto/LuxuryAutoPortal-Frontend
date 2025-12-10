@@ -445,12 +445,21 @@ export default function FormsPage() {
       return response.json();
     },
     onSuccess: (data, variables) => {
-      toast({
-        title: variables.action === "approve" ? "Submission Approved" : "Submission Rejected",
-        description: variables.action === "approve" 
-          ? "Create account email has been sent to the client."
-          : "Submission has been rejected.",
-      });
+      if (variables.action === "approve") {
+        // Show different message for existing vs new clients
+        const isExistingClient = data.isExistingClient;
+        toast({
+          title: "✅ Submission Approved",
+          description: isExistingClient 
+            ? "🚗 Existing client detected - New car will be added to their account (no email sent)."
+            : "📧 Create account email has been sent to the new client.",
+        });
+      } else {
+        toast({
+          title: "Submission Rejected",
+          description: "Submission has been rejected.",
+        });
+      }
       // Invalidate and refetch submissions
       queryClient.invalidateQueries({ queryKey: ["onboarding-submissions"] });
     },
@@ -993,7 +1002,7 @@ export default function FormsPage() {
                                                     variant="ghost"
                                                     className="h-8 w-8 p-0 hover:bg-green-500/20"
                                                     onClick={() => {
-                                                      if (confirm(`Approve ${submission.firstNameOwner} ${submission.lastNameOwner}?\n\nThis will send them the create account email.`)) {
+                                                      if (confirm(`Approve ${submission.firstNameOwner} ${submission.lastNameOwner}?\n\nNote: If this is a new client, they will receive a create account email.\nIf this is an existing client (email already registered), no email will be sent.`)) {
                                                         approvalMutation.mutate({ id: submission.id, action: "approve" });
                                                       }
                                                     }}
@@ -1010,7 +1019,7 @@ export default function FormsPage() {
                                                         ? "Already approved"
                                                         : submission.status === "rejected"
                                                         ? "Already rejected"
-                                                        : "Approve and send create account email"
+                                                        : "Approve submission"
                                                     }
                                                   >
                                                     <CheckCircle className={cn(
