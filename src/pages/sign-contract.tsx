@@ -123,7 +123,8 @@ export default function SignContract() {
         // Optionally open the signed PDF in a new tab
         if (result.signedPdfUrl) {
           setTimeout(() => {
-            window.open(buildApiUrl(result.signedPdfUrl), "_blank");
+            // signedPdfUrl is already a full URL from backend, don't wrap with buildApiUrl
+            window.open(result.signedPdfUrl, "_blank");
           }, 1000);
         }
       } else {

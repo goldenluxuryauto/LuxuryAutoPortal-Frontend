@@ -1510,9 +1510,10 @@ export default function FormsPage() {
                             <Button
                               onClick={() => {
                                 if (data.signedContractUrl) {
+                                  // signedContractUrl is a full URL, use it directly
                                   window.open(data.signedContractUrl, "_blank");
                                 } else {
-                                  // Fallback to old pattern if URL not in database
+                                  // Fallback: Try backend URL path (for old records)
                                   window.open(
                                     buildApiUrl(
                                       `/signed-contracts/submission_${data.id}.pdf`
