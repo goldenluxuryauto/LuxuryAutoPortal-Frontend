@@ -31,6 +31,8 @@ import {
   ExternalLink,
   Download,
   Share2,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
@@ -428,6 +430,38 @@ export default function FormsPage() {
     // Update ref with current IDs
     previousSignedIdsRef.current = currentSignedIds;
   }, [submissionsData?.data]);
+
+  // Approve/Reject submission mutation
+  const approvalMutation = useMutation({
+    mutationFn: async ({ id, action }: { id: number; action: "approve" | "reject" }) => {
+      const response = await fetch(buildApiUrl(`/api/onboarding/submissions/${id}/${action}`), {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: `Failed to ${action} submission` }));
+        throw new Error(error.error || `Failed to ${action} submission`);
+      }
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      toast({
+        title: variables.action === "approve" ? "Submission Approved" : "Submission Rejected",
+        description: variables.action === "approve" 
+          ? "Create account email has been sent to the client."
+          : "Submission has been rejected.",
+      });
+      // Invalidate and refetch submissions
+      queryClient.invalidateQueries({ queryKey: ["onboarding-submissions"] });
+    },
+    onError: (error: Error, variables) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   // Fetch full submission details for viewing
   const { data: submissionDetails } = useQuery<{
@@ -950,6 +984,77 @@ export default function FormsPage() {
                                                     title="View Details"
                                                   >
                                                     <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
+                                                  </Button>
+                                                  
+                                                  {/* Always show Approve/Reject buttons for consistent layout */}
+                                                  {/* Disable them if contract is not signed or already approved/rejected */}
+                                                  <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="h-8 w-8 p-0 hover:bg-green-500/20"
+                                                    onClick={() => {
+                                                      if (confirm(`Approve ${submission.firstNameOwner} ${submission.lastNameOwner}?\n\nThis will send them the create account email.`)) {
+                                                        approvalMutation.mutate({ id: submission.id, action: "approve" });
+                                                      }
+                                                    }}
+                                                    disabled={
+                                                      submission.contractStatus !== "signed" || 
+                                                      submission.status === "approved" || 
+                                                      submission.status === "rejected" ||
+                                                      approvalMutation.isPending
+                                                    }
+                                                    title={
+                                                      submission.contractStatus !== "signed"
+                                                        ? "Contract must be signed before approval"
+                                                        : submission.status === "approved"
+                                                        ? "Already approved"
+                                                        : submission.status === "rejected"
+                                                        ? "Already rejected"
+                                                        : "Approve and send create account email"
+                                                    }
+                                                  >
+                                                    <CheckCircle className={cn(
+                                                      "w-4 h-4",
+                                                      submission.contractStatus === "signed" && 
+                                                      submission.status !== "approved" && 
+                                                      submission.status !== "rejected"
+                                                        ? "text-green-400 hover:text-green-300"
+                                                        : "text-gray-600"
+                                                    )} />
+                                                  </Button>
+                                                  <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="h-8 w-8 p-0 hover:bg-red-500/20"
+                                                    onClick={() => {
+                                                      if (confirm(`Reject ${submission.firstNameOwner} ${submission.lastNameOwner}?`)) {
+                                                        approvalMutation.mutate({ id: submission.id, action: "reject" });
+                                                      }
+                                                    }}
+                                                    disabled={
+                                                      submission.contractStatus !== "signed" || 
+                                                      submission.status === "approved" || 
+                                                      submission.status === "rejected" ||
+                                                      approvalMutation.isPending
+                                                    }
+                                                    title={
+                                                      submission.contractStatus !== "signed"
+                                                        ? "Contract must be signed before rejection"
+                                                        : submission.status === "approved"
+                                                        ? "Already approved"
+                                                        : submission.status === "rejected"
+                                                        ? "Already rejected"
+                                                        : "Reject submission"
+                                                    }
+                                                  >
+                                                    <XCircle className={cn(
+                                                      "w-4 h-4",
+                                                      submission.contractStatus === "signed" && 
+                                                      submission.status !== "approved" && 
+                                                      submission.status !== "rejected"
+                                                        ? "text-red-400 hover:text-red-300"
+                                                        : "text-gray-600"
+                                                    )} />
                                                   </Button>
                                                 </div>
                                               </td>
