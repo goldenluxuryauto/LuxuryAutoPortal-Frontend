@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import ContractManagement from "./ContractManagement";
 import CarOnboarding from "./CarOnboarding";
 import CarOffboarding from "./CarOffboarding";
+import CarOnboardingForm from "@/components/forms/CarOnboardingForm";
+import CarOffboardingForm from "@/components/forms/CarOffboardingForm";
 import {
   Dialog,
   DialogContent,
@@ -645,15 +647,25 @@ export default function FormsPage() {
 
                             {/* Expanded content for Car On-boarding */}
                             {isItemExpanded && item.id === "car-on" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4">
-                                <CarOnboarding />
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
+                                {/* Show form for clients, table for admins */}
+                                {formVisibilityData?.isAdmin || formVisibilityData?.isEmployee ? (
+                                  <CarOnboarding />
+                                ) : (
+                                  <CarOnboardingForm />
+                                )}
                               </div>
                             )}
 
                             {/* Expanded content for Car Off-boarding */}
                             {isItemExpanded && item.id === "car-off" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4">
-                                <CarOffboarding />
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
+                                {/* Show form for clients, table for admins */}
+                                {formVisibilityData?.isAdmin || formVisibilityData?.isEmployee ? (
+                                  <CarOffboarding />
+                                ) : (
+                                  <CarOffboardingForm />
+                                )}
                               </div>
                             )}
 
@@ -731,7 +743,7 @@ export default function FormsPage() {
                                             Car Onboarding Date
                                           </th>
                                           <th className="text-left py-3 px-4 text-gray-400 font-medium">
-                                            Off boarding
+                                            Car Offboarding Date
                                           </th>
                                           <th className="text-left py-3 px-4 text-gray-400 font-medium">
                                             Actions

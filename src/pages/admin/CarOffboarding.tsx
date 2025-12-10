@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -21,21 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { buildApiUrl, apiRequest } from "@/lib/queryClient";
-import { Search, Loader2, LogOut } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
 import {
   Form,
   FormControl,
@@ -44,40 +27,56 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { buildApiUrl } from "@/lib/queryClient";
+import {
+  Loader2,
+  Search,
+  LogOut,
+  Eye,
+  Archive,
+} from "lucide-react";
+import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
+import { useLocation } from "wouter";
+import { cn } from "@/lib/utils";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
 
-interface Car {
+interface OffboardingCar {
   id: number;
-  vin: string;
-  makeModel: string;
-  licensePlate: string | null;
+  createdAt: string;
+  clientId: number | null;
+  clientName: string;
+  clientEmail: string | null;
+  clientPhone: string | null;
+  vin: string | null;
+  carMakeModel: string;
   year: number | null;
-  color: string | null;
-  mileage: number;
-  status: "available" | "in_use" | "maintenance" | "off_fleet";
-  offboardReason: "sold" | "damaged" | "end_lease" | "other" | null;
-  offboardNote: string | null;
+  licensePlate: string | null;
+  status: string;
   offboardAt: string | null;
-  owner?: {
-    firstName: string;
-    lastName: string;
-    email: string | null;
-  } | null;
+  offboardReason: string | null;
+  finalMileage: number | null;
 }
 
-const offboardSchema = z.object({
-  finalMileage: z.string().min(1, "Final mileage is required"),
-  reason: z.enum(["sold", "damaged", "end_lease", "other"]),
-  note: z.string().optional(),
+const offboardCarSchema = z.object({
+  date: z.string().min(1, "Date is required"),
+  name: z.string().min(1, "Name is required"),
+  vehicleMakeModelYear: z.string().min(1, "Vehicle Make/Model/Year is required"),
+  licensePlate: z.string().min(1, "License Plate is required"),
+  returnDate: z.string().min(1, "Return date is required"),
 });
 
-type OffboardFormData = z.infer<typeof offboardSchema>;
+type OffboardCarFormData = z.infer<typeof offboardCarSchema>;
 
 export default function CarOffboarding() {
-  const [activeTab, setActiveTab] = useState<"active" | "archived">("active");
-  const [isOffboardModalOpen, setIsOffboardModalOpen] = useState(false);
-  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [isOffboardDialogOpen, setIsOffboardDialogOpen] = useState(false);
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   // Load items per page from localStorage, default to 10
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
@@ -90,197 +89,153 @@ export default function CarOffboarding() {
     localStorage.setItem("car_offboarding_limit", itemsPerPage.toString());
   }, [itemsPerPage]);
 
-  // Reset page to 1 when search or tab changes
+  // Reset page to 1 when search changes
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, activeTab]);
+  }, [searchQuery]);
 
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  // Form for off-board
-  const offboardForm = useForm<OffboardFormData>({
-    resolver: zodResolver(offboardSchema),
-    defaultValues: {
-      finalMileage: "",
-      reason: "sold",
-      note: "",
-    },
-  });
-
-  // Fetch active cars (can be off-boarded) from glav1_car table
-  const { data: activeCarsData, isLoading: isLoadingActive } = useQuery<{
+  // Fetch cars for offboarding section with pagination
+  const { data: carsData, isLoading } = useQuery<{
     success: boolean;
-    data: Car[];
-    pagination?: {
+    data: OffboardingCar[];
+    pagination: {
       page: number;
       limit: number;
       total: number;
       totalPages: number;
     };
   }>({
-    queryKey: ["/api/cars/offboarding", searchQuery, page, itemsPerPage],
-    enabled: activeTab === "active",
+    queryKey: ["cars-offboarding-forms", searchQuery, page, itemsPerPage],
     placeholderData: keepPreviousData,
     queryFn: async () => {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: itemsPerPage.toString(),
+      });
       if (searchQuery) {
         params.append("search", searchQuery);
       }
-      params.append("page", page.toString());
-      params.append("limit", itemsPerPage.toString());
-      const url = buildApiUrl(`/api/cars/offboarding?${params.toString()}`);
-      const response = await fetch(url, {
-        credentials: "include",
-      });
+      const response = await fetch(
+        buildApiUrl(`/api/cars/offboarding-forms?${params.toString()}`),
+        {
+          credentials: "include",
+        }
+      );
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: "Database connection failed" }));
         throw new Error(errorData.error || "Failed to fetch cars for offboarding");
       }
       return response.json();
     },
-    retry: false,
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 
-  // Fetch archived cars (off-fleet)
-  const { data: archivedCarsData, isLoading: isLoadingArchived } = useQuery<{
-    success: boolean;
-    data: Car[];
-    pagination?: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  }>({
-    queryKey: ["/api/cars", "off_fleet", searchQuery, page, itemsPerPage],
-    enabled: activeTab === "archived",
-    placeholderData: keepPreviousData,
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append("status", "off_fleet");
-      if (searchQuery) {
-        params.append("search", searchQuery);
-      }
-      params.append("page", page.toString());
-      params.append("limit", itemsPerPage.toString());
-      const url = buildApiUrl(`/api/cars?${params.toString()}`);
-      const response = await fetch(url, {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Database connection failed" }));
-        throw new Error(errorData.error || "Failed to fetch archived cars");
-      }
-      return response.json();
+  // Form for Offboard Car dialog
+  const offboardCarForm = useForm<OffboardCarFormData>({
+    resolver: zodResolver(offboardCarSchema),
+    defaultValues: {
+      date: new Date().toISOString().split('T')[0],
+      name: "",
+      vehicleMakeModelYear: "",
+      licensePlate: "",
+      returnDate: new Date().toISOString().split('T')[0],
     },
-    retry: false,
   });
 
-  const activeCars = activeCarsData?.data || [];
-  const archivedCars = archivedCarsData?.data || [];
-  const activePagination = activeCarsData?.pagination;
-  const archivedPagination = archivedCarsData?.pagination;
-  const isLoading = activeTab === "active" ? isLoadingActive : isLoadingArchived;
-  const currentCars = activeTab === "active" ? activeCars : archivedCars;
-  const currentPagination = activeTab === "active" ? activePagination : archivedPagination;
-
-  // Off-board mutation
-  const offboardMutation = useMutation({
-    mutationFn: async (data: OffboardFormData) => {
-      const response = await apiRequest("POST", `/api/cars/${selectedCar?.id}/offboard`, {
-        finalMileage: parseInt(data.finalMileage, 10),
-        reason: data.reason,
-        note: data.note || undefined,
+  // Offboard car mutation
+  const offboardCarMutation = useMutation({
+    mutationFn: async (data: OffboardCarFormData) => {
+      const response = await fetch(buildApiUrl("/api/cars/offboard"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(data),
       });
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to off-board car");
+        const error = await response.json().catch(() => ({ error: "Failed to offboard car" }));
+        throw new Error(error.error || "Failed to offboard car");
       }
+
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/cars/offboarding"] });
+      queryClient.invalidateQueries({ queryKey: ["cars-offboarding-forms"] });
+      setIsOffboardDialogOpen(false);
+      offboardCarForm.reset();
       toast({
-        title: "Success",
-        description: "Vehicle off-boarded successfully",
+        title: "✅ Success",
+        description: "Car offboarded successfully",
+        duration: 5000,
       });
-      setIsOffboardModalOpen(false);
-      setSelectedCar(null);
-      offboardForm.reset();
-      // Switch to Archived tab
-      setActiveTab("archived");
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to offboard car",
         variant: "destructive",
       });
     },
   });
 
-  const handleOffboard = (car: Car) => {
-    setSelectedCar(car);
-    offboardForm.reset({
-      finalMileage: car.mileage.toString(),
-      reason: "sold",
-      note: "",
-    });
-    setIsOffboardModalOpen(true);
+  const onSubmitOffboardCar = (data: OffboardCarFormData) => {
+    offboardCarMutation.mutate(data);
   };
 
-  const onOffboardSubmit = (data: OffboardFormData) => {
-    if (selectedCar) {
-      offboardMutation.mutate(data);
+  const cars = carsData?.data || [];
+  const pagination = carsData?.pagination;
+
+  // Handle row click - navigate to client profile
+  const handleRowClick = (car: OffboardingCar) => {
+    if (car.clientId) {
+      setLocation(`/admin/clients?id=${car.clientId}`);
+    } else {
+      setLocation(`/admin/clients?search=${encodeURIComponent(car.clientName)}`);
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "available":
-        return (
-          <Badge className="bg-green-500/20 text-green-400 border-green-500/50 text-xs">
-            Available
-          </Badge>
-        );
-      case "in_use":
-        return (
-          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/50 text-xs">
-            In Use
-          </Badge>
-        );
-      case "maintenance":
-        return (
-          <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50 text-xs">
-            Maintenance
-          </Badge>
-        );
-      case "off_fleet":
-        return (
-          <Badge className="bg-gray-800/50 text-gray-400 border-gray-700 text-xs">
-            Off Fleet
-          </Badge>
-        );
-      default:
-        return (
-          <Badge className="bg-gray-800/50 text-gray-400 border-gray-700 text-xs">
-            {status}
-          </Badge>
-        );
+  // Handle action buttons
+  const handleView = (e: React.MouseEvent, car: OffboardingCar) => {
+    e.stopPropagation();
+    if (car.clientId) {
+      setLocation(`/admin/clients?id=${car.clientId}`);
     }
+  };
+
+  const handleArchive = (e: React.MouseEvent, car: OffboardingCar) => {
+    e.stopPropagation();
+    // TODO: Implement archive functionality
+    console.log("Archive car:", car.id);
+  };
+
+  // Format offboard reason
+  const formatReason = (reason: string | null): string => {
+    if (!reason) return "—";
+    return reason
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   return (
     <div className="space-y-6">
+      {/* Header with Off-board Car button */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Car Off-boarding</h1>
-          <p className="text-gray-400 mt-1">
-            Remove vehicles from active fleet
+          <h2 className="text-xl font-semibold text-white">Car Off-boarding</h2>
+          <p className="text-sm text-gray-400 mt-1">
+            View vehicles removed from the fleet
           </p>
         </div>
+        <Button
+          onClick={() => setIsOffboardDialogOpen(true)}
+          className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Offboard Car
+        </Button>
       </div>
 
       {/* Search Bar */}
@@ -288,62 +243,55 @@ export default function CarOffboarding() {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <Input
           type="text"
-          placeholder="Search by VIN, Make, Plate, or Owner..."
+          placeholder="Search by name, email, phone, VIN, plate, or make/model..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500"
         />
       </div>
 
+      {/* Table Card */}
       <Card className="bg-[#111111] border-[#EAEB80]/20">
         <CardContent className="p-0">
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "active" | "archived")}>
-            <TabsList className="bg-[#1a1a1a] border-b border-[#1a1a1a] rounded-none w-full justify-start">
-              <TabsTrigger
-                value="active"
-                className="data-[state=active]:bg-transparent data-[state=active]:text-[#EAEB80] data-[state=active]:border-b-2 data-[state=active]:border-[#EAEB80] rounded-none px-6 py-3"
-              >
-                Active Fleet
-              </TabsTrigger>
-              <TabsTrigger
-                value="archived"
-                className="data-[state=active]:bg-transparent data-[state=active]:text-[#EAEB80] data-[state=active]:border-b-2 data-[state=active]:border-[#EAEB80] rounded-none px-6 py-3"
-              >
-                Archived
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="active" className="m-0">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 text-[#EAEB80] animate-spin" />
+            </div>
+          ) : cars.length > 0 ? (
+            <>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-b border-[#2a2a2a]">
+                    <TableRow className="border-b border-[#1a1a1a]">
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        ID
+                        Name
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        VIN
+                        Email
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Make
+                        Phone
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Model
+                        Vehicle
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Year
+                        VIN#
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Color
+                        Plate #
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        License Plate
+                        Submitted
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                         Status
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Current Driver
+                        Contract
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Car Offboarding Date
                       </TableHead>
                       <TableHead className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                         Actions
@@ -351,320 +299,191 @@ export default function CarOffboarding() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {isLoading ? (
-                      // Loading skeleton
-                      Array.from({ length: itemsPerPage }).map((_, i) => (
-                        <TableRow key={i} className="border-b border-[#2a2a2a]">
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-12" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-24" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-20" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-24" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-16" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-16" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-20" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-6 bg-gray-700 rounded animate-pulse w-20" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-24" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4 text-right">
-                            <div className="h-8 bg-gray-700 rounded animate-pulse w-24 ml-auto" />
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : activeCars.length > 0 ? (
-                      activeCars.map((car) => {
-                        // Parse make and model from makeModel string
-                        const makeModelParts = car.makeModel ? car.makeModel.split(" ") : [];
-                        const make = makeModelParts[0] || "N/A";
-                        const model = makeModelParts.slice(1).join(" ") || "N/A";
-                        
-                        return (
-                          <TableRow
-                            key={car.id}
-                            className="border-b border-[#2a2a2a] hover:bg-[#1a1a1a] transition-colors"
+                    {cars.map((car) => (
+                      <TableRow
+                        key={car.id}
+                        className={cn(
+                          "border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
+                        )}
+                      >
+                        <TableCell className="px-6 py-4 text-white cursor-pointer" onClick={() => handleRowClick(car)}>
+                          {car.clientName}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300">
+                          {car.clientEmail || "—"}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300">
+                          {car.clientPhone || "—"}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300">
+                          {car.carMakeModel}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300 font-mono text-xs">
+                          {car.vin || "—"}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300 font-mono">
+                          {car.licensePlate ? car.licensePlate.toUpperCase() : "—"}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300">
+                          {new Date(car.createdAt).toLocaleDateString("en-US", {
+                            month: "2-digit",
+                            day: "2-digit",
+                            year: "numeric",
+                          })}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <Badge
+                            variant="outline"
+                            className="border-red-500/50 text-red-400 bg-red-500/10 text-xs"
                           >
-                            <TableCell className="px-6 py-4">
-                              <span className="text-white font-mono text-sm">
-                                {car.id}
-                              </span>
-                            </TableCell>
-                            <TableCell className="px-6 py-4">
-                              <span className="text-white font-mono text-sm">
-                                {car.vin || "N/A"}
-                              </span>
-                            </TableCell>
-                            <TableCell className="px-6 py-4">
-                              <span className="text-white font-medium">
-                                {make}
-                              </span>
-                            </TableCell>
-                            <TableCell className="px-6 py-4">
-                              <span className="text-white">
-                                {model}
-                              </span>
-                            </TableCell>
-                            <TableCell className="px-6 py-4">
-                              <span className="text-gray-300">
-                                {car.year || <span className="text-gray-500">N/A</span>}
-                              </span>
-                            </TableCell>
-                            <TableCell className="px-6 py-4">
-                              <span className="text-gray-300">
-                                {car.color || <span className="text-gray-500">N/A</span>}
-                              </span>
-                            </TableCell>
-                            <TableCell className="px-6 py-4">
-                              <span className="text-gray-300 font-mono text-sm">
-                                {car.licensePlate || <span className="text-gray-500">N/A</span>}
-                              </span>
-                            </TableCell>
-                            <TableCell className="px-6 py-4">
-                              {getStatusBadge(car.status)}
-                            </TableCell>
-                            <TableCell className="px-6 py-4">
-                              {car.owner ? (
-                                <div>
-                                  <div className="text-white text-sm">
-                                    {car.owner.firstName} {car.owner.lastName}
-                                  </div>
-                                  {car.owner.email && (
-                                    <div className="text-gray-400 text-xs">
-                                      {car.owner.email}
-                                    </div>
-                                  )}
-                                </div>
-                              ) : (
-                                <span className="text-gray-500 text-sm">Unassigned</span>
-                              )}
-                            </TableCell>
-                            <TableCell className="px-6 py-4 text-right">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 px-3 hover:bg-[#EAEB80]/20 text-[#EAEB80]"
-                                onClick={() => handleOffboard(car)}
-                              >
-                                <LogOut className="w-4 h-4 mr-1" />
-                                Off-board Car
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={10} className="px-6 py-12 text-center">
-                          <div className="flex flex-col items-center justify-center">
-                            <p className="text-gray-400 text-lg mb-2">No cars available for off-boarding</p>
-                            <p className="text-gray-500 text-sm">
-                              {searchQuery
-                                ? "Try adjusting your search"
-                                : "No active vehicles found in glav1_car table"}
-                            </p>
+                            {car.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <Badge
+                            variant="outline"
+                            className="bg-gray-800/50 text-gray-400 border-gray-700 text-xs"
+                          >
+                            N/A
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300">
+                          {car.offboardAt
+                            ? new Date(car.offboardAt).toLocaleDateString("en-US", {
+                                month: "2-digit",
+                                day: "2-digit",
+                                year: "numeric",
+                              })
+                            : "—"}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 hover:bg-gray-800"
+                              onClick={(e) => handleView(e, car)}
+                              title="View"
+                            >
+                              <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 hover:bg-[#EAEB80]/20"
+                              onClick={(e) => handleArchive(e, car)}
+                              title="Archive"
+                            >
+                              <Archive className="w-4 h-4 text-gray-400 hover:text-[#EAEB80]" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
-                    )}
+                    ))}
                   </TableBody>
                 </Table>
               </div>
 
-              {/* Pagination for Active Fleet */}
-              {activePagination && (
-                <div className="border-t border-[#2a2a2a] px-6 py-4">
-                  <TablePagination
-                    totalItems={activePagination.total}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={page}
-                    onPageChange={setPage}
-                    onItemsPerPageChange={setItemsPerPage}
-                    isLoading={isLoading}
-                  />
-                </div>
+              {/* Pagination */}
+              {pagination && (
+                <TablePagination
+                  totalItems={pagination.total}
+                  itemsPerPage={itemsPerPage}
+                  currentPage={page}
+                  onPageChange={(newPage) => {
+                    setPage(newPage);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  onItemsPerPageChange={(newLimit) => {
+                    setItemsPerPage(newLimit);
+                    setPage(1); // Reset to first page when changing limit
+                  }}
+                  isLoading={isLoading}
+                />
               )}
-            </TabsContent>
-
-            <TabsContent value="archived" className="m-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-b border-[#2a2a2a]">
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        VIN
-                      </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Make & Model
-                      </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Plate
-                      </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Year
-                      </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Mileage
-                      </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Status
-                      </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Off-boarded
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {isLoading ? (
-                      // Loading skeleton
-                      Array.from({ length: itemsPerPage }).map((_, i) => (
-                        <TableRow key={i} className="border-b border-[#2a2a2a]">
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-24" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-32" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-20" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-16" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-20" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-6 bg-gray-700 rounded animate-pulse w-20" />
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <div className="h-4 bg-gray-700 rounded animate-pulse w-24" />
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : archivedCars.length > 0 ? (
-                      archivedCars.map((car) => (
-                        <TableRow
-                          key={car.id}
-                          className="border-b border-[#2a2a2a] hover:bg-[#1a1a1a] transition-colors"
-                        >
-                          <TableCell className="px-6 py-4">
-                            <span className="text-white font-mono text-sm">
-                              {car.vin || "N/A"}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <span className="text-white font-medium">
-                              {car.makeModel || "N/A"}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <span className="text-gray-300">
-                              {car.licensePlate || <span className="text-gray-500">N/A</span>}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <span className="text-gray-300">
-                              {car.year || <span className="text-gray-500">N/A</span>}
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <span className="text-gray-300">
-                              {car.mileage.toLocaleString()} mi
-                            </span>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            {getStatusBadge("off_fleet")}
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <span className="text-gray-400 text-sm">
-                              {car.offboardAt
-                                ? new Date(car.offboardAt).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  })
-                                : "N/A"}
-                            </span>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={7} className="px-6 py-12 text-center">
-                          <div className="flex flex-col items-center justify-center">
-                            <p className="text-gray-400 text-lg mb-2">No archived vehicles</p>
-                            <p className="text-gray-500 text-sm">
-                              {searchQuery
-                                ? "Try adjusting your search"
-                                : "No vehicles have been off-boarded yet"}
-                            </p>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-
-              {/* Pagination for Archived */}
-              {archivedPagination && (
-                <div className="border-t border-[#2a2a2a] px-6 py-4">
-                  <TablePagination
-                    totalItems={archivedPagination.total}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={page}
-                    onPageChange={setPage}
-                    onItemsPerPageChange={setItemsPerPage}
-                    isLoading={isLoading}
-                  />
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
+            </>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <p className="text-lg">No records found</p>
+              <p className="text-sm mt-2">
+                {searchQuery
+                  ? "Try adjusting your search"
+                  : "No cars have been offboarded yet"}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Off-board Modal */}
-      <Dialog open={isOffboardModalOpen} onOpenChange={setIsOffboardModalOpen}>
-        <DialogContent className="bg-[#111111] border-[#EAEB80]/30 border-2 text-white max-w-md">
+      {/* Offboard Car Dialog */}
+      <Dialog open={isOffboardDialogOpen} onOpenChange={setIsOffboardDialogOpen}>
+        <DialogContent className="bg-[#111111] border-[#EAEB80]/30 border-2 text-white max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-white">Off-board Vehicle</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold text-[#EAEB80]">
+              Offboard Car
+            </DialogTitle>
             <DialogDescription className="text-gray-400">
-              Remove this vehicle from the active fleet
+              Remove a vehicle from the active fleet
             </DialogDescription>
           </DialogHeader>
 
-          <Form {...offboardForm}>
-            <form
-              onSubmit={offboardForm.handleSubmit(onOffboardSubmit)}
-              className="space-y-4"
-            >
+          <Form {...offboardCarForm}>
+            <form onSubmit={offboardCarForm.handleSubmit(onSubmitOffboardCar)} className="space-y-6 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={offboardCarForm.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">
+                        Date <span className="text-[#EAEB80]">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={offboardCarForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">
+                        Name <span className="text-[#EAEB80]">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Client full name"
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
-                control={offboardForm.control}
-                name="finalMileage"
+                control={offboardCarForm.control}
+                name="vehicleMakeModelYear"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white">Final Mileage *</FormLabel>
+                    <FormLabel className="text-gray-300">
+                      Vehicle Make/Model (Year) <span className="text-[#EAEB80]">*</span>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        type="number"
-                        className="bg-[#0a0a0a] border-gray-700 text-white"
+                        placeholder="e.g., 2024 Lamborghini Urus"
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -672,75 +491,73 @@ export default function CarOffboarding() {
                 )}
               />
 
-              <FormField
-                control={offboardForm.control}
-                name="reason"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-white">Reason *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={offboardCarForm.control}
+                  name="licensePlate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">
+                        License Plate Number <span className="text-[#EAEB80]">*</span>
+                      </FormLabel>
                       <FormControl>
-                        <SelectTrigger className="bg-[#0a0a0a] border-gray-700 text-white">
-                          <SelectValue placeholder="Select reason" />
-                        </SelectTrigger>
+                        <Input
+                          {...field}
+                          placeholder="License plate number"
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] uppercase"
+                          style={{ textTransform: "uppercase" }}
+                        />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="sold">Sold</SelectItem>
-                        <SelectItem value="damaged">Damaged</SelectItem>
-                        <SelectItem value="end_lease">End of Lease</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={offboardForm.control}
-                name="note"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-white">Note (optional)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        className="bg-[#0a0a0a] border-gray-700 text-white"
-                        rows={3}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={offboardCarForm.control}
+                  name="returnDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">
+                        Vehicle Return Date <span className="text-[#EAEB80]">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <div className="flex justify-end gap-2 pt-4">
+              <div className="flex justify-end gap-3 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    setIsOffboardModalOpen(false);
-                    setSelectedCar(null);
-                    offboardForm.reset();
+                    setIsOffboardDialogOpen(false);
+                    offboardCarForm.reset();
                   }}
+                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-                  disabled={offboardMutation.isPending}
+                  disabled={offboardCarMutation.isPending || !offboardCarForm.formState.isValid}
+                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {offboardMutation.isPending ? (
+                  {offboardCarMutation.isPending ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
+                      Offboarding...
                     </>
                   ) : (
-                    "Confirm"
+                    "Confirm Offboarding"
                   )}
                 </Button>
               </div>

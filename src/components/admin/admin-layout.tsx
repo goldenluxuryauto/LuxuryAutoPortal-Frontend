@@ -50,7 +50,7 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/totals", label: "Totals", icon: Calculator },
   { href: "/admin/earnings", label: "Earnings Calculator", icon: Calculator },
   { href: "/admin/maintenance", label: "Car Maintenance", icon: Wrench },
-  { href: "/admin/forms", label: "Forms", icon: ClipboardList },
+  { href: "/admin/forms", label: "Forms", icon: ClipboardList, badgeKey: "/admin/forms" },
   { href: "/admin/view-client", label: "View as a Client", icon: Eye, roles: ["admin"] },
   { href: "/admin/view-employee", label: "View as an Employee", icon: Eye, roles: ["admin"] },
   { href: "/admin/car-rental", label: "Car Rental", icon: Key, roles: ["admin"] },
@@ -108,6 +108,17 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         }
       } catch (e) {
         counts["/admin/cars"] = 0;
+      }
+      
+      // Fetch car onboarding submissions count (for Forms badge)
+      try {
+        const onboardingCountResponse = await fetch(`${apiUrl}/api/car-onboarding/today-count`, { credentials: "include" });
+        if (onboardingCountResponse.ok) {
+          const onboardingCountData = await onboardingCountResponse.json();
+          counts["/admin/forms"] = (counts["/admin/forms"] || 0) + (onboardingCountData.count || 0);
+        }
+      } catch (e) {
+        // Ignore error, keep existing count
       }
       
       setBadgeCounts(counts);

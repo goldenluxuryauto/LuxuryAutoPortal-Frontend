@@ -1,9 +1,6 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -22,99 +19,128 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { buildApiUrl } from "@/lib/queryClient";
 import {
-  Plus,
   Loader2,
   Search,
-  Undo2,
+  Plus,
+  Eye,
+  Edit,
+  LogOut,
 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
+import { useLocation } from "wouter";
+import { cn } from "@/lib/utils";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
 
-interface ClientCar {
+interface OnboardingCar {
   id: number;
-  date: string;
-  name: string;
-  makeModel: string;
-  plateNumber: string;
-  dropOffDate: string;
-  isActive: boolean;
-  returnedAt?: string | null;
+  createdAt: string;
+  clientId: number | null;
+  clientName: string;
+  clientEmail: string | null;
+  clientPhone: string | null;
+  vin: string | null;
+  carMakeModel: string;
+  year: number | null;
+  licensePlate: string | null;
+  status: string;
+  offboardAt: string | null;
+  offboardReason: string | null;
+  finalMileage: number | null;
 }
 
-// Validation schemas
-const carOnboardingSchema = z.object({
+const addCarSchema = z.object({
   date: z.string().min(1, "Date is required"),
   name: z.string().min(1, "Name is required"),
-  makeModel: z.string().min(1, "Car Make/Model (year) is required"),
-  plateNumber: z.string().min(1, "Plate # is required"),
-  dropOffDate: z.string().min(1, "Date of Car Drop Off is required"),
+  carMakeModelYear: z.string().min(1, "Car Make/Model/Year is required"),
+  plateNumber: z.string().optional(),
+  dropOffDate: z.string().min(1, "Drop-off date is required"),
 });
 
-const carOffboardingSchema = z.object({
-  date: z.string().min(1, "Date is required"),
-  name: z.string().min(1, "Name is required"),
-  makeModel: z.string().min(1, "Car Make/Model (year) is required"),
-  plateNumber: z.string().min(1, "Plate # is required"),
-  pickUpDate: z.string().min(1, "Date of Car Pick Up is required"),
-});
+type AddCarFormData = z.infer<typeof addCarSchema>;
 
-type CarOnboardingFormData = z.infer<typeof carOnboardingSchema>;
-type CarOffboardingFormData = z.infer<typeof carOffboardingSchema>;
-
-export default function CarOnboarding() {
-  const [isOnboardModalOpen, setIsOnboardModalOpen] = useState(false);
-  const [isOffboardModalOpen, setIsOffboardModalOpen] = useState(false);
+function CarOnboarding() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"active" | "returned">("active");
+  const [statusFilter, setStatusFilter] = useState<string>("active");
+  const [page, setPage] = useState(1);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Load items per page from localStorage, default to 10
+  const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
+    const saved = localStorage.getItem("car_onboarding_limit");
+    return (saved ? parseInt(saved) : 10) as ItemsPerPage;
+  });
 
-  // Get today's date in YYYY-MM-DD format
-  const getTodayDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  };
+  // Save to localStorage when itemsPerPage changes
+  useEffect(() => {
+    localStorage.setItem("car_onboarding_limit", itemsPerPage.toString());
+  }, [itemsPerPage]);
 
-  // Onboarding form
-  const onboardForm = useForm<CarOnboardingFormData>({
-    resolver: zodResolver(carOnboardingSchema),
-    mode: "onChange",
+  // Reset page to 1 when search or status changes
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, statusFilter]);
+
+  // Form for Add New Car dialog
+  const addCarForm = useForm<AddCarFormData>({
+    resolver: zodResolver(addCarSchema),
     defaultValues: {
-      date: getTodayDate(),
+      date: new Date().toISOString().split('T')[0],
       name: "",
-      makeModel: "",
+      carMakeModelYear: "",
       plateNumber: "",
-      dropOffDate: "",
+      dropOffDate: new Date().toISOString().split('T')[0],
     },
   });
 
-  // Offboarding form
-  const offboardForm = useForm<CarOffboardingFormData>({
-    resolver: zodResolver(carOffboardingSchema),
-    mode: "onChange",
-    defaultValues: {
-      date: getTodayDate(),
-      name: "",
-      makeModel: "",
-      plateNumber: "",
-      pickUpDate: "",
-    },
-  });
-
-  // Fetch client cars
+  // Fetch cars for onboarding section with pagination
   const { data: carsData, isLoading } = useQuery<{
     success: boolean;
-    data: ClientCar[];
+    data: OnboardingCar[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
   }>({
-    queryKey: ["client-cars", activeTab === "returned"],
+    queryKey: ["cars-onboarding", searchQuery, statusFilter, page, itemsPerPage],
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const params = new URLSearchParams({
-        includeReturned: activeTab === "returned" ? "true" : "false",
+        page: page.toString(),
+        limit: itemsPerPage.toString(),
       });
+      if (searchQuery) {
+        params.append("search", searchQuery);
+      }
+      if (statusFilter && statusFilter !== "all") {
+        params.append("status", statusFilter);
+      }
       const response = await fetch(
-        buildApiUrl(`/api/client/cars?${params.toString()}`),
+        buildApiUrl(`/api/cars/onboarding?${params.toString()}`),
         {
           credentials: "include",
         }
@@ -125,12 +151,13 @@ export default function CarOnboarding() {
       }
       return response.json();
     },
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 
-  // Onboard vehicle mutation
-  const onboardMutation = useMutation({
-    mutationFn: async (data: CarOnboardingFormData) => {
-      const response = await fetch(buildApiUrl("/api/client/cars/onboard"), {
+  // Add new car mutation
+  const addCarMutation = useMutation({
+    mutationFn: async (data: AddCarFormData) => {
+      const response = await fetch(buildApiUrl("/api/cars/onboard"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -138,444 +165,405 @@ export default function CarOnboarding() {
         credentials: "include",
         body: JSON.stringify(data),
       });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Failed to add vehicle");
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: "Failed to add car" }));
+        throw new Error(error.error || "Failed to add car");
       }
-      return result;
+
+      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["client-cars"] });
+      queryClient.invalidateQueries({ queryKey: ["cars-onboarding"] });
+      setIsAddDialogOpen(false);
+      addCarForm.reset();
       toast({
-        title: "Success!",
-        description: "Vehicle added to your fleet.",
-      });
-      setIsOnboardModalOpen(false);
-      onboardForm.reset({
-        date: getTodayDate(),
-        name: "",
-        makeModel: "",
-        plateNumber: "",
-        dropOffDate: "",
+        title: "✅ Success",
+        description: "New car added successfully",
+        duration: 5000,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to Add Vehicle",
-        description: error.message || "An error occurred.",
+        title: "Error",
+        description: error.message || "Failed to add car",
         variant: "destructive",
       });
     },
   });
 
-  // Offboard vehicle mutation
-  const offboardMutation = useMutation({
-    mutationFn: async (data: CarOffboardingFormData) => {
-      const response = await fetch(buildApiUrl("/api/client/cars/offboard"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Failed to return vehicle");
-      }
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["client-cars"] });
-      toast({
-        title: "Success!",
-        description: "Vehicle returned successfully.",
-      });
-      setIsOffboardModalOpen(false);
-      offboardForm.reset({
-        date: getTodayDate(),
-        name: "",
-        makeModel: "",
-        plateNumber: "",
-        pickUpDate: "",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to Return Vehicle",
-        description: error.message || "An error occurred.",
-        variant: "destructive",
-      });
-    },
-  });
+  const onSubmitAddCar = (data: AddCarFormData) => {
+    addCarMutation.mutate(data);
+  };
 
-  // Filter cars based on search query
-  const filteredCars = carsData?.data?.filter((car) => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      car.name.toLowerCase().includes(query) ||
-      car.makeModel.toLowerCase().includes(query) ||
-      car.plateNumber.toLowerCase().includes(query)
-    );
-  });
+  const cars = carsData?.data || [];
+  const pagination = carsData?.pagination;
 
-  // Get active and returned counts
-  const activeCars = carsData?.data?.filter((car) => car.isActive) || [];
-  const returnedCars = carsData?.data?.filter((car) => !car.isActive) || [];
+  // Handle row click - navigate to client profile
+  const handleRowClick = (car: OnboardingCar) => {
+    if (car.clientId) {
+      setLocation(`/admin/clients?id=${car.clientId}`);
+    } else {
+      setLocation(`/admin/clients?search=${encodeURIComponent(car.clientName)}`);
+    }
+  };
+
+  // Handle action buttons
+  const handleView = (e: React.MouseEvent, car: OnboardingCar) => {
+    e.stopPropagation();
+    if (car.clientId) {
+      setLocation(`/admin/clients?id=${car.clientId}`);
+    }
+  };
+
+  const handleEdit = (e: React.MouseEvent, car: OnboardingCar) => {
+    e.stopPropagation();
+    setLocation(`/admin/cars?id=${car.id}`);
+  };
+
+  const handleOffboard = (e: React.MouseEvent, car: OnboardingCar) => {
+    e.stopPropagation();
+    setLocation(`/admin/cars/offboarding?carId=${car.id}`);
+  };
 
   return (
     <div className="space-y-6">
-      {/* Header with buttons */}
-      <Card className="bg-[#0a0a0a] border-[#EAEB80]/30 border-2">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <div>
-            <CardTitle className="text-2xl font-bold text-[#EAEB80]">
-              My Vehicles
-            </CardTitle>
-            <p className="text-sm text-gray-400 mt-1">
-              Manage your vehicle fleet with GLA
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
-              onClick={() => setIsOnboardModalOpen(true)}
-            >
-              <Plus className="w-4 h-4 mr-2" /> Add Vehicle
-            </Button>
-            <Button
-              className="bg-red-600 text-white hover:bg-red-700 font-medium"
-              onClick={() => setIsOffboardModalOpen(true)}
-            >
-              <Undo2 className="w-4 h-4 mr-2" /> Return Vehicle
-            </Button>
-          </div>
-        </CardHeader>
-      </Card>
+      {/* Header with Add New Car button */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-white">Car On-boarding</h2>
+          <p className="text-sm text-gray-400 mt-1">
+            Manage vehicles added to the fleet
+          </p>
+        </div>
+        <Button
+          onClick={() => setIsAddDialogOpen(true)}
+          className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add New Car
+        </Button>
+      </div>
 
-      {/* Main content card */}
-      <Card className="bg-[#0a0a0a] border-[#EAEB80]/30 border-2">
-        <CardContent className="pt-6">
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-            <div className="flex items-center justify-between mb-6">
-              <TabsList className="bg-[#111111]">
-                <TabsTrigger value="active" className="data-[state=active]:bg-[#EAEB80] data-[state=active]:text-black">
-                  Active Fleet ({activeCars.length})
-                </TabsTrigger>
-                <TabsTrigger value="returned" className="data-[state=active]:bg-red-600 data-[state=active]:text-white">
-                  Returned ({returnedCars.length})
-                </TabsTrigger>
-              </TabsList>
+      {/* Search and Filter Bar */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Input
+            type="text"
+            placeholder="Search by name, email, phone, VIN, plate, or make/model..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500"
+          />
+        </div>
+        <div className="w-full sm:w-48">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="offboarded">Offboarded</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
 
-              {/* Search */}
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-                <Input
-                  type="text"
-                  placeholder="Search vehicles..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-[#111111] border-[#1a1a1a] text-white placeholder:text-gray-600"
-                />
-              </div>
+      {/* Table Card */}
+      <Card className="bg-[#111111] border-[#EAEB80]/20">
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 text-[#EAEB80] animate-spin" />
             </div>
-
-            <TabsContent value="active" className="mt-0">
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 text-[#EAEB80] animate-spin" />
-                </div>
-              ) : filteredCars && filteredCars.filter((c) => c.isActive).length > 0 ? (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-b border-[#1a1a1a] hover:bg-transparent">
-                        <TableHead className="text-gray-400 font-medium">Drop-off Date</TableHead>
-                        <TableHead className="text-gray-400 font-medium">Name</TableHead>
-                        <TableHead className="text-gray-400 font-medium">Make & Model</TableHead>
-                        <TableHead className="text-gray-400 font-medium">Plate #</TableHead>
-                        <TableHead className="text-gray-400 font-medium">Status</TableHead>
+          ) : cars.length > 0 ? (
+            <>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-b border-[#1a1a1a]">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Name
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Email
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Phone
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Vehicle
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        VIN#
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Plate #
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Submitted
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Contract
+                      </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Car Onboarding Date
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {cars.map((car) => (
+                      <TableRow
+                        key={car.id}
+                        className={cn(
+                          "border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
+                        )}
+                      >
+                        <TableCell className="px-6 py-4 text-white cursor-pointer" onClick={() => handleRowClick(car)}>
+                          {car.clientName}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300">
+                          {car.clientEmail || "—"}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300">
+                          {car.clientPhone || "—"}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300">
+                          {car.carMakeModel}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300 font-mono text-xs">
+                          {car.vin || "—"}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300 font-mono">
+                          {car.licensePlate ? car.licensePlate.toUpperCase() : "—"}
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300">
+                          {new Date(car.createdAt).toLocaleDateString("en-US", {
+                            month: "2-digit",
+                            day: "2-digit",
+                            year: "numeric",
+                          })}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "text-xs",
+                              car.status === "On-boarded"
+                                ? "border-green-500/50 text-green-400 bg-green-500/10"
+                                : "border-gray-500/50 text-gray-400 bg-gray-500/10"
+                            )}
+                          >
+                            {car.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <Badge
+                            variant="outline"
+                            className="bg-gray-800/50 text-gray-400 border-gray-700 text-xs"
+                          >
+                            N/A
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-gray-300">
+                          {new Date(car.createdAt).toLocaleDateString("en-US", {
+                            month: "2-digit",
+                            day: "2-digit",
+                            year: "numeric",
+                          })}
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredCars.filter((c) => c.isActive).map((car) => (
-                        <TableRow
-                          key={car.id}
-                          className="border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
-                        >
-                          <TableCell className="text-white">
-                            {new Date(car.dropOffDate).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell className="text-gray-300">{car.name}</TableCell>
-                          <TableCell className="text-gray-300">{car.makeModel}</TableCell>
-                          <TableCell className="text-gray-300">{car.plateNumber}</TableCell>
-                          <TableCell>
-                            <Badge className="bg-green-600/20 text-green-400 border-green-600/50">
-                              Active
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <p className="text-lg">No active vehicles in your fleet.</p>
-                  <p className="text-sm mt-2">Click "+ Add Vehicle" to add your first vehicle.</p>
-                </div>
-              )}
-            </TabsContent>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
 
-            <TabsContent value="returned" className="mt-0">
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 text-[#EAEB80] animate-spin" />
-                </div>
-              ) : filteredCars && filteredCars.filter((c) => !c.isActive).length > 0 ? (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-b border-[#1a1a1a] hover:bg-transparent">
-                        <TableHead className="text-gray-400 font-medium">Drop-off Date</TableHead>
-                        <TableHead className="text-gray-400 font-medium">Name</TableHead>
-                        <TableHead className="text-gray-400 font-medium">Make & Model</TableHead>
-                        <TableHead className="text-gray-400 font-medium">Plate #</TableHead>
-                        <TableHead className="text-gray-400 font-medium">Returned</TableHead>
-                        <TableHead className="text-gray-400 font-medium">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredCars.filter((c) => !c.isActive).map((car) => (
-                        <TableRow
-                          key={car.id}
-                          className="border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors opacity-60"
-                        >
-                          <TableCell className="text-white">
-                            {new Date(car.dropOffDate).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell className="text-gray-300">{car.name}</TableCell>
-                          <TableCell className="text-gray-300">{car.makeModel}</TableCell>
-                          <TableCell className="text-gray-300">{car.plateNumber}</TableCell>
-                          <TableCell className="text-gray-300">
-                            {car.returnedAt ? new Date(car.returnedAt).toLocaleDateString() : "N/A"}
-                          </TableCell>
-                          <TableCell>
-                            <Badge className="bg-red-600/20 text-red-400 border-red-600/50">
-                              Returned
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <p className="text-lg">No returned vehicles.</p>
-                </div>
+              {/* Pagination */}
+              {pagination && (
+                <TablePagination
+                  totalItems={pagination.total}
+                  itemsPerPage={itemsPerPage}
+                  currentPage={page}
+                  onPageChange={(newPage) => {
+                    setPage(newPage);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  onItemsPerPageChange={(newLimit) => {
+                    setItemsPerPage(newLimit);
+                    setPage(1);
+                  }}
+                  isLoading={isLoading}
+                />
               )}
-            </TabsContent>
-          </Tabs>
+            </>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <p className="text-lg">No records found</p>
+              <p className="text-sm mt-2">
+                {searchQuery || statusFilter !== "all"
+                  ? "Try adjusting your search or filters"
+                  : "No cars have been onboarded yet"}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Onboarding Modal */}
-      <Dialog open={isOnboardModalOpen} onOpenChange={setIsOnboardModalOpen}>
-        <DialogContent className="max-w-md bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
+      {/* Add New Car Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="bg-[#111111] border-[#EAEB80]/30 border-2 text-white max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-white text-2xl">Car On-boarding Form</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold text-[#EAEB80]">
+              Add New Car
+            </DialogTitle>
             <DialogDescription className="text-gray-400">
-              Please fill out the details below when dropping off your car to GLA
+              Add a new vehicle to the onboarding queue
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={onboardForm.handleSubmit((data) => onboardMutation.mutate(data))} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-white">Date *</label>
-              <Input
-                type="date"
-                {...onboardForm.register("date")}
-                className="mt-1 bg-[#1a1a1a] border-[#222222] text-white"
-              />
-              {onboardForm.formState.errors.date && (
-                <p className="text-red-500 text-sm mt-1">{onboardForm.formState.errors.date.message}</p>
-              )}
-            </div>
 
-            <div>
-              <label className="text-sm font-medium text-white">Name *</label>
-              <Input
-                {...onboardForm.register("name")}
-                placeholder="Your name"
-                className="mt-1 bg-[#1a1a1a] border-[#222222] text-white placeholder:text-gray-500"
-              />
-              {onboardForm.formState.errors.name && (
-                <p className="text-red-500 text-sm mt-1">{onboardForm.formState.errors.name.message}</p>
-              )}
-            </div>
+          <Form {...addCarForm}>
+            <form onSubmit={addCarForm.handleSubmit(onSubmitAddCar)} className="space-y-6 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={addCarForm.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">
+                        Date <span className="text-[#EAEB80]">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div>
-              <label className="text-sm font-medium text-white">Car Make/Model (year) *</label>
-              <Input
-                {...onboardForm.register("makeModel")}
-                placeholder="e.g., Mercedes-Benz C-Class (2023)"
-                className="mt-1 bg-[#1a1a1a] border-[#222222] text-white placeholder:text-gray-500"
-              />
-              {onboardForm.formState.errors.makeModel && (
-                <p className="text-red-500 text-sm mt-1">{onboardForm.formState.errors.makeModel.message}</p>
-              )}
-            </div>
+                <FormField
+                  control={addCarForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">
+                        Name <span className="text-[#EAEB80]">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Client full name"
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-            <div>
-              <label className="text-sm font-medium text-white">Plate # *</label>
-              <Input
-                {...onboardForm.register("plateNumber")}
-                placeholder="e.g., ABC-123"
-                className="mt-1 bg-[#1a1a1a] border-[#222222] text-white placeholder:text-gray-500"
-              />
-              {onboardForm.formState.errors.plateNumber && (
-                <p className="text-red-500 text-sm mt-1">{onboardForm.formState.errors.plateNumber.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-white">Date of Car Drop Off *</label>
-              <Input
-                type="date"
-                {...onboardForm.register("dropOffDate")}
-                className="mt-1 bg-[#1a1a1a] border-[#222222] text-white"
-              />
-              {onboardForm.formState.errors.dropOffDate && (
-                <p className="text-red-500 text-sm mt-1">{onboardForm.formState.errors.dropOffDate.message}</p>
-              )}
-            </div>
-
-            <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setIsOnboardModalOpen(false);
-                  onboardForm.reset();
-                }}
-                className="flex-1 border-gray-600 text-gray-400 hover:bg-gray-800 hover:text-white"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
-                disabled={onboardMutation.isPending || !onboardForm.formState.isValid}
-              >
-                {onboardMutation.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  "Create"
+              <FormField
+                control={addCarForm.control}
+                name="carMakeModelYear"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">
+                      Car Make/Model (Year) <span className="text-[#EAEB80]">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="e.g., 2024 Lamborghini Urus"
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Offboarding Modal */}
-      <Dialog open={isOffboardModalOpen} onOpenChange={setIsOffboardModalOpen}>
-        <DialogContent className="max-w-md bg-[#111111] border-red-600/30 border-2 text-white">
-          <DialogHeader>
-            <DialogTitle className="text-white text-2xl">Car Off-boarding Form</DialogTitle>
-            <DialogDescription className="text-gray-400">
-              Please fill out the details below when you want us to return your car
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={offboardForm.handleSubmit((data) => offboardMutation.mutate(data))} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-white">Date *</label>
-              <Input
-                type="date"
-                {...offboardForm.register("date")}
-                className="mt-1 bg-[#1a1a1a] border-[#222222] text-white"
               />
-              {offboardForm.formState.errors.date && (
-                <p className="text-red-500 text-sm mt-1">{offboardForm.formState.errors.date.message}</p>
-              )}
-            </div>
 
-            <div>
-              <label className="text-sm font-medium text-white">Name *</label>
-              <Input
-                {...offboardForm.register("name")}
-                placeholder="Your name"
-                className="mt-1 bg-[#1a1a1a] border-[#222222] text-white placeholder:text-gray-500"
-              />
-              {offboardForm.formState.errors.name && (
-                <p className="text-red-500 text-sm mt-1">{offboardForm.formState.errors.name.message}</p>
-              )}
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={addCarForm.control}
+                  name="plateNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">Plate #</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="License plate number"
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] uppercase"
+                          style={{ textTransform: "uppercase" }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div>
-              <label className="text-sm font-medium text-white">Car Make/Model (year) *</label>
-              <Input
-                {...offboardForm.register("makeModel")}
-                placeholder="e.g., Mercedes-Benz C-Class (2023)"
-                className="mt-1 bg-[#1a1a1a] border-[#222222] text-white placeholder:text-gray-500"
-              />
-              {offboardForm.formState.errors.makeModel && (
-                <p className="text-red-500 text-sm mt-1">{offboardForm.formState.errors.makeModel.message}</p>
-              )}
-            </div>
+                <FormField
+                  control={addCarForm.control}
+                  name="dropOffDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">
+                        Date of Car Drop Off <span className="text-[#EAEB80]">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-            <div>
-              <label className="text-sm font-medium text-white">Plate # *</label>
-              <Input
-                {...offboardForm.register("plateNumber")}
-                placeholder="e.g., ABC-123"
-                className="mt-1 bg-[#1a1a1a] border-[#222222] text-white placeholder:text-gray-500"
-              />
-              {offboardForm.formState.errors.plateNumber && (
-                <p className="text-red-500 text-sm mt-1">{offboardForm.formState.errors.plateNumber.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-white">Date of Car Pick Up *</label>
-              <Input
-                type="date"
-                {...offboardForm.register("pickUpDate")}
-                className="mt-1 bg-[#1a1a1a] border-[#222222] text-white"
-              />
-              {offboardForm.formState.errors.pickUpDate && (
-                <p className="text-red-500 text-sm mt-1">{offboardForm.formState.errors.pickUpDate.message}</p>
-              )}
-            </div>
-
-            <div className="flex gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setIsOffboardModalOpen(false);
-                  offboardForm.reset();
-                }}
-                className="flex-1 border-gray-600 text-gray-400 hover:bg-gray-800 hover:text-white"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-red-600 text-white hover:bg-red-700 font-medium"
-                disabled={offboardMutation.isPending || !offboardForm.formState.isValid}
-              >
-                {offboardMutation.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  "Return Vehicle"
-                )}
-              </Button>
-            </div>
-          </form>
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddDialogOpen(false);
+                    addCarForm.reset();
+                  }}
+                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={addCarMutation.isPending || !addCarForm.formState.isValid}
+                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {addCarMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    "Confirm"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>
   );
 }
+
+export default CarOnboarding;

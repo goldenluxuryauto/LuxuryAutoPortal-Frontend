@@ -49,6 +49,13 @@ interface Contract {
   uploadedAt: string;
   isDefault: boolean;
   size?: number;
+  type?: "default_template" | "uploaded" | "signed";
+}
+
+interface SignedContract {
+  name: string;
+  url: string;
+  date: string;
 }
 
 export default function ContractManagement() {
@@ -77,6 +84,24 @@ export default function ContractManagement() {
       }
       return response.json();
     },
+  });
+
+  // Fetch signed contracts from public_html
+  const { data: signedContractsData, isLoading: isLoadingSigned } = useQuery<{
+    success: boolean;
+    data: SignedContract[];
+  }>({
+    queryKey: ["signed-contracts"],
+    queryFn: async () => {
+      const response = await fetch(buildApiUrl("/api/contracts/list"), {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch signed contracts");
+      }
+      return response.json();
+    },
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
   });
 
   // Upload mutation
@@ -258,6 +283,11 @@ export default function ContractManagement() {
   };
 
   const contracts = contractsData?.data || [];
+  const signedContracts = signedContractsData?.data || [];
+
+  const handleViewSignedContract = (contract: SignedContract) => {
+    window.open(contract.url, "_blank");
+  };
 
   return (
     <div className="space-y-6">
@@ -319,16 +349,26 @@ export default function ContractManagement() {
                         {formatFileSize(contract.size)}
                       </TableCell>
                       <TableCell>
-                        {contract.isDefault ? (
-                          <Badge className="bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/50">
-                            <Star className="w-3 h-3 mr-1 fill-[#EAEB80]" />
-                            Active
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="border-gray-600 text-gray-400">
-                            Inactive
-                          </Badge>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {contract.isDefault ? (
+                            <Badge className="bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/50">
+                              <Star className="w-3 h-3 mr-1 fill-[#EAEB80]" />
+                              Default
+                            </Badge>
+                          ) : contract.type === "default_template" ? (
+                            <Badge variant="outline" className="border-blue-500/50 text-blue-400 bg-blue-500/10">
+                              Template
+                            </Badge>
+                          ) : contract.type === "uploaded" ? (
+                            <Badge variant="outline" className="border-purple-500/50 text-purple-400 bg-purple-500/10">
+                              Uploaded
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="border-gray-600 text-gray-400">
+                              Inactive
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -341,42 +381,110 @@ export default function ContractManagement() {
                           >
                             <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 hover:bg-[#EAEB80]/20"
-                            onClick={() => setDefaultMutation.mutate(contract.id)}
-                            disabled={contract.isDefault || setDefaultMutation.isPending}
-                            title="Set as Default"
-                          >
-                            <Star
-                              className={cn(
-                                "w-4 h-4",
-                                contract.isDefault
-                                  ? "text-[#EAEB80] fill-[#EAEB80]"
-                                  : "text-gray-400 hover:text-[#EAEB80]"
-                              )}
-                            />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 hover:bg-red-500/20"
-                            onClick={() => {
-                              if (
-                                confirm(
-                                  `Are you sure you want to delete "${contract.name}"? This action cannot be undone.`
-                                )
-                              ) {
-                                deleteMutation.mutate(contract.id);
-                              }
-                            }}
-                            disabled={deleteMutation.isPending}
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </Button>
+                          {contract.id !== 0 && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 hover:bg-[#EAEB80]/20"
+                                onClick={() => setDefaultMutation.mutate(contract.id)}
+                                disabled={contract.isDefault || setDefaultMutation.isPending}
+                                title="Set as Default"
+                              >
+                                <Star
+                                  className={cn(
+                                    "w-4 h-4",
+                                    contract.isDefault
+                                      ? "text-[#EAEB80] fill-[#EAEB80]"
+                                      : "text-gray-400 hover:text-[#EAEB80]"
+                                  )}
+                                />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 hover:bg-red-500/20"
+                                onClick={() => {
+                                  if (
+                                    confirm(
+                                      `Are you sure you want to delete "${contract.name}"? This action cannot be undone.`
+                                    )
+                                  ) {
+                                    deleteMutation.mutate(contract.id);
+                                  }
+                                }}
+                                disabled={deleteMutation.isPending}
+                                title="Delete"
+                              >
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                              </Button>
+                            </>
+                          )}
                         </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Signed Contracts Section */}
+        <Card className="bg-[#111111] border-[#EAEB80]/20">
+          <CardHeader>
+            <CardTitle className="text-white">Signed Contracts</CardTitle>
+            <p className="text-sm text-gray-400 mt-1">
+              Contracts signed by clients and stored in public_html/signed-contracts/
+            </p>
+          </CardHeader>
+          <CardContent>
+            {isLoadingSigned ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 text-[#EAEB80] animate-spin" />
+              </div>
+            ) : signedContracts.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <FileText className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+                <p>No signed contracts uploaded yet</p>
+                <p className="text-sm mt-2">Signed contracts will appear here automatically</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-[#1a1a1a]">
+                    <TableHead className="text-gray-400">Contract Name</TableHead>
+                    <TableHead className="text-gray-400">Uploaded Date</TableHead>
+                    <TableHead className="text-gray-400 text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {signedContracts.map((contract, index) => (
+                    <TableRow
+                      key={`${contract.name}-${index}`}
+                      className="border-[#1a1a1a] hover:bg-[#1a1a1a]"
+                    >
+                      <TableCell className="text-white font-medium">
+                        {contract.name}
+                      </TableCell>
+                      <TableCell className="text-gray-300">
+                        {new Date(contract.date).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          onClick={() => handleViewSignedContract(contract)}
+                          className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
