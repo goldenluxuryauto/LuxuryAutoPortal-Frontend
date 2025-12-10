@@ -844,12 +844,12 @@ export default function FormsPage() {
                                                             );
                                                           } else {
                                                             // Fallback to old pattern if URL not in database
-                                                            window.open(
-                                                              buildApiUrl(
-                                                                `/signed-contracts/submission_${submission.id}.pdf`
-                                                              ),
-                                                              "_blank"
-                                                            );
+                                                          window.open(
+                                                            buildApiUrl(
+                                                              `/signed-contracts/submission_${submission.id}.pdf`
+                                                            ),
+                                                            "_blank"
+                                                          );
                                                           }
                                                         }}
                                                       >
@@ -1513,12 +1513,12 @@ export default function FormsPage() {
                                   window.open(data.signedContractUrl, "_blank");
                                 } else {
                                   // Fallback to old pattern if URL not in database
-                                  window.open(
-                                    buildApiUrl(
-                                      `/signed-contracts/submission_${data.id}.pdf`
-                                    ),
-                                    "_blank"
-                                  );
+                                window.open(
+                                  buildApiUrl(
+                                    `/signed-contracts/submission_${data.id}.pdf`
+                                  ),
+                                  "_blank"
+                                );
                                 }
                               }}
                               className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"

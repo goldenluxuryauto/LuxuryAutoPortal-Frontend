@@ -89,7 +89,7 @@ export default function CarsPage() {
   useEffect(() => {
     localStorage.setItem("cars_limit", itemsPerPage.toString());
   }, [itemsPerPage]);
-
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -118,8 +118,8 @@ export default function CarsPage() {
     },
   });
 
-  const { data: carsData, isLoading } = useQuery<{
-    success: boolean;
+  const { data: carsData, isLoading } = useQuery<{ 
+    success: boolean; 
     data: Car[];
     pagination?: {
       page: number;
@@ -466,8 +466,8 @@ export default function CarsPage() {
                         <tr key={`skeleton-${i}`} className="border-b border-[#2a2a2a]">
                           <td colSpan={9} className="px-6 py-4">
                             <div className="h-4 bg-[#252525] rounded animate-pulse" />
-                          </td>
-                        </tr>
+                      </td>
+                    </tr>
                       ))}
                     </>
                   ) : cars.length > 0 ? (
