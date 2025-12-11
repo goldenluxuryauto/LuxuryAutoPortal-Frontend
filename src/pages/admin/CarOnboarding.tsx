@@ -40,7 +40,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { buildApiUrl } from "@/lib/queryClient";
-import { Loader2, Search, Plus, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, Search, Plus } from "lucide-react";
 import {
   TablePagination,
   ItemsPerPage,
@@ -209,55 +209,6 @@ function CarOnboarding() {
     addCarMutation.mutate(data);
   };
 
-  // Approve/Reject submission mutation
-  const approvalMutation = useMutation({
-    mutationFn: async ({
-      id,
-      action,
-    }: {
-      id: number;
-      action: "approve" | "reject";
-    }) => {
-      const response = await fetch(
-        buildApiUrl(`/api/car-onboarding/submissions/${id}/${action}`),
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        const error = await response
-          .json()
-          .catch(() => ({ error: `Failed to ${action}` }));
-        throw new Error(error.error || `Failed to ${action} submission`);
-      }
-
-      return response.json();
-    },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["cars-onboarding"] });
-      toast({
-        title:
-          variables.action === "approve"
-            ? "✅ Submission Approved"
-            : "❌ Submission Rejected",
-        description:
-          variables.action === "approve"
-            ? "Car onboarding submission approved successfully"
-            : "Car onboarding submission rejected",
-      });
-    },
-    onError: (error: any, variables) => {
-      toast({
-        title: "Error",
-        description:
-          error.message || `Failed to ${variables.action} submission`,
-        variant: "destructive",
-      });
-    },
-  });
-
   const cars = carsData?.data || [];
   const pagination = carsData?.pagination;
 
@@ -269,14 +220,6 @@ function CarOnboarding() {
       setLocation(
         `/admin/clients?search=${encodeURIComponent(car.clientName)}`
       );
-    }
-  };
-
-  // Handle action buttons
-  const handleView = (e: React.MouseEvent, car: OnboardingCar) => {
-    e.stopPropagation();
-    if (car.clientId) {
-      setLocation(`/admin/clients?id=${car.clientId}`);
     }
   };
 
@@ -378,9 +321,6 @@ function CarOnboarding() {
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                         Car Onboarding Date
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Actions
-                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -448,84 +388,6 @@ function CarOnboarding() {
                             day: "2-digit",
                             year: "numeric",
                           })}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 hover:bg-green-500/20"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                approvalMutation.mutate({
-                                  id: car.id,
-                                  action: "approve",
-                                });
-                              }}
-                              disabled={
-                                car.status === "approved" ||
-                                car.status === "rejected" ||
-                                approvalMutation.isPending
-                              }
-                              title={
-                                car.status === "approved"
-                                  ? "Already approved"
-                                  : car.status === "rejected"
-                                  ? "Already rejected"
-                                  : "Approve submission"
-                              }
-                            >
-                              <CheckCircle
-                                className={cn(
-                                  "w-4 h-4",
-                                  car.status !== "approved" &&
-                                    car.status !== "rejected"
-                                    ? "text-green-400 hover:text-green-300"
-                                    : "text-gray-600"
-                                )}
-                              />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 hover:bg-red-500/20"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (
-                                  confirm(
-                                    `Reject car onboarding for ${car.clientName}?`
-                                  )
-                                ) {
-                                  approvalMutation.mutate({
-                                    id: car.id,
-                                    action: "reject",
-                                  });
-                                }
-                              }}
-                              disabled={
-                                car.status === "approved" ||
-                                car.status === "rejected" ||
-                                approvalMutation.isPending
-                              }
-                              title={
-                                car.status === "approved"
-                                  ? "Already approved"
-                                  : car.status === "rejected"
-                                  ? "Already rejected"
-                                  : "Reject submission"
-                              }
-                            >
-                              <XCircle
-                                className={cn(
-                                  "w-4 h-4",
-                                  car.status !== "approved" &&
-                                    car.status !== "rejected"
-                                    ? "text-red-400 hover:text-red-300"
-                                    : "text-gray-600"
-                                )}
-                              />
-                            </Button>
-                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
