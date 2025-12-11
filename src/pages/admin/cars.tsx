@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +14,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
+import {
+  TablePagination,
+  ItemsPerPage,
+} from "@/components/ui/table-pagination";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +44,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, buildApiUrl } from "@/lib/queryClient";
 import { Plus, Edit, Trash2, Search, Loader2, X, LogOut } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface Car {
   id: number;
@@ -59,7 +68,10 @@ interface Car {
 }
 
 const carSchema = z.object({
-  vin: z.string().min(1, "VIN is required").max(17, "VIN must be 17 characters or less"),
+  vin: z
+    .string()
+    .min(1, "VIN is required")
+    .max(17, "VIN must be 17 characters or less"),
   makeModel: z.string().min(1, "Make & Model is required"),
   licensePlate: z.string().optional(),
   year: z.string().optional(),
@@ -78,7 +90,7 @@ export default function CarsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
-  
+
   // Load items per page from localStorage, default to 10
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
     const saved = localStorage.getItem("cars_limit");
@@ -89,16 +101,18 @@ export default function CarsPage() {
   useEffect(() => {
     localStorage.setItem("cars_limit", itemsPerPage.toString());
   }, [itemsPerPage]);
-  
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const offboardForm = useForm({
-    resolver: zodResolver(z.object({
-      finalMileage: z.string().min(1, "Final mileage is required"),
-      reason: z.enum(["sold", "damaged", "end_lease", "other"]),
-      note: z.string().optional(),
-    })),
+    resolver: zodResolver(
+      z.object({
+        finalMileage: z.string().min(1, "Final mileage is required"),
+        reason: z.enum(["sold", "damaged", "end_lease", "other"]),
+        note: z.string().optional(),
+      })
+    ),
     defaultValues: {
       finalMileage: "",
       reason: "sold" as const,
@@ -118,8 +132,8 @@ export default function CarsPage() {
     },
   });
 
-  const { data: carsData, isLoading } = useQuery<{ 
-    success: boolean; 
+  const { data: carsData, isLoading } = useQuery<{
+    success: boolean;
     data: Car[];
     pagination?: {
       page: number;
@@ -145,7 +159,9 @@ export default function CarsPage() {
         credentials: "include",
       });
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Database connection failed" }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Database connection failed" }));
         throw new Error(errorData.error || "Failed to fetch cars");
       }
       return response.json();
@@ -258,12 +274,20 @@ export default function CarsPage() {
   });
 
   const offboardMutation = useMutation({
-    mutationFn: async (data: { finalMileage: string; reason: string; note?: string }) => {
-      const response = await apiRequest("POST", `/api/cars/${selectedCar?.id}/offboard`, {
-        finalMileage: parseInt(data.finalMileage, 10),
-        reason: data.reason,
-        note: data.note || undefined,
-      });
+    mutationFn: async (data: {
+      finalMileage: string;
+      reason: string;
+      note?: string;
+    }) => {
+      const response = await apiRequest(
+        "POST",
+        `/api/cars/${selectedCar?.id}/offboard`,
+        {
+          finalMileage: parseInt(data.finalMileage, 10),
+          reason: data.reason,
+          note: data.note || undefined,
+        }
+      );
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to off-board car");
@@ -299,7 +323,11 @@ export default function CarsPage() {
     setIsOffboardModalOpen(true);
   };
 
-  const onOffboardSubmit = (data: { finalMileage: string; reason: string; note?: string }) => {
+  const onOffboardSubmit = (data: {
+    finalMileage: string;
+    reason: string;
+    note?: string;
+  }) => {
     offboardMutation.mutate(data);
   };
 
@@ -330,9 +358,7 @@ export default function CarsPage() {
   };
 
   const handleDeleteClick = (id: number) => {
-    if (confirm("Are you sure you want to delete this car? This action cannot be undone.")) {
-      deleteMutation.mutate(id);
-    }
+    deleteMutation.mutate(id);
   };
 
   const onSubmit = (data: CarFormData) => {
@@ -394,10 +420,13 @@ export default function CarsPage() {
                   className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600"
                 />
               </div>
-              <Select value={statusFilter} onValueChange={(value) => {
-                setStatusFilter(value);
-                setPage(1); // Reset to first page on filter change
-              }}>
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => {
+                  setStatusFilter(value);
+                  setPage(1); // Reset to first page on filter change
+                }}
+              >
                 <SelectTrigger className="w-full md:w-[200px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -463,44 +492,68 @@ export default function CarsPage() {
                   {isLoading ? (
                     <>
                       {[...Array(5)].map((_, i) => (
-                        <tr key={`skeleton-${i}`} className="border-b border-[#2a2a2a]">
+                        <tr
+                          key={`skeleton-${i}`}
+                          className="border-b border-[#2a2a2a]"
+                        >
                           <td colSpan={9} className="px-6 py-4">
                             <div className="h-4 bg-[#252525] rounded animate-pulse" />
-                      </td>
-                    </tr>
+                          </td>
+                        </tr>
                       ))}
                     </>
                   ) : cars.length > 0 ? (
                     cars.map((car) => {
                       return (
-                        <tr 
-                          key={car.id} 
+                        <tr
+                          key={car.id}
                           className="hover:bg-[#252525] transition-colors cursor-pointer group"
                           onClick={() => setLocation(`/admin/cars/${car.id}`)}
                         >
                           <td className="px-6 py-4">
-                            <span className="text-white font-mono text-sm">{car.vin || "N/A"}</span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-white font-medium">{car.makeModel || "N/A"}</span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-white">{car.year || "N/A"}</span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-gray-400">{car.color || "N/A"}</span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-gray-400">{car.mileage?.toLocaleString() || "0"}</span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-gray-400 font-mono text-sm">
-                              {car.licensePlate || <span className="text-gray-600">N/A</span>}
+                            <span className="text-white font-mono text-sm">
+                              {car.vin || "N/A"}
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <Badge variant="outline" className={getStatusBadgeColor(car.status)}>
-                              {car.status === "available" ? "Available" : car.status === "in_use" ? "Rented" : car.status === "maintenance" ? "Maintenance" : "Off Fleet"}
+                            <span className="text-white font-medium">
+                              {car.makeModel || "N/A"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-white">
+                              {car.year || "N/A"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-gray-400">
+                              {car.color || "N/A"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-gray-400">
+                              {car.mileage?.toLocaleString() || "0"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-gray-400 font-mono text-sm">
+                              {car.licensePlate || (
+                                <span className="text-gray-600">N/A</span>
+                              )}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <Badge
+                              variant="outline"
+                              className={getStatusBadgeColor(car.status)}
+                            >
+                              {car.status === "available"
+                                ? "Available"
+                                : car.status === "in_use"
+                                ? "Rented"
+                                : car.status === "maintenance"
+                                ? "Maintenance"
+                                : "Off Fleet"}
                             </Badge>
                           </td>
                           <td className="px-6 py-4">
@@ -510,11 +563,15 @@ export default function CarsPage() {
                                   {car.owner.firstName} {car.owner.lastName}
                                 </div>
                                 {car.owner.email && (
-                                  <div className="text-gray-500 text-xs">{car.owner.email}</div>
+                                  <div className="text-gray-500 text-xs">
+                                    {car.owner.email}
+                                  </div>
                                 )}
                               </div>
                             ) : (
-                              <span className="text-gray-600 text-sm">Unassigned</span>
+                              <span className="text-gray-600 text-sm">
+                                Unassigned
+                              </span>
                             )}
                           </td>
                           <td className="px-6 py-4 text-right">
@@ -545,18 +602,27 @@ export default function CarsPage() {
                                   <LogOut className="w-4 h-4" />
                                 </Button>
                               )}
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-gray-400 hover:text-red-400"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteClick(car.id);
-                                }}
-                                title="Delete"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                              <ConfirmDialog
+                                trigger={
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-gray-400 hover:text-red-400"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                    }}
+                                    title="Delete"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                }
+                                title="Delete Car"
+                                description="Are you sure you want to delete this car? This action cannot be undone."
+                                confirmText="Delete"
+                                cancelText="Cancel"
+                                variant="destructive"
+                                onConfirm={() => handleDeleteClick(car.id)}
+                              />
                             </div>
                           </td>
                         </tr>
@@ -567,7 +633,9 @@ export default function CarsPage() {
                       <td colSpan={9} className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <p className="text-gray-400 text-lg">No cars found</p>
-                          <p className="text-gray-500 text-sm">Try adjusting your search or filters</p>
+                          <p className="text-gray-500 text-sm">
+                            Try adjusting your search or filters
+                          </p>
                         </div>
                       </td>
                     </tr>
@@ -597,14 +665,17 @@ export default function CarsPage() {
         </Card>
 
         {/* Add/Edit Car Modal */}
-        <Dialog open={isAddModalOpen || isEditModalOpen} onOpenChange={(open) => {
-          if (!open) {
-            setIsAddModalOpen(false);
-            setIsEditModalOpen(false);
-            setSelectedCar(null);
-            form.reset();
-          }
-        }}>
+        <Dialog
+          open={isAddModalOpen || isEditModalOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsAddModalOpen(false);
+              setIsEditModalOpen(false);
+              setSelectedCar(null);
+              form.reset();
+            }
+          }}
+        >
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-md">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold">
@@ -618,7 +689,10 @@ export default function CarsPage() {
             </DialogHeader>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4 mt-4"
+              >
                 <FormField
                   control={form.control}
                   name="vin"
@@ -643,7 +717,9 @@ export default function CarsPage() {
                   name="makeModel"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Make & Model *</FormLabel>
+                      <FormLabel className="text-gray-400">
+                        Make & Model *
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -662,7 +738,9 @@ export default function CarsPage() {
                     name="licensePlate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">License Plate</FormLabel>
+                        <FormLabel className="text-gray-400">
+                          License Plate
+                        </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -719,7 +797,9 @@ export default function CarsPage() {
                     name="mileage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Current Mileage</FormLabel>
+                        <FormLabel className="text-gray-400">
+                          Current Mileage
+                        </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -751,7 +831,9 @@ export default function CarsPage() {
                   <Button
                     type="submit"
                     className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
-                    disabled={createMutation.isPending || updateMutation.isPending}
+                    disabled={
+                      createMutation.isPending || updateMutation.isPending
+                    }
                   >
                     {(createMutation.isPending || updateMutation.isPending) && (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -765,23 +847,33 @@ export default function CarsPage() {
         </Dialog>
 
         {/* Off-board Modal */}
-        <Dialog open={isOffboardModalOpen} onOpenChange={setIsOffboardModalOpen}>
+        <Dialog
+          open={isOffboardModalOpen}
+          onOpenChange={setIsOffboardModalOpen}
+        >
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold">Off-board Vehicle</DialogTitle>
+              <DialogTitle className="text-xl font-semibold">
+                Off-board Vehicle
+              </DialogTitle>
               <DialogDescription className="text-gray-400">
                 Remove this vehicle from the active fleet
               </DialogDescription>
             </DialogHeader>
 
             <Form {...offboardForm}>
-              <form onSubmit={offboardForm.handleSubmit(onOffboardSubmit)} className="space-y-4 mt-4">
+              <form
+                onSubmit={offboardForm.handleSubmit(onOffboardSubmit)}
+                className="space-y-4 mt-4"
+              >
                 <FormField
                   control={offboardForm.control}
                   name="finalMileage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Final Mileage *</FormLabel>
+                      <FormLabel className="text-gray-400">
+                        Final Mileage *
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -800,7 +892,10 @@ export default function CarsPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-400">Reason *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
                             <SelectValue placeholder="Select reason" />
@@ -809,7 +904,9 @@ export default function CarsPage() {
                         <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
                           <SelectItem value="sold">Sold</SelectItem>
                           <SelectItem value="damaged">Damaged</SelectItem>
-                          <SelectItem value="end_lease">End of Lease</SelectItem>
+                          <SelectItem value="end_lease">
+                            End of Lease
+                          </SelectItem>
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
@@ -823,7 +920,9 @@ export default function CarsPage() {
                   name="note"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Note (optional)</FormLabel>
+                      <FormLabel className="text-gray-400">
+                        Note (optional)
+                      </FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
@@ -868,4 +967,3 @@ export default function CarsPage() {
     </AdminLayout>
   );
 }
-

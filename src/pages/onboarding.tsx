@@ -318,7 +318,7 @@ export default function Onboarding() {
       console.log("=".repeat(80));
 
       setIsSubmitted(true);
-      window.location.href = "/onboarding/thank-you";
+      // Thank you page is rendered inline below (lines 339-372)
     } catch (error: any) {
       console.error("❌ [FRONTEND] Submission error:");
       console.error("Error type:", error?.constructor?.name);

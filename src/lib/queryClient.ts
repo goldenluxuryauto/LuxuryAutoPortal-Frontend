@@ -1,8 +1,11 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 // Use empty string for relative URLs (works with Vite proxy in dev, and same-origin in production)
-const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// In development, Vite proxy handles /api requests and forwards to backend
+// In production, use VITE_API_URL if set, otherwise use relative URLs
+const API_BASE_URL = import.meta.env.VITE_API_URL 
+  ? (import.meta.env.VITE_API_URL.replace(/\/$/, ""))
+  : ""; // Empty string = relative URLs (use Vite proxy in dev)
 
 export const getApiBaseUrl = () => API_BASE_URL;
 
@@ -16,7 +19,9 @@ export function buildApiUrl(path: string): string {
   }
 
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  return `${API_BASE_URL}${normalizedPath}`;
+  // If API_BASE_URL is empty, return just the path (relative URL for Vite proxy)
+  // Otherwise, prepend the base URL
+  return API_BASE_URL ? `${API_BASE_URL}${normalizedPath}` : normalizedPath;
 }
 
 async function throwIfResNotOk(res: Response) {
@@ -50,8 +55,8 @@ export async function apiRequest(
   path: string,  // Changed from 'url' to 'path' for clarity
   data?: unknown | undefined,
 ): Promise<Response> {
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';  // Use env var in production, fallback for local
-  const fullUrl = `${baseUrl}${path}`;  // Prepend base to path (e.g., /api/auth/login → full backend URL)
+  // Use buildApiUrl to ensure proper URL construction (respects Vite proxy in dev)
+  const fullUrl = buildApiUrl(path);
   console.log('API call to:', fullUrl);  // Debug log (remove later if not needed)
 
   const res = await fetch(fullUrl, {

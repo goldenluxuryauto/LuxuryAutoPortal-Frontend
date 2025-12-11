@@ -18,6 +18,7 @@ import ProfilePage from "@/pages/admin/profile";
 import CarsPage from "@/pages/admin/cars";
 import CarDetailPage from "@/pages/admin/car-detail";
 import IncomeExpensesPage from "@/pages/admin/income-expenses";
+import SettingsPage from "@/pages/admin/settings";
 import SignContract from "@/pages/sign-contract";
 import Signup from "@/pages/signup";
 
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/admin/cars" component={CarsPage} />
       <Route path="/admin/cars/:id" component={CarDetailPage} />
       <Route path="/admin/income-expenses" component={IncomeExpensesPage} />
+      <Route path="/admin/settings" component={SettingsPage} />
       <Route component={NotFound} />
     </Switch>
   );

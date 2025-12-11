@@ -28,29 +28,40 @@ interface ContractData {
 export default function SignContract() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/sign-contract/:token");
-  
-  // Extract token from URL
-  const token = params?.token || (() => {
-    const pathParts = window.location.pathname.split("/").filter(Boolean);
-    const signContractIndex = pathParts.indexOf("sign-contract");
-    if (signContractIndex >= 0 && pathParts[signContractIndex + 1]) {
-      return pathParts[signContractIndex + 1];
-    }
-    return "";
-  })();
 
-  const contractTemplateUrl = buildApiUrl("/contracts/GoldenLuxuryAuto_Contract_Template.pdf");
+  // Extract token from URL
+  const token =
+    params?.token ||
+    (() => {
+      const pathParts = window.location.pathname.split("/").filter(Boolean);
+      const signContractIndex = pathParts.indexOf("sign-contract");
+      if (signContractIndex >= 0 && pathParts[signContractIndex + 1]) {
+        return pathParts[signContractIndex + 1];
+      }
+      return "";
+    })();
+
+  const contractTemplateUrl = buildApiUrl(
+    "/contracts/GoldenLuxuryAuto_Contract_Template.pdf"
+  );
   const { toast } = useToast();
   const signPdfFnRef = useRef<(() => Promise<Blob>) | null>(null);
 
   // Validate token
-  const { data: contractData, isLoading: isValidating, error: validationError } = useQuery<ContractData>({
+  const {
+    data: contractData,
+    isLoading: isValidating,
+    error: validationError,
+  } = useQuery<ContractData>({
     queryKey: ["validateContract", token],
     queryFn: async () => {
       if (!token) throw new Error("No token provided");
-      const response = await fetch(buildApiUrl(`/api/contract/validate/${token}`), {
-        credentials: "include",
-      });
+      const response = await fetch(
+        buildApiUrl(`/api/contract/validate/${token}`),
+        {
+          credentials: "include",
+        }
+      );
       const result = await response.json();
       if (!response.ok || !result.success) {
         throw new Error(result.error || "Invalid or expired contract link");
@@ -91,17 +102,20 @@ export default function SignContract() {
           return result;
         } else {
           // If PDF editor not ready, send empty signature (backend will use template)
-          const response = await fetch(buildApiUrl(`/api/contract/sign/${token}`), {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              signatureData: "",
-              isFlattenedPdf: false,
-            }),
-            credentials: "include",
-          });
+          const response = await fetch(
+            buildApiUrl(`/api/contract/sign/${token}`),
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                signatureData: "",
+                isFlattenedPdf: false,
+              }),
+              credentials: "include",
+            }
+          );
 
           const result = await response.json();
           if (!response.ok || !result.success) {
@@ -111,19 +125,22 @@ export default function SignContract() {
         }
       } else {
         // Decline
-        const response = await fetch(buildApiUrl(`/api/contract/decline/${token}`), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
+        const response = await fetch(
+          buildApiUrl(`/api/contract/decline/${token}`),
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
 
         const result = await response.json();
         if (!response.ok || !result.success) {
           throw new Error(result.error || "Failed to decline contract");
-      }
-      return result;
+        }
+        return result;
       }
     },
     onSuccess: (result, data) => {
@@ -194,7 +211,9 @@ export default function SignContract() {
       <div className="min-h-screen bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1a1a1a] flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-[#2d2d2d] border-2 border-[#d4af37] rounded-lg p-8 text-center">
           <X className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-[#d4af37] mb-4">Link Expired or Invalid</h1>
+          <h1 className="text-2xl font-bold text-[#d4af37] mb-4">
+            Link Expired or Invalid
+          </h1>
           <p className="text-gray-300 mb-6">
             {validationError instanceof Error
               ? validationError.message
