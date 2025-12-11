@@ -209,6 +209,55 @@ function CarOnboarding() {
     addCarMutation.mutate(data);
   };
 
+  // Approve/Reject submission mutation
+  const approvalMutation = useMutation({
+    mutationFn: async ({
+      id,
+      action,
+    }: {
+      id: number;
+      action: "approve" | "reject";
+    }) => {
+      const response = await fetch(
+        buildApiUrl(`/api/car-onboarding/submissions/${id}/${action}`),
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response
+          .json()
+          .catch(() => ({ error: `Failed to ${action}` }));
+        throw new Error(error.error || `Failed to ${action} submission`);
+      }
+
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["cars-onboarding"] });
+      toast({
+        title:
+          variables.action === "approve"
+            ? "✅ Submission Approved"
+            : "❌ Submission Rejected",
+        description:
+          variables.action === "approve"
+            ? "Car onboarding submission approved successfully"
+            : "Car onboarding submission rejected",
+      });
+    },
+    onError: (error: any, variables) => {
+      toast({
+        title: "Error",
+        description:
+          error.message || `Failed to ${variables.action} submission`,
+        variant: "destructive",
+      });
+    },
+  });
+
   const cars = carsData?.data || [];
   const pagination = carsData?.pagination;
 
