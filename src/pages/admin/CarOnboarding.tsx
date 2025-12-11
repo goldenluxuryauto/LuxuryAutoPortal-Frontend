@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,15 +40,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { buildApiUrl } from "@/lib/queryClient";
+import { Loader2, Search, Plus, CheckCircle, XCircle } from "lucide-react";
 import {
-  Loader2,
-  Search,
-  Plus,
-  Eye,
-  Edit,
-  LogOut,
-} from "lucide-react";
-import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
+  TablePagination,
+  ItemsPerPage,
+} from "@/components/ui/table-pagination";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
@@ -86,7 +87,7 @@ function CarOnboarding() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   // Load items per page from localStorage, default to 10
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
     const saved = localStorage.getItem("car_onboarding_limit");
@@ -107,11 +108,11 @@ function CarOnboarding() {
   const addCarForm = useForm<AddCarFormData>({
     resolver: zodResolver(addCarSchema),
     defaultValues: {
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split("T")[0],
       name: "",
       carMakeModelYear: "",
       plateNumber: "",
-      dropOffDate: new Date().toISOString().split('T')[0],
+      dropOffDate: new Date().toISOString().split("T")[0],
     },
   });
 
@@ -126,7 +127,13 @@ function CarOnboarding() {
       totalPages: number;
     };
   }>({
-    queryKey: ["cars-onboarding", searchQuery, statusFilter, page, itemsPerPage],
+    queryKey: [
+      "cars-onboarding",
+      searchQuery,
+      statusFilter,
+      page,
+      itemsPerPage,
+    ],
     placeholderData: keepPreviousData,
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -146,8 +153,12 @@ function CarOnboarding() {
         }
       );
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: "Failed to fetch cars" }));
-        throw new Error(error.error || `Failed to fetch cars: ${response.status}`);
+        const error = await response
+          .json()
+          .catch(() => ({ error: "Failed to fetch cars" }));
+        throw new Error(
+          error.error || `Failed to fetch cars: ${response.status}`
+        );
       }
       return response.json();
     },
@@ -167,7 +178,9 @@ function CarOnboarding() {
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: "Failed to add car" }));
+        const error = await response
+          .json()
+          .catch(() => ({ error: "Failed to add car" }));
         throw new Error(error.error || "Failed to add car");
       }
 
@@ -204,7 +217,9 @@ function CarOnboarding() {
     if (car.clientId) {
       setLocation(`/admin/clients?id=${car.clientId}`);
     } else {
-      setLocation(`/admin/clients?search=${encodeURIComponent(car.clientName)}`);
+      setLocation(
+        `/admin/clients?search=${encodeURIComponent(car.clientName)}`
+      );
     }
   };
 
@@ -314,6 +329,9 @@ function CarOnboarding() {
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                         Car Onboarding Date
                       </TableHead>
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -324,7 +342,10 @@ function CarOnboarding() {
                           "border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
                         )}
                       >
-                        <TableCell className="px-6 py-4 text-white cursor-pointer" onClick={() => handleRowClick(car)}>
+                        <TableCell
+                          className="px-6 py-4 text-white cursor-pointer"
+                          onClick={() => handleRowClick(car)}
+                        >
                           {car.clientName}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">
@@ -340,7 +361,9 @@ function CarOnboarding() {
                           {car.vin || "—"}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300 font-mono">
-                          {car.licensePlate ? car.licensePlate.toUpperCase() : "—"}
+                          {car.licensePlate
+                            ? car.licensePlate.toUpperCase()
+                            : "—"}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">
                           {new Date(car.createdAt).toLocaleDateString("en-US", {
@@ -376,6 +399,84 @@ function CarOnboarding() {
                             day: "2-digit",
                             year: "numeric",
                           })}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 hover:bg-green-500/20"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                approvalMutation.mutate({
+                                  id: car.id,
+                                  action: "approve",
+                                });
+                              }}
+                              disabled={
+                                car.status === "approved" ||
+                                car.status === "rejected" ||
+                                approvalMutation.isPending
+                              }
+                              title={
+                                car.status === "approved"
+                                  ? "Already approved"
+                                  : car.status === "rejected"
+                                  ? "Already rejected"
+                                  : "Approve submission"
+                              }
+                            >
+                              <CheckCircle
+                                className={cn(
+                                  "w-4 h-4",
+                                  car.status !== "approved" &&
+                                    car.status !== "rejected"
+                                    ? "text-green-400 hover:text-green-300"
+                                    : "text-gray-600"
+                                )}
+                              />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 hover:bg-red-500/20"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (
+                                  confirm(
+                                    `Reject car onboarding for ${car.clientName}?`
+                                  )
+                                ) {
+                                  approvalMutation.mutate({
+                                    id: car.id,
+                                    action: "reject",
+                                  });
+                                }
+                              }}
+                              disabled={
+                                car.status === "approved" ||
+                                car.status === "rejected" ||
+                                approvalMutation.isPending
+                              }
+                              title={
+                                car.status === "approved"
+                                  ? "Already approved"
+                                  : car.status === "rejected"
+                                  ? "Already rejected"
+                                  : "Reject submission"
+                              }
+                            >
+                              <XCircle
+                                className={cn(
+                                  "w-4 h-4",
+                                  car.status !== "approved" &&
+                                    car.status !== "rejected"
+                                    ? "text-red-400 hover:text-red-300"
+                                    : "text-gray-600"
+                                )}
+                              />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -427,7 +528,10 @@ function CarOnboarding() {
           </DialogHeader>
 
           <Form {...addCarForm}>
-            <form onSubmit={addCarForm.handleSubmit(onSubmitAddCar)} className="space-y-6 mt-4">
+            <form
+              onSubmit={addCarForm.handleSubmit(onSubmitAddCar)}
+              className="space-y-6 mt-4"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={addCarForm.control}
@@ -476,7 +580,8 @@ function CarOnboarding() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-gray-300">
-                      Car Make/Model (Year) <span className="text-[#EAEB80]">*</span>
+                      Car Make/Model (Year){" "}
+                      <span className="text-[#EAEB80]">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -516,7 +621,8 @@ function CarOnboarding() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-300">
-                        Date of Car Drop Off <span className="text-[#EAEB80]">*</span>
+                        Date of Car Drop Off{" "}
+                        <span className="text-[#EAEB80]">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -545,7 +651,9 @@ function CarOnboarding() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={addCarMutation.isPending || !addCarForm.formState.isValid}
+                  disabled={
+                    addCarMutation.isPending || !addCarForm.formState.isValid
+                  }
                   className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {addCarMutation.isPending ? (
