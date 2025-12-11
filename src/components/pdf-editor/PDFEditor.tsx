@@ -760,10 +760,10 @@ export function PDFEditor({ pdfUrl, onSign, contractId, onSignReady }: PDFEditor
     const x = ((e.clientX - rect.left) / scale) - 20;
     const y = ((e.clientY - rect.top) / scale) - 10;
     
-    // Initial state: 20px width (1 char), 22px height (20px font + 2px padding), 20px font
-    const initialWidth = 20; // One character at 20px font
-    const initialFontSize = 20; // 20px font size fixed
-    const initialHeight = initialFontSize + 2; // Font size + 2px padding = 22px
+    // Initial state: 12px width (1 char), 14px height (12px font + 2px padding), 12px font
+    const initialWidth = 30; // One character at 12px font
+    const initialFontSize = 30; // 12px font size to match PDF
+    const initialHeight = initialFontSize; // Font size + 2px padding = 14px
     
     const newText: TextAnnotation = {
       id: `text-${Date.now()}`,
