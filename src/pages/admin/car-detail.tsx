@@ -131,6 +131,7 @@ export default function CarDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       toast({
         title: "Success",
         description: "Car updated successfully",

@@ -481,6 +481,10 @@ export default function FormsPage() {
       }
       // Invalidate and refetch submissions
       queryClient.invalidateQueries({ queryKey: ["onboarding-submissions"] });
+      // Also invalidate cars list queries so cars page updates (car status changes when approved)
+      queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      // Invalidate sidebar badges (car counts may change)
+      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
     },
     onError: (error: Error, variables) => {
       toast({

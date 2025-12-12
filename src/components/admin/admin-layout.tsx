@@ -99,7 +99,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         counts["/admin/clients"] = 0;
       }
       
-      // Fetch available cars count (active cars from glav1_car)
+      // Fetch available cars count (active cars from car table)
       try {
         const carsResponse = await fetch(buildApiUrl("/api/cars?status=available"), { credentials: "include" });
         if (carsResponse.ok) {
@@ -147,10 +147,19 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const handleLogout = async () => {
     try {
       await apiRequest("POST", "/api/auth/logout");
+      
+      // Clear ALL query caches to prevent showing previous user's data
+      // This ensures when a new user logs in, they see fresh data, not cached data from previous user
+      queryClient.clear();
+      
+      // Also invalidate auth query explicitly
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      
       setLocation("/admin/login");
     } catch (error) {
       console.error("Logout failed:", error);
+      // Even if logout fails on server, clear cache to prevent data leakage
+      queryClient.clear();
     }
   };
 

@@ -173,6 +173,10 @@ export default function CarOffboarding() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cars-offboarding-forms"] });
+      // Also invalidate main cars list so cars page updates (car status changes to off_fleet)
+      queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      // Invalidate sidebar badges (car counts may change)
+      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       setIsOffboardDialogOpen(false);
       offboardCarForm.reset();
       toast({
