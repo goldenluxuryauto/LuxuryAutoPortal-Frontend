@@ -77,14 +77,14 @@ export default function ContractManagement() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: itemsPerPage.toString(),
-      });
+  });
       if (searchQuery) {
         params.append("search", searchQuery);
       }
       const response = await fetch(
         buildApiUrl(`/api/contracts/lyc?${params.toString()}`),
         {
-          credentials: "include",
+        credentials: "include",
         }
       );
 
@@ -177,7 +177,7 @@ export default function ContractManagement() {
           Expired
         </Badge>
       );
-    }
+      }
     return (
       <Badge
         variant="outline"
@@ -191,7 +191,7 @@ export default function ContractManagement() {
   return (
     <div className="space-y-6">
       {/* Header with Title and Description */}
-      <div>
+        <div>
         <h2 className="text-xl font-semibold text-white">LYC Contract / Agreement</h2>
         <p className="text-sm text-gray-400 mt-1">
           Manage LYC contracts and agreements
@@ -229,8 +229,8 @@ export default function ContractManagement() {
           ) : contractsData?.data && contractsData.data.length > 0 ? (
             <>
               <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
+            <Table>
+              <TableHeader>
                     <TableRow className="border-b border-[#1a1a1a]">
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                         Name
@@ -266,36 +266,36 @@ export default function ContractManagement() {
                         Offboarding
                       </TableHead>
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Actions
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                     {contractsData.data.map((contract) => (
-                      <TableRow
-                        key={contract.id}
+                  <TableRow
+                    key={contract.id}
                         className={cn(
                           "border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
                         )}
-                      >
+                  >
                         <TableCell className="px-6 py-4 text-white">
                           {contract.firstNameOwner} {contract.lastNameOwner}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">
                           {contract.emailOwner}
-                        </TableCell>
+                    </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">
                           {contract.phoneOwner}
-                        </TableCell>
+                    </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">
                           {contract.vehicleMake} {contract.vehicleModel}{" "}
                           {contract.vehicleYear}
-                        </TableCell>
+                    </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300 font-mono text-xs">
                           {contract.vinNumber || (
                             <span className="text-gray-500">—</span>
-                          )}
-                        </TableCell>
+                        )}
+                    </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300 font-mono text-xs">
                           {contract.licensePlate || (
                             <span className="text-gray-500">—</span>
@@ -336,9 +336,9 @@ export default function ContractManagement() {
                                     ? "Contract sent"
                                     : "Not sent"}
                                 </span>
-                              )}
-                          </div>
-                        </TableCell>
+                        )}
+                      </div>
+                    </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">
                           {contract.contractSignedAt ? (
                             new Date(
@@ -377,8 +377,8 @@ export default function ContractManagement() {
                                   {contract.carOffboardReason.replace("_", " ")}
                                 </span>
                               )}
-                            </div>
-                          ) : (
+            </div>
+          ) : (
                             <Badge
                               variant="outline"
                               className="border-green-500/50 text-green-400 bg-green-500/10 text-xs"
@@ -386,10 +386,10 @@ export default function ContractManagement() {
                               Active
                             </Badge>
                           )}
-                        </TableCell>
+                    </TableCell>
                         <TableCell className="px-6 py-4">
-                          <Button
-                            size="sm"
+                      <Button
+                        size="sm"
                             variant="outline"
                             className="h-8 px-3 bg-[#EAEB80]/10 border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/20"
                             onClick={() => {
@@ -405,12 +405,12 @@ export default function ContractManagement() {
                                 Resend Contract
                               </>
                             )}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
               </div>
 
               {/* Pagination */}

@@ -1281,13 +1281,13 @@ export default function FormsPage() {
           <DialogHeader>
             <div className="flex items-start justify-between">
               <div>
-                <DialogTitle className="text-white text-2xl">
-                  Complete Submission Details
-                </DialogTitle>
-                <DialogDescription className="text-gray-400">
-                  Full onboarding form submission information - All data from
-                  database
-                </DialogDescription>
+            <DialogTitle className="text-white text-2xl">
+              Complete Submission Details
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Full onboarding form submission information - All data from
+              database
+            </DialogDescription>
               </div>
               {!showSensitiveData && (
                 <Button
@@ -1423,14 +1423,14 @@ export default function FormsPage() {
                           </span>
                         </div>
                         {showSensitiveData && (
-                          <div>
-                            <span className="text-gray-400 block mb-1">
+                        <div>
+                          <span className="text-gray-400 block mb-1">
                               SSN:
-                            </span>
+                          </span>
                             <span className="text-white font-mono">
                               {maskSSN(data.ssn)}
-                            </span>
-                          </div>
+                          </span>
+                        </div>
                         )}
                         <div>
                           <span className="text-gray-400 block mb-1">
@@ -1450,22 +1450,22 @@ export default function FormsPage() {
                         </div>
                         {showSensitiveData && (
                           <>
-                            <div>
-                              <span className="text-gray-400 block mb-1">
-                                Emergency Contact Name:
-                              </span>
-                              <span className="text-white">
-                                {formatValue(data.emergencyContactName)}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-400 block mb-1">
-                                Emergency Contact Phone:
-                              </span>
-                              <span className="text-white">
-                                {formatValue(data.emergencyContactPhone)}
-                              </span>
-                            </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Emergency Contact Name:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.emergencyContactName)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Emergency Contact Phone:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.emergencyContactPhone)}
+                          </span>
+                        </div>
                           </>
                         )}
                       </div>
@@ -1478,14 +1478,14 @@ export default function FormsPage() {
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         {showSensitiveData && (
-                          <div className="md:col-span-2">
-                            <span className="text-gray-400 block mb-1">
-                              Street Address:
-                            </span>
-                            <span className="text-white">
-                              {formatValue(data.streetAddress)}
-                            </span>
-                          </div>
+                        <div className="md:col-span-2">
+                          <span className="text-gray-400 block mb-1">
+                            Street Address:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.streetAddress)}
+                          </span>
+                        </div>
                         )}
                         <div className={showSensitiveData ? "" : "md:col-span-2"}>
                           <span className="text-gray-400 block mb-1">
@@ -1497,30 +1497,30 @@ export default function FormsPage() {
                         </div>
                         {showSensitiveData && (
                           <>
-                            <div>
-                              <span className="text-gray-400 block mb-1">
-                                City:
-                              </span>
-                              <span className="text-white">
-                                {formatValue(data.city)}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-400 block mb-1">
-                                State:
-                              </span>
-                              <span className="text-white">
-                                {formatValue(data.state)}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-400 block mb-1">
-                                Zip Code:
-                              </span>
-                              <span className="text-white">
-                                {formatValue(data.zipCode)}
-                              </span>
-                            </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            City:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.city)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            State:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.state)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Zip Code:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.zipCode)}
+                          </span>
+                        </div>
                           </>
                         )}
                       </div>
@@ -1712,22 +1712,22 @@ export default function FormsPage() {
                         </div>
                         {showSensitiveData && (
                           <>
-                            <div>
-                              <span className="text-gray-400 block mb-1">
-                                Routing Number:
-                              </span>
-                              <span className="text-white font-mono">
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Routing Number:
+                          </span>
+                          <span className="text-white font-mono">
                                 {maskAccountInfo(data.routingNumber)}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-400 block mb-1">
-                                Account Number:
-                              </span>
-                              <span className="text-white font-mono">
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Account Number:
+                          </span>
+                          <span className="text-white font-mono">
                                 {maskAccountInfo(data.accountNumber)}
-                              </span>
-                            </div>
+                          </span>
+                        </div>
                           </>
                         )}
                         {data.businessName && (
@@ -1768,14 +1768,14 @@ export default function FormsPage() {
                           </span>
                         </div>
                         {showSensitiveData && (
-                          <div>
-                            <span className="text-gray-400 block mb-1">
-                              Policy Number:
-                            </span>
-                            <span className="text-white">
-                              {formatValue(data.policyNumber)}
-                            </span>
-                          </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Policy Number:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.policyNumber)}
+                          </span>
+                        </div>
                         )}
                         <div>
                           <span className="text-gray-400 block mb-1">
@@ -1825,14 +1825,14 @@ export default function FormsPage() {
                           </Badge>
                         </div>
                         {showSensitiveData && (
-                          <div>
-                            <span className="text-gray-400 block mb-1">
-                              Contract Token:
-                            </span>
-                            <span className="text-white font-mono text-xs break-all">
-                              {formatValue(data.contractToken)}
-                            </span>
-                          </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Contract Token:
+                          </span>
+                          <span className="text-white font-mono text-xs break-all">
+                            {formatValue(data.contractToken)}
+                          </span>
+                        </div>
                         )}
                         <div>
                           <span className="text-gray-400 block mb-1">
