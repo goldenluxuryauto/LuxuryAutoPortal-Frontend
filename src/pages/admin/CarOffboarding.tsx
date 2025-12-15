@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,14 +33,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { buildApiUrl } from "@/lib/queryClient";
+import { Loader2, Search, LogOut } from "lucide-react";
 import {
-  Loader2,
-  Search,
-  LogOut,
-  Eye,
-  Archive,
-} from "lucide-react";
-import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
+  TablePagination,
+  ItemsPerPage,
+} from "@/components/ui/table-pagination";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
@@ -63,7 +65,9 @@ interface OffboardingCar {
 const offboardCarSchema = z.object({
   date: z.string().min(1, "Date is required"),
   name: z.string().min(1, "Name is required"),
-  vehicleMakeModelYear: z.string().min(1, "Vehicle Make/Model/Year is required"),
+  vehicleMakeModelYear: z
+    .string()
+    .min(1, "Vehicle Make/Model/Year is required"),
   licensePlate: z.string().min(1, "License Plate is required"),
   returnDate: z.string().min(1, "Return date is required"),
 });
@@ -77,7 +81,7 @@ export default function CarOffboarding() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   // Load items per page from localStorage, default to 10
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
     const saved = localStorage.getItem("car_offboarding_limit");
@@ -122,8 +126,12 @@ export default function CarOffboarding() {
         }
       );
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Database connection failed" }));
-        throw new Error(errorData.error || "Failed to fetch cars for offboarding");
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Database connection failed" }));
+        throw new Error(
+          errorData.error || "Failed to fetch cars for offboarding"
+        );
       }
       return response.json();
     },
@@ -134,11 +142,11 @@ export default function CarOffboarding() {
   const offboardCarForm = useForm<OffboardCarFormData>({
     resolver: zodResolver(offboardCarSchema),
     defaultValues: {
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split("T")[0],
       name: "",
       vehicleMakeModelYear: "",
       licensePlate: "",
-      returnDate: new Date().toISOString().split('T')[0],
+      returnDate: new Date().toISOString().split("T")[0],
     },
   });
 
@@ -155,7 +163,9 @@ export default function CarOffboarding() {
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: "Failed to offboard car" }));
+        const error = await response
+          .json()
+          .catch(() => ({ error: "Failed to offboard car" }));
         throw new Error(error.error || "Failed to offboard car");
       }
 
@@ -196,22 +206,10 @@ export default function CarOffboarding() {
     if (car.clientId) {
       setLocation(`/admin/clients?id=${car.clientId}`);
     } else {
-      setLocation(`/admin/clients?search=${encodeURIComponent(car.clientName)}`);
+      setLocation(
+        `/admin/clients?search=${encodeURIComponent(car.clientName)}`
+      );
     }
-  };
-
-  // Handle action buttons
-  const handleView = (e: React.MouseEvent, car: OffboardingCar) => {
-    e.stopPropagation();
-    if (car.clientId) {
-      setLocation(`/admin/clients?id=${car.clientId}`);
-    }
-  };
-
-  const handleArchive = (e: React.MouseEvent, car: OffboardingCar) => {
-    e.stopPropagation();
-    // TODO: Implement archive functionality
-    console.log("Archive car:", car.id);
   };
 
   // Format offboard reason
@@ -297,9 +295,6 @@ export default function CarOffboarding() {
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                         Car Offboarding Date
                       </TableHead>
-                      <TableHead className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Actions
-                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -310,7 +305,10 @@ export default function CarOffboarding() {
                           "border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
                         )}
                       >
-                        <TableCell className="px-6 py-4 text-white cursor-pointer" onClick={() => handleRowClick(car)}>
+                        <TableCell
+                          className="px-6 py-4 text-white cursor-pointer"
+                          onClick={() => handleRowClick(car)}
+                        >
                           {car.clientName}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">
@@ -326,7 +324,9 @@ export default function CarOffboarding() {
                           {car.vin || "—"}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300 font-mono">
-                          {car.licensePlate ? car.licensePlate.toUpperCase() : "—"}
+                          {car.licensePlate
+                            ? car.licensePlate.toUpperCase()
+                            : "—"}
                         </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">
                           {new Date(car.createdAt).toLocaleDateString("en-US", {
@@ -353,34 +353,15 @@ export default function CarOffboarding() {
                         </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">
                           {car.offboardAt
-                            ? new Date(car.offboardAt).toLocaleDateString("en-US", {
-                                month: "2-digit",
-                                day: "2-digit",
-                                year: "numeric",
-                              })
+                            ? new Date(car.offboardAt).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "2-digit",
+                                  day: "2-digit",
+                                  year: "numeric",
+                                }
+                              )
                             : "—"}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 hover:bg-gray-800"
-                              onClick={(e) => handleView(e, car)}
-                              title="View"
-                            >
-                              <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 hover:bg-[#EAEB80]/20"
-                              onClick={(e) => handleArchive(e, car)}
-                              title="Archive"
-                            >
-                              <Archive className="w-4 h-4 text-gray-400 hover:text-[#EAEB80]" />
-                            </Button>
-                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -420,7 +401,10 @@ export default function CarOffboarding() {
       </Card>
 
       {/* Offboard Car Dialog */}
-      <Dialog open={isOffboardDialogOpen} onOpenChange={setIsOffboardDialogOpen}>
+      <Dialog
+        open={isOffboardDialogOpen}
+        onOpenChange={setIsOffboardDialogOpen}
+      >
         <DialogContent className="bg-[#111111] border-[#EAEB80]/30 border-2 text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-semibold text-[#EAEB80]">
@@ -432,7 +416,10 @@ export default function CarOffboarding() {
           </DialogHeader>
 
           <Form {...offboardCarForm}>
-            <form onSubmit={offboardCarForm.handleSubmit(onSubmitOffboardCar)} className="space-y-6 mt-4">
+            <form
+              onSubmit={offboardCarForm.handleSubmit(onSubmitOffboardCar)}
+              className="space-y-6 mt-4"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={offboardCarForm.control}
@@ -481,7 +468,8 @@ export default function CarOffboarding() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-gray-300">
-                      Vehicle Make/Model (Year) <span className="text-[#EAEB80]">*</span>
+                      Vehicle Make/Model (Year){" "}
+                      <span className="text-[#EAEB80]">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -502,7 +490,8 @@ export default function CarOffboarding() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-300">
-                        License Plate Number <span className="text-[#EAEB80]">*</span>
+                        License Plate Number{" "}
+                        <span className="text-[#EAEB80]">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -523,7 +512,8 @@ export default function CarOffboarding() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-300">
-                        Vehicle Return Date <span className="text-[#EAEB80]">*</span>
+                        Vehicle Return Date{" "}
+                        <span className="text-[#EAEB80]">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -552,7 +542,10 @@ export default function CarOffboarding() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={offboardCarMutation.isPending || !offboardCarForm.formState.isValid}
+                  disabled={
+                    offboardCarMutation.isPending ||
+                    !offboardCarForm.formState.isValid
+                  }
                   className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {offboardCarMutation.isPending ? (
