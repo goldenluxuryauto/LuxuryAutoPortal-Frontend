@@ -297,9 +297,6 @@ export default function CarOffboarding() {
                       <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                         Car Offboarding Date
                       </TableHead>
-                      <TableHead className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                        Actions
-                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -359,28 +356,6 @@ export default function CarOffboarding() {
                                 year: "numeric",
                               })
                             : "—"}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 hover:bg-gray-800"
-                              onClick={(e) => handleView(e, car)}
-                              title="View"
-                            >
-                              <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 hover:bg-[#EAEB80]/20"
-                              onClick={(e) => handleArchive(e, car)}
-                              title="Archive"
-                            >
-                              <Archive className="w-4 h-4 text-gray-400 hover:text-[#EAEB80]" />
-                            </Button>
-                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

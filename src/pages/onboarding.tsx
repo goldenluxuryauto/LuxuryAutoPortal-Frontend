@@ -286,13 +286,13 @@ export default function Onboarding() {
     setIsSubmitting(true);
     try {
       const endpoint = buildApiUrl("/api/onboarding/submit");
-      console.log("📤 [FRONTEND] Sending POST request to", endpoint);
+      // console.log("📤 [FRONTEND] Sending POST request to", endpoint);
       const requestBody = JSON.stringify(data);
-      console.log(
-        "📦 [FRONTEND] Request body length:",
-        requestBody.length,
-        "characters"
-      );
+      // console.log(
+      //   "📦 [FRONTEND] Request body length:",
+      //   requestBody.length,
+      //   "characters"
+      // );
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -301,30 +301,30 @@ export default function Onboarding() {
         credentials: "include",
       });
 
-      console.log("📥 [FRONTEND] Response received");
-      console.log("📊 [FRONTEND] Response status:", response.status);
-      console.log("📊 [FRONTEND] Response statusText:", response.statusText);
-      console.log("📊 [FRONTEND] Response ok:", response.ok);
+      // console.log("📥 [FRONTEND] Response received");
+      // console.log("📊 [FRONTEND] Response status:", response.status);
+      // console.log("📊 [FRONTEND] Response statusText:", response.statusText);
+      // console.log("📊 [FRONTEND] Response ok:", response.ok);
 
       if (!response.ok) {
         const error = await response.json();
-        console.error("❌ [FRONTEND] Response error:", error);
+        // console.error("❌ [FRONTEND] Response error:", error);
         throw new Error(error.message || "Submission failed");
       }
 
       const responseData = await response.json();
-      console.log("✅ [FRONTEND] Response data:", responseData);
-      console.log("🆔 [FRONTEND] Submission ID:", responseData.id);
-      console.log("=".repeat(80));
+      // Log summary only, not full data
+      // console.log("✅ [FRONTEND] Submission successful, ID:", responseData.id);
+      // console.log("=".repeat(80));
 
       setIsSubmitted(true);
       // Thank you page is rendered inline below (lines 339-372)
     } catch (error: any) {
-      console.error("❌ [FRONTEND] Submission error:");
-      console.error("Error type:", error?.constructor?.name);
-      console.error("Error message:", error.message);
-      console.error("Error stack:", error.stack);
-      console.log("=".repeat(80));
+      // console.error("❌ [FRONTEND] Submission error:");
+      // console.error("Error type:", error?.constructor?.name);
+      // console.error("Error message:", error.message);
+      // console.error("Error stack:", error.stack);
+      // console.log("=".repeat(80));
 
       toast({
         title: "Submission Failed",

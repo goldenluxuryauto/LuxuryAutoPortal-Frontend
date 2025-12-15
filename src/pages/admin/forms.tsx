@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,13 +36,20 @@ import {
   ExternalLink,
   Download,
   Share2,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
-import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
+import {
+  TablePagination,
+  ItemsPerPage,
+} from "@/components/ui/table-pagination";
 
 interface FormItem {
   id: string;
@@ -265,8 +277,11 @@ export default function FormsPage() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [showSensitiveData, setShowSensitiveData] = useState(false);
   const [showAccessConfirmation, setShowAccessConfirmation] = useState(false);
+  const [showDeclineModal, setShowDeclineModal] = useState(false);
+  const [declineReason, setDeclineReason] = useState("");
+  const [submissionToDecline, setSubmissionToDecline] = useState<OnboardingSubmission | null>(null);
   const [page, setPage] = useState(1);
-  
+
   // Load items per page from localStorage, default to 10
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
     const saved = localStorage.getItem("submissions_limit");
@@ -379,11 +394,11 @@ export default function FormsPage() {
       }
 
       const data = await response.json();
-      console.log("✅ [FORMS PAGE] Submissions received:", {
-        success: data.success,
-        count: data.data?.length || 0,
-        total: data.pagination?.total || 0,
-      });
+      // console.log("✅ [FORMS PAGE] Submissions received:", {
+      //   success: data.success,
+      //   count: data.data?.length || 0,
+      //   total: data.pagination?.total || 0,
+      // });
       return data;
     },
     enabled: expandedItems.includes("lyc"), // Only fetch when LYC item is expanded
@@ -436,15 +451,21 @@ export default function FormsPage() {
     mutationFn: async ({
       id,
       action,
+      reason,
     }: {
       id: number;
       action: "approve" | "reject";
+      reason?: string;
     }) => {
       const response = await fetch(
         buildApiUrl(`/api/onboarding/submissions/${id}/${action}`),
         {
           method: "POST",
           credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ reason }),
         }
       );
       if (!response.ok) {
@@ -457,20 +478,20 @@ export default function FormsPage() {
     },
     onSuccess: (data, variables) => {
       if (variables.action === "approve") {
-        // Show different message for existing vs new clients
-        const isExistingClient = data.isExistingClient;
         toast({
           title: "✅ Submission Approved",
-          description: isExistingClient
-            ? "🚗 Existing client detected - New car will be added to their account (no email sent)."
-            : "📧 Create account email has been sent to the new client.",
+          description: "Email and Slack notifications sent. Status updated.",
         });
       } else {
         toast({
-          title: "Submission Rejected",
-          description: "Submission has been rejected.",
+          title: "Submission Declined",
+          description: "Email and Slack notifications sent. Status updated.",
         });
       }
+      // Close decline modal if open
+      setShowDeclineModal(false);
+      setDeclineReason("");
+      setSubmissionToDecline(null);
       // Invalidate and refetch submissions
       queryClient.invalidateQueries({ queryKey: ["onboarding-submissions"] });
       // Also invalidate cars list queries so cars page updates (car status changes when approved)
@@ -799,8 +820,9 @@ export default function FormsPage() {
                             {isItemExpanded && item.id === "car-on" && (
                               <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
                                 {/* Show form for clients, table for admins */}
-                                {formVisibilityData?.isAdmin || formVisibilityData?.isEmployee ? (
-                                <CarOnboarding />
+                                {formVisibilityData?.isAdmin ||
+                                formVisibilityData?.isEmployee ? (
+                                  <CarOnboarding />
                                 ) : (
                                   <CarOnboardingForm />
                                 )}
@@ -811,8 +833,9 @@ export default function FormsPage() {
                             {isItemExpanded && item.id === "car-off" && (
                               <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
                                 {/* Show form for clients, table for admins */}
-                                {formVisibilityData?.isAdmin || formVisibilityData?.isEmployee ? (
-                                <CarOffboarding />
+                                {formVisibilityData?.isAdmin ||
+                                formVisibilityData?.isEmployee ? (
+                                  <CarOffboarding />
                                 ) : (
                                   <CarOffboardingForm />
                                 )}
@@ -997,19 +1020,21 @@ export default function FormsPage() {
                                                         className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20"
                                                         onClick={() => {
                                                           // Use signed_contract_url from database if available
-                                                          if (submission.signedContractUrl) {
-                                                            // If it's already a full URL, use it directly
-                                                            // If it's a relative path, prepend API base URL
-                                                            const pdfUrl = submission.signedContractUrl.startsWith('http')
-                                                              ? submission.signedContractUrl
-                                                              : buildApiUrl(submission.signedContractUrl);
-                                                            window.open(pdfUrl, "_blank");
+                                                          if (
+                                                            submission.signedContractUrl
+                                                          ) {
+                                                            window.open(
+                                                              submission.signedContractUrl,
+                                                              "_blank"
+                                                            );
                                                           } else {
-                                                            // Fallback: try to find signed PDF by pattern
-                                                          window.open(
-                                                              buildApiUrl(`/signed-contracts/signed_${submission.id}_*.pdf`),
-                                                            "_blank"
-                                                          );
+                                                            // Fallback to old pattern if URL not in database
+                                                            window.open(
+                                                              buildApiUrl(
+                                                                `/signed-contracts/submission_${submission.id}.pdf`
+                                                              ),
+                                                              "_blank"
+                                                            );
                                                           }
                                                         }}
                                                       >
@@ -1099,6 +1124,75 @@ export default function FormsPage() {
                                                   >
                                                     <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
                                                   </Button>
+
+                                                  {/* Always show Approve/Decline buttons for consistent layout */}
+                                                  {/* Disable them if contract is not signed or already approved/rejected */}
+                                                  <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="h-8 w-8 p-0 text-[#d4af37]"
+                                                    onClick={() => {
+                                                      approvalMutation.mutate({
+                                                        id: submission.id,
+                                                        action: "approve",
+                                                      });
+                                                    }}
+                                                    disabled={
+                                                      submission.contractStatus !==
+                                                        "signed" ||
+                                                      submission.status ===
+                                                        "approved" ||
+                                                      submission.status ===
+                                                        "rejected" ||
+                                                      approvalMutation.isPending
+                                                    }
+                                                    title={
+                                                      submission.contractStatus !==
+                                                      "signed"
+                                                        ? "Contract must be signed before approval"
+                                                        : submission.status ===
+                                                          "approved"
+                                                        ? "Already approved"
+                                                        : submission.status ===
+                                                          "rejected"
+                                                        ? "Already rejected"
+                                                        : "Approve submission"
+                                                    }
+                                                  >
+                                                    <CheckCircle className="w-4 h-4" />
+                                                  </Button>
+                                                  <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="h-8 w-8 p-0 text-red-400"
+                                                    onClick={() => {
+                                                      setSubmissionToDecline(submission);
+                                                      setShowDeclineModal(true);
+                                                    }}
+                                                    disabled={
+                                                      submission.contractStatus !==
+                                                        "signed" ||
+                                                      submission.status ===
+                                                        "approved" ||
+                                                      submission.status ===
+                                                        "rejected" ||
+                                                      approvalMutation.isPending
+                                                    }
+                                                    title={
+                                                      submission.contractStatus !==
+                                                      "signed"
+                                                        ? "Contract must be signed before decline"
+                                                        : submission.status ===
+                                                          "approved"
+                                                        ? "Already approved"
+                                                        : submission.status ===
+                                                          "rejected"
+                                                        ? "Already declined"
+                                                        : "Decline submission"
+                                                    }
+                                                  >
+                                                    <XCircle className="w-4 h-4" />
+                                                  </Button>
                                                 </div>
                                               </td>
                                             </tr>
@@ -1106,16 +1200,21 @@ export default function FormsPage() {
                                         )}
                                       </tbody>
                                     </table>
-                                    
+
                                     {/* Pagination */}
                                     {submissionsData.pagination && (
                                       <TablePagination
-                                        totalItems={submissionsData.pagination.total}
+                                        totalItems={
+                                          submissionsData.pagination.total
+                                        }
                                         itemsPerPage={itemsPerPage}
                                         currentPage={page}
                                         onPageChange={(newPage) => {
                                           setPage(newPage);
-                                          window.scrollTo({ top: 0, behavior: "smooth" });
+                                          window.scrollTo({
+                                            top: 0,
+                                            behavior: "smooth",
+                                          });
                                         }}
                                         onItemsPerPageChange={(newLimit) => {
                                           setItemsPerPage(newLimit);
@@ -1761,12 +1860,12 @@ export default function FormsPage() {
                                   window.open(data.signedContractUrl, "_blank");
                                 } else {
                                   // Fallback to old pattern if URL not in database
-                                window.open(
-                                  buildApiUrl(
-                                    `/signed-contracts/submission_${data.id}.pdf`
-                                  ),
-                                  "_blank"
-                                );
+                                  window.open(
+                                    buildApiUrl(
+                                      `/signed-contracts/submission_${data.id}.pdf`
+                                    ),
+                                    "_blank"
+                                  );
                                 }
                               }}
                               className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
@@ -1830,6 +1929,91 @@ export default function FormsPage() {
               <Loader2 className="w-6 h-6 text-[#EAEB80] animate-spin" />
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Decline Reason Modal */}
+      <Dialog open={showDeclineModal} onOpenChange={setShowDeclineModal}>
+        <DialogContent className="bg-[#0a0a0a] border-[#1a1a1a] text-white">
+          <DialogHeader>
+            <DialogTitle className="text-[#EAEB80]">
+              Decline Submission
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Please provide a reason for declining this submission. The client will receive an email with this reason.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {submissionToDecline && (
+              <div className="text-sm text-gray-300">
+                <p>
+                  <span className="text-gray-500">Client:</span>{" "}
+                  {submissionToDecline.firstNameOwner}{" "}
+                  {submissionToDecline.lastNameOwner}
+                </p>
+                <p>
+                  <span className="text-gray-500">Email:</span>{" "}
+                  {submissionToDecline.emailOwner}
+                </p>
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="decline-reason" className="text-gray-300">
+                Reason for Decline <span className="text-red-400">*</span>
+              </Label>
+              <Textarea
+                id="decline-reason"
+                value={declineReason}
+                onChange={(e) => setDeclineReason(e.target.value)}
+                placeholder="Enter reason for declining this submission..."
+                className="bg-[#111111] border-[#1a1a1a] text-white placeholder:text-gray-600 min-h-[100px]"
+                required
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowDeclineModal(false);
+                  setDeclineReason("");
+                  setSubmissionToDecline(null);
+                }}
+                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  if (!declineReason.trim()) {
+                    toast({
+                      title: "Reason Required",
+                      description: "Please provide a reason for declining.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  if (submissionToDecline) {
+                    approvalMutation.mutate({
+                      id: submissionToDecline.id,
+                      action: "reject",
+                      reason: declineReason.trim(),
+                    });
+                  }
+                }}
+                disabled={!declineReason.trim() || approvalMutation.isPending}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {approvalMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Declining...
+                  </>
+                ) : (
+                  "Decline Submission"
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </AdminLayout>

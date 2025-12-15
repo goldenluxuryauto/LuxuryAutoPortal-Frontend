@@ -154,7 +154,12 @@ export default function ClientDetailPage() {
         throw new Error(errorData.error || `Failed to fetch client: ${response.statusText}`);
       }
       const result = await response.json();
-      console.log("✅ [CLIENT DETAIL] Fetched client data:", result);
+      // Log summary only, not full data
+      console.log("✅ [CLIENT DETAIL] Fetched client data:", {
+        id: result.id,
+        email: result.email,
+        name: result.name,
+      });
       return result;
     },
     enabled: !!clientId,
