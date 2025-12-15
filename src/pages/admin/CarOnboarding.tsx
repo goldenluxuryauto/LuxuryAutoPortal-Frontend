@@ -175,6 +175,10 @@ function CarOnboarding() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cars-onboarding"] });
+      // Also invalidate main cars list so cars page updates
+      queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      // Invalidate sidebar badges (car counts may change)
+      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       setIsAddDialogOpen(false);
       addCarForm.reset();
       toast({

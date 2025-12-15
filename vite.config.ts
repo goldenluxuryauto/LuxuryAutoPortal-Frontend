@@ -60,6 +60,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/car-photos": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

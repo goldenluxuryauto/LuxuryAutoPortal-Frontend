@@ -192,6 +192,7 @@ export default function CarsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       toast({
         title: "Success",
         description: "Car added successfully",
@@ -231,6 +232,7 @@ export default function CarsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       toast({
         title: "Success",
         description: "Car updated successfully",
@@ -259,6 +261,7 @@ export default function CarsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       toast({
         title: "Success",
         description: "Car deleted successfully",
@@ -296,6 +299,7 @@ export default function CarsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       toast({
         title: "Success",
         description: "Car off-boarded successfully",

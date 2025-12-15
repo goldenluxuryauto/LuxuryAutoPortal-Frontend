@@ -263,6 +263,8 @@ export default function FormsPage() {
   const [selectedSubmission, setSelectedSubmission] =
     useState<OnboardingSubmission | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [showSensitiveData, setShowSensitiveData] = useState(false);
+  const [showAccessConfirmation, setShowAccessConfirmation] = useState(false);
   const [page, setPage] = useState(1);
   
   // Load items per page from localStorage, default to 10
@@ -429,6 +431,62 @@ export default function FormsPage() {
     previousSignedIdsRef.current = currentSignedIds;
   }, [submissionsData?.data]);
 
+  // Approve/Reject submission mutation
+  const approvalMutation = useMutation({
+    mutationFn: async ({
+      id,
+      action,
+    }: {
+      id: number;
+      action: "approve" | "reject";
+    }) => {
+      const response = await fetch(
+        buildApiUrl(`/api/onboarding/submissions/${id}/${action}`),
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
+        const error = await response
+          .json()
+          .catch(() => ({ error: `Failed to ${action} submission` }));
+        throw new Error(error.error || `Failed to ${action} submission`);
+      }
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      if (variables.action === "approve") {
+        // Show different message for existing vs new clients
+        const isExistingClient = data.isExistingClient;
+        toast({
+          title: "✅ Submission Approved",
+          description: isExistingClient
+            ? "🚗 Existing client detected - New car will be added to their account (no email sent)."
+            : "📧 Create account email has been sent to the new client.",
+        });
+      } else {
+        toast({
+          title: "Submission Rejected",
+          description: "Submission has been rejected.",
+        });
+      }
+      // Invalidate and refetch submissions
+      queryClient.invalidateQueries({ queryKey: ["onboarding-submissions"] });
+      // Also invalidate cars list queries so cars page updates (car status changes when approved)
+      queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      // Invalidate sidebar badges (car counts may change)
+      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
+    },
+    onError: (error: Error, variables) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   // Fetch full submission details for viewing
   const { data: submissionDetails } = useQuery<{
     success: boolean;
@@ -450,7 +508,99 @@ export default function FormsPage() {
 
   const handleViewDetails = async (submission: OnboardingSubmission) => {
     setSelectedSubmission(submission);
+    setShowSensitiveData(false); // Reset sensitive data visibility
     setIsDetailsOpen(true);
+  };
+
+  // Mutation to log sensitive data access
+  const logAccessMutation = useMutation({
+    mutationFn: async (submissionId: number) => {
+      const response = await fetch(
+        buildApiUrl(`/api/onboarding/submissions/${submissionId}/log-access`),
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+      if (!response.ok) throw new Error("Failed to log access");
+      return response.json();
+    },
+    onSuccess: () => {
+      setShowSensitiveData(true);
+      setShowAccessConfirmation(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to log access",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleRequestSensitiveData = () => {
+    setShowAccessConfirmation(true);
+  };
+
+  const handleConfirmViewSensitiveData = () => {
+    if (selectedSubmission?.id) {
+      logAccessMutation.mutate(selectedSubmission.id);
+    }
+  };
+
+  // Helper function to calculate age from date of birth
+  const getAgeOrBirthYear = (birthday: string | null | undefined): string => {
+    if (!birthday) return "Not provided";
+    try {
+      const birthDate = new Date(birthday);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        return `Age ${age - 1}`;
+      }
+      return `Age ${age}`;
+    } catch {
+      // If parsing fails, try to extract just the year
+      const yearMatch = birthday.match(/\d{4}/);
+      if (yearMatch) {
+        return `Birth Year: ${yearMatch[0]}`;
+      }
+      return "Not provided";
+    }
+  };
+
+  // Helper function to format address (city, state ZIP only)
+  const formatAddress = (
+    city: string | null | undefined,
+    state: string | null | undefined,
+    zipCode: string | null | undefined
+  ): string => {
+    const parts: string[] = [];
+    if (city) parts.push(city);
+    if (state) parts.push(state);
+    if (zipCode) parts.push(zipCode);
+    return parts.length > 0 ? parts.join(", ") : "Not provided";
+  };
+
+  // Helper function to mask SSN (show last 4 or masked)
+  const maskSSN = (ssn: string | null | undefined): string => {
+    if (!ssn) return "Not provided";
+    if (showSensitiveData) return ssn;
+    if (ssn.length >= 4) {
+      return `•••-••-${ssn.slice(-4)}`;
+    }
+    return "•••-••-••••";
+  };
+
+  // Helper function to mask account/routing number
+  const maskAccountInfo = (value: string | null | undefined): string => {
+    if (!value) return "Not provided";
+    if (showSensitiveData) return value;
+    if (value.length >= 3) {
+      return `••••••${value.slice(-3)}`;
+    }
+    return "•••••••••";
   };
 
   // Filter form items based on visibility
@@ -995,9 +1145,20 @@ export default function FormsPage() {
       </div>
 
       {/* Submission Details Dialog */}
-      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+      <Dialog
+        open={isDetailsOpen}
+        onOpenChange={(open) => {
+          setIsDetailsOpen(open);
+          if (!open) {
+            setShowSensitiveData(false);
+            setShowAccessConfirmation(false);
+          }
+        }}
+      >
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
           <DialogHeader>
+            <div className="flex items-start justify-between">
+              <div>
             <DialogTitle className="text-white text-2xl">
               Complete Submission Details
             </DialogTitle>
@@ -1005,7 +1166,55 @@ export default function FormsPage() {
               Full onboarding form submission information - All data from
               database
             </DialogDescription>
+              </div>
+              {!showSensitiveData && (
+                <Button
+                  onClick={handleRequestSensitiveData}
+                  variant="outline"
+                  className="bg-yellow-500/10 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/20"
+                >
+                  View Full Sensitive Information
+                </Button>
+              )}
+            </div>
           </DialogHeader>
+
+          {/* Confirmation Dialog for Sensitive Data Access */}
+          <Dialog open={showAccessConfirmation} onOpenChange={setShowAccessConfirmation}>
+            <DialogContent className="bg-[#111111] border-[#EAEB80]/30 border-2 text-white max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-white text-xl">
+                  Access Sensitive Data
+                </DialogTitle>
+                <DialogDescription className="text-gray-400 mt-2">
+                  This action is logged. Continue?
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-end gap-3 mt-4">
+                <Button
+                  onClick={() => setShowAccessConfirmation(false)}
+                  variant="outline"
+                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleConfirmViewSensitiveData}
+                  disabled={logAccessMutation.isPending}
+                  className="bg-yellow-500/20 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/30"
+                >
+                  {logAccessMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Logging...
+                    </>
+                  ) : (
+                    "Continue"
+                  )}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {submissionDetails?.data ? (
             <div className="space-y-6 mt-4">
@@ -1078,7 +1287,9 @@ export default function FormsPage() {
                             Date of Birth:
                           </span>
                           <span className="text-white">
-                            {formatValue(data.birthday)}
+                            {showSensitiveData
+                              ? formatValue(data.birthday)
+                              : getAgeOrBirthYear(data.birthday)}
                           </span>
                         </div>
                         <div>
@@ -1089,16 +1300,16 @@ export default function FormsPage() {
                             {formatValue(data.tshirtSize)}
                           </span>
                         </div>
+                        {showSensitiveData && (
                         <div>
                           <span className="text-gray-400 block mb-1">
-                            SSN (Last 4):
+                              SSN:
                           </span>
-                          <span className="text-white">
-                            {formatValue(data.ssn)
-                              ? data.ssn?.slice(-4) || "Not provided"
-                              : "Not provided"}
+                            <span className="text-white font-mono">
+                              {maskSSN(data.ssn)}
                           </span>
                         </div>
+                        )}
                         <div>
                           <span className="text-gray-400 block mb-1">
                             Representative:
@@ -1115,6 +1326,8 @@ export default function FormsPage() {
                             {formatValue(data.heardAboutUs)}
                           </span>
                         </div>
+                        {showSensitiveData && (
+                          <>
                         <div>
                           <span className="text-gray-400 block mb-1">
                             Emergency Contact Name:
@@ -1131,6 +1344,8 @@ export default function FormsPage() {
                             {formatValue(data.emergencyContactPhone)}
                           </span>
                         </div>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -1140,6 +1355,7 @@ export default function FormsPage() {
                         Address Information
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        {showSensitiveData && (
                         <div className="md:col-span-2">
                           <span className="text-gray-400 block mb-1">
                             Street Address:
@@ -1148,6 +1364,17 @@ export default function FormsPage() {
                             {formatValue(data.streetAddress)}
                           </span>
                         </div>
+                        )}
+                        <div className={showSensitiveData ? "" : "md:col-span-2"}>
+                          <span className="text-gray-400 block mb-1">
+                            {showSensitiveData ? "City, State, ZIP:" : "Address:"}
+                          </span>
+                          <span className="text-white">
+                            {formatAddress(data.city, data.state, data.zipCode)}
+                          </span>
+                        </div>
+                        {showSensitiveData && (
+                          <>
                         <div>
                           <span className="text-gray-400 block mb-1">
                             City:
@@ -1172,6 +1399,8 @@ export default function FormsPage() {
                             {formatValue(data.zipCode)}
                           </span>
                         </div>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -1359,12 +1588,14 @@ export default function FormsPage() {
                             {formatValue(data.taxClassification)}
                           </span>
                         </div>
+                        {showSensitiveData && (
+                          <>
                         <div>
                           <span className="text-gray-400 block mb-1">
                             Routing Number:
                           </span>
                           <span className="text-white font-mono">
-                            {formatValue(data.routingNumber)}
+                                {maskAccountInfo(data.routingNumber)}
                           </span>
                         </div>
                         <div>
@@ -1372,9 +1603,11 @@ export default function FormsPage() {
                             Account Number:
                           </span>
                           <span className="text-white font-mono">
-                            {formatValue(data.accountNumber)}
+                                {maskAccountInfo(data.accountNumber)}
                           </span>
                         </div>
+                          </>
+                        )}
                         {data.businessName && (
                           <div>
                             <span className="text-gray-400 block mb-1">
@@ -1385,7 +1618,7 @@ export default function FormsPage() {
                             </span>
                           </div>
                         )}
-                        {data.ein && (
+                        {showSensitiveData && data.ein && data.taxClassification === "business" && (
                           <div>
                             <span className="text-gray-400 block mb-1">
                               EIN:
@@ -1412,6 +1645,7 @@ export default function FormsPage() {
                             {formatValue(data.insuranceProvider)}
                           </span>
                         </div>
+                        {showSensitiveData && (
                         <div>
                           <span className="text-gray-400 block mb-1">
                             Policy Number:
@@ -1420,6 +1654,7 @@ export default function FormsPage() {
                             {formatValue(data.policyNumber)}
                           </span>
                         </div>
+                        )}
                         <div>
                           <span className="text-gray-400 block mb-1">
                             Insurance Phone:
@@ -1467,6 +1702,7 @@ export default function FormsPage() {
                             {formatValue(data.contractStatus || "Not sent")}
                           </Badge>
                         </div>
+                        {showSensitiveData && (
                         <div>
                           <span className="text-gray-400 block mb-1">
                             Contract Token:
@@ -1475,6 +1711,7 @@ export default function FormsPage() {
                             {formatValue(data.contractToken)}
                           </span>
                         </div>
+                        )}
                         <div>
                           <span className="text-gray-400 block mb-1">
                             Contract Sent At:

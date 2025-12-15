@@ -131,6 +131,7 @@ export default function CarDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       toast({
         title: "Success",
         description: "Car updated successfully",
@@ -148,9 +149,11 @@ export default function CarDetailPage() {
 
   const deletePhotoMutation = useMutation({
     mutationFn: async (photoPath: string) => {
+      // Extract filename from path (e.g., "car-photos/1/filename.jpg" -> "filename.jpg")
+      const filename = photoPath.split("/").pop() || photoPath;
       const response = await fetch(
         buildApiUrl(
-          `/api/cars/${carId}/photos/${encodeURIComponent(photoPath)}`
+          `/api/cars/${carId}/photos/${encodeURIComponent(filename)}`
         ),
         {
           method: "DELETE",
@@ -183,6 +186,18 @@ export default function CarDetailPage() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    // Check photo count limit
+    const currentPhotoCount = car?.photos?.length || 0;
+    if (currentPhotoCount + files.length > 20) {
+      toast({
+        title: "Error",
+        description: `Maximum 20 photos allowed. Current: ${currentPhotoCount}, Trying to add: ${files.length}`,
+        variant: "destructive",
+      });
+      e.target.value = "";
+      return;
+    }
+
     setUploadingPhotos(true);
     try {
       const formData = new FormData();
@@ -190,8 +205,8 @@ export default function CarDetailPage() {
         formData.append("photos", file);
       });
 
-      const response = await fetch(buildApiUrl(`/api/cars/${carId}`), {
-        method: "PATCH",
+      const response = await fetch(buildApiUrl(`/api/cars/${carId}/photos`), {
+        method: "POST",
         credentials: "include",
         body: formData,
       });
@@ -201,10 +216,11 @@ export default function CarDetailPage() {
         throw new Error(error.error || "Failed to upload photos");
       }
 
+      const result = await response.json();
       queryClient.invalidateQueries({ queryKey: ["/api/cars", carId] });
       toast({
         title: "Success",
-        description: "Photos uploaded successfully",
+        description: result.message || "Photos uploaded successfully",
       });
     } catch (error: any) {
       toast({
@@ -351,12 +367,6 @@ export default function CarDetailPage() {
                   <p className="text-xs text-gray-500 mb-1">License Plate</p>
                   <p className="text-white">{car.licensePlate || "N/A"}</p>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Mileage</p>
-                  <p className="text-white">
-                    {car.mileage.toLocaleString()} mi
-                  </p>
-                </div>
               </div>
               <div className="pt-4 border-t border-[#2a2a2a]">
                 <div className="flex items-center gap-4">
@@ -475,9 +485,13 @@ export default function CarDetailPage() {
                 {car.photos.map((photo, index) => (
                   <div key={index} className="relative group">
                     <img
-                      src={buildApiUrl(photo)}
+                      src={photo.startsWith('/') ? photo : `/${photo}`}
                       alt={`Car photo ${index + 1}`}
                       className="w-full h-48 object-cover rounded-lg border border-[#2a2a2a]"
+                      onError={(e) => {
+                        console.error('Failed to load photo:', photo);
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
                     />
                     <ConfirmDialog
                       trigger={
@@ -622,24 +636,6 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="mileage"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">Mileage</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="number"
                             className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
                           />
                         </FormControl>
