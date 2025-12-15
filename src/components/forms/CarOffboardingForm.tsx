@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,126 +16,42 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const carOffboardingSchema = z.object({
   date: z.string().min(1, "Date is required"),
   name: z.string().min(1, "Name is required").max(255),
-  carId: z.string().min(1, "Please select a car"),
   carMakeModelYear: z.string().min(1, "Car Make/Model/Year is required").max(255),
   plateNumber: z.string().min(1, "Plate number is required").max(50),
-  pickUpDate: z.string().min(1, "Pick-up date is required"),
+  dropOffDate: z.string().min(1, "Drop-off date is required"),
 });
 
 type CarOffboardingFormData = z.infer<typeof carOffboardingSchema>;
 
-interface UserCar {
-  id: number;
-  vin: string;
-  makeModel: string;
-  year: number | null;
-  plateNumber: string | null;  // Changed from licensePlate to match backend
-  status: string;
-  isActive: number;
-}
-
 export default function CarOffboardingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const [selectedCarId, setSelectedCarId] = useState<string>("");
-
-  // Get current user data
-  const { data: userData } = useQuery({
-    queryKey: ["/api/auth/me"],
-    retry: false,
-  });
-
-  // Fetch user's cars from the database (only active/on-boarded cars)
-  const { data: carsData, isLoading: isLoadingCars } = useQuery<{
-    success: boolean;
-    data: UserCar[];
-  }>({
-    queryKey: ["/api/client/cars"],
-    queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/client/cars"), {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch cars");
-      }
-      const result = await response.json();
-      console.log("🚗 [CAR OFFBOARDING] Fetched cars:", result);
-      console.log("🚗 [CAR OFFBOARDING] Number of cars:", result.data?.length || 0);
-      return result;
-    },
-    enabled: !!userData?.user,
-  });
-
-  // Filter only active cars (on-boarded cars)
-  const activeCars = carsData?.data?.filter((car) => car.isActive === 1) || [];
 
   const form = useForm<CarOffboardingFormData>({
     resolver: zodResolver(carOffboardingSchema),
     defaultValues: {
       date: new Date().toISOString().split('T')[0],
       name: "",
-      carId: "",
       carMakeModelYear: "",
       plateNumber: "",
-      pickUpDate: new Date().toISOString().split('T')[0],
+      dropOffDate: new Date().toISOString().split('T')[0],
     },
   });
-
-  // Auto-fill name when user data is available
-  useEffect(() => {
-    if (userData?.user) {
-      const fullName = `${userData.user.firstName} ${userData.user.lastName}`;
-      form.setValue("name", fullName);
-    }
-  }, [userData, form]);
-
-  // Auto-fill car details when a car is selected
-  useEffect(() => {
-    if (selectedCarId && activeCars) {
-      const selectedCar = activeCars.find((car) => car.id.toString() === selectedCarId);
-      if (selectedCar) {
-        const makeModelYear = selectedCar.year
-          ? `${selectedCar.makeModel} ${selectedCar.year}`
-          : selectedCar.makeModel;
-        form.setValue("carMakeModelYear", makeModelYear);
-        form.setValue("plateNumber", selectedCar.plateNumber || "N/A");  // Changed from licensePlate to plateNumber
-      }
-    }
-  }, [selectedCarId, activeCars, form]);
 
   const onSubmit = async (data: CarOffboardingFormData) => {
     setIsSubmitting(true);
     try {
-      // Convert date strings to ISO format
-      const dateTime = new Date(data.date).toISOString();
-      const pickUpDateTime = new Date(data.pickUpDate).toISOString();
-
-      const payload = {
-        date: dateTime,
-        name: data.name,
-        carMakeModelYear: data.carMakeModelYear,
-        plateNumber: data.plateNumber,
-        pickUpDate: pickUpDateTime,
-      };
-
       const response = await fetch(buildApiUrl("/api/car-offboarding/submit"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(payload),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
@@ -153,16 +68,13 @@ export default function CarOffboardingForm() {
       });
 
       // Reset form
-      const now = new Date();
       form.reset({
-        date: now.toISOString().split('T')[0],
-        name: userData?.user ? `${userData.user.firstName} ${userData.user.lastName}` : "",
-        carId: "",
+        date: new Date().toISOString().split('T')[0],
+        name: "",
         carMakeModelYear: "",
         plateNumber: "",
-        pickUpDate: now.toISOString().split('T')[0],
+        dropOffDate: new Date().toISOString().split('T')[0],
       });
-      setSelectedCarId("");
     } catch (error: any) {
       console.error("Submission error:", error);
       toast({
@@ -189,7 +101,6 @@ export default function CarOffboardingForm() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Date and Name Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -220,7 +131,6 @@ export default function CarOffboardingForm() {
                         {...field}
                         placeholder="Your full name"
                         className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                        readOnly
                       />
                     </FormControl>
                     <FormMessage />
@@ -229,59 +139,6 @@ export default function CarOffboardingForm() {
               />
             </div>
 
-            {/* Car Selection Dropdown - Only Active Cars */}
-            <FormField
-              control={form.control}
-              name="carId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300">Select Car to Pick Up *</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      setSelectedCarId(value);
-                    }}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                        <SelectValue placeholder="Select a car to pick up" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                      {isLoadingCars ? (
-                        <SelectItem value="loading" disabled>
-                          Loading cars...
-                        </SelectItem>
-                      ) : activeCars && activeCars.length > 0 ? (
-                        activeCars.map((car) => {
-                          // Extract year from makeModel if year field is not available
-                          const displayText = car.makeModel 
-                            ? `${car.makeModel}${car.plateNumber ? ` - ${car.plateNumber}` : " - No Plate"}`
-                            : `Car #${car.id}${car.plateNumber ? ` - ${car.plateNumber}` : ""}`;
-                          
-                          return (
-                            <SelectItem key={`car-${car.id}`} value={car.id.toString()}>
-                              {displayText}
-                            </SelectItem>
-                          );
-                        })
-                      ) : (
-                        <SelectItem value="no-cars" disabled>
-                          No active cars available for pick-up
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Only showing cars currently with GLA (on-boarded status)
-                  </p>
-                </FormItem>
-              )}
-            />
-
-            {/* Auto-filled Car Details */}
             <FormField
               control={form.control}
               name="carMakeModelYear"
@@ -291,46 +148,7 @@ export default function CarOffboardingForm() {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="Select a car above to auto-fill"
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                      readOnly
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="plateNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300">Plate Number *</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Enter plate number or auto-filled from car"
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] uppercase"
-                      style={{ textTransform: "uppercase" }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Pick-Up Date */}
-            <FormField
-              control={form.control}
-              name="pickUpDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300">Pick-up Date *</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      {...field}
+                      placeholder="e.g., BMW X5 2023"
                       className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
                     />
                   </FormControl>
@@ -338,10 +156,49 @@ export default function CarOffboardingForm() {
                 </FormItem>
               )}
             />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="plateNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Plate Number *</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="License plate number"
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] uppercase"
+                        style={{ textTransform: "uppercase" }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dropOffDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Drop-off Date *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <Button
               type="submit"
-              disabled={isSubmitting || isLoadingCars || activeCars.length === 0}
+              disabled={isSubmitting}
               className="w-full bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
             >
               {isSubmitting ? (
