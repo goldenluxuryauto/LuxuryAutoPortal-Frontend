@@ -5,12 +5,6 @@ import {
   useQueryClient,
   keepPreviousData,
 } from "@tanstack/react-query";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  keepPreviousData,
-} from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -44,8 +38,6 @@ import {
   Share2,
   CheckCircle,
   XCircle,
-  CheckCircle,
-  XCircle,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
@@ -54,10 +46,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
-import {
-  TablePagination,
-  ItemsPerPage,
-} from "@/components/ui/table-pagination";
 import {
   TablePagination,
   ItemsPerPage,
@@ -836,9 +824,6 @@ export default function FormsPage() {
                                 {formVisibilityData?.isAdmin ||
                                 formVisibilityData?.isEmployee ? (
                                   <CarOnboarding />
-                                {formVisibilityData?.isAdmin ||
-                                formVisibilityData?.isEmployee ? (
-                                  <CarOnboarding />
                                 ) : (
                                   <CarOnboardingForm />
                                 )}
@@ -849,9 +834,6 @@ export default function FormsPage() {
                             {isItemExpanded && item.id === "car-off" && (
                               <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
                                 {/* Show form for clients, table for admins */}
-                                {formVisibilityData?.isAdmin ||
-                                formVisibilityData?.isEmployee ? (
-                                  <CarOffboarding />
                                 {formVisibilityData?.isAdmin ||
                                 formVisibilityData?.isEmployee ? (
                                   <CarOffboarding />
@@ -1046,21 +1028,7 @@ export default function FormsPage() {
                                                               submission.signedContractUrl,
                                                               "_blank"
                                                             );
-                                                          if (
-                                                            submission.signedContractUrl
-                                                          ) {
-                                                            window.open(
-                                                              submission.signedContractUrl,
-                                                              "_blank"
-                                                            );
                                                           } else {
-                                                            // Fallback to old pattern if URL not in database
-                                                            window.open(
-                                                              buildApiUrl(
-                                                                `/signed-contracts/submission_${submission.id}.pdf`
-                                                              ),
-                                                              "_blank"
-                                                            );
                                                             // Fallback to old pattern if URL not in database
                                                             window.open(
                                                               buildApiUrl(
@@ -1238,9 +1206,6 @@ export default function FormsPage() {
                                     {/* Pagination */}
                                     {submissionsData.pagination && (
                                       <TablePagination
-                                        totalItems={
-                                          submissionsData.pagination.total
-                                        }
                                         totalItems={
                                           submissionsData.pagination.total
                                         }
