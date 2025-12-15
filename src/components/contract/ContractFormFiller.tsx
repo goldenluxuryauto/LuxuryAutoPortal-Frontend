@@ -139,10 +139,10 @@ const PDF_FIELD_COORDINATES: Record<string, { page: number; x: number; y: number
 // Signature coordinates - exact position on Page 11
 const SIGNATURE_COORDINATES = {
   page: 11, // Page 11 as specified
-  x: 340, // Exact X coordinate
-  y: 132, // Exact Y coordinate (PDF coordinate system: bottom-left origin)
-  dateX: 340, // X position for date (next to signature)
-  dateY: 100, // Y position for date (below signature)
+  x: 340, // Exact X coordinate for signature
+  y: 130, // Exact Y coordinate (PDF coordinate system: bottom-left origin)
+  dateX: 450, // X position for date (to the right of "Date:" label, same line)
+  dateY: 130, // Y position for date (same Y as signature - aligned on same line)
 };
 // ============================================================================
 
@@ -543,15 +543,7 @@ export function ContractFormFiller({
       }
     }
 
-    // Add date at exact coordinates from configuration
-    const today = new Date().toLocaleDateString();
-    signaturePage.drawText(`Date: ${today}`, {
-      x: SIGNATURE_COORDINATES.dateX,
-      y: SIGNATURE_COORDINATES.dateY,
-      size: fontSize,
-      font: helveticaFont,
-      color: textColor,
-    });
+    // Date is NOT automatically added - leave blank for manual entry if needed
 
     const pdfBytesResult = await pdfDoc.save();
     return new Blob([new Uint8Array(pdfBytesResult)], { type: "application/pdf" });
