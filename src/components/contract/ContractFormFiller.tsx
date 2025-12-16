@@ -44,7 +44,7 @@ const contractFormSchema = z.object({
   vin: z.string().min(1, "VIN number is required").max(17, "VIN must be 17 characters or less"),
   modelYear: z.string().min(1, "Year is required").max(4, "Year must be 4 characters or less"),
   fuelType: z.string().max(20, "Fuel type must be 20 characters or less").optional().or(z.literal("")),
-  expectedStartDate: z.string().optional().or(z.literal("")),
+  expectedStartDate: z.string().min(1, "Expected Start Date is required"),
   vehicleMileage: z.string().max(10, "Mileage must be 10 characters or less").optional().or(z.literal("")),
   contractDate: z.string().min(1, "Contract date is required"),
   vehicleOwner: z.string().min(1, "Vehicle owner is required").max(50, "Vehicle owner must be 50 characters or less"),
@@ -324,7 +324,7 @@ export function ContractFormFiller({
     { name: "fuelType", label: "Fuel Type", value: onboardingData?.fuelType || "", required: false, maxLength: 20 },
     
     // Additional contract fields
-    { name: "expectedStartDate", label: "Expected Start Date", value: onboardingData?.expectedStartDate || "", required: false, type: "date" },
+    { name: "expectedStartDate", label: "Expected Start Date", value: onboardingData?.expectedStartDate || "", required: true, type: "date" },
     { name: "vehicleMileage", label: "Vehicle Mileage", value: onboardingData?.vehicleMiles || "", required: false, maxLength: 10 },
     { name: "contractDate", label: "Contract Date", value: new Date().toLocaleDateString(), required: true },
     { name: "vehicleOwner", label: "Vehicle Owner", value: onboardingData ? `${onboardingData.firstNameOwner || ""} ${onboardingData.lastNameOwner || ""}`.trim() : "", required: true, maxLength: 50 },
@@ -535,10 +535,9 @@ export function ContractFormFiller({
   };
 
   const handleDateChange = (name: string, value: string) => {
-    // For date fields, format as mm/dd/yyyy
-    const formattedValue = formatDateMMDDYYYY(value);
+    // For date fields, keep in YYYY-MM-DD format for the input
     setFormFields((prev) =>
-      prev.map((field) => (field.name === name ? { ...field, value: formattedValue, error: undefined } : field))
+      prev.map((field) => (field.name === name ? { ...field, value: value, error: undefined } : field))
     );
   };
 
@@ -682,7 +681,11 @@ export function ContractFormFiller({
             });
           } else {
             // Single-line fields - draw directly without wrapping
-            targetPage.drawText(field.value.trim(), {
+            // Format date fields (expectedStartDate) to mm/dd/yyyy for PDF
+            const displayValue = field.name === "expectedStartDate" && field.type === "date"
+              ? formatDateMMDDYYYY(field.value.trim())
+              : field.value.trim();
+            targetPage.drawText(displayValue, {
               x: dynamicX,
               y: pos.y,
               size: fontSize,
@@ -897,8 +900,12 @@ export function ContractFormFiller({
                         const dynamicX = field.name === "owner" ? calculateOwnerNameX(field.value) : coords.x;
                         
                         // Only wrap owner name; all other fields are single-line
+                        // Format date fields (expectedStartDate) to mm/dd/yyyy for preview
+                        const displayValue = field.name === "expectedStartDate" && field.type === "date"
+                          ? formatDateMMDDYYYY(field.value)
+                          : field.value;
                         const shouldWrap = field.name === "owner";
-                        const lines = shouldWrap ? wrapText(field.value, 20) : [field.value];
+                        const lines = shouldWrap ? wrapText(displayValue, 20) : [displayValue];
                         const lineHeight = 14; // 14pt line height for 12pt font
                         
                         return (
@@ -1109,6 +1116,7 @@ export function ContractFormFiller({
                       <Input
                         id={field.name}
                         type="date"
+                        value={field.value}
                         onChange={(e) => handleDateChange(field.name, e.target.value)}
                         onBlur={(e) => handleFieldBlur(field.name, e.target.value)}
                         required={field.required}
@@ -1118,7 +1126,7 @@ export function ContractFormFiller({
                       />
                       {field.value && (
                         <p className="text-xs text-gray-400 mt-1">
-                          Will appear as: {field.value}
+                          Will appear as: {formatDateMMDDYYYY(field.value)}
                         </p>
                       )}
                       {field.error && (
