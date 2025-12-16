@@ -14,7 +14,6 @@ import AdminsPage from "@/pages/admin/admins";
 import ClientsPage from "@/pages/admin/clients";
 import ClientDetailPage from "@/pages/admin/client-detail";
 import FormsPage from "@/pages/admin/forms";
-import ProfilePage from "@/pages/admin/profile";
 import CarsPage from "@/pages/admin/cars";
 import CarDetailPage from "@/pages/admin/car-detail";
 import IncomeExpensesPage from "@/pages/admin/income-expenses";
@@ -37,7 +36,6 @@ function Router() {
       <Route path="/admin/clients" component={ClientsPage} />
       <Route path="/admin/clients/:id" component={ClientDetailPage} />
       <Route path="/admin/forms" component={FormsPage} />
-      <Route path="/admin/profile" component={ProfilePage} />
       <Route path="/admin/cars" component={CarsPage} />
       <Route path="/admin/cars/:id" component={CarDetailPage} />
       <Route path="/admin/income-expenses" component={IncomeExpensesPage} />
