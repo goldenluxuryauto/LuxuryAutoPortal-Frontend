@@ -406,6 +406,47 @@ export default function ProfilePage() {
                             </div>
                           )}
 
+                          {/* Contract Information */}
+                          {data.signedContractUrl && (
+                            <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                              <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                                Signed Contract
+                              </h3>
+                              <div className="space-y-3">
+                                <div>
+                                  <span className="text-gray-400 block mb-2">Contract Document:</span>
+                                  <a
+                                    href={data.signedContractUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#EAEB80] text-black hover:bg-[#d4d570] rounded-md font-medium transition-colors"
+                                  >
+                                    <svg
+                                      className="w-5 h-5"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                      />
+                                    </svg>
+                                    View/Download Contract PDF
+                                  </a>
+                                </div>
+                                {data.contractSignedAt && (
+                                  <div>
+                                    <span className="text-gray-400 block mb-1">Signed Date:</span>
+                                    <span className="text-white">{formatDate(data.contractSignedAt)}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
                           {/* Status */}
                           <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
                             <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
