@@ -1,26 +1,12 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  User,
-  Edit,
   Loader2,
 } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
 import QuickLinks from "@/components/admin/QuickLinks";
 
 interface ClientDetail {
@@ -58,13 +44,6 @@ interface ClientDetail {
 }
 
 export default function ProfilePage() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  // Edit modal state
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editFormData, setEditFormData] = useState<any>({});
-
   // Fetch logged-in client's profile data
   const { data, isLoading, error } = useQuery<{
     success: boolean;
@@ -86,75 +65,6 @@ export default function ProfilePage() {
   });
 
   const client = data?.data;
-
-  // Update mutation for editing onboarding data
-  const updateMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await fetch(buildApiUrl(`/api/clients/${client?.id}/onboarding`), {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to update onboarding data");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/client/profile"] });
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
-      setIsEditModalOpen(false);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update profile",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Handle edit button click
-  const handleEditClick = () => {
-    if (client?.onboarding) {
-      const data = client.onboarding;
-      setEditFormData({
-        firstNameOwner: data.firstNameOwner || "",
-        lastNameOwner: data.lastNameOwner || "",
-        emailOwner: data.emailOwner || "",
-        phoneOwner: data.phoneOwner || "",
-        birthday: data.birthday || "",
-        tshirtSize: data.tshirtSize || "",
-        streetAddress: data.streetAddress || "",
-        city: data.city || "",
-        state: data.state || "",
-        zipCode: data.zipCode || "",
-        vehicleYear: data.vehicleYear || "",
-        vehicleMake: data.vehicleMake || "",
-        vehicleModel: data.vehicleModel || "",
-        vinNumber: data.vinNumber || "",
-        licensePlate: data.licensePlate || "",
-        vehicleMiles: data.vehicleMiles || "",
-        bankName: data.bankName || "",
-        routingNumber: data.routingNumber || "",
-        accountNumber: data.accountNumber || "",
-      });
-      setIsEditModalOpen(true);
-    }
-  };
-
-  // Handle edit form submission
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateMutation.mutate(editFormData);
-  };
 
   const formatDate = (dateString: string | null | undefined): string => {
     if (!dateString) return "N/A";
@@ -202,20 +112,7 @@ export default function ProfilePage() {
         {/* Main Content */}
         <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-[#EAEB80] text-xl">Profile Information</CardTitle>
-                    {client.onboarding && (
-                      <Button
-                        onClick={handleEditClick}
-                        variant="outline"
-                        size="sm"
-                        className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
-                    )}
-                  </div>
+                  <CardTitle className="text-[#EAEB80] text-xl">Profile Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {client.onboarding ? (
@@ -564,218 +461,6 @@ export default function ProfilePage() {
 
         {/* Quick Links */}
         <QuickLinks />
-
-        {/* Edit Modal */}
-        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
-            <DialogHeader>
-              <DialogTitle className="text-white text-2xl">Edit Profile Information</DialogTitle>
-              <DialogDescription className="text-gray-400">
-                Update your profile information
-              </DialogDescription>
-            </DialogHeader>
-
-            <form onSubmit={handleEditSubmit} className="space-y-6 mt-4">
-              {/* Personal Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
-                  Personal Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-gray-400">First Name</Label>
-                    <Input
-                      value={editFormData.firstNameOwner || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, firstNameOwner: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">Last Name</Label>
-                    <Input
-                      value={editFormData.lastNameOwner || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, lastNameOwner: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">Email</Label>
-                    <Input
-                      type="email"
-                      value={editFormData.emailOwner || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, emailOwner: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">Phone</Label>
-                    <Input
-                      value={editFormData.phoneOwner || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, phoneOwner: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Address Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
-                  Address Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    <Label className="text-gray-400">Street Address</Label>
-                    <Input
-                      value={editFormData.streetAddress || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, streetAddress: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">City</Label>
-                    <Input
-                      value={editFormData.city || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, city: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">State</Label>
-                    <Input
-                      value={editFormData.state || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, state: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">Zip Code</Label>
-                    <Input
-                      value={editFormData.zipCode || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, zipCode: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Vehicle Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
-                  Vehicle Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-gray-400">Year</Label>
-                    <Input
-                      value={editFormData.vehicleYear || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, vehicleYear: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">Make</Label>
-                    <Input
-                      value={editFormData.vehicleMake || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, vehicleMake: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">Model</Label>
-                    <Input
-                      value={editFormData.vehicleModel || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, vehicleModel: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">VIN Number</Label>
-                    <Input
-                      value={editFormData.vinNumber || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, vinNumber: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">License Plate</Label>
-                    <Input
-                      value={editFormData.licensePlate || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, licensePlate: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">Mileage</Label>
-                    <Input
-                      value={editFormData.vehicleMiles || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, vehicleMiles: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Banking Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
-                  Banking Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-gray-400">Bank Name</Label>
-                    <Input
-                      value={editFormData.bankName || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, bankName: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">Routing Number</Label>
-                    <Input
-                      value={editFormData.routingNumber || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, routingNumber: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-gray-400">Account Number</Label>
-                    <Input
-                      value={editFormData.accountNumber || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, accountNumber: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={updateMutation.isPending}
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-                >
-                  {updateMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    "Save Changes"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
       </div>
     </AdminLayout>
   );
