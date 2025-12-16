@@ -9,6 +9,19 @@ import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import QuickLinks from "@/components/admin/QuickLinks";
 
+interface SignedContract {
+  id: number;
+  signedContractUrl: string;
+  contractSignedAt: string | null;
+  contractStatus: string;
+  vehicleMake?: string;
+  vehicleModel?: string;
+  vehicleYear?: string;
+  licensePlate?: string;
+  vinNumber?: string;
+  createdAt: string;
+}
+
 interface ClientDetail {
   id: number;
   firstName: string;
@@ -41,6 +54,7 @@ interface ClientDetail {
     registrationExpiration?: string | null;
   }>;
   onboarding?: any;
+  signedContracts?: SignedContract[];
 }
 
 export default function ProfilePage() {
@@ -112,7 +126,7 @@ export default function ProfilePage() {
         {/* Main Content */}
         <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
                 <CardHeader>
-                  <CardTitle className="text-[#EAEB80] text-xl">Profile Information</CardTitle>
+                    <CardTitle className="text-[#EAEB80] text-xl">Profile Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {client.onboarding ? (
@@ -406,43 +420,61 @@ export default function ProfilePage() {
                             </div>
                           )}
 
-                          {/* Contract Information */}
-                          {data.signedContractUrl && (
+                          {/* Signed Contracts */}
+                          {client.signedContracts && client.signedContracts.length > 0 && (
                             <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
                               <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
-                                Signed Contract
+                                Signed Contracts ({client.signedContracts.length})
                               </h3>
-                              <div className="space-y-3">
-                                <div>
-                                  <span className="text-gray-400 block mb-2">Contract Document:</span>
-                                  <a
-                                    href={data.signedContractUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#EAEB80] text-black hover:bg-[#d4d570] rounded-md font-medium transition-colors"
+                              <div className="space-y-4">
+                                {client.signedContracts.map((contract, index) => (
+                                  <div
+                                    key={contract.id}
+                                    className="bg-[#0a0a0a] p-4 rounded-lg border border-[#EAEB80]/10"
                                   >
-                                    <svg
-                                      className="w-5 h-5"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24"
+                                    <div className="flex items-start justify-between mb-3">
+                                      <div>
+                                        <h4 className="text-[#EAEB80] font-medium mb-1">
+                                          Contract #{index + 1}
+                                        </h4>
+                                        {(contract.vehicleMake || contract.vehicleModel || contract.vehicleYear) && (
+                                          <p className="text-gray-400 text-sm">
+                                            {[contract.vehicleYear, contract.vehicleMake, contract.vehicleModel]
+                                              .filter(Boolean)
+                                              .join(" ")}
+                                            {contract.licensePlate && ` • ${contract.licensePlate}`}
+                                          </p>
+                                        )}
+                                      </div>
+                                      {contract.contractSignedAt && (
+                                        <span className="text-gray-500 text-xs">
+                                          {formatDate(contract.contractSignedAt)}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <a
+                                      href={contract.signedContractUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#EAEB80] text-black hover:bg-[#d4d570] rounded-md font-medium transition-colors"
                                     >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                      />
-                                    </svg>
-                                    View/Download Contract PDF
-                                  </a>
-                                </div>
-                                {data.contractSignedAt && (
-                                  <div>
-                                    <span className="text-gray-400 block mb-1">Signed Date:</span>
-                                    <span className="text-white">{formatDate(data.contractSignedAt)}</span>
+                                      <svg
+                                        className="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                        />
+                                      </svg>
+                                      View/Download Contract PDF
+                                    </a>
                                   </div>
-                                )}
+                                ))}
                               </div>
                             </div>
                           )}
