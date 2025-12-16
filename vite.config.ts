@@ -46,22 +46,22 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       "/api": {
-        target: "http://localhost:3001",
+        target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
       },
       "/contracts": {
-        target: "http://localhost:3001",
+        target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
       },
       "/signed-contracts": {
-        target: "http://localhost:3001",
+        target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
       },
       "/car-photos": {
-        target: "http://localhost:3001",
+        target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
       },

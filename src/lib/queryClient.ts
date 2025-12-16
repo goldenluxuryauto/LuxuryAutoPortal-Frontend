@@ -6,8 +6,8 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 // 
 // IMPORTANT: In development, do NOT set VITE_API_URL to localhost:5000 (Vite server port)
 // Instead, either:
-//   1. Leave VITE_API_URL unset (uses relative URLs + Vite proxy to localhost:3001)
-//   2. Set VITE_API_URL to http://localhost:3001 (direct backend URL)
+//   1. Leave VITE_API_URL unset (uses relative URLs + Vite proxy to localhost:3000)
+//   2. Set VITE_API_URL to http://localhost:3000 (direct backend URL)
 const API_BASE_URL = import.meta.env.VITE_API_URL 
   ? (import.meta.env.VITE_API_URL.replace(/\/$/, ""))
   : ""; // Empty string = relative URLs (use Vite proxy in dev)
@@ -30,7 +30,7 @@ export function buildApiUrl(path: string): string {
   if (import.meta.env.DEV && API_BASE_URL === "http://localhost:5000") {
     console.warn(
       "⚠️ [API] VITE_API_URL is set to http://localhost:5000 which bypasses Vite proxy.\n" +
-      "   Using relative URL to enable proxy. Set VITE_API_URL to http://localhost:3001 or unset it."
+      "   Using relative URL to enable proxy. Set VITE_API_URL to http://localhost:3000 or unset it."
     );
     return normalizedPath; // Use relative URL to trigger Vite proxy
   }
