@@ -1419,8 +1419,6 @@ export default function ClientDetailPage() {
                           <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Plate #</TableHead>
                           <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">VIN #</TableHead>
                           <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Tire Size</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Oil Type</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Oil Miles/Fuel/Gas</TableHead>
                           <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Maintenance Type</TableHead>
                           <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Status</TableHead>
                           <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Schedule Date</TableHead>
@@ -1431,7 +1429,7 @@ export default function ClientDetailPage() {
                       </TableHeader>
                       <TableBody>
                         <TableRow>
-                          <TableCell colSpan={15} className="text-center py-12">
+                      <TableCell colSpan={13} className="text-center py-12">
                             <div className="flex flex-col items-center gap-3">
                               <Folder className="w-12 h-12 text-gray-600" />
                               <p className="text-gray-400">No data</p>
