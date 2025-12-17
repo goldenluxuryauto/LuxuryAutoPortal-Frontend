@@ -106,6 +106,21 @@ interface ClientDetail {
     contractToken?: string | null;
     createdAt: string;
   } | null;
+  signedContracts?: Array<{
+    id: number;
+    firstNameOwner: string;
+    lastNameOwner: string;
+    emailOwner: string;
+    vehicleYear?: string;
+    vehicleMake?: string;
+    vehicleModel?: string;
+    vinNumber?: string;
+    licensePlate?: string;
+    contractStatus: string;
+    contractSignedAt?: string;
+    signedContractUrl?: string;
+    createdAt: string;
+  }>;
 }
 
 type Section = "profile" | "cars" | "totals" | "maintenance";
@@ -879,6 +894,72 @@ export default function ClientDetailPage() {
                                 </Badge>
                               </div>
                             </div>
+                          </div>
+
+                          {/* Signed Contracts Section */}
+                          <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                            <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                              Signed Contracts
+                            </h3>
+                            {client.signedContracts && client.signedContracts.length > 0 ? (
+                              <div className="space-y-3">
+                                {client.signedContracts.map((contract, index) => (
+                                  <div
+                                    key={contract.id ?? index}
+                                    className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#111111] border border-[#EAEB80]/10 rounded-lg p-4"
+                                  >
+                                    <div className="space-y-1 text-sm">
+                                      <div className="text-white font-medium">
+                                        {formatValue(contract.vehicleYear)}{" "}
+                                        {formatValue(contract.vehicleMake)}{" "}
+                                        {formatValue(contract.vehicleModel)}
+                                      </div>
+                                      <div className="text-gray-400">
+                                        Plate:{" "}
+                                        <span className="text-white">
+                                          {formatValue(contract.licensePlate)}
+                                        </span>
+                                        {" · "}
+                                        VIN:{" "}
+                                        <span className="text-white font-mono text-xs">
+                                          {formatValue(contract.vinNumber)}
+                                        </span>
+                                      </div>
+                                      <div className="text-gray-400">
+                                        Signed on:{" "}
+                                        <span className="text-white">
+                                          {formatDate(contract.contractSignedAt || contract.createdAt)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <Badge
+                                        variant="outline"
+                                        className="border-green-500/50 text-green-400 bg-green-500/10"
+                                      >
+                                        Signed
+                                      </Badge>
+                                      {contract.signedContractUrl && (
+                                        <a
+                                          href={contract.signedContractUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-[#EAEB80] text-black hover:bg-[#d4d570] transition-colors"
+                                        >
+                                          <Download className="w-4 h-4" />
+                                          Download
+                                        </a>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                                <Folder className="w-8 h-8 mb-2 text-gray-600" />
+                                <p>No signed contracts available yet.</p>
+                              </div>
+                            )}
                           </div>
                         </>
                       );
