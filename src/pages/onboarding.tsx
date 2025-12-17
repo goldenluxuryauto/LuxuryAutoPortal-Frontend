@@ -114,7 +114,7 @@ const steps = [
   { id: 4, title: "VEHICLE INSURANCE INFO" },
   { id: 5, title: "VEHICLE PURCHASE INFO" },
   { id: 6, title: "ACH DIRECT DEPOSIT PAYMENT INFORMATION" },
-  { id: 7, title: "TURO GO QUALIFICATION" },
+  { id: 7, title: "CAR LOGIN INFORMATION" },
 ];
 
 function generateRandomData(): OnboardingFormData {
