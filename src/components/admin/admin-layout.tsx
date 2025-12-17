@@ -34,8 +34,6 @@ interface SidebarItem {
   href: string;
   label: string;
   icon: any;
-  badge?: number;
-  badgeKey?: string;
   roles?: ("admin" | "client" | "employee")[];
 }
 
@@ -49,7 +47,7 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/totals", label: "Totals", icon: Calculator },
   { href: "/admin/earnings", label: "Earnings Calculator", icon: Calculator },
   { href: "/admin/maintenance", label: "Car Maintenance", icon: Wrench },
-  { href: "/admin/forms", label: "Forms", icon: ClipboardList, badgeKey: "/admin/forms" },
+  { href: "/admin/forms", label: "Forms", icon: ClipboardList },
   { href: "/admin/view-client", label: "View as a Client", icon: Eye, roles: ["admin"] },
   { href: "/admin/view-employee", label: "View as an Employee", icon: Eye, roles: ["admin"] },
   { href: "/admin/car-rental", label: "Car Rental", icon: Key, roles: ["admin"] },
@@ -65,7 +63,6 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location, setLocation] = useLocation();
-  const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({});
 
   const { data } = useQuery<{ user?: any }>({
     queryKey: ["/api/auth/me"],
@@ -79,52 +76,6 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   });
 
   const user = data?.user;
-
-  // Fetch badge counts
-  useQuery({
-    queryKey: ["sidebar-badges"],
-    queryFn: async () => {
-      const { buildApiUrl } = await import("@/lib/queryClient");
-      const counts: Record<string, number> = {};
-      
-      // Fetch clients count (active clients)
-      try {
-        const clientsResponse = await fetch(buildApiUrl("/api/clients?limit=1"), { credentials: "include" });
-        if (clientsResponse.ok) {
-          const clientsData = await clientsResponse.json();
-          counts["/admin/clients"] = clientsData.pagination?.total || 0;
-        }
-      } catch (e) {
-        counts["/admin/clients"] = 0;
-      }
-      
-      // Fetch available cars count (active cars from car table)
-      try {
-        const carsResponse = await fetch(buildApiUrl("/api/cars?status=available"), { credentials: "include" });
-        if (carsResponse.ok) {
-          const carsData = await carsResponse.json();
-          counts["/admin/cars"] = carsData.data?.length || 0;
-        }
-      } catch (e) {
-        counts["/admin/cars"] = 0;
-      }
-      
-      // Fetch car onboarding submissions count (for Forms badge)
-      try {
-        const onboardingCountResponse = await fetch(buildApiUrl("/api/car-onboarding/today-count"), { credentials: "include" });
-        if (onboardingCountResponse.ok) {
-          const onboardingCountData = await onboardingCountResponse.json();
-          counts["/admin/forms"] = (counts["/admin/forms"] || 0) + (onboardingCountData.count || 0);
-        }
-      } catch (e) {
-        // Ignore error, keep existing count
-      }
-      
-      setBadgeCounts(counts);
-      return counts;
-    },
-    refetchInterval: 30000, // Refresh every 30 seconds
-  });
 
   // Filter sidebar items based on user role
   const sidebarItems = useMemo(() => {
@@ -210,11 +161,6 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 {sidebarOpen && (
                   <>
                     <span className="text-sm">{item.label}</span>
-                    {(item.badge || (item.badgeKey && badgeCounts[item.href])) && (item.badge || badgeCounts[item.href] || 0) > 0 && (
-                      <span className="ml-auto bg-[#EAEB80] text-black text-xs font-medium px-1.5 py-0.5 rounded-full min-w-[24px] text-center">
-                        {item.badge || badgeCounts[item.href] || 0}
-                      </span>
-                    )}
                   </>
                 )}
               </Link>
