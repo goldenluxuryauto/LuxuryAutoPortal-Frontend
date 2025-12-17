@@ -44,7 +44,7 @@ const contractFormSchema = z.object({
   vin: z.string().min(1, "VIN number is required").max(17, "VIN must be 17 characters or less"),
   modelYear: z.string().min(1, "Year is required").max(4, "Year must be 4 characters or less"),
   fuelType: z.string().max(20, "Fuel type must be 20 characters or less").optional().or(z.literal("")),
-  expectedStartDate: z.string().min(1, "Expected Start Date is required"),
+  expectedStartDate: z.string().min(1, "Estimated Start Date is required"),
   vehicleMileage: z.string().max(10, "Mileage must be 10 characters or less").optional().or(z.literal("")),
   contractDate: z.string().min(1, "Contract date is required"),
   vehicleOwner: z.string().min(1, "Vehicle owner is required").max(50, "Vehicle owner must be 50 characters or less"),
@@ -139,13 +139,20 @@ const PDF_FIELD_COORDINATES: Record<string, { page: number; x: number; y: number
 };
 
 // Signature coordinates - exact position on Page 11
+// Two signature fields: left (owner/client) and right (company)
 const SIGNATURE_COORDINATES = {
   page: 11, // Page 11 as specified
-  x: 340, // Exact X coordinate for signature
-  y: 130, // Exact Y coordinate (PDF coordinate system: bottom-left origin)
+  left: {
+    x: 100, // Left signature X coordinate (owner/client signature)
+    y: 130, // Y coordinate (PDF coordinate system: bottom-left origin)
+  },
+  right: {
+    x: 340, // Right signature X coordinate (company signature)
+    y: 130, // Y coordinate (same Y as left signature - aligned on same line)
+  },
   dateX: 450, // X position for date (to the right of "Date:" label, same line)
   dateY: 130, // Y position for date (same Y as signature - aligned on same line)
-};
+} as const;
 
 // Checkbox coordinates for options/notes (X marks)
 // Adjust these coordinates to match the exact checkboxes in your PDF template.
@@ -324,7 +331,7 @@ export function ContractFormFiller({
     { name: "fuelType", label: "Fuel Type", value: onboardingData?.fuelType || "", required: false, maxLength: 20 },
     
     // Additional contract fields
-    { name: "expectedStartDate", label: "Expected Start Date", value: onboardingData?.expectedStartDate || "", required: true, type: "date" },
+    { name: "expectedStartDate", label: "Estimated Start Date", value: onboardingData?.expectedStartDate || "", required: true, type: "date" },
     { name: "vehicleMileage", label: "Vehicle Mileage", value: onboardingData?.vehicleMiles || "", required: false, maxLength: 10 },
     { name: "contractDate", label: "Contract Date", value: new Date().toLocaleDateString(), required: true },
     { name: "vehicleOwner", label: "Vehicle Owner", value: onboardingData ? `${onboardingData.firstNameOwner || ""} ${onboardingData.lastNameOwner || ""}`.trim() : "", required: true, maxLength: 50 },
@@ -755,44 +762,49 @@ export function ContractFormFiller({
     if (authorizeOtherPlatforms) drawCheckbox("authorizeOtherPlatforms");
     if (authorizeChauffeurUse) drawCheckbox("authorizeChauffeurUse");
 
-    // Add signature at exact coordinates from configuration
+    // Add signatures at exact coordinates from configuration (left and right)
     const signaturePageIndex = SIGNATURE_COORDINATES.page - 1;
     const signaturePage = signaturePageIndex >= 0 && signaturePageIndex < pages.length 
       ? pages[signaturePageIndex] 
       : pages[pages.length - 1]; // Fallback to last page if invalid
-    const signatureX = SIGNATURE_COORDINATES.x;
-    const signatureY = SIGNATURE_COORDINATES.y;
 
-    if (signatureType === "typed" && typedName.trim()) {
-      // Render typed signature as image with Dancing Script font (24pt)
-      const signatureImageDataUrl = await renderTypedSignatureAsImage(typedName);
-      const signatureImage = await pdfDoc.embedPng(signatureImageDataUrl);
-      // Use a unified scale so typed and drawn signatures have similar visual size
-      const signatureDims = signatureImage.scale(0.4);
-      // Center the image vertically on the configured Y (to match preview overlay)
-      const centeredY = signatureY - signatureDims.height / 2;
-      signaturePage.drawImage(signatureImage, {
-        x: signatureX,
-        y: centeredY,
-        width: signatureDims.width,
-        height: signatureDims.height,
-      });
-    } else if (signatureType === "drawn" && signatureCanvasRef.current) {
-      // Embed drawn signature as image
-      const signatureDataUrl = signatureCanvasRef.current.toDataURL("image/png");
-      if (signatureDataUrl && !signatureCanvasRef.current.isEmpty()) {
-        const signatureImage = await pdfDoc.embedPng(signatureDataUrl);
-        // Use the same scale factor as typed signature for consistent size
+    // Helper function to draw signature at a specific position
+    const drawSignatureAtPosition = async (x: number, y: number) => {
+      if (signatureType === "typed" && typedName.trim()) {
+        // Render typed signature as image with Dancing Script font (24pt)
+        const signatureImageDataUrl = await renderTypedSignatureAsImage(typedName);
+        const signatureImage = await pdfDoc.embedPng(signatureImageDataUrl);
+        // Use a unified scale so typed and drawn signatures have similar visual size
         const signatureDims = signatureImage.scale(0.4);
-        const centeredY = signatureY - signatureDims.height / 2;
+        // Center the image vertically on the configured Y (to match preview overlay)
+        const centeredY = y - signatureDims.height / 2;
         signaturePage.drawImage(signatureImage, {
-          x: signatureX,
+          x: x,
           y: centeredY,
           width: signatureDims.width,
           height: signatureDims.height,
         });
+      } else if (signatureType === "drawn" && signatureCanvasRef.current) {
+        // Embed drawn signature as image
+        const signatureDataUrl = signatureCanvasRef.current.toDataURL("image/png");
+        if (signatureDataUrl && !signatureCanvasRef.current.isEmpty()) {
+          const signatureImage = await pdfDoc.embedPng(signatureDataUrl);
+          // Use the same scale factor as typed signature for consistent size
+          const signatureDims = signatureImage.scale(0.4);
+          const centeredY = y - signatureDims.height / 2;
+          signaturePage.drawImage(signatureImage, {
+            x: x,
+            y: centeredY,
+            width: signatureDims.width,
+            height: signatureDims.height,
+          });
+        }
       }
-    }
+    };
+
+    // Draw signature in both left and right positions
+    await drawSignatureAtPosition(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y);
+    await drawSignatureAtPosition(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y);
 
     // Date is NOT automatically added - leave blank for manual entry if needed
 
@@ -991,43 +1003,79 @@ export function ContractFormFiller({
                           );
                         })}
 
-                      {/* Signature overlay for real-time preview */}
+                      {/* Signature overlay for real-time preview - both left and right */}
                       {SIGNATURE_COORDINATES.page === pageNumber && (
                         <>
-                          {/* Typed signature overlay */}
+                          {/* Left signature overlay */}
                           {signatureType === "typed" && typedName && (
-                            <div
-                              className="absolute pointer-events-none"
-                              style={{
-                                left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.x, SIGNATURE_COORDINATES.y, pageNumber).x}px`,
-                                top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.x, SIGNATURE_COORDINATES.y, pageNumber).y}px`,
-                                fontSize: `${24 * scale}px`,
-                                fontFamily: "'Dancing Script', cursive",
-                                color: 'black',
-                                fontStyle: 'italic',
-                                whiteSpace: 'nowrap',
-                                transform: 'translateY(-50%)',
-                              }}
-                            >
-                              {typedName}
-                            </div>
+                            <>
+                              {/* Left typed signature */}
+                              <div
+                                className="absolute pointer-events-none"
+                                style={{
+                                  left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).x}px`,
+                                  top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).y}px`,
+                                  fontSize: `${24 * scale}px`,
+                                  fontFamily: "'Dancing Script', cursive",
+                                  color: 'black',
+                                  fontStyle: 'italic',
+                                  whiteSpace: 'nowrap',
+                                  transform: 'translateY(-50%)',
+                                }}
+                              >
+                                {typedName}
+                              </div>
+                              {/* Right typed signature */}
+                              <div
+                                className="absolute pointer-events-none"
+                                style={{
+                                  left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y, pageNumber).x}px`,
+                                  top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y, pageNumber).y}px`,
+                                  fontSize: `${24 * scale}px`,
+                                  fontFamily: "'Dancing Script', cursive",
+                                  color: 'black',
+                                  fontStyle: 'italic',
+                                  whiteSpace: 'nowrap',
+                                  transform: 'translateY(-50%)',
+                                }}
+                              >
+                                {typedName}
+                              </div>
+                            </>
                           )}
                           
-                          {/* Drawn signature overlay - display as image */}
+                          {/* Drawn signature overlay - display as image in both positions */}
                           {signatureType === "drawn" && drawnSignatureDataUrl && (
-                            <img
-                              src={drawnSignatureDataUrl}
-                              alt="Signature"
-                              className="absolute pointer-events-none"
-                              style={{
-                                left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.x, SIGNATURE_COORDINATES.y, pageNumber).x}px`,
-                                top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.x, SIGNATURE_COORDINATES.y, pageNumber).y}px`,
-                                width: `${200 * scale}px`, // 200px base width, scaled
-                                height: 'auto',
-                                transform: 'translateY(-50%)',
-                                maxWidth: 'none',
-                              }}
-                            />
+                            <>
+                              {/* Left drawn signature */}
+                              <img
+                                src={drawnSignatureDataUrl}
+                                alt="Signature"
+                                className="absolute pointer-events-none"
+                                style={{
+                                  left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).x}px`,
+                                  top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).y}px`,
+                                  width: `${200 * scale}px`, // 200px base width, scaled
+                                  height: 'auto',
+                                  transform: 'translateY(-50%)',
+                                  maxWidth: 'none',
+                                }}
+                              />
+                              {/* Right drawn signature */}
+                              <img
+                                src={drawnSignatureDataUrl}
+                                alt="Signature"
+                                className="absolute pointer-events-none"
+                                style={{
+                                  left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y, pageNumber).x}px`,
+                                  top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y, pageNumber).y}px`,
+                                  width: `${200 * scale}px`, // 200px base width, scaled
+                                  height: 'auto',
+                                  transform: 'translateY(-50%)',
+                                  maxWidth: 'none',
+                                }}
+                              />
+                            </>
                           )}
                         </>
                       )}
