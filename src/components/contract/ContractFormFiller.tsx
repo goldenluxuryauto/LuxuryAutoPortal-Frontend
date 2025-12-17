@@ -770,36 +770,36 @@ export function ContractFormFiller({
 
     // Helper function to draw signature at a specific position
     const drawSignatureAtPosition = async (x: number, y: number) => {
-      if (signatureType === "typed" && typedName.trim()) {
-        // Render typed signature as image with Dancing Script font (24pt)
-        const signatureImageDataUrl = await renderTypedSignatureAsImage(typedName);
-        const signatureImage = await pdfDoc.embedPng(signatureImageDataUrl);
-        // Use a unified scale so typed and drawn signatures have similar visual size
-        const signatureDims = signatureImage.scale(0.4);
-        // Center the image vertically on the configured Y (to match preview overlay)
+    if (signatureType === "typed" && typedName.trim()) {
+      // Render typed signature as image with Dancing Script font (24pt)
+      const signatureImageDataUrl = await renderTypedSignatureAsImage(typedName);
+      const signatureImage = await pdfDoc.embedPng(signatureImageDataUrl);
+      // Use a unified scale so typed and drawn signatures have similar visual size
+      const signatureDims = signatureImage.scale(0.4);
+      // Center the image vertically on the configured Y (to match preview overlay)
         const centeredY = y - signatureDims.height / 2;
-        signaturePage.drawImage(signatureImage, {
+      signaturePage.drawImage(signatureImage, {
           x: x,
+        y: centeredY,
+        width: signatureDims.width,
+        height: signatureDims.height,
+      });
+    } else if (signatureType === "drawn" && signatureCanvasRef.current) {
+      // Embed drawn signature as image
+      const signatureDataUrl = signatureCanvasRef.current.toDataURL("image/png");
+      if (signatureDataUrl && !signatureCanvasRef.current.isEmpty()) {
+        const signatureImage = await pdfDoc.embedPng(signatureDataUrl);
+        // Use the same scale factor as typed signature for consistent size
+        const signatureDims = signatureImage.scale(0.4);
+          const centeredY = y - signatureDims.height / 2;
+        signaturePage.drawImage(signatureImage, {
+            x: x,
           y: centeredY,
           width: signatureDims.width,
           height: signatureDims.height,
         });
-      } else if (signatureType === "drawn" && signatureCanvasRef.current) {
-        // Embed drawn signature as image
-        const signatureDataUrl = signatureCanvasRef.current.toDataURL("image/png");
-        if (signatureDataUrl && !signatureCanvasRef.current.isEmpty()) {
-          const signatureImage = await pdfDoc.embedPng(signatureDataUrl);
-          // Use the same scale factor as typed signature for consistent size
-          const signatureDims = signatureImage.scale(0.4);
-          const centeredY = y - signatureDims.height / 2;
-          signaturePage.drawImage(signatureImage, {
-            x: x,
-            y: centeredY,
-            width: signatureDims.width,
-            height: signatureDims.height,
-          });
-        }
       }
+    }
     };
 
     // Draw signature in both left and right positions
@@ -1010,21 +1010,21 @@ export function ContractFormFiller({
                           {signatureType === "typed" && typedName && (
                             <>
                               {/* Left typed signature */}
-                              <div
-                                className="absolute pointer-events-none"
-                                style={{
+                            <div
+                              className="absolute pointer-events-none"
+                              style={{
                                   left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).x}px`,
                                   top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).y}px`,
-                                  fontSize: `${24 * scale}px`,
-                                  fontFamily: "'Dancing Script', cursive",
-                                  color: 'black',
-                                  fontStyle: 'italic',
-                                  whiteSpace: 'nowrap',
-                                  transform: 'translateY(-50%)',
-                                }}
-                              >
-                                {typedName}
-                              </div>
+                                fontSize: `${24 * scale}px`,
+                                fontFamily: "'Dancing Script', cursive",
+                                color: 'black',
+                                fontStyle: 'italic',
+                                whiteSpace: 'nowrap',
+                                transform: 'translateY(-50%)',
+                              }}
+                            >
+                              {typedName}
+                            </div>
                               {/* Right typed signature */}
                               <div
                                 className="absolute pointer-events-none"
@@ -1048,19 +1048,19 @@ export function ContractFormFiller({
                           {signatureType === "drawn" && drawnSignatureDataUrl && (
                             <>
                               {/* Left drawn signature */}
-                              <img
-                                src={drawnSignatureDataUrl}
-                                alt="Signature"
-                                className="absolute pointer-events-none"
-                                style={{
+                            <img
+                              src={drawnSignatureDataUrl}
+                              alt="Signature"
+                              className="absolute pointer-events-none"
+                              style={{
                                   left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).x}px`,
                                   top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).y}px`,
-                                  width: `${200 * scale}px`, // 200px base width, scaled
-                                  height: 'auto',
-                                  transform: 'translateY(-50%)',
-                                  maxWidth: 'none',
-                                }}
-                              />
+                                width: `${200 * scale}px`, // 200px base width, scaled
+                                height: 'auto',
+                                transform: 'translateY(-50%)',
+                                maxWidth: 'none',
+                              }}
+                            />
                               {/* Right drawn signature */}
                               <img
                                 src={drawnSignatureDataUrl}

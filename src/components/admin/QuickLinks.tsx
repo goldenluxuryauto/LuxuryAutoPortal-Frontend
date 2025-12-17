@@ -60,13 +60,20 @@ export default function QuickLinks() {
     return acc;
   }, {} as Record<string, QuickLink[]>);
 
-  // Ensure we have the three main categories
-  const categories = ["Reports Center", "Support Center", "Forms Center"];
+  // Get categories that have visible links
+  const categoriesWithLinks = Object.keys(groupedLinks).filter(
+    (category) => groupedLinks[category].length > 0
+  );
+
+  // If no categories have links, show nothing
+  if (categoriesWithLinks.length === 0) {
+    return null;
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {categories.map((category) => {
-        const links = groupedLinks[category] || [];
+      {categoriesWithLinks.map((category) => {
+        const links = groupedLinks[category];
         const Icon = categoryIcons[category] || ExternalLink;
         const iconColor = categoryColors[category] || "text-[#EAEB80]";
 
@@ -79,25 +86,21 @@ export default function QuickLinks() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {links.length > 0 ? (
-                <ul className="space-y-2">
-                  {links.map((link) => (
-                    <li key={link.id}>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#EAEB80] transition-colors group"
-                      >
-                        <span className="flex-1 truncate">{link.title}</span>
-                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-gray-600">No links available</p>
-              )}
+              <ul className="space-y-2">
+                {links.map((link) => (
+                  <li key={link.id}>
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#EAEB80] transition-colors group"
+                    >
+                      <span className="flex-1 truncate">{link.title}</span>
+                      <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </CardContent>
           </Card>
         );
