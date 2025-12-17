@@ -39,6 +39,8 @@ interface SidebarItem {
 
 const allSidebarItems: SidebarItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  // Client-only profile link for logged-in clients
+  { href: "/admin/profile", label: "Profile", icon: User, roles: ["client"] },
   { href: "/admin/admins", label: "Admins", icon: Users, roles: ["admin"] },
   { href: "/admin/clients", label: "Clients", icon: Users, roles: ["admin"] },
   { href: "/admin/cars", label: "Cars", icon: Car },
