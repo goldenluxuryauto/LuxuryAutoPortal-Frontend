@@ -803,7 +803,7 @@ export function ContractFormFiller({
     };
 
     // Draw signature in both left and right positions
-    await drawSignatureAtPosition(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y);
+    // Only draw signature on the right side (client signature)
     await drawSignatureAtPosition(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y);
 
     // Date is NOT automatically added - leave blank for manual entry if needed
@@ -1003,29 +1003,11 @@ export function ContractFormFiller({
                           );
                         })}
 
-                      {/* Signature overlay for real-time preview - both left and right */}
+                      {/* Signature overlay for real-time preview - right side only (client signature) */}
                       {SIGNATURE_COORDINATES.page === pageNumber && (
                         <>
-                          {/* Left signature overlay */}
+                          {/* Right typed signature only */}
                           {signatureType === "typed" && typedName && (
-                            <>
-                              {/* Left typed signature */}
-                            <div
-                              className="absolute pointer-events-none"
-                              style={{
-                                  left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).x}px`,
-                                  top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).y}px`,
-                                fontSize: `${24 * scale}px`,
-                                fontFamily: "'Dancing Script', cursive",
-                                color: 'black',
-                                fontStyle: 'italic',
-                                whiteSpace: 'nowrap',
-                                transform: 'translateY(-50%)',
-                              }}
-                            >
-                              {typedName}
-                            </div>
-                              {/* Right typed signature */}
                               <div
                                 className="absolute pointer-events-none"
                                 style={{
@@ -1041,27 +1023,10 @@ export function ContractFormFiller({
                               >
                                 {typedName}
                               </div>
-                            </>
                           )}
                           
-                          {/* Drawn signature overlay - display as image in both positions */}
+                          {/* Right drawn signature only */}
                           {signatureType === "drawn" && drawnSignatureDataUrl && (
-                            <>
-                              {/* Left drawn signature */}
-                            <img
-                              src={drawnSignatureDataUrl}
-                              alt="Signature"
-                              className="absolute pointer-events-none"
-                              style={{
-                                  left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).x}px`,
-                                  top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.left.x, SIGNATURE_COORDINATES.left.y, pageNumber).y}px`,
-                                width: `${200 * scale}px`, // 200px base width, scaled
-                                height: 'auto',
-                                transform: 'translateY(-50%)',
-                                maxWidth: 'none',
-                              }}
-                            />
-                              {/* Right drawn signature */}
                               <img
                                 src={drawnSignatureDataUrl}
                                 alt="Signature"
@@ -1069,13 +1034,12 @@ export function ContractFormFiller({
                                 style={{
                                   left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y, pageNumber).x}px`,
                                   top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y, pageNumber).y}px`,
-                                  width: `${200 * scale}px`, // 200px base width, scaled
+                                  width: `${200 * scale}px`,
                                   height: 'auto',
                                   transform: 'translateY(-50%)',
                                   maxWidth: 'none',
                                 }}
                               />
-                            </>
                           )}
                         </>
                       )}

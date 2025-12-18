@@ -32,6 +32,7 @@ const carOnboardingSchema = z.object({
   carMakeModelYear: z.string().min(1, "Car Make/Model/Year is required").max(255),
   plateNumber: z.string().min(1, "Plate number is required").max(50),
   dropOffDate: z.string().min(1, "Drop-off date is required"),
+  dropOffTime: z.string().min(1, "Drop-off time is required"),
 });
 
 type CarOnboardingFormData = z.infer<typeof carOnboardingSchema>;
@@ -91,6 +92,7 @@ export default function CarOnboardingForm() {
       carMakeModelYear: "",
       plateNumber: "",
       dropOffDate: new Date().toISOString().split('T')[0],
+      dropOffTime: "09:00",
     },
   });
 
@@ -121,7 +123,8 @@ export default function CarOnboardingForm() {
     try {
       // Convert date strings to ISO format
       const dateTime = new Date(data.date).toISOString();
-      const dropOffDateTime = new Date(data.dropOffDate).toISOString();
+      // Combine drop-off date and time
+      const dropOffDateTime = new Date(`${data.dropOffDate}T${data.dropOffTime}`).toISOString();
 
       const payload = {
         date: dateTime,
@@ -162,6 +165,7 @@ export default function CarOnboardingForm() {
         carMakeModelYear: "",
         plateNumber: "",
         dropOffDate: now.toISOString().split('T')[0],
+        dropOffTime: "09:00",
       });
       setSelectedCarId("");
     } catch (error: any) {
@@ -318,24 +322,44 @@ export default function CarOnboardingForm() {
               )}
             />
 
-            {/* Drop-off Date */}
-            <FormField
-              control={form.control}
-              name="dropOffDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300">Date of Car Drop-off *</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      {...field}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Drop-off Date and Time */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="dropOffDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Date of Car Drop-off *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dropOffTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Time of Car Drop-off *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="time"
+                        {...field}
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <Button
               type="submit"

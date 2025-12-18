@@ -32,6 +32,7 @@ const carOffboardingSchema = z.object({
   carMakeModelYear: z.string().min(1, "Car Make/Model/Year is required").max(255),
   plateNumber: z.string().min(1, "Plate number is required").max(50),
   pickUpDate: z.string().min(1, "Pick-up date is required"),
+  pickUpTime: z.string().min(1, "Pick-up time is required"),
 });
 
 type CarOffboardingFormData = z.infer<typeof carOffboardingSchema>;
@@ -90,6 +91,7 @@ export default function CarOffboardingForm() {
       carMakeModelYear: "",
       plateNumber: "",
       pickUpDate: new Date().toISOString().split('T')[0],
+      pickUpTime: "09:00",
     },
   });
 
@@ -120,7 +122,8 @@ export default function CarOffboardingForm() {
     try {
       // Convert date strings to ISO format
       const dateTime = new Date(data.date).toISOString();
-      const pickUpDateTime = new Date(data.pickUpDate).toISOString();
+      // Combine pick-up date and time
+      const pickUpDateTime = new Date(`${data.pickUpDate}T${data.pickUpTime}`).toISOString();
 
       const payload = {
         date: dateTime,
@@ -161,6 +164,7 @@ export default function CarOffboardingForm() {
         carMakeModelYear: "",
         plateNumber: "",
         pickUpDate: now.toISOString().split('T')[0],
+        pickUpTime: "09:00",
       });
       setSelectedCarId("");
     } catch (error: any) {
@@ -320,24 +324,44 @@ export default function CarOffboardingForm() {
               )}
             />
 
-            {/* Pick-Up Date */}
-            <FormField
-              control={form.control}
-              name="pickUpDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300">Pick-up Date *</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      {...field}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Pick-Up Date and Time */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="pickUpDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Pick-up Date *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="pickUpTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Pick-up Time *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="time"
+                        {...field}
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <Button
               type="submit"

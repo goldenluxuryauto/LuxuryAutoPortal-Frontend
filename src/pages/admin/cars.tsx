@@ -105,6 +105,13 @@ export default function CarsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Get current user to check if admin
+  const { data: userData } = useQuery({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
+  const isAdmin = userData?.user?.isAdmin === true;
+
   const offboardForm = useForm({
     resolver: zodResolver(
       z.object({
@@ -396,15 +403,17 @@ export default function CarsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-white">Cars</h1>
-            <p className="text-gray-400 text-sm">Manage your vehicle fleet</p>
+            <p className="text-gray-400 text-sm">{isAdmin ? "Manage your vehicle fleet" : "View your vehicles"}</p>
           </div>
-          <Button
-            onClick={handleAddClick}
-            className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add New Car
-          </Button>
+          {isAdmin && (
+            <Button
+              onClick={handleAddClick}
+              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add New Car
+            </Button>
+          )}
         </div>
 
         {/* Search and Filter */}
@@ -487,9 +496,11 @@ export default function CarsPage() {
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
                       Owner
                     </th>
-                    <th className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                      Actions
-                    </th>
+                    {isAdmin && (
+                      <th className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                        Actions
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#2a2a2a]">
@@ -500,7 +511,7 @@ export default function CarsPage() {
                           key={`skeleton-${i}`}
                           className="border-b border-[#2a2a2a]"
                         >
-                          <td colSpan={9} className="px-6 py-4">
+                          <td colSpan={isAdmin ? 9 : 8} className="px-6 py-4">
                             <div className="h-4 bg-[#252525] rounded animate-pulse" />
                           </td>
                         </tr>
@@ -578,63 +589,65 @@ export default function CarsPage() {
                               </span>
                             )}
                           </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEditClick(car);
-                                }}
-                                title="Edit"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              {car.status === "available" && (
+                          {isAdmin && (
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="text-gray-400 hover:text-orange-400"
+                                  className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleOffboardClick(car);
+                                    handleEditClick(car);
                                   }}
-                                  title="Off-board vehicle"
+                                  title="Edit"
                                 >
-                                  <LogOut className="w-4 h-4" />
+                                  <Edit className="w-4 h-4" />
                                 </Button>
-                              )}
-                              <ConfirmDialog
-                                trigger={
+                                {car.status === "available" && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="text-gray-400 hover:text-red-400"
+                                    className="text-gray-400 hover:text-orange-400"
                                     onClick={(e) => {
                                       e.stopPropagation();
+                                      handleOffboardClick(car);
                                     }}
-                                    title="Delete"
+                                    title="Off-board vehicle"
                                   >
-                                    <Trash2 className="w-4 h-4" />
+                                    <LogOut className="w-4 h-4" />
                                   </Button>
-                                }
-                                title="Delete Car"
-                                description="Are you sure you want to delete this car? This action cannot be undone."
-                                confirmText="Delete"
-                                cancelText="Cancel"
-                                variant="destructive"
-                                onConfirm={() => handleDeleteClick(car.id)}
-                              />
-                            </div>
-                          </td>
+                                )}
+                                <ConfirmDialog
+                                  trigger={
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="text-gray-400 hover:text-red-400"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                      }}
+                                      title="Delete"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  }
+                                  title="Delete Car"
+                                  description="Are you sure you want to delete this car? This action cannot be undone."
+                                  confirmText="Delete"
+                                  cancelText="Cancel"
+                                  variant="destructive"
+                                  onConfirm={() => handleDeleteClick(car.id)}
+                                />
+                              </div>
+                            </td>
+                          )}
                         </tr>
                       );
                     })
                   ) : (
                     <tr>
-                      <td colSpan={9} className="px-6 py-12 text-center">
+                      <td colSpan={isAdmin ? 9 : 8} className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <p className="text-gray-400 text-lg">No cars found</p>
                           <p className="text-gray-500 text-sm">

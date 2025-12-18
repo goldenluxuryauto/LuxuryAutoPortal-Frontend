@@ -43,6 +43,7 @@ import {
   Plus,
   Minus,
   Edit,
+  Upload,
 } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -150,6 +151,28 @@ export default function ClientDetailPage() {
   // Edit modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState<any>({});
+  
+  // Upload contract modal state
+  const [isUploadContractOpen, setIsUploadContractOpen] = useState(false);
+  const [uploadContractForm, setUploadContractForm] = useState({
+    contractUrl: "",
+    vehicleYear: "",
+    vehicleMake: "",
+    vehicleModel: "",
+    vinNumber: "",
+    licensePlate: "",
+  });
+  
+  // Add car modal state
+  const [isAddCarOpen, setIsAddCarOpen] = useState(false);
+  const [addCarForm, setAddCarForm] = useState({
+    vin: "",
+    make: "",
+    model: "",
+    year: "",
+    licensePlate: "",
+    mileage: "",
+  });
   
   const queryClient = useQueryClient();
 
@@ -274,17 +297,48 @@ export default function ClientDetailPage() {
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
       if (!clientId) throw new Error("Invalid client ID");
-      const response = await fetch(buildApiUrl(`/api/clients/${clientId}/onboarding`), {
+      
+      // Determine which endpoint to use based on whether onboarding data exists
+      const hasOnboardingData = onboardingData?.success && onboardingData?.data;
+      const endpoint = hasOnboardingData 
+        ? `/api/clients/${clientId}/onboarding`
+        : `/api/clients/${clientId}`;
+      
+      // Transform data for the client endpoint if no onboarding data
+      // Send all fields so the backend can create/update onboarding record
+      const body = hasOnboardingData ? data : {
+        firstName: data.firstNameOwner,
+        lastName: data.lastNameOwner,
+        email: data.emailOwner,
+        phone: data.phoneOwner,
+        birthday: data.birthday,
+        tshirtSize: data.tshirtSize,
+        streetAddress: data.streetAddress,
+        city: data.city,
+        state: data.state,
+        zipCode: data.zipCode,
+        vehicleYear: data.vehicleYear,
+        vehicleMake: data.vehicleMake,
+        vehicleModel: data.vehicleModel,
+        vinNumber: data.vinNumber,
+        licensePlate: data.licensePlate,
+        vehicleMiles: data.vehicleMiles,
+        bankName: data.bankName,
+        bankRoutingNumber: data.routingNumber,
+        bankAccountNumber: data.accountNumber,
+      };
+      
+      const response = await fetch(buildApiUrl(endpoint), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update onboarding data");
+        throw new Error(error.error || "Failed to update client data");
       }
       return response.json();
     },
@@ -306,9 +360,79 @@ export default function ClientDetailPage() {
     },
   });
 
+  // Upload contract mutation
+  const uploadContractMutation = useMutation({
+    mutationFn: async (data: typeof uploadContractForm) => {
+      if (!clientId) throw new Error("Invalid client ID");
+      const response = await fetch(buildApiUrl(`/api/clients/${clientId}/contracts`), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to upload contract");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients", clientId] });
+      toast({ title: "Success", description: "Contract uploaded successfully" });
+      setIsUploadContractOpen(false);
+      setUploadContractForm({
+        contractUrl: "",
+        vehicleYear: "",
+        vehicleMake: "",
+        vehicleModel: "",
+        vinNumber: "",
+        licensePlate: "",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload contract",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add car mutation
+  const addCarMutation = useMutation({
+    mutationFn: async (data: typeof addCarForm) => {
+      if (!clientId) throw new Error("Invalid client ID");
+      const response = await fetch(buildApiUrl(`/api/clients/${clientId}/cars`), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to add car");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients", clientId] });
+      toast({ title: "Success", description: "Car added successfully" });
+      setIsAddCarOpen(false);
+      setAddCarForm({ vin: "", make: "", model: "", year: "", licensePlate: "", mileage: "" });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add car",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Handle edit button click
   const handleEditClick = () => {
     if (onboardingData?.success && onboardingData?.data) {
+      // Client has onboarding data - use it
       const data = onboardingData.data;
       setEditFormData({
         firstNameOwner: data.firstNameOwner || "",
@@ -331,8 +455,31 @@ export default function ClientDetailPage() {
         routingNumber: data.routingNumber || "",
         accountNumber: data.accountNumber || "",
       });
-      setIsEditModalOpen(true);
+    } else if (client) {
+      // Manually created client - use client data
+      setEditFormData({
+        firstNameOwner: client?.firstName || "",
+        lastNameOwner: client?.lastName || "",
+        emailOwner: client?.email || "",
+        phoneOwner: client?.phone || "",
+        birthday: "",
+        tshirtSize: "",
+        streetAddress: "",
+        city: "",
+        state: "",
+        zipCode: "",
+        vehicleYear: "",
+        vehicleMake: "",
+        vehicleModel: "",
+        vinNumber: "",
+        licensePlate: "",
+        vehicleMiles: "",
+        bankName: client?.bankName || "",
+        routingNumber: client?.bankRoutingNumber || "",
+        accountNumber: client?.bankAccountNumber || "",
+      });
     }
+    setIsEditModalOpen(true);
   };
 
   // Handle edit form submission
@@ -499,17 +646,15 @@ export default function ClientDetailPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-[#EAEB80] text-xl">Client Details</CardTitle>
-                    {onboardingData?.success && onboardingData?.data && (
-                      <Button
-                        onClick={handleEditClick}
-                        variant="outline"
-                        size="sm"
-                        className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
-                    )}
+                    <Button
+                      onClick={handleEditClick}
+                      variant="outline"
+                      size="sm"
+                      className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -898,9 +1043,20 @@ export default function ClientDetailPage() {
 
                           {/* Signed Contracts Section */}
                           <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                            <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
-                              Signed Contracts
-                            </h3>
+                            <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAEB80]/30">
+                              <h3 className="text-lg font-semibold text-[#EAEB80]">
+                                Signed Contracts
+                              </h3>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                                onClick={() => setIsUploadContractOpen(true)}
+                              >
+                                <Upload className="w-4 h-4 mr-2" />
+                                Upload Contract
+                              </Button>
+                            </div>
                             {client.signedContracts && client.signedContracts.length > 0 ? (
                               <div className="space-y-3">
                                 {client.signedContracts.map((contract, index) => (
@@ -965,9 +1121,160 @@ export default function ClientDetailPage() {
                       );
                     })()
                   ) : (
-                    <div className="text-center py-8 text-gray-400">
-                      No onboarding submission found for this client
-                    </div>
+                    // Show basic client info when no onboarding data exists (manually created client)
+                    <>
+                      {/* Basic Client Information */}
+                      <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                        <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                          Personal Information
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-400 block mb-1">Full Name:</span>
+                            <span className="text-white font-medium">
+                              {client.firstName} {client.lastName}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-400 block mb-1">Email:</span>
+                            <span className="text-white">{client.email}</span>
+                          </div>
+                          {client.phone && (
+                            <div>
+                              <span className="text-gray-400 block mb-1">Phone:</span>
+                              <span className="text-white">{client.phone}</span>
+                            </div>
+                          )}
+                          <div>
+                            <span className="text-gray-400 block mb-1">Status:</span>
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                client.isActive
+                                  ? "border-green-500/50 text-green-400 bg-green-500/10"
+                                  : "border-red-500/50 text-red-400 bg-red-500/10"
+                              )}
+                            >
+                              {client.isActive ? "Active" : "Inactive"}
+                            </Badge>
+                          </div>
+                          <div>
+                            <span className="text-gray-400 block mb-1">Created:</span>
+                            <span className="text-white">
+                              {new Date(client.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Banking Information (if available) */}
+                      {(client.bankName || client.bankRoutingNumber || client.bankAccountNumber) && (
+                        <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                          <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                            Banking Information
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            {client.bankName && (
+                              <div>
+                                <span className="text-gray-400 block mb-1">Bank Name:</span>
+                                <span className="text-white">{client.bankName}</span>
+                              </div>
+                            )}
+                            {client.bankRoutingNumber && (
+                              <div>
+                                <span className="text-gray-400 block mb-1">Routing Number:</span>
+                                <span className="text-white font-mono">{client.bankRoutingNumber}</span>
+                              </div>
+                            )}
+                            {client.bankAccountNumber && (
+                              <div>
+                                <span className="text-gray-400 block mb-1">Account Number:</span>
+                                <span className="text-white font-mono">{client.bankAccountNumber}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Signed Contracts for manually created clients */}
+                      <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                        <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAEB80]/30">
+                          <h3 className="text-lg font-semibold text-[#EAEB80]">
+                            Signed Contracts
+                          </h3>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                            onClick={() => setIsUploadContractOpen(true)}
+                          >
+                            <Upload className="w-4 h-4 mr-2" />
+                            Upload Contract
+                          </Button>
+                        </div>
+                        {client.signedContracts && client.signedContracts.length > 0 ? (
+                          <div className="space-y-3">
+                            {client.signedContracts.map((contract, index) => (
+                              <div
+                                key={contract.id ?? index}
+                                className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#111111] border border-[#EAEB80]/10 rounded-lg p-4"
+                              >
+                                <div className="space-y-1 text-sm">
+                                  <div className="text-white font-medium">
+                                    {contract.vehicleYear || ""}{" "}
+                                    {contract.vehicleMake || ""}{" "}
+                                    {contract.vehicleModel || ""}
+                                  </div>
+                                  <div className="text-gray-400">
+                                    Plate: <span className="text-white">{contract.licensePlate || "N/A"}</span>
+                                    {" · "}
+                                    VIN: <span className="text-white font-mono text-xs">{contract.vinNumber || "N/A"}</span>
+                                  </div>
+                                  <div className="text-gray-400">
+                                    Signed on:{" "}
+                                    <span className="text-white">
+                                      {contract.contractSignedAt
+                                        ? new Date(contract.contractSignedAt).toLocaleString()
+                                        : "N/A"}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <Badge
+                                    variant="outline"
+                                    className="border-green-500/50 text-green-400 bg-green-500/10"
+                                  >
+                                    Signed
+                                  </Badge>
+                                  {contract.signedContractUrl && (
+                                    <a
+                                      href={contract.signedContractUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-[#EAEB80] text-black hover:bg-[#d4d570] transition-colors"
+                                    >
+                                      <Download className="w-4 h-4" />
+                                      Download
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                            <Folder className="w-8 h-8 mb-2 text-gray-600" />
+                            <p>No signed contracts available yet.</p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="bg-[#1a1a1a]/50 p-4 rounded-lg border border-[#EAEB80]/10 text-center">
+                        <p className="text-gray-400 text-sm">
+                          This client was created manually. Complete onboarding details are not available.
+                        </p>
+                      </div>
+                    </>
                   )}
                 </CardContent>
               </Card>
@@ -976,13 +1283,34 @@ export default function ClientDetailPage() {
             {activeSection === "cars" && (
               <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
                 <CardHeader>
-                  <CardTitle className="text-[#EAEB80] text-xl">
-                    Assigned Cars ({client.cars.length})
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-[#EAEB80] text-xl">
+                      Assigned Cars ({client.cars.length})
+                    </CardTitle>
+                    <Button
+                      onClick={() => setIsAddCarOpen(true)}
+                      variant="outline"
+                      size="sm"
+                      className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Car
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {client.cars.length === 0 ? (
-                    <p className="text-gray-400 text-center py-8">No cars assigned to this client</p>
+                    <div className="text-center py-8">
+                      <Car className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+                      <p className="text-gray-400 mb-4">No cars assigned to this client</p>
+                      <Button
+                        onClick={() => setIsAddCarOpen(true)}
+                        className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add First Car
+                      </Button>
+                    </div>
                   ) : (
                     <div className="overflow-x-auto">
                       <Table>
@@ -1749,6 +2077,217 @@ export default function ClientDetailPage() {
                   </>
                 ) : (
                   "Save Changes"
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Upload Contract Dialog */}
+      <Dialog open={isUploadContractOpen} onOpenChange={setIsUploadContractOpen}>
+        <DialogContent className="max-w-lg bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white text-xl">Upload Contract</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Manually upload a signed contract for this client
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              uploadContractMutation.mutate(uploadContractForm);
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <Label className="text-gray-400">Contract URL *</Label>
+              <Input
+                value={uploadContractForm.contractUrl}
+                onChange={(e) => setUploadContractForm({ ...uploadContractForm, contractUrl: e.target.value })}
+                placeholder="https://example.com/contract.pdf"
+                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">Enter the URL of the uploaded contract PDF</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-400">Vehicle Year</Label>
+                <Input
+                  value={uploadContractForm.vehicleYear}
+                  onChange={(e) => setUploadContractForm({ ...uploadContractForm, vehicleYear: e.target.value })}
+                  placeholder="2024"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-gray-400">Vehicle Make</Label>
+                <Input
+                  value={uploadContractForm.vehicleMake}
+                  onChange={(e) => setUploadContractForm({ ...uploadContractForm, vehicleMake: e.target.value })}
+                  placeholder="Mercedes-Benz"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+            </div>
+            <div>
+              <Label className="text-gray-400">Vehicle Model</Label>
+              <Input
+                value={uploadContractForm.vehicleModel}
+                onChange={(e) => setUploadContractForm({ ...uploadContractForm, vehicleModel: e.target.value })}
+                placeholder="S-Class"
+                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-400">VIN Number</Label>
+                <Input
+                  value={uploadContractForm.vinNumber}
+                  onChange={(e) => setUploadContractForm({ ...uploadContractForm, vinNumber: e.target.value })}
+                  placeholder="WDDNG8GB5LA123456"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                />
+              </div>
+              <div>
+                <Label className="text-gray-400">License Plate</Label>
+                <Input
+                  value={uploadContractForm.licensePlate}
+                  onChange={(e) => setUploadContractForm({ ...uploadContractForm, licensePlate: e.target.value })}
+                  placeholder="ABC1234"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsUploadContractOpen(false)}
+                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={uploadContractMutation.isPending}
+                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              >
+                {uploadContractMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  "Upload Contract"
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Car Dialog */}
+      <Dialog open={isAddCarOpen} onOpenChange={setIsAddCarOpen}>
+        <DialogContent className="max-w-lg bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white text-xl">Add Car</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Add a new car for this client
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              addCarMutation.mutate(addCarForm);
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <Label className="text-gray-400">VIN Number *</Label>
+              <Input
+                value={addCarForm.vin}
+                onChange={(e) => setAddCarForm({ ...addCarForm, vin: e.target.value })}
+                placeholder="WDDNG8GB5LA123456"
+                className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-400">Make *</Label>
+                <Input
+                  value={addCarForm.make}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, make: e.target.value })}
+                  placeholder="Mercedes-Benz"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  required
+                />
+              </div>
+              <div>
+                <Label className="text-gray-400">Model *</Label>
+                <Input
+                  value={addCarForm.model}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, model: e.target.value })}
+                  placeholder="S-Class"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  required
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-400">Year *</Label>
+                <Input
+                  value={addCarForm.year}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, year: e.target.value })}
+                  placeholder="2024"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  required
+                />
+              </div>
+              <div>
+                <Label className="text-gray-400">License Plate</Label>
+                <Input
+                  value={addCarForm.licensePlate}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, licensePlate: e.target.value })}
+                  placeholder="ABC1234"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+            </div>
+            <div>
+              <Label className="text-gray-400">Mileage</Label>
+              <Input
+                type="number"
+                value={addCarForm.mileage}
+                onChange={(e) => setAddCarForm({ ...addCarForm, mileage: e.target.value })}
+                placeholder="0"
+                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+              />
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsAddCarOpen(false)}
+                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={addCarMutation.isPending}
+                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              >
+                {addCarMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  "Add Car"
                 )}
               </Button>
             </div>
