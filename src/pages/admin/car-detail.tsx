@@ -77,6 +77,17 @@ export default function CarDetailPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
 
+  // Get current user to check if admin
+  const { data: userData } = useQuery<{
+    user?: {
+      isAdmin?: boolean;
+    };
+  }>({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
+  const isAdmin = userData?.user?.isAdmin === true;
+
   const { data, isLoading, error } = useQuery<{
     success: boolean;
     data: CarDetail;
@@ -328,13 +339,15 @@ export default function CarDetailPage() {
               <p className="text-gray-400 text-sm">Car Details</p>
             </div>
           </div>
-          <Button
-            onClick={handleEditClick}
-            className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-          >
-            <Edit className="w-4 h-4 mr-2" />
-            Edit
-          </Button>
+          {isAdmin && (
+            <Button
+              onClick={handleEditClick}
+              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -466,36 +479,38 @@ export default function CarDetailPage() {
                 <Upload className="w-5 h-5" />
                 Photos ({car.photos?.length || 0})
               </CardTitle>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePhotoUpload}
-                  disabled={uploadingPhotos}
-                  className="hidden"
-                  id="photo-upload"
-                />
-                <Button
-                  asChild
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-                  disabled={uploadingPhotos}
-                >
-                  <label htmlFor="photo-upload" className="cursor-pointer">
-                    {uploadingPhotos ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload Photos
-                      </>
-                    )}
-                  </label>
-                </Button>
-              </div>
+              {isAdmin && (
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handlePhotoUpload}
+                    disabled={uploadingPhotos}
+                    className="hidden"
+                    id="photo-upload"
+                  />
+                  <Button
+                    asChild
+                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                    disabled={uploadingPhotos}
+                  >
+                    <label htmlFor="photo-upload" className="cursor-pointer">
+                      {uploadingPhotos ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Upload Photos
+                        </>
+                      )}
+                    </label>
+                  </Button>
+                </div>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -512,23 +527,25 @@ export default function CarDetailPage() {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
-                    <ConfirmDialog
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500/80 hover:bg-red-500 text-white"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      }
-                      title="Delete Photo"
-                      description="Are you sure you want to delete this photo?"
-                      confirmText="Delete"
-                      cancelText="Cancel"
-                      variant="destructive"
-                      onConfirm={() => deletePhotoMutation.mutate(photo)}
-                    />
+                    {isAdmin && (
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500/80 hover:bg-red-500 text-white"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        }
+                        title="Delete Photo"
+                        description="Are you sure you want to delete this photo?"
+                        confirmText="Delete"
+                        cancelText="Cancel"
+                        variant="destructive"
+                        onConfirm={() => deletePhotoMutation.mutate(photo)}
+                      />
+                    )}
                   </div>
                 ))}
               </div>
@@ -552,8 +569,9 @@ export default function CarDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Edit Modal */}
-        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        {/* Edit Modal - Only for admins */}
+        {isAdmin && (
+          <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-md">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold">
@@ -688,6 +706,7 @@ export default function CarDetailPage() {
             </Form>
           </DialogContent>
         </Dialog>
+        )}
       </div>
     </AdminLayout>
   );
