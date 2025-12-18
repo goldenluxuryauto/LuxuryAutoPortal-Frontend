@@ -45,6 +45,7 @@ interface CarDetail {
   createdAt: string;
   updatedAt: string;
   userId?: number | null;
+  clientId?: number | null;
   owner?: {
     firstName: string;
     lastName: string;
@@ -382,13 +383,31 @@ export default function CarDetailPage() {
                   {car.owner && (
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Assigned To</p>
-                      <p className="text-white text-sm">
-                        {car.owner.firstName} {car.owner.lastName}
-                      </p>
-                      {car.owner.email && (
-                        <p className="text-gray-400 text-xs">
-                          {car.owner.email}
-                        </p>
+                      {car.clientId ? (
+                        <button
+                          onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
+                          className="text-left hover:text-[#EAEB80] transition-colors"
+                        >
+                          <p className="text-white text-sm hover:underline">
+                            {car.owner.firstName} {car.owner.lastName}
+                          </p>
+                          {car.owner.email && (
+                            <p className="text-gray-400 text-xs hover:text-[#EAEB80]">
+                              {car.owner.email}
+                            </p>
+                          )}
+                        </button>
+                      ) : (
+                        <>
+                          <p className="text-white text-sm">
+                            {car.owner.firstName} {car.owner.lastName}
+                          </p>
+                          {car.owner.email && (
+                            <p className="text-gray-400 text-xs">
+                              {car.owner.email}
+                            </p>
+                          )}
+                        </>
                       )}
                     </div>
                   )}
