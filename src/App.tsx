@@ -21,6 +21,7 @@ import SettingsPage from "@/pages/admin/settings";
 import ClientProfilePage from "@/pages/admin/profile";
 import SignContract from "@/pages/sign-contract";
 import Signup from "@/pages/signup";
+import ResetPasswordPage from "@/pages/reset-password";
 
 function Router() {
   return (
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/admin/income-expenses" component={IncomeExpensesPage} />
       <Route path="/admin/settings" component={SettingsPage} />
       <Route path="/admin/profile" component={ClientProfilePage} />
+      <Route path="/reset-password" component={ResetPasswordPage} />
       <Route component={NotFound} />
     </Switch>
   );

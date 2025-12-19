@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
-import { Loader2, Save, Slack } from "lucide-react";
+import { Loader2, Save, Slack, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { checkPasswordStrength, getPasswordStrengthColor, getPasswordStrengthLabel } from "@/lib/password-strength";
 
 interface SlackChannelConfig {
   id: number;
@@ -26,9 +28,29 @@ const formTypeLabels: Record<string, string> = {
 export default function SettingsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [editingChannels, setEditingChannels] = useState<Record<string, string>>({});
+  
+  // Password change form state
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Fetch Slack channel configurations
+  // Get current user to check if admin
+  const { data: userData } = useQuery<{
+    user?: {
+      isAdmin?: boolean;
+    };
+  }>({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
+  const isAdmin = userData?.user?.isAdmin === true;
+
+  // Fetch Slack channel configurations (only for admins)
   const { data: channelsData, isLoading } = useQuery<{
     success: boolean;
     data: SlackChannelConfig[];
@@ -43,6 +65,7 @@ export default function SettingsPage() {
       }
       return response.json();
     },
+    enabled: isAdmin, // Only fetch if user is admin
   });
 
   // Update channel mutation
@@ -111,7 +134,74 @@ export default function SettingsPage() {
     });
   };
 
-  if (isLoading) {
+  // Password change mutation
+  const passwordUpdateMutation = useMutation({
+    mutationFn: async (data: { oldPassword: string; newPassword: string }) => {
+      const response = await fetch(buildApiUrl("/api/auth/update-password"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to update password");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Password updated successfully. Please log in again.",
+      });
+      // Reset form
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      // Redirect to login after a delay
+      setTimeout(() => {
+        setLocation("/admin/login");
+      }, 2000);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update password",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const passwordStrength = checkPasswordStrength(newPassword);
+  const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0;
+  const canSubmitPassword = 
+    oldPassword.length > 0 &&
+    passwordStrength.isValid &&
+    passwordsMatch &&
+    !passwordUpdateMutation.isPending;
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canSubmitPassword) return;
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    passwordUpdateMutation.mutate({
+      oldPassword,
+      newPassword,
+    });
+  };
+
+  if (isLoading && isAdmin) {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center min-h-[400px]">
@@ -128,20 +218,179 @@ export default function SettingsPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-          <p className="text-gray-400">Configure Slack channel notifications for different form types</p>
+          <p className="text-gray-400">Manage your account settings and preferences</p>
         </div>
 
+        {/* Account Security - Password Change */}
         <Card className="bg-[#111111] border-[#EAEB80]/20">
           <CardHeader>
             <CardTitle className="text-[#EAEB80] flex items-center gap-2">
-              <Slack className="w-5 h-5" />
-              Slack Channel Configuration
+              <Lock className="w-5 h-5" />
+              Account Security
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Configure which Slack channels receive notifications for each form type. Each form type can have its own dedicated channel.
+              Update your password to keep your account secure
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent>
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="old-password" className="text-gray-300">
+                  Current Password *
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="old-password"
+                    type={showOldPassword ? "text" : "password"}
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    className="bg-[#0a0a0a] border-[#2a2a2a] text-white focus:border-[#EAEB80] pr-10"
+                    placeholder="Enter your current password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-white transition-colors"
+                    onClick={() => setShowOldPassword(!showOldPassword)}
+                  >
+                    {showOldPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="new-password" className="text-gray-300">
+                  New Password *
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="new-password"
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="bg-[#0a0a0a] border-[#2a2a2a] text-white focus:border-[#EAEB80] pr-10"
+                    placeholder="Enter your new password (min 8 characters)"
+                    required
+                    minLength={8}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-white transition-colors"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {newPassword.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-[#2a2a2a] rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all ${getPasswordStrengthColor(
+                            passwordStrength.score
+                          )}`}
+                          style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        {getPasswordStrengthLabel(passwordStrength.score)}
+                      </span>
+                    </div>
+                    {passwordStrength.feedback.length > 0 && (
+                      <div className="text-xs space-y-1">
+                        {passwordStrength.feedback.map((feedback, idx) => (
+                          <div
+                            key={idx}
+                            className={`flex items-center gap-1 ${
+                              passwordStrength.isValid ? "text-green-400" : "text-yellow-400"
+                            }`}
+                          >
+                            <AlertCircle className="w-3 h-3" />
+                            {feedback}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password" className="text-gray-300">
+                  Confirm New Password *
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="confirm-password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="bg-[#0a0a0a] border-[#2a2a2a] text-white focus:border-[#EAEB80] pr-10"
+                    placeholder="Confirm your new password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-white transition-colors"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {confirmPassword.length > 0 && (
+                  <div className="text-xs flex items-center gap-1">
+                    {passwordsMatch ? (
+                      <span className="text-green-400">✓ Passwords match</span>
+                    ) : (
+                      <span className="text-red-400">✗ Passwords do not match</span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <Button
+                  type="submit"
+                  disabled={!canSubmitPassword}
+                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {passwordUpdateMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Update Password
+                    </>
+                  )}
+                </Button>
+                <a
+                  href="/reset-password"
+                  className="text-sm text-[#EAEB80] hover:underline"
+                >
+                  Forgot your password?
+                </a>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Slack Channel Configuration - Admin Only */}
+        {isAdmin && (
+          <>
+            <Card className="bg-[#111111] border-[#EAEB80]/20">
+            <CardHeader>
+              <CardTitle className="text-[#EAEB80] flex items-center gap-2">
+                <Slack className="w-5 h-5" />
+                Slack Channel Configuration
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                Configure which Slack channels receive notifications for each form type. Each form type can have its own dedicated channel.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
             {channels.map((config) => {
               const isEditing = editingChannels.hasOwnProperty(config.formType);
               const editingValue = editingChannels[config.formType] || config.channelId;
@@ -234,25 +483,27 @@ export default function SettingsPage() {
                 <p className="text-sm mt-2">Channels will be initialized on first use.</p>
               </div>
             )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card className="bg-[#111111] border-[#EAEB80]/20">
-          <CardHeader>
-            <CardTitle className="text-[#EAEB80]">How to Get Slack Channel ID</CardTitle>
-          </CardHeader>
-          <CardContent className="text-gray-300 space-y-2">
-            <ol className="list-decimal list-inside space-y-2">
-              <li>Open Slack and navigate to the channel you want to use</li>
-              <li>Click on the channel name at the top</li>
-              <li>Scroll down to find the "Channel ID" (starts with "C")</li>
-              <li>Copy the Channel ID and paste it in the field above</li>
-            </ol>
-            <p className="text-sm text-gray-400 mt-4">
-              Note: Make sure your Slack bot has been invited to the channel before notifications can be sent.
-            </p>
-          </CardContent>
-        </Card>
+          <Card className="bg-[#111111] border-[#EAEB80]/20">
+            <CardHeader>
+              <CardTitle className="text-[#EAEB80]">How to Get Slack Channel ID</CardTitle>
+            </CardHeader>
+            <CardContent className="text-gray-300 space-y-2">
+              <ol className="list-decimal list-inside space-y-2">
+                <li>Open Slack and navigate to the channel you want to use</li>
+                <li>Click on the channel name at the top</li>
+                <li>Scroll down to find the "Channel ID" (starts with "C")</li>
+                <li>Copy the Channel ID and paste it in the field above</li>
+              </ol>
+              <p className="text-sm text-gray-400 mt-4">
+                Note: Make sure your Slack bot has been invited to the channel before notifications can be sent.
+              </p>
+            </CardContent>
+          </Card>
+          </>
+        )}
       </div>
     </AdminLayout>
   );

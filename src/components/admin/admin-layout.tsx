@@ -55,7 +55,7 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/car-rental", label: "Car Rental", icon: Key, roles: ["admin"] },
   { href: "/admin/hr", label: "Human Resources", icon: Briefcase, roles: ["admin"] },
   { href: "/admin/payroll", label: "Payroll", icon: DollarSign, roles: ["admin"] },
-  { href: "/admin/settings", label: "Settings", icon: Settings, roles: ["admin"] },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/admin/turo-guide", label: "Turo Guide", icon: BookOpen },
   { href: "/admin/training-manual", label: "Training Manual", icon: GraduationCap },
   { href: "/admin/testimonials", label: "Client Testimonials", icon: Star },
