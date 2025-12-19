@@ -95,6 +95,13 @@ interface ClientDetail {
     lastOilChange?: string | null;
     fuelType?: string | null;
     registrationExpiration?: string | null;
+    owner?: {
+      firstName?: string;
+      lastName?: string;
+      email?: string | null;
+      phone?: string | null;
+    } | null;
+    contactPhone?: string | null;
   }>;
   onboarding?: {
     id: number;
@@ -1368,9 +1375,9 @@ export default function ClientDetailPage() {
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Make</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Year</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Model/Specs</TableHead>
+                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Contact</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">VIN #</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Plate #</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Lic/Reg Date</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Gas</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Tire Size</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Oil Type</TableHead>
@@ -1380,11 +1387,17 @@ export default function ClientDetailPage() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {client.cars.map((car, index) => (
+                          {client.cars.map((car, index) => {
+                            // Determine Management value based on owner name
+                            const ownerFullName = car.owner 
+                              ? `${car.owner.firstName || ''} ${car.owner.lastName || ''}`.trim()
+                              : '';
+                            const managementValue = ownerFullName === "Jay Barton" ? "Own" : "Manage";
+
+                            return (
                             <TableRow
                               key={car.id}
-                              className="border-[#2a2a2a] hover:bg-gray-800/50 cursor-pointer transition-colors"
-                              onClick={() => setLocation(`/admin/cars/${car.id}`)}
+                              className="border-[#2a2a2a] hover:bg-gray-800/50 transition-colors"
                             >
                               <TableCell className="text-center text-[#EAEB80] px-4 py-3 align-middle">
                                 {index + 1}
@@ -1401,11 +1414,20 @@ export default function ClientDetailPage() {
                                   {car.status === "available" ? "Available" : "Off Fleet"}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-left text-white px-4 py-3 align-middle">
-                                {car.mileage.toLocaleString()} mi
+                              <TableCell className="text-left px-4 py-3 align-middle">
+                                <a
+                                  href={`/admin/cars/${car.id}`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setLocation(`/admin/cars/${car.id}`);
+                                  }}
+                                  className="text-[#EAEB80] hover:underline"
+                                >
+                                  View Stats
+                                </a>
                               </TableCell>
                               <TableCell className="text-left text-white px-4 py-3 align-middle">
-                                -
+                                {managementValue}
                               </TableCell>
                               <TableCell className="text-left text-white px-4 py-3 align-middle">
                                 {car.make || "N/A"}
@@ -1416,14 +1438,14 @@ export default function ClientDetailPage() {
                               <TableCell className="text-left text-white px-4 py-3 align-middle">
                                 {car.model || "N/A"}
                               </TableCell>
+                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                                {car.contactPhone || car.owner?.phone || "N/A"}
+                              </TableCell>
                               <TableCell className="text-left text-white font-mono text-sm px-4 py-3 align-middle">
                                 {car.vin}
                               </TableCell>
                               <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
                                 {car.licensePlate || "N/A"}
-                              </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
-                                {formatDate(car.registrationExpiration)}
                               </TableCell>
                               <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
                                 {car.fuelType || "N/A"}
@@ -1456,7 +1478,8 @@ export default function ClientDetailPage() {
                                 </a>
                               </TableCell>
                             </TableRow>
-                          ))}
+                            );
+                          })}
                         </TableBody>
                       </Table>
                     </div>

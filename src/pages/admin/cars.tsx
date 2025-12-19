@@ -61,17 +61,18 @@ interface Car {
   offboardNote: string | null;
   offboardAt: string | null;
   userId?: number | null;
-  owner?: {
-    firstName: string;
-    lastName: string;
-    email: string | null;
-  } | null;
-  photos?: string[];
   tireSize?: string | null;
   oilType?: string | null;
   lastOilChange?: string | null;
   fuelType?: string | null;
   registrationExpiration?: string | null;
+  contactPhone?: string | null;
+  owner?: {
+    firstName: string;
+    lastName: string;
+    email: string | null;
+    phone?: string | null;
+  } | null;
 }
 
 const carSchema = z.object({
@@ -492,6 +493,9 @@ export default function CarsPage() {
                       Management
                     </th>
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Owner
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                       Make
                     </th>
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
@@ -501,13 +505,13 @@ export default function CarsPage() {
                       Model/Specs
                     </th>
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Contact
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                       VIN #
                     </th>
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                       Plate #
-                    </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
-                      Lic/Reg Date
                     </th>
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                       Gas
@@ -526,9 +530,6 @@ export default function CarsPage() {
                     </th>
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                       Admin Turo Link
-                    </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
-                      Owner
                     </th>
                     {isAdmin && (
                       <th className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
@@ -566,11 +567,16 @@ export default function CarsPage() {
                         }
                       };
 
+                      // Determine Management value based on owner name
+                      const ownerFullName = car.owner 
+                        ? `${car.owner.firstName || ''} ${car.owner.lastName || ''}`.trim()
+                        : '';
+                      const managementValue = ownerFullName === "Jay Barton" ? "Own" : "Manage";
+
                       return (
                         <tr
                           key={car.id}
-                          className="hover:bg-[#252525] transition-colors cursor-pointer group border-b border-[#2a2a2a]"
-                          onClick={() => setLocation(`/admin/cars/${car.id}`)}
+                          className="hover:bg-[#252525] transition-colors group border-b border-[#2a2a2a]"
                         >
                           <td className="text-center text-[#EAEB80] px-4 py-3 align-middle">
                             {index + 1}
@@ -589,11 +595,38 @@ export default function CarsPage() {
                                 : "Off Fleet"}
                             </Badge>
                           </td>
-                          <td className="text-left text-white px-4 py-3 align-middle">
-                            {car.mileage?.toLocaleString() || "0"} mi
+                          <td className="text-left px-4 py-3 align-middle">
+                            <a
+                              href={`/admin/cars/${car.id}`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setLocation(`/admin/cars/${car.id}`);
+                              }}
+                              className="text-[#EAEB80] hover:underline"
+                            >
+                              View Stats
+                            </a>
                           </td>
                           <td className="text-left text-white px-4 py-3 align-middle">
-                            -
+                            {managementValue}
+                          </td>
+                          <td className="text-left px-4 py-3 align-middle">
+                            {car.owner ? (
+                              <div>
+                                <div className="text-white text-sm">
+                                  {car.owner.firstName} {car.owner.lastName}
+                                </div>
+                                {car.owner.email && (
+                                  <div className="text-gray-500 text-xs">
+                                    {car.owner.email}
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-gray-600 text-sm">
+                                Unassigned
+                              </span>
+                            )}
                           </td>
                           <td className="text-left text-white px-4 py-3 align-middle">
                             {car.make || "N/A"}
@@ -604,14 +637,14 @@ export default function CarsPage() {
                           <td className="text-left text-white px-4 py-3 align-middle">
                             {car.model || "N/A"}
                           </td>
+                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                            {car.contactPhone || car.owner?.phone || "N/A"}
+                          </td>
                           <td className="text-left text-white font-mono text-sm px-4 py-3 align-middle">
                             {car.vin || "N/A"}
                           </td>
                           <td className="text-left text-gray-400 px-4 py-3 align-middle">
                             {car.licensePlate || "N/A"}
-                          </td>
-                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
-                            {formatDate(car.registrationExpiration)}
                           </td>
                           <td className="text-left text-gray-400 px-4 py-3 align-middle">
                             {car.fuelType || "N/A"}
@@ -642,24 +675,6 @@ export default function CarsPage() {
                             >
                               <ExternalLink className="w-4 h-4" />
                             </a>
-                          </td>
-                          <td className="text-left px-4 py-3 align-middle">
-                            {car.owner ? (
-                              <div>
-                                <div className="text-white text-sm">
-                                  {car.owner.firstName} {car.owner.lastName}
-                                </div>
-                                {car.owner.email && (
-                                  <div className="text-gray-500 text-xs">
-                                    {car.owner.email}
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-gray-600 text-sm">
-                                Unassigned
-                              </span>
-                            )}
                           </td>
                           {isAdmin && (
                             <td className="px-4 py-3 text-right">
