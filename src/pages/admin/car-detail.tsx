@@ -516,14 +516,18 @@ export default function CarDetailPage() {
           <CardContent>
             {car.photos && car.photos.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {car.photos.map((photo, index) => (
+                {car.photos.map((photo, index) => {
+                  // Construct full URL using backend API base URL
+                  // photo path is like "/car-photos/66/filename.png"
+                  const photoUrl = buildApiUrl(photo.startsWith('/') ? photo : `/${photo}`);
+                  return (
                   <div key={index} className="relative group">
                     <img
-                      src={photo.startsWith('/') ? photo : `/${photo}`}
+                      src={photoUrl}
                       alt={`Car photo ${index + 1}`}
                       className="w-full h-48 object-cover rounded-lg border border-[#2a2a2a]"
                       onError={(e) => {
-                        console.error('Failed to load photo:', photo);
+                        console.error('Failed to load photo:', photoUrl);
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
@@ -547,7 +551,8 @@ export default function CarDetailPage() {
                       />
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className="text-gray-400 text-center py-8">
