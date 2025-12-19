@@ -159,7 +159,7 @@ function CarCard({ car }: { car: Partial<Car> }) {
             <p className="text-sm text-muted-foreground">{car.exteriorColor}</p>
           </div>
           <p className="text-xl font-semibold text-primary whitespace-nowrap">
-            {formatPrice(car.price || "0")}
+            {formatPrice(String(car.price || "0"))}
           </p>
         </div>
 
@@ -290,7 +290,7 @@ export default function Fleet() {
     let matchesPrice = true;
     if (priceRange !== "all") {
       const [min, max] = priceRange.split("-").map(Number);
-      const price = parseFloat(car.price || "0");
+      const price = parseFloat(String(car.price || "0"));
       matchesPrice = price >= min && price <= max;
     }
 

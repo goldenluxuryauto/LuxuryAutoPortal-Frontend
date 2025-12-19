@@ -6,7 +6,7 @@ import QuickLinks from "@/components/admin/QuickLinks";
 
 export default function AdminDashboard() {
   // Fetch user role information
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{ user?: { isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean; firstName?: string; lastName?: string; roleName?: string } }>({
     queryKey: ["/api/auth/me"],
     retry: false,
   });
@@ -16,7 +16,7 @@ export default function AdminDashboard() {
   const isClient = user?.isClient || false;
   const isEmployee = user?.isEmployee || false;
 
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading } = useQuery<{ activeVehicles?: number; totalClients?: number; monthlyRevenue?: number; growthRate?: number }>({
     queryKey: ["/api/admin/dashboard"],
     retry: false,
     enabled: !!user, // Only fetch if user is authenticated

@@ -309,6 +309,15 @@ export default function Onboarding() {
       if (!response.ok) {
         const error = await response.json();
         // console.error("❌ [FRONTEND] Response error:", error);
+        
+        // If error has a specific field (like VIN duplicate), set form error
+        if (error.field && error.message) {
+          form.setError(error.field as keyof OnboardingFormData, {
+            type: "manual",
+            message: error.message,
+          });
+        }
+        
         throw new Error(error.message || "Submission failed");
       }
 

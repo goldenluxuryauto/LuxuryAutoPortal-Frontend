@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, buildApiUrl } from "@/lib/queryClient";
-import { Plus, Edit, Trash2, Search, Loader2, X, LogOut } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Loader2, X, LogOut, ExternalLink } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
@@ -50,6 +50,8 @@ interface Car {
   id: number;
   vin: string;
   makeModel: string;
+  make?: string | null;
+  model?: string | null;
   licensePlate: string | null;
   year: number | null;
   color: string | null;
@@ -65,6 +67,11 @@ interface Car {
     email: string | null;
   } | null;
   photos?: string[];
+  tireSize?: string | null;
+  oilType?: string | null;
+  lastOilChange?: string | null;
+  fuelType?: string | null;
+  registrationExpiration?: string | null;
 }
 
 const carSchema = z.object({
@@ -106,7 +113,7 @@ export default function CarsPage() {
   const queryClient = useQueryClient();
 
   // Get current user to check if admin
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{ user?: { isAdmin?: boolean } }>({
     queryKey: ["/api/auth/me"],
     retry: false,
   });
@@ -472,32 +479,59 @@ export default function CarsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#2a2a2a]">
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                      VIN
+                    <th className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3 w-12">
+                      #
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                      Make & Model
-                    </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                      Year
-                    </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                      Color
-                    </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                      Mileage
-                    </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
-                      License Plate
-                    </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                       Status
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Stats
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Management
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Make
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Year
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Model/Specs
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      VIN #
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Plate #
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Lic/Reg Date
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Gas
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Tire Size
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Oil Type
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Last Oil Change
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Turo Link
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      Admin Turo Link
+                    </th>
+                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                       Owner
                     </th>
                     {isAdmin && (
-                      <th className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <th className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                         Actions
                       </th>
                     )}
@@ -511,53 +545,37 @@ export default function CarsPage() {
                           key={`skeleton-${i}`}
                           className="border-b border-[#2a2a2a]"
                         >
-                          <td colSpan={isAdmin ? 9 : 8} className="px-6 py-4">
+                          <td colSpan={isAdmin ? 18 : 17} className="px-4 py-3">
                             <div className="h-4 bg-[#252525] rounded animate-pulse" />
                           </td>
                         </tr>
                       ))}
                     </>
                   ) : cars.length > 0 ? (
-                    cars.map((car) => {
+                    cars.map((car, index) => {
+                      const formatDate = (dateStr: string | null | undefined): string => {
+                        if (!dateStr) return "N/A";
+                        try {
+                          return new Date(dateStr).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          });
+                        } catch {
+                          return "N/A";
+                        }
+                      };
+
                       return (
                         <tr
                           key={car.id}
-                          className="hover:bg-[#252525] transition-colors cursor-pointer group"
+                          className="hover:bg-[#252525] transition-colors cursor-pointer group border-b border-[#2a2a2a]"
                           onClick={() => setLocation(`/admin/cars/${car.id}`)}
                         >
-                          <td className="px-6 py-4">
-                            <span className="text-white font-mono text-sm">
-                              {car.vin || "N/A"}
-                            </span>
+                          <td className="text-center text-[#EAEB80] px-4 py-3 align-middle">
+                            {index + 1}
                           </td>
-                          <td className="px-6 py-4">
-                            <span className="text-white font-medium">
-                              {car.makeModel || "N/A"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-white">
-                              {car.year || "N/A"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-gray-400">
-                              {car.color || "N/A"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-gray-400">
-                              {car.mileage?.toLocaleString() || "0"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-gray-400 font-mono text-sm">
-                              {car.licensePlate || (
-                                <span className="text-gray-600">N/A</span>
-                              )}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
+                          <td className="text-left px-4 py-3 align-middle">
                             <Badge
                               variant="outline"
                               className={getStatusBadgeColor(car.status)}
@@ -571,7 +589,61 @@ export default function CarsPage() {
                                 : "Off Fleet"}
                             </Badge>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="text-left text-white px-4 py-3 align-middle">
+                            {car.mileage?.toLocaleString() || "0"} mi
+                          </td>
+                          <td className="text-left text-white px-4 py-3 align-middle">
+                            -
+                          </td>
+                          <td className="text-left text-white px-4 py-3 align-middle">
+                            {car.make || "N/A"}
+                          </td>
+                          <td className="text-left text-white px-4 py-3 align-middle">
+                            {car.year || "N/A"}
+                          </td>
+                          <td className="text-left text-white px-4 py-3 align-middle">
+                            {car.model || "N/A"}
+                          </td>
+                          <td className="text-left text-white font-mono text-sm px-4 py-3 align-middle">
+                            {car.vin || "N/A"}
+                          </td>
+                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                            {car.licensePlate || "N/A"}
+                          </td>
+                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                            {formatDate(car.registrationExpiration)}
+                          </td>
+                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                            {car.fuelType || "N/A"}
+                          </td>
+                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                            {car.tireSize || "N/A"}
+                          </td>
+                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                            {car.oilType || "N/A"}
+                          </td>
+                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                            {formatDate(car.lastOilChange)}
+                          </td>
+                          <td className="text-left px-4 py-3 align-middle">
+                            <a
+                              href="#"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[#EAEB80] hover:underline"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          </td>
+                          <td className="text-left px-4 py-3 align-middle">
+                            <a
+                              href="#"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[#EAEB80] hover:underline"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          </td>
+                          <td className="text-left px-4 py-3 align-middle">
                             {car.owner ? (
                               <div>
                                 <div className="text-white text-sm">
@@ -590,7 +662,7 @@ export default function CarsPage() {
                             )}
                           </td>
                           {isAdmin && (
-                            <td className="px-6 py-4 text-right">
+                            <td className="px-4 py-3 text-right">
                               <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Button
                                   variant="ghost"
@@ -647,7 +719,7 @@ export default function CarsPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={isAdmin ? 9 : 8} className="px-6 py-12 text-center">
+                      <td colSpan={isAdmin ? 18 : 17} className="px-4 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <p className="text-gray-400 text-lg">No cars found</p>
                           <p className="text-gray-500 text-sm">

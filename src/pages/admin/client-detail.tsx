@@ -326,6 +326,21 @@ export default function ClientDetailPage() {
         bankName: data.bankName,
         bankRoutingNumber: data.routingNumber,
         bankAccountNumber: data.accountNumber,
+        // Financial Information
+        purchasePrice: data.purchasePrice,
+        downPayment: data.downPayment,
+        monthlyPayment: data.monthlyPayment,
+        interestRate: data.interestRate,
+        transportCityToCity: data.transportCityToCity,
+        ultimateGoal: data.ultimateGoal,
+        // Insurance Information
+        insuranceProvider: data.insuranceProvider,
+        insurancePhone: data.insurancePhone,
+        policyNumber: data.policyNumber,
+        insuranceExpiration: data.insuranceExpiration,
+        // Additional Information
+        carManufacturerWebsite: data.carManufacturerWebsite,
+        carManufacturerUsername: data.carManufacturerUsername,
       };
       
       const response = await fetch(buildApiUrl(endpoint), {
@@ -454,6 +469,21 @@ export default function ClientDetailPage() {
         bankName: data.bankName || "",
         routingNumber: data.routingNumber || "",
         accountNumber: data.accountNumber || "",
+        // Financial Information
+        purchasePrice: data.purchasePrice || "",
+        downPayment: data.downPayment || "",
+        monthlyPayment: data.monthlyPayment || "",
+        interestRate: data.interestRate || "",
+        transportCityToCity: data.transportCityToCity || "",
+        ultimateGoal: data.ultimateGoal || "",
+        // Insurance Information
+        insuranceProvider: data.insuranceProvider || "",
+        insurancePhone: data.insurancePhone || "",
+        policyNumber: data.policyNumber || "",
+        insuranceExpiration: data.insuranceExpiration || "",
+        // Additional Information
+        carManufacturerWebsite: data.carManufacturerWebsite || "",
+        carManufacturerUsername: data.carManufacturerUsername || "",
       });
     } else if (client) {
       // Manually created client - use client data
@@ -477,6 +507,21 @@ export default function ClientDetailPage() {
         bankName: client?.bankName || "",
         routingNumber: client?.bankRoutingNumber || "",
         accountNumber: client?.bankAccountNumber || "",
+        // Financial Information
+        purchasePrice: "",
+        downPayment: "",
+        monthlyPayment: "",
+        interestRate: "",
+        transportCityToCity: "",
+        ultimateGoal: "",
+        // Insurance Information
+        insuranceProvider: "",
+        insurancePhone: "",
+        policyNumber: "",
+        insuranceExpiration: "",
+        // Additional Information
+        carManufacturerWebsite: "",
+        carManufacturerUsername: "",
       });
     }
     setIsEditModalOpen(true);
@@ -2051,6 +2096,144 @@ export default function ClientDetailPage() {
                     value={editFormData.accountNumber || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, accountNumber: e.target.value })}
                     className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Financial Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+                Financial Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Purchase Price</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={editFormData.purchasePrice || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, purchasePrice: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Down Payment</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={editFormData.downPayment || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, downPayment: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Monthly Payment</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={editFormData.monthlyPayment || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, monthlyPayment: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Interest Rate (%)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={editFormData.interestRate || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, interestRate: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Transport City to City</Label>
+                  <Input
+                    value={editFormData.transportCityToCity || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, transportCityToCity: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Ultimate Goal</Label>
+                  <Input
+                    value={editFormData.ultimateGoal || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, ultimateGoal: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Insurance Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+                Insurance Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Provider</Label>
+                  <Input
+                    value={editFormData.insuranceProvider || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, insuranceProvider: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Phone</Label>
+                  <Input
+                    value={editFormData.insurancePhone || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, insurancePhone: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Policy Number</Label>
+                  <Input
+                    value={editFormData.policyNumber || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, policyNumber: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Expiration</Label>
+                  <Input
+                    type="date"
+                    value={editFormData.insuranceExpiration ? editFormData.insuranceExpiration.split("T")[0] : ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, insuranceExpiration: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+                Additional Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Car Manufacturer Website</Label>
+                  <Input
+                    type="url"
+                    value={editFormData.carManufacturerWebsite || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, carManufacturerWebsite: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    placeholder="https://example.com"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Manufacturer Username</Label>
+                  <Input
+                    value={editFormData.carManufacturerUsername || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, carManufacturerUsername: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
                   />
                 </div>
               </div>

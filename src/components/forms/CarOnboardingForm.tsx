@@ -53,7 +53,7 @@ export default function CarOnboardingForm() {
   const [selectedCarId, setSelectedCarId] = useState<string>("");
 
   // Get current user data
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{ user?: { firstName?: string; lastName?: string; id?: number } }>({
     queryKey: ["/api/auth/me"],
     retry: false,
   });

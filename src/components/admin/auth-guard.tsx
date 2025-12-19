@@ -10,7 +10,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const [, setLocation] = useLocation();
   const [isChecking, setIsChecking] = useState(true);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error } = useQuery<{ user?: { id?: number; email?: string; isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean } }>({
     queryKey: ["/api/auth/me"],
     retry: false,
     staleTime: 1000 * 60 * 5,
