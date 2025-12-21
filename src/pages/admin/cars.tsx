@@ -56,7 +56,7 @@ interface Car {
   year: number | null;
   color: string | null;
   mileage: number;
-  status: "available" | "in_use" | "maintenance" | "off_fleet";
+  status: "ACTIVE" | "INACTIVE";
   offboardReason: "sold" | "damaged" | "end_lease" | "other" | null;
   offboardNote: string | null;
   offboardAt: string | null;
@@ -67,6 +67,8 @@ interface Car {
   fuelType?: string | null;
   registrationExpiration?: string | null;
   contactPhone?: string | null;
+  turoLink?: string | null;
+  adminTuroLink?: string | null;
   owner?: {
     firstName: string;
     lastName: string;
@@ -81,10 +83,20 @@ const carSchema = z.object({
     .min(1, "VIN is required")
     .max(17, "VIN must be 17 characters or less"),
   makeModel: z.string().min(1, "Make & Model is required"),
+  make: z.string().optional(),
+  model: z.string().optional(),
   licensePlate: z.string().optional(),
   year: z.string().optional(),
   color: z.string().optional(),
+  interiorColor: z.string().optional(),
   mileage: z.string().optional(),
+  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+  tireSize: z.string().optional(),
+  oilType: z.string().optional(),
+  lastOilChange: z.string().optional(),
+  fuelType: z.string().optional(),
+  turoLink: z.string().url().optional().or(z.literal("")),
+  adminTuroLink: z.string().url().optional().or(z.literal("")),
 });
 
 type CarFormData = z.infer<typeof carSchema>;
@@ -140,10 +152,20 @@ export default function CarsPage() {
     defaultValues: {
       vin: "",
       makeModel: "",
+      make: "",
+      model: "",
       licensePlate: "",
       year: "",
       color: "",
+      interiorColor: "",
       mileage: "",
+      status: "ACTIVE",
+      tireSize: "",
+      oilType: "",
+      lastOilChange: "",
+      fuelType: "",
+      turoLink: "",
+      adminTuroLink: "",
     },
   });
 
@@ -189,10 +211,20 @@ export default function CarsPage() {
       const formData = new FormData();
       formData.append("vin", data.vin);
       formData.append("makeModel", data.makeModel);
+      if (data.make) formData.append("make", data.make);
+      if (data.model) formData.append("model", data.model);
       if (data.licensePlate) formData.append("licensePlate", data.licensePlate);
       if (data.year) formData.append("year", data.year);
       if (data.color) formData.append("color", data.color);
+      if (data.interiorColor) formData.append("interiorColor", data.interiorColor);
       if (data.mileage) formData.append("mileage", data.mileage);
+      if (data.status) formData.append("status", data.status);
+      if (data.tireSize) formData.append("tireSize", data.tireSize);
+      if (data.oilType) formData.append("oilType", data.oilType);
+      if (data.lastOilChange) formData.append("lastOilChange", data.lastOilChange);
+      if (data.fuelType) formData.append("fuelType", data.fuelType);
+      if (data.turoLink) formData.append("turoLink", data.turoLink);
+      if (data.adminTuroLink) formData.append("adminTuroLink", data.adminTuroLink);
 
       const response = await fetch(buildApiUrl("/api/cars"), {
         method: "POST",
@@ -226,13 +258,36 @@ export default function CarsPage() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: CarFormData }) => {
+      console.log(`📤 [FRONTEND] Update mutation - Full form data:`, data);
+      console.log(`📤 [FRONTEND] Status value:`, data.status, `(type: ${typeof data.status})`);
+      
       const formData = new FormData();
       formData.append("vin", data.vin);
       formData.append("makeModel", data.makeModel);
+      if (data.make) formData.append("make", data.make);
+      if (data.model) formData.append("model", data.model);
       if (data.licensePlate) formData.append("licensePlate", data.licensePlate);
       if (data.year) formData.append("year", data.year);
       if (data.color) formData.append("color", data.color);
+      if (data.interiorColor) formData.append("interiorColor", data.interiorColor);
       if (data.mileage) formData.append("mileage", data.mileage);
+      
+      // ALWAYS send status - it's required and should always have a value
+      const statusValue = data.status || "ACTIVE"; // Default to ACTIVE if somehow undefined
+      formData.append("status", statusValue);
+      console.log(`📤 [FRONTEND] Appending status to FormData: "${statusValue}"`);
+      
+      // Debug: Log all FormData entries
+      console.log(`📤 [FRONTEND] FormData entries:`);
+      for (const [key, value] of formData.entries()) {
+        console.log(`   ${key}: ${value}`);
+      }
+      if (data.tireSize) formData.append("tireSize", data.tireSize);
+      if (data.oilType) formData.append("oilType", data.oilType);
+      if (data.lastOilChange) formData.append("lastOilChange", data.lastOilChange);
+      if (data.fuelType) formData.append("fuelType", data.fuelType);
+      if (data.turoLink) formData.append("turoLink", data.turoLink);
+      if (data.adminTuroLink) formData.append("adminTuroLink", data.adminTuroLink);
 
       const response = await fetch(buildApiUrl(`/api/cars/${id}`), {
         method: "PATCH",
@@ -246,8 +301,11 @@ export default function CarsPage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+      // Invalidate all car queries to force refetch
+      queryClient.invalidateQueries({ queryKey: ["/api/cars"], exact: false });
       queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
+      // Force refetch to ensure UI updates immediately
+      queryClient.refetchQueries({ queryKey: ["/api/cars"], exact: false });
       toast({
         title: "Success",
         description: "Car updated successfully",
@@ -355,10 +413,20 @@ export default function CarsPage() {
     form.reset({
       vin: "",
       makeModel: "",
+      make: "",
+      model: "",
       licensePlate: "",
       year: "",
       color: "",
+      interiorColor: "",
       mileage: "",
+      status: "ACTIVE",
+      tireSize: "",
+      oilType: "",
+      lastOilChange: "",
+      fuelType: "",
+      turoLink: "",
+      adminTuroLink: "",
     });
     setIsAddModalOpen(true);
   };
@@ -368,10 +436,20 @@ export default function CarsPage() {
     form.reset({
       vin: car.vin,
       makeModel: car.makeModel,
+      make: car.make || "",
+      model: car.model || "",
       licensePlate: car.licensePlate || "",
       year: car.year?.toString() || "",
       color: car.color || "",
+      interiorColor: "",
       mileage: car.mileage?.toString() || "",
+      status: car.status || "ACTIVE",
+      tireSize: car.tireSize || "",
+      oilType: car.oilType || "",
+      lastOilChange: car.lastOilChange || "",
+      fuelType: car.fuelType || "",
+      turoLink: car.turoLink || "",
+      adminTuroLink: car.adminTuroLink || "",
     });
     setIsEditModalOpen(true);
   };
@@ -390,13 +468,9 @@ export default function CarsPage() {
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
-      case "available":
+      case "ACTIVE":
         return "bg-green-500/20 text-green-400 border-green-500/30";
-      case "in_use":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-      case "maintenance":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-      case "off_fleet":
+      case "INACTIVE":
         return "bg-gray-500/20 text-gray-400 border-gray-500/30";
       default:
         return "bg-gray-500/20 text-gray-400 border-gray-500/30";
@@ -453,10 +527,8 @@ export default function CarsPage() {
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="available">Available</SelectItem>
-                  <SelectItem value="in_use">In Use</SelectItem>
-                  <SelectItem value="maintenance">Maintenance</SelectItem>
-                  <SelectItem value="off_fleet">Off Fleet</SelectItem>
+                  <SelectItem value="ACTIVE">ACTIVE</SelectItem>
+                  <SelectItem value="INACTIVE">INACTIVE</SelectItem>
                 </SelectContent>
               </Select>
               {searchQuery && (
@@ -573,9 +645,13 @@ export default function CarsPage() {
                         : '';
                       const managementValue = ownerFullName === "Jay Barton" ? "Own" : "Manage";
 
+                      // Create unique key to avoid duplicate key warnings
+                      // Use combination of id, index, and vin to ensure uniqueness
+                      const uniqueKey = `car-${car.id}-${index}-${car.vin || 'no-vin'}`;
+
                       return (
                         <tr
-                          key={car.id}
+                          key={uniqueKey}
                           className="hover:bg-[#252525] transition-colors group border-b border-[#2a2a2a]"
                         >
                           <td className="text-center text-[#EAEB80] px-4 py-3 align-middle">
@@ -586,13 +662,11 @@ export default function CarsPage() {
                               variant="outline"
                               className={getStatusBadgeColor(car.status)}
                             >
-                              {car.status === "available"
-                                ? "Available"
-                                : car.status === "in_use"
-                                ? "Rented"
-                                : car.status === "maintenance"
-                                ? "Maintenance"
-                                : "Off Fleet"}
+                              {car.status === "ACTIVE"
+                                ? "ACTIVE"
+                                : car.status === "INACTIVE"
+                                ? "INACTIVE"
+                                : car.status || "ACTIVE"}
                             </Badge>
                           </td>
                           <td className="text-left px-4 py-3 align-middle">
@@ -691,7 +765,7 @@ export default function CarsPage() {
                                 >
                                   <Edit className="w-4 h-4" />
                                 </Button>
-                                {car.status === "available" && (
+                                {car.status === "ACTIVE" && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -780,7 +854,7 @@ export default function CarsPage() {
             }
           }}
         >
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-md">
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold">
                 {selectedCar ? "Edit Car" : "Add New Car"}
@@ -839,6 +913,44 @@ export default function CarsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
+                    name="make"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Make</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            placeholder="Mercedes"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Model</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            placeholder="S580"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
                     name="licensePlate"
                     render={({ field }) => (
                       <FormItem>
@@ -883,7 +995,7 @@ export default function CarsPage() {
                     name="color"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Color</FormLabel>
+                        <FormLabel className="text-gray-400">Exterior Color</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -898,6 +1010,26 @@ export default function CarsPage() {
 
                   <FormField
                     control={form.control}
+                    name="interiorColor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Interior Color</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            placeholder="Black"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
                     name="mileage"
                     render={({ field }) => (
                       <FormItem>
@@ -910,6 +1042,150 @@ export default function CarsPage() {
                             type="number"
                             className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
                             placeholder="0"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Status *</FormLabel>
+                        <Select
+                          onValueChange={(value) => {
+                            console.log(`📝 [FRONTEND] Status changed to: ${value}`);
+                            field.onChange(value);
+                          }}
+                          value={field.value || "ACTIVE"}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectItem value="ACTIVE">ACTIVE</SelectItem>
+                            <SelectItem value="INACTIVE">INACTIVE</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="tireSize"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Tire Size</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            placeholder="225/50R17"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="oilType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Oil Type</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            placeholder="5W-30"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="lastOilChange"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Last Oil Change</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="date"
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="fuelType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Fuel Type</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            placeholder="Premium"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="turoLink"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Turo Link</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="url"
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            placeholder="https://turo.com/us/en/car/..."
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="adminTuroLink"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Admin Turo Link</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="url"
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            placeholder="https://turo.com/us/en/car/..."
                           />
                         </FormControl>
                         <FormMessage />
