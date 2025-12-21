@@ -54,6 +54,7 @@ interface Client {
   roleId: number;
   roleName: string;
   isActive: boolean;
+  status?: number; // 0 = inactive, 1 = active, 3 = blocked
   createdAt: string;
   carCount: number;
 }
@@ -90,6 +91,7 @@ export default function ClientsPage() {
   const [deleteClientId, setDeleteClientId] = useState<number | null>(null);
   const [revokeClientEmail, setRevokeClientEmail] = useState<string | null>(null);
   const [reactivateClientEmail, setReactivateClientEmail] = useState<string | null>(null);
+  const [blockClientEmail, setBlockClientEmail] = useState<string | null>(null);
   const [deleteClientEmail, setDeleteClientEmail] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -286,6 +288,51 @@ export default function ClientsPage() {
     },
   });
 
+  // Block user mutation (permanent block - sets status to 3)
+  const blockUserMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const userId = await getUserIdByEmail(email);
+      if (!userId) {
+        // If user doesn't exist in user table, update client table directly
+        const response = await fetch(buildApiUrl(`/api/clients/block`), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email }),
+        });
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Failed to block client account");
+        }
+        return response.json();
+      }
+      const response = await fetch(buildApiUrl(`/api/users/${userId}/block`), {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to block user account");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      toast({
+        title: "Success",
+        description: "Client account permanently blocked successfully. The user cannot register or access their account.",
+      });
+      setBlockClientEmail(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to block client account",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Reactivate access mutation
   const reactivateAccessMutation = useMutation({
     mutationFn: async (email: string) => {
@@ -405,6 +452,16 @@ export default function ClientsPage() {
   const handleConfirmReactivate = () => {
     if (reactivateClientEmail) {
       reactivateAccessMutation.mutate(reactivateClientEmail);
+    }
+  };
+
+  const handleBlockUser = (email: string) => {
+    setBlockClientEmail(email);
+  };
+
+  const handleConfirmBlock = () => {
+    if (blockClientEmail) {
+      blockUserMutation.mutate(blockClientEmail);
     }
   };
 
@@ -559,12 +616,14 @@ export default function ClientsPage() {
                             <Badge
                               variant="outline"
                               className={cn(
-                                client.isActive
+                                client.status === 3
+                                  ? "bg-red-500/20 text-red-400 border-red-500/30"
+                                  : client.isActive
                                   ? "bg-green-500/20 text-green-400 border-green-500/30"
                                   : "bg-gray-500/20 text-gray-400 border-gray-500/30"
                               )}
                             >
-                              {client.isActive ? "Active" : "Inactive"}
+                              {client.status === 3 ? "Blocked" : client.isActive ? "Active" : "Inactive"}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-left text-gray-400 px-6 py-4 align-middle">
@@ -606,7 +665,7 @@ export default function ClientsPage() {
                                   )}
                                 </Button>
                               )}
-                              {client.isActive && (
+                              {client.status !== 3 && client.isActive && (
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -618,6 +677,20 @@ export default function ClientsPage() {
                                   title="Suspend Access (Temporary)"
                                 >
                                   Suspend
+                                </Button>
+                              )}
+                              {client.status !== 3 && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBlockUser(client.email);
+                                  }}
+                                  title="Permanently Block Account"
+                                >
+                                  Block
                                 </Button>
                               )}
                               <Button
@@ -898,6 +971,46 @@ export default function ClientsPage() {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 )}
                 Suspend Access
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Block Account Confirmation Dialog */}
+        <Dialog open={blockClientEmail !== null} onOpenChange={(open) => !open && setBlockClientEmail(null)}>
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-red-400">Permanently Block Account</DialogTitle>
+              <DialogDescription className="text-gray-400">
+                This will permanently block the client account. The user will not be able to register or access their account.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <p className="text-gray-300 mb-4">
+                Are you sure you want to permanently block <strong>{blockClientEmail}</strong>?
+              </p>
+              <p className="text-yellow-400 text-sm mb-4">
+                ⚠️ This action cannot be undone. The account will be permanently blocked.
+              </p>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setBlockClientEmail(null)}
+                className="border-[#2a2a2a] text-gray-400 hover:text-white"
+                disabled={blockUserMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmBlock}
+                className="bg-red-600 text-white hover:bg-red-700"
+                disabled={blockUserMutation.isPending}
+              >
+                {blockUserMutation.isPending && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                Permanently Block
               </Button>
             </div>
           </DialogContent>
