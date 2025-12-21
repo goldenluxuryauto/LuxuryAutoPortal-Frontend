@@ -261,6 +261,7 @@ export default function AdminsPage() {
     }
   };
 
+
   const quickLinkCreateMutation = useMutation({
     mutationFn: async (data: QuickLinkFormData) => {
       const response = await apiRequest("POST", "/api/admin/quick-links", data);
@@ -514,16 +515,18 @@ export default function AdminsPage() {
                           {format(new Date(user.createdAt), "MMM d, yyyy")}
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-gray-400 hover:text-white"
-                            onClick={() => handleEditClick(user)}
-                            data-testid={`button-edit-admin-${user.id}`}
-                          >
-                            <Pencil className="w-4 h-4 mr-1" />
-                            Edit
-                          </Button>
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-gray-400 hover:text-white"
+                              onClick={() => handleEditClick(user)}
+                              data-testid={`button-edit-admin-${user.id}`}
+                            >
+                              <Pencil className="w-4 h-4 mr-1" />
+                              Edit
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -1040,6 +1043,7 @@ export default function AdminsPage() {
             </Form>
           </DialogContent>
         </Dialog>
+
       </div>
     </AdminLayout>
   );

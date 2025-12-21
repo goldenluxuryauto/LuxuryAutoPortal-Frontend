@@ -88,6 +88,9 @@ export default function ClientsPage() {
   }, [itemsPerPage]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [deleteClientId, setDeleteClientId] = useState<number | null>(null);
+  const [revokeClientEmail, setRevokeClientEmail] = useState<string | null>(null);
+  const [reactivateClientEmail, setReactivateClientEmail] = useState<string | null>(null);
+  const [deleteClientEmail, setDeleteClientEmail] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -215,6 +218,196 @@ export default function ClientsPage() {
     }
   };
 
+  // Helper function to get user ID from email
+  const getUserIdByEmail = async (email: string): Promise<number | null> => {
+    try {
+      const encodedEmail = encodeURIComponent(email);
+      const response = await fetch(buildApiUrl(`/api/users/by-email/${encodedEmail}`), {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "User not found" }));
+        console.error("Error fetching user ID:", errorData.error);
+        return null;
+      }
+      const data = await response.json();
+      if (data.success && data.data) {
+        return data.data.id;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching user ID:", error);
+      return null;
+    }
+  };
+
+  // Revoke access mutation (suspend - temporary)
+  const revokeAccessMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const userId = await getUserIdByEmail(email);
+      if (!userId) {
+        // If user doesn't exist in user table, update client table directly
+        const response = await fetch(buildApiUrl(`/api/clients/revoke-access`), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email }),
+        });
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Failed to revoke client access");
+        }
+        return response.json();
+      }
+      const response = await fetch(buildApiUrl(`/api/users/${userId}/revoke`), {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to revoke user access");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      toast({
+        title: "Success",
+        description: "Client access revoked successfully. The user can no longer log in.",
+      });
+      setRevokeClientEmail(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to revoke client access",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Reactivate access mutation
+  const reactivateAccessMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const userId = await getUserIdByEmail(email);
+      if (!userId) {
+        // If user doesn't exist in user table, update client table directly
+        const response = await fetch(buildApiUrl(`/api/clients/reactivate-access`), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email }),
+        });
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Failed to reactivate client access");
+        }
+        return response.json();
+      }
+      const response = await fetch(buildApiUrl(`/api/users/${userId}/reactivate`), {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to reactivate user access");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      toast({
+        title: "Success",
+        description: "Client access reactivated successfully. The user can now log in again.",
+      });
+      setReactivateClientEmail(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reactivate client access",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete user mutation (permanent) - deletes both client and user
+  const deleteUserMutation = useMutation({
+    mutationFn: async ({ clientId, email }: { clientId: number; email: string }) => {
+      // First delete the client
+      const clientResponse = await fetch(buildApiUrl(`/api/clients/${clientId}`), {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!clientResponse.ok) {
+        const error = await clientResponse.json();
+        throw new Error(error.error || "Failed to delete client");
+      }
+
+      // Then delete the user account
+      const userId = await getUserIdByEmail(email);
+      if (userId) {
+        const userResponse = await fetch(buildApiUrl(`/api/users/${userId}`), {
+          method: "DELETE",
+          credentials: "include",
+        });
+        if (!userResponse.ok) {
+          const error = await userResponse.json();
+          throw new Error(error.error || "Failed to delete user account");
+        }
+      }
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      toast({
+        title: "Success",
+        description: "Client and user account permanently deleted. All related data has been removed.",
+      });
+      setDeleteClientEmail(null);
+      setDeleteClientId(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete client",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleRevokeAccess = (clientEmail: string) => {
+    setRevokeClientEmail(clientEmail);
+  };
+
+  const handleConfirmRevoke = () => {
+    if (revokeClientEmail) {
+      revokeAccessMutation.mutate(revokeClientEmail);
+    }
+  };
+
+  const handleDeleteUser = (clientId: number, clientEmail: string) => {
+    setDeleteClientId(clientId);
+    setDeleteClientEmail(clientEmail);
+  };
+
+  const handleConfirmDeleteUser = () => {
+    if (deleteClientId && deleteClientEmail) {
+      deleteUserMutation.mutate({ clientId: deleteClientId, email: deleteClientEmail });
+    }
+  };
+
+  const handleReactivateAccess = (clientEmail: string) => {
+    setReactivateClientEmail(clientEmail);
+  };
+
+  const handleConfirmReactivate = () => {
+    if (reactivateClientEmail) {
+      reactivateAccessMutation.mutate(reactivateClientEmail);
+    }
+  };
+
   const onSubmit = (data: ClientFormData) => {
     createMutation.mutate(data);
   };
@@ -312,25 +505,24 @@ export default function ClientsPage() {
                     <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 min-w-[140px]">Joined Date</TableHead>
                     <TableHead className="text-center text-[#EAEB80] font-medium px-6 py-4 w-32">Counts of Cars</TableHead>
                     <TableHead className="text-center text-[#EAEB80] font-medium px-6 py-4 w-28">Actions</TableHead>
-                    <TableHead className="text-center text-[#EAEB80] font-medium px-6 py-4 w-24">Delete</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8">
+                      <TableCell colSpan={9} className="text-center py-8">
                         <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#EAEB80]" />
                       </TableCell>
                     </TableRow>
                   ) : error ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8 text-red-400">
+                      <TableCell colSpan={9} className="text-center py-8 text-red-400">
                         Database connection failed. Please try again.
                       </TableCell>
                     </TableRow>
                   ) : clients.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8 text-gray-400">
+                      <TableCell colSpan={9} className="text-center py-8 text-gray-400">
                         No clients found. Try adjusting your search or filters.
                       </TableCell>
                     </TableRow>
@@ -382,28 +574,65 @@ export default function ClientsPage() {
                             {client.carCount}
                           </TableCell>
                           <TableCell className="text-center px-6 py-4 align-middle">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleViewClient(client.id);
-                              }}
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              View
-                            </Button>
-                          </TableCell>
-                          <TableCell className="text-center px-6 py-4 align-middle">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-red-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={(e) => handleDeleteClick(e, client.id, `${client.firstName} ${client.lastName}`)}
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </Button>
+                            <div className="flex items-center justify-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleViewClient(client.id);
+                                }}
+                              >
+                                <Eye className="w-4 h-4 mr-1" />
+                                View
+                              </Button>
+                              {!client.isActive && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-green-400 hover:text-green-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleReactivateAccess(client.email);
+                                  }}
+                                  disabled={reactivateAccessMutation.isPending}
+                                  title="Grant/Reactivate Access"
+                                >
+                                  {reactivateAccessMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    "Grant Access"
+                                  )}
+                                </Button>
+                              )}
+                              {client.isActive && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-yellow-400 hover:text-yellow-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRevokeAccess(client.email);
+                                  }}
+                                  title="Suspend Access (Temporary)"
+                                >
+                                  Suspend
+                                </Button>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteUser(client.id, client.email);
+                                }}
+                                title="Permanently Delete User"
+                              >
+                                <Trash2 className="w-5 h-5" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
@@ -602,8 +831,8 @@ export default function ClientsPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Delete Confirmation Modal */}
-        <Dialog open={deleteClientId !== null} onOpenChange={(open) => !open && setDeleteClientId(null)}>
+        {/* Delete Client Only Confirmation Modal */}
+        <Dialog open={deleteClientId !== null && deleteClientEmail === null} onOpenChange={(open) => !open && setDeleteClientId(null)}>
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold text-red-400">Delete Client</DialogTitle>
@@ -631,6 +860,123 @@ export default function ClientsPage() {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 )}
                 Confirm Delete
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Revoke Access Confirmation Dialog */}
+        <Dialog open={revokeClientEmail !== null} onOpenChange={(open) => !open && setRevokeClientEmail(null)}>
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-yellow-400">Suspend Client Access</DialogTitle>
+              <DialogDescription className="text-gray-400">
+                {revokeClientEmail && clients.find(c => c.email === revokeClientEmail) && (
+                  <>
+                    Are you sure you want to suspend access for <strong className="text-white">{clients.find(c => c.email === revokeClientEmail)?.firstName} {clients.find(c => c.email === revokeClientEmail)?.lastName}</strong>?
+                    <br /><br />
+                    This will temporarily revoke their login access. The client's data will be preserved and can be reactivated later.
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-end gap-3 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setRevokeClientEmail(null)}
+                className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                disabled={revokeAccessMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmRevoke}
+                className="bg-yellow-600 text-white hover:bg-yellow-700"
+                disabled={revokeAccessMutation.isPending}
+              >
+                {revokeAccessMutation.isPending && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                Suspend Access
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Grant/Reactivate Access Confirmation Dialog */}
+        <Dialog open={reactivateClientEmail !== null} onOpenChange={(open) => !open && setReactivateClientEmail(null)}>
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-green-400">Grant Client Access</DialogTitle>
+              <DialogDescription className="text-gray-400">
+                {reactivateClientEmail && clients.find(c => c.email === reactivateClientEmail) && (
+                  <>
+                    Are you sure you want to grant access for <strong className="text-white">{clients.find(c => c.email === reactivateClientEmail)?.firstName} {clients.find(c => c.email === reactivateClientEmail)?.lastName}</strong>?
+                    <br /><br />
+                    This will restore their login access. The client will be able to log in and access their account again.
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-end gap-3 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setReactivateClientEmail(null)}
+                className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                disabled={reactivateAccessMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmReactivate}
+                className="bg-green-600 text-white hover:bg-green-700"
+                disabled={reactivateAccessMutation.isPending}
+              >
+                {reactivateAccessMutation.isPending && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                Grant Access
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete User Confirmation Dialog */}
+        <Dialog open={deleteClientEmail !== null && deleteClientId !== null} onOpenChange={(open) => !open && (setDeleteClientEmail(null), setDeleteClientId(null))}>
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-red-400">Permanently Delete Client</DialogTitle>
+              <DialogDescription className="text-gray-400">
+                {deleteClientId && deleteClientEmail && clients.find(c => c.id === deleteClientId) && (
+                  <>
+                    Are you sure you want to permanently delete <strong className="text-white">{clients.find(c => c.id === deleteClientId)?.firstName} {clients.find(c => c.id === deleteClientId)?.lastName}</strong>?
+                    <br /><br />
+                    <span className="text-red-400 font-semibold">Warning:</span> This action cannot be undone. All client data, user account, cars, contracts, and related information will be permanently deleted.
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-end gap-3 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDeleteClientEmail(null);
+                  setDeleteClientId(null);
+                }}
+                className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                disabled={deleteUserMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmDeleteUser}
+                className="bg-red-600 text-white hover:bg-red-700"
+                disabled={deleteUserMutation.isPending}
+              >
+                {deleteUserMutation.isPending && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                Delete Permanently
               </Button>
             </div>
           </DialogContent>
