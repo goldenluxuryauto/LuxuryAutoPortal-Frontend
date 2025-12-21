@@ -87,6 +87,7 @@ export default function ClientsPage() {
   useEffect(() => {
     localStorage.setItem("clients_limit", itemsPerPage.toString());
   }, [itemsPerPage]);
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [deleteClientId, setDeleteClientId] = useState<number | null>(null);
   const [revokeClientEmail, setRevokeClientEmail] = useState<string | null>(null);
@@ -110,7 +111,10 @@ export default function ClientsPage() {
     placeholderData: keepPreviousData,
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (searchQuery) params.append("search", searchQuery);
+      // Only include search if it's not empty after trimming
+      if (searchQuery && searchQuery.trim()) {
+        params.append("search", searchQuery.trim());
+      }
       if (statusFilter !== "all") params.append("status", statusFilter);
       params.append("page", page.toString());
       params.append("limit", itemsPerPage.toString());
@@ -130,6 +134,20 @@ export default function ClientsPage() {
 
   const clients = data?.data || [];
   const pagination = data?.pagination;
+
+  // Validate page number when pagination data changes
+  useEffect(() => {
+    if (pagination && pagination.totalPages > 0) {
+      // If current page exceeds total pages, reset to last valid page
+      if (page > pagination.totalPages) {
+        setPage(pagination.totalPages);
+      }
+      // Ensure page is at least 1
+      if (page < 1) {
+        setPage(1);
+      }
+    }
+  }, [pagination, page]);
 
   const form = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
@@ -506,7 +524,7 @@ export default function ClientsPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <Input
                   type="text"
-                  placeholder="Search by name or email..."
+                  placeholder="Search by name, email, phone, or ID..."
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -715,13 +733,15 @@ export default function ClientsPage() {
             </div>
 
             {/* Pagination */}
-            {pagination && (
+            {pagination && pagination.total > 0 && (
               <TablePagination
                 totalItems={pagination.total}
                 itemsPerPage={itemsPerPage}
-                currentPage={page}
+                currentPage={Math.min(page, pagination.totalPages)} // Ensure page doesn't exceed totalPages
                 onPageChange={(newPage) => {
-                  setPage(newPage);
+                  // Validate page number
+                  const validPage = Math.max(1, Math.min(newPage, pagination.totalPages));
+                  setPage(validPage);
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 onItemsPerPageChange={(newLimit) => {

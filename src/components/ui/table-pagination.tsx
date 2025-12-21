@@ -69,8 +69,10 @@ export function TablePagination({
   const pageNumbers = getPageNumbers();
 
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages && page !== currentPage && !isLoading) {
-      onPageChange(page);
+    // Validate page number
+    const validPage = Math.max(1, Math.min(page, totalPages));
+    if (validPage >= 1 && validPage <= totalPages && validPage !== currentPage && !isLoading) {
+      onPageChange(validPage);
     }
   };
 
