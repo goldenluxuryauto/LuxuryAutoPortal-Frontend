@@ -3,6 +3,7 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Car, Users, DollarSign, TrendingUp, Mail, Phone, Clock, MessageCircle, CheckCircle } from "lucide-react";
 import QuickLinks from "@/components/admin/QuickLinks";
+import { OnboardingTutorial } from "@/components/onboarding/OnboardingTutorial";
 
 export default function AdminDashboard() {
   // Fetch user role information
@@ -282,6 +283,9 @@ export default function AdminDashboard() {
           <h2 className="text-xl font-semibold text-white">Quick Links</h2>
           <QuickLinks />
         </div>
+
+        {/* Client Onboarding Tutorial - shows automatically for new signups only */}
+        {isClient && <OnboardingTutorial />}
       </div>
     </AdminLayout>
   );

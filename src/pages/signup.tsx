@@ -72,6 +72,8 @@ export default function Signup() {
       return response.json();
     },
     onSuccess: () => {
+      // Mark that this is a new signup so tutorial can be shown after login
+      localStorage.setItem("gla_new_signup", "true");
       toast({
         title: "Account created successfully!",
         description: "Please log in with your credentials.",
