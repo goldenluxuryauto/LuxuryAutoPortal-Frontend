@@ -589,8 +589,7 @@ export default function ClientsPage() {
                       return (
                         <TableRow
                           key={client.id}
-                          className="border-[#2a2a2a] hover:bg-gray-800/50 cursor-pointer transition-colors group"
-                          onClick={() => handleViewClient(client.id)}
+                          className="border-[#2a2a2a] group"
                         >
                           <TableCell className="text-center text-[#EAEB80] font-medium px-6 py-4 align-middle">
                             {rowNumber}
