@@ -2367,8 +2367,8 @@ export default function ClientDetailPage() {
                     file:cursor-pointer
                     cursor-pointer
                     bg-[#1a1a1a] border border-[#2a2a2a] rounded-md p-2"
-                  required
-                />
+                required
+              />
                 {uploadContractForm.contractFile && (
                   <p className="text-xs text-gray-400 mt-2">
                     Selected: {uploadContractForm.contractFile.name}
@@ -2537,15 +2537,15 @@ export default function ClientDetailPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-gray-400">Mileage</Label>
-                <Input
-                  type="number"
-                  value={addCarForm.mileage}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, mileage: e.target.value })}
-                  placeholder="0"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
+            <div>
+              <Label className="text-gray-400">Mileage</Label>
+              <Input
+                type="number"
+                value={addCarForm.mileage}
+                onChange={(e) => setAddCarForm({ ...addCarForm, mileage: e.target.value })}
+                placeholder="0"
+                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+              />
               </div>
               <div>
                 <Label className="text-gray-400">Status *</Label>

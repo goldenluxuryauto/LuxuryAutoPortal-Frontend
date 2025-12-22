@@ -970,43 +970,48 @@ export default function CarDetailPage() {
                         )}
                         {/* Delete Button (Admin only, single delete) */}
                         {isAdmin && (
-                          <ConfirmDialog
-                            trigger={
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500/80 hover:bg-red-500 text-white z-10"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  e.preventDefault();
-                                }}
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            }
-                            title="Delete Photo"
-                            description={`Are you sure you want to delete this photo? This will only delete the selected photo, not all selected photos.`}
-                            confirmText="Delete"
-                            cancelText="Cancel"
-                            variant="destructive"
-                            onConfirm={() => {
-                              // Capture the photo path and index in the closure
-                              const photoToDelete = photo;
-                              const photoIndex = index;
-                              
-                              // Delete only this specific photo
-                              deletePhotoMutation.mutate(photoToDelete, {
-                                onSuccess: () => {
-                                  // Remove from selection if it was selected
-                                  if (selectedPhotos.has(photoIndex)) {
-                                    const newSelected = new Set(selectedPhotos);
-                                    newSelected.delete(photoIndex);
-                                    setSelectedPhotos(newSelected);
+                          <div 
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ConfirmDialog
+                              trigger={
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="bg-red-500/80 hover:bg-red-500 text-white"
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              }
+                              title="Delete Photo"
+                              description={`Are you sure you want to delete this photo? This action cannot be undone.`}
+                              confirmText="Delete"
+                              cancelText="Cancel"
+                              variant="destructive"
+                              onConfirm={() => {
+                                // Capture the photo path and index in the closure
+                                const photoToDelete = photo;
+                                const photoIndex = index;
+                                
+                                // Delete only this specific photo
+                                deletePhotoMutation.mutate(photoToDelete, {
+                                  onSuccess: () => {
+                                    // Remove from selection if it was selected
+                                    if (selectedPhotos.has(photoIndex)) {
+                                      const newSelected = new Set(selectedPhotos);
+                                      newSelected.delete(photoIndex);
+                                      setSelectedPhotos(newSelected);
+                                    }
+                                    // Adjust carousel index if needed
+                                    if (car.photos && carouselIndex >= car.photos.length - 1) {
+                                      setCarouselIndex(Math.max(0, car.photos.length - 2));
+                                    }
                                   }
-                                }
-                              });
-                            }}
-                          />
+                                });
+                              }}
+                            />
+                          </div>
                         )}
                         {/* Image Number Badge */}
                         <div className="absolute bottom-2 right-2 bg-black/70 px-2 py-1 rounded text-xs text-white">
@@ -1177,83 +1182,39 @@ export default function CarDetailPage() {
 
         {/* Full Screen Image Viewer */}
         {fullScreenImageIndex !== null && car?.photos && car.photos[fullScreenImageIndex] && (
-          <Dialog open={fullScreenImageIndex !== null} onOpenChange={(open) => !open && setFullScreenImageIndex(null)}>
-            <DialogContent className="bg-black/98 border-none p-0 max-w-[100vw] max-h-[100vh] w-full h-full m-0 rounded-none overflow-hidden">
-              <div className="relative w-full h-full flex items-center justify-center">
-                {/* Close Button - Top Right */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setFullScreenImageIndex(null)}
-                  className="absolute top-4 right-4 z-[100] bg-black/80 hover:bg-black/95 text-white border-2 border-white/40 rounded-full h-12 w-12 shadow-2xl backdrop-blur-sm transition-all hover:scale-110 hover:border-white/60"
-                  aria-label="Close"
-                >
-                  <X className="w-6 h-6" />
-                </Button>
-                
-                {/* Navigation Buttons - Only show if more than one photo */}
-                {car.photos.length > 1 && (
-                  <>
-                    {/* Previous Button - Left Center */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const prevIndex = (fullScreenImageIndex - 1 + car.photos!.length) % car.photos!.length;
-                        setFullScreenImageIndex(prevIndex);
-                      }}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 z-[90] bg-black/80 hover:bg-black/95 text-white border-2 border-white/40 rounded-full h-16 w-16 shadow-2xl backdrop-blur-sm transition-all hover:scale-110 hover:border-white/60"
-                      aria-label="Previous image"
-                    >
-                      <ChevronLeft className="w-8 h-8" />
-                    </Button>
-                    
-                    {/* Next Button - Right Center */}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const nextIndex = (fullScreenImageIndex + 1) % car.photos!.length;
-                        setFullScreenImageIndex(nextIndex);
-                      }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 z-[90] bg-black/80 hover:bg-black/95 text-white border-2 border-white/40 rounded-full h-16 w-16 shadow-2xl backdrop-blur-sm transition-all hover:scale-110 hover:border-white/60"
-                      aria-label="Next image"
-                    >
-                      <ChevronRight className="w-8 h-8" />
-                    </Button>
-                  </>
-                )}
+          <div 
+            className="fixed inset-0 z-[100] bg-black/98 flex items-center justify-center"
+            onClick={() => setFullScreenImageIndex(null)}
+          >
+            <div className="relative w-full h-full flex items-center justify-center">
+              {/* Image Counter - Bottom Center */}
+              {car.photos.length > 1 && (
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
+                  <span className="text-white text-base font-semibold tracking-wide">
+                    {fullScreenImageIndex + 1} / {car.photos.length}
+                  </span>
+                </div>
+              )}
 
-                {/* Image Counter - Bottom Center */}
-                {car.photos.length > 1 && (
-                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[90] bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
-                    <span className="text-white text-base font-semibold tracking-wide">
-                      {fullScreenImageIndex + 1} / {car.photos.length}
-                    </span>
-                  </div>
-                )}
-
-                {/* Full Screen Image - High Resolution Display */}
-                {car.photos && car.photos[fullScreenImageIndex] && (
-                  <img
-                    src={buildApiUrl(car.photos[fullScreenImageIndex].startsWith('/') ? car.photos[fullScreenImageIndex] : `/${car.photos[fullScreenImageIndex]}`)}
-                    alt={`Car photo ${fullScreenImageIndex + 1}`}
-                    className="w-full h-full object-contain z-10"
-                    style={{
-                      maxWidth: '100vw',
-                      maxHeight: '100vh',
-                    }}
-                    onError={(e) => {
-                      console.error('Failed to load photo:', car.photos?.[fullScreenImageIndex]);
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
+              {/* Full Screen Image - High Resolution Display */}
+              {car.photos && car.photos[fullScreenImageIndex] && (
+                <img
+                  src={buildApiUrl(car.photos[fullScreenImageIndex].startsWith('/') ? car.photos[fullScreenImageIndex] : `/${car.photos[fullScreenImageIndex]}`)}
+                  alt={`Car photo ${fullScreenImageIndex + 1}`}
+                  className="w-full h-full object-contain"
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    maxWidth: '100vw',
+                    maxHeight: '100vh',
+                  }}
+                  onError={(e) => {
+                    console.error('Failed to load photo:', car.photos?.[fullScreenImageIndex]);
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              )}
+            </div>
+          </div>
         )}
       </div>
     </AdminLayout>

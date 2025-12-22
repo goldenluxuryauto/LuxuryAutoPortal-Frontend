@@ -469,189 +469,189 @@ export default function ClientProfilePage() {
                             ))
                           ) : onboarding ? (
                             // Fallback to onboarding data if no cars are available
-                            <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                              <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
-                                Vehicle Information
-                              </h3>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Year:</span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.vehicleYear)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Make:</span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.vehicleMake)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Model:</span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.vehicleModel)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Trim:</span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.vehicleTrim)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    VIN Number:
-                                  </span>
-                                  <span className="text-white font-mono text-xs">
-                                    {formatValue(onboarding.vinNumber)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    License Plate:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.licensePlate)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Mileage:</span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.vehicleMiles)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    Exterior Color:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.exteriorColor)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    Interior Color:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.interiorColor)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    Title Type:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.titleType)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    Registration Expiration:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.registrationExpiration)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Fuel Type:</span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.fuelType)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Tire Size:</span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.tireSize)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Oil Type:</span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.oilType)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    Last Oil Change:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.lastOilChange)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    Number of Seats:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.numberOfSeats)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    Number of Doors:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.numberOfDoors)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    Vehicle Recall:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.vehicleRecall)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Ski Racks:</span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.skiRacks)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    Ski Cross Bars:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.skiCrossBars)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Roof Rails:</span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.roofRails)}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="text-gray-400 block mb-1">
-                                    Free Dealership Oil Changes:
-                                  </span>
-                                  <span className="text-white">
-                                    {formatValue(onboarding.freeDealershipOilChanges)}
-                                  </span>
-                                </div>
-                                {onboarding.oilPackageDetails && (
-                                  <div>
-                                    <span className="text-gray-400 block mb-1">
-                                      Oil Package Details:
-                                    </span>
-                                    <span className="text-white">
-                                      {formatValue(onboarding.oilPackageDetails)}
-                                    </span>
-                                  </div>
-                                )}
-                                {onboarding.dealershipAddress && (
-                                  <div>
-                                    <span className="text-gray-400 block mb-1">
-                                      Dealership Address:
-                                    </span>
-                                    <span className="text-white">
-                                      {formatValue(onboarding.dealershipAddress)}
-                                    </span>
-                                  </div>
-                                )}
+                          <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                            <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                              Vehicle Information
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="text-gray-400 block mb-1">Year:</span>
+                      <span className="text-white">
+                        {formatValue(onboarding.vehicleYear)}
+                      </span>
                               </div>
+                              <div>
+                                <span className="text-gray-400 block mb-1">Make:</span>
+                      <span className="text-white">
+                        {formatValue(onboarding.vehicleMake)}
+                      </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-400 block mb-1">Model:</span>
+                      <span className="text-white">
+                        {formatValue(onboarding.vehicleModel)}
+                      </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-400 block mb-1">Trim:</span>
+                      <span className="text-white">
+                        {formatValue(onboarding.vehicleTrim)}
+                      </span>
+                              </div>
+                              <div>
+                      <span className="text-gray-400 block mb-1">
+                        VIN Number:
+                      </span>
+                      <span className="text-white font-mono text-xs">
+                        {formatValue(onboarding.vinNumber)}
+                      </span>
+                              </div>
+                              <div>
+                      <span className="text-gray-400 block mb-1">
+                        License Plate:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.licensePlate)}
+                      </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-400 block mb-1">Mileage:</span>
+                      <span className="text-white">
+                        {formatValue(onboarding.vehicleMiles)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 block mb-1">
+                        Exterior Color:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.exteriorColor)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 block mb-1">
+                        Interior Color:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.interiorColor)}
+                      </span>
+                              </div>
+                              <div>
+                      <span className="text-gray-400 block mb-1">
+                        Title Type:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.titleType)}
+                      </span>
+                              </div>
+                              <div>
+                      <span className="text-gray-400 block mb-1">
+                        Registration Expiration:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.registrationExpiration)}
+                      </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-400 block mb-1">Fuel Type:</span>
+                      <span className="text-white">
+                        {formatValue(onboarding.fuelType)}
+                      </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-400 block mb-1">Tire Size:</span>
+                      <span className="text-white">
+                        {formatValue(onboarding.tireSize)}
+                      </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-400 block mb-1">Oil Type:</span>
+                      <span className="text-white">
+                        {formatValue(onboarding.oilType)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 block mb-1">
+                        Last Oil Change:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.lastOilChange)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 block mb-1">
+                        Number of Seats:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.numberOfSeats)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 block mb-1">
+                        Number of Doors:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.numberOfDoors)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 block mb-1">
+                        Vehicle Recall:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.vehicleRecall)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 block mb-1">Ski Racks:</span>
+                      <span className="text-white">
+                        {formatValue(onboarding.skiRacks)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 block mb-1">
+                        Ski Cross Bars:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.skiCrossBars)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 block mb-1">Roof Rails:</span>
+                      <span className="text-white">
+                        {formatValue(onboarding.roofRails)}
+                      </span>
+                              </div>
+                              <div>
+                      <span className="text-gray-400 block mb-1">
+                        Free Dealership Oil Changes:
+                      </span>
+                      <span className="text-white">
+                        {formatValue(onboarding.freeDealershipOilChanges)}
+                      </span>
+                    </div>
+                    {onboarding.oilPackageDetails && (
+                      <div>
+                        <span className="text-gray-400 block mb-1">
+                          Oil Package Details:
+                        </span>
+                        <span className="text-white">
+                          {formatValue(onboarding.oilPackageDetails)}
+                        </span>
+                      </div>
+                    )}
+                    {onboarding.dealershipAddress && (
+                      <div>
+                        <span className="text-gray-400 block mb-1">
+                          Dealership Address:
+                        </span>
+                        <span className="text-white">
+                          {formatValue(onboarding.dealershipAddress)}
+                        </span>
+                              </div>
+                    )}
                             </div>
+                          </div>
                           ) : null}
 
                           {/* Financial Information */}
