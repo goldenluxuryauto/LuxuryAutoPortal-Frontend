@@ -179,6 +179,15 @@ export default function ClientDetailPage() {
     year: "",
     licensePlate: "",
     mileage: "",
+    color: "",
+    interiorColor: "",
+    status: "ACTIVE",
+    tireSize: "",
+    oilType: "",
+    lastOilChange: "",
+    fuelType: "",
+    turoLink: "",
+    adminTuroLink: "",
   });
   
   const queryClient = useQueryClient();
@@ -424,11 +433,29 @@ export default function ClientDetailPage() {
   const addCarMutation = useMutation({
     mutationFn: async (data: typeof addCarForm) => {
       if (!clientId) throw new Error("Invalid client ID");
+      
+      const formData = new FormData();
+      formData.append("vin", data.vin);
+      formData.append("makeModel", `${data.make} ${data.model}`.trim());
+      if (data.make) formData.append("make", data.make);
+      if (data.model) formData.append("model", data.model);
+      if (data.licensePlate) formData.append("licensePlate", data.licensePlate);
+      if (data.year) formData.append("year", data.year);
+      if (data.color) formData.append("color", data.color);
+      if (data.interiorColor) formData.append("interiorColor", data.interiorColor);
+      if (data.mileage) formData.append("mileage", data.mileage);
+      formData.append("status", data.status || "ACTIVE");
+      if (data.tireSize) formData.append("tireSize", data.tireSize);
+      if (data.oilType) formData.append("oilType", data.oilType);
+      if (data.lastOilChange) formData.append("lastOilChange", data.lastOilChange);
+      if (data.fuelType) formData.append("fuelType", data.fuelType);
+      if (data.turoLink) formData.append("turoLink", data.turoLink);
+      if (data.adminTuroLink) formData.append("adminTuroLink", data.adminTuroLink);
+
       const response = await fetch(buildApiUrl(`/api/clients/${clientId}/cars`), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(data),
+        body: formData,
       });
       if (!response.ok) {
         const error = await response.json();
@@ -440,7 +467,23 @@ export default function ClientDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/clients", clientId] });
       toast({ title: "Success", description: "Car added successfully" });
       setIsAddCarOpen(false);
-      setAddCarForm({ vin: "", make: "", model: "", year: "", licensePlate: "", mileage: "" });
+      setAddCarForm({ 
+        vin: "", 
+        make: "", 
+        model: "", 
+        year: "", 
+        licensePlate: "", 
+        mileage: "",
+        color: "",
+        interiorColor: "",
+        status: "ACTIVE",
+        tireSize: "",
+        oilType: "",
+        lastOilChange: "",
+        fuelType: "",
+        turoLink: "",
+        adminTuroLink: "",
+      });
     },
     onError: (error: any) => {
       toast({
@@ -2392,7 +2435,7 @@ export default function ClientDetailPage() {
 
       {/* Add Car Dialog */}
       <Dialog open={isAddCarOpen} onOpenChange={setIsAddCarOpen}>
-        <DialogContent className="max-w-lg bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
           <DialogHeader>
             <DialogTitle className="text-white text-xl">Add Car</DialogTitle>
             <DialogDescription className="text-gray-400">
@@ -2459,15 +2502,112 @@ export default function ClientDetailPage() {
                 />
               </div>
             </div>
-            <div>
-              <Label className="text-gray-400">Mileage</Label>
-              <Input
-                type="number"
-                value={addCarForm.mileage}
-                onChange={(e) => setAddCarForm({ ...addCarForm, mileage: e.target.value })}
-                placeholder="0"
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-400">Exterior Color</Label>
+                <Input
+                  value={addCarForm.color}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, color: e.target.value })}
+                  placeholder="Black"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-gray-400">Interior Color</Label>
+                <Input
+                  value={addCarForm.interiorColor}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, interiorColor: e.target.value })}
+                  placeholder="Black"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-400">Mileage</Label>
+                <Input
+                  type="number"
+                  value={addCarForm.mileage}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, mileage: e.target.value })}
+                  placeholder="0"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-gray-400">Status *</Label>
+                <Select
+                  value={addCarForm.status}
+                  onValueChange={(value) => setAddCarForm({ ...addCarForm, status: value })}
+                >
+                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectItem value="ACTIVE">ACTIVE</SelectItem>
+                    <SelectItem value="INACTIVE">INACTIVE</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-400">Tire Size</Label>
+                <Input
+                  value={addCarForm.tireSize}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, tireSize: e.target.value })}
+                  placeholder="225/50R17"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-gray-400">Oil Type</Label>
+                <Input
+                  value={addCarForm.oilType}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, oilType: e.target.value })}
+                  placeholder="5W-30"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-400">Last Oil Change</Label>
+                <Input
+                  type="date"
+                  value={addCarForm.lastOilChange}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, lastOilChange: e.target.value })}
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-gray-400">Fuel Type</Label>
+                <Input
+                  value={addCarForm.fuelType}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, fuelType: e.target.value })}
+                  placeholder="Premium"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-gray-400">Turo Link</Label>
+                <Input
+                  value={addCarForm.turoLink}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, turoLink: e.target.value })}
+                  placeholder="https://turo.com/..."
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-gray-400">Admin Turo Link</Label>
+                <Input
+                  value={addCarForm.adminTuroLink}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, adminTuroLink: e.target.value })}
+                  placeholder="https://turo.com/..."
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
+              </div>
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
               <Button
