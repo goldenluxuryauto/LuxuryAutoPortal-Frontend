@@ -413,18 +413,15 @@ export default function CarDetailPage() {
   const handleSelectAll = () => {
     if (!isAdmin || !car?.photos) return;
     
-    // Check if all photos (except carousel) are already selected
-    const allIndicesExceptCarousel = car.photos.map((_, index) => index).filter(index => index !== carouselIndex);
-    const allNonCarouselSelected = allIndicesExceptCarousel.every(index => selectedPhotos.has(index));
+    // Check if all photos are already selected
+    const allIndices = car.photos.map((_, index) => index);
+    const allSelected = allIndices.length > 0 && allIndices.every(index => selectedPhotos.has(index));
     
-    if (allNonCarouselSelected && selectedPhotos.size === allIndicesExceptCarousel.length) {
+    if (allSelected && selectedPhotos.size === allIndices.length) {
       // Deselect all
       setSelectedPhotos(new Set());
     } else {
-      // Select all photos except the one currently displayed in the carousel
-      // This ensures the carousel photo is automatically deselected when "Select All" is clicked
-      // Even if it was manually selected before, it will be deselected now
-      const allIndices = car.photos.map((_, index) => index).filter(index => index !== carouselIndex);
+      // Select all photos including the one currently displayed in the carousel
       setSelectedPhotos(new Set(allIndices));
     }
   };
@@ -856,13 +853,13 @@ export default function CarDetailPage() {
                       className="border-[#EAEB80]/50 text-[#EAEB80] hover:bg-[#EAEB80]/10"
                     >
                       {(() => {
-                        // Check if all photos (except carousel) are selected
-                        const allIndicesExceptCarousel = car.photos.map((_, index) => index).filter(index => index !== carouselIndex);
-                        const allNonCarouselSelected = allIndicesExceptCarousel.length > 0 && 
-                          allIndicesExceptCarousel.every(index => selectedPhotos.has(index)) &&
-                          selectedPhotos.size === allIndicesExceptCarousel.length;
+                        // Check if all photos are selected
+                        const allIndices = car.photos.map((_, index) => index);
+                        const allSelected = allIndices.length > 0 && 
+                          allIndices.every(index => selectedPhotos.has(index)) &&
+                          selectedPhotos.size === allIndices.length;
                         
-                        return allNonCarouselSelected ? (
+                        return allSelected ? (
                           <>
                             <Square className="w-4 h-4 mr-2" />
                             Deselect All
