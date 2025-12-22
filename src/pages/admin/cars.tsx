@@ -642,7 +642,7 @@ export default function CarsPage() {
                           key={uniqueKey}
                           className="hover:bg-[#252525] transition-colors group border-b border-[#2a2a2a]"
                         >
-                          <td className="text-center text-[#EAEB80] px-4 py-3 align-middle">
+                          <td className="text-center text-[#EAEB80] text-sm px-4 py-3 align-middle">
                             {index + 1}
                           </td>
                           <td className="text-left px-4 py-3 align-middle">
@@ -664,12 +664,12 @@ export default function CarsPage() {
                                 e.preventDefault();
                                 setLocation(`/admin/cars/${car.id}`);
                               }}
-                              className="text-[#EAEB80] hover:underline"
+                              className="text-[#EAEB80] hover:underline text-sm"
                             >
                               View Stats
                             </a>
                           </td>
-                          <td className="text-left text-white px-4 py-3 align-middle">
+                          <td className="text-left text-white text-sm px-4 py-3 align-middle">
                             {managementValue}
                           </td>
                           <td className="text-left px-4 py-3 align-middle">
@@ -690,31 +690,31 @@ export default function CarsPage() {
                               </span>
                             )}
                           </td>
-                          <td className="text-left text-white px-4 py-3 align-middle">
+                          <td className="text-left text-white text-sm px-4 py-3 align-middle">
                             {car.make || "N/A"}
                           </td>
-                          <td className="text-left text-white px-4 py-3 align-middle">
+                          <td className="text-left text-white text-sm px-4 py-3 align-middle">
                             {car.year || "N/A"}
                           </td>
-                          <td className="text-left text-white px-4 py-3 align-middle">
+                          <td className="text-left text-white text-sm px-4 py-3 align-middle">
                             {car.model || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                          <td className="text-left text-gray-400 text-sm px-4 py-3 align-middle">
                             {car.contactPhone || car.owner?.phone || "N/A"}
                           </td>
                           <td className="text-left text-white font-mono text-sm px-4 py-3 align-middle">
                             {car.vin || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                          <td className="text-left text-gray-400 text-sm px-4 py-3 align-middle">
                             {car.licensePlate || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                          <td className="text-left text-gray-400 text-sm px-4 py-3 align-middle">
                             {car.fuelType || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                          <td className="text-left text-gray-400 text-sm px-4 py-3 align-middle">
                             {car.tireSize || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
+                          <td className="text-left text-gray-400 text-sm px-4 py-3 align-middle">
                             {car.oilType || "N/A"}
                           </td>
                           <td className="text-left px-4 py-3 align-middle">
