@@ -162,7 +162,7 @@ export default function ClientDetailPage() {
   // Upload contract modal state
   const [isUploadContractOpen, setIsUploadContractOpen] = useState(false);
   const [uploadContractForm, setUploadContractForm] = useState({
-    contractUrl: "",
+    contractFile: null as File | null,
     vehicleYear: "",
     vehicleMake: "",
     vehicleModel: "",
@@ -395,11 +395,20 @@ export default function ClientDetailPage() {
   const uploadContractMutation = useMutation({
     mutationFn: async (data: typeof uploadContractForm) => {
       if (!clientId) throw new Error("Invalid client ID");
+      if (!data.contractFile) throw new Error("Please select a PDF file to upload");
+
+      const formData = new FormData();
+      formData.append("contract", data.contractFile);
+      if (data.vehicleYear) formData.append("vehicleYear", data.vehicleYear);
+      if (data.vehicleMake) formData.append("vehicleMake", data.vehicleMake);
+      if (data.vehicleModel) formData.append("vehicleModel", data.vehicleModel);
+      if (data.vinNumber) formData.append("vinNumber", data.vinNumber);
+      if (data.licensePlate) formData.append("licensePlate", data.licensePlate);
+
       const response = await fetch(buildApiUrl(`/api/clients/${clientId}/contracts`), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(data),
+        body: formData,
       });
       if (!response.ok) {
         const error = await response.json();
@@ -412,7 +421,7 @@ export default function ClientDetailPage() {
       toast({ title: "Success", description: "Contract uploaded successfully" });
       setIsUploadContractOpen(false);
       setUploadContractForm({
-        contractUrl: "",
+        contractFile: null,
         vehicleYear: "",
         vehicleMake: "",
         vehicleModel: "",
@@ -2340,15 +2349,33 @@ export default function ClientDetailPage() {
             className="space-y-4"
           >
             <div>
-              <Label className="text-gray-400">Contract URL *</Label>
-              <Input
-                value={uploadContractForm.contractUrl}
-                onChange={(e) => setUploadContractForm({ ...uploadContractForm, contractUrl: e.target.value })}
-                placeholder="https://example.com/contract.pdf"
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                required
-              />
-              <p className="text-xs text-gray-500 mt-1">Enter the URL of the uploaded contract PDF</p>
+              <Label className="text-gray-400">Contract PDF File *</Label>
+              <div className="mt-2">
+                <input
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setUploadContractForm({ ...uploadContractForm, contractFile: file });
+                  }}
+                  className="block w-full text-sm text-gray-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-md file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-[#EAEB80] file:text-black
+                    hover:file:bg-[#d4d570]
+                    file:cursor-pointer
+                    cursor-pointer
+                    bg-[#1a1a1a] border border-[#2a2a2a] rounded-md p-2"
+                  required
+                />
+                {uploadContractForm.contractFile && (
+                  <p className="text-xs text-gray-400 mt-2">
+                    Selected: {uploadContractForm.contractFile.name}
+                  </p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">Upload a PDF file from your local device (max 5MB)</p>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
