@@ -915,7 +915,17 @@ export default function CarDetailPage() {
                         "relative group",
                         isSelected && "ring-2 ring-[#EAEB80] rounded-lg",
                         // Removed carousel sync indicator - carousel and Photos card are independent
+                        isAdmin && "cursor-pointer"
                       )}
+                      onClick={(e) => {
+                        // Only select if admin and not clicking on checkbox or delete button
+                        if (isAdmin) {
+                          const target = e.target as HTMLElement;
+                          if (!target.closest('.checkbox-area') && !target.closest('button')) {
+                            handleSelectPhoto(index);
+                          }
+                        }
+                      }}
                     >
                       <div className="relative aspect-square">
                         <img
