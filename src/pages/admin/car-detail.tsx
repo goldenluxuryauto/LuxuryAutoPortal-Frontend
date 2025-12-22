@@ -1178,17 +1178,17 @@ export default function CarDetailPage() {
         {/* Full Screen Image Viewer */}
         {fullScreenImageIndex !== null && car?.photos && car.photos[fullScreenImageIndex] && (
           <Dialog open={fullScreenImageIndex !== null} onOpenChange={(open) => !open && setFullScreenImageIndex(null)}>
-            <DialogContent className="bg-black/98 border-none p-0 max-w-[100vw] max-h-[100vh] w-full h-full m-0 rounded-none">
+            <DialogContent className="bg-black/98 border-none p-0 max-w-[100vw] max-h-[100vh] w-full h-full m-0 rounded-none overflow-hidden">
               <div className="relative w-full h-full flex items-center justify-center">
                 {/* Close Button - Top Right */}
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setFullScreenImageIndex(null)}
-                  className="absolute top-6 right-6 z-50 bg-black/80 hover:bg-black/95 text-white border-2 border-white/40 rounded-full h-11 w-11 shadow-2xl backdrop-blur-sm transition-all hover:scale-110 hover:border-white/60"
+                  className="absolute top-4 right-4 z-[100] bg-black/80 hover:bg-black/95 text-white border-2 border-white/40 rounded-full h-12 w-12 shadow-2xl backdrop-blur-sm transition-all hover:scale-110 hover:border-white/60"
                   aria-label="Close"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-6 h-6" />
                 </Button>
                 
                 {/* Navigation Buttons - Only show if more than one photo */}
@@ -1203,10 +1203,10 @@ export default function CarDetailPage() {
                         const prevIndex = (fullScreenImageIndex - 1 + car.photos!.length) % car.photos!.length;
                         setFullScreenImageIndex(prevIndex);
                       }}
-                      className="absolute left-6 top-1/2 -translate-y-1/2 z-50 bg-black/80 hover:bg-black/95 text-white border-2 border-white/40 rounded-full h-14 w-14 shadow-2xl backdrop-blur-sm transition-all hover:scale-110 hover:border-white/60"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-[90] bg-black/80 hover:bg-black/95 text-white border-2 border-white/40 rounded-full h-16 w-16 shadow-2xl backdrop-blur-sm transition-all hover:scale-110 hover:border-white/60"
                       aria-label="Previous image"
                     >
-                      <ChevronLeft className="w-7 h-7" />
+                      <ChevronLeft className="w-8 h-8" />
                     </Button>
                     
                     {/* Next Button - Right Center */}
@@ -1218,17 +1218,17 @@ export default function CarDetailPage() {
                         const nextIndex = (fullScreenImageIndex + 1) % car.photos!.length;
                         setFullScreenImageIndex(nextIndex);
                       }}
-                      className="absolute right-6 top-1/2 -translate-y-1/2 z-50 bg-black/80 hover:bg-black/95 text-white border-2 border-white/40 rounded-full h-14 w-14 shadow-2xl backdrop-blur-sm transition-all hover:scale-110 hover:border-white/60"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-[90] bg-black/80 hover:bg-black/95 text-white border-2 border-white/40 rounded-full h-16 w-16 shadow-2xl backdrop-blur-sm transition-all hover:scale-110 hover:border-white/60"
                       aria-label="Next image"
                     >
-                      <ChevronRight className="w-7 h-7" />
+                      <ChevronRight className="w-8 h-8" />
                     </Button>
                   </>
                 )}
 
                 {/* Image Counter - Bottom Center */}
                 {car.photos.length > 1 && (
-                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
+                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[90] bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
                     <span className="text-white text-base font-semibold tracking-wide">
                       {fullScreenImageIndex + 1} / {car.photos.length}
                     </span>
@@ -1240,11 +1240,10 @@ export default function CarDetailPage() {
                   <img
                     src={buildApiUrl(car.photos[fullScreenImageIndex].startsWith('/') ? car.photos[fullScreenImageIndex] : `/${car.photos[fullScreenImageIndex]}`)}
                     alt={`Car photo ${fullScreenImageIndex + 1}`}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain z-10"
                     style={{
                       maxWidth: '100vw',
                       maxHeight: '100vh',
-                      imageRendering: 'high-quality',
                     }}
                     onError={(e) => {
                       console.error('Failed to load photo:', car.photos?.[fullScreenImageIndex]);
