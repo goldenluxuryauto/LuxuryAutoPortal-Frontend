@@ -42,7 +42,8 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, buildApiUrl } from "@/lib/queryClient";
-import { Plus, Edit, Trash2, Search, Loader2, X, LogOut, ExternalLink } from "lucide-react";
+import { Plus, Edit, Trash2, Search, X, LogOut, ExternalLink } from "lucide-react";
+import { TableRowSkeleton } from "@/components/ui/skeletons";
 import { Textarea } from "@/components/ui/textarea";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
@@ -600,18 +601,7 @@ export default function CarsPage() {
                 </thead>
                 <tbody className="divide-y divide-[#2a2a2a]">
                   {isLoading ? (
-                    <>
-                      {[...Array(5)].map((_, i) => (
-                        <tr
-                          key={`skeleton-${i}`}
-                          className="border-b border-[#2a2a2a]"
-                        >
-                          <td colSpan={isAdmin ? 17 : 16} className="px-4 py-3">
-                            <div className="h-4 bg-[#252525] rounded animate-pulse" />
-                          </td>
-                        </tr>
-                      ))}
-                    </>
+                    <TableRowSkeleton colSpan={isAdmin ? 17 : 16} rows={5} />
                   ) : cars.length > 0 ? (
                     cars.map((car, index) => {
                       const formatDate = (dateStr: string | null | undefined): string => {
@@ -1200,9 +1190,6 @@ export default function CarsPage() {
                       createMutation.isPending || updateMutation.isPending
                     }
                   >
-                    {(createMutation.isPending || updateMutation.isPending) && (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    )}
                     {selectedCar ? "Update" : "Create"}
                   </Button>
                 </div>
@@ -1318,9 +1305,6 @@ export default function CarsPage() {
                     className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
                     disabled={offboardMutation.isPending}
                   >
-                    {offboardMutation.isPending && (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    )}
                     Confirm
                   </Button>
                 </div>

@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Car, Upload, X, Loader2, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square } from "lucide-react";
+import { ArrowLeft, Car, Upload, X, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square } from "lucide-react";
+import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -521,9 +522,7 @@ export default function CarDetailPage() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
-        </div>
+        <CarDetailSkeleton />
       </AdminLayout>
     );
   }
@@ -819,7 +818,6 @@ export default function CarDetailPage() {
                           >
                             {deleteMultiplePhotosMutation.isPending ? (
                               <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                                 Deleting...
                               </>
                             ) : (
@@ -890,7 +888,6 @@ export default function CarDetailPage() {
                     <label htmlFor="photo-upload" className="cursor-pointer">
                       {uploadingPhotos ? (
                         <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                           Uploading...
                         </>
                       ) : (
@@ -1169,10 +1166,7 @@ export default function CarDetailPage() {
                     className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
                     disabled={updateMutation.isPending}
                   >
-                    {updateMutation.isPending && (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    )}
-                    Update
+                    {updateMutation.isPending ? "Updating..." : "Update"}
                   </Button>
                 </div>
               </form>

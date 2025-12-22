@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
+import { ClientDetailSkeleton } from "@/components/ui/skeletons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +36,6 @@ import {
   Wrench,
   DollarSign,
   Eye,
-  Loader2,
   Link as LinkIcon,
   ExternalLink,
   Folder,
@@ -599,9 +599,7 @@ export default function ClientDetailPage() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
-        </div>
+        <ClientDetailSkeleton />
       </AdminLayout>
     );
   }
@@ -754,9 +752,10 @@ export default function ClientDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {isLoadingOnboarding ? (
-                    <div className="text-center py-8 text-gray-400">
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-                      Loading onboarding data...
+                    <div className="text-center py-8 text-gray-400 space-y-3">
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="h-4 bg-[#252525] rounded animate-pulse w-3/4 mx-auto" />
+                      ))}
                     </div>
                   ) : onboardingData?.success && onboardingData?.data ? (
                     (() => {
@@ -1601,8 +1600,10 @@ export default function ClientDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {totalsLoading ? (
-                    <div className="flex items-center justify-center py-12">
-                      <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
+                    <div className="flex items-center justify-center py-12 space-y-3 flex-col">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="h-4 bg-[#252525] rounded animate-pulse w-3/4" />
+                      ))}
                     </div>
                   ) : !totals ? (
                     <div className="text-center py-12 text-gray-400">
@@ -2315,14 +2316,7 @@ export default function ClientDetailPage() {
                 disabled={updateMutation.isPending}
                 className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
               >
-                {updateMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Changes"
-                )}
+                {updateMutation.isPending ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </form>
@@ -2419,14 +2413,7 @@ export default function ClientDetailPage() {
                 disabled={uploadContractMutation.isPending}
                 className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
               >
-                {uploadContractMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Uploading...
-                  </>
-                ) : (
-                  "Upload Contract"
-                )}
+                {uploadContractMutation.isPending ? "Uploading..." : "Upload Contract"}
               </Button>
             </div>
           </form>
@@ -2623,14 +2610,7 @@ export default function ClientDetailPage() {
                 disabled={addCarMutation.isPending}
                 className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
               >
-                {addCarMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Adding...
-                  </>
-                ) : (
-                  "Add Car"
-                )}
+                {addCarMutation.isPending ? "Adding..." : "Add Car"}
               </Button>
             </div>
           </form>

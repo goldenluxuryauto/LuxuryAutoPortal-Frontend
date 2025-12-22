@@ -4,7 +4,8 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Folder, Download } from "lucide-react";
+import { Folder, Download } from "lucide-react";
+import { ProfileSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import QuickLinks from "@/components/admin/QuickLinks";
@@ -112,9 +113,7 @@ export default function ClientProfilePage() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
-        </div>
+        <ProfileSkeleton />
       </AdminLayout>
     );
   }

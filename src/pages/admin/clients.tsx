@@ -39,7 +39,8 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Search, Loader2, Eye, ChevronLeft, ChevronRight, X, Plus } from "lucide-react";
+import { Search, Eye, ChevronLeft, ChevronRight, X, Plus } from "lucide-react";
+import { TableRowSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
 import { cn } from "@/lib/utils";
@@ -584,11 +585,7 @@ export default function ClientsPage() {
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8">
-                        <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#EAEB80]" />
-                      </TableCell>
-                    </TableRow>
+                    <TableRowSkeleton colSpan={9} rows={5} />
                   ) : error ? (
                     <TableRow>
                       <TableCell colSpan={9} className="text-center py-8 text-red-400">
@@ -675,11 +672,7 @@ export default function ClientsPage() {
                                   disabled={reactivateAccessMutation.isPending}
                                   title="Grant/Reactivate Access"
                                 >
-                                  {reactivateAccessMutation.isPending ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                  ) : (
-                                    "Grant Access"
-                                  )}
+                                  {reactivateAccessMutation.isPending ? "Granting..." : "Grant Access"}
                                 </Button>
                               )}
                               <Button
@@ -908,10 +901,7 @@ export default function ClientsPage() {
                     className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
                     disabled={createMutation.isPending}
                   >
-                    {createMutation.isPending && (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    )}
-                    Save
+                    {createMutation.isPending ? "Saving..." : "Save"}
                   </Button>
                 </div>
               </form>
@@ -1022,9 +1012,6 @@ export default function ClientsPage() {
                 className="bg-red-600 text-white hover:bg-red-700"
                 disabled={blockUserMutation.isPending}
               >
-                {blockUserMutation.isPending && (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                )}
                 Permanently Block
               </Button>
             </div>
@@ -1060,9 +1047,6 @@ export default function ClientsPage() {
                 className="bg-green-600 text-white hover:bg-green-700"
                 disabled={reactivateAccessMutation.isPending}
               >
-                {reactivateAccessMutation.isPending && (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                )}
                 Grant Access
               </Button>
             </div>
@@ -1101,9 +1085,6 @@ export default function ClientsPage() {
                 className="bg-red-600 text-white hover:bg-red-700"
                 disabled={deleteUserMutation.isPending}
               >
-                {deleteUserMutation.isPending && (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                )}
                 Delete Permanently
               </Button>
             </div>
