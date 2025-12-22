@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { buildApiUrl } from "@/lib/queryClient";
 
 // Tutorial step interface
 export interface TutorialStep {
@@ -51,12 +53,13 @@ interface TutorialContextType {
   markStepComplete: (step: number) => void;
   resetTutorial: () => void;
   hasCompletedTutorial: boolean;
+  tutorialSteps: TutorialStep[];
 }
 
 const TutorialContext = createContext<TutorialContextType | undefined>(undefined);
 
-// Tutorial steps configuration
-const TUTORIAL_STEPS: TutorialStep[] = [
+// Default tutorial steps (fallback if API fails)
+const DEFAULT_TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 1,
     title: "Complete the Onboarding Form",
@@ -80,7 +83,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     id: 2,
     title: "Complete the Offboarding Form",
     description: "Learn how to complete the offboarding form when picking up your vehicle from GLA.",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     videoPlaceholder: "Step 2: Complete the offboarding form when picking up the vehicle from GLA.",
     instructions: [
       "Navigate to the Forms page from the main menu",
@@ -99,7 +102,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     id: 3,
     title: "Access Your Profile",
     description: "Learn how to check your user information, contract copy, and shortcut links in your profile.",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
     videoPlaceholder: "Step 3: You can check your user information, contract copy, and shortcut links in your profile.",
     instructions: [
       "Navigate to your Profile page from the main menu",
@@ -118,7 +121,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     id: 4,
     title: "In-Vehicle Navigation",
     description: "This feature will be available soon. Stay tuned for updates!",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
     videoPlaceholder: "Step 4: (To be added once the in-vehicle navigation function is completed)",
     instructions: [
       "This feature is currently under development",
@@ -132,12 +135,46 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   },
 ];
 
+// Hook to fetch tutorial steps from API
+function useTutorialSteps() {
+  return useQuery<TutorialStep[]>({
+    queryKey: ["/api/tutorial/steps"],
+    queryFn: async () => {
+      const response = await fetch(buildApiUrl("/api/tutorial/steps"), {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        console.warn("Failed to fetch tutorial steps, using defaults");
+        return DEFAULT_TUTORIAL_STEPS;
+      }
+      const data = await response.json();
+      // Handle both response formats: { success: true, data: [...] } or direct array
+      if (data.success && Array.isArray(data.data)) {
+        return data.data;
+      } else if (Array.isArray(data)) {
+        return data;
+      } else if (Array.isArray(data.data)) {
+        return data.data;
+      }
+      return DEFAULT_TUTORIAL_STEPS;
+    },
+    staleTime: 0, // Always refetch when invalidated
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    refetchOnMount: true, // Refetch when component mounts
+    refetchInterval: false, // Don't auto-refetch on interval
+    retry: 1,
+    placeholderData: DEFAULT_TUTORIAL_STEPS,
+  });
+}
+
 // Tutorial Provider Component
 export function TutorialProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState(false);
+  const queryClient = useQueryClient();
+  const { data: tutorialSteps = DEFAULT_TUTORIAL_STEPS, refetch: refetchTutorialSteps } = useTutorialSteps();
 
   // Save tutorial state to localStorage
   const saveState = (updates: {
@@ -170,17 +207,34 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     
     if (isNewSignup) {
       // New signup - reset tutorial state and show tutorial
-      setCurrentStep(1);
-      setCompletedSteps(new Set());
-      setHasCompletedTutorial(false);
-      setIsOpen(true);
-      localStorage.removeItem("gla_new_signup"); // Clear the flag
-      saveState({
-        currentStep: 1,
-        completedSteps: new Set(),
-        completed: false,
-        isOpen: true,
-      });
+      // Wait for tutorial steps to be loaded before setting current step
+      if (Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
+        const firstStep = tutorialSteps[0].id;
+        setCurrentStep(firstStep);
+        setCompletedSteps(new Set());
+        setHasCompletedTutorial(false);
+        setIsOpen(true);
+        localStorage.removeItem("gla_new_signup"); // Clear the flag
+        saveState({
+          currentStep: firstStep,
+          completedSteps: new Set(),
+          completed: false,
+          isOpen: true,
+        });
+      } else {
+        // Fallback if steps not loaded yet
+        setCurrentStep(1);
+        setCompletedSteps(new Set());
+        setHasCompletedTutorial(false);
+        setIsOpen(true);
+        localStorage.removeItem("gla_new_signup");
+        saveState({
+          currentStep: 1,
+          completedSteps: new Set(),
+          completed: false,
+          isOpen: true,
+        });
+      }
     } else {
       // Load saved state for existing users
       const savedState = localStorage.getItem("gla_tutorial_state");
@@ -190,7 +244,20 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
           setHasCompletedTutorial(parsed.completed || false);
           setCompletedSteps(new Set(parsed.completedSteps || []));
           if (parsed.currentStep) {
-            setCurrentStep(parsed.currentStep);
+            // Validate that the saved step exists in the tutorial steps
+            if (Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
+              const stepExists = tutorialSteps.some(step => step.id === parsed.currentStep);
+              if (stepExists) {
+                setCurrentStep(parsed.currentStep);
+              } else {
+                // If saved step doesn't exist, use first step
+                const firstStep = tutorialSteps[0].id;
+                setCurrentStep(firstStep);
+              }
+            } else {
+              // Fallback if steps not loaded yet
+              setCurrentStep(parsed.currentStep);
+            }
           }
         } catch (e) {
           console.error("Error loading tutorial state:", e);
@@ -198,13 +265,34 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tutorialSteps]);
 
-  const openTutorial = () => {
-    // Always start from Step 1 when opening tutorial
-    setCurrentStep(1);
+  // Update current step when tutorialSteps change (e.g., when new steps are added)
+  useEffect(() => {
+    if (Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
+      // If current step doesn't exist in the new steps, reset to first step
+      const stepExists = tutorialSteps.some(step => step.id === currentStep);
+      if (!stepExists) {
+        const firstStep = tutorialSteps[0].id;
+        setCurrentStep(firstStep);
+        saveState({ currentStep: firstStep });
+      }
+    }
+  }, [tutorialSteps, currentStep]);
+
+  const openTutorial = async () => {
+    // Refetch tutorial steps to ensure we have the latest data
+    await refetchTutorialSteps();
+    
+    // Get the latest tutorial steps after refetch
+    const latestSteps = queryClient.getQueryData<TutorialStep[]>(["/api/tutorial/steps"]) || tutorialSteps;
+    const safeLatestSteps = Array.isArray(latestSteps) && latestSteps.length > 0 ? latestSteps : DEFAULT_TUTORIAL_STEPS;
+    
+    // Always start from the first step (lowest step_order/id) when opening tutorial
+    const firstStep = safeLatestSteps[0].id;
+    setCurrentStep(firstStep);
     setIsOpen(true);
-    saveState({ currentStep: 1, isOpen: true });
+    saveState({ currentStep: firstStep, isOpen: true });
   };
 
   const closeTutorial = () => {
@@ -213,30 +301,57 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   };
 
   const nextStep = () => {
-    if (currentStep < TUTORIAL_STEPS.length) {
-      const newStep = currentStep + 1;
-      setCurrentStep(newStep);
-      saveState({ currentStep: newStep });
+    // Ensure tutorialSteps is an array
+    if (!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
+      console.warn("Tutorial steps not available");
+      return;
+    }
+    
+    // Find the next step by id (step_order from database)
+    const currentStepIndex = safeTutorialSteps.findIndex(step => step.id === currentStep);
+    if (currentStepIndex >= 0 && currentStepIndex < safeTutorialSteps.length - 1) {
+      const nextStepData = safeTutorialSteps[currentStepIndex + 1];
+      setCurrentStep(nextStepData.id);
+      saveState({ currentStep: nextStepData.id });
     } else {
-      // Tutorial completed
-      setHasCompletedTutorial(true);
-      saveState({ completed: true, currentStep: TUTORIAL_STEPS.length });
-      closeTutorial();
+      // Tutorial completed - find the last step id
+      const lastStep = safeTutorialSteps[safeTutorialSteps.length - 1];
+      if (lastStep) {
+        setHasCompletedTutorial(true);
+        saveState({ completed: true, currentStep: lastStep.id });
+        closeTutorial();
+      }
     }
   };
 
   const previousStep = () => {
-    if (currentStep > 1) {
-      const newStep = currentStep - 1;
-      setCurrentStep(newStep);
-      saveState({ currentStep: newStep });
+    // Ensure tutorialSteps is an array
+    if (!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
+      console.warn("Tutorial steps not available");
+      return;
+    }
+    
+    // Find the previous step by id (step_order from database)
+    const currentStepIndex = safeTutorialSteps.findIndex(step => step.id === currentStep);
+    if (currentStepIndex > 0) {
+      const prevStepData = safeTutorialSteps[currentStepIndex - 1];
+      setCurrentStep(prevStepData.id);
+      saveState({ currentStep: prevStepData.id });
     }
   };
 
   const goToStep = (step: number) => {
-    if (step >= 1 && step <= TUTORIAL_STEPS.length) {
-      setCurrentStep(step);
-      saveState({ currentStep: step });
+    // Ensure tutorialSteps is an array
+    if (!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
+      console.warn("Tutorial steps not available");
+      return;
+    }
+    
+    // Find step by id (step_order from database)
+    const stepData = safeTutorialSteps.find(s => s.id === step);
+    if (stepData) {
+      setCurrentStep(stepData.id);
+      saveState({ currentStep: stepData.id });
     }
   };
 
@@ -247,13 +362,28 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     saveState({ completedSteps: newCompleted });
   };
 
-  const resetTutorial = () => {
-    setCurrentStep(1);
+  // Ensure tutorialSteps is always an array (create this before functions that use it)
+  // Also ensure it updates when tutorialSteps changes
+  const safeTutorialSteps = Array.isArray(tutorialSteps) && tutorialSteps.length > 0 
+    ? tutorialSteps 
+    : DEFAULT_TUTORIAL_STEPS;
+
+  const resetTutorial = async () => {
+    // Refetch tutorial steps to ensure we have the latest data before resetting
+    await refetchTutorialSteps();
+    
+    // Get the latest tutorial steps after refetch
+    const latestSteps = queryClient.getQueryData<TutorialStep[]>(["/api/tutorial/steps"]) || tutorialSteps;
+    const safeLatestSteps = Array.isArray(latestSteps) && latestSteps.length > 0 ? latestSteps : DEFAULT_TUTORIAL_STEPS;
+    
+    // Always start from the first step (lowest step_order/id) when resetting tutorial
+    const firstStep = safeLatestSteps[0].id;
+    setCurrentStep(firstStep);
     setCompletedSteps(new Set());
     setHasCompletedTutorial(false);
     setIsOpen(true);
     saveState({
-      currentStep: 1,
+      currentStep: firstStep,
       completedSteps: new Set(),
       completed: false,
       isOpen: true,
@@ -274,6 +404,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         markStepComplete,
         resetTutorial,
         hasCompletedTutorial,
+        tutorialSteps: safeTutorialSteps, // Expose steps to context (always an array)
       }}
     >
       {children}
@@ -303,6 +434,9 @@ export function OnboardingTutorial({
   autoStart = false,
 }: OnboardingTutorialProps) {
   const [, setLocation] = useLocation();
+  const [videoError, setVideoError] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(true);
+  
   const {
     isOpen: contextIsOpen,
     currentStep,
@@ -314,6 +448,7 @@ export function OnboardingTutorial({
     markStepComplete,
     hasCompletedTutorial,
     openTutorial: contextOpenTutorial,
+    tutorialSteps: contextTutorialSteps = DEFAULT_TUTORIAL_STEPS,
   } = useTutorial();
 
   // Use controlled props if provided, otherwise use context
@@ -323,10 +458,63 @@ export function OnboardingTutorial({
   // Note: Auto-start is now handled by TutorialProvider for new signups only
   // This component no longer auto-starts on its own
 
-  const currentStepData = TUTORIAL_STEPS[currentStep - 1];
-  const progress = (currentStep / TUTORIAL_STEPS.length) * 100;
+  // Use tutorial steps from context (which are fetched from API)
+  // Ensure tutorialSteps is always an array
+  const tutorialSteps = Array.isArray(contextTutorialSteps) ? contextTutorialSteps : DEFAULT_TUTORIAL_STEPS;
+  
+  // Refetch tutorial steps when dialog opens to ensure latest data
+  // Note: We use refetchQueries without invalidateQueries to avoid clearing cached data
+  // The resetTutorial/openTutorial functions already handle refetching before opening
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (isOpen) {
+      // Refetch tutorial steps when dialog opens to get latest edits
+      // Use refetchQueries without invalidateQueries to preserve cached data during refetch
+      queryClient.refetchQueries({ 
+        queryKey: ["/api/tutorial/steps"],
+        type: 'active', // Only refetch active queries
+      });
+    }
+  }, [isOpen, queryClient]);
+  
+  // Find current step data by matching step id with currentStep
+  // The API returns id as step_order, so we need to find the step where id === currentStep
+  const currentStepData = tutorialSteps.find(step => step.id === currentStep) || tutorialSteps[currentStep - 1] || tutorialSteps[0];
+  
+  // Reset video state when step changes or video URL changes
+  useEffect(() => {
+    setVideoError(false);
+    setVideoLoading(true);
+  }, [currentStep, currentStepData?.videoUrl]);
+  
+  if (!currentStepData) {
+    return null; // Don't render if no step data
+  }
+  
+  const progress = (currentStep / tutorialSteps.length) * 100;
   const isFirstStep = currentStep === 1;
-  const isLastStep = currentStep === TUTORIAL_STEPS.length;
+  const isLastStep = currentStep === tutorialSteps.length;
+  
+  const handleVideoError = () => {
+    setVideoError(true);
+    setVideoLoading(false);
+    console.warn("Video failed to load:", currentStepData.videoUrl);
+  };
+  
+  const handleVideoLoad = () => {
+    setVideoLoading(false);
+    setVideoError(false);
+  };
+  
+  const handleVideoLoadStart = () => {
+    setVideoLoading(true);
+    setVideoError(false);
+  };
+  
+  // Check if video URL is valid
+  const hasValidVideoUrl = currentStepData.videoUrl && 
+    typeof currentStepData.videoUrl === 'string' && 
+    currentStepData.videoUrl.trim() !== '';
 
   const handleActionClick = () => {
     if (currentStepData.actionButton?.href) {
@@ -357,7 +545,16 @@ export function OnboardingTutorial({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        // Only close when user explicitly closes the dialog
+        // Don't close when open is true (that's a programmatic open)
+        if (!open) {
+          handleClose();
+        }
+      }}
+    >
       <DialogContent className="max-w-4xl max-h-[95vh] flex flex-col bg-[#0a0a0a] border-[#1a1a1a] text-white">
         <DialogHeader className="space-y-2 pb-2">
           <div className="flex items-center justify-between">
@@ -367,7 +564,7 @@ export function OnboardingTutorial({
             </DialogTitle>
           </div>
           <DialogDescription className="text-xs text-gray-400">
-            Step {currentStep} of {TUTORIAL_STEPS.length}
+            Step {currentStep} of {tutorialSteps.length}
           </DialogDescription>
         </DialogHeader>
 
@@ -377,7 +574,7 @@ export function OnboardingTutorial({
           <div className="flex justify-between text-xs text-gray-500">
             <span>{Math.round(progress)}% Complete</span>
             <span>
-              {currentStep} / {TUTORIAL_STEPS.length}
+              {currentStep} / {tutorialSteps.length}
             </span>
           </div>
         </div>
@@ -386,18 +583,47 @@ export function OnboardingTutorial({
         <div className="space-y-4 py-2 flex-1 overflow-hidden flex flex-col min-h-0">
            {/* Video Section */}
            <div className="relative h-[400px] bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex-shrink-0">
-             <video
-               key={currentStep}
-               src={currentStepData.videoUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
-               className="w-full h-full object-contain"
-               controls
-               autoPlay
-               loop
-               muted
-               playsInline
-             >
-               Your browser does not support the video tag.
-             </video>
+             {videoError || !hasValidVideoUrl ? (
+               <div className="w-full h-full flex items-center justify-center p-8">
+                 <div className="text-center space-y-2">
+                   <div className="text-gray-500 text-sm">
+                     {currentStepData.videoPlaceholder || "Video will be available soon"}
+                   </div>
+                   {hasValidVideoUrl && videoError && (
+                     <div className="text-xs text-gray-600 mt-2 break-all">
+                       Video URL: {currentStepData.videoUrl}
+                     </div>
+                   )}
+                 </div>
+               </div>
+             ) : (
+               <>
+                 {videoLoading && (
+                   <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
+                     <div className="text-center space-y-2">
+                       <div className="w-8 h-8 border-2 border-[#EAEB80] border-t-transparent rounded-full animate-spin mx-auto"></div>
+                       <p className="text-sm text-gray-400">Loading video...</p>
+                     </div>
+                   </div>
+                 )}
+                 <video
+                   key={`${currentStep}-${currentStepData.videoUrl}`}
+                   src={currentStepData.videoUrl}
+                   className="w-full h-full object-contain"
+                   controls
+                   autoPlay
+                   loop
+                   muted
+                   playsInline
+                   onError={handleVideoError}
+                   onLoadedData={handleVideoLoad}
+                   onLoadStart={handleVideoLoadStart}
+                   onCanPlay={handleVideoLoad}
+                 >
+                   Your browser does not support the video tag.
+                 </video>
+               </>
+             )}
            </div>
 
           {/* Step Title and Description */}
@@ -411,16 +637,20 @@ export function OnboardingTutorial({
             <h4 className="text-xs font-semibold text-gray-300 uppercase tracking-wide">
               Instructions:
             </h4>
-            <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              {currentStepData.instructions.map((instruction, index) => (
-                <li key={index} className="flex items-start gap-2 text-gray-300">
-                  <div className="mt-0.5 w-5 h-5 rounded-full bg-[#EAEB80]/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-[#EAEB80] text-xs font-bold">{index + 1}</span>
-                  </div>
-                  <span className="flex-1 leading-relaxed">{instruction}</span>
-                </li>
-              ))}
-            </ul>
+            {currentStepData.instructions && Array.isArray(currentStepData.instructions) && currentStepData.instructions.length > 0 ? (
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                {currentStepData.instructions.map((instruction, index) => (
+                  <li key={index} className="flex items-start gap-2 text-gray-300">
+                    <div className="mt-0.5 w-5 h-5 rounded-full bg-[#EAEB80]/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[#EAEB80] text-xs font-bold">{index + 1}</span>
+                    </div>
+                    <span className="flex-1 leading-relaxed">{instruction}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-gray-500 italic">No instructions available for this step.</p>
+            )}
           </div>
         </div>
 
