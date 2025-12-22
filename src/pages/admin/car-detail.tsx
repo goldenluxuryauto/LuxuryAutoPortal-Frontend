@@ -916,17 +916,6 @@ export default function CarDetailPage() {
                         isSelected && "ring-2 ring-[#EAEB80] rounded-lg",
                         // Removed carousel sync indicator - carousel and Photos card are independent
                       )}
-                      onClick={(e) => {
-                        // Only handle selection if clicking checkbox area or button
-                        // Otherwise, open full screen view
-                        const target = e.target as HTMLElement;
-                        if (isAdmin && (target.closest('.checkbox-area') || target.closest('button'))) {
-                          handleSelectPhoto(index);
-                        } else {
-                          // Open full screen view when clicking on the image
-                          setFullScreenImageIndex(index);
-                        }
-                      }}
                     >
                       <div className="relative aspect-square">
                         <img
@@ -1186,20 +1175,21 @@ export default function CarDetailPage() {
             className="fixed inset-0 z-[100] bg-black/98 flex items-center justify-center"
             onClick={() => setFullScreenImageIndex(null)}
           >
+            {/* Close Button - Top Right */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                setFullScreenImageIndex(null);
+              }}
+              className="fixed top-6 right-6 z-[200] h-12 w-12 bg-black/90 hover:bg-red-600/90 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+              aria-label="Close full screen view"
+            >
+              <X className="w-7 h-7" />
+            </Button>
+
             <div className="relative w-full h-full flex items-center justify-center">
-              {/* Close Button - Top Right */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setFullScreenImageIndex(null);
-                }}
-                className="absolute top-4 right-4 z-[101] h-10 w-10 bg-black/80 hover:bg-black/90 text-white border border-white/40 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
-                aria-label="Close full screen view"
-              >
-                <X className="w-6 h-6" />
-              </Button>
 
               {/* Image Counter - Bottom Center */}
               {car.photos.length > 1 && (
