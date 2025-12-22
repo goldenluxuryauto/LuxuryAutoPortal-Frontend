@@ -20,6 +20,7 @@ import CarDetailPage from "@/pages/admin/car-detail";
 import IncomeExpensesPage from "@/pages/admin/income-expenses";
 import SettingsPage from "@/pages/admin/settings";
 import ClientProfilePage from "@/pages/admin/profile";
+import TrainingManualPage from "@/pages/admin/training-manual";
 import SignContract from "@/pages/sign-contract";
 import Signup from "@/pages/signup";
 import ResetPasswordPage from "@/pages/reset-password";
@@ -44,6 +45,7 @@ function Router() {
       <Route path="/admin/income-expenses" component={IncomeExpensesPage} />
       <Route path="/admin/settings" component={SettingsPage} />
       <Route path="/admin/profile" component={ClientProfilePage} />
+      <Route path="/admin/training-manual" component={TrainingManualPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
       <Route component={NotFound} />
     </Switch>

@@ -39,7 +39,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Search, Loader2, Eye, ChevronLeft, ChevronRight, X, Plus, Trash2 } from "lucide-react";
+import { Search, Loader2, Eye, ChevronLeft, ChevronRight, X, Plus } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
 import { cn } from "@/lib/utils";
@@ -654,7 +654,7 @@ export default function ClientsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleViewClient(client.id);
@@ -663,11 +663,11 @@ export default function ClientsPage() {
                                 <Eye className="w-4 h-4 mr-1" />
                                 View
                               </Button>
-                              {!client.isActive && (
+                              {!client.isActive && client.status !== 3 && (
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="text-green-400 hover:text-green-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className="text-green-400 hover:text-green-300"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleReactivateAccess(client.email);
@@ -682,45 +682,41 @@ export default function ClientsPage() {
                                   )}
                                 </Button>
                               )}
-                              {client.status !== 3 && client.isActive && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-yellow-400 hover:text-yellow-300 opacity-0 group-hover:opacity-100 transition-opacity"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRevokeAccess(client.email);
-                                  }}
-                                  title="Suspend Access (Temporary)"
-                                >
-                                  Suspend
-                                </Button>
-                              )}
-                              {client.status !== 3 && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-red-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleBlockUser(client.email);
-                                  }}
-                                  title="Permanently Block Account"
-                                >
-                                  Block
-                                </Button>
-                              )}
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-red-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                                className={client.status === 3 
+                                  ? "text-yellow-400 opacity-50 cursor-not-allowed" 
+                                  : "text-yellow-400 hover:text-yellow-300"
+                                }
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDeleteUser(client.id, client.email);
+                                  if (client.status !== 3 && client.isActive) {
+                                    handleRevokeAccess(client.email);
+                                  }
                                 }}
-                                title="Permanently Delete User"
+                                disabled={client.status === 3 || !client.isActive}
+                                title={client.status === 3 ? "Suspend Access (Temporary) - Disabled for blocked clients" : "Suspend Access (Temporary)"}
                               >
-                                <Trash2 className="w-5 h-5" />
+                                Suspend
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={client.status === 3 
+                                  ? "text-red-400 opacity-50 cursor-not-allowed border border-transparent" 
+                                  : "text-red-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent"
+                                }
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (client.status !== 3) {
+                                    handleBlockUser(client.email);
+                                  }
+                                }}
+                                disabled={client.status === 3}
+                                title={client.status === 3 ? "Permanently Block Account - Already blocked" : "Permanently Block Account"}
+                              >
+                                Block
                               </Button>
                             </div>
                           </TableCell>

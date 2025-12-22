@@ -4,12 +4,11 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Folder, Download, PlayCircle } from "lucide-react";
+import { Loader2, Folder, Download } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import QuickLinks from "@/components/admin/QuickLinks";
 import { useToast } from "@/hooks/use-toast";
-import { OnboardingTutorial, useTutorial } from "@/components/onboarding/OnboardingTutorial";
 
 interface ClientProfileResponse {
   success: boolean;
@@ -18,7 +17,6 @@ interface ClientProfileResponse {
 
 export default function ClientProfilePage() {
   const { toast } = useToast();
-  const { isOpen: tutorialOpen, openTutorial, closeTutorial, resetTutorial } = useTutorial();
 
   const {
     data,
@@ -792,32 +790,6 @@ export default function ClientProfilePage() {
           <QuickLinks />
               </div>
 
-        {/* Tutorial Restart Button */}
-        <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
-          <CardHeader>
-            <CardTitle className="text-[#EAEB80] text-xl">Help & Tutorials</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-medium">System Tutorial</p>
-                <p className="text-gray-400 text-sm">
-                  Learn how to use the GLA portal with our guided tutorial
-                </p>
-              </div>
-              <Button
-                onClick={resetTutorial}
-                className="bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90"
-              >
-                <PlayCircle className="w-4 h-4 mr-2" />
-                Start Tutorial
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tutorial Modal */}
-        <OnboardingTutorial isOpen={tutorialOpen} onClose={closeTutorial} />
       </div>
     </AdminLayout>
   );

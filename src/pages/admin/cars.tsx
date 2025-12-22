@@ -487,15 +487,6 @@ export default function CarsPage() {
             <h1 className="text-2xl font-semibold text-white">Cars</h1>
             <p className="text-gray-400 text-sm">{isAdmin ? "Manage your vehicle fleet" : "View your vehicles"}</p>
           </div>
-          {isAdmin && (
-            <Button
-              onClick={handleAddClick}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add New Car
-            </Button>
-          )}
         </div>
 
         {/* Search and Filter */}
@@ -595,9 +586,6 @@ export default function CarsPage() {
                       Oil Type
                     </th>
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
-                      Last Oil Change
-                    </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                       Turo Link
                     </th>
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
@@ -618,7 +606,7 @@ export default function CarsPage() {
                           key={`skeleton-${i}`}
                           className="border-b border-[#2a2a2a]"
                         >
-                          <td colSpan={isAdmin ? 18 : 17} className="px-4 py-3">
+                          <td colSpan={isAdmin ? 17 : 16} className="px-4 py-3">
                             <div className="h-4 bg-[#252525] rounded animate-pulse" />
                           </td>
                         </tr>
@@ -729,9 +717,6 @@ export default function CarsPage() {
                           <td className="text-left text-gray-400 px-4 py-3 align-middle">
                             {car.oilType || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 px-4 py-3 align-middle">
-                            {formatDate(car.lastOilChange)}
-                          </td>
                           <td className="text-left px-4 py-3 align-middle">
                             <a
                               href="#"
@@ -752,7 +737,7 @@ export default function CarsPage() {
                           </td>
                           {isAdmin && (
                             <td className="px-4 py-3 text-right">
-                              <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="flex items-center justify-end gap-2">
                                 <Button
                                   variant="ghost"
                                   size="sm"

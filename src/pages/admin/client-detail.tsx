@@ -1381,7 +1381,6 @@ export default function ClientDetailPage() {
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Gas</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Tire Size</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Oil Type</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Last Oil Change</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Turo Link</TableHead>
                             <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Admin Turo Link</TableHead>
                           </TableRow>
@@ -1455,9 +1454,6 @@ export default function ClientDetailPage() {
                               </TableCell>
                               <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
                                 {car.oilType || "N/A"}
-                              </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
-                                {formatDate(car.lastOilChange)}
                               </TableCell>
                               <TableCell className="text-left px-4 py-3 align-middle">
                                 <a
