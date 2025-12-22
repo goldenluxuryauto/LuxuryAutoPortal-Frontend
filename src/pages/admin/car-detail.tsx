@@ -1187,6 +1187,20 @@ export default function CarDetailPage() {
             onClick={() => setFullScreenImageIndex(null)}
           >
             <div className="relative w-full h-full flex items-center justify-center">
+              {/* Close Button - Top Right */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFullScreenImageIndex(null);
+                }}
+                className="absolute top-4 right-4 z-[101] h-10 w-10 bg-black/80 hover:bg-black/90 text-white border border-white/40 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                aria-label="Close full screen view"
+              >
+                <X className="w-6 h-6" />
+              </Button>
+
               {/* Image Counter - Bottom Center */}
               {car.photos.length > 1 && (
                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
