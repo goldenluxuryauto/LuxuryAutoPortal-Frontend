@@ -56,6 +56,7 @@ interface CarDetail {
 }
 
 const carSchema = z.object({
+  // Vehicle Information
   vin: z
     .string()
     .min(1, "VIN is required")
@@ -65,6 +66,21 @@ const carSchema = z.object({
   year: z.string().optional(),
   color: z.string().optional(),
   mileage: z.string().optional(),
+  // Financial Information
+  purchasePrice: z.string().optional(),
+  downPayment: z.string().optional(),
+  monthlyPayment: z.string().optional(),
+  interestRate: z.string().optional(),
+  transportCityToCity: z.string().optional(),
+  ultimateGoal: z.string().optional(),
+  // Insurance Information
+  insuranceProvider: z.string().optional(),
+  insurancePhone: z.string().optional(),
+  policyNumber: z.string().optional(),
+  insuranceExpiration: z.string().optional(),
+  // Additional Information
+  carManufacturerWebsite: z.string().optional(),
+  carManufacturerUsername: z.string().optional(),
 });
 
 type CarFormData = z.infer<typeof carSchema>;
@@ -112,6 +128,53 @@ export default function CarDetailPage() {
   });
 
   const car = data?.data;
+
+  // Fetch onboarding data for financial, insurance, and additional information
+  const { data: onboardingData, isLoading: isLoadingOnboarding } = useQuery<{
+    success: boolean;
+    data: any;
+  }>({
+    queryKey: ["/api/clients", car?.clientId, "onboarding"],
+    queryFn: async () => {
+      if (!car?.clientId) throw new Error("No client ID");
+      const url = buildApiUrl(`/api/clients/${car.clientId}/onboarding`);
+      const response = await fetch(url, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        // Return null if no onboarding found (404) instead of throwing
+        if (response.status === 404) {
+          return { success: false, data: null };
+        }
+        throw new Error(errorData.error || `Failed to fetch onboarding: ${response.statusText}`);
+      }
+      const result = await response.json();
+      return result;
+    },
+    enabled: !!car?.clientId,
+    retry: false,
+  });
+
+  const onboarding = onboardingData?.success ? onboardingData?.data : null;
+
+  // Helper functions
+  const formatValue = (value: any): string => {
+    if (value === null || value === undefined || value === "") {
+      return "Not provided";
+    }
+    return String(value);
+  };
+
+  const formatCurrency = (value: string | null | undefined): string => {
+    if (!value) return "Not provided";
+    const num = parseFloat(value);
+    if (isNaN(num)) return value;
+    return `$${num.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
 
   // Reset carousel index when car changes or photos change
   useEffect(() => {
@@ -174,18 +237,46 @@ export default function CarDetailPage() {
       year: "",
       color: "",
       mileage: "",
+      purchasePrice: "",
+      downPayment: "",
+      monthlyPayment: "",
+      interestRate: "",
+      transportCityToCity: "",
+      ultimateGoal: "",
+      insuranceProvider: "",
+      insurancePhone: "",
+      policyNumber: "",
+      insuranceExpiration: "",
+      carManufacturerWebsite: "",
+      carManufacturerUsername: "",
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: async (data: CarFormData) => {
       const formData = new FormData();
+      // Vehicle Information
       formData.append("vin", data.vin);
       formData.append("makeModel", data.makeModel);
       if (data.licensePlate) formData.append("licensePlate", data.licensePlate);
       if (data.year) formData.append("year", data.year);
       if (data.color) formData.append("color", data.color);
       if (data.mileage) formData.append("mileage", data.mileage);
+      // Financial Information
+      if (data.purchasePrice !== undefined) formData.append("purchasePrice", data.purchasePrice || "");
+      if (data.downPayment !== undefined) formData.append("downPayment", data.downPayment || "");
+      if (data.monthlyPayment !== undefined) formData.append("monthlyPayment", data.monthlyPayment || "");
+      if (data.interestRate !== undefined) formData.append("interestRate", data.interestRate || "");
+      if (data.transportCityToCity !== undefined) formData.append("transportCityToCity", data.transportCityToCity || "");
+      if (data.ultimateGoal !== undefined) formData.append("ultimateGoal", data.ultimateGoal || "");
+      // Insurance Information
+      if (data.insuranceProvider !== undefined) formData.append("insuranceProvider", data.insuranceProvider || "");
+      if (data.insurancePhone !== undefined) formData.append("insurancePhone", data.insurancePhone || "");
+      if (data.policyNumber !== undefined) formData.append("policyNumber", data.policyNumber || "");
+      if (data.insuranceExpiration !== undefined) formData.append("insuranceExpiration", data.insuranceExpiration || "");
+      // Additional Information
+      if (data.carManufacturerWebsite !== undefined) formData.append("carManufacturerWebsite", data.carManufacturerWebsite || "");
+      if (data.carManufacturerUsername !== undefined) formData.append("carManufacturerUsername", data.carManufacturerUsername || "");
 
       const response = await fetch(buildApiUrl(`/api/cars/${carId}`), {
         method: "PATCH",
@@ -198,12 +289,17 @@ export default function CarDetailPage() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
+    onSuccess: async () => {
+      // Refetch both car and onboarding data to ensure UI updates
+      await queryClient.refetchQueries({ queryKey: ["/api/cars", carId] });
+      if (car?.clientId) {
+        await queryClient.refetchQueries({ queryKey: ["/api/clients", car.clientId, "onboarding"] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["/api/cars"] }); // For the cars list page
       queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       toast({
         title: "Success",
-        description: "Car updated successfully",
+        description: "Car information updated successfully",
       });
       setIsEditModalOpen(false);
     },
@@ -388,6 +484,21 @@ export default function CarDetailPage() {
       year: car.year?.toString() || "",
       color: car.color || "",
       mileage: car.mileage?.toString() || "",
+      // Financial Information
+      purchasePrice: onboarding?.purchasePrice || "",
+      downPayment: onboarding?.downPayment || "",
+      monthlyPayment: onboarding?.monthlyPayment || "",
+      interestRate: onboarding?.interestRate || "",
+      transportCityToCity: onboarding?.transportCityToCity || "",
+      ultimateGoal: onboarding?.ultimateGoal || "",
+      // Insurance Information
+      insuranceProvider: onboarding?.insuranceProvider || "",
+      insurancePhone: onboarding?.insurancePhone || "",
+      policyNumber: onboarding?.policyNumber || "",
+      insuranceExpiration: onboarding?.insuranceExpiration || "",
+      // Additional Information
+      carManufacturerWebsite: onboarding?.carManufacturerWebsite || "",
+      carManufacturerUsername: onboarding?.carManufacturerUsername || "",
     });
     setIsEditModalOpen(true);
   };
@@ -575,36 +686,37 @@ export default function CarDetailPage() {
           )}
         </div>
 
+        {/* Row 1: Vehicle Information, Financial Information, Insurance Information */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Specifications Card - Increased by 1 column (4 + 1 = 5 columns) */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-5">
+          {/* Vehicle Information Card */}
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80] flex items-center gap-2">
+              <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
                 <Car className="w-5 h-5" />
-                Specifications
+                Vehicle Information
               </CardTitle>
             </CardHeader>
               <CardContent className="space-y-1.5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">VIN</p>
-                    <p className="text-white font-mono">{car.vin}</p>
+                    <p className="text-white text-base font-mono">{car.vin}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Make & Model</p>
-                    <p className="text-white">{car.makeModel}</p>
+                    <p className="text-white text-base">{car.makeModel}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Year</p>
-                    <p className="text-white">{car.year || "N/A"}</p>
+                    <p className="text-white text-base">{car.year || "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Color</p>
-                    <p className="text-white">{car.color || "N/A"}</p>
+                    <p className="text-white text-base">{car.color || "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">License Plate</p>
-                    <p className="text-white">{car.licensePlate || "N/A"}</p>
+                    <p className="text-white text-base">{car.licensePlate || "N/A"}</p>
                   </div>
                 </div>
                 <div className="pt-1.5 border-t border-[#2a2a2a]">
@@ -626,7 +738,7 @@ export default function CarDetailPage() {
                           onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
                           className="text-left hover:text-[#EAEB80] transition-colors"
                         >
-                          <p className="text-white text-sm hover:underline">
+                          <p className="text-white text-base hover:underline">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
@@ -637,7 +749,7 @@ export default function CarDetailPage() {
                         </button>
                       ) : (
                         <>
-                          <p className="text-white text-sm">
+                          <p className="text-white text-base">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
@@ -654,7 +766,7 @@ export default function CarDetailPage() {
                 {car.offboardAt && (
                   <div className="pt-1.5 border-t border-[#2a2a2a]">
                     <p className="text-xs text-gray-500 mb-0.5">Off-boarded</p>
-                    <p className="text-white text-sm">
+                    <p className="text-white text-base">
                       {formatDate(car.offboardAt)}
                     </p>
                     {car.offboardReason && (
@@ -672,7 +784,140 @@ export default function CarDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Timestamps Card - Increased by 1 column (2 + 1 = 3 columns) */}
+          {/* Financial Information Card */}
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
+            <CardHeader>
+              <CardTitle className="text-[#EAEB80] text-lg">
+                Financial Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {isLoadingOnboarding ? (
+                <div className="text-center py-4 text-gray-400">
+                  <p className="text-sm">Loading...</p>
+                </div>
+              ) : onboarding ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Purchase Price</p>
+                    <p className="text-white text-base">{formatCurrency(onboarding.purchasePrice)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Down Payment</p>
+                    <p className="text-white text-base">{formatCurrency(onboarding.downPayment)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Monthly Payment</p>
+                    <p className="text-white text-base">{formatCurrency(onboarding.monthlyPayment)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Interest Rate</p>
+                    <p className="text-white text-base">{formatValue(onboarding.interestRate)}%</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Transport City to City</p>
+                    <p className="text-white text-base">{formatValue(onboarding.transportCityToCity)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Ultimate Goal</p>
+                    <p className="text-white text-base">{formatValue(onboarding.ultimateGoal)}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-4 text-gray-400">
+                  <p className="text-sm">No financial information available</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Insurance Information Card */}
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
+            <CardHeader>
+              <CardTitle className="text-[#EAEB80] text-lg">
+                Insurance Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {isLoadingOnboarding ? (
+                <div className="text-center py-4 text-gray-400">
+                  <p className="text-sm">Loading...</p>
+                </div>
+              ) : onboarding ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Provider</p>
+                    <p className="text-white text-base">{formatValue(onboarding.insuranceProvider)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Phone</p>
+                    <p className="text-white text-base">{formatValue(onboarding.insurancePhone)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Policy Number</p>
+                    <p className="text-white text-base font-mono">{formatValue(onboarding.policyNumber)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Expiration</p>
+                    <p className="text-white text-base">{formatValue(onboarding.insuranceExpiration)}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-4 text-gray-400">
+                  <p className="text-sm">No insurance information available</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Row 2: Additional Information, Timestamps, Car Photos Carousel */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Additional Information Card */}
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
+            <CardHeader>
+              <CardTitle className="text-[#EAEB80] text-lg">
+                Additional Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {isLoadingOnboarding ? (
+                <div className="text-center py-4 text-gray-400">
+                  <p className="text-sm">Loading...</p>
+                </div>
+              ) : onboarding ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                  {onboarding.carManufacturerWebsite && (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Car Manufacturer Website</p>
+                      <p className="text-white text-base break-all">
+                        <a
+                          href={onboarding.carManufacturerWebsite}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#EAEB80] hover:underline"
+                        >
+                          {formatValue(onboarding.carManufacturerWebsite)}
+                        </a>
+                      </p>
+                    </div>
+                  )}
+                  {onboarding.carManufacturerUsername && (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Manufacturer Username</p>
+                      <p className="text-white text-base">{formatValue(onboarding.carManufacturerUsername)}</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-4 text-gray-400">
+                  <p className="text-sm">No additional information available</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Timestamps Card */}
           <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
@@ -682,23 +927,23 @@ export default function CarDetailPage() {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-xs text-gray-500 mb-1">Created</p>
-                <p className="text-white">
+                <p className="text-white text-base">
                   {formatDate(car.createdAt)}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Last Updated</p>
-                <p className="text-white">
+                <p className="text-white text-base">
                   {formatDate(car.updatedAt)}
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Car Photos Carousel Card - Reduced by 1/5 (6 * 4/5 = 4.8 ≈ 5 columns) */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4 h-full">
+          {/* Car Photos Carousel Card */}
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-5 h-full">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80] flex items-center gap-2">
+              <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
                 <Car className="w-5 h-5" />
                 Car Photos
               </CardTitle>
@@ -709,7 +954,9 @@ export default function CarDetailPage() {
                     {/* Main Carousel Display - Reduced height by 1/5 (333 * 4/5 = 266px) */}
                     <div className="relative w-full h-[266px] bg-black rounded-lg overflow-hidden border border-[#2a2a2a]">
                     {car.photos.map((photo, index) => {
-                      const photoUrl = buildApiUrl(photo.startsWith('/') ? photo : `/${photo}`);
+                      // For static assets like car photos, use the path directly without buildApiUrl
+                      // buildApiUrl is for API endpoints, not static files
+                      const photoUrl = photo.startsWith('/') ? photo : `/${photo}`;
                       const isActive = index === carouselIndex;
                       return (
                         <div
@@ -801,7 +1048,7 @@ export default function CarDetailPage() {
         <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-[#EAEB80] flex items-center gap-2">
+              <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
                 <Upload className="w-5 h-5" />
                 Photos ({car.photos?.length || 0} / 20)
               </CardTitle>
@@ -906,7 +1153,9 @@ export default function CarDetailPage() {
             {car.photos && car.photos.length > 0 ? (
               <div className="grid grid-cols-8 gap-4">
                 {car.photos.map((photo, index) => {
-                  const photoUrl = buildApiUrl(photo.startsWith('/') ? photo : `/${photo}`);
+                  // For static assets like car photos, use the path directly without buildApiUrl
+                  // buildApiUrl is for API endpoints, not static files
+                  const photoUrl = photo.startsWith('/') ? photo : `/${photo}`;
                   const isSelected = selectedPhotos.has(index);
                   return (
                     <div
@@ -1034,7 +1283,7 @@ export default function CarDetailPage() {
         {/* Rental History - Placeholder */}
         <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
           <CardHeader>
-            <CardTitle className="text-[#EAEB80]">Rental History</CardTitle>
+            <CardTitle className="text-[#EAEB80] text-lg">Rental History</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-400 text-center py-8">
@@ -1046,66 +1295,51 @@ export default function CarDetailPage() {
         {/* Edit Modal - Only for admins */}
         {isAdmin && (
           <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-md">
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold">
-                Edit Car
+                Edit Car Information
               </DialogTitle>
               <DialogDescription className="text-gray-400">
-                Update car information
+                Update vehicle, financial, insurance, and additional information
               </DialogDescription>
             </DialogHeader>
 
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4 mt-4"
+                className="space-y-6 mt-4"
               >
-                <FormField
-                  control={form.control}
-                  name="vin"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-400">VIN *</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          maxLength={17}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="makeModel"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-400">
-                        Make & Model *
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
+                {/* Vehicle Information Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                    Vehicle Information
+                  </h3>
                   <FormField
                     control={form.control}
-                    name="licensePlate"
+                    name="vin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">VIN *</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            maxLength={17}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="makeModel"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-gray-400">
-                          License Plate
+                          Make & Model *
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -1118,45 +1352,328 @@ export default function CarDetailPage() {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="year"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">Year</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="number"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="licensePlate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">
+                            License Plate
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="year"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Year</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="color"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Color</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="mileage"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Mileage</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="color"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">Color</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                {/* Financial Information Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                    Financial Information
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="purchasePrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Purchase Price</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="downPayment"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Down Payment</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="monthlyPayment"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Monthly Payment</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="interestRate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Interest Rate (%)</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="transportCityToCity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Transport City to City</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="ultimateGoal"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Ultimate Goal</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4">
+                {/* Insurance Information Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                    Insurance Information
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="insuranceProvider"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Provider</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="insurancePhone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Phone</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="tel"
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="policyNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Policy Number</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] font-mono"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="insuranceExpiration"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Expiration</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="date"
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Additional Information Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                    Additional Information
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="carManufacturerWebsite"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Car Manufacturer Website</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="url"
+                              placeholder="https://example.com"
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="carManufacturerUsername"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Manufacturer Username</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
                   <Button
                     type="button"
                     variant="ghost"
@@ -1213,7 +1730,7 @@ export default function CarDetailPage() {
               {/* Full Screen Image - High Resolution Display */}
               {car.photos && car.photos[fullScreenImageIndex] && (
                 <img
-                  src={buildApiUrl(car.photos[fullScreenImageIndex].startsWith('/') ? car.photos[fullScreenImageIndex] : `/${car.photos[fullScreenImageIndex]}`)}
+                  src={car.photos[fullScreenImageIndex].startsWith('/') ? car.photos[fullScreenImageIndex] : `/${car.photos[fullScreenImageIndex]}`}
                   alt={`Car photo ${fullScreenImageIndex + 1}`}
                   className="w-full h-full object-contain"
                   onClick={(e) => e.stopPropagation()}

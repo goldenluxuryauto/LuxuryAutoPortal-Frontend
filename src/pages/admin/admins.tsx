@@ -516,16 +516,16 @@ export default function AdminsPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-gray-400 hover:text-white"
-                              onClick={() => handleEditClick(user)}
-                              data-testid={`button-edit-admin-${user.id}`}
-                            >
-                              <Pencil className="w-4 h-4 mr-1" />
-                              Edit
-                            </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-gray-400 hover:text-white"
+                            onClick={() => handleEditClick(user)}
+                            data-testid={`button-edit-admin-${user.id}`}
+                          >
+                            <Pencil className="w-4 h-4 mr-1" />
+                            Edit
+                          </Button>
                           </div>
                         </td>
                       </tr>
