@@ -309,21 +309,21 @@ export default function CarDetailPage() {
       formData.append("year", data.year || "");
       formData.append("color", data.color || "");
       formData.append("mileage", data.mileage || "");
-      // Financial Information
-      if (data.purchasePrice !== undefined) formData.append("purchasePrice", data.purchasePrice || "");
-      if (data.downPayment !== undefined) formData.append("downPayment", data.downPayment || "");
-      if (data.monthlyPayment !== undefined) formData.append("monthlyPayment", data.monthlyPayment || "");
-      if (data.interestRate !== undefined) formData.append("interestRate", data.interestRate || "");
-      if (data.transportCityToCity !== undefined) formData.append("transportCityToCity", data.transportCityToCity || "");
-      if (data.ultimateGoal !== undefined) formData.append("ultimateGoal", data.ultimateGoal || "");
-      // Insurance Information
-      if (data.insuranceProvider !== undefined) formData.append("insuranceProvider", data.insuranceProvider || "");
-      if (data.insurancePhone !== undefined) formData.append("insurancePhone", data.insurancePhone || "");
-      if (data.policyNumber !== undefined) formData.append("policyNumber", data.policyNumber || "");
-      if (data.insuranceExpiration !== undefined) formData.append("insuranceExpiration", data.insuranceExpiration || "");
-      // Additional Information
-      if (data.carManufacturerWebsite !== undefined) formData.append("carManufacturerWebsite", data.carManufacturerWebsite || "");
-      if (data.carManufacturerUsername !== undefined) formData.append("carManufacturerUsername", data.carManufacturerUsername || "");
+      // Financial Information - Always send all fields to ensure backend can update them
+      formData.append("purchasePrice", data.purchasePrice || "");
+      formData.append("downPayment", data.downPayment || "");
+      formData.append("monthlyPayment", data.monthlyPayment || "");
+      formData.append("interestRate", data.interestRate || "");
+      formData.append("transportCityToCity", data.transportCityToCity || "");
+      formData.append("ultimateGoal", data.ultimateGoal || "");
+      // Insurance Information - Always send all fields to ensure backend can update them
+      formData.append("insuranceProvider", data.insuranceProvider || "");
+      formData.append("insurancePhone", data.insurancePhone || "");
+      formData.append("policyNumber", data.policyNumber || "");
+      formData.append("insuranceExpiration", data.insuranceExpiration || "");
+      // Additional Information - Always send all fields to ensure backend can update them
+      formData.append("carManufacturerWebsite", data.carManufacturerWebsite || "");
+      formData.append("carManufacturerUsername", data.carManufacturerUsername || "");
       
       // Documents - Handle file uploads
       const insuranceCardFile = (form as any).getValues("insuranceCardFile");
@@ -1620,13 +1620,13 @@ export default function CarDetailPage() {
                             <Input
                               {...field}
                               type="number"
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   </div>
                 </div>
 
