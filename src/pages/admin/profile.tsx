@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Folder, Download, ExternalLink, X } from "lucide-react";
+import { Folder, Download, ExternalLink } from "lucide-react";
 import { ProfileSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,6 @@ interface ClientProfileResponse {
 
 export default function ClientProfilePage() {
   const { toast } = useToast();
-  const [fullScreenImage, setFullScreenImage] = useState<{ url: string; type: 'insurance' | 'license'; index?: number } | null>(null);
 
   const {
     data,
@@ -59,42 +58,6 @@ export default function ClientProfilePage() {
   const onboarding = profile?.onboarding;
   const signedContracts: any[] = profile?.signedContracts || [];
   const cars: any[] = profile?.cars || [];
-
-  // Keyboard navigation for full screen image viewer
-  useEffect(() => {
-    if (fullScreenImage === null || !onboarding) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (fullScreenImage.type === 'license' && 
-          onboarding.driversLicenseUrls && 
-          Array.isArray(onboarding.driversLicenseUrls) && 
-          onboarding.driversLicenseUrls.length > 1 && 
-          fullScreenImage.index !== undefined) {
-        if (e.key === 'ArrowLeft' && fullScreenImage.index > 0) {
-          const prevIndex = fullScreenImage.index - 1;
-          setFullScreenImage({ 
-            url: onboarding.driversLicenseUrls[prevIndex], 
-            type: 'license', 
-            index: prevIndex 
-          });
-        } else if (e.key === 'ArrowRight' && fullScreenImage.index < onboarding.driversLicenseUrls.length - 1) {
-          const nextIndex = fullScreenImage.index + 1;
-          setFullScreenImage({ 
-            url: onboarding.driversLicenseUrls[nextIndex], 
-            type: 'license', 
-            index: nextIndex 
-          });
-        }
-      }
-      
-      if (e.key === 'Escape') {
-        setFullScreenImage(null);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [fullScreenImage, onboarding]);
 
   const formatValue = (value: any): string => {
     if (value === null || value === undefined || value === "") {
@@ -374,113 +337,6 @@ export default function ClientProfilePage() {
                               </div>
                             </div>
 
-                          {/* Insurance Card & Drivers License Photos - Prominently Displayed */}
-                          <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#EAEB80]/20">
-                            <h3 className="text-xl font-semibold text-[#EAEB80] mb-6 pb-3 border-b border-[#EAEB80]/30">
-                              Documents
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                              {/* Insurance Card */}
-                              <div>
-                                <h4 className="text-base font-semibold text-gray-200 mb-4">Insurance Card</h4>
-                                {onboarding.insuranceCardUrl ? (
-                                  <div 
-                                    className="relative group cursor-pointer"
-                                    onClick={() => {
-                                      const imageUrl = onboarding.insuranceCardUrl.startsWith('http') 
-                                        ? onboarding.insuranceCardUrl 
-                                        : buildApiUrl(onboarding.insuranceCardUrl);
-                                      setFullScreenImage({ url: imageUrl, type: 'insurance' });
-                                    }}
-                                  >
-                                    <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
-                                      <img
-                                        src={onboarding.insuranceCardUrl.startsWith('http') 
-                                          ? onboarding.insuranceCardUrl 
-                                          : buildApiUrl(onboarding.insuranceCardUrl)}
-                                        alt="Insurance Card"
-                                        className="w-full h-full object-contain p-2"
-                                        onError={(e) => {
-                                          console.error('Failed to load insurance card image:', onboarding.insuranceCardUrl);
-                                          const target = e.target as HTMLImageElement;
-                                          target.style.display = "none";
-                                          const parent = target.parentElement?.parentElement;
-                                          if (parent && !parent.querySelector(".error-message")) {
-                                            const errorDiv = document.createElement("div");
-                                            errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
-                                            errorDiv.textContent = "Failed to load image";
-                                            parent.appendChild(errorDiv);
-                                          }
-                                        }}
-                                      />
-                                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                                          Click to view full screen
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
-                                    <p className="text-sm text-gray-500">No insurance card uploaded</p>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Drivers License */}
-                              <div>
-                                <h4 className="text-base font-semibold text-gray-200 mb-4">Drivers License</h4>
-                                {onboarding.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 ? (
-                                  <div className="space-y-4">
-                                    {onboarding.driversLicenseUrls.map((url: string, index: number) => {
-                                      const imageUrl = url.startsWith('http') ? url : buildApiUrl(url);
-                                      return (
-                                        <div 
-                                          key={index}
-                                          className="relative group cursor-pointer"
-                                          onClick={() => setFullScreenImage({ url: imageUrl, type: 'license', index })}
-                                        >
-                                          <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
-                                            <img
-                                              src={imageUrl}
-                                              alt={`Drivers License ${index + 1}`}
-                                              className="w-full h-full object-contain p-2"
-                                              onError={(e) => {
-                                                console.error('Failed to load drivers license image:', url);
-                                                const target = e.target as HTMLImageElement;
-                                                target.style.display = "none";
-                                                const parent = target.parentElement?.parentElement;
-                                                if (parent && !parent.querySelector(".error-message")) {
-                                                  const errorDiv = document.createElement("div");
-                                                  errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
-                                                  errorDiv.textContent = "Failed to load image";
-                                                  parent.appendChild(errorDiv);
-                                                }
-                                              }}
-                                            />
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                              <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                                                Click to view full screen
-                                              </div>
-                                            </div>
-                                          </div>
-                                          {onboarding.driversLicenseUrls.length > 1 && (
-                                            <div className="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-                                              {index + 1} / {onboarding.driversLicenseUrls.length}
-                                            </div>
-                                          )}
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                ) : (
-                                  <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
-                                    <p className="text-sm text-gray-500">No drivers license uploaded</p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
                         </>
                       )}
                     </CardContent>
@@ -572,117 +428,6 @@ export default function ClientProfilePage() {
 
       </div>
 
-      {/* Full Screen Image Viewer Dialog */}
-      {fullScreenImage && (
-        <div 
-          className="fixed inset-0 z-[100] bg-black/98 flex items-center justify-center"
-          onClick={() => setFullScreenImage(null)}
-        >
-          {/* Close Button - Top Right */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              setFullScreenImage(null);
-            }}
-            className="fixed top-6 right-6 z-[200] h-12 w-12 bg-black/90 hover:bg-red-600/90 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
-            aria-label="Close full screen view"
-          >
-            <X className="w-7 h-7" />
-          </Button>
-
-          <div className="relative w-full h-full flex items-center justify-center p-8">
-            {/* Image Counter - Bottom Center (for multiple drivers licenses) */}
-            {fullScreenImage.type === 'license' && 
-             onboarding?.driversLicenseUrls && 
-             Array.isArray(onboarding.driversLicenseUrls) && 
-             onboarding.driversLicenseUrls.length > 1 && 
-             fullScreenImage.index !== undefined && (
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
-                <span className="text-white text-base font-semibold tracking-wide">
-                  {fullScreenImage.index + 1} / {onboarding.driversLicenseUrls.length}
-                </span>
-              </div>
-            )}
-
-            {/* Navigation Buttons (for multiple drivers licenses) */}
-            {fullScreenImage.type === 'license' && 
-             onboarding?.driversLicenseUrls && 
-             Array.isArray(onboarding.driversLicenseUrls) && 
-             onboarding.driversLicenseUrls.length > 1 && 
-             fullScreenImage.index !== undefined && (
-              <>
-                {/* Previous Button */}
-                {fullScreenImage.index > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const prevIndex = fullScreenImage.index! - 1;
-                      const prevUrl = onboarding.driversLicenseUrls[prevIndex];
-                      const imageUrl = prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl);
-                      setFullScreenImage({ 
-                        url: imageUrl, 
-                        type: 'license', 
-                        index: prevIndex 
-                      });
-                    }}
-                    className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
-                    aria-label="Previous image"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </Button>
-                )}
-
-                {/* Next Button */}
-                {fullScreenImage.index < onboarding.driversLicenseUrls.length - 1 && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const nextIndex = fullScreenImage.index! + 1;
-                      const nextUrl = onboarding.driversLicenseUrls[nextIndex];
-                      const imageUrl = nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl);
-                      setFullScreenImage({ 
-                        url: imageUrl, 
-                        type: 'license', 
-                        index: nextIndex 
-                      });
-                    }}
-                    className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
-                    aria-label="Next image"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Button>
-                )}
-              </>
-            )}
-
-            {/* Full Screen Image - High Resolution Display */}
-            <img
-              src={fullScreenImage.url}
-              alt={fullScreenImage.type === 'insurance' ? 'Insurance Card' : `Drivers License ${fullScreenImage.index !== undefined ? fullScreenImage.index + 1 : ''}`}
-              className="w-full h-full object-contain"
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                maxWidth: '100vw',
-                maxHeight: '100vh',
-              }}
-              onError={(e) => {
-                console.error('Failed to load image in full screen viewer:', fullScreenImage.url);
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          </div>
-        </div>
-      )}
     </AdminLayout>
   );
 }
