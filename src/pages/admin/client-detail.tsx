@@ -928,6 +928,104 @@ export default function ClientDetailPage() {
                             </div>
                           </div>
 
+                          {/* Insurance Card & Drivers License Photos */}
+                          <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                            <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                              Documents
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              {/* Insurance Card */}
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-300 mb-3">Insurance Card</h4>
+                                {data.insuranceCardUrl ? (
+                                  <div className="space-y-2">
+                                    <a
+                                      href={data.insuranceCardUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="block"
+                                    >
+                                      <img
+                                        src={data.insuranceCardUrl}
+                                        alt="Insurance Card"
+                                        className="w-full h-auto rounded-lg border border-[#EAEB80]/20 hover:border-[#EAEB80]/50 transition-colors cursor-pointer max-h-64 object-contain bg-[#0a0a0a]"
+                                        onError={(e) => {
+                                          const target = e.target as HTMLImageElement;
+                                          target.style.display = "none";
+                                          const parent = target.parentElement;
+                                          if (parent && !parent.querySelector(".error-message")) {
+                                            const errorDiv = document.createElement("div");
+                                            errorDiv.className = "error-message text-sm text-gray-500";
+                                            errorDiv.textContent = "Failed to load image";
+                                            parent.appendChild(errorDiv);
+                                          }
+                                        }}
+                                      />
+                                    </a>
+                                    <a
+                                      href={data.insuranceCardUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-[#EAEB80] hover:underline flex items-center gap-1"
+                                    >
+                                      <ExternalLink className="w-3 h-3" />
+                                      Open in new tab
+                                    </a>
+                                  </div>
+                                ) : (
+                                  <p className="text-sm text-gray-500">No insurance card uploaded</p>
+                                )}
+                              </div>
+
+                              {/* Drivers License */}
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-300 mb-3">Drivers License</h4>
+                                {data.driversLicenseUrls && Array.isArray(data.driversLicenseUrls) && data.driversLicenseUrls.length > 0 ? (
+                                  <div className="space-y-3">
+                                    {data.driversLicenseUrls.map((url: string, index: number) => (
+                                      <div key={index} className="space-y-2">
+                                        <a
+                                          href={url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="block"
+                                        >
+                                          <img
+                                            src={url}
+                                            alt={`Drivers License ${index + 1}`}
+                                            className="w-full h-auto rounded-lg border border-[#EAEB80]/20 hover:border-[#EAEB80]/50 transition-colors cursor-pointer max-h-64 object-contain bg-[#0a0a0a]"
+                                            onError={(e) => {
+                                              const target = e.target as HTMLImageElement;
+                                              target.style.display = "none";
+                                              const parent = target.parentElement?.parentElement;
+                                              if (parent && !parent.querySelector(".error-message")) {
+                                                const errorDiv = document.createElement("div");
+                                                errorDiv.className = "error-message text-sm text-gray-500";
+                                                errorDiv.textContent = "Failed to load image";
+                                                parent.appendChild(errorDiv);
+                                              }
+                                            }}
+                                          />
+                                        </a>
+                                        <a
+                                          href={url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-xs text-[#EAEB80] hover:underline flex items-center gap-1"
+                                        >
+                                          <ExternalLink className="w-3 h-3" />
+                                          Open in new tab
+                                        </a>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="text-sm text-gray-500">No drivers license uploaded</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
                           {/* Signed Contracts Section */}
                           <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
                             <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAEB80]/30">
