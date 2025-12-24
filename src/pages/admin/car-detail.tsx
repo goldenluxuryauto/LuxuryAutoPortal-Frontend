@@ -305,10 +305,10 @@ export default function CarDetailPage() {
       // Vehicle Information
       formData.append("vin", data.vin);
       formData.append("makeModel", data.makeModel);
-      if (data.licensePlate) formData.append("licensePlate", data.licensePlate);
-      if (data.year) formData.append("year", data.year);
-      if (data.color) formData.append("color", data.color);
-      if (data.mileage) formData.append("mileage", data.mileage);
+      formData.append("licensePlate", data.licensePlate || "");
+      formData.append("year", data.year || "");
+      formData.append("color", data.color || "");
+      formData.append("mileage", data.mileage || "");
       // Financial Information
       if (data.purchasePrice !== undefined) formData.append("purchasePrice", data.purchasePrice || "");
       if (data.downPayment !== undefined) formData.append("downPayment", data.downPayment || "");
@@ -356,14 +356,29 @@ export default function CarDetailPage() {
         const error = await response.json();
         throw new Error(error.error || "Failed to update car");
       }
-      return response.json();
+      const result = await response.json();
+      return result;
     },
-    onSuccess: async () => {
+    onSuccess: async (responseData) => {
+      // Update the car data in cache first
+      if (responseData?.data) {
+        queryClient.setQueryData(["/api/cars", carId], responseData);
+      }
+      
       // Refetch both car and onboarding data to ensure UI updates
       await queryClient.refetchQueries({ queryKey: ["/api/cars", carId] });
-      if (car?.clientId) {
+      
+      // Get the updated car data to find clientId
+      const updatedCarData = queryClient.getQueryData<{ success: boolean; data: CarDetail }>(["/api/cars", carId]);
+      const updatedCar = updatedCarData?.data;
+      
+      if (updatedCar?.clientId) {
+        await queryClient.refetchQueries({ queryKey: ["/api/clients", updatedCar.clientId, "onboarding"] });
+      } else if (car?.clientId) {
+        // Fallback to old car data if updated car doesn't have clientId yet
         await queryClient.refetchQueries({ queryKey: ["/api/clients", car.clientId, "onboarding"] });
       }
+      
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] }); // For the cars list page
       queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       toast({
@@ -770,27 +785,27 @@ export default function CarDetailPage() {
             </CardHeader>
               <CardContent className="space-y-1.5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">VIN</p>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">VIN</p>
                     <p className="text-white text-base font-mono">{car.vin}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Make & Model</p>
-                    <p className="text-white text-base">{car.makeModel}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Year</p>
-                    <p className="text-white text-base">{car.year || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Color</p>
-                    <p className="text-white text-base">{car.color || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">License Plate</p>
-                    <p className="text-white text-base">{car.licensePlate || "N/A"}</p>
-                  </div>
                 </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Make & Model</p>
+                    <p className="text-white text-base">{car.makeModel}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Year</p>
+                    <p className="text-white text-base">{car.year || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Color</p>
+                    <p className="text-white text-base">{car.color || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">License Plate</p>
+                    <p className="text-white text-base">{car.licensePlate || "N/A"}</p>
+                </div>
+              </div>
                 <div className="pt-1.5 border-t border-[#2a2a2a]">
                   <div className="flex items-center gap-2">
                   <div>
@@ -835,24 +850,24 @@ export default function CarDetailPage() {
                   )}
                 </div>
               </div>
-                {car.offboardAt && (
+              {car.offboardAt && (
                   <div className="pt-1.5 border-t border-[#2a2a2a]">
                     <p className="text-xs text-gray-500 mb-0.5">Off-boarded</p>
                     <p className="text-white text-base">
-                      {formatDate(car.offboardAt)}
+                    {formatDate(car.offboardAt)}
+                  </p>
+                  {car.offboardReason && (
+                      <p className="text-gray-400 text-xs mt-0.5">
+                      Reason: {car.offboardReason.replace("_", " ")}
                     </p>
-                    {car.offboardReason && (
+                  )}
+                  {car.offboardNote && (
                       <p className="text-gray-400 text-xs mt-0.5">
-                        Reason: {car.offboardReason.replace("_", " ")}
-                      </p>
-                    )}
-                    {car.offboardNote && (
-                      <p className="text-gray-400 text-xs mt-0.5">
-                        Note: {car.offboardNote}
-                      </p>
-                    )}
-                  </div>
-                )}
+                      Note: {car.offboardNote}
+                    </p>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -1110,17 +1125,17 @@ export default function CarDetailPage() {
               )}
               {/* Timestamps */}
               <div className="pt-3 border-t border-[#2a2a2a] space-y-2">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Created</p>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Created</p>
                   <p className="text-white text-base">
-                    {formatDate(car.createdAt)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Last Updated</p>
+                  {formatDate(car.createdAt)}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Last Updated</p>
                   <p className="text-white text-base">
-                    {formatDate(car.updatedAt)}
-                  </p>
+                  {formatDate(car.updatedAt)}
+                </p>
                 </div>
               </div>
             </CardContent>
@@ -1161,7 +1176,7 @@ export default function CarDetailPage() {
                               (e.target as HTMLImageElement).style.display = 'none';
                             }}
                           />
-                        </div>
+        </div>
                       );
                     })}
                     
@@ -1363,22 +1378,22 @@ export default function CarDetailPage() {
                       }}
                     >
                       <div className="relative aspect-square">
-                        <img
-                          src={photoUrl}
-                          alt={`Car photo ${index + 1}`}
+                    <img
+                      src={photoUrl}
+                      alt={`Car photo ${index + 1}`}
                           className={cn(
                             "w-full h-full object-cover rounded-lg border transition-all",
                             isSelected
                               ? "border-[#EAEB80] opacity-80"
                               : "border-[#2a2a2a] group-hover:border-[#EAEB80]/50"
                           )}
-                          onError={(e) => {
-                            console.error('Failed to load photo:', photoUrl);
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
+                      onError={(e) => {
+                        console.error('Failed to load photo:', photoUrl);
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
                         {/* Checkbox Overlay */}
-                        {isAdmin && (
+                    {isAdmin && (
                           <div 
                             className="absolute top-2 left-2 z-10 checkbox-area"
                             onClick={(e) => e.stopPropagation()}
@@ -1408,21 +1423,21 @@ export default function CarDetailPage() {
                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <ConfirmDialog
-                              trigger={
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="sm"
                                   className="bg-red-500/80 hover:bg-red-500 text-white"
-                                >
-                                  <X className="w-4 h-4" />
-                                </Button>
-                              }
-                              title="Delete Photo"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        }
+                        title="Delete Photo"
                               description={`Are you sure you want to delete this photo? This action cannot be undone.`}
-                              confirmText="Delete"
-                              cancelText="Cancel"
-                              variant="destructive"
+                        confirmText="Delete"
+                        cancelText="Cancel"
+                        variant="destructive"
                               onConfirm={() => {
                                 // Capture the photo path and index in the closure
                                 const photoToDelete = photo;
@@ -1452,7 +1467,7 @@ export default function CarDetailPage() {
                           {index + 1}
                         </div>
                       </div>
-                    </div>
+                  </div>
                   );
                 })}
               </div>
@@ -1460,7 +1475,7 @@ export default function CarDetailPage() {
               <div className="flex items-center justify-center py-16">
                 <p className="text-gray-400 text-center">
                   No photos uploaded. {isAdmin && "Upload photos to get started."}
-                </p>
+              </p>
               </div>
             )}
           </CardContent>
@@ -1501,31 +1516,51 @@ export default function CarDetailPage() {
                   <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
                     Vehicle Information
                   </h3>
-                  <FormField
-                    control={form.control}
-                    name="vin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">VIN *</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            maxLength={17}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <FormField
+                  control={form.control}
+                  name="vin"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-400">VIN *</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          maxLength={17}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
+                <FormField
+                  control={form.control}
+                  name="makeModel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-400">
+                        Make & Model *
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="makeModel"
+                    name="licensePlate"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-gray-400">
-                          Make & Model *
+                          License Plate
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -1538,62 +1573,42 @@ export default function CarDetailPage() {
                     )}
                   />
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="licensePlate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-400">
-                            License Plate
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <FormField
+                    control={form.control}
+                    name="year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Year</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-                    <FormField
-                      control={form.control}
-                      name="year"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-400">Year</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="number"
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="color"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-400">Color</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="color"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Color</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                     <FormField
                       control={form.control}
