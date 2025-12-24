@@ -727,10 +727,10 @@ export default function CarDetailPage() {
           )}
         </div>
 
-        {/* Row 1: Vehicle Information, Financial Information, Insurance Information */}
+        {/* Row 1: Vehicle Information, Financial Information, Insurance Information, Additional Information */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Vehicle Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
                 <Car className="w-5 h-5" />
@@ -826,7 +826,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Financial Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
                 Financial Information
@@ -873,7 +873,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Insurance Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
                 Insurance Information
@@ -910,12 +910,9 @@ export default function CarDetailPage() {
               )}
             </CardContent>
           </Card>
-        </div>
 
-        {/* Row 2: Additional Information, Timestamps, Car Photos Carousel */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Additional Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
                 Additional Information
@@ -957,6 +954,131 @@ export default function CarDetailPage() {
               )}
             </CardContent>
           </Card>
+        </div>
+
+        {/* Row 2: Documents, Timestamps, Car Photos Carousel */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Documents Card */}
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-5">
+            <CardHeader>
+              <CardTitle className="text-[#EAEB80] text-lg">
+                Documents
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoadingOnboarding ? (
+                <div className="text-center py-8 text-gray-400">
+                  <p className="text-sm">Loading documents...</p>
+                </div>
+              ) : onboarding ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Insurance Card */}
+                  <div>
+                    <h4 className="text-base font-semibold text-gray-200 mb-4">Insurance Card</h4>
+                    {onboarding.insuranceCardUrl ? (
+                      <div 
+                        className="relative group cursor-pointer"
+                        onClick={() => {
+                          const imageUrl = onboarding.insuranceCardUrl.startsWith('http') 
+                            ? onboarding.insuranceCardUrl 
+                            : buildApiUrl(onboarding.insuranceCardUrl);
+                          setFullScreenDocument({ url: imageUrl, type: 'insurance' });
+                        }}
+                      >
+                        <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
+                          <img
+                            src={onboarding.insuranceCardUrl.startsWith('http') 
+                              ? onboarding.insuranceCardUrl 
+                              : buildApiUrl(onboarding.insuranceCardUrl)}
+                            alt="Insurance Card"
+                            className="w-full h-full object-contain p-2"
+                            onError={(e) => {
+                              console.error('Failed to load insurance card image:', onboarding.insuranceCardUrl);
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = "none";
+                              const parent = target.parentElement?.parentElement;
+                              if (parent && !parent.querySelector(".error-message")) {
+                                const errorDiv = document.createElement("div");
+                                errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                errorDiv.textContent = "Failed to load image";
+                                parent.appendChild(errorDiv);
+                              }
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                              Click to view full screen
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
+                        <p className="text-sm text-gray-500">No insurance card uploaded</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Drivers License */}
+                  <div>
+                    <h4 className="text-base font-semibold text-gray-200 mb-4">Drivers License</h4>
+                    {onboarding.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 ? (
+                      <div className="space-y-4">
+                        {onboarding.driversLicenseUrls.map((url: string, index: number) => {
+                          const imageUrl = url.startsWith('http') ? url : buildApiUrl(url);
+                          return (
+                            <div 
+                              key={index}
+                              className="relative group cursor-pointer"
+                              onClick={() => setFullScreenDocument({ url: imageUrl, type: 'license', index })}
+                            >
+                              <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
+                                <img
+                                  src={imageUrl}
+                                  alt={`Drivers License ${index + 1}`}
+                                  className="w-full h-full object-contain p-2"
+                                  onError={(e) => {
+                                    console.error('Failed to load drivers license image:', url);
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = "none";
+                                    const parent = target.parentElement?.parentElement;
+                                    if (parent && !parent.querySelector(".error-message")) {
+                                      const errorDiv = document.createElement("div");
+                                      errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                      errorDiv.textContent = "Failed to load image";
+                                      parent.appendChild(errorDiv);
+                                    }
+                                  }}
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                    Click to view full screen
+                                  </div>
+                                </div>
+                              </div>
+                              {onboarding.driversLicenseUrls.length > 1 && (
+                                <div className="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                                  {index + 1} / {onboarding.driversLicenseUrls.length}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
+                        <p className="text-sm text-gray-500">No drivers license uploaded</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-400">
+                  <p className="text-sm">No documents available</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Timestamps Card */}
           <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
@@ -982,7 +1104,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Car Photos Carousel Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-5 h-full">
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4 h-full">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
                 <Car className="w-5 h-5" />
@@ -1084,128 +1206,6 @@ export default function CarDetailPage() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Row 3: Documents (Insurance Card & Driver's License) */}
-        <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
-          <CardHeader>
-            <CardTitle className="text-[#EAEB80] text-lg">
-              Documents
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoadingOnboarding ? (
-              <div className="text-center py-8 text-gray-400">
-                <p className="text-sm">Loading documents...</p>
-              </div>
-            ) : onboarding ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Insurance Card */}
-                <div>
-                  <h4 className="text-base font-semibold text-gray-200 mb-4">Insurance Card</h4>
-                  {onboarding.insuranceCardUrl ? (
-                    <div 
-                      className="relative group cursor-pointer"
-                      onClick={() => {
-                        const imageUrl = onboarding.insuranceCardUrl.startsWith('http') 
-                          ? onboarding.insuranceCardUrl 
-                          : buildApiUrl(onboarding.insuranceCardUrl);
-                        setFullScreenDocument({ url: imageUrl, type: 'insurance' });
-                      }}
-                    >
-                      <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
-                        <img
-                          src={onboarding.insuranceCardUrl.startsWith('http') 
-                            ? onboarding.insuranceCardUrl 
-                            : buildApiUrl(onboarding.insuranceCardUrl)}
-                          alt="Insurance Card"
-                          className="w-full h-full object-contain p-2"
-                          onError={(e) => {
-                            console.error('Failed to load insurance card image:', onboarding.insuranceCardUrl);
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = "none";
-                            const parent = target.parentElement?.parentElement;
-                            if (parent && !parent.querySelector(".error-message")) {
-                              const errorDiv = document.createElement("div");
-                              errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
-                              errorDiv.textContent = "Failed to load image";
-                              parent.appendChild(errorDiv);
-                            }
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                            Click to view full screen
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
-                      <p className="text-sm text-gray-500">No insurance card uploaded</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Drivers License */}
-                <div>
-                  <h4 className="text-base font-semibold text-gray-200 mb-4">Drivers License</h4>
-                  {onboarding.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 ? (
-                    <div className="space-y-4">
-                      {onboarding.driversLicenseUrls.map((url: string, index: number) => {
-                        const imageUrl = url.startsWith('http') ? url : buildApiUrl(url);
-                        return (
-                          <div 
-                            key={index}
-                            className="relative group cursor-pointer"
-                            onClick={() => setFullScreenDocument({ url: imageUrl, type: 'license', index })}
-                          >
-                            <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
-                              <img
-                                src={imageUrl}
-                                alt={`Drivers License ${index + 1}`}
-                                className="w-full h-full object-contain p-2"
-                                onError={(e) => {
-                                  console.error('Failed to load drivers license image:', url);
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = "none";
-                                  const parent = target.parentElement?.parentElement;
-                                  if (parent && !parent.querySelector(".error-message")) {
-                                    const errorDiv = document.createElement("div");
-                                    errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
-                                    errorDiv.textContent = "Failed to load image";
-                                    parent.appendChild(errorDiv);
-                                  }
-                                }}
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                                  Click to view full screen
-                                </div>
-                              </div>
-                            </div>
-                            {onboarding.driversLicenseUrls.length > 1 && (
-                              <div className="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-                                {index + 1} / {onboarding.driversLicenseUrls.length}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
-                      <p className="text-sm text-gray-500">No drivers license uploaded</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <p className="text-sm">No documents available</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
         {/* Photos Grid - 8 columns per row (up to 20 images) */}
         <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
@@ -1917,7 +1917,7 @@ export default function CarDetailPage() {
             className="fixed inset-0 z-[100] bg-black/98 flex items-center justify-center"
             onClick={() => setFullScreenDocument(null)}
           >
-            {/* Close Button - Top Right */}
+            {/* Close Button - Top Right Corner */}
             <Button
               variant="ghost"
               size="icon"
@@ -1925,10 +1925,16 @@ export default function CarDetailPage() {
                 e.stopPropagation();
                 setFullScreenDocument(null);
               }}
-              className="fixed top-6 right-6 z-[200] h-12 w-12 bg-black/90 hover:bg-red-600/90 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+              className="fixed top-4 right-4 z-[9999] h-14 w-14 bg-red-600/90 hover:bg-red-600 text-white border-2 border-white rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110 flex items-center justify-center"
               aria-label="Close full screen view"
+              style={{
+                position: 'fixed',
+                top: '1rem',
+                right: '1rem',
+                zIndex: 9999,
+              }}
             >
-              <X className="w-7 h-7" />
+              <X className="w-8 h-8" strokeWidth={3} />
             </Button>
 
             <div className="relative w-full h-full flex items-center justify-center p-8">
