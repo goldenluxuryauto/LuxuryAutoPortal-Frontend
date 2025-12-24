@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Car, Upload, X, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square } from "lucide-react";
+import { ArrowLeft, Car, Upload, X, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square, FileText } from "lucide-react";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -101,7 +101,14 @@ export default function CarDetailPage() {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
   const [fullScreenImageIndex, setFullScreenImageIndex] = useState<number | null>(null);
-  const [fullScreenDocument, setFullScreenDocument] = useState<{ url: string; type: 'insurance' | 'license'; index?: number } | null>(null);
+  const [fullScreenDocument, setFullScreenDocument] = useState<{ url: string; type: 'insurance' | 'license'; index?: number; isPdf?: boolean } | null>(null);
+
+  // Helper function to check if a URL is a PDF
+  const isPdfDocument = (url: string): boolean => {
+    if (!url) return false;
+    const lowerUrl = url.toLowerCase();
+    return lowerUrl.endsWith('.pdf') || lowerUrl.includes('.pdf?') || lowerUrl.includes('application/pdf');
+  };
 
   // Get current user to check if admin
   const { data: userData } = useQuery<{
@@ -993,44 +1000,63 @@ export default function CarDetailPage() {
                   {/* Insurance Card */}
                   <div>
                     <h4 className="text-base font-semibold text-gray-200 mb-4">Insurance Card</h4>
-                    {onboarding.insuranceCardUrl ? (
-                      <div 
-                        className="relative group cursor-pointer"
-                        onClick={() => {
-                          const imageUrl = onboarding.insuranceCardUrl.startsWith('http') 
-                            ? onboarding.insuranceCardUrl 
-                            : buildApiUrl(onboarding.insuranceCardUrl);
-                          setFullScreenDocument({ url: imageUrl, type: 'insurance' });
-                        }}
-                      >
-                        <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
-                          <img
-                            src={onboarding.insuranceCardUrl.startsWith('http') 
-                              ? onboarding.insuranceCardUrl 
-                              : buildApiUrl(onboarding.insuranceCardUrl)}
-                            alt="Insurance Card"
-                            className="w-full h-full object-contain p-2"
-                            onError={(e) => {
-                              console.error('Failed to load insurance card image:', onboarding.insuranceCardUrl);
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = "none";
-                              const parent = target.parentElement?.parentElement;
-                              if (parent && !parent.querySelector(".error-message")) {
-                                const errorDiv = document.createElement("div");
-                                errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
-                                errorDiv.textContent = "Failed to load image";
-                                parent.appendChild(errorDiv);
-                              }
-                            }}
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                              Click to view full screen
+                    {onboarding.insuranceCardUrl ? (() => {
+                      const documentUrl = onboarding.insuranceCardUrl.startsWith('http') 
+                        ? onboarding.insuranceCardUrl 
+                        : buildApiUrl(onboarding.insuranceCardUrl);
+                      const isPdf = isPdfDocument(onboarding.insuranceCardUrl);
+                      
+                      return (
+                        <div 
+                          className="relative group cursor-pointer"
+                          onClick={() => {
+                            setFullScreenDocument({ url: documentUrl, type: 'insurance', isPdf });
+                          }}
+                        >
+                          <div className={`relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
+                            isPdf 
+                              ? 'border-blue-500/50 hover:border-blue-500 shadow-blue-500/20' 
+                              : 'border-[#EAEB80]/30 hover:border-[#EAEB80] shadow-[#EAEB80]/20'
+                          }`}>
+                            {isPdf ? (
+                              <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                <FileText className="w-16 h-16 text-blue-400 mb-2" />
+                                <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
+                                <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
+                              </div>
+                            ) : (
+                              <img
+                                src={documentUrl}
+                                alt="Insurance Card"
+                                className="w-full h-full object-contain p-2"
+                                onError={(e) => {
+                                  console.error('Failed to load insurance card image:', onboarding.insuranceCardUrl);
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = "none";
+                                  const parent = target.parentElement?.parentElement;
+                                  if (parent && !parent.querySelector(".error-message")) {
+                                    const errorDiv = document.createElement("div");
+                                    errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                    errorDiv.textContent = "Failed to load image";
+                                    parent.appendChild(errorDiv);
+                                  }
+                                }}
+                              />
+                            )}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                {isPdf ? 'Click to open PDF' : 'Click to view full screen'}
+                              </div>
                             </div>
+                            {isPdf && (
+                              <div className="absolute top-2 right-2 bg-blue-500/90 text-white text-xs px-2 py-1 rounded font-semibold">
+                                PDF
+                              </div>
+                            )}
                           </div>
                         </div>
-                      </div>
-                    ) : (
+                      );
+                    })() : (
                       <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
                         <p className="text-sm text-gray-500">No insurance card uploaded</p>
                       </div>
@@ -1043,42 +1069,65 @@ export default function CarDetailPage() {
                     {onboarding.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 ? (
                       <div className="space-y-4">
                         {onboarding.driversLicenseUrls.map((url: string, index: number) => {
-                          const imageUrl = url.startsWith('http') ? url : buildApiUrl(url);
+                          const documentUrl = url.startsWith('http') ? url : buildApiUrl(url);
+                          const isPdf = isPdfDocument(url);
+                          
                           return (
                             <div 
                               key={index}
                               className="relative group cursor-pointer"
-                              onClick={() => setFullScreenDocument({ url: imageUrl, type: 'license', index })}
+                              onClick={() => setFullScreenDocument({ url: documentUrl, type: 'license', index, isPdf })}
                             >
-                              <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
-                                <img
-                                  src={imageUrl}
-                                  alt={`Drivers License ${index + 1}`}
-                                  className="w-full h-full object-contain p-2"
-                                  onError={(e) => {
-                                    console.error('Failed to load drivers license image:', url);
-                                    const target = e.target as HTMLImageElement;
-                                    target.style.display = "none";
-                                    const parent = target.parentElement?.parentElement;
-                                    if (parent && !parent.querySelector(".error-message")) {
-                                      const errorDiv = document.createElement("div");
-                                      errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
-                                      errorDiv.textContent = "Failed to load image";
-                                      parent.appendChild(errorDiv);
-                                    }
-                                  }}
-                                />
+                              <div className={`relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
+                                isPdf 
+                                  ? 'border-blue-500/50 hover:border-blue-500 shadow-blue-500/20' 
+                                  : 'border-[#EAEB80]/30 hover:border-[#EAEB80] shadow-[#EAEB80]/20'
+                              }`}>
+                                {isPdf ? (
+                                  <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                    <div className="text-blue-400 mb-2">
+                                      <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                      </svg>
+                                    </div>
+                                    <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
+                                    <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
+                                  </div>
+                                ) : (
+                                  <img
+                                    src={documentUrl}
+                                    alt={`Drivers License ${index + 1}`}
+                                    className="w-full h-full object-contain p-2"
+                                    onError={(e) => {
+                                      console.error('Failed to load drivers license image:', url);
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = "none";
+                                      const parent = target.parentElement?.parentElement;
+                                      if (parent && !parent.querySelector(".error-message")) {
+                                        const errorDiv = document.createElement("div");
+                                        errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                        errorDiv.textContent = "Failed to load image";
+                                        parent.appendChild(errorDiv);
+                                      }
+                                    }}
+                                  />
+                                )}
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                                   <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                                    Click to view full screen
+                                    {isPdf ? 'Click to open PDF' : 'Click to view full screen'}
                                   </div>
                                 </div>
+                                {isPdf && (
+                                  <div className="absolute top-2 right-2 bg-blue-500/90 text-white text-xs px-2 py-1 rounded font-semibold">
+                                    PDF
+                                  </div>
+                                )}
+                                {onboarding.driversLicenseUrls.length > 1 && (
+                                  <div className="absolute top-2 left-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                                    {index + 1} / {onboarding.driversLicenseUrls.length}
+                                  </div>
+                                )}
                               </div>
-                              {onboarding.driversLicenseUrls.length > 1 && (
-                                <div className="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-                                  {index + 1} / {onboarding.driversLicenseUrls.length}
-                                </div>
-                              )}
                             </div>
                           );
                         })}
@@ -2087,7 +2136,8 @@ export default function CarDetailPage() {
                         setFullScreenDocument({ 
                           url: imageUrl, 
                           type: 'license', 
-                          index: prevIndex 
+                          index: prevIndex,
+                          isPdf: isPdfDocument(prevUrl)
                         });
                       }}
                       className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
@@ -2110,7 +2160,8 @@ export default function CarDetailPage() {
                         setFullScreenDocument({ 
                           url: imageUrl, 
                           type: 'license', 
-                          index: nextIndex 
+                          index: nextIndex,
+                          isPdf: isPdfDocument(nextUrl)
                         });
                       }}
                       className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
@@ -2122,21 +2173,34 @@ export default function CarDetailPage() {
                 </>
               )}
 
-              {/* Full Screen Image - High Resolution Display */}
-              <img
-                src={fullScreenDocument.url}
-                alt={fullScreenDocument.type === 'insurance' ? 'Insurance Card' : `Drivers License ${fullScreenDocument.index !== undefined ? fullScreenDocument.index + 1 : ''}`}
-                className="w-full h-full object-contain"
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                  maxWidth: '100vw',
-                  maxHeight: '100vh',
-                }}
-                onError={(e) => {
-                  console.error('Failed to load image in full screen viewer:', fullScreenDocument.url);
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
+              {/* Full Screen Document Display - PDF or Image */}
+              {fullScreenDocument.isPdf ? (
+                <iframe
+                  src={fullScreenDocument.url}
+                  className="w-full h-full border-0"
+                  style={{
+                    maxWidth: '100vw',
+                    maxHeight: '100vh',
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  title={fullScreenDocument.type === 'insurance' ? 'Insurance Card PDF' : `Drivers License PDF ${fullScreenDocument.index !== undefined ? fullScreenDocument.index + 1 : ''}`}
+                />
+              ) : (
+                <img
+                  src={fullScreenDocument.url}
+                  alt={fullScreenDocument.type === 'insurance' ? 'Insurance Card' : `Drivers License ${fullScreenDocument.index !== undefined ? fullScreenDocument.index + 1 : ''}`}
+                  className="w-full h-full object-contain"
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    maxWidth: '100vw',
+                    maxHeight: '100vh',
+                  }}
+                  onError={(e) => {
+                    console.error('Failed to load image in full screen viewer:', fullScreenDocument.url);
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              )}
             </div>
           </div>
         )}
