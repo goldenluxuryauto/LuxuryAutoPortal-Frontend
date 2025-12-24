@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ArrowLeft, Car, Upload, X, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square } from "lucide-react";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
@@ -323,9 +324,28 @@ export default function CarDetailPage() {
       // Additional Information
       if (data.carManufacturerWebsite !== undefined) formData.append("carManufacturerWebsite", data.carManufacturerWebsite || "");
       if (data.carManufacturerUsername !== undefined) formData.append("carManufacturerUsername", data.carManufacturerUsername || "");
-      // Documents
-      if (data.insuranceCardUrl !== undefined) formData.append("insuranceCardUrl", data.insuranceCardUrl || "");
-      if (data.driversLicenseUrls !== undefined) formData.append("driversLicenseUrls", data.driversLicenseUrls || "");
+      
+      // Documents - Handle file uploads
+      const insuranceCardFile = (form as any).getValues("insuranceCardFile");
+      const driversLicenseFiles = (form as any).getValues("driversLicenseFiles");
+      
+      if (insuranceCardFile instanceof File) {
+        formData.append("insuranceCard", insuranceCardFile);
+      } else if (data.insuranceCardUrl !== undefined) {
+        // Fallback to URL if no file uploaded
+        formData.append("insuranceCardUrl", data.insuranceCardUrl || "");
+      }
+      
+      if (driversLicenseFiles && Array.isArray(driversLicenseFiles) && driversLicenseFiles.length > 0) {
+        driversLicenseFiles.forEach((file: File) => {
+          if (file instanceof File) {
+            formData.append("driversLicense", file);
+          }
+        });
+      } else if (data.driversLicenseUrls !== undefined) {
+        // Fallback to URLs if no files uploaded
+        formData.append("driversLicenseUrls", data.driversLicenseUrls || "");
+      }
 
       const response = await fetch(buildApiUrl(`/api/cars/${carId}`), {
         method: "PATCH",
@@ -1844,46 +1864,61 @@ export default function CarDetailPage() {
                   <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
                     Documents
                   </h3>
-                  <FormField
-                    control={form.control}
-                    name="insuranceCardUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">Insurance Card URL</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="url"
-                            placeholder="https://example.com/insurance-card.jpg"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="driversLicenseUrls"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">Drivers License URLs (JSON array)</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="text"
-                            placeholder='["https://example.com/license1.jpg", "https://example.com/license2.jpg"]'
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] font-mono text-sm"
-                          />
-                        </FormControl>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Enter as JSON array of URLs, e.g., ["url1", "url2"]
+                  
+                  {/* Insurance Card Upload */}
+                  <div className="space-y-2">
+                    <Label className="text-gray-400">Insurance Card</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            // Store file in form state for submission
+                            (form as any).setValue("insuranceCardFile", file);
+                          }
+                        }}
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#EAEB80] file:text-black hover:file:bg-[#d4d570]"
+                      />
+                      {onboarding?.insuranceCardUrl && (
+                        <p className="text-xs text-gray-500">
+                          Current: {onboarding.insuranceCardUrl.split("/").pop()}
                         </p>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Upload a new image to replace the existing insurance card
+                    </p>
+                  </div>
+
+                  {/* Drivers License Upload */}
+                  <div className="space-y-2">
+                    <Label className="text-gray-400">Drivers License (Multiple files)</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        multiple
+                        onChange={(e) => {
+                          const files = e.target.files;
+                          if (files && files.length > 0) {
+                            // Store files in form state for submission
+                            (form as any).setValue("driversLicenseFiles", Array.from(files));
+                          }
+                        }}
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#EAEB80] file:text-black hover:file:bg-[#d4d570]"
+                      />
+                      {onboarding?.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 && (
+                        <p className="text-xs text-gray-500">
+                          Current: {onboarding.driversLicenseUrls.length} file(s)
+                        </p>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Upload new images to replace all existing drivers license files
+                    </p>
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">

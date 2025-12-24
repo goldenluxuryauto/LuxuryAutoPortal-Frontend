@@ -195,7 +195,7 @@ export default function Onboarding() {
     1, 2, 3, 4, 5, 6, 7,
   ]);
   const [insuranceCardFile, setInsuranceCardFile] = useState<File | null>(null);
-  const [driversLicenseFiles, setDriversLicenseFiles] = useState<File[]>([]);
+  const [driversLicenseFile, setDriversLicenseFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isDraggingLicense, setIsDraggingLicense] = useState(false);
   const { toast } = useToast();
@@ -298,7 +298,7 @@ export default function Onboarding() {
       let requestBody: FormData | string;
       let headers: HeadersInit;
       
-      if (insuranceCardFile || driversLicenseFiles.length > 0) {
+      if (insuranceCardFile || driversLicenseFile) {
         const formData = new FormData();
         // Append all form fields
         Object.entries(data).forEach(([key, value]) => {
@@ -317,10 +317,10 @@ export default function Onboarding() {
         if (insuranceCardFile) {
           formData.append("insuranceCard", insuranceCardFile);
         }
-        // Append drivers license files
-        driversLicenseFiles.forEach((file, index) => {
-          formData.append(`driversLicense`, file);
-        });
+        // Append drivers license file
+        if (driversLicenseFile) {
+          formData.append("driversLicense", driversLicenseFile);
+        }
         requestBody = formData;
         // Don't set Content-Type header for FormData - browser will set it with boundary
         headers = {};
@@ -1407,24 +1407,21 @@ export default function Onboarding() {
                               onDrop={(e) => {
                                 e.preventDefault();
                                 setIsDraggingLicense(false);
-                                const files = Array.from(e.dataTransfer.files);
-                                const validFiles = files.filter(
-                                  (file) =>
+                                const file = e.dataTransfer.files[0];
+                                if (file) {
+                                  if (
                                     file.type.startsWith("image/") ||
                                     file.type === "application/pdf"
-                                );
-                                if (validFiles.length > 0) {
-                                  setDriversLicenseFiles((prev) => [
-                                    ...prev,
-                                    ...validFiles,
-                                  ]);
-                                } else {
-                                  toast({
-                                    title: "Invalid file type",
-                                    description:
-                                      "Please upload image or PDF files only",
-                                    variant: "destructive",
-                                  });
+                                  ) {
+                                    setDriversLicenseFile(file);
+                                  } else {
+                                    toast({
+                                      title: "Invalid file type",
+                                      description:
+                                        "Please upload an image or PDF file",
+                                      variant: "destructive",
+                                    });
+                                  }
                                 }
                               }}
                             >
@@ -1432,29 +1429,25 @@ export default function Onboarding() {
                                 type="file"
                                 id="drivers-license-upload"
                                 accept="image/*,.pdf"
-                                multiple
                                 className="hidden"
                                 onChange={(e) => {
-                                  const files = Array.from(
-                                    e.target.files || []
-                                  );
-                                  const validFiles = files.filter(
-                                    (file) =>
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    if (
                                       file.type.startsWith("image/") ||
                                       file.type === "application/pdf"
-                                  );
-                                  if (validFiles.length > 0) {
-                                    setDriversLicenseFiles((prev) => [
-                                      ...prev,
-                                      ...validFiles,
-                                    ]);
-                                  } else {
-                                    toast({
-                                      title: "Invalid file type",
-                                      description:
-                                        "Please upload image or PDF files only",
-                                      variant: "destructive",
-                                    });
+                                    ) {
+                                      setDriversLicenseFile(file);
+                                    } else {
+                                      toast({
+                                        title: "Invalid file type",
+                                        description:
+                                          "Please upload an image or PDF file",
+                                        variant: "destructive",
+                                      });
+                                      // Reset the input
+                                      e.target.value = "";
+                                    }
                                   }
                                 }}
                               />
@@ -1466,32 +1459,21 @@ export default function Onboarding() {
                                   Drag & drop files here or click to browse
                                 </p>
                                 <p className="text-gray-500 text-xs mt-1">
-                                  Supports images and PDF files (multiple files allowed)
+                                  Supports images and PDF files
                                 </p>
                               </label>
-                              {driversLicenseFiles.length > 0 && (
-                                <div className="mt-4 space-y-2">
-                                  {driversLicenseFiles.map((file, index) => (
-                                    <div
-                                      key={index}
-                                      className="p-3 bg-[#1a1a1a] rounded border border-[#EAEB80]/20 flex items-center justify-between"
-                                    >
-                                      <p className="text-white text-sm">
-                                        {file.name}
-                                      </p>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setDriversLicenseFiles((prev) =>
-                                            prev.filter((_, i) => i !== index)
-                                          );
-                                        }}
-                                        className="text-red-400 text-xs hover:underline ml-4"
-                                      >
-                                        Remove
-                                      </button>
-                                    </div>
-                                  ))}
+                              {driversLicenseFile && (
+                                <div className="mt-4 p-3 bg-[#1a1a1a] rounded border border-[#EAEB80]/20">
+                                  <p className="text-white text-sm">
+                                    Selected: {driversLicenseFile.name}
+                                  </p>
+                                  <button
+                                    type="button"
+                                    onClick={() => setDriversLicenseFile(null)}
+                                    className="text-red-400 text-xs mt-2 hover:underline"
+                                  >
+                                    Remove
+                                  </button>
                                 </div>
                               )}
                             </div>
