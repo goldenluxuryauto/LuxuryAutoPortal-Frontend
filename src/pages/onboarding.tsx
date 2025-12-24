@@ -80,6 +80,7 @@ const onboardingSchema = z.object({
   dealershipAddress: z.string().optional(),
   fuelType: z.string().min(1, "Fuel type is required"),
   tireSize: z.string().min(1, "Tire size is required"),
+  vehicleFeatures: z.array(z.string()).min(1, "At least one feature must be selected"),
   insuranceProvider: z.string().min(1, "Insurance provider is required"),
   insurancePhone: z.string().min(10, "Insurance phone is required"),
   policyNumber: z.string().min(1, "Policy number is required"),
@@ -162,6 +163,7 @@ function generateRandomData(): OnboardingFormData {
     dealershipAddress: "456 Oak Street",
     fuelType: "Gasoline",
     tireSize: "225/45R17",
+    vehicleFeatures: ["Bluetooth", "GPS", "Back Up Camera"],
     insuranceProvider: "State Farm",
     insurancePhone: "555-9876543",
     policyNumber: "POL123456",
@@ -192,6 +194,10 @@ export default function Onboarding() {
   const [expandedSteps, setExpandedSteps] = useState<number[]>([
     1, 2, 3, 4, 5, 6, 7,
   ]);
+  const [insuranceCardFile, setInsuranceCardFile] = useState<File | null>(null);
+  const [driversLicenseFiles, setDriversLicenseFiles] = useState<File[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDraggingLicense, setIsDraggingLicense] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<OnboardingFormData>({
@@ -234,6 +240,7 @@ export default function Onboarding() {
       freeDealershipOilChanges: "",
       fuelType: "",
       tireSize: "",
+      vehicleFeatures: [],
       insuranceProvider: "",
       insurancePhone: "",
       policyNumber: "",
@@ -286,17 +293,45 @@ export default function Onboarding() {
     setIsSubmitting(true);
     try {
       const endpoint = buildApiUrl("/api/onboarding/submit");
-      // console.log("📤 [FRONTEND] Sending POST request to", endpoint);
-      const requestBody = JSON.stringify(data);
-      // console.log(
-      //   "📦 [FRONTEND] Request body length:",
-      //   requestBody.length,
-      //   "characters"
-      // );
+      
+      // Use FormData if there are files, otherwise use JSON
+      let requestBody: FormData | string;
+      let headers: HeadersInit;
+      
+      if (insuranceCardFile || driversLicenseFiles.length > 0) {
+        const formData = new FormData();
+        // Append all form fields
+        Object.entries(data).forEach(([key, value]) => {
+          if (value !== null && value !== undefined) {
+            if (typeof value === "boolean") {
+              formData.append(key, value.toString());
+            } else if (Array.isArray(value)) {
+              // Stringify arrays (e.g., vehicleFeatures)
+              formData.append(key, JSON.stringify(value));
+            } else {
+              formData.append(key, String(value));
+            }
+          }
+        });
+        // Append the insurance card file if present
+        if (insuranceCardFile) {
+          formData.append("insuranceCard", insuranceCardFile);
+        }
+        // Append drivers license files
+        driversLicenseFiles.forEach((file, index) => {
+          formData.append(`driversLicense`, file);
+        });
+        requestBody = formData;
+        // Don't set Content-Type header for FormData - browser will set it with boundary
+        headers = {};
+      } else {
+        requestBody = JSON.stringify(data);
+        headers = { "Content-Type": "application/json" };
+      }
 
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: headers,
         body: requestBody,
         credentials: "include",
       });
@@ -919,6 +954,15 @@ export default function Onboarding() {
                                       <SelectItem value="Salvage">
                                         Salvage
                                       </SelectItem>
+                                      <SelectItem value="Rebuilt">
+                                        Rebuilt
+                                      </SelectItem>
+                                      <SelectItem value="Branded">
+                                        Branded
+                                      </SelectItem>
+                                      <SelectItem value="Other">
+                                        Other
+                                      </SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <FormMessage />
@@ -1273,6 +1317,185 @@ export default function Onboarding() {
                               )}
                             />
                           </div>
+                          <FormField
+                            control={form.control}
+                            name="vehicleFeatures"
+                            render={() => (
+                              <FormItem>
+                                <div className="mb-4">
+                                  <FormLabel className="text-gray-300 text-base font-semibold">
+                                    Features (check all that apply)
+                                    <span className="text-red-500 ml-1">* Required</span>
+                                  </FormLabel>
+                                </div>
+                                <div className="border border-red-500 rounded-lg p-4">
+                                  <div className="grid grid-cols-2 gap-3">
+                                    {[
+                                      "All-wheel drive",
+                                      "AUX input",
+                                      "Blind Spot Warning",
+                                      "Convertible",
+                                      "Keyless Entry",
+                                      "Snow Tires or Chains",
+                                      "USB Charger",
+                                      "Android Auto",
+                                      "Back Up Camera",
+                                      "Bluetooth",
+                                      "GPS",
+                                      "Pet Friendly",
+                                      "Sunroof",
+                                      "USB Input",
+                                      "Apple CarPlay",
+                                      "Bike Rack",
+                                      "Toll Pass",
+                                      "Wheelchair Accessible",
+                                    ].map((feature) => (
+                                      <FormField
+                                        key={feature}
+                                        control={form.control}
+                                        name="vehicleFeatures"
+                                        render={({ field }) => {
+                                          return (
+                                            <FormItem
+                                              key={feature}
+                                              className="flex flex-row items-start space-x-3 space-y-0"
+                                            >
+                                              <FormControl>
+                                                <Checkbox
+                                                  checked={field.value?.includes(feature) || false}
+                                                  onCheckedChange={(checked) => {
+                                                    const currentValue = field.value || [];
+                                                    return checked
+                                                      ? field.onChange([...currentValue, feature])
+                                                      : field.onChange(
+                                                          currentValue.filter(
+                                                            (value) => value !== feature
+                                                          )
+                                                        );
+                                                  }}
+                                                />
+                                              </FormControl>
+                                              <FormLabel className="text-gray-300 text-sm font-normal cursor-pointer">
+                                                {feature}
+                                              </FormLabel>
+                                            </FormItem>
+                                          );
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormItem>
+                            <FormLabel className="text-gray-300">
+                              Drivers License Upload *
+                            </FormLabel>
+                            <div
+                              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                                isDraggingLicense
+                                  ? "border-[#EAEB80] bg-[#EAEB80]/10"
+                                  : "border-[#EAEB80]/30"
+                              }`}
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                setIsDraggingLicense(true);
+                              }}
+                              onDragLeave={() => setIsDraggingLicense(false)}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                setIsDraggingLicense(false);
+                                const files = Array.from(e.dataTransfer.files);
+                                const validFiles = files.filter(
+                                  (file) =>
+                                    file.type.startsWith("image/") ||
+                                    file.type === "application/pdf"
+                                );
+                                if (validFiles.length > 0) {
+                                  setDriversLicenseFiles((prev) => [
+                                    ...prev,
+                                    ...validFiles,
+                                  ]);
+                                } else {
+                                  toast({
+                                    title: "Invalid file type",
+                                    description:
+                                      "Please upload image or PDF files only",
+                                    variant: "destructive",
+                                  });
+                                }
+                              }}
+                            >
+                              <input
+                                type="file"
+                                id="drivers-license-upload"
+                                accept="image/*,.pdf"
+                                multiple
+                                className="hidden"
+                                onChange={(e) => {
+                                  const files = Array.from(
+                                    e.target.files || []
+                                  );
+                                  const validFiles = files.filter(
+                                    (file) =>
+                                      file.type.startsWith("image/") ||
+                                      file.type === "application/pdf"
+                                  );
+                                  if (validFiles.length > 0) {
+                                    setDriversLicenseFiles((prev) => [
+                                      ...prev,
+                                      ...validFiles,
+                                    ]);
+                                  } else {
+                                    toast({
+                                      title: "Invalid file type",
+                                      description:
+                                        "Please upload image or PDF files only",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor="drivers-license-upload"
+                                className="cursor-pointer"
+                              >
+                                <p className="text-[#EAEB80] text-sm">
+                                  Drag & drop files here or click to browse
+                                </p>
+                                <p className="text-gray-500 text-xs mt-1">
+                                  Supports images and PDF files (multiple files allowed)
+                                </p>
+                              </label>
+                              {driversLicenseFiles.length > 0 && (
+                                <div className="mt-4 space-y-2">
+                                  {driversLicenseFiles.map((file, index) => (
+                                    <div
+                                      key={index}
+                                      className="p-3 bg-[#1a1a1a] rounded border border-[#EAEB80]/20 flex items-center justify-between"
+                                    >
+                                      <p className="text-white text-sm">
+                                        {file.name}
+                                      </p>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setDriversLicenseFiles((prev) =>
+                                            prev.filter((_, i) => i !== index)
+                                          );
+                                        }}
+                                        className="text-red-400 text-xs hover:underline ml-4"
+                                      >
+                                        Remove
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </FormItem>
                         </>
                       )}
                       {step.id === 4 && (
@@ -1358,13 +1581,89 @@ export default function Onboarding() {
                             <FormLabel className="text-gray-300">
                               Insurance Card *
                             </FormLabel>
-                            <div className="border-2 border-dashed border-[#EAEB80]/30 rounded-lg p-8 text-center">
-                              <p className="text-[#EAEB80] text-sm">
-                                Drag & drop files here or click to browse
-                              </p>
-                              <p className="text-gray-500 text-xs mt-1">
-                                Supports images and PDF files
-                              </p>
+                            <div
+                              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                                isDragging
+                                  ? "border-[#EAEB80] bg-[#EAEB80]/10"
+                                  : "border-[#EAEB80]/30"
+                              }`}
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                setIsDragging(true);
+                              }}
+                              onDragLeave={() => setIsDragging(false)}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                setIsDragging(false);
+                                const file = e.dataTransfer.files[0];
+                                if (file) {
+                                  if (
+                                    file.type.startsWith("image/") ||
+                                    file.type === "application/pdf"
+                                  ) {
+                                    setInsuranceCardFile(file);
+                                  } else {
+                                    toast({
+                                      title: "Invalid file type",
+                                      description:
+                                        "Please upload an image or PDF file",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }
+                              }}
+                            >
+                              <input
+                                type="file"
+                                id="insurance-card-upload"
+                                accept="image/*,.pdf"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    if (
+                                      file.type.startsWith("image/") ||
+                                      file.type === "application/pdf"
+                                    ) {
+                                      setInsuranceCardFile(file);
+                                    } else {
+                                      toast({
+                                        title: "Invalid file type",
+                                        description:
+                                          "Please upload an image or PDF file",
+                                        variant: "destructive",
+                                      });
+                                      // Reset the input
+                                      e.target.value = "";
+                                    }
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor="insurance-card-upload"
+                                className="cursor-pointer"
+                              >
+                                <p className="text-[#EAEB80] text-sm">
+                                  Drag & drop files here or click to browse
+                                </p>
+                                <p className="text-gray-500 text-xs mt-1">
+                                  Supports images and PDF files
+                                </p>
+                              </label>
+                              {insuranceCardFile && (
+                                <div className="mt-4 p-3 bg-[#1a1a1a] rounded border border-[#EAEB80]/20">
+                                  <p className="text-white text-sm">
+                                    Selected: {insuranceCardFile.name}
+                                  </p>
+                                  <button
+                                    type="button"
+                                    onClick={() => setInsuranceCardFile(null)}
+                                    className="text-red-400 text-xs mt-2 hover:underline"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           </FormItem>
                         </>
@@ -1378,7 +1677,7 @@ export default function Onboarding() {
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel className="text-gray-300">
-                                    Plate #*
+                                    Purchase Price *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
@@ -1457,7 +1756,7 @@ export default function Onboarding() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel className="text-gray-300">
-                                  Transport vehicle city to city?
+                                  To maximize profits, would you like us to transport the vehicle from city to city if necessary? (US only)
                                 </FormLabel>
                                 <Select
                                   onValueChange={field.onChange}
@@ -1483,7 +1782,7 @@ export default function Onboarding() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel className="text-gray-300">
-                                  What is your ultimate goal? *
+                                  What is your ultimate goal we can help you achieve with our program *
                                 </FormLabel>
                                 <FormControl>
                                   <Textarea
@@ -1582,6 +1881,45 @@ export default function Onboarding() {
                                   <FormControl>
                                     <Input
                                       {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="businessName"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Business Name
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="ein"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    EIN
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="XX-XXXXXXX"
                                       className="bg-[#0a0a0a] border-gray-700"
                                     />
                                   </FormControl>
