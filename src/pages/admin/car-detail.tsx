@@ -1155,9 +1155,9 @@ export default function CarDetailPage() {
                     {/* Main Carousel Display - Reduced height by 1/5 (333 * 4/5 = 266px) */}
                     <div className="relative w-full h-[266px] bg-black rounded-lg overflow-hidden border border-[#2a2a2a]">
                     {car.photos.map((photo, index) => {
-                      // For static assets like car photos, use the path directly without buildApiUrl
-                      // buildApiUrl is for API endpoints, not static files
-                      const photoUrl = photo.startsWith('/') ? photo : `/${photo}`;
+                      // For static assets like car photos, use buildApiUrl to get correct backend URL in production
+                      const photoPath = photo.startsWith('/') ? photo : `/${photo}`;
+                      const photoUrl = buildApiUrl(photoPath);
                       const isActive = index === carouselIndex;
                       return (
                         <div
@@ -1354,9 +1354,9 @@ export default function CarDetailPage() {
             {car.photos && car.photos.length > 0 ? (
               <div className="grid grid-cols-8 gap-4">
                 {car.photos.map((photo, index) => {
-                  // For static assets like car photos, use the path directly without buildApiUrl
-                  // buildApiUrl is for API endpoints, not static files
-                  const photoUrl = photo.startsWith('/') ? photo : `/${photo}`;
+                  // For static assets like car photos, use buildApiUrl to get correct backend URL in production
+                  const photoPath = photo.startsWith('/') ? photo : `/${photo}`;
+                  const photoUrl = buildApiUrl(photoPath);
                   const isSelected = selectedPhotos.has(index);
                   return (
                     <div
@@ -1993,7 +1993,7 @@ export default function CarDetailPage() {
               {/* Full Screen Image - High Resolution Display */}
               {car.photos && car.photos[fullScreenImageIndex] && (
                 <img
-                  src={car.photos[fullScreenImageIndex].startsWith('/') ? car.photos[fullScreenImageIndex] : `/${car.photos[fullScreenImageIndex]}`}
+                  src={buildApiUrl(car.photos[fullScreenImageIndex].startsWith('/') ? car.photos[fullScreenImageIndex] : `/${car.photos[fullScreenImageIndex]}`)}
                   alt={`Car photo ${fullScreenImageIndex + 1}`}
                   className="w-full h-full object-contain"
                   onClick={(e) => e.stopPropagation()}
