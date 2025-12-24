@@ -81,6 +81,9 @@ const carSchema = z.object({
   // Additional Information
   carManufacturerWebsite: z.string().optional(),
   carManufacturerUsername: z.string().optional(),
+  // Documents
+  insuranceCardUrl: z.string().optional(),
+  driversLicenseUrls: z.string().optional(), // JSON string array
 });
 
 type CarFormData = z.infer<typeof carSchema>;
@@ -290,6 +293,8 @@ export default function CarDetailPage() {
       insuranceExpiration: "",
       carManufacturerWebsite: "",
       carManufacturerUsername: "",
+      insuranceCardUrl: "",
+      driversLicenseUrls: "",
     },
   });
 
@@ -318,6 +323,9 @@ export default function CarDetailPage() {
       // Additional Information
       if (data.carManufacturerWebsite !== undefined) formData.append("carManufacturerWebsite", data.carManufacturerWebsite || "");
       if (data.carManufacturerUsername !== undefined) formData.append("carManufacturerUsername", data.carManufacturerUsername || "");
+      // Documents
+      if (data.insuranceCardUrl !== undefined) formData.append("insuranceCardUrl", data.insuranceCardUrl || "");
+      if (data.driversLicenseUrls !== undefined) formData.append("driversLicenseUrls", data.driversLicenseUrls || "");
 
       const response = await fetch(buildApiUrl(`/api/cars/${carId}`), {
         method: "PATCH",
@@ -540,6 +548,9 @@ export default function CarDetailPage() {
       // Additional Information
       carManufacturerWebsite: onboarding?.carManufacturerWebsite || "",
       carManufacturerUsername: onboarding?.carManufacturerUsername || "",
+      // Documents
+      insuranceCardUrl: onboarding?.insuranceCardUrl || "",
+      driversLicenseUrls: onboarding?.driversLicenseUrls ? (Array.isArray(onboarding.driversLicenseUrls) ? JSON.stringify(onboarding.driversLicenseUrls) : onboarding.driversLicenseUrls) : "",
     });
     setIsEditModalOpen(true);
   };
@@ -727,10 +738,10 @@ export default function CarDetailPage() {
           )}
         </div>
 
-        {/* Row 1: Vehicle Information, Financial Information, Insurance Information, Additional Information */}
+        {/* Row 1: Vehicle Information, Financial Information, Insurance Information */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Vehicle Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
                 <Car className="w-5 h-5" />
@@ -826,7 +837,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Financial Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
                 Financial Information
@@ -873,7 +884,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Insurance Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
                 Insurance Information
@@ -910,56 +921,12 @@ export default function CarDetailPage() {
               )}
             </CardContent>
           </Card>
-
-          {/* Additional Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
-            <CardHeader>
-              <CardTitle className="text-[#EAEB80] text-lg">
-                Additional Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {isLoadingOnboarding ? (
-                <div className="text-center py-4 text-gray-400">
-                  <p className="text-sm">Loading...</p>
-                </div>
-              ) : onboarding ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                  {onboarding.carManufacturerWebsite && (
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Car Manufacturer Website</p>
-                      <p className="text-white text-base break-all">
-                        <a
-                          href={onboarding.carManufacturerWebsite}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#EAEB80] hover:underline"
-                        >
-                          {formatValue(onboarding.carManufacturerWebsite)}
-                        </a>
-                      </p>
-                    </div>
-                  )}
-                  {onboarding.carManufacturerUsername && (
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Manufacturer Username</p>
-                      <p className="text-white text-base">{formatValue(onboarding.carManufacturerUsername)}</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-4 text-gray-400">
-                  <p className="text-sm">No additional information available</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Row 2: Documents, Timestamps, Car Photos Carousel */}
+        {/* Row 2: Documents, Additional Information, Car Photos Carousel */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Documents Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-5">
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
                 Documents
@@ -1080,25 +1047,61 @@ export default function CarDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Timestamps Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
+          {/* Additional Information Card */}
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
-                Timestamps
+                Additional Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Created</p>
-                <p className="text-white text-base">
-                  {formatDate(car.createdAt)}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Last Updated</p>
-                <p className="text-white text-base">
-                  {formatDate(car.updatedAt)}
-                </p>
+            <CardContent className="space-y-2">
+              {isLoadingOnboarding ? (
+                <div className="text-center py-4 text-gray-400">
+                  <p className="text-sm">Loading...</p>
+                </div>
+              ) : onboarding ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                  {onboarding.carManufacturerWebsite && (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Car Manufacturer Website</p>
+                      <p className="text-white text-base break-all">
+                        <a
+                          href={onboarding.carManufacturerWebsite}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#EAEB80] hover:underline"
+                        >
+                          {formatValue(onboarding.carManufacturerWebsite)}
+                        </a>
+                      </p>
+                    </div>
+                  )}
+                  {onboarding.carManufacturerUsername && (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Manufacturer Username</p>
+                      <p className="text-white text-base">{formatValue(onboarding.carManufacturerUsername)}</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-4 text-gray-400">
+                  <p className="text-sm">No additional information available</p>
+                </div>
+              )}
+              {/* Timestamps */}
+              <div className="pt-3 border-t border-[#2a2a2a] space-y-2">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Created</p>
+                  <p className="text-white text-base">
+                    {formatDate(car.createdAt)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Last Updated</p>
+                  <p className="text-white text-base">
+                    {formatDate(car.updatedAt)}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -1834,6 +1837,53 @@ export default function CarDetailPage() {
                       )}
                     />
                   </div>
+                </div>
+
+                {/* Documents Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                    Documents
+                  </h3>
+                  <FormField
+                    control={form.control}
+                    name="insuranceCardUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Insurance Card URL</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="url"
+                            placeholder="https://example.com/insurance-card.jpg"
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="driversLicenseUrls"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Drivers License URLs (JSON array)</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder='["https://example.com/license1.jpg", "https://example.com/license2.jpg"]'
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] font-mono text-sm"
+                          />
+                        </FormControl>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Enter as JSON array of URLs, e.g., ["url1", "url2"]
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
