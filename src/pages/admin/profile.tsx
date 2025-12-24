@@ -386,14 +386,22 @@ export default function ClientProfilePage() {
                                 {onboarding.insuranceCardUrl ? (
                                   <div 
                                     className="relative group cursor-pointer"
-                                    onClick={() => setFullScreenImage({ url: onboarding.insuranceCardUrl!, type: 'insurance' })}
+                                    onClick={() => {
+                                      const imageUrl = onboarding.insuranceCardUrl.startsWith('http') 
+                                        ? onboarding.insuranceCardUrl 
+                                        : buildApiUrl(onboarding.insuranceCardUrl);
+                                      setFullScreenImage({ url: imageUrl, type: 'insurance' });
+                                    }}
                                   >
                                     <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
                                       <img
-                                        src={onboarding.insuranceCardUrl}
+                                        src={onboarding.insuranceCardUrl.startsWith('http') 
+                                          ? onboarding.insuranceCardUrl 
+                                          : buildApiUrl(onboarding.insuranceCardUrl)}
                                         alt="Insurance Card"
                                         className="w-full h-full object-contain p-2"
                                         onError={(e) => {
+                                          console.error('Failed to load insurance card image:', onboarding.insuranceCardUrl);
                                           const target = e.target as HTMLImageElement;
                                           target.style.display = "none";
                                           const parent = target.parentElement?.parentElement;
@@ -424,42 +432,46 @@ export default function ClientProfilePage() {
                                 <h4 className="text-base font-semibold text-gray-200 mb-4">Drivers License</h4>
                                 {onboarding.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 ? (
                                   <div className="space-y-4">
-                                    {onboarding.driversLicenseUrls.map((url: string, index: number) => (
-                                      <div 
-                                        key={index}
-                                        className="relative group cursor-pointer"
-                                        onClick={() => setFullScreenImage({ url, type: 'license', index })}
-                                      >
-                                        <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
-                                          <img
-                                            src={url}
-                                            alt={`Drivers License ${index + 1}`}
-                                            className="w-full h-full object-contain p-2"
-                                            onError={(e) => {
-                                              const target = e.target as HTMLImageElement;
-                                              target.style.display = "none";
-                                              const parent = target.parentElement?.parentElement;
-                                              if (parent && !parent.querySelector(".error-message")) {
-                                                const errorDiv = document.createElement("div");
-                                                errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
-                                                errorDiv.textContent = "Failed to load image";
-                                                parent.appendChild(errorDiv);
-                                              }
-                                            }}
-                                          />
-                                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                                              Click to view full screen
+                                    {onboarding.driversLicenseUrls.map((url: string, index: number) => {
+                                      const imageUrl = url.startsWith('http') ? url : buildApiUrl(url);
+                                      return (
+                                        <div 
+                                          key={index}
+                                          className="relative group cursor-pointer"
+                                          onClick={() => setFullScreenImage({ url: imageUrl, type: 'license', index })}
+                                        >
+                                          <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/30 hover:border-[#EAEB80] transition-all overflow-hidden shadow-lg hover:shadow-[#EAEB80]/20">
+                                            <img
+                                              src={imageUrl}
+                                              alt={`Drivers License ${index + 1}`}
+                                              className="w-full h-full object-contain p-2"
+                                              onError={(e) => {
+                                                console.error('Failed to load drivers license image:', url);
+                                                const target = e.target as HTMLImageElement;
+                                                target.style.display = "none";
+                                                const parent = target.parentElement?.parentElement;
+                                                if (parent && !parent.querySelector(".error-message")) {
+                                                  const errorDiv = document.createElement("div");
+                                                  errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                                  errorDiv.textContent = "Failed to load image";
+                                                  parent.appendChild(errorDiv);
+                                                }
+                                              }}
+                                            />
+                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                              <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                                Click to view full screen
+                                              </div>
                                             </div>
                                           </div>
+                                          {onboarding.driversLicenseUrls.length > 1 && (
+                                            <div className="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                                              {index + 1} / {onboarding.driversLicenseUrls.length}
+                                            </div>
+                                          )}
                                         </div>
-                                        {onboarding.driversLicenseUrls.length > 1 && (
-                                          <div className="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-                                            {index + 1} / {onboarding.driversLicenseUrls.length}
-                                          </div>
-                                        )}
-                                      </div>
-                                    ))}
+                                      );
+                                    })}
                                   </div>
                                 ) : (
                                   <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
@@ -609,8 +621,10 @@ export default function ClientProfilePage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       const prevIndex = fullScreenImage.index! - 1;
+                      const prevUrl = onboarding.driversLicenseUrls[prevIndex];
+                      const imageUrl = prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl);
                       setFullScreenImage({ 
-                        url: onboarding.driversLicenseUrls[prevIndex], 
+                        url: imageUrl, 
                         type: 'license', 
                         index: prevIndex 
                       });
@@ -632,8 +646,10 @@ export default function ClientProfilePage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       const nextIndex = fullScreenImage.index! + 1;
+                      const nextUrl = onboarding.driversLicenseUrls[nextIndex];
+                      const imageUrl = nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl);
                       setFullScreenImage({ 
-                        url: onboarding.driversLicenseUrls[nextIndex], 
+                        url: imageUrl, 
                         type: 'license', 
                         index: nextIndex 
                       });
@@ -660,7 +676,7 @@ export default function ClientProfilePage() {
                 maxHeight: '100vh',
               }}
               onError={(e) => {
-                console.error('Failed to load image:', fullScreenImage.url);
+                console.error('Failed to load image in full screen viewer:', fullScreenImage.url);
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
