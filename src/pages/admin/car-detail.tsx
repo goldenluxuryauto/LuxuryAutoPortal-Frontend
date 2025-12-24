@@ -135,14 +135,16 @@ export default function CarDetailPage() {
   const car = data?.data;
 
   // Fetch onboarding data for financial, insurance, and additional information
+  // Use VIN from vehicle information card to fetch the correct onboarding record
   const { data: onboardingData, isLoading: isLoadingOnboarding } = useQuery<{
     success: boolean;
     data: any;
   }>({
-    queryKey: ["/api/clients", car?.clientId, "onboarding"],
+    queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
     queryFn: async () => {
-      if (!car?.clientId) throw new Error("No client ID");
-      const url = buildApiUrl(`/api/clients/${car.clientId}/onboarding`);
+      if (!car?.vin) throw new Error("No VIN");
+      // Use VIN to fetch onboarding data
+      const url = buildApiUrl(`/api/onboarding/vin/${encodeURIComponent(car.vin)}`);
       const response = await fetch(url, {
         credentials: "include",
       });
@@ -157,7 +159,7 @@ export default function CarDetailPage() {
       const result = await response.json();
       return result;
     },
-    enabled: !!car?.clientId,
+    enabled: !!car?.vin,
     retry: false,
   });
 
@@ -360,27 +362,41 @@ export default function CarDetailPage() {
       return result;
     },
     onSuccess: async (responseData) => {
-      // Update the car data in cache first
+      // Immediately update the car data in cache to reflect changes
+      // This ensures the UI updates instantly without waiting for refetch
       if (responseData?.data) {
         queryClient.setQueryData(["/api/cars", carId], responseData);
       }
       
-      // Refetch both car and onboarding data to ensure UI updates
-      await queryClient.refetchQueries({ queryKey: ["/api/cars", carId] });
+      // Get the VIN from updated car data (prioritize response data, then current car)
+      const updatedCar = responseData?.data || car;
+      const carVin = updatedCar?.vin || car?.vin;
       
-      // Get the updated car data to find clientId
-      const updatedCarData = queryClient.getQueryData<{ success: boolean; data: CarDetail }>(["/api/cars", carId]);
-      const updatedCar = updatedCarData?.data;
+      // Refetch car data in the background to ensure we have the latest from server
+      // This will update the cache again with any server-side changes
+      queryClient.refetchQueries({ queryKey: ["/api/cars", carId] });
       
-      if (updatedCar?.clientId) {
-        await queryClient.refetchQueries({ queryKey: ["/api/clients", updatedCar.clientId, "onboarding"] });
-      } else if (car?.clientId) {
-        // Fallback to old car data if updated car doesn't have clientId yet
-        await queryClient.refetchQueries({ queryKey: ["/api/clients", car.clientId, "onboarding"] });
+      // Refetch onboarding data using VIN (as we changed to VIN-based query)
+      // This ensures Financial, Insurance, and Additional Information are updated immediately
+      if (carVin) {
+        // Invalidate first to ensure fresh data
+        queryClient.invalidateQueries({ queryKey: ["/api/onboarding/vin", carVin, "onboarding"] });
+        // Then refetch to get the latest data
+        await queryClient.refetchQueries({ queryKey: ["/api/onboarding/vin", carVin, "onboarding"] });
       }
       
+      // Also invalidate client-based onboarding queries for backward compatibility
+      const finalCar = updatedCar;
+      if (finalCar?.clientId) {
+        queryClient.invalidateQueries({ queryKey: ["/api/clients", finalCar.clientId, "onboarding"] });
+      } else if (car?.clientId) {
+        queryClient.invalidateQueries({ queryKey: ["/api/clients", car.clientId, "onboarding"] });
+      }
+      
+      // Invalidate other related queries
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] }); // For the cars list page
       queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
+      
       toast({
         title: "Success",
         description: "Car information updated successfully",
