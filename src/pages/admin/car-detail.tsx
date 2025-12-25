@@ -102,6 +102,11 @@ export default function CarDetailPage() {
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
   const [fullScreenImageIndex, setFullScreenImageIndex] = useState<number | null>(null);
   const [fullScreenDocument, setFullScreenDocument] = useState<{ url: string; type: 'insurance' | 'license'; index?: number; isPdf?: boolean } | null>(null);
+  // Document editing state
+  const [insuranceCardFile, setInsuranceCardFile] = useState<File | null>(null);
+  const [insuranceCardPreview, setInsuranceCardPreview] = useState<string | null>(null);
+  const [driversLicenseFiles, setDriversLicenseFiles] = useState<File[]>([]);
+  const [driversLicensePreviews, setDriversLicensePreviews] = useState<string[]>([]);
 
   // Helper function to check if a URL is a PDF
   const isPdfDocument = (url: string): boolean => {
@@ -334,10 +339,7 @@ export default function CarDetailPage() {
       formData.append("carManufacturerWebsite", data.carManufacturerWebsite || "");
       formData.append("carManufacturerUsername", data.carManufacturerUsername || "");
       
-      // Documents - Handle file uploads
-      const insuranceCardFile = (form as any).getValues("insuranceCardFile");
-      const driversLicenseFiles = (form as any).getValues("driversLicenseFiles");
-      
+      // Documents - Handle file uploads using state
       if (insuranceCardFile instanceof File) {
         formData.append("insuranceCard", insuranceCardFile);
       } else if (data.insuranceCardUrl !== undefined) {
@@ -345,7 +347,7 @@ export default function CarDetailPage() {
         formData.append("insuranceCardUrl", data.insuranceCardUrl || "");
       }
       
-      if (driversLicenseFiles && Array.isArray(driversLicenseFiles) && driversLicenseFiles.length > 0) {
+      if (driversLicenseFiles && driversLicenseFiles.length > 0) {
         driversLicenseFiles.forEach((file: File) => {
           if (file instanceof File) {
             formData.append("driversLicense", file);
@@ -408,6 +410,11 @@ export default function CarDetailPage() {
         title: "Success",
         description: "Car information updated successfully",
       });
+      // Reset document file state after successful update
+      setInsuranceCardFile(null);
+      setInsuranceCardPreview(null);
+      setDriversLicenseFiles([]);
+      setDriversLicensePreviews([]);
       setIsEditModalOpen(false);
     },
     onError: (error: any) => {
@@ -610,7 +617,83 @@ export default function CarDetailPage() {
       insuranceCardUrl: onboarding?.insuranceCardUrl || "",
       driversLicenseUrls: onboarding?.driversLicenseUrls ? (Array.isArray(onboarding.driversLicenseUrls) ? JSON.stringify(onboarding.driversLicenseUrls) : onboarding.driversLicenseUrls) : "",
     });
+    // Reset document file state when opening edit dialog
+    setInsuranceCardFile(null);
+    setInsuranceCardPreview(null);
+    setDriversLicenseFiles([]);
+    setDriversLicensePreviews([]);
     setIsEditModalOpen(true);
+  };
+
+  // Handle insurance card file selection
+  const handleInsuranceCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setInsuranceCardFile(file);
+      // Generate preview
+      if (file.type === 'application/pdf') {
+        setInsuranceCardPreview(null); // PDF preview handled separately
+      } else {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setInsuranceCardPreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  };
+
+  // Handle drivers license files selection
+  const handleDriversLicenseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const fileArray = Array.from(files);
+      setDriversLicenseFiles(fileArray);
+      // Generate previews
+      const previews: string[] = [];
+      let loadedCount = 0;
+      fileArray.forEach((file, index) => {
+        if (file.type === 'application/pdf') {
+          previews[index] = 'pdf'; // Mark as PDF
+          loadedCount++;
+          if (loadedCount === fileArray.length) {
+            setDriversLicensePreviews(previews);
+          }
+        } else {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            previews[index] = reader.result as string;
+            loadedCount++;
+            if (loadedCount === fileArray.length) {
+              setDriversLicensePreviews(previews);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  };
+
+  // Remove insurance card file
+  const handleRemoveInsuranceCard = () => {
+    setInsuranceCardFile(null);
+    setInsuranceCardPreview(null);
+    // Reset file input
+    const input = document.getElementById('insurance-card-input') as HTMLInputElement;
+    if (input) input.value = '';
+  };
+
+  // Remove drivers license file
+  const handleRemoveDriversLicense = (index: number) => {
+    const newFiles = driversLicenseFiles.filter((_, i) => i !== index);
+    const newPreviews = driversLicensePreviews.filter((_, i) => i !== index);
+    setDriversLicenseFiles(newFiles);
+    setDriversLicensePreviews(newPreviews);
+    // Reset file input if all files removed
+    if (newFiles.length === 0) {
+      const input = document.getElementById('drivers-license-input') as HTMLInputElement;
+      if (input) input.value = '';
+    }
   };
 
   const onSubmit = (data: CarFormData) => {
@@ -1560,7 +1643,16 @@ export default function CarDetailPage() {
 
         {/* Edit Modal - Only for admins */}
         {isAdmin && (
-          <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <Dialog open={isEditModalOpen} onOpenChange={(open) => {
+            setIsEditModalOpen(open);
+            if (!open) {
+              // Reset document file state when dialog closes
+              setInsuranceCardFile(null);
+              setInsuranceCardPreview(null);
+              setDriversLicenseFiles([]);
+              setDriversLicensePreviews([]);
+            }
+          }}>
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold">
@@ -1940,64 +2032,193 @@ export default function CarDetailPage() {
                 </div>
 
                 {/* Documents Section */}
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
                     Documents
                   </h3>
                   
                   {/* Insurance Card Upload */}
-                  <div className="space-y-2">
-                    <Label className="text-gray-400">Insurance Card</Label>
-                    <div className="flex items-center gap-2">
+                  <div className="space-y-4">
+                    <Label className="text-gray-400 text-base font-medium">Insurance Card</Label>
+                    
+                    {/* Current Insurance Card Preview */}
+                    {onboarding?.insuranceCardUrl && !insuranceCardFile && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-gray-500">Current Document:</p>
+                        <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#2a2a2a] overflow-hidden">
+                          {(() => {
+                            const documentUrl = onboarding.insuranceCardUrl.startsWith('http') 
+                              ? onboarding.insuranceCardUrl 
+                              : buildApiUrl(onboarding.insuranceCardUrl);
+                            const isPdf = isPdfDocument(onboarding.insuranceCardUrl);
+                            
+                            return isPdf ? (
+                              <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                <FileText className="w-16 h-16 text-blue-400 mb-2" />
+                                <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
+                                <p className="text-gray-400 text-xs mt-1">{onboarding.insuranceCardUrl.split("/").pop()}</p>
+                              </div>
+                            ) : (
+                              <img
+                                src={documentUrl}
+                                alt="Current Insurance Card"
+                                className="w-full h-full object-contain p-2"
+                              />
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* New Insurance Card Preview */}
+                    {insuranceCardFile && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-gray-500">New Document (will replace current):</p>
+                        <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/50 overflow-hidden">
+                          {insuranceCardFile.type === 'application/pdf' ? (
+                            <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                              <FileText className="w-16 h-16 text-blue-400 mb-2" />
+                              <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
+                              <p className="text-gray-400 text-xs mt-1">{insuranceCardFile.name}</p>
+                            </div>
+                          ) : insuranceCardPreview ? (
+                            <div className="relative w-full h-full">
+                              <img
+                                src={insuranceCardPreview}
+                                alt="Preview"
+                                className="w-full h-full object-contain p-2"
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={handleRemoveInsuranceCard}
+                                className="absolute top-2 right-2 h-8 w-8 bg-red-600/90 hover:bg-red-600 text-white rounded-full"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* File Input */}
+                    <div>
                       <Input
+                        id="insurance-card-input"
                         type="file"
                         accept="image/*,application/pdf"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            // Store file in form state for submission
-                            (form as any).setValue("insuranceCardFile", file);
-                          }
-                        }}
+                        onChange={handleInsuranceCardChange}
                         className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#EAEB80] file:text-black hover:file:bg-[#d4d570]"
                       />
-                      {onboarding?.insuranceCardUrl && (
-                        <p className="text-xs text-gray-500">
-                          Current: {onboarding.insuranceCardUrl.split("/").pop()}
-                        </p>
-                      )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        {insuranceCardFile ? "New file selected. Click Update to replace the current document." : "Select a new image or PDF to replace the current insurance card"}
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-500">
-                      Upload a new image to replace the existing insurance card
-                    </p>
                   </div>
 
                   {/* Drivers License Upload */}
-                  <div className="space-y-2">
-                    <Label className="text-gray-400">Drivers License (Multiple files)</Label>
-                    <div className="flex items-center gap-2">
+                  <div className="space-y-4">
+                    <Label className="text-gray-400 text-base font-medium">Drivers License</Label>
+                    
+                    {/* Current Drivers License Previews */}
+                    {onboarding?.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 && driversLicenseFiles.length === 0 && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-gray-500">Current Documents ({onboarding.driversLicenseUrls.length}):</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          {onboarding.driversLicenseUrls.map((url: string, index: number) => {
+                            const documentUrl = url.startsWith('http') ? url : buildApiUrl(url);
+                            const isPdf = isPdfDocument(url);
+                            
+                            return (
+                              <div key={index} className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#2a2a2a] overflow-hidden">
+                                {isPdf ? (
+                                  <div className="w-full h-full flex flex-col items-center justify-center p-2">
+                                    <FileText className="w-12 h-12 text-blue-400 mb-1" />
+                                    <p className="text-blue-400 text-xs font-semibold">PDF</p>
+                                  </div>
+                                ) : (
+                                  <img
+                                    src={documentUrl}
+                                    alt={`License ${index + 1}`}
+                                    className="w-full h-full object-contain p-1"
+                                  />
+                                )}
+                                {onboarding.driversLicenseUrls.length > 1 && (
+                                  <div className="absolute top-1 left-1 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded">
+                                    {index + 1}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* New Drivers License Previews */}
+                    {driversLicenseFiles.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-gray-500">New Documents (will replace all current):</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          {driversLicenseFiles.map((file, index) => (
+                            <div key={index} className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/50 overflow-hidden">
+                              {file.type === 'application/pdf' ? (
+                                <div className="w-full h-full flex flex-col items-center justify-center p-2">
+                                  <FileText className="w-12 h-12 text-blue-400 mb-1" />
+                                  <p className="text-blue-400 text-xs font-semibold">PDF</p>
+                                  <p className="text-gray-400 text-xs truncate w-full px-1">{file.name}</p>
+                                </div>
+                              ) : driversLicensePreviews[index] && driversLicensePreviews[index] !== 'pdf' ? (
+                                <div className="relative w-full h-full">
+                                  <img
+                                    src={driversLicensePreviews[index]}
+                                    alt={`Preview ${index + 1}`}
+                                    className="w-full h-full object-contain p-1"
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleRemoveDriversLicense(index)}
+                                    className="absolute top-1 right-1 h-6 w-6 bg-red-600/90 hover:bg-red-600 text-white rounded-full"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <p className="text-xs text-gray-500">Loading...</p>
+                                </div>
+                              )}
+                              {driversLicenseFiles.length > 1 && (
+                                <div className="absolute top-1 left-1 bg-[#EAEB80]/90 text-black text-xs px-1.5 py-0.5 rounded font-semibold">
+                                  {index + 1}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* File Input */}
+                    <div>
                       <Input
+                        id="drivers-license-input"
                         type="file"
                         accept="image/*,application/pdf"
                         multiple
-                        onChange={(e) => {
-                          const files = e.target.files;
-                          if (files && files.length > 0) {
-                            // Store files in form state for submission
-                            (form as any).setValue("driversLicenseFiles", Array.from(files));
-                          }
-                        }}
+                        onChange={handleDriversLicenseChange}
                         className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#EAEB80] file:text-black hover:file:bg-[#d4d570]"
                       />
-                      {onboarding?.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 && (
-                        <p className="text-xs text-gray-500">
-                          Current: {onboarding.driversLicenseUrls.length} file(s)
-                        </p>
-                      )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        {driversLicenseFiles.length > 0 
+                          ? `${driversLicenseFiles.length} file(s) selected. Click Update to replace all current documents.`
+                          : "Select one or more images or PDFs to replace all current drivers license documents"}
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-500">
-                      Upload new images to replace all existing drivers license files
-                    </p>
                   </div>
                 </div>
 
