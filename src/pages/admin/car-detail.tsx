@@ -2037,187 +2037,190 @@ export default function CarDetailPage() {
                     Documents
                   </h3>
                   
-                  {/* Insurance Card Upload */}
-                  <div className="space-y-4">
-                    <Label className="text-gray-400 text-base font-medium">Insurance Card</Label>
-                    
-                    {/* Current Insurance Card Preview */}
-                    {onboarding?.insuranceCardUrl && !insuranceCardFile && (
-                      <div className="space-y-2">
-                        <p className="text-xs text-gray-500">Current Document:</p>
-                        <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#2a2a2a] overflow-hidden">
-                          {(() => {
-                            const documentUrl = onboarding.insuranceCardUrl.startsWith('http') 
-                              ? onboarding.insuranceCardUrl 
-                              : buildApiUrl(onboarding.insuranceCardUrl);
-                            const isPdf = isPdfDocument(onboarding.insuranceCardUrl);
-                            
-                            return isPdf ? (
+                  {/* Upload Boxes - Side by Side */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Insurance Card Upload */}
+                    <div className="space-y-4">
+                      <Label className="text-gray-400 text-base font-medium">Insurance Card</Label>
+                      
+                      {/* Current Insurance Card Preview */}
+                      {onboarding?.insuranceCardUrl && !insuranceCardFile && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-500">Current Document:</p>
+                          <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#2a2a2a] overflow-hidden">
+                            {(() => {
+                              const documentUrl = onboarding.insuranceCardUrl.startsWith('http') 
+                                ? onboarding.insuranceCardUrl 
+                                : buildApiUrl(onboarding.insuranceCardUrl);
+                              const isPdf = isPdfDocument(onboarding.insuranceCardUrl);
+                              
+                              return isPdf ? (
+                                <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                  <FileText className="w-16 h-16 text-blue-400 mb-2" />
+                                  <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
+                                  <p className="text-gray-400 text-xs mt-1">{onboarding.insuranceCardUrl.split("/").pop()}</p>
+                                </div>
+                              ) : (
+                                <img
+                                  src={documentUrl}
+                                  alt="Current Insurance Card"
+                                  className="w-full h-full object-contain p-2"
+                                />
+                              );
+                            })()}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* New Insurance Card Preview */}
+                      {insuranceCardFile && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-500">New Document (will replace current):</p>
+                          <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/50 overflow-hidden">
+                            {insuranceCardFile.type === 'application/pdf' ? (
                               <div className="w-full h-full flex flex-col items-center justify-center p-4">
                                 <FileText className="w-16 h-16 text-blue-400 mb-2" />
                                 <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
-                                <p className="text-gray-400 text-xs mt-1">{onboarding.insuranceCardUrl.split("/").pop()}</p>
+                                <p className="text-gray-400 text-xs mt-1">{insuranceCardFile.name}</p>
                               </div>
-                            ) : (
-                              <img
-                                src={documentUrl}
-                                alt="Current Insurance Card"
-                                className="w-full h-full object-contain p-2"
-                              />
-                            );
-                          })()}
+                            ) : insuranceCardPreview ? (
+                              <div className="relative w-full h-full">
+                                <img
+                                  src={insuranceCardPreview}
+                                  alt="Preview"
+                                  className="w-full h-full object-contain p-2"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={handleRemoveInsuranceCard}
+                                  className="absolute top-2 right-2 h-8 w-8 bg-red-600/90 hover:bg-red-600 text-white rounded-full"
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            ) : null}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* New Insurance Card Preview */}
-                    {insuranceCardFile && (
-                      <div className="space-y-2">
-                        <p className="text-xs text-gray-500">New Document (will replace current):</p>
-                        <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/50 overflow-hidden">
-                          {insuranceCardFile.type === 'application/pdf' ? (
-                            <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                              <FileText className="w-16 h-16 text-blue-400 mb-2" />
-                              <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
-                              <p className="text-gray-400 text-xs mt-1">{insuranceCardFile.name}</p>
-                            </div>
-                          ) : insuranceCardPreview ? (
-                            <div className="relative w-full h-full">
-                              <img
-                                src={insuranceCardPreview}
-                                alt="Preview"
-                                className="w-full h-full object-contain p-2"
-                              />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={handleRemoveInsuranceCard}
-                                className="absolute top-2 right-2 h-8 w-8 bg-red-600/90 hover:bg-red-600 text-white rounded-full"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          ) : null}
-                        </div>
+                      {/* File Input */}
+                      <div>
+                        <Input
+                          id="insurance-card-input"
+                          type="file"
+                          accept="image/*,application/pdf"
+                          onChange={handleInsuranceCardChange}
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#EAEB80] file:text-black hover:file:bg-[#d4d570]"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          {insuranceCardFile ? "New file selected. Click Update to replace the current document." : "Select a new image or PDF to replace the current insurance card"}
+                        </p>
                       </div>
-                    )}
-
-                    {/* File Input */}
-                    <div>
-                      <Input
-                        id="insurance-card-input"
-                        type="file"
-                        accept="image/*,application/pdf"
-                        onChange={handleInsuranceCardChange}
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#EAEB80] file:text-black hover:file:bg-[#d4d570]"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        {insuranceCardFile ? "New file selected. Click Update to replace the current document." : "Select a new image or PDF to replace the current insurance card"}
-                      </p>
                     </div>
-                  </div>
 
-                  {/* Drivers License Upload */}
-                  <div className="space-y-4">
-                    <Label className="text-gray-400 text-base font-medium">Drivers License</Label>
-                    
-                    {/* Current Drivers License Previews */}
-                    {onboarding?.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 && driversLicenseFiles.length === 0 && (
-                      <div className="space-y-2">
-                        <p className="text-xs text-gray-500">Current Documents ({onboarding.driversLicenseUrls.length}):</p>
-                        <div className="grid grid-cols-2 gap-3">
-                          {onboarding.driversLicenseUrls.map((url: string, index: number) => {
-                            const documentUrl = url.startsWith('http') ? url : buildApiUrl(url);
-                            const isPdf = isPdfDocument(url);
-                            
-                            return (
-                              <div key={index} className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#2a2a2a] overflow-hidden">
-                                {isPdf ? (
+                    {/* Drivers License Upload */}
+                    <div className="space-y-4">
+                      <Label className="text-gray-400 text-base font-medium">Drivers License</Label>
+                      
+                      {/* Current Drivers License Previews */}
+                      {onboarding?.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 && driversLicenseFiles.length === 0 && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-500">Current Documents ({onboarding.driversLicenseUrls.length}):</p>
+                          <div className="grid grid-cols-2 gap-3">
+                            {onboarding.driversLicenseUrls.map((url: string, index: number) => {
+                              const documentUrl = url.startsWith('http') ? url : buildApiUrl(url);
+                              const isPdf = isPdfDocument(url);
+                              
+                              return (
+                                <div key={index} className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#2a2a2a] overflow-hidden">
+                                  {isPdf ? (
+                                    <div className="w-full h-full flex flex-col items-center justify-center p-2">
+                                      <FileText className="w-12 h-12 text-blue-400 mb-1" />
+                                      <p className="text-blue-400 text-xs font-semibold">PDF</p>
+                                    </div>
+                                  ) : (
+                                    <img
+                                      src={documentUrl}
+                                      alt={`License ${index + 1}`}
+                                      className="w-full h-full object-contain p-1"
+                                    />
+                                  )}
+                                  {onboarding.driversLicenseUrls.length > 1 && (
+                                    <div className="absolute top-1 left-1 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded">
+                                      {index + 1}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* New Drivers License Previews */}
+                      {driversLicenseFiles.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-500">New Documents (will replace all current):</p>
+                          <div className="grid grid-cols-2 gap-3">
+                            {driversLicenseFiles.map((file, index) => (
+                              <div key={index} className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/50 overflow-hidden">
+                                {file.type === 'application/pdf' ? (
                                   <div className="w-full h-full flex flex-col items-center justify-center p-2">
                                     <FileText className="w-12 h-12 text-blue-400 mb-1" />
                                     <p className="text-blue-400 text-xs font-semibold">PDF</p>
+                                    <p className="text-gray-400 text-xs truncate w-full px-1">{file.name}</p>
+                                  </div>
+                                ) : driversLicensePreviews[index] && driversLicensePreviews[index] !== 'pdf' ? (
+                                  <div className="relative w-full h-full">
+                                    <img
+                                      src={driversLicensePreviews[index]}
+                                      alt={`Preview ${index + 1}`}
+                                      className="w-full h-full object-contain p-1"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => handleRemoveDriversLicense(index)}
+                                      className="absolute top-1 right-1 h-6 w-6 bg-red-600/90 hover:bg-red-600 text-white rounded-full"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </Button>
                                   </div>
                                 ) : (
-                                  <img
-                                    src={documentUrl}
-                                    alt={`License ${index + 1}`}
-                                    className="w-full h-full object-contain p-1"
-                                  />
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <p className="text-xs text-gray-500">Loading...</p>
+                                  </div>
                                 )}
-                                {onboarding.driversLicenseUrls.length > 1 && (
-                                  <div className="absolute top-1 left-1 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded">
+                                {driversLicenseFiles.length > 1 && (
+                                  <div className="absolute top-1 left-1 bg-[#EAEB80]/90 text-black text-xs px-1.5 py-0.5 rounded font-semibold">
                                     {index + 1}
                                   </div>
                                 )}
                               </div>
-                            );
-                          })}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* New Drivers License Previews */}
-                    {driversLicenseFiles.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-xs text-gray-500">New Documents (will replace all current):</p>
-                        <div className="grid grid-cols-2 gap-3">
-                          {driversLicenseFiles.map((file, index) => (
-                            <div key={index} className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/50 overflow-hidden">
-                              {file.type === 'application/pdf' ? (
-                                <div className="w-full h-full flex flex-col items-center justify-center p-2">
-                                  <FileText className="w-12 h-12 text-blue-400 mb-1" />
-                                  <p className="text-blue-400 text-xs font-semibold">PDF</p>
-                                  <p className="text-gray-400 text-xs truncate w-full px-1">{file.name}</p>
-                                </div>
-                              ) : driversLicensePreviews[index] && driversLicensePreviews[index] !== 'pdf' ? (
-                                <div className="relative w-full h-full">
-                                  <img
-                                    src={driversLicensePreviews[index]}
-                                    alt={`Preview ${index + 1}`}
-                                    className="w-full h-full object-contain p-1"
-                                  />
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleRemoveDriversLicense(index)}
-                                    className="absolute top-1 right-1 h-6 w-6 bg-red-600/90 hover:bg-red-600 text-white rounded-full"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </Button>
-                                </div>
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <p className="text-xs text-gray-500">Loading...</p>
-                                </div>
-                              )}
-                              {driversLicenseFiles.length > 1 && (
-                                <div className="absolute top-1 left-1 bg-[#EAEB80]/90 text-black text-xs px-1.5 py-0.5 rounded font-semibold">
-                                  {index + 1}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                      {/* File Input */}
+                      <div>
+                        <Input
+                          id="drivers-license-input"
+                          type="file"
+                          accept="image/*,application/pdf"
+                          multiple
+                          onChange={handleDriversLicenseChange}
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#EAEB80] file:text-black hover:file:bg-[#d4d570]"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          {driversLicenseFiles.length > 0 
+                            ? `${driversLicenseFiles.length} file(s) selected. Click Update to replace all current documents.`
+                            : "Select one or more images or PDFs to replace all current drivers license documents"}
+                        </p>
                       </div>
-                    )}
-
-                    {/* File Input */}
-                    <div>
-                      <Input
-                        id="drivers-license-input"
-                        type="file"
-                        accept="image/*,application/pdf"
-                        multiple
-                        onChange={handleDriversLicenseChange}
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#EAEB80] file:text-black hover:file:bg-[#d4d570]"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        {driversLicenseFiles.length > 0 
-                          ? `${driversLicenseFiles.length} file(s) selected. Click Update to replace all current documents.`
-                          : "Select one or more images or PDFs to replace all current drivers license documents"}
-                      </p>
                     </div>
                   </div>
                 </div>
