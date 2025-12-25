@@ -878,8 +878,8 @@ export default function TrainingManualPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Tutorial Modal */}
-        <OnboardingTutorial />
+        {/* Tutorial Modal - Disable autoplay on system tutorial page */}
+        <OnboardingTutorial autoPlay={false} />
       </div>
     </AdminLayout>
   );

@@ -22,7 +22,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
 
 // Tutorial step interface
@@ -174,7 +175,34 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState(false);
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const { data: tutorialSteps = DEFAULT_TUTORIAL_STEPS, refetch: refetchTutorialSteps } = useTutorialSteps();
+
+  // Mutation to mark tour as completed
+  const completeTourMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(buildApiUrl("/api/auth/complete-tour"), {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to mark tour as completed");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate user query to refresh user data
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    },
+    onError: (error) => {
+      console.error("Failed to mark tour as completed:", error);
+      toast({
+        title: "Error",
+        description: "Failed to mark tutorial as completed. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Save tutorial state to localStorage
   const saveState = (updates: {
@@ -200,68 +228,36 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("gla_tutorial_state", JSON.stringify(newState));
   };
 
-  // Load tutorial state from localStorage
+  // Load tutorial state from localStorage (but don't auto-open)
+  // Auto-opening is now handled explicitly by the dashboard page
   useEffect(() => {
-    // Check if this is a new signup
-    const isNewSignup = localStorage.getItem("gla_new_signup") === "true";
-    
-    if (isNewSignup) {
-      // New signup - reset tutorial state and show tutorial
-      // Wait for tutorial steps to be loaded before setting current step
-      if (Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
-        const firstStep = tutorialSteps[0].id;
-        setCurrentStep(firstStep);
-        setCompletedSteps(new Set());
-        setHasCompletedTutorial(false);
-        setIsOpen(true);
-        localStorage.removeItem("gla_new_signup"); // Clear the flag
-        saveState({
-          currentStep: firstStep,
-          completedSteps: new Set(),
-          completed: false,
-          isOpen: true,
-        });
-      } else {
-        // Fallback if steps not loaded yet
-        setCurrentStep(1);
-        setCompletedSteps(new Set());
-        setHasCompletedTutorial(false);
-        setIsOpen(true);
-        localStorage.removeItem("gla_new_signup");
-        saveState({
-          currentStep: 1,
-          completedSteps: new Set(),
-          completed: false,
-          isOpen: true,
-        });
-      }
-    } else {
-      // Load saved state for existing users
-      const savedState = localStorage.getItem("gla_tutorial_state");
-      if (savedState) {
-        try {
-          const parsed = JSON.parse(savedState);
-          setHasCompletedTutorial(parsed.completed || false);
-          setCompletedSteps(new Set(parsed.completedSteps || []));
-          if (parsed.currentStep) {
-            // Validate that the saved step exists in the tutorial steps
-            if (Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
-              const stepExists = tutorialSteps.some(step => step.id === parsed.currentStep);
-              if (stepExists) {
-                setCurrentStep(parsed.currentStep);
-              } else {
-                // If saved step doesn't exist, use first step
-                const firstStep = tutorialSteps[0].id;
-                setCurrentStep(firstStep);
-              }
-            } else {
-              // Fallback if steps not loaded yet
+    // Load saved state for existing users (step position, completed steps, etc.)
+    // But do NOT auto-open the tutorial - that's handled by dashboard page
+    const savedState = localStorage.getItem("gla_tutorial_state");
+    if (savedState) {
+      try {
+        const parsed = JSON.parse(savedState);
+        setHasCompletedTutorial(parsed.completed || false);
+        setCompletedSteps(new Set(parsed.completedSteps || []));
+        if (parsed.currentStep) {
+          // Validate that the saved step exists in the tutorial steps
+          if (Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
+            const stepExists = tutorialSteps.some(step => step.id === parsed.currentStep);
+            if (stepExists) {
               setCurrentStep(parsed.currentStep);
+            } else {
+              // If saved step doesn't exist, use first step
+              const firstStep = tutorialSteps[0].id;
+              setCurrentStep(firstStep);
             }
+          } else {
+            // Fallback if steps not loaded yet
+            setCurrentStep(parsed.currentStep);
           }
-        } catch (e) {
-          console.error("Error loading tutorial state:", e);
         }
+        // Do NOT set setIsOpen(true) here - tutorial should only open when explicitly called
+      } catch (e) {
+        console.error("Error loading tutorial state:", e);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -319,6 +315,8 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
       if (lastStep) {
         setHasCompletedTutorial(true);
         saveState({ completed: true, currentStep: lastStep.id });
+        // Mark tour as completed in database
+        completeTourMutation.mutate();
         closeTutorial();
       }
     }
@@ -426,12 +424,14 @@ interface OnboardingTutorialProps {
   isOpen?: boolean;
   onClose?: () => void;
   autoStart?: boolean;
+  autoPlay?: boolean; // Control video autoplay
 }
 
 export function OnboardingTutorial({
   isOpen: controlledIsOpen,
   onClose: controlledOnClose,
   autoStart = false,
+  autoPlay = true, // Default to autoplay for dashboard, but can be disabled for training-manual page
 }: OnboardingTutorialProps) {
   const [, setLocation] = useLocation();
   const [videoError, setVideoError] = useState(false);
@@ -611,7 +611,7 @@ export function OnboardingTutorial({
                    src={currentStepData.videoUrl}
                    className="w-full h-full object-contain"
                    controls
-                   autoPlay
+                   {...(autoPlay ? { autoPlay: true } : {})}
                    loop
                    muted
                    playsInline

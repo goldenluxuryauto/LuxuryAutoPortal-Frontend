@@ -1,21 +1,92 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Car, Users, DollarSign, TrendingUp, Mail, Phone, Clock, MessageCircle, CheckCircle } from "lucide-react";
 import QuickLinks from "@/components/admin/QuickLinks";
-import { OnboardingTutorial } from "@/components/onboarding/OnboardingTutorial";
+import { OnboardingTutorial, useTutorial } from "@/components/onboarding/OnboardingTutorial";
+import { buildApiUrl } from "@/lib/queryClient";
 
 export default function AdminDashboard() {
+  const { openTutorial, isOpen: tutorialIsOpen } = useTutorial();
+  const queryClient = useQueryClient();
+  const hasAttemptedOpen = useRef(false); // Track if we've already tried to open the tutorial
+  
   // Fetch user role information
-  const { data: userData } = useQuery<{ user?: { isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean; firstName?: string; lastName?: string; roleName?: string } }>({
+  const { data: userData } = useQuery<{ user?: { id?: number; isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean; firstName?: string; lastName?: string; roleName?: string; tourCompleted?: boolean } }>({
     queryKey: ["/api/auth/me"],
+    queryFn: async () => {
+      const response = await fetch(buildApiUrl("/api/auth/me"), {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        return { user: undefined };
+      }
+      return response.json();
+    },
     retry: false,
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes to prevent unnecessary refetches
+  });
+
+  // Mutation to mark tour as shown (when tutorial is first displayed)
+  const markTourShownMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(buildApiUrl("/api/auth/mark-tour-shown"), {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to mark tour as shown");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate user query to refresh user data with updated tourCompleted
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    },
   });
 
   const user = userData?.user;
   const isAdmin = user?.isAdmin || false;
   const isClient = user?.isClient || false;
   const isEmployee = user?.isEmployee || false;
+  const tourCompleted = user?.tourCompleted === true;
+
+  // Auto-open tutorial for new clients who haven't completed the tour
+  // Only on dashboard page, only once per user
+  useEffect(() => {
+    // Don't open if tour is already completed (tourCompleted === 1)
+    if (tourCompleted) {
+      return;
+    }
+
+    // Don't open if tutorial is already open
+    if (tutorialIsOpen) {
+      return;
+    }
+
+    // Only open if conditions are met and we haven't already attempted
+    // This should only happen on dashboard page for clients with tourCompleted === 0
+    // First check the database value, then display the modal
+    if (isClient && !tourCompleted && user?.id && !hasAttemptedOpen.current) {
+      hasAttemptedOpen.current = true; // Mark that we've attempted to open
+      
+      // Small delay to ensure page is fully loaded, then open tutorial
+      const timer = setTimeout(() => {
+        openTutorial();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isClient, tourCompleted, user?.id, tutorialIsOpen, openTutorial]);
+
+  // When tutorial is closed, mark it as shown in database
+  useEffect(() => {
+    // If tutorial was open and is now closed, and tourCompleted is still 0, update it
+    if (!tutorialIsOpen && hasAttemptedOpen.current && !tourCompleted && user?.id) {
+      // Mark tour as shown in database (set tourCompleted = 1)
+      markTourShownMutation.mutate();
+    }
+  }, [tutorialIsOpen, tourCompleted, user?.id, markTourShownMutation]);
 
   const { data: stats, isLoading } = useQuery<{ activeVehicles?: number; totalClients?: number; monthlyRevenue?: number; growthRate?: number }>({
     queryKey: ["/api/admin/dashboard"],
