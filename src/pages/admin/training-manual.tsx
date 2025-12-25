@@ -75,7 +75,7 @@ export default function TrainingManualPage() {
   const [videoValid, setVideoValid] = useState<boolean | null>(null);
 
   // Fetch tutorial steps
-  const { data: tutorialStepsData, isLoading, isError } = useQuery<{ success: boolean; data: TutorialStep[] }>({
+  const { data: tutorialStepsData, isLoading, isError, isFetching } = useQuery<{ success: boolean; data: TutorialStep[] }>({
     queryKey: ["/api/tutorial/steps"],
     queryFn: async () => {
       const response = await fetch(buildApiUrl("/api/tutorial/steps"), {
@@ -407,7 +407,7 @@ export default function TrainingManualPage() {
                 <div className="text-center py-8">
                   <p className="text-red-400 mb-4">Error loading tutorial steps. Please try refreshing the page.</p>
                 </div>
-              ) : (!tutorialStepsData || (tutorialStepsData && !tutorialStepsData.success) || (tutorialSteps.length === 0 && !isFetching)) ? (
+              ) : (!tutorialStepsData || (tutorialStepsData && !tutorialStepsData.success && !Array.isArray(tutorialStepsData)) || (tutorialSteps.length === 0 && !isFetching && !isLoading)) ? (
                 <div className="text-center py-8">
                   <p className="text-gray-400 mb-4">No tutorial steps found. Click "Add New Step" to create tutorial steps.</p>
                 </div>
