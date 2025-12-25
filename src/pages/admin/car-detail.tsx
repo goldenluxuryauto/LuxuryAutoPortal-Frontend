@@ -1098,13 +1098,13 @@ export default function CarDetailPage() {
                         >
                           <div className={`relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
                             isPdf 
-                              ? 'border-blue-500/50 hover:border-blue-500 shadow-blue-500/20' 
+                              ? 'border-[#EAEB80]/50 hover:border-[#EAEB80] shadow-[#EAEB80]/20' 
                               : 'border-[#EAEB80]/30 hover:border-[#EAEB80] shadow-[#EAEB80]/20'
                           }`}>
                             {isPdf ? (
                               <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                                <FileText className="w-16 h-16 text-blue-400 mb-2" />
-                                <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
+                                <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
+                                <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
                                 <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
                               </div>
                             ) : (
@@ -1132,7 +1132,7 @@ export default function CarDetailPage() {
                               </div>
                             </div>
                             {isPdf && (
-                              <div className="absolute top-2 right-2 bg-blue-500/90 text-white text-xs px-2 py-1 rounded font-semibold">
+                              <div className="absolute top-2 right-2 bg-[#EAEB80]/90 text-black text-xs px-2 py-1 rounded font-semibold">
                                 PDF
                               </div>
                             )}
@@ -1163,17 +1163,17 @@ export default function CarDetailPage() {
                             >
                               <div className={`relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
                                 isPdf 
-                                  ? 'border-blue-500/50 hover:border-blue-500 shadow-blue-500/20' 
+                                  ? 'border-[#EAEB80]/50 hover:border-[#EAEB80] shadow-[#EAEB80]/20' 
                                   : 'border-[#EAEB80]/30 hover:border-[#EAEB80] shadow-[#EAEB80]/20'
                               }`}>
                                 {isPdf ? (
                                   <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                                    <div className="text-blue-400 mb-2">
+                                    <div className="text-[#EAEB80] mb-2">
                                       <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                       </svg>
                                     </div>
-                                    <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
+                                    <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
                                     <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
                                   </div>
                                 ) : (
@@ -1201,7 +1201,7 @@ export default function CarDetailPage() {
                                   </div>
                                 </div>
                                 {isPdf && (
-                                  <div className="absolute top-2 right-2 bg-blue-500/90 text-white text-xs px-2 py-1 rounded font-semibold">
+                                  <div className="absolute top-2 right-2 bg-[#EAEB80]/90 text-black text-xs px-2 py-1 rounded font-semibold">
                                     PDF
                                   </div>
                                 )}
@@ -2038,7 +2038,7 @@ export default function CarDetailPage() {
                   </h3>
                   
                   {/* Upload Boxes - Side by Side */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-6">
                     {/* Insurance Card Upload */}
                     <div className="space-y-4">
                       <Label className="text-gray-400 text-base font-medium">Insurance Card</Label>
@@ -2056,8 +2056,8 @@ export default function CarDetailPage() {
                               
                               return isPdf ? (
                                 <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                                  <FileText className="w-16 h-16 text-blue-400 mb-2" />
-                                  <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
+                                  <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
+                                  <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
                                   <p className="text-gray-400 text-xs mt-1">{onboarding.insuranceCardUrl.split("/").pop()}</p>
                                 </div>
                               ) : (
@@ -2079,8 +2079,8 @@ export default function CarDetailPage() {
                           <div className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/50 overflow-hidden">
                             {insuranceCardFile.type === 'application/pdf' ? (
                               <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                                <FileText className="w-16 h-16 text-blue-400 mb-2" />
-                                <p className="text-blue-400 text-sm font-semibold">PDF Document</p>
+                                <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
+                                <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
                                 <p className="text-gray-400 text-xs mt-1">{insuranceCardFile.name}</p>
                               </div>
                             ) : insuranceCardPreview ? (
@@ -2134,13 +2134,13 @@ export default function CarDetailPage() {
                               const isPdf = isPdfDocument(url);
                               
                               return (
-                                <div key={index} className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#2a2a2a] overflow-hidden">
-                                  {isPdf ? (
-                                    <div className="w-full h-full flex flex-col items-center justify-center p-2">
-                                      <FileText className="w-12 h-12 text-blue-400 mb-1" />
-                                      <p className="text-blue-400 text-xs font-semibold">PDF</p>
-                                    </div>
-                                  ) : (
+                              <div key={index} className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#2a2a2a] overflow-hidden">
+                                {isPdf ? (
+                                  <div className="w-full h-full flex flex-col items-center justify-center p-2">
+                                    <FileText className="w-12 h-12 text-[#EAEB80] mb-1" />
+                                    <p className="text-[#EAEB80] text-xs font-semibold">PDF</p>
+                                  </div>
+                                ) : (
                                     <img
                                       src={documentUrl}
                                       alt={`License ${index + 1}`}
@@ -2165,14 +2165,14 @@ export default function CarDetailPage() {
                           <p className="text-xs text-gray-500">New Documents (will replace all current):</p>
                           <div className="grid grid-cols-2 gap-3">
                             {driversLicenseFiles.map((file, index) => (
-                              <div key={index} className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/50 overflow-hidden">
-                                {file.type === 'application/pdf' ? (
-                                  <div className="w-full h-full flex flex-col items-center justify-center p-2">
-                                    <FileText className="w-12 h-12 text-blue-400 mb-1" />
-                                    <p className="text-blue-400 text-xs font-semibold">PDF</p>
-                                    <p className="text-gray-400 text-xs truncate w-full px-1">{file.name}</p>
-                                  </div>
-                                ) : driversLicensePreviews[index] && driversLicensePreviews[index] !== 'pdf' ? (
+                            <div key={index} className="relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 border-[#EAEB80]/50 overflow-hidden">
+                              {file.type === 'application/pdf' ? (
+                                <div className="w-full h-full flex flex-col items-center justify-center p-2">
+                                  <FileText className="w-12 h-12 text-[#EAEB80] mb-1" />
+                                  <p className="text-[#EAEB80] text-xs font-semibold">PDF</p>
+                                  <p className="text-gray-400 text-xs truncate w-full px-1">{file.name}</p>
+                                </div>
+                              ) : driversLicensePreviews[index] && driversLicensePreviews[index] !== 'pdf' ? (
                                   <div className="relative w-full h-full">
                                     <img
                                       src={driversLicensePreviews[index]}
