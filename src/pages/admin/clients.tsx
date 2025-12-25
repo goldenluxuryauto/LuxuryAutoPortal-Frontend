@@ -39,7 +39,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Search, Eye, ChevronLeft, ChevronRight, X, Plus } from "lucide-react";
+import { Search, Eye, ChevronLeft, ChevronRight, X, Plus, Upload, FileSpreadsheet, Loader2 } from "lucide-react";
 import { TableRowSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
@@ -90,6 +90,8 @@ export default function ClientsPage() {
   }, [itemsPerPage]);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
   const [deleteClientId, setDeleteClientId] = useState<number | null>(null);
   const [revokeClientEmail, setRevokeClientEmail] = useState<string | null>(null);
   const [reactivateClientEmail, setReactivateClientEmail] = useState<string | null>(null);
@@ -223,6 +225,67 @@ export default function ClientsPage() {
       });
     },
   });
+
+  // Import mutation
+  const importMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(buildApiUrl("/api/admin/onboarding/import"), {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || error.message || "Failed to import clients");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/onboarding/submissions"] });
+      
+      const { total, successful, failed, errors } = data.data;
+      
+      toast({
+        title: "Import Completed",
+        description: `${successful} of ${total} records imported successfully${failed > 0 ? `. ${failed} failed.` : ''}`,
+        variant: failed > 0 ? "default" : "default",
+      });
+
+      if (failed > 0 && errors.length > 0) {
+        console.error("Import errors:", errors);
+        // Show detailed errors in console or could show in a separate dialog
+      }
+
+      setIsImportModalOpen(false);
+      setImportFile(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Import Failed",
+        description: error.message || "Failed to import clients and cars",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleImport = () => {
+    if (!importFile) {
+      toast({
+        title: "No File Selected",
+        description: "Please select an Excel or CSV file to import",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    importMutation.mutate(importFile);
+  };
 
   const handleViewClient = (clientId: number) => {
     setLocation(`/admin/clients/${clientId}`);
@@ -508,13 +571,23 @@ export default function ClientsPage() {
             <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-2">Clients</h1>
             <p className="text-gray-400 text-sm">Manage your client database</p>
           </div>
-          <Button
-            onClick={() => setIsAddModalOpen(true)}
-            className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setIsImportModalOpen(true)}
+              variant="outline"
+              className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Import
+            </Button>
+            <Button
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add
+            </Button>
+          </div>
         </div>
 
         {/* Search and Filter */}
@@ -1087,6 +1160,118 @@ export default function ClientsPage() {
               >
                 Delete Permanently
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Import Clients and Cars Modal */}
+        <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-[#EAEB80] flex items-center gap-2">
+                <FileSpreadsheet className="w-5 h-5" />
+                Import Clients and Cars
+              </DialogTitle>
+              <DialogDescription className="text-gray-400">
+                Upload an Excel (.xlsx, .xls) or CSV file to import existing clients and their cars.
+                The file should contain the same fields as the client onboarding form.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <label
+                  htmlFor="import-file"
+                  className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-[#EAEB80]/40 rounded-xl bg-[#0a0a0a]/50 hover:border-[#EAEB80]/60 hover:bg-[#EAEB80]/5 transition-all cursor-pointer group"
+                >
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="w-10 h-10 text-[#EAEB80] mb-3 group-hover:scale-110 transition-transform" />
+                    <p className="mb-2 text-sm font-semibold text-gray-300 group-hover:text-[#EAEB80] transition-colors">
+                      {importFile ? importFile.name : "Click to Upload or Drag and Drop"}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Excel (.xlsx, .xls) or CSV file (Max 100MB)
+                    </p>
+                  </div>
+                  <input
+                    id="import-file"
+                    type="file"
+                    accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setImportFile(file);
+                      }
+                    }}
+                    className="hidden"
+                  />
+                </label>
+                {importFile && (
+                  <div className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-lg border border-[#2a2a2a]">
+                    <div className="flex items-center gap-2">
+                      <FileSpreadsheet className="w-5 h-5 text-[#EAEB80]" />
+                      <span className="text-sm text-gray-300">{importFile.name}</span>
+                      <span className="text-xs text-gray-500">
+                        ({(importFile.size / 1024 / 1024).toFixed(2)} MB)
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setImportFile(null)}
+                      className="text-gray-400 hover:text-white h-8 w-8 p-0"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-[#0a0a0a] p-4 rounded-lg border border-[#2a2a2a]">
+                <p className="text-sm text-gray-400 mb-2">
+                  <strong className="text-[#EAEB80]">Note:</strong> The imported data will:
+                </p>
+                <ul className="text-xs text-gray-500 space-y-1 list-disc list-inside">
+                  <li>Create onboarding submissions with "pending" status</li>
+                  <li>Use the same fields as the client onboarding form</li>
+                  <li>Require approval before creating client accounts and cars</li>
+                  <li>Send email to clients to create password after approval</li>
+                </ul>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setIsImportModalOpen(false);
+                    setImportFile(null);
+                  }}
+                  className="text-gray-400 hover:text-white"
+                  disabled={importMutation.isPending}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleImport}
+                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                  disabled={!importFile || importMutation.isPending}
+                >
+                  {importMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Importing...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4 mr-2" />
+                      Import
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

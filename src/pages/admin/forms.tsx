@@ -1127,7 +1127,7 @@ export default function FormsPage() {
                                                   </Button>
 
                                                   {/* Always show Approve/Decline buttons for consistent layout */}
-                                                  {/* Disable them if contract is not signed or already approved/rejected */}
+                                                  {/* Allow approval if contract is signed OR if contract status is null/empty (imported submissions) */}
                                                   <Button
                                                     size="sm"
                                                     variant="ghost"
@@ -1139,8 +1139,9 @@ export default function FormsPage() {
                                                       });
                                                     }}
                                                     disabled={
-                                                      submission.contractStatus !==
-                                                        "signed" ||
+                                                      (submission.contractStatus !== "signed" && 
+                                                       submission.contractStatus !== null && 
+                                                       submission.contractStatus !== undefined) ||
                                                       submission.status ===
                                                         "approved" ||
                                                       submission.status ===
@@ -1148,8 +1149,9 @@ export default function FormsPage() {
                                                       approvalMutation.isPending
                                                     }
                                                     title={
-                                                      submission.contractStatus !==
-                                                      "signed"
+                                                      (submission.contractStatus !== "signed" && 
+                                                       submission.contractStatus !== null && 
+                                                       submission.contractStatus !== undefined)
                                                         ? "Contract must be signed before approval"
                                                         : submission.status ===
                                                           "approved"
@@ -1171,8 +1173,9 @@ export default function FormsPage() {
                                                       setShowDeclineModal(true);
                                                     }}
                                                     disabled={
-                                                      submission.contractStatus !==
-                                                        "signed" ||
+                                                      (submission.contractStatus !== "signed" && 
+                                                       submission.contractStatus !== null && 
+                                                       submission.contractStatus !== undefined) ||
                                                       submission.status ===
                                                         "approved" ||
                                                       submission.status ===
@@ -1180,8 +1183,9 @@ export default function FormsPage() {
                                                       approvalMutation.isPending
                                                     }
                                                     title={
-                                                      submission.contractStatus !==
-                                                      "signed"
+                                                      (submission.contractStatus !== "signed" && 
+                                                       submission.contractStatus !== null && 
+                                                       submission.contractStatus !== undefined)
                                                         ? "Contract must be signed before decline"
                                                         : submission.status ===
                                                           "approved"
