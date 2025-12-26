@@ -39,7 +39,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Search, Eye, ChevronLeft, ChevronRight, X, Plus, Upload, FileSpreadsheet, Loader2 } from "lucide-react";
+import { Search, Eye, ChevronLeft, ChevronRight, X, Plus, Upload, FileSpreadsheet, Loader2, UserCheck, UserX, Ban, Lock } from "lucide-react";
 import { TableRowSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
@@ -795,23 +795,41 @@ export default function ClientsPage() {
                           </TableCell>
                           <TableCell className="text-center px-6 py-4 align-middle">
                             <div className="flex items-center justify-center gap-2">
+                              {/* View Client - Eye icon */}
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                                className="h-9 w-9 p-0 text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 rounded-full"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleViewClient(client.id);
                                 }}
+                                title="View Client Details"
                               >
-                                <Eye className="w-4 h-4 mr-1" />
-                                View
+                                <Eye className="w-4 h-4" />
                               </Button>
-                              {!client.isActive && client.status !== 3 && (
+                              
+                              {/* Grant Access / Suspend - Toggle based on status */}
+                              {client.isActive && client.status !== 3 ? (
+                                // Active client - Show Suspend button
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="text-green-400 hover:text-green-300"
+                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 rounded-full"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRevokeAccess(client.email);
+                                  }}
+                                  title="Suspend Access (Temporary)"
+                                >
+                                  <Lock className="w-4 h-4" />
+                                </Button>
+                              ) : !client.isActive && client.status !== 3 ? (
+                                // Inactive client - Show Grant Access button
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-9 w-9 p-0 text-green-400 hover:text-green-300 hover:bg-green-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleReactivateAccess(client.email);
@@ -819,45 +837,29 @@ export default function ClientsPage() {
                                   disabled={reactivateAccessMutation.isPending}
                                   title="Grant/Reactivate Access"
                                 >
-                                  {reactivateAccessMutation.isPending ? "Granting..." : "Grant Access"}
+                                  {reactivateAccessMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <UserCheck className="w-4 h-4" />
+                                  )}
+                                </Button>
+                              ) : null}
+                              
+                              {/* Block Account - Ban icon */}
+                              {client.status !== 3 && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-9 w-9 p-0 text-red-400 hover:text-red-500 hover:bg-red-500/10 rounded-full"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBlockUser(client.email);
+                                  }}
+                                  title="Permanently Block Account"
+                                >
+                                  <Ban className="w-4 h-4" />
                                 </Button>
                               )}
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className={client.status === 3 
-                                  ? "text-yellow-400 opacity-50 cursor-not-allowed" 
-                                  : "text-yellow-400 hover:text-yellow-300"
-                                }
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (client.status !== 3 && client.isActive) {
-                                    handleRevokeAccess(client.email);
-                                  }
-                                }}
-                                disabled={client.status === 3 || !client.isActive}
-                                title={client.status === 3 ? "Suspend Access (Temporary) - Disabled for blocked clients" : "Suspend Access (Temporary)"}
-                              >
-                                Suspend
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className={client.status === 3 
-                                  ? "text-red-400 opacity-50 cursor-not-allowed border border-transparent" 
-                                  : "text-red-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent"
-                                }
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (client.status !== 3) {
-                                    handleBlockUser(client.email);
-                                  }
-                                }}
-                                disabled={client.status === 3}
-                                title={client.status === 3 ? "Permanently Block Account - Already blocked" : "Permanently Block Account"}
-                              >
-                                Block
-                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>
