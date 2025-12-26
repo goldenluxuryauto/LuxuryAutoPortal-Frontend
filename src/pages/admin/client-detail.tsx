@@ -48,6 +48,7 @@ import {
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import QuickLinks from "@/components/admin/QuickLinks";
+import { getOnlineStatusBadge, formatLastLogin } from "@/lib/onlineStatus";
 import {
   Accordion,
   AccordionContent,
@@ -78,6 +79,10 @@ interface ClientDetail {
   roleName: string;
   isActive: boolean;
   createdAt: string;
+  userId?: number | null;
+  lastLoginAt?: string | null;
+  lastLogoutAt?: string | null;
+  status?: number; // 0 = inactive, 1 = active, 3 = blocked
   carCount: number;
   cars: Array<{
     id: number;
@@ -208,16 +213,28 @@ export default function ClientDetailPage() {
         throw new Error(errorData.error || `Failed to fetch client: ${response.statusText}`);
       }
       const result = await response.json();
-      // Log summary only, not full data
+      // Log summary including lastLoginAt and lastLogoutAt for debugging
       console.log("✅ [CLIENT DETAIL] Fetched client data:", {
-        id: result.id,
-        email: result.email,
-        name: result.name,
+        id: result.data?.id,
+        email: result.data?.email,
+        name: result.data?.firstName + " " + result.data?.lastName,
+        lastLoginAt: result.data?.lastLoginAt,
+        lastLogoutAt: result.data?.lastLogoutAt,
+        isActive: result.data?.isActive,
+        status: result.data?.status,
+        userId: result.data?.userId,
       });
       return result;
     },
     enabled: !!clientId,
     retry: false,
+    // Poll backend every 2 seconds to get updated lastLoginAt/lastLogoutAt values immediately
+    // This ensures login/logout events are reflected within 2 seconds
+    refetchInterval: 2000,
+    // Refetch when window regains focus
+    refetchOnWindowFocus: true,
+    // Refetch when browser tab becomes visible
+    refetchOnMount: true,
   });
 
   // Fetch onboarding submission data
@@ -437,6 +454,39 @@ export default function ClientDetailPage() {
       });
     },
   });
+
+  // Resend password email mutation
+  const resendPasswordEmailMutation = useMutation({
+    mutationFn: async () => {
+      if (!clientId) throw new Error("Invalid client ID");
+      const response = await fetch(buildApiUrl(`/api/clients/${clientId}/resend-password-email`), {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to send password email");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Password creation email has been sent successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send password email",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleResendPasswordEmail = () => {
+    resendPasswordEmailMutation.mutate();
+  };
 
   // Add car mutation
   const addCarMutation = useMutation({
@@ -748,15 +798,27 @@ export default function ClientDetailPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-[#EAEB80] text-xl">Client Details</CardTitle>
-                    <Button
-                      onClick={handleEditClick}
-                      variant="outline"
-                      size="sm"
-                      className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={handleResendPasswordEmail}
+                        variant="outline"
+                        size="sm"
+                        className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                        disabled={resendPasswordEmailMutation.isPending}
+                      >
+                        <Mail className="w-4 h-4 mr-2" />
+                        {resendPasswordEmailMutation.isPending ? "Sending..." : "Send Password Email"}
+                      </Button>
+                      <Button
+                        onClick={handleEditClick}
+                        variant="outline"
+                        size="sm"
+                        className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -824,6 +886,31 @@ export default function ClientDetailPage() {
                               <div>
                                 <span className="text-gray-400 block mb-1">Email:</span>
                                 <span className="text-white">{formatValue(data.emailOwner)}</span>
+                              </div>
+                              <div>
+                                <span className="text-gray-400 block mb-1">Last Login:</span>
+                                <span className="text-white">{formatLastLogin(client?.lastLoginAt)}</span>
+                              </div>
+                              <div>
+                                <span className="text-gray-400 block mb-1">Online Status:</span>
+                                <Badge
+                                  variant="outline"
+                                  className={getOnlineStatusBadge(
+                                    client?.lastLoginAt,
+                                    15, // onlineThresholdMinutes
+                                    client?.isActive, // isActive
+                                    client?.status, // status: 0 = inactive, 1 = active, 3 = blocked
+                                    client?.lastLogoutAt // lastLogoutAt
+                                  ).className}
+                                >
+                                  {getOnlineStatusBadge(
+                                    client?.lastLoginAt,
+                                    15, // onlineThresholdMinutes
+                                    client?.isActive, // isActive
+                                    client?.status, // status: 0 = inactive, 1 = active, 3 = blocked
+                                    client?.lastLogoutAt // lastLogoutAt
+                                  ).text}
+                                </Badge>
                               </div>
                               <div>
                                 <span className="text-gray-400 block mb-1">Phone:</span>
@@ -1050,6 +1137,33 @@ export default function ClientDetailPage() {
                             <span className="text-white">
                               {new Date(client.createdAt).toLocaleDateString()}
                             </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-400 block mb-1">Last Login:</span>
+                            <span className="text-white">
+                              {formatLastLogin(client.lastLoginAt)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-400 block mb-1">Online Status:</span>
+                            <Badge
+                              variant="outline"
+                              className={getOnlineStatusBadge(
+                                client.lastLoginAt,
+                                15, // onlineThresholdMinutes
+                                client.isActive, // isActive
+                                client.status, // status: 0 = inactive, 1 = active, 3 = blocked
+                                client.lastLogoutAt // lastLogoutAt
+                              ).className}
+                            >
+                              {getOnlineStatusBadge(
+                                client.lastLoginAt,
+                                15, // onlineThresholdMinutes
+                                client.isActive, // isActive
+                                client.status, // status: 0 = inactive, 1 = active, 3 = blocked
+                                client.lastLogoutAt // lastLogoutAt
+                              ).text}
+                            </Badge>
                           </div>
                         </div>
                       </div>

@@ -45,6 +45,7 @@ import { buildApiUrl } from "@/lib/queryClient";
 import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { getOnlineStatusBadge } from "@/lib/onlineStatus";
 
 interface Client {
   id: number;
@@ -58,6 +59,8 @@ interface Client {
   status?: number; // 0 = inactive, 1 = active, 3 = blocked
   createdAt: string;
   carCount: number;
+  lastLoginAt?: string | null;
+  lastLogoutAt?: string | null;
 }
 
 const clientSchema = z.object({
@@ -100,7 +103,34 @@ export default function ClientsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data, isLoading, error } = useQuery<{
+  // State to force re-render for real-time online status calculation
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  // Update current time every 10 seconds to recalculate online status in real-time
+  // This ensures status changes (online -> offline) are reflected immediately
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 10000); // Update every 10 seconds for more responsive status updates
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Refetch query when page becomes visible (using Visibility API)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [queryClient]);
+
+  const { data, isLoading, error, refetch } = useQuery<{
     success: boolean;
     data: Client[];
     pagination: {
@@ -133,6 +163,13 @@ export default function ClientsPage() {
       return response.json();
     },
     retry: false,
+    // Poll backend every 2 seconds to get updated lastLoginAt/lastLogoutAt values immediately
+    // This ensures login/logout events are reflected within 2 seconds
+    refetchInterval: 2000,
+    // Refetch when window regains focus
+    refetchOnWindowFocus: true,
+    // Refetch when browser tab becomes visible
+    refetchOnMount: true,
   });
 
   const clients = data?.data || [];
@@ -179,12 +216,23 @@ export default function ClientsPage() {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
-      toast({
-        title: "Success",
-        description: "Client created successfully",
-      });
+      
+      // Show appropriate message based on email status
+      if (data.emailSent) {
+        toast({
+          title: "Success",
+          description: data.message || "Client created successfully. Password creation email has been sent.",
+        });
+      } else {
+        toast({
+          title: "Client Created",
+          description: data.message || "Client created successfully, but password email could not be sent. You can resend it from the client detail page.",
+          variant: "default",
+        });
+      }
+      
       setIsAddModalOpen(false);
       form.reset();
     },
@@ -353,8 +401,10 @@ export default function ClientsPage() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+    onSuccess: async () => {
+      // Immediately invalidate and refetch to update online status
+      await queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      await refetch();
       toast({
         title: "Success",
         description: "Client access revoked successfully. The user can no longer log in.",
@@ -398,8 +448,10 @@ export default function ClientsPage() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+    onSuccess: async () => {
+      // Immediately invalidate and refetch to update online status
+      await queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      await refetch();
       toast({
         title: "Success",
         description: "Client account permanently blocked successfully. The user cannot register or access their account.",
@@ -443,8 +495,10 @@ export default function ClientsPage() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+    onSuccess: async () => {
+      // Immediately invalidate and refetch to update online status
+      await queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      await refetch();
       toast({
         title: "Success",
         description: "Client access reactivated successfully. The user can now log in again.",
@@ -488,8 +542,10 @@ export default function ClientsPage() {
 
       return { success: true };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+    onSuccess: async () => {
+      // Immediately invalidate and refetch to update online status
+      await queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      await refetch();
       toast({
         title: "Success",
         description: "Client and user account permanently deleted. All related data has been removed.",
@@ -652,28 +708,38 @@ export default function ClientsPage() {
                     <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 w-32">Role</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 w-28">Status</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 min-w-[140px]">Joined Date</TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 min-w-[120px]">Online Status</TableHead>
                     <TableHead className="text-center text-[#EAEB80] font-medium px-6 py-4 w-32">Counts of Cars</TableHead>
                     <TableHead className="text-center text-[#EAEB80] font-medium px-6 py-4 w-28">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
-                    <TableRowSkeleton colSpan={9} rows={5} />
+                    <TableRowSkeleton colSpan={10} rows={5} />
                   ) : error ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8 text-red-400">
+                      <TableCell colSpan={10} className="text-center py-8 text-red-400">
                         Database connection failed. Please try again.
                       </TableCell>
                     </TableRow>
                   ) : clients.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8 text-gray-400">
+                      <TableCell colSpan={10} className="text-center py-8 text-gray-400">
                         No clients found. Try adjusting your search or filters.
                       </TableCell>
                     </TableRow>
                   ) : (
                     clients.map((client, index) => {
                       const rowNumber = (pagination ? (pagination.page - 1) * pagination.limit : 0) + index + 1;
+                      // Calculate online status badge once per client (recalculates on each render due to currentTime state)
+                      // Pass account status and logout time to ensure deactivated/blocked/deleted/logged-out clients show as offline
+                      const onlineStatusBadge = getOnlineStatusBadge(
+                        client.lastLoginAt,
+                        15, // onlineThresholdMinutes
+                        client.isActive, // isActive
+                        client.status, // status: 0 = inactive, 1 = active, 3 = blocked
+                        client.lastLogoutAt // lastLogoutAt - if exists and more recent than login, user is offline
+                      );
                       return (
                         <TableRow
                           key={client.id}
@@ -715,6 +781,14 @@ export default function ClientsPage() {
                           </TableCell>
                           <TableCell className="text-left text-gray-400 px-6 py-4 align-middle">
                             {formatDate(client.createdAt)}
+                          </TableCell>
+                          <TableCell className="text-left px-6 py-4 align-middle">
+                            <Badge
+                              variant="outline"
+                              className={onlineStatusBadge.className}
+                            >
+                              {onlineStatusBadge.text}
+                            </Badge>
                           </TableCell>
                           <TableCell className="text-center text-gray-400 px-6 py-4 align-middle">
                             {client.carCount}
