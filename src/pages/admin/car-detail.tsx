@@ -1289,7 +1289,7 @@ export default function CarDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Car Photos Carousel Card */}
+          {/* Car Photos Carousel Card - Visible for all users */}
           <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4 h-full">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
@@ -1391,9 +1391,11 @@ export default function CarDetailPage() {
                 )}
             </CardContent>
           </Card>
+
         </div>
 
-        {/* Photos Grid - 8 columns per row (up to 20 images) */}
+        {/* Photos Grid - 8 columns per row (up to 20 images) - Hidden for client accounts */}
+        {isAdmin && (
         <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -1628,6 +1630,7 @@ export default function CarDetailPage() {
             )}
           </CardContent>
         </Card>
+        )}
 
         {/* Rental History - Placeholder */}
         <Card className="bg-[#0f0f0f] border-[#1a1a1a]">

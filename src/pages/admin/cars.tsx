@@ -589,9 +589,11 @@ export default function CarsPage() {
                     <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                       Turo Link
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
-                      Admin Turo Link
-                    </th>
+                    {isAdmin && (
+                      <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                        Admin Turo Link
+                      </th>
+                    )}
                     {isAdmin && (
                       <th className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
                         Actions
@@ -601,7 +603,7 @@ export default function CarsPage() {
                 </thead>
                 <tbody className="divide-y divide-[#2a2a2a]">
                   {isLoading ? (
-                    <TableRowSkeleton colSpan={isAdmin ? 17 : 16} rows={5} />
+                    <TableRowSkeleton colSpan={isAdmin ? 17 : 15} rows={5} />
                   ) : cars.length > 0 ? (
                     cars.map((car, index) => {
                       const formatDate = (dateStr: string | null | undefined): string => {
@@ -709,22 +711,28 @@ export default function CarsPage() {
                           </td>
                           <td className="text-left px-4 py-3 align-middle">
                             <a
-                              href="#"
+                              href={car.turoLink || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
                               className="text-[#EAEB80] hover:underline"
                             >
                               <ExternalLink className="w-4 h-4" />
                             </a>
                           </td>
-                          <td className="text-left px-4 py-3 align-middle">
-                            <a
-                              href="#"
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-[#EAEB80] hover:underline"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          </td>
+                          {isAdmin && (
+                            <td className="text-left px-4 py-3 align-middle">
+                              <a
+                                href={car.adminTuroLink || "#"}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-[#EAEB80] hover:underline"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            </td>
+                          )}
                           {isAdmin && (
                             <td className="px-4 py-3 text-right">
                               <div className="flex items-center justify-end gap-2">
@@ -783,7 +791,7 @@ export default function CarsPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={isAdmin ? 18 : 17} className="px-4 py-12 text-center">
+                      <td colSpan={isAdmin ? 17 : 15} className="px-4 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <p className="text-gray-400 text-lg">No cars found</p>
                           <p className="text-gray-500 text-sm">
