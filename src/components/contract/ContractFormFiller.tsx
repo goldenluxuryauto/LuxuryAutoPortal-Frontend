@@ -23,7 +23,15 @@ import "react-pdf/dist/esm/Page/TextLayer.css";
 import { Textarea } from "../ui/textarea";
 
 // PDF.js worker setup
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// IMPORTANT: This must be set synchronously before any PDF components load
+// Use unpkg CDN with full HTTPS URL - this is the most reliable option
+// The version must match react-pdf's bundled pdfjs-dist version (4.8.69)
+const WORKER_VERSION = '4.8.69'; // Match react-pdf's pdfjs-dist version
+const workerUrl = `https://unpkg.com/pdfjs-dist@${WORKER_VERSION}/build/pdf.worker.min.mjs`;
+
+pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+console.log('✅ PDF worker configured:', workerUrl);
+console.log('   Worker version:', WORKER_VERSION);
 
 // ============================================================================
 // Zod Validation Schema
@@ -295,7 +303,10 @@ export function ContractFormFiller({
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0); // Initial zoom at 100%
   const [pdfBytes, setPdfBytes] = useState<Uint8Array | null>(null);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [pdfLoadError, setPdfLoadError] = useState<string | null>(null);
+  const [isPdfLoading, setIsPdfLoading] = useState(true);
   const [drawnSignatureDataUrl, setDrawnSignatureDataUrl] = useState<string | null>(null); // For real-time overlay
   const [isAddTextMode, setIsAddTextMode] = useState(false);
   const [textAnnotations, setTextAnnotations] = useState<TextAnnotation[]>([]);
@@ -387,22 +398,44 @@ export function ContractFormFiller({
   // Load PDF bytes - keep the original PDF static, never reload it
   useEffect(() => {
     async function loadPdf() {
+      setIsPdfLoading(true);
+      setPdfLoadError(null);
       try {
         const response = await fetch(pdfUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to load PDF: ${response.status} ${response.statusText}`);
+        }
         const arrayBuffer = await response.arrayBuffer();
         const bytes = new Uint8Array(arrayBuffer);
         setPdfBytes(bytes);
+        // Create a Blob URL for the PDF
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(blob);
+        setPdfBlobUrl(blobUrl);
+        setIsPdfLoading(false);
       } catch (error) {
         console.error("Error loading PDF:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to load contract template";
+        setPdfLoadError(errorMessage);
+        setIsPdfLoading(false);
         toast({
           title: "Error",
-          description: "Failed to load contract template",
+          description: errorMessage,
           variant: "destructive",
         });
       }
     }
     loadPdf();
   }, [pdfUrl, toast]);
+  
+  // Cleanup: revoke blob URL when component unmounts or URL changes
+  useEffect(() => {
+    return () => {
+      if (pdfBlobUrl) {
+        URL.revokeObjectURL(pdfBlobUrl);
+      }
+    };
+  }, [pdfBlobUrl]);
   
   // Memoize Document options to prevent unnecessary reloads
   const documentOptions = useMemo(() => ({
@@ -876,16 +909,80 @@ export function ContractFormFiller({
           {/* Scrollable PDF Viewer - All Pages in Continuous Scroll */}
           <div className="flex-1 overflow-auto bg-gray-100 p-4">
             <div className="flex flex-col items-center gap-4 py-4">
-              <Document
-                file={pdfUrl}
-                onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                loading={
-                  <div className="flex items-center justify-center h-[600px]">
-                    <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
-                  </div>
-                }
-                options={documentOptions}
-              >
+              {isPdfLoading && (
+                <div className="flex items-center justify-center h-[600px]">
+                  <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
+                  <p className="ml-3 text-gray-300">Loading contract document...</p>
+                </div>
+              )}
+              {pdfLoadError && (
+                <div className="flex flex-col items-center justify-center h-[600px] p-8">
+                  <X className="w-12 h-12 text-red-500 mb-4" />
+                  <p className="text-red-500 font-semibold mb-2">Failed to load contract document</p>
+                  <p className="text-gray-400 text-sm text-center max-w-md">{pdfLoadError}</p>
+                  <Button
+                    onClick={() => {
+                      setPdfLoadError(null);
+                      setIsPdfLoading(true);
+                      const loadPdf = async () => {
+                        try {
+                          const response = await fetch(pdfUrl);
+                          if (!response.ok) {
+                            throw new Error(`Failed to load PDF: ${response.status} ${response.statusText}`);
+                          }
+                          const arrayBuffer = await response.arrayBuffer();
+                          const bytes = new Uint8Array(arrayBuffer);
+                          setPdfBytes(bytes);
+                          setIsPdfLoading(false);
+                        } catch (error) {
+                          const errorMessage = error instanceof Error ? error.message : "Failed to load contract template";
+                          setPdfLoadError(errorMessage);
+                          setIsPdfLoading(false);
+                        }
+                      };
+                      loadPdf();
+                    }}
+                    className="mt-4 bg-[#EAEB80] text-[#1a1a1a] hover:bg-[#f4d03f]"
+                  >
+                    Retry
+                  </Button>
+                </div>
+              )}
+              {!isPdfLoading && !pdfLoadError && (pdfBlobUrl || pdfUrl) && (
+                <Document
+                  file={pdfBlobUrl || pdfUrl}
+                  onLoadSuccess={({ numPages }) => {
+                    setNumPages(numPages);
+                    setIsPdfLoading(false);
+                  }}
+                  onLoadError={(error) => {
+                    console.error("PDF Document load error:", error);
+                    let errorMessage = error.message || "Failed to load PDF document";
+                    
+                    // Check if it's a worker error
+                    if (errorMessage.includes('worker') || errorMessage.includes('pdf.worker')) {
+                      console.warn('⚠️ PDF worker error detected, trying CDN fallback...');
+                      // Try to set worker to CDN as fallback
+                      const cdnWorkerUrl = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+                      pdfjs.GlobalWorkerOptions.workerSrc = cdnWorkerUrl;
+                      errorMessage = `Worker error: ${errorMessage}. Trying CDN fallback. Please refresh the page.`;
+                    }
+                    
+                    setPdfLoadError(errorMessage);
+                    setIsPdfLoading(false);
+                    toast({
+                      title: "PDF Load Error",
+                      description: errorMessage,
+                      variant: "destructive",
+                    });
+                  }}
+                  loading={
+                    <div className="flex items-center justify-center h-[600px]">
+                      <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
+                    </div>
+                  }
+                  options={documentOptions}
+                >
                 {Array.from(new Array(numPages), (el, index) => {
                   const pageNumber = index + 1;
                   return (
@@ -1070,7 +1167,8 @@ export function ContractFormFiller({
                     </div>
                   );
                 })}
-              </Document>
+                </Document>
+              )}
             </div>
           </div>
 
@@ -1177,11 +1275,7 @@ export function ContractFormFiller({
                         Long name detected - text will auto-shift left ({field.value.length} chars)
                       </p>
                     )}
-                    {field.name !== "owner" && field.value.length > 20 && !field.error && (
-                      <p className="text-xs text-[#EAEB80] mt-1">
-                        Long text detected - will wrap to {wrapText(field.value, 20).length} lines ({field.value.length} chars)
-                      </p>
-                    )}
+
                   </div>
                 );
               })}

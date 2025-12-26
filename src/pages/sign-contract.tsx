@@ -239,7 +239,7 @@ export default function SignContract() {
             className="h-20 md:h-24 w-auto mx-auto object-contain mb-3 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
           />
           <p className="text-gray-300 text-lg">
-            Contract Agreement for {contractData.firstNameOwner} {contractData.lastNameOwner}
+            Contract Agreement - {contractData.firstNameOwner} {contractData.lastNameOwner}
           </p>
         </div>
 
