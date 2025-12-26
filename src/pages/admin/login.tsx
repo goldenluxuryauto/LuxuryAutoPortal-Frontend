@@ -31,23 +31,22 @@ export default function AdminLogin() {
       return response.json();
     },
     onSuccess: async (data) => {
-      // Invalidate and refetch auth query to ensure session is loaded
-      await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      // Set the user data directly in the cache FIRST
+      // This ensures all components see the user immediately without querying
+      queryClient.setQueryData(["/api/auth/me"], { user: data.user });
       
-      // Wait a moment for the session cookie to be set
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Refetch the auth query to verify session
-      try {
-        await queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
-      } catch (error) {
-        console.error("Failed to verify session after login:", error);
-      }
+      // Wait for session cookie to be fully set and propagated
+      // This prevents race conditions where queries fire before cookie is ready
+      await new Promise(resolve => setTimeout(resolve, 800));
       
       toast({
         title: "Welcome back!",
         description: `Logged in as ${data.user.firstName}`,
       });
+      
+      // Wait a bit more before redirecting to ensure everything is stable
+      // This gives time for the cookie to be fully set and all components to see cached data
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       setLocation("/admin");
     },

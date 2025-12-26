@@ -45,8 +45,12 @@ export default function AdminDashboard() {
     onSuccess: (data) => {
       // Only invalidate if mutation was successful
       if (data?.success) {
-        // Invalidate user query to refresh user data with updated tourCompleted
-        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        // Add a small delay before invalidating to ensure session is stable
+        // This prevents logout issues right after login
+        setTimeout(() => {
+          // Invalidate user query to refresh user data with updated tourCompleted
+          queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        }, 500);
       }
     },
     onError: (error) => {
@@ -89,11 +93,17 @@ export default function AdminDashboard() {
   }, [isClient, tourCompleted, user?.id, tutorialIsOpen, openTutorial]);
 
   // When tutorial is closed, mark it as shown in database
+  // Add a small delay to ensure session is fully established before making the mutation
   useEffect(() => {
     // If tutorial was open and is now closed, and tourCompleted is still 0, update it
     if (!tutorialIsOpen && hasAttemptedOpen.current && !tourCompleted && user?.id) {
-      // Mark tour as shown in database (set tourCompleted = 1)
-      markTourShownMutation.mutate();
+      // Add a small delay to ensure session is fully established
+      // This prevents logout issues right after login
+      const timer = setTimeout(() => {
+        markTourShownMutation.mutate();
+      }, 1000); // Wait 1 second after tutorial closes before updating
+      
+      return () => clearTimeout(timer);
     }
   }, [tutorialIsOpen, tourCompleted, user?.id, markTourShownMutation]);
 

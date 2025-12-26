@@ -71,10 +71,15 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
     queryFn: async () => {
       const { buildApiUrl } = await import("@/lib/queryClient");
       const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
-      if (!response.ok) throw new Error("Not authenticated");
+      if (!response.ok) {
+        // Don't throw error - return undefined user to prevent logout
+        // AuthGuard will handle the redirect if needed
+        return { user: undefined };
+      }
       return response.json();
     },
     retry: false,
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes to prevent unnecessary refetches
   });
 
   const user = data?.user;
