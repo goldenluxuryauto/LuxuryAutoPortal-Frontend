@@ -36,13 +36,22 @@ export default function AdminDashboard() {
         credentials: "include",
       });
       if (!response.ok) {
-        throw new Error("Failed to mark tour as shown");
+        // Don't throw error - just log it to prevent logout
+        console.error("Failed to mark tour as shown:", response.status, response.statusText);
+        return { success: false };
       }
       return response.json();
     },
-    onSuccess: () => {
-      // Invalidate user query to refresh user data with updated tourCompleted
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    onSuccess: (data) => {
+      // Only invalidate if mutation was successful
+      if (data?.success) {
+        // Invalidate user query to refresh user data with updated tourCompleted
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      }
+    },
+    onError: (error) => {
+      // Log error but don't throw - prevent logout
+      console.error("Error marking tour as shown:", error);
     },
   });
 
