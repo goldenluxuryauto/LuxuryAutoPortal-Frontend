@@ -1627,26 +1627,82 @@ export default function FormsPage() {
                         Address Information
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        {showSensitiveData && (
-                        <div className="md:col-span-2">
+                        <div>
                           <span className="text-gray-400 block mb-1">
-                            Street Address:
+                            T-Shirt Size:
                           </span>
                           <span className="text-white">
-                            {formatValue(data.streetAddress)}
+                            {formatValue(data.tshirtSize)}
                           </span>
                         </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            First Name:
+                          </span>
+                          <span className="text-white font-medium">
+                            {formatValue(data.firstNameOwner)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Last Name:
+                          </span>
+                          <span className="text-white font-medium">
+                            {formatValue(data.lastNameOwner)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Phone:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.phoneOwner)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Email:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.emailOwner)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Representative:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.representative)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            How Did You Hear About Us:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.heardAboutUs)}
+                          </span>
+                        </div>
+                        {showSensitiveData && (
+                          <div>
+                            <span className="text-gray-400 block mb-1">
+                              Date of Birth:
+                            </span>
+                            <span className="text-white">
+                              {formatValue(data.birthday)}
+                            </span>
+                          </div>
                         )}
-                        <div className={showSensitiveData ? "" : "md:col-span-2"}>
-                          <span className="text-gray-400 block mb-1">
-                            {showSensitiveData ? "City, State, ZIP:" : "Address:"}
-                          </span>
-                          <span className="text-white">
-                            {formatAddress(data.city, data.state, data.zipCode)}
-                          </span>
-                        </div>
                         {showSensitiveData && (
-                          <>
+                          <div className="md:col-span-2">
+                            <span className="text-gray-400 block mb-1">
+                              Street Address:
+                            </span>
+                            <span className="text-white">
+                              {formatValue(data.streetAddress)}
+                            </span>
+                          </div>
+                        )}
                         <div>
                           <span className="text-gray-400 block mb-1">
                             City:
@@ -1671,6 +1727,24 @@ export default function FormsPage() {
                             {formatValue(data.zipCode)}
                           </span>
                         </div>
+                        {showSensitiveData && (
+                          <>
+                            <div>
+                              <span className="text-gray-400 block mb-1">
+                                Emergency Contact Name:
+                              </span>
+                              <span className="text-white">
+                                {formatValue(data.emergencyContactName)}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400 block mb-1">
+                                Emergency Contact Phone:
+                              </span>
+                              <span className="text-white">
+                                {formatValue(data.emergencyContactPhone)}
+                              </span>
+                            </div>
                           </>
                         )}
                       </div>
@@ -1778,6 +1852,41 @@ export default function FormsPage() {
                             {formatValue(data.fuelType)}
                           </span>
                         </div>
+                        {data.vehicleFeatures && (
+                          <div className="md:col-span-2">
+                            <span className="text-gray-400 block mb-2">
+                              Features:
+                            </span>
+                            <div className="flex flex-wrap gap-2">
+                              {(() => {
+                                let featuresArray: string[] = [];
+                                try {
+                                  if (typeof data.vehicleFeatures === 'string') {
+                                    const parsed = JSON.parse(data.vehicleFeatures);
+                                    featuresArray = Array.isArray(parsed) ? parsed : [];
+                                  } else if (Array.isArray(data.vehicleFeatures)) {
+                                    featuresArray = data.vehicleFeatures;
+                                  }
+                                } catch {
+                                  featuresArray = [];
+                                }
+                                return featuresArray.length > 0 ? (
+                                  featuresArray.map((feature: string, index: number) => (
+                                    <Badge
+                                      key={index}
+                                      variant="outline"
+                                      className="border-[#EAEB80]/50 text-[#EAEB80] bg-[#EAEB80]/10 text-xs"
+                                    >
+                                      {feature}
+                                    </Badge>
+                                  ))
+                                ) : (
+                                  <span className="text-gray-500 text-sm">No features selected</span>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
