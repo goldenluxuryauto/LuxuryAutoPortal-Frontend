@@ -39,7 +39,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Search, Eye, ChevronLeft, ChevronRight, X, Plus, Upload, FileSpreadsheet, Loader2, UserCheck, UserX, Ban, Lock } from "lucide-react";
+import { Search, Eye, ChevronLeft, ChevronRight, X, Plus, Upload, FileSpreadsheet, Loader2, UserCheck, UserX, Ban, Lock, Download } from "lucide-react";
 import { TableRowSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
@@ -635,6 +635,80 @@ export default function ClientsPage() {
             >
               <Upload className="w-4 h-4 mr-2" />
               Import
+            </Button>
+            <Button
+              onClick={async () => {
+                try {
+                  // Download Excel file
+                  const excelResponse = await fetch(buildApiUrl("/api/admin/onboarding/export?format=xlsx"), {
+                    credentials: "include",
+                    method: "GET",
+                  });
+                  
+                  if (!excelResponse.ok) {
+                    // Check if response is JSON (error response)
+                    const contentType = excelResponse.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                      const errorData = await excelResponse.json();
+                      throw new Error(errorData.message || errorData.error || `Failed to download Excel file (${excelResponse.status})`);
+                    }
+                    throw new Error(`Failed to download Excel file (${excelResponse.status} ${excelResponse.statusText})`);
+                  }
+                  
+                  const excelBlob = await excelResponse.blob();
+                  const excelUrl = window.URL.createObjectURL(excelBlob);
+                  const excelLink = document.createElement("a");
+                  excelLink.href = excelUrl;
+                  excelLink.download = "onboarding_submissions_lyc_example.xlsx";
+                  document.body.appendChild(excelLink);
+                  excelLink.click();
+                  document.body.removeChild(excelLink);
+                  window.URL.revokeObjectURL(excelUrl);
+
+                  // Download CSV file
+                  const csvResponse = await fetch(buildApiUrl("/api/admin/onboarding/export?format=csv"), {
+                    credentials: "include",
+                    method: "GET",
+                  });
+                  
+                  if (!csvResponse.ok) {
+                    // Check if response is JSON (error response)
+                    const contentType = csvResponse.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                      const errorData = await csvResponse.json();
+                      throw new Error(errorData.message || errorData.error || `Failed to download CSV file (${csvResponse.status})`);
+                    }
+                    throw new Error(`Failed to download CSV file (${csvResponse.status} ${csvResponse.statusText})`);
+                  }
+                  
+                  const csvBlob = await csvResponse.blob();
+                  const csvUrl = window.URL.createObjectURL(csvBlob);
+                  const csvLink = document.createElement("a");
+                  csvLink.href = csvUrl;
+                  csvLink.download = "onboarding_submissions_lyc_example.csv";
+                  document.body.appendChild(csvLink);
+                  csvLink.click();
+                  document.body.removeChild(csvLink);
+                  window.URL.revokeObjectURL(csvUrl);
+
+                  toast({
+                    title: "Download Complete",
+                    description: "Example Excel and CSV files downloaded successfully",
+                  });
+                } catch (error: any) {
+                  console.error("Download error:", error);
+                  toast({
+                    title: "Download Failed",
+                    description: error.message || "Failed to download example files. Please ensure you are logged in.",
+                    variant: "destructive",
+                  });
+                }
+              }}
+              variant="outline"
+              className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download
             </Button>
             <Button
               onClick={() => setIsAddModalOpen(true)}
