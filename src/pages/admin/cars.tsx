@@ -735,27 +735,35 @@ export default function CarsPage() {
                             {car.oilType || "N/A"}
                           </td>
                           <td className="text-left px-4 py-3 align-middle">
-                            <a
-                              href={car.turoLink || "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-[#EAEB80] hover:underline"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          </td>
-                          {isAdmin && (
-                            <td className="text-left px-4 py-3 align-middle">
+                            {car.turoLink ? (
                               <a
-                                href={car.adminTuroLink || "#"}
+                                href={car.turoLink}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="text-[#EAEB80] hover:underline"
+                                className="text-[#EAEB80] hover:underline inline-flex items-center"
                               >
                                 <ExternalLink className="w-4 h-4" />
                               </a>
+                            ) : (
+                              <span className="text-gray-600 text-sm">N/A</span>
+                            )}
+                          </td>
+                          {isAdmin && (
+                            <td className="text-left px-4 py-3 align-middle">
+                              {car.adminTuroLink ? (
+                                <a
+                                  href={car.adminTuroLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-[#EAEB80] hover:underline inline-flex items-center"
+                                >
+                                  <ExternalLink className="w-4 h-4" />
+                                </a>
+                              ) : (
+                                <span className="text-gray-600 text-sm">N/A</span>
+                              )}
                             </td>
                           )}
                           {isAdmin && (
