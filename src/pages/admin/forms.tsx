@@ -24,6 +24,7 @@ import {
 import {
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   FileText,
   ClipboardList,
   Car,
@@ -38,6 +39,8 @@ import {
   Share2,
   CheckCircle,
   XCircle,
+  X,
+  Upload,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
@@ -280,6 +283,16 @@ export default function FormsPage() {
   const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [declineReason, setDeclineReason] = useState("");
   const [submissionToDecline, setSubmissionToDecline] = useState<OnboardingSubmission | null>(null);
+  const [fullScreenDocument, setFullScreenDocument] = useState<{
+    url: string;
+    type: 'insurance' | 'license';
+    index?: number;
+    isPdf?: boolean;
+  } | null>(null);
+  const [insuranceCardFile, setInsuranceCardFile] = useState<File | null>(null);
+  const [insuranceCardPreview, setInsuranceCardPreview] = useState<string | null>(null);
+  const [driversLicenseFiles, setDriversLicenseFiles] = useState<File[]>([]);
+  const [driversLicensePreviews, setDriversLicensePreviews] = useState<string[]>([]);
   const [page, setPage] = useState(1);
 
 
@@ -532,7 +545,135 @@ export default function FormsPage() {
     setSelectedSubmission(submission);
     setShowSensitiveData(false); // Reset sensitive data visibility
     setIsDetailsOpen(true);
+    // Reset file uploads when opening details
+    setInsuranceCardFile(null);
+    setInsuranceCardPreview(null);
+    setDriversLicenseFiles([]);
+    setDriversLicensePreviews([]);
   };
+
+  // Handle insurance card file selection
+  const handleInsuranceCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setInsuranceCardFile(file);
+      // Generate preview
+      if (file.type === 'application/pdf') {
+        setInsuranceCardPreview(null); // PDF preview handled separately
+      } else {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setInsuranceCardPreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  };
+
+  // Handle drivers license files selection
+  const handleDriversLicenseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const fileArray = Array.from(files);
+      setDriversLicenseFiles(fileArray);
+      // Generate previews
+      const previews: string[] = [];
+      let loadedCount = 0;
+      fileArray.forEach((file) => {
+        if (file.type === 'application/pdf') {
+          previews.push('');
+          loadedCount++;
+          if (loadedCount === fileArray.length) {
+            setDriversLicensePreviews(previews);
+          }
+        } else {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            previews.push(reader.result as string);
+            loadedCount++;
+            if (loadedCount === fileArray.length) {
+              setDriversLicensePreviews(previews);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  };
+
+  // Remove insurance card file
+  const handleRemoveInsuranceCard = () => {
+    setInsuranceCardFile(null);
+    setInsuranceCardPreview(null);
+    const input = document.getElementById('insurance-card-input-forms') as HTMLInputElement;
+    if (input) input.value = '';
+  };
+
+  // Remove drivers license file
+  const handleRemoveDriversLicense = (index: number) => {
+    const newFiles = driversLicenseFiles.filter((_, i) => i !== index);
+    const newPreviews = driversLicensePreviews.filter((_, i) => i !== index);
+    setDriversLicenseFiles(newFiles);
+    setDriversLicensePreviews(newPreviews);
+    if (newFiles.length === 0) {
+      const input = document.getElementById('drivers-license-input-forms') as HTMLInputElement;
+      if (input) input.value = '';
+    }
+  };
+
+  // Mutation to update documents
+  const updateDocumentsMutation = useMutation({
+    mutationFn: async (submissionId: number) => {
+      const formData = new FormData();
+      
+      if (insuranceCardFile) {
+        formData.append("insuranceCard", insuranceCardFile);
+      }
+      
+      if (driversLicenseFiles.length > 0) {
+        driversLicenseFiles.forEach((file) => {
+          formData.append("driversLicense", file);
+        });
+      }
+
+      const response = await fetch(
+        buildApiUrl(`/api/onboarding/submissions/${submissionId}/documents`),
+        {
+          method: "PUT",
+          body: formData,
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update documents");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Documents updated successfully",
+      });
+      // Reset file uploads
+      setInsuranceCardFile(null);
+      setInsuranceCardPreview(null);
+      setDriversLicenseFiles([]);
+      setDriversLicensePreviews([]);
+      // Refetch submission details
+      queryClient.invalidateQueries({ queryKey: ["onboarding-submission", selectedSubmission?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/onboarding/submissions"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update documents",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Mutation to log sensitive data access
   const logAccessMutation = useMutation({
@@ -1358,6 +1499,28 @@ export default function FormsPage() {
 
                 const data = submissionDetails.data;
 
+                // Helper function to check if a URL is a PDF
+                const isPdfDocument = (url: string): boolean => {
+                  if (!url) return false;
+                  const lowerUrl = url.toLowerCase();
+                  return lowerUrl.endsWith('.pdf') || lowerUrl.includes('.pdf');
+                };
+
+                // Parse driversLicenseUrls if it's a string
+                let driversLicenseUrlsArray: string[] = [];
+                if (data.driversLicenseUrls) {
+                  if (typeof data.driversLicenseUrls === 'string') {
+                    try {
+                      const parsed = JSON.parse(data.driversLicenseUrls);
+                      driversLicenseUrlsArray = Array.isArray(parsed) ? parsed : [];
+                    } catch {
+                      driversLicenseUrlsArray = [];
+                    }
+                  } else if (Array.isArray(data.driversLicenseUrls)) {
+                    driversLicenseUrlsArray = data.driversLicenseUrls;
+                  }
+                }
+
                 return (
                   <>
                     {/* Personal Information */}
@@ -1892,24 +2055,158 @@ export default function FormsPage() {
                           </div>
                         )}
                       </div>
+                      </div>
 
-                      {/* Signature Image */}
-                      {data.contractStatus === "signed" &&
-                        data.signatureData && (
-                          <div className="mt-4 pt-4 border-t border-[#EAEB80]/30">
-                            <span className="text-gray-400 block mb-2">
-                              Digital Signature:
-                            </span>
-                            <div className="bg-white p-4 rounded border border-[#EAEB80]/30">
-                              <img
-                                src={data.signatureData}
-                                alt="Client Signature"
-                                className="max-w-full h-auto"
-                                style={{ maxHeight: "200px" }}
-                              />
+                    {/* Health Insurance Card & Driver's License */}
+                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAEB80]/30">
+                        <h3 className="text-lg font-semibold text-[#EAEB80]">
+                          Documents
+                        </h3>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Health Insurance Card */}
+                        <div className="space-y-4">
+                          <h4 className="text-base font-semibold text-gray-200">Insurance Card</h4>
+                          
+                          {/* Insurance Card Display */}
+                          {data.insuranceCardUrl ? (() => {
+                            const documentUrl = data.insuranceCardUrl.startsWith('http') 
+                              ? data.insuranceCardUrl 
+                              : buildApiUrl(data.insuranceCardUrl);
+                            const isPdf = isPdfDocument(data.insuranceCardUrl);
+                            
+                            return (
+                              <div 
+                                className="relative group cursor-pointer"
+                                onClick={() => {
+                                  setFullScreenDocument({ url: documentUrl, type: 'insurance', isPdf });
+                                }}
+                              >
+                                <div className={`relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
+                                  isPdf 
+                                    ? 'border-[#EAEB80]/50 hover:border-[#EAEB80] shadow-[#EAEB80]/20' 
+                                    : 'border-[#EAEB80]/30 hover:border-[#EAEB80] shadow-[#EAEB80]/20'
+                                }`}>
+                                  {isPdf ? (
+                                    <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                      <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
+                                      <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
+                                      <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
+                                    </div>
+                                  ) : (
+                                    <img
+                                      src={documentUrl}
+                                      alt="Insurance Card"
+                                      className="w-full h-full object-contain p-2"
+                                      onError={(e) => {
+                                        console.error('Failed to load insurance card image:', data.insuranceCardUrl);
+                                        const target = e.target as HTMLImageElement;
+                                        target.style.display = "none";
+                                        const parent = target.parentElement?.parentElement;
+                                        if (parent && !parent.querySelector(".error-message")) {
+                                          const errorDiv = document.createElement("div");
+                                          errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                          errorDiv.textContent = "Failed to load image";
+                                          parent.appendChild(errorDiv);
+                                        }
+                                      }}
+                                    />
+                                  )}
+                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                      {isPdf ? 'Click to open PDF' : 'Click to view full screen'}
                             </div>
+                                  </div>
+                                  {isPdf && (
+                                    <div className="absolute top-2 right-2 bg-[#EAEB80]/90 text-black text-xs px-2 py-1 rounded font-semibold">
+                                      PDF
                           </div>
                         )}
+                                </div>
+                              </div>
+                            );
+                          })() : (
+                            <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
+                              <p className="text-sm text-gray-500">No insurance card uploaded</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Driver's License */}
+                        <div className="space-y-4">
+                          <h4 className="text-base font-semibold text-gray-200">Driver License</h4>
+                          
+                          {/* Driver's License Display */}
+                          {driversLicenseUrlsArray.length > 0 ? (
+                            <div className="space-y-4">
+                              {driversLicenseUrlsArray.map((url: string, index: number) => {
+                                const documentUrl = url.startsWith('http') ? url : buildApiUrl(url);
+                                const isPdf = isPdfDocument(url);
+                                
+                                return (
+                                  <div 
+                                    key={index}
+                                    className="relative group cursor-pointer"
+                                    onClick={() => setFullScreenDocument({ url: documentUrl, type: 'license', index, isPdf })}
+                                  >
+                                    <div className={`relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
+                                      isPdf 
+                                        ? 'border-[#EAEB80]/50 hover:border-[#EAEB80] shadow-[#EAEB80]/20' 
+                                        : 'border-[#EAEB80]/30 hover:border-[#EAEB80] shadow-[#EAEB80]/20'
+                                    }`}>
+                                      {isPdf ? (
+                                        <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                          <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
+                                          <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
+                                          <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
+                                        </div>
+                                      ) : (
+                                        <img
+                                          src={documentUrl}
+                                          alt={`Driver's License ${index + 1}`}
+                                          className="w-full h-full object-contain p-2"
+                                          onError={(e) => {
+                                            console.error('Failed to load drivers license image:', url);
+                                            const target = e.target as HTMLImageElement;
+                                            target.style.display = "none";
+                                            const parent = target.parentElement?.parentElement;
+                                            if (parent && !parent.querySelector(".error-message")) {
+                                              const errorDiv = document.createElement("div");
+                                              errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                              errorDiv.textContent = "Failed to load image";
+                                              parent.appendChild(errorDiv);
+                                            }
+                                          }}
+                                        />
+                                      )}
+                                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                          {isPdf ? 'Click to open PDF' : 'Click to view full screen'}
+                                        </div>
+                                      </div>
+                                      {isPdf && (
+                                        <div className="absolute top-2 right-2 bg-[#EAEB80]/90 text-black text-xs px-2 py-1 rounded font-semibold">
+                                          PDF
+                                        </div>
+                                      )}
+                                      {driversLicenseUrlsArray.length > 1 && (
+                                        <div className="absolute top-2 left-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                                          {index + 1} / {driversLicenseUrlsArray.length}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
+                              <p className="text-sm text-gray-500">No driver's license uploaded</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Timestamps */}
@@ -2032,6 +2329,163 @@ export default function FormsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Full Screen Document Viewer Dialog */}
+      {fullScreenDocument && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/98 flex items-center justify-center"
+          onClick={() => setFullScreenDocument(null)}
+        >
+          {/* Close Button - Top Right Corner */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              setFullScreenDocument(null);
+            }}
+            className="fixed top-4 right-4 z-[9999] h-14 w-14 bg-red-600/90 hover:bg-red-600 text-white border-2 border-white rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110 flex items-center justify-center"
+            aria-label="Close full screen view"
+            style={{
+              position: 'fixed',
+              top: '1rem',
+              right: '1rem',
+              zIndex: 9999,
+            }}
+          >
+            <X className="w-8 h-8" strokeWidth={3} />
+          </Button>
+
+          <div className="relative w-full h-full flex items-center justify-center p-8">
+            {/* Image Counter - Bottom Center (for multiple drivers licenses) */}
+            {fullScreenDocument.type === 'license' && 
+             submissionDetails?.data?.driversLicenseUrls && 
+             fullScreenDocument.index !== undefined && (() => {
+               let driversLicenseUrlsArray: string[] = [];
+               if (submissionDetails.data.driversLicenseUrls) {
+                 if (typeof submissionDetails.data.driversLicenseUrls === 'string') {
+                   try {
+                     const parsed = JSON.parse(submissionDetails.data.driversLicenseUrls);
+                     driversLicenseUrlsArray = Array.isArray(parsed) ? parsed : [];
+                   } catch {
+                     driversLicenseUrlsArray = [];
+                   }
+                 } else if (Array.isArray(submissionDetails.data.driversLicenseUrls)) {
+                   driversLicenseUrlsArray = submissionDetails.data.driversLicenseUrls;
+                 }
+               }
+               return driversLicenseUrlsArray.length > 1 ? (
+                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
+                   <span className="text-white text-base font-semibold tracking-wide">
+                     {fullScreenDocument.index + 1} / {driversLicenseUrlsArray.length}
+                   </span>
+                 </div>
+               ) : null;
+             })()}
+
+            {/* Navigation Buttons (for multiple drivers licenses) */}
+            {fullScreenDocument.type === 'license' && 
+             submissionDetails?.data?.driversLicenseUrls && 
+             fullScreenDocument.index !== undefined && (() => {
+               let driversLicenseUrlsArray: string[] = [];
+               if (submissionDetails.data.driversLicenseUrls) {
+                 if (typeof submissionDetails.data.driversLicenseUrls === 'string') {
+                   try {
+                     const parsed = JSON.parse(submissionDetails.data.driversLicenseUrls);
+                     driversLicenseUrlsArray = Array.isArray(parsed) ? parsed : [];
+                   } catch {
+                     driversLicenseUrlsArray = [];
+                   }
+                 } else if (Array.isArray(submissionDetails.data.driversLicenseUrls)) {
+                   driversLicenseUrlsArray = submissionDetails.data.driversLicenseUrls;
+                 }
+               }
+               return driversLicenseUrlsArray.length > 1 ? (
+                 <>
+                   {/* Previous Button */}
+                   {fullScreenDocument.index > 0 && (
+                     <Button
+                       variant="ghost"
+                       size="icon"
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         const prevIndex = fullScreenDocument.index! - 1;
+                         const prevUrl = driversLicenseUrlsArray[prevIndex];
+                         const imageUrl = prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl);
+                         const isPdf = prevUrl.toLowerCase().endsWith('.pdf') || prevUrl.toLowerCase().includes('.pdf');
+                         setFullScreenDocument({ 
+                           url: imageUrl, 
+                           type: 'license', 
+                           index: prevIndex,
+                           isPdf
+                         });
+                       }}
+                       className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+                       aria-label="Previous image"
+                     >
+                       <ChevronLeft className="w-6 h-6" />
+                     </Button>
+                   )}
+
+                   {/* Next Button */}
+                   {fullScreenDocument.index < driversLicenseUrlsArray.length - 1 && (
+                     <Button
+                       variant="ghost"
+                       size="icon"
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         const nextIndex = fullScreenDocument.index! + 1;
+                         const nextUrl = driversLicenseUrlsArray[nextIndex];
+                         const imageUrl = nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl);
+                         const isPdf = nextUrl.toLowerCase().endsWith('.pdf') || nextUrl.toLowerCase().includes('.pdf');
+                         setFullScreenDocument({ 
+                           url: imageUrl, 
+                           type: 'license', 
+                           index: nextIndex,
+                           isPdf
+                         });
+                       }}
+                       className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+                       aria-label="Next image"
+                     >
+                       <ChevronRight className="w-6 h-6" />
+                     </Button>
+                   )}
+                 </>
+               ) : null;
+             })()}
+
+            {/* Full Screen Document Display - PDF or Image */}
+            {fullScreenDocument.isPdf ? (
+              <iframe
+                src={fullScreenDocument.url}
+                className="w-full h-full border-0"
+                style={{
+                  maxWidth: '100vw',
+                  maxHeight: '100vh',
+                }}
+                onClick={(e) => e.stopPropagation()}
+                title={fullScreenDocument.type === 'insurance' ? 'Insurance Card PDF' : `Driver's License PDF ${fullScreenDocument.index !== undefined ? fullScreenDocument.index + 1 : ''}`}
+              />
+            ) : (
+              <img
+                src={fullScreenDocument.url}
+                alt={fullScreenDocument.type === 'insurance' ? 'Insurance Card' : `Driver's License ${fullScreenDocument.index !== undefined ? fullScreenDocument.index + 1 : ''}`}
+                className="w-full h-full object-contain"
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  maxWidth: '100vw',
+                  maxHeight: '100vh',
+                }}
+                onError={(e) => {
+                  console.error('Failed to load image in full screen viewer:', fullScreenDocument.url);
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            )}
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
