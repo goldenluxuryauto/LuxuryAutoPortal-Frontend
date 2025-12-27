@@ -263,32 +263,35 @@ export default function CarsPage() {
       console.log(`📤 [FRONTEND] Status value:`, data.status, `(type: ${typeof data.status})`);
       
       const formData = new FormData();
-      formData.append("vin", data.vin);
-      formData.append("makeModel", data.makeModel);
-      if (data.make) formData.append("make", data.make);
-      if (data.model) formData.append("model", data.model);
-      if (data.licensePlate) formData.append("licensePlate", data.licensePlate);
-      if (data.year) formData.append("year", data.year);
-      if (data.color) formData.append("color", data.color);
-      if (data.interiorColor) formData.append("interiorColor", data.interiorColor);
-      if (data.mileage) formData.append("mileage", data.mileage);
+      // Always append all fields, even if empty, so backend can update them
+      formData.append("vin", data.vin || "");
+      formData.append("makeModel", data.makeModel || "");
+      formData.append("make", data.make || "");
+      formData.append("model", data.model || "");
+      formData.append("licensePlate", data.licensePlate || "");
+      formData.append("year", data.year || "");
+      formData.append("color", data.color || "");
+      formData.append("interiorColor", data.interiorColor || "");
+      formData.append("mileage", data.mileage || "");
       
       // ALWAYS send status - it's required and should always have a value
       const statusValue = data.status || "ACTIVE"; // Default to ACTIVE if somehow undefined
       formData.append("status", statusValue);
       console.log(`📤 [FRONTEND] Appending status to FormData: "${statusValue}"`);
       
+      // Always append optional fields, even if empty
+      formData.append("tireSize", data.tireSize || "");
+      formData.append("oilType", data.oilType || "");
+      formData.append("lastOilChange", data.lastOilChange || "");
+      formData.append("fuelType", data.fuelType || "");
+      formData.append("turoLink", data.turoLink || "");
+      formData.append("adminTuroLink", data.adminTuroLink || "");
+      
       // Debug: Log all FormData entries
       console.log(`📤 [FRONTEND] FormData entries:`);
       for (const [key, value] of formData.entries()) {
         console.log(`   ${key}: ${value}`);
       }
-      if (data.tireSize) formData.append("tireSize", data.tireSize);
-      if (data.oilType) formData.append("oilType", data.oilType);
-      if (data.lastOilChange) formData.append("lastOilChange", data.lastOilChange);
-      if (data.fuelType) formData.append("fuelType", data.fuelType);
-      if (data.turoLink) formData.append("turoLink", data.turoLink);
-      if (data.adminTuroLink) formData.append("adminTuroLink", data.adminTuroLink);
 
       const response = await fetch(buildApiUrl(`/api/cars/${id}`), {
         method: "PATCH",
@@ -301,12 +304,34 @@ export default function CarsPage() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      // Invalidate all car queries to force refetch
-      queryClient.invalidateQueries({ queryKey: ["/api/cars"], exact: false });
+    onSuccess: async (responseData) => {
+      // Immediately update the cache with the response data
+      if (responseData?.success && responseData?.data) {
+        const updatedCar = responseData.data;
+        
+        // Update all matching car queries in cache
+        queryClient.setQueriesData<{ success: boolean; data: Car[]; pagination?: any }>(
+          { queryKey: ["/api/cars"], exact: false },
+          (oldData) => {
+            if (!oldData) return oldData;
+            
+            return {
+              ...oldData,
+              data: oldData.data.map((car) =>
+                car.id === updatedCar.id ? updatedCar : car
+              ),
+            };
+          }
+        );
+      }
+      
+      // Invalidate all car queries to force refetch in background
+      await queryClient.invalidateQueries({ queryKey: ["/api/cars"], exact: false });
       queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
+      
       // Force refetch to ensure UI updates immediately
-      queryClient.refetchQueries({ queryKey: ["/api/cars"], exact: false });
+      await queryClient.refetchQueries({ queryKey: ["/api/cars"], exact: false });
+      
       toast({
         title: "Success",
         description: "Car updated successfully",
