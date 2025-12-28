@@ -65,7 +65,7 @@ export default function AdminDashboard() {
   const isEmployee = user?.isEmployee || false;
   const tourCompleted = user?.tourCompleted === true;
 
-  // Auto-open tutorial for new clients who haven't completed the tour
+  // Auto-open tutorial for new users (admin, client, employee) who haven't completed the tour
   // Only on dashboard page, only once per user
   useEffect(() => {
     // Don't open if tour is already completed (tourCompleted === 1)
@@ -79,9 +79,10 @@ export default function AdminDashboard() {
     }
 
     // Only open if conditions are met and we haven't already attempted
-    // This should only happen on dashboard page for clients with tourCompleted === 0
+    // This should only happen on dashboard page for users with tourCompleted === 0
     // First check the database value, then display the modal
-    if (isClient && !tourCompleted && user?.id && !hasAttemptedOpen.current) {
+    // Check for all roles: admin, client, or employee
+    if ((isAdmin || isClient || isEmployee) && !tourCompleted && user?.id && !hasAttemptedOpen.current) {
       hasAttemptedOpen.current = true; // Mark that we've attempted to open
       
       // Small delay to ensure page is fully loaded, then open tutorial
@@ -90,7 +91,7 @@ export default function AdminDashboard() {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isClient, tourCompleted, user?.id, tutorialIsOpen, openTutorial]);
+  }, [isAdmin, isClient, isEmployee, tourCompleted, user?.id, tutorialIsOpen, openTutorial]);
 
   // When tutorial is closed, mark it as shown in database
   // Add a small delay to ensure session is fully established before making the mutation
@@ -374,8 +375,8 @@ export default function AdminDashboard() {
           <QuickLinks />
         </div>
 
-        {/* Client Onboarding Tutorial - shows automatically for new signups only */}
-        {isClient && <OnboardingTutorial />}
+        {/* Tutorial - shows automatically for new users (admin, client, employee) who haven't completed the tour */}
+        {(isAdmin || isClient || isEmployee) && <OnboardingTutorial />}
       </div>
     </AdminLayout>
   );

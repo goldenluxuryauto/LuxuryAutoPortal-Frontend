@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -42,6 +43,7 @@ function useIsAdmin() {
 
 // Form schema for tutorial step
 const tutorialStepSchema = z.object({
+  role: z.enum(['admin', 'client', 'employee']),
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   videoUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
@@ -73,12 +75,13 @@ export default function TrainingManualPage() {
   const [videoLoading, setVideoLoading] = useState(false);
   const [videoError, setVideoError] = useState<string | null>(null);
   const [videoValid, setVideoValid] = useState<boolean | null>(null);
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'client' | 'employee'>('client');
 
-  // Fetch tutorial steps
+  // Fetch tutorial steps for selected role
   const { data: tutorialStepsData, isLoading, isError, isFetching } = useQuery<{ success: boolean; data: TutorialStep[] }>({
-    queryKey: ["/api/tutorial/steps"],
+    queryKey: ["/api/tutorial/steps", selectedRole],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/tutorial/steps"), {
+      const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${selectedRole}`), {
         credentials: "include",
       });
       if (!response.ok) {
@@ -107,6 +110,7 @@ export default function TrainingManualPage() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
+          role: data.role || selectedRole,
           stepOrder,
           title: data.title,
           description: data.description,
@@ -126,8 +130,8 @@ export default function TrainingManualPage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps"] });
-      queryClient.refetchQueries({ queryKey: ["/api/tutorial/steps"] }); // Force immediate refetch
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps", selectedRole] });
+      queryClient.refetchQueries({ queryKey: ["/api/tutorial/steps", selectedRole] }); // Force immediate refetch
       toast({
         title: "Success",
         description: "Tutorial step created successfully",
@@ -149,7 +153,7 @@ export default function TrainingManualPage() {
   // Delete tutorial step mutation
   const deleteMutation = useMutation({
     mutationFn: async (stepId: number) => {
-      const response = await fetch(buildApiUrl(`/api/admin/tutorial/steps/${stepId}`), {
+      const response = await fetch(buildApiUrl(`/api/admin/tutorial/steps/${stepId}?role=${selectedRole}`), {
         method: "DELETE",
         credentials: "include",
       });
@@ -160,8 +164,8 @@ export default function TrainingManualPage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps"] });
-      queryClient.refetchQueries({ queryKey: ["/api/tutorial/steps"] }); // Force immediate refetch
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps", selectedRole] });
+      queryClient.refetchQueries({ queryKey: ["/api/tutorial/steps", selectedRole] }); // Force immediate refetch
       toast({
         title: "Success",
         description: "Tutorial step deleted successfully",
@@ -185,6 +189,7 @@ export default function TrainingManualPage() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
+          role: data.role || selectedRole, // Include role in request body
           title: data.title,
           description: data.description,
           videoUrl: data.videoUrl || undefined,
@@ -202,9 +207,14 @@ export default function TrainingManualPage() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps"] });
-      queryClient.refetchQueries({ queryKey: ["/api/tutorial/steps"] }); // Force immediate refetch
+    onSuccess: (_, variables) => {
+      // Invalidate queries for both the role used and the original step's role
+      const roleUsed = variables.data.role || selectedRole;
+      const originalRole = editingStep ? (editingStep as any).role || selectedRole : selectedRole;
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps", roleUsed] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps", originalRole] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps", selectedRole] });
+      queryClient.refetchQueries({ queryKey: ["/api/tutorial/steps", selectedRole] }); // Force immediate refetch
       toast({
         title: "Success",
         description: "Tutorial step updated successfully",
@@ -226,6 +236,7 @@ export default function TrainingManualPage() {
   const form = useForm<TutorialStepFormData>({
     resolver: zodResolver(tutorialStepSchema),
     defaultValues: {
+      role: selectedRole,
       title: "",
       description: "",
       videoUrl: "",
@@ -235,6 +246,13 @@ export default function TrainingManualPage() {
       actionButtonHref: "",
     },
   });
+
+  // Update form role when selectedRole changes (only when not editing)
+  useEffect(() => {
+    if (!isEditDialogOpen && !editingStep) {
+      form.setValue("role", selectedRole);
+    }
+  }, [selectedRole, isEditDialogOpen, editingStep, form]);
 
   // Test video URL validity
   const testVideoUrl = async (url: string) => {
@@ -278,11 +296,12 @@ export default function TrainingManualPage() {
     }
   };
 
-  const handleEditClick = (step: TutorialStep) => {
+  const handleEditClick = (step: TutorialStep & { role?: string }) => {
     setEditingStep(step);
     setIsAddingStep(false);
     const videoUrl = step.videoUrl || "";
     form.reset({
+      role: (step as any).role || selectedRole, // Get role from step or use selectedRole
       title: step.title,
       description: step.description,
       videoUrl: videoUrl,
@@ -308,6 +327,7 @@ export default function TrainingManualPage() {
     setEditingStep(null);
     setIsAddingStep(true);
     form.reset({
+      role: selectedRole, // Use selectedRole from dropdown
       title: "",
       description: "",
       videoUrl: "",
@@ -388,6 +408,16 @@ export default function TrainingManualPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-[#EAEB80] text-xl">Tutorial Configuration</CardTitle>
                 <div className="flex gap-2">
+                  <Select value={selectedRole} onValueChange={(value: 'admin' | 'client' | 'employee') => setSelectedRole(value)}>
+                    <SelectTrigger className="w-[150px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="client">Client</SelectItem>
+                      <SelectItem value="employee">Employee</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Button
                     onClick={handleAddStepClick}
                     className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
@@ -582,6 +612,32 @@ export default function TrainingManualPage() {
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-400">Role *</FormLabel>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="client">Client</SelectItem>
+                          <SelectItem value="employee">Employee</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="title"

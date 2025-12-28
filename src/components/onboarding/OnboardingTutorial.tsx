@@ -137,11 +137,11 @@ const DEFAULT_TUTORIAL_STEPS: TutorialStep[] = [
 ];
 
 // Hook to fetch tutorial steps from API
-function useTutorialSteps() {
+function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
   return useQuery<TutorialStep[]>({
-    queryKey: ["/api/tutorial/steps"],
+    queryKey: ["/api/tutorial/steps", role],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/tutorial/steps"), {
+      const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${role}`), {
         credentials: "include",
       });
       if (!response.ok) {
@@ -176,7 +176,27 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { data: tutorialSteps = DEFAULT_TUTORIAL_STEPS, refetch: refetchTutorialSteps } = useTutorialSteps();
+  
+  // Fetch user role to determine which tutorial to show
+  const { data: userData } = useQuery<{ user?: { isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean } }>({
+    queryKey: ["/api/auth/me"],
+    queryFn: async () => {
+      const response = await fetch(buildApiUrl("/api/auth/me"), {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        return { user: undefined };
+      }
+      return response.json();
+    },
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Determine role from user data
+  const userRole = userData?.user?.isAdmin ? 'admin' : userData?.user?.isClient ? 'client' : userData?.user?.isEmployee ? 'employee' : 'client';
+  
+  const { data: tutorialSteps = DEFAULT_TUTORIAL_STEPS, refetch: refetchTutorialSteps } = useTutorialSteps(userRole);
 
   // Mutation to mark tour as completed
   const completeTourMutation = useMutation({
