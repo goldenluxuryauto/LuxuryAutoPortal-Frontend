@@ -67,6 +67,8 @@ interface OnboardingCar {
   offboardAt: string | null;
   offboardReason: string | null;
   finalMileage: number | null;
+  contractStatus: string | null;
+  onboardingDate: string | null;
 }
 
 const addCarSchema = z.object({
@@ -239,21 +241,12 @@ function CarOnboarding() {
 
   return (
     <div className="space-y-6">
-      {/* Header with Add New Car button */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-white">Car On-boarding</h2>
-          <p className="text-sm text-gray-400 mt-1">
-            Manage vehicles added to the fleet
-          </p>
-        </div>
-        <Button
-          onClick={() => setIsAddDialogOpen(true)}
-          className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add New Car
-        </Button>
+      {/* Header */}
+      <div>
+        <h2 className="text-xl font-semibold text-white">Car On-boarding</h2>
+        <p className="text-sm text-gray-400 mt-1">
+          Manage vehicles added to the fleet
+        </p>
       </div>
 
       {/* Search and Filter Bar */}
@@ -370,28 +363,47 @@ function CarOnboarding() {
                             variant="outline"
                             className={cn(
                               "text-xs",
-                              car.status === "On-boarded"
-                                ? "border-green-500/50 text-green-400 bg-green-500/10"
-                                : "border-gray-500/50 text-gray-400 bg-gray-500/10"
+                              (car.status === "available" || car.status === "in_use") 
+                                ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                : "bg-gray-500/20 text-gray-400 border-gray-500/30"
                             )}
                           >
-                            {car.status}
+                            {(car.status === "available" || car.status === "in_use") ? "ACTIVE" : "INACTIVE"}
                           </Badge>
                         </TableCell>
                         <TableCell className="px-6 py-4">
                           <Badge
                             variant="outline"
-                            className="bg-gray-800/50 text-gray-400 border-gray-700 text-xs"
+                            className={cn(
+                              "text-xs",
+                              car.contractStatus === "signed"
+                                ? "border-green-500/50 text-green-400 bg-green-500/10"
+                                : car.contractStatus === "pending"
+                                ? "border-yellow-500/50 text-yellow-400 bg-yellow-500/10"
+                                : car.contractStatus === "sent" || car.contractStatus === "opened"
+                                ? "border-blue-500/50 text-blue-400 bg-blue-500/10"
+                                : car.contractStatus === "declined"
+                                ? "border-red-500/50 text-red-400 bg-red-500/10"
+                                : "bg-gray-800/50 text-gray-400 border-gray-700"
+                            )}
                           >
-                            N/A
+                            {car.contractStatus ? car.contractStatus.charAt(0).toUpperCase() + car.contractStatus.slice(1) : "N/A"}
                           </Badge>
                         </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">
-                          {new Date(car.createdAt).toLocaleDateString("en-US", {
-                            month: "2-digit",
-                            day: "2-digit",
-                            year: "numeric",
-                          })}
+                          {car.onboardingDate
+                            ? new Date(car.onboardingDate).toLocaleDateString("en-US", {
+                                month: "2-digit",
+                                day: "2-digit",
+                                year: "numeric",
+                              })
+                            : car.createdAt
+                            ? new Date(car.createdAt).toLocaleDateString("en-US", {
+                                month: "2-digit",
+                                day: "2-digit",
+                                year: "numeric",
+                              })
+                            : "—"}
                         </TableCell>
                       </TableRow>
                     ))}

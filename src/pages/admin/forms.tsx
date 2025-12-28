@@ -1217,38 +1217,15 @@ export default function FormsPage() {
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-4">
-                                                {submission.isOffboarded ? (
-                                                  <div className="flex flex-col gap-1">
-                                                    <Badge
-                                                      variant="outline"
-                                                      className="border-red-500/50 text-red-400 bg-red-500/10 text-xs"
-                                                    >
-                                                      Offboarded
-                                                    </Badge>
-                                                    {submission.carOffboardAt && (
-                                                      <span className="text-xs text-gray-500">
-                                                        {new Date(
-                                                          submission.carOffboardAt
-                                                        ).toLocaleDateString()}
-                                                      </span>
-                                                    )}
-                                                    {submission.carOffboardReason && (
-                                                      <span className="text-xs text-gray-500 capitalize">
-                                                        {submission.carOffboardReason.replace(
-                                                          "_",
-                                                          " "
-                                                        )}
-                                                      </span>
-                                                    )}
-                                                  </div>
+                                              <td className="py-3 px-4 text-gray-300">
+                                                {submission.carOffboardAt ? (
+                                                  new Date(
+                                                    submission.carOffboardAt
+                                                  ).toLocaleDateString()
                                                 ) : (
-                                                  <Badge
-                                                    variant="outline"
-                                                    className="border-green-500/50 text-green-400 bg-green-500/10 text-xs"
-                                                  >
-                                                    Active
-                                                  </Badge>
+                                                  <span className="text-gray-500">
+                                                    N/A
+                                                  </span>
                                                 )}
                                               </td>
                                               <td className="py-3 px-4">

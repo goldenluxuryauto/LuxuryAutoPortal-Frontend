@@ -60,6 +60,7 @@ interface OffboardingCar {
   offboardAt: string | null;
   offboardReason: string | null;
   finalMileage: number | null;
+  contractStatus: string | null;
 }
 
 const offboardCarSchema = z.object({
@@ -223,21 +224,12 @@ export default function CarOffboarding() {
 
   return (
     <div className="space-y-6">
-      {/* Header with Off-board Car button */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-white">Car Off-boarding</h2>
-          <p className="text-sm text-gray-400 mt-1">
-            View vehicles removed from the fleet
-          </p>
-        </div>
-        <Button
-          onClick={() => setIsOffboardDialogOpen(true)}
-          className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Offboard Car
-        </Button>
+      {/* Header */}
+      <div>
+        <h2 className="text-xl font-semibold text-white">Car Off-boarding</h2>
+        <p className="text-sm text-gray-400 mt-1">
+          View vehicles removed from the fleet
+        </p>
       </div>
 
       {/* Search Bar */}
@@ -338,17 +330,33 @@ export default function CarOffboarding() {
                         <TableCell className="px-6 py-4">
                           <Badge
                             variant="outline"
-                            className="border-red-500/50 text-red-400 bg-red-500/10 text-xs"
+                            className={cn(
+                              "text-xs",
+                              (car.status === "available" || car.status === "in_use") 
+                                ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                            )}
                           >
-                            {car.status}
+                            {(car.status === "available" || car.status === "in_use") ? "ACTIVE" : "INACTIVE"}
                           </Badge>
                         </TableCell>
                         <TableCell className="px-6 py-4">
                           <Badge
                             variant="outline"
-                            className="bg-gray-800/50 text-gray-400 border-gray-700 text-xs"
+                            className={cn(
+                              "text-xs",
+                              car.contractStatus === "signed"
+                                ? "border-green-500/50 text-green-400 bg-green-500/10"
+                                : car.contractStatus === "pending"
+                                ? "border-yellow-500/50 text-yellow-400 bg-yellow-500/10"
+                                : car.contractStatus === "sent" || car.contractStatus === "opened"
+                                ? "border-blue-500/50 text-blue-400 bg-blue-500/10"
+                                : car.contractStatus === "declined"
+                                ? "border-red-500/50 text-red-400 bg-red-500/10"
+                                : "bg-gray-800/50 text-gray-400 border-gray-700"
+                            )}
                           >
-                            N/A
+                            {car.contractStatus ? car.contractStatus.charAt(0).toUpperCase() + car.contractStatus.slice(1) : "N/A"}
                           </Badge>
                         </TableCell>
                         <TableCell className="px-6 py-4 text-gray-300">

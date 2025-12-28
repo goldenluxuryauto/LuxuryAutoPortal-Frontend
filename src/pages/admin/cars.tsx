@@ -42,10 +42,19 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, buildApiUrl } from "@/lib/queryClient";
-import { Plus, Edit, Trash2, Search, X, LogOut, ExternalLink } from "lucide-react";
+import { Plus, Edit, Search, X, ExternalLink } from "lucide-react";
 import { TableRowSkeleton } from "@/components/ui/skeletons";
 import { Textarea } from "@/components/ui/textarea";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Car {
   id: number;
@@ -98,6 +107,9 @@ const carSchema = z.object({
   fuelType: z.string().optional(),
   turoLink: z.string().url().optional().or(z.literal("")),
   adminTuroLink: z.string().url().optional().or(z.literal("")),
+  offboardAt: z.string().optional(),
+  offboardReason: z.enum(["sold", "damaged", "end_lease", "other"]).optional().or(z.literal("")),
+  offboardNote: z.string().optional(),
 });
 
 type CarFormData = z.infer<typeof carSchema>;
@@ -106,11 +118,12 @@ export default function CarsPage() {
   const [, setLocation] = useLocation();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isOffboardModalOpen, setIsOffboardModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
+  const [isLastActiveCarDialogOpen, setIsLastActiveCarDialogOpen] = useState(false);
+  const [pendingStatusChange, setPendingStatusChange] = useState<"ACTIVE" | "INACTIVE" | null>(null);
 
   // Load items per page from localStorage, default to 10
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
@@ -133,21 +146,6 @@ export default function CarsPage() {
   });
   const isAdmin = userData?.user?.isAdmin === true;
 
-  const offboardForm = useForm({
-    resolver: zodResolver(
-      z.object({
-        finalMileage: z.string().min(1, "Final mileage is required"),
-        reason: z.enum(["sold", "damaged", "end_lease", "other"]),
-        note: z.string().optional(),
-      })
-    ),
-    defaultValues: {
-      finalMileage: "",
-      reason: "sold" as const,
-      note: "",
-    },
-  });
-
   const form = useForm<CarFormData>({
     resolver: zodResolver(carSchema),
     defaultValues: {
@@ -167,6 +165,9 @@ export default function CarsPage() {
       fuelType: "",
       turoLink: "",
       adminTuroLink: "",
+      offboardAt: "",
+      offboardReason: "",
+      offboardNote: "",
     },
   });
 
@@ -286,6 +287,9 @@ export default function CarsPage() {
       formData.append("fuelType", data.fuelType || "");
       formData.append("turoLink", data.turoLink || "");
       formData.append("adminTuroLink", data.adminTuroLink || "");
+      formData.append("offboardAt", data.offboardAt || "");
+      formData.append("offboardReason", data.offboardReason || "");
+      formData.append("offboardNote", data.offboardNote || "");
       
       // Debug: Log all FormData entries
       console.log(`📤 [FRONTEND] FormData entries:`);
@@ -349,91 +353,6 @@ export default function CarsPage() {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await apiRequest("DELETE", `/api/cars/${id}`);
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to delete car");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
-      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
-      toast({
-        title: "Success",
-        description: "Car deleted successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to delete car",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const offboardMutation = useMutation({
-    mutationFn: async (data: {
-      finalMileage: string;
-      reason: string;
-      note?: string;
-    }) => {
-      const response = await apiRequest(
-        "POST",
-        `/api/cars/${selectedCar?.id}/offboard`,
-        {
-          finalMileage: parseInt(data.finalMileage, 10),
-          reason: data.reason,
-          note: data.note || undefined,
-        }
-      );
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to off-board car");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
-      queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
-      toast({
-        title: "Success",
-        description: "Car off-boarded successfully",
-      });
-      setIsOffboardModalOpen(false);
-      setSelectedCar(null);
-      offboardForm.reset();
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to off-board car",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleOffboardClick = (car: Car) => {
-    setSelectedCar(car);
-    offboardForm.reset({
-      finalMileage: car.mileage.toString(),
-      reason: "sold",
-      note: "",
-    });
-    setIsOffboardModalOpen(true);
-  };
-
-  const onOffboardSubmit = (data: {
-    finalMileage: string;
-    reason: string;
-    note?: string;
-  }) => {
-    offboardMutation.mutate(data);
-  };
-
   const handleAddClick = () => {
     setSelectedCar(null);
     form.reset({
@@ -476,12 +395,11 @@ export default function CarsPage() {
       fuelType: car.fuelType || "",
       turoLink: car.turoLink || "",
       adminTuroLink: car.adminTuroLink || "",
+      offboardAt: car.offboardAt ? new Date(car.offboardAt).toISOString().split('T')[0] : "",
+      offboardReason: car.offboardReason || "",
+      offboardNote: car.offboardNote || "",
     });
     setIsEditModalOpen(true);
-  };
-
-  const handleDeleteClick = (id: number) => {
-    deleteMutation.mutate(id);
   };
 
   const onSubmit = (data: CarFormData) => {
@@ -781,41 +699,6 @@ export default function CarsPage() {
                                 >
                                   <Edit className="w-4 h-4" />
                                 </Button>
-                                {car.status === "ACTIVE" && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-gray-400 hover:text-orange-400"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleOffboardClick(car);
-                                    }}
-                                    title="Off-board vehicle"
-                                  >
-                                    <LogOut className="w-4 h-4" />
-                                  </Button>
-                                )}
-                                <ConfirmDialog
-                                  trigger={
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="text-gray-400 hover:text-red-400"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                      }}
-                                      title="Delete"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                  }
-                                  title="Delete Car"
-                                  description="Are you sure you want to delete this car? This action cannot be undone."
-                                  confirmText="Delete"
-                                  cancelText="Cancel"
-                                  variant="destructive"
-                                  onConfirm={() => handleDeleteClick(car.id)}
-                                />
                               </div>
                             </td>
                           )}
@@ -1072,8 +955,29 @@ export default function CarsPage() {
                       <FormItem>
                         <FormLabel className="text-gray-400">Status *</FormLabel>
                         <Select
-                          onValueChange={(value) => {
+                          onValueChange={async (value) => {
                             console.log(`📝 [FRONTEND] Status changed to: ${value}`);
+                            
+                            // If changing to INACTIVE and editing an existing car, check if it's the last active car
+                            if (value === "INACTIVE" && selectedCar && selectedCar.userId) {
+                              try {
+                                const response = await fetch(
+                                  buildApiUrl(`/api/cars/check-last-active?carId=${selectedCar.id}&userId=${selectedCar.userId}`),
+                                  { credentials: "include" }
+                                );
+                                if (response.ok) {
+                                  const result = await response.json();
+                                  if (result.isLastActiveCar) {
+                                    setPendingStatusChange("INACTIVE");
+                                    setIsLastActiveCarDialogOpen(true);
+                                    return; // Don't update the field yet
+                                  }
+                                }
+                              } catch (error) {
+                                console.error("Error checking last active car:", error);
+                              }
+                            }
+                            
                             field.onChange(value);
                           }}
                           value={field.value || "ACTIVE"}
@@ -1210,6 +1114,77 @@ export default function CarsPage() {
                   />
                 </div>
 
+                {/* Offboarding Fields - Show when status is INACTIVE or when editing */}
+                {(form.watch("status") === "INACTIVE" || selectedCar?.status === "INACTIVE") && (
+                  <div className="grid grid-cols-1 gap-4 pt-4 border-t border-[#2a2a2a]">
+                    <div className="text-sm text-[#EAEB80] font-medium mb-2">Offboarding Information</div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="offboardAt"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Offboarding Date</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="date"
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="offboardReason"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Offboarding Reason</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value || ""}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                                <SelectValue placeholder="Select reason" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              <SelectItem value="sold">Sold</SelectItem>
+                              <SelectItem value="damaged">Damaged</SelectItem>
+                              <SelectItem value="end_lease">End of Lease</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="offboardNote"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Offboarding Note (Optional)</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              rows={3}
+                              placeholder="Additional notes about the offboarding..."
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
                 <div className="flex justify-end gap-3 pt-4">
                   <Button
                     type="button"
@@ -1239,120 +1214,46 @@ export default function CarsPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Off-board Modal */}
-        <Dialog
-          open={isOffboardModalOpen}
-          onOpenChange={setIsOffboardModalOpen}
-        >
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-semibold">
-                Off-board Vehicle
-              </DialogTitle>
-              <DialogDescription className="text-gray-400">
-                Remove this vehicle from the active fleet
-              </DialogDescription>
-            </DialogHeader>
-
-            <Form {...offboardForm}>
-              <form
-                onSubmit={offboardForm.handleSubmit(onOffboardSubmit)}
-                className="space-y-4 mt-4"
+        {/* Confirmation Dialog for Last Active Car */}
+        <AlertDialog open={isLastActiveCarDialogOpen} onOpenChange={setIsLastActiveCarDialogOpen}>
+          <AlertDialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-xl font-semibold text-[#EAEB80]">
+                Last Active Car Warning
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-400">
+                This is the client's last active car. Changing the status to INACTIVE will leave the client with no active vehicles. You may want to consider deactivating the client account as well.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => {
+                  setIsLastActiveCarDialogOpen(false);
+                  setPendingStatusChange(null);
+                  // Reset status to previous value
+                  if (selectedCar) {
+                    form.setValue("status", selectedCar.status);
+                  }
+                }}
+                className="text-gray-400 hover:text-white"
               >
-                <FormField
-                  control={offboardForm.control}
-                  name="finalMileage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-400">
-                        Final Mileage *
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="number"
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={offboardForm.control}
-                  name="reason"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-400">Reason *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                            <SelectValue placeholder="Select reason" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                          <SelectItem value="sold">Sold</SelectItem>
-                          <SelectItem value="damaged">Damaged</SelectItem>
-                          <SelectItem value="end_lease">
-                            End of Lease
-                          </SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={offboardForm.control}
-                  name="note"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-400">
-                        Note (optional)
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          rows={3}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => {
-                      setIsOffboardModalOpen(false);
-                      setSelectedCar(null);
-                      offboardForm.reset();
-                    }}
-                    className="text-gray-400 hover:text-white"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
-                    disabled={offboardMutation.isPending}
-                  >
-                    Confirm
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (pendingStatusChange && selectedCar) {
+                    form.setValue("status", pendingStatusChange);
+                    setIsLastActiveCarDialogOpen(false);
+                    setPendingStatusChange(null);
+                  }
+                }}
+                className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+              >
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );

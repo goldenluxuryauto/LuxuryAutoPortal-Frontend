@@ -43,7 +43,8 @@ interface UserCar {
   makeModel: string;
   year: number | null;
   plateNumber: string | null;  // Changed from licensePlate to match backend
-  status: string;
+  status?: string;
+  carStatus?: string;  // Backend returns carStatus
   isActive?: number;
 }
 
@@ -58,15 +59,15 @@ export default function CarOnboardingForm() {
     retry: false,
   });
 
-  // Fetch user's cars from the database (include all cars for onboarding)
+  // Fetch user's cars from the database (include all cars to filter for offboarded ones)
   const { data: carsData, isLoading: isLoadingCars } = useQuery<{
     success: boolean;
     data: UserCar[];
   }>({
     queryKey: ["/api/client/cars", "onboarding"], // Include "onboarding" to differentiate from offboarding query
     queryFn: async () => {
-      // Include returned/inactive cars for onboarding form
-      const response = await fetch(buildApiUrl("/api/client/cars?includeReturned=true"), {
+      // Fetch cars for onboarding: off_fleet cars with approved onboarding submissions
+      const response = await fetch(buildApiUrl("/api/client/cars?for=onboarding"), {
         credentials: "include",
       });
       if (!response.ok) {
@@ -82,6 +83,9 @@ export default function CarOnboardingForm() {
     },
     enabled: !!userData?.user,
   });
+
+  // Backend already filters for off_fleet cars with approved onboarding submissions
+  const offboardedCars = carsData?.data || [];
 
   const form = useForm<CarOnboardingFormData>({
     resolver: zodResolver(carOnboardingSchema),
@@ -106,8 +110,8 @@ export default function CarOnboardingForm() {
 
   // Auto-fill car details when a car is selected
   useEffect(() => {
-    if (selectedCarId && carsData?.data) {
-      const selectedCar = carsData.data.find((car) => car.id.toString() === selectedCarId);
+    if (selectedCarId && offboardedCars) {
+      const selectedCar = offboardedCars.find((car) => car.id.toString() === selectedCarId);
       if (selectedCar) {
         const makeModelYear = selectedCar.year
           ? `${selectedCar.makeModel} ${selectedCar.year}`
@@ -116,7 +120,7 @@ export default function CarOnboardingForm() {
         form.setValue("plateNumber", selectedCar.plateNumber || "N/A");  // Changed from licensePlate to plateNumber
       }
     }
-  }, [selectedCarId, carsData, form]);
+  }, [selectedCarId, offboardedCars, form]);
 
   const onSubmit = async (data: CarOnboardingFormData) => {
     setIsSubmitting(true);
@@ -132,6 +136,7 @@ export default function CarOnboardingForm() {
         carMakeModelYear: data.carMakeModelYear,
         plateNumber: data.plateNumber,
         dropOffDate: dropOffDateTime,
+        carId: data.carId, // Include carId to update car status
       };
 
       const response = await fetch(buildApiUrl("/api/car-onboarding/submit"), {
@@ -258,8 +263,8 @@ export default function CarOnboardingForm() {
                         <SelectItem value="loading" disabled>
                           Loading cars...
                         </SelectItem>
-                      ) : carsData?.data && carsData.data.length > 0 ? (
-                        carsData.data.map((car) => {
+                      ) : offboardedCars && offboardedCars.length > 0 ? (
+                        offboardedCars.map((car) => {
                           // Extract year from makeModel if year field is not available
                           const displayText = car.makeModel 
                             ? `${car.makeModel}${car.plateNumber ? ` - ${car.plateNumber}` : " - No Plate"}`
@@ -273,12 +278,15 @@ export default function CarOnboardingForm() {
                         })
                       ) : (
                         <SelectItem value="no-cars" disabled>
-                          No cars available
+                          No offboarded cars available
                         </SelectItem>
                       )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Only showing offboarded cars (inactive/returned vehicles)
+                  </p>
                 </FormItem>
               )}
             />

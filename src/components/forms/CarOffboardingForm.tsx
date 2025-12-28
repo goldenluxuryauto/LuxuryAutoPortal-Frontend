@@ -43,7 +43,8 @@ interface UserCar {
   makeModel: string;
   year: number | null;
   plateNumber: string | null;  // Changed from licensePlate to match backend
-  status: string;
+  status?: string;
+  carStatus?: string;  // Backend returns carStatus
   isActive: number;
 }
 
@@ -59,13 +60,15 @@ export default function CarOffboardingForm() {
   });
 
   // Fetch user's cars from the database (only active/on-boarded cars)
+  // Note: API returns only active cars by default (includeReturned=false)
   const { data: carsData, isLoading: isLoadingCars } = useQuery<{
     success: boolean;
     data: UserCar[];
   }>({
-    queryKey: ["/api/client/cars"],
+    queryKey: ["/api/client/cars", "offboarding"], // Include "offboarding" to differentiate from onboarding query
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/client/cars"), {
+      // Fetch cars for offboarding: only available cars
+      const response = await fetch(buildApiUrl("/api/client/cars?for=offboarding"), {
         credentials: "include",
       });
       if (!response.ok) {
@@ -79,8 +82,8 @@ export default function CarOffboardingForm() {
     enabled: !!userData?.user,
   });
 
-  // Filter only active cars (on-boarded cars)
-  const activeCars = carsData?.data?.filter((car) => car.isActive === 1) || [];
+  // Backend already filters for available cars
+  const activeCars = carsData?.data || [];
 
   const form = useForm<CarOffboardingFormData>({
     resolver: zodResolver(carOffboardingSchema),
@@ -131,6 +134,7 @@ export default function CarOffboardingForm() {
         carMakeModelYear: data.carMakeModelYear,
         plateNumber: data.plateNumber,
         pickUpDate: pickUpDateTime,
+        carId: data.carId, // Include carId to update car status
       };
 
       const response = await fetch(buildApiUrl("/api/car-offboarding/submit"), {

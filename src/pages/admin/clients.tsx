@@ -56,7 +56,7 @@ interface Client {
   roleId: number;
   roleName: string;
   isActive: boolean;
-  status?: number; // 0 = inactive, 1 = active, 3 = blocked
+  status?: number; // 0 = inactive, 1 = active, 2 = suspended, 3 = blocked
   createdAt: string;
   carCount: number;
   lastLoginAt?: string | null;
@@ -807,11 +807,13 @@ export default function ClientsPage() {
                       const rowNumber = (pagination ? (pagination.page - 1) * pagination.limit : 0) + index + 1;
                       // Calculate online status badge once per client (recalculates on each render due to currentTime state)
                       // Pass account status and logout time to ensure deactivated/blocked/deleted/logged-out clients show as offline
+                      // status: 0 = inactive, 1 = active, 2 = suspended, 3 = blocked
+                      const isActiveForOnlineStatus = client.status === 1; // Only status 1 is active
                       const onlineStatusBadge = getOnlineStatusBadge(
                         client.lastLoginAt,
                         15, // onlineThresholdMinutes
-                        client.isActive, // isActive
-                        client.status, // status: 0 = inactive, 1 = active, 3 = blocked
+                        isActiveForOnlineStatus, // isActive - only true for status 1
+                        client.status, // status: 0 = inactive, 1 = active, 2 = suspended, 3 = blocked
                         client.lastLogoutAt // lastLogoutAt - if exists and more recent than login, user is offline
                       );
                       return (
@@ -845,12 +847,12 @@ export default function ClientsPage() {
                               className={cn(
                                 client.status === 3
                                   ? "bg-red-500/20 text-red-400 border-red-500/30"
-                                  : client.isActive
+                                  : client.status === 1
                                   ? "bg-green-500/20 text-green-400 border-green-500/30"
                                   : "bg-gray-500/20 text-gray-400 border-gray-500/30"
                               )}
                             >
-                              {client.status === 3 ? "Blocked" : client.isActive ? "Active" : "Inactive"}
+                              {client.status === 3 ? "Blocked" : client.status === 1 ? "Active" : "Inactive"}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-left text-gray-400 px-6 py-4 align-middle">
@@ -884,8 +886,8 @@ export default function ClientsPage() {
                               </Button>
                               
                               {/* Grant Access / Suspend - Toggle based on status */}
-                              {client.isActive && client.status !== 3 ? (
-                                // Active client - Show Suspend button
+                              {client.status === 1 ? (
+                                // Active client (status 1) - Show Suspend button
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -898,8 +900,27 @@ export default function ClientsPage() {
                                 >
                                   <Lock className="w-4 h-4" />
                                 </Button>
-                              ) : !client.isActive && client.status !== 3 ? (
-                                // Inactive client - Show Grant Access button
+                              ) : client.status !== 3 && client.status !== 2 ? (
+                                // Inactive client (status 0) - Show Grant Access button
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-9 w-9 p-0 text-green-400 hover:text-green-300 hover:bg-green-500/10 rounded-full"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleReactivateAccess(client.email);
+                                  }}
+                                  disabled={reactivateAccessMutation.isPending}
+                                  title="Grant/Reactivate Access"
+                                >
+                                  {reactivateAccessMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <UserCheck className="w-4 h-4" />
+                                  )}
+                                </Button>
+                              ) : client.status === 2 ? (
+                                // Suspended client (status 2) - Show Grant Access button to reactivate
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -919,7 +940,7 @@ export default function ClientsPage() {
                                 </Button>
                               ) : null}
                               
-                              {/* Block Account - Ban icon */}
+                              {/* Block Account - Ban icon - Show only if not blocked (status !== 3) */}
                               {client.status !== 3 && (
                                 <Button
                                   variant="ghost"
