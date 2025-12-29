@@ -981,7 +981,7 @@ export default function CarDetailPage() {
           <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
-                Financial Information
+              Vehicle Purchase Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -1024,42 +1024,106 @@ export default function CarDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Insurance Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
+          {/* Car Photos Carousel Card - Visible for all users */}
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4 h-full">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80] text-lg">
-                Insurance Information
+              <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
+                <Car className="w-5 h-5" />
+                Car Photos
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              {isLoadingOnboarding ? (
-                <div className="text-center py-4 text-gray-400">
-                  <p className="text-sm">Loading...</p>
+            <CardContent>
+              {car.photos && car.photos.length > 0 ? (
+                <div className="space-y-4">
+                    {/* Main Carousel Display - Reduced height by 1/5 (333 * 4/5 = 266px) */}
+                    <div className="relative w-full h-[266px] bg-black rounded-lg overflow-hidden border border-[#2a2a2a]">
+                    {car.photos.map((photo, index) => {
+                      // For static assets like car photos, use buildApiUrl to get correct backend URL in production
+                      const photoPath = photo.startsWith('/') ? photo : `/${photo}`;
+                      const photoUrl = buildApiUrl(photoPath);
+                      const isActive = index === carouselIndex;
+                      return (
+                        <div
+                          key={index}
+                          className={cn(
+                            "absolute inset-0 transition-all duration-500 ease-in-out px-6",
+                            isActive ? "opacity-100 z-10" : "opacity-0 z-0"
+                          )}
+                        >
+                          <img
+                            src={photoUrl}
+                            alt={`Car photo ${index + 1}`}
+                            className="w-full h-full object-contain"
+                            onError={(e) => {
+                              console.error('Failed to load photo:', photoUrl);
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+        </div>
+                      );
+                    })}
+                    
+                    {/* Navigation Controls - Bottom Center */}
+                    {car.photos.length > 1 && (
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+                        {/* Previous Button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleCarouselPrev}
+                          className="h-9 w-9 bg-black/70 hover:bg-black/90 text-white border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                          aria-label="Previous image"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </Button>
+                        
+                        {/* Image Counter */}
+                        <div className="bg-black/70 px-4 py-2 rounded-full border border-white/30 shadow-lg backdrop-blur-sm">
+                          <span className="text-white text-sm font-medium">
+                            {carouselIndex + 1} / {car.photos.length}
+                          </span>
+                        </div>
+                        
+                        {/* Next Button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleCarouselNext}
+                          className="h-9 w-9 bg-black/70 hover:bg-black/90 text-white border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                          aria-label="Next image"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Circular Indicator Dots */}
+                  {car.photos.length > 1 && (
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                      {car.photos.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleCarouselGoTo(index)}
+                          className={cn(
+                            "w-3 h-3 rounded-full transition-all duration-300",
+                            index === carouselIndex
+                              ? "bg-[#EAEB80] w-8"
+                              : "bg-gray-600 hover:bg-gray-500"
+                          )}
+                          aria-label={`Go to image ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ) : onboarding ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Provider</p>
-                    <p className="text-white text-base">{formatValue(onboarding.insuranceProvider)}</p>
+                ) : (
+                  <div className="flex items-center justify-center h-[266px] bg-black/20 rounded-lg border border-[#2a2a2a]">
+                    <p className="text-gray-400 text-center">
+                      No photos available
+                    </p>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Phone</p>
-                    <p className="text-white text-base">{formatValue(onboarding.insurancePhone)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Policy Number</p>
-                    <p className="text-white text-base font-mono">{formatValue(onboarding.policyNumber)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Expiration</p>
-                    <p className="text-white text-base">{formatValue(onboarding.insuranceExpiration)}</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-4 text-gray-400">
-                  <p className="text-sm">No insurance information available</p>
-                </div>
-              )}
+                )}
             </CardContent>
           </Card>
         </div>
@@ -1234,7 +1298,7 @@ export default function CarDetailPage() {
           <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
-                Additional Information
+                Car Login Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -1289,106 +1353,42 @@ export default function CarDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Car Photos Carousel Card - Visible for all users */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4 h-full">
+          {/* Insurance Information Card */}
+          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-4">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
-                <Car className="w-5 h-5" />
-                Car Photos
+              <CardTitle className="text-[#EAEB80] text-lg">
+                Insurance Information
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              {car.photos && car.photos.length > 0 ? (
-                <div className="space-y-4">
-                    {/* Main Carousel Display - Reduced height by 1/5 (333 * 4/5 = 266px) */}
-                    <div className="relative w-full h-[266px] bg-black rounded-lg overflow-hidden border border-[#2a2a2a]">
-                    {car.photos.map((photo, index) => {
-                      // For static assets like car photos, use buildApiUrl to get correct backend URL in production
-                      const photoPath = photo.startsWith('/') ? photo : `/${photo}`;
-                      const photoUrl = buildApiUrl(photoPath);
-                      const isActive = index === carouselIndex;
-                      return (
-                        <div
-                          key={index}
-                          className={cn(
-                            "absolute inset-0 transition-all duration-500 ease-in-out px-6",
-                            isActive ? "opacity-100 z-10" : "opacity-0 z-0"
-                          )}
-                        >
-                          <img
-                            src={photoUrl}
-                            alt={`Car photo ${index + 1}`}
-                            className="w-full h-full object-contain"
-                            onError={(e) => {
-                              console.error('Failed to load photo:', photoUrl);
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-        </div>
-                      );
-                    })}
-                    
-                    {/* Navigation Controls - Bottom Center */}
-                    {car.photos.length > 1 && (
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
-                        {/* Previous Button */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={handleCarouselPrev}
-                          className="h-9 w-9 bg-black/70 hover:bg-black/90 text-white border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
-                          aria-label="Previous image"
-                        >
-                          <ChevronLeft className="w-5 h-5" />
-                        </Button>
-                        
-                        {/* Image Counter */}
-                        <div className="bg-black/70 px-4 py-2 rounded-full border border-white/30 shadow-lg backdrop-blur-sm">
-                          <span className="text-white text-sm font-medium">
-                            {carouselIndex + 1} / {car.photos.length}
-                          </span>
-                        </div>
-                        
-                        {/* Next Button */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={handleCarouselNext}
-                          className="h-9 w-9 bg-black/70 hover:bg-black/90 text-white border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
-                          aria-label="Next image"
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Circular Indicator Dots */}
-                  {car.photos.length > 1 && (
-                    <div className="flex items-center justify-center gap-2 flex-wrap">
-                      {car.photos.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleCarouselGoTo(index)}
-                          className={cn(
-                            "w-3 h-3 rounded-full transition-all duration-300",
-                            index === carouselIndex
-                              ? "bg-[#EAEB80] w-8"
-                              : "bg-gray-600 hover:bg-gray-500"
-                          )}
-                          aria-label={`Go to image ${index + 1}`}
-                        />
-                      ))}
-                    </div>
-                  )}
+            <CardContent className="space-y-2">
+              {isLoadingOnboarding ? (
+                <div className="text-center py-4 text-gray-400">
+                  <p className="text-sm">Loading...</p>
                 </div>
-                ) : (
-                  <div className="flex items-center justify-center h-[266px] bg-black/20 rounded-lg border border-[#2a2a2a]">
-                    <p className="text-gray-400 text-center">
-                      No photos available
-                    </p>
+              ) : onboarding ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Provider</p>
+                    <p className="text-white text-base">{formatValue(onboarding.insuranceProvider)}</p>
                   </div>
-                )}
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Phone</p>
+                    <p className="text-white text-base">{formatValue(onboarding.insurancePhone)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Policy Number</p>
+                    <p className="text-white text-base font-mono">{formatValue(onboarding.policyNumber)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Expiration</p>
+                    <p className="text-white text-base">{formatValue(onboarding.insuranceExpiration)}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-4 text-gray-400">
+                  <p className="text-sm">No insurance information available</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 

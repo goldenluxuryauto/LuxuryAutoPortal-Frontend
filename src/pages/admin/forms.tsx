@@ -1829,6 +1829,14 @@ export default function FormsPage() {
                             {formatValue(data.fuelType)}
                           </span>
                         </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Vehicle Recall:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.vehicleRecall)}
+                          </span>
+                        </div>
                         {data.vehicleFeatures && (
                           <div className="md:col-span-2">
                             <span className="text-gray-400 block mb-2">
@@ -1867,8 +1875,19 @@ export default function FormsPage() {
                       </div>
                     </div>
 
+                    {/* Vehicle Recall Missing Error - Prominent overlay */}
+                    {(!data.vehicleRecall || data.vehicleRecall.trim() === '' || data.vehicleRecall === 'Not provided') && (
+                      <div className="relative my-4 z-20">
+                        <div className="bg-white border-4 border-red-500 rounded-lg p-6 shadow-2xl flex items-center justify-center">
+                          <p className="text-red-500 text-xl font-semibold text-center m-0">
+                            Vehicle Recall is missing
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Financial Information */}
-                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                    <div className={`bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20 ${(!data.vehicleRecall || data.vehicleRecall.trim() === '' || data.vehicleRecall === 'Not provided') ? 'opacity-30' : ''}`}>
                       <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
                         Financial Information
                       </h3>
