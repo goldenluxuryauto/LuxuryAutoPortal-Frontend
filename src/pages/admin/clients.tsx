@@ -56,7 +56,7 @@ interface Client {
   roleId: number;
   roleName: string;
   isActive: boolean;
-  status?: number; // 0 = inactive, 1 = active, 2 = suspended, 3 = blocked
+  status?: number; // 0 = Active (Access), 1 = Inactive (Access), 2 = Inactive (Suspend), 3 = Inactive (Block)
   createdAt: string;
   carCount: number;
   lastLoginAt?: string | null;
@@ -807,13 +807,13 @@ export default function ClientsPage() {
                       const rowNumber = (pagination ? (pagination.page - 1) * pagination.limit : 0) + index + 1;
                       // Calculate online status badge once per client (recalculates on each render due to currentTime state)
                       // Pass account status and logout time to ensure deactivated/blocked/deleted/logged-out clients show as offline
-                      // status: 0 = inactive, 1 = active, 2 = suspended, 3 = blocked
-                      const isActiveForOnlineStatus = client.status === 1; // Only status 1 is active
+                      // status: 0 = Active (Access), 1 = Inactive (Access), 2 = Inactive (Suspend), 3 = Inactive (Block)
+                      const isActiveForOnlineStatus = client.status === 0; // Only status 0 is active
                       const onlineStatusBadge = getOnlineStatusBadge(
                         client.lastLoginAt,
                         15, // onlineThresholdMinutes
-                        isActiveForOnlineStatus, // isActive - only true for status 1
-                        client.status, // status: 0 = inactive, 1 = active, 2 = suspended, 3 = blocked
+                        isActiveForOnlineStatus, // isActive - only true for status 0
+                        client.status, // status: 0 = Active (Access), 1 = Inactive (Access), 2 = Inactive (Suspend), 3 = Inactive (Block)
                         client.lastLogoutAt // lastLogoutAt - if exists and more recent than login, user is offline
                       );
                       return (
@@ -847,12 +847,12 @@ export default function ClientsPage() {
                               className={cn(
                                 client.status === 3
                                   ? "bg-red-500/20 text-red-400 border-red-500/30"
-                                  : client.status === 1
+                                  : client.status === 0
                                   ? "bg-green-500/20 text-green-400 border-green-500/30"
                                   : "bg-gray-500/20 text-gray-400 border-gray-500/30"
                               )}
                             >
-                              {client.status === 3 ? "Blocked" : client.status === 1 ? "Active" : "Inactive"}
+                              {client.status === 3 ? "Blocked" : client.status === 0 ? "Active" : "Inactive"}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-left text-gray-400 px-6 py-4 align-middle">
@@ -886,8 +886,8 @@ export default function ClientsPage() {
                               </Button>
                               
                               {/* Grant Access / Suspend - Toggle based on status */}
-                              {client.status === 1 ? (
-                                // Active client (status 1) - Show Suspend button
+                              {/* Status 0 = Active (Access) - Show Suspend button */}
+                              {client.status === 0 ? (
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -896,12 +896,17 @@ export default function ClientsPage() {
                                     e.stopPropagation();
                                     handleRevokeAccess(client.email);
                                   }}
+                                  disabled={revokeAccessMutation.isPending || reactivateAccessMutation.isPending}
                                   title="Suspend Access (Temporary)"
                                 >
-                                  <Lock className="w-4 h-4" />
+                                  {revokeAccessMutation.isPending && revokeClientEmail === client.email ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <Lock className="w-4 h-4" />
+                                  )}
                                 </Button>
-                              ) : client.status !== 3 && client.status !== 2 ? (
-                                // Inactive client (status 0) - Show Grant Access button
+                              ) : client.status === 2 ? (
+                                // Status 2 = Inactive (Suspend) - Show Grant Access button to reactivate
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -910,17 +915,17 @@ export default function ClientsPage() {
                                     e.stopPropagation();
                                     handleReactivateAccess(client.email);
                                   }}
-                                  disabled={reactivateAccessMutation.isPending}
+                                  disabled={reactivateAccessMutation.isPending || revokeAccessMutation.isPending}
                                   title="Grant/Reactivate Access"
                                 >
-                                  {reactivateAccessMutation.isPending ? (
+                                  {reactivateAccessMutation.isPending && reactivateClientEmail === client.email ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
                                   ) : (
                                     <UserCheck className="w-4 h-4" />
                                   )}
                                 </Button>
-                              ) : client.status === 2 ? (
-                                // Suspended client (status 2) - Show Grant Access button to reactivate
+                              ) : client.status === 1 ? (
+                                // Status 1 = Inactive (Access) - Show Grant Access button to activate
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -929,16 +934,17 @@ export default function ClientsPage() {
                                     e.stopPropagation();
                                     handleReactivateAccess(client.email);
                                   }}
-                                  disabled={reactivateAccessMutation.isPending}
-                                  title="Grant/Reactivate Access"
+                                  disabled={reactivateAccessMutation.isPending || revokeAccessMutation.isPending}
+                                  title="Grant/Activate Access"
                                 >
-                                  {reactivateAccessMutation.isPending ? (
+                                  {reactivateAccessMutation.isPending && reactivateClientEmail === client.email ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
                                   ) : (
                                     <UserCheck className="w-4 h-4" />
                                   )}
                                 </Button>
                               ) : null}
+                              {/* Status 3 = Inactive (Block) - No button shown */}
                               
                               {/* Block Account - Ban icon - Show only if not blocked (status !== 3) */}
                               {client.status !== 3 && (
