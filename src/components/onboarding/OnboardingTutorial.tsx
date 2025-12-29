@@ -26,9 +26,21 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
 
+// Tutorial module interface
+export interface TutorialModule {
+  id: number;
+  role: 'admin' | 'client' | 'employee';
+  moduleOrder: number;
+  title: string;
+  description: string;
+  steps?: TutorialStep[];
+}
+
 // Tutorial step interface
 export interface TutorialStep {
   id: number;
+  moduleId?: number;
+  role?: 'admin' | 'client' | 'employee';
   title: string;
   description: string;
   videoUrl?: string;
@@ -44,6 +56,7 @@ export interface TutorialStep {
 // Tutorial context
 interface TutorialContextType {
   isOpen: boolean;
+  currentModule: number | null;
   currentStep: number;
   completedSteps: Set<number>;
   openTutorial: () => void;
@@ -51,10 +64,12 @@ interface TutorialContextType {
   nextStep: () => void;
   previousStep: () => void;
   goToStep: (step: number) => void;
+  goToModule: (moduleId: number) => void;
   markStepComplete: (step: number) => void;
   resetTutorial: () => void;
   hasCompletedTutorial: boolean;
   tutorialSteps: TutorialStep[];
+  tutorialModules: TutorialModule[];
 }
 
 const TutorialContext = createContext<TutorialContextType | undefined>(undefined);
@@ -136,7 +151,47 @@ const DEFAULT_TUTORIAL_STEPS: TutorialStep[] = [
   },
 ];
 
-// Hook to fetch tutorial steps from API
+// Hook to fetch tutorial modules from API
+function useTutorialModules(role: 'admin' | 'client' | 'employee' = 'client') {
+  return useQuery<TutorialModule[]>({
+    queryKey: ["/api/tutorial/modules", role],
+    queryFn: async () => {
+      const response = await fetch(buildApiUrl(`/api/tutorial/modules?role=${role}`), {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        console.warn("Failed to fetch tutorial modules");
+        return [];
+      }
+      const data = await response.json();
+      return data.success ? data.data : [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+  });
+}
+
+// Hook to fetch tutorial steps grouped by modules from API
+function useTutorialStepsWithModules(role: 'admin' | 'client' | 'employee' = 'client') {
+  return useQuery<{ modules: Array<TutorialModule & { steps: TutorialStep[] }> }>({
+    queryKey: ["/api/tutorial/steps", role, "with-modules"],
+    queryFn: async () => {
+      const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${role}&includeModules=true`), {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        console.warn("Failed to fetch tutorial steps with modules, using defaults");
+        return { modules: [] };
+      }
+      const data = await response.json();
+      return data.success ? data.data : { modules: [] };
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+  });
+}
+
+// Hook to fetch tutorial steps from API (backwards compatibility - flat list)
 function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
   return useQuery<TutorialStep[]>({
     queryKey: ["/api/tutorial/steps", role],
@@ -149,20 +204,24 @@ function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
         return DEFAULT_TUTORIAL_STEPS;
       }
       const data = await response.json();
-      // Handle both response formats: { success: true, data: [...] } or direct array
-      if (data.success && Array.isArray(data.data)) {
-        return data.data;
-      } else if (Array.isArray(data)) {
-        return data;
-      } else if (Array.isArray(data.data)) {
-        return data.data;
+      // Handle both response formats: { success: true, data: [...] } or { success: true, data: { modules: [...] } }
+      if (data.success) {
+        if (Array.isArray(data.data)) {
+          return data.data;
+        } else if (data.data.modules) {
+          // Flatten modules into steps
+          const allSteps: TutorialStep[] = [];
+          data.data.modules.forEach((module: any) => {
+            if (module.steps && Array.isArray(module.steps)) {
+              allSteps.push(...module.steps);
+            }
+          });
+          return allSteps.length > 0 ? allSteps : DEFAULT_TUTORIAL_STEPS;
+        }
       }
       return DEFAULT_TUTORIAL_STEPS;
     },
-    staleTime: 0, // Always refetch when invalidated
-    refetchOnWindowFocus: true, // Refetch when window regains focus
-    refetchOnMount: true, // Refetch when component mounts
-    refetchInterval: false, // Don't auto-refetch on interval
+    staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
     placeholderData: DEFAULT_TUTORIAL_STEPS,
   });
@@ -171,6 +230,7 @@ function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
 // Tutorial Provider Component
 export function TutorialProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [currentModule, setCurrentModule] = useState<number | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState(false);
@@ -197,6 +257,8 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   const userRole = userData?.user?.isAdmin ? 'admin' : userData?.user?.isClient ? 'client' : userData?.user?.isEmployee ? 'employee' : 'client';
   
   const { data: tutorialSteps = DEFAULT_TUTORIAL_STEPS, refetch: refetchTutorialSteps } = useTutorialSteps(userRole);
+  const { data: tutorialModules = [], refetch: refetchTutorialModules } = useTutorialModules(userRole);
+  const { data: tutorialDataWithModules } = useTutorialStepsWithModules(userRole);
 
   // Mutation to mark tour as completed
   const completeTourMutation = useMutation({
@@ -358,6 +420,18 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const goToModule = (moduleId: number) => {
+    setCurrentModule(moduleId);
+    // Find the first step in the module
+    if (tutorialDataWithModules?.modules) {
+      const module = tutorialDataWithModules.modules.find(m => m.id === moduleId);
+      if (module && module.steps && module.steps.length > 0) {
+        setCurrentStep(module.steps[0].id);
+        saveState({ currentStep: module.steps[0].id });
+      }
+    }
+  };
+
   const goToStep = (step: number) => {
     // Ensure tutorialSteps is an array
     if (!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
@@ -412,6 +486,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     <TutorialContext.Provider
       value={{
         isOpen,
+        currentModule,
         currentStep,
         completedSteps,
         openTutorial,
@@ -419,10 +494,12 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         nextStep,
         previousStep,
         goToStep,
+        goToModule,
         markStepComplete,
         resetTutorial,
         hasCompletedTutorial,
         tutorialSteps: safeTutorialSteps, // Expose steps to context (always an array)
+        tutorialModules: tutorialModules, // Expose modules to context
       }}
     >
       {children}
@@ -459,16 +536,19 @@ export function OnboardingTutorial({
   
   const {
     isOpen: contextIsOpen,
+    currentModule,
     currentStep,
     completedSteps,
     closeTutorial,
     nextStep,
     previousStep,
     goToStep,
+    goToModule,
     markStepComplete,
     hasCompletedTutorial,
     openTutorial: contextOpenTutorial,
     tutorialSteps: contextTutorialSteps = DEFAULT_TUTORIAL_STEPS,
+    tutorialModules: contextTutorialModules = [],
   } = useTutorial();
 
   // Use controlled props if provided, otherwise use context
@@ -478,9 +558,31 @@ export function OnboardingTutorial({
   // Note: Auto-start is now handled by TutorialProvider for new signups only
   // This component no longer auto-starts on its own
 
-  // Use tutorial steps from context (which are fetched from API)
+  // Use tutorial steps and modules from context (which are fetched from API)
   // Ensure tutorialSteps is always an array
   const tutorialSteps = Array.isArray(contextTutorialSteps) ? contextTutorialSteps : DEFAULT_TUTORIAL_STEPS;
+  const tutorialModules = Array.isArray(contextTutorialModules) ? contextTutorialModules : [];
+  
+  // Get user role to fetch module data
+  const { data: userData } = useQuery<{ user?: { isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean } }>({
+    queryKey: ["/api/auth/me"],
+    queryFn: async () => {
+      const response = await fetch(buildApiUrl("/api/auth/me"), {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        return { user: undefined };
+      }
+      return response.json();
+    },
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  
+  const userRole = userData?.user?.isAdmin ? 'admin' : userData?.user?.isClient ? 'client' : userData?.user?.isEmployee ? 'employee' : 'client';
+  
+  // Fetch steps grouped by modules
+  const { data: tutorialDataWithModules } = useTutorialStepsWithModules(userRole);
   
   // Refetch tutorial steps when dialog opens to ensure latest data
   // Note: We use refetchQueries without invalidateQueries to avoid clearing cached data
@@ -494,12 +596,24 @@ export function OnboardingTutorial({
         queryKey: ["/api/tutorial/steps"],
         type: 'active', // Only refetch active queries
       });
+      queryClient.refetchQueries({ 
+        queryKey: ["/api/tutorial/modules"],
+        type: 'active', // Only refetch active queries
+      });
     }
   }, [isOpen, queryClient]);
   
   // Find current step data by matching step id with currentStep
   // The API returns id as step_order, so we need to find the step where id === currentStep
   const currentStepData = tutorialSteps.find(step => step.id === currentStep) || tutorialSteps[currentStep - 1] || tutorialSteps[0];
+  
+  // Find current module based on current step
+  const currentModuleData = currentStepData?.moduleId 
+    ? tutorialModules.find(m => m.id === currentStepData.moduleId)
+    : null;
+  
+  // Get steps for current module if we have module data
+  const currentModuleSteps = tutorialDataWithModules?.modules?.find(m => m.id === currentModuleData?.id)?.steps || tutorialSteps;
   
   // Reset video state when step changes or video URL changes
   useEffect(() => {
@@ -511,9 +625,12 @@ export function OnboardingTutorial({
     return null; // Don't render if no step data
   }
   
-  const progress = (currentStep / tutorialSteps.length) * 100;
-  const isFirstStep = currentStep === 1;
-  const isLastStep = currentStep === tutorialSteps.length;
+  // Calculate progress within current module or overall
+  const stepsForProgress = currentModuleData ? currentModuleSteps : tutorialSteps;
+  const currentStepIndex = stepsForProgress.findIndex(step => step.id === currentStep);
+  const progress = currentStepIndex >= 0 ? ((currentStepIndex + 1) / stepsForProgress.length) * 100 : 0;
+  const isFirstStep = currentStepIndex === 0;
+  const isLastStep = currentStepIndex === stepsForProgress.length - 1;
   
   const handleVideoError = () => {
     setVideoError(true);
@@ -584,9 +701,39 @@ export function OnboardingTutorial({
             </DialogTitle>
           </div>
           <DialogDescription className="text-xs text-gray-400">
-            Step {currentStep} of {tutorialSteps.length}
+            {currentModuleData ? (
+              <>
+                Module: {currentModuleData.title} - Step {currentStep} of {currentModuleSteps.length}
+              </>
+            ) : (
+              <>
+                Step {currentStep} of {tutorialSteps.length}
+              </>
+            )}
           </DialogDescription>
         </DialogHeader>
+
+        {/* Module Navigation - Show if modules exist */}
+        {tutorialModules.length > 0 && (
+          <div className="flex gap-2 pb-2 overflow-x-auto">
+            {tutorialModules.map((module) => (
+              <Button
+                key={module.id}
+                variant={currentModuleData?.id === module.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => goToModule(module.id)}
+                className={cn(
+                  "whitespace-nowrap",
+                  currentModuleData?.id === module.id
+                    ? "bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90"
+                    : "border-gray-700 text-gray-300 hover:bg-gray-800"
+                )}
+              >
+                {module.title}
+              </Button>
+            ))}
+          </div>
+        )}
 
         {/* Progress Bar */}
         <div className="space-y-1 pb-2">
@@ -594,7 +741,7 @@ export function OnboardingTutorial({
           <div className="flex justify-between text-xs text-gray-500">
             <span>{Math.round(progress)}% Complete</span>
             <span>
-              {currentStep} / {tutorialSteps.length}
+              {currentStepIndex >= 0 ? currentStepIndex + 1 : currentStep} / {stepsForProgress.length}
             </span>
           </div>
         </div>
