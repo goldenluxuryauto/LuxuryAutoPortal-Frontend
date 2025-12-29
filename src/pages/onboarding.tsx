@@ -1055,6 +1055,21 @@ export default function Onboarding() {
                               )}
                             />
                           </div>
+                          {/* NHTSA Recall Check Link */}
+                          <div className="mt-2 mb-2 text-center">
+                            <p className="text-sm text-gray-400 mb-1">
+                              If Your Not Sure If Your Vehicle May Have a Recall You Can Check Here:
+                            </p>
+                            <a
+                              href="https://www.nhtsa.gov/recalls"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#EAEB80] hover:text-[#d4d570] underline font-medium"
+                              style={{ fontSize: '1.3em' }}
+                            >
+                              National Highway Traffic Safety Administration (NHTSA)
+                            </a>
+                          </div>
                           <div className="grid grid-cols-2 gap-4">
                             <FormField
                               control={form.control}
