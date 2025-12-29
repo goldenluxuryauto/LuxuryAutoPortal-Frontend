@@ -905,6 +905,25 @@ export default function ClientsPage() {
                                     <Lock className="w-4 h-4" />
                                   )}
                                 </Button>
+                              ) : client.status === 1 ? (
+                                // Status 1 = Inactive (Access) - Show Suspend button
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 rounded-full"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRevokeAccess(client.email);
+                                  }}
+                                  disabled={revokeAccessMutation.isPending || reactivateAccessMutation.isPending}
+                                  title="Suspend Access (Temporary)"
+                                >
+                                  {revokeAccessMutation.isPending && revokeClientEmail === client.email ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <Lock className="w-4 h-4" />
+                                  )}
+                                </Button>
                               ) : client.status === 2 ? (
                                 // Status 2 = Inactive (Suspend) - Show Grant Access button to reactivate
                                 <Button
@@ -924,30 +943,32 @@ export default function ClientsPage() {
                                     <UserCheck className="w-4 h-4" />
                                   )}
                                 </Button>
-                              ) : client.status === 1 ? (
-                                // Status 1 = Inactive (Access) - Show Grant Access button to activate
+                              ) : client.status === 3 ? (
+                                // Status 3 = Inactive (Block) - Show disabled Suspend button
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-green-400 hover:text-green-300 hover:bg-green-500/10 rounded-full"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleReactivateAccess(client.email);
-                                  }}
-                                  disabled={reactivateAccessMutation.isPending || revokeAccessMutation.isPending}
-                                  title="Grant/Activate Access"
+                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 rounded-full opacity-50 cursor-not-allowed"
+                                  disabled={true}
+                                  title="Account is blocked - Cannot suspend"
                                 >
-                                  {reactivateAccessMutation.isPending && reactivateClientEmail === client.email ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                  ) : (
-                                    <UserCheck className="w-4 h-4" />
-                                  )}
+                                  <Lock className="w-4 h-4" />
                                 </Button>
                               ) : null}
-                              {/* Status 3 = Inactive (Block) - No button shown */}
+                              {/* Status 3 = Inactive (Block) - Buttons shown but disabled (except view) */}
                               
-                              {/* Block Account - Ban icon - Show only if not blocked (status !== 3) */}
-                              {client.status !== 3 && (
+                              {/* Block Account - Ban icon - Show but disable if blocked (status === 3) */}
+                              {client.status === 3 ? (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-9 w-9 p-0 text-red-400 hover:text-red-500 hover:bg-red-500/10 rounded-full opacity-50 cursor-not-allowed"
+                                  disabled={true}
+                                  title="Account is blocked - Cannot perform actions"
+                                >
+                                  <Ban className="w-4 h-4" />
+                                </Button>
+                              ) : (
                                 <Button
                                   variant="ghost"
                                   size="sm"

@@ -1391,7 +1391,7 @@ export default function Onboarding() {
                           />
                           <FormItem>
                             <FormLabel className="text-gray-300">
-                              Drivers License Upload *
+                              Drivers License Upload
                             </FormLabel>
                             <div
                               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
@@ -1561,7 +1561,7 @@ export default function Onboarding() {
                           </div>
                           <FormItem>
                             <FormLabel className="text-gray-300">
-                              Insurance Card *
+                              Insurance Card
                             </FormLabel>
                             <div
                               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
