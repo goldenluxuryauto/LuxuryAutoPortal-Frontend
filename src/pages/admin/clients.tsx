@@ -39,7 +39,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Search, Eye, ChevronLeft, ChevronRight, X, Plus, Upload, FileSpreadsheet, Loader2, UserCheck, UserX, Ban, Lock, Download } from "lucide-react";
+import { Search, Eye, ChevronLeft, ChevronRight, X, Plus, Upload, FileSpreadsheet, Loader2, UserCheck, UserX, Ban, Lock, Download, RefreshCw } from "lucide-react";
 import { TableRowSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { TablePagination, ItemsPerPage } from "@/components/ui/table-pagination";
@@ -162,7 +162,19 @@ export default function ClientsPage() {
       }
       return response.json();
     },
-    retry: false,
+    // Retry on database connection errors with exponential backoff
+    retry: (failureCount, error) => {
+      // Retry up to 3 times for database connection errors
+      if (failureCount < 3) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage.includes('Database') || errorMessage.includes('connection') || errorMessage.includes('timeout')) {
+          console.log(`🔄 [CLIENTS] Retrying database query (attempt ${failureCount + 1}/3)...`);
+          return true;
+        }
+      }
+      return false;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000), // Exponential backoff, max 10 seconds
     // Poll backend every 2 seconds to get updated lastLoginAt/lastLogoutAt values immediately
     // This ensures login/logout events are reflected within 2 seconds
     refetchInterval: 2000,
@@ -792,8 +804,21 @@ export default function ClientsPage() {
                     <TableRowSkeleton colSpan={10} rows={5} />
                   ) : error ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8 text-red-400">
-                        Database connection failed. Please try again.
+                      <TableCell colSpan={10} className="text-center py-8">
+                        <div className="flex flex-col items-center gap-3">
+                          <p className="text-red-400">
+                            {error instanceof Error ? error.message : "Database connection failed. Please try again."}
+                          </p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => refetch()}
+                            className="border-[#EAEB80] text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                          >
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Retry
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ) : clients.length === 0 ? (
