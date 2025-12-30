@@ -191,6 +191,7 @@ export default function ClientDetailPage() {
     oilType: "",
     lastOilChange: "",
     fuelType: "",
+    gas: "",
     turoLink: "",
     adminTuroLink: "",
   });
@@ -508,6 +509,7 @@ export default function ClientDetailPage() {
       if (data.oilType) formData.append("oilType", data.oilType);
       if (data.lastOilChange) formData.append("lastOilChange", data.lastOilChange);
       if (data.fuelType) formData.append("fuelType", data.fuelType);
+      if (data.gas) formData.append("gas", data.gas);
       if (data.turoLink) formData.append("turoLink", data.turoLink);
       if (data.adminTuroLink) formData.append("adminTuroLink", data.adminTuroLink);
 
@@ -540,6 +542,7 @@ export default function ClientDetailPage() {
         oilType: "",
         lastOilChange: "",
         fuelType: "",
+        gas: "",
         turoLink: "",
         adminTuroLink: "",
       });
@@ -2305,6 +2308,15 @@ export default function ClientDetailPage() {
                   className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
                 />
               </div>
+            </div>
+            <div>
+              <Label className="text-gray-400">Gas</Label>
+              <Input
+                value={addCarForm.gas}
+                onChange={(e) => setAddCarForm({ ...addCarForm, gas: e.target.value })}
+                placeholder="Gas information"
+                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
