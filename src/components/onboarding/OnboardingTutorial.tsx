@@ -238,19 +238,50 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   
   // Fetch user role to determine which tutorial to show
+  // Add timeout and error handling to prevent blocking app initialization
+  // Use enabled: false initially and enable after a short delay to prevent blocking
+  const [enableAuthQuery, setEnableAuthQuery] = useState(false);
+  
+  // Enable query after initial render to prevent blocking
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setEnableAuthQuery(true);
+    }, 100); // Small delay to let app render first
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
   const { data: userData } = useQuery<{ user?: { isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean } }>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/auth/me"), {
-        credentials: "include",
-      });
-      if (!response.ok) {
+      try {
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
+        const response = await fetch(buildApiUrl("/api/auth/me"), {
+          credentials: "include",
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          return { user: undefined };
+        }
+        return response.json();
+      } catch (error) {
+        // If fetch fails (network error, timeout, etc.), return undefined user
+        // This prevents the app from being blocked
+        console.warn("⚠️ [TUTORIAL] Failed to fetch user data (non-critical):", error);
         return { user: undefined };
       }
-      return response.json();
     },
     retry: false,
     staleTime: 5 * 60 * 1000,
+    enabled: enableAuthQuery, // Don't fetch until enabled
+    // Don't block app initialization if this query fails
+    throwOnError: false,
   });
 
   // Determine role from user data
@@ -564,19 +595,36 @@ export function OnboardingTutorial({
   const tutorialModules = Array.isArray(contextTutorialModules) ? contextTutorialModules : [];
   
   // Get user role to fetch module data
+  // Add timeout and error handling to prevent blocking
   const { data: userData } = useQuery<{ user?: { isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean } }>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/auth/me"), {
-        credentials: "include",
-      });
-      if (!response.ok) {
+      try {
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
+        const response = await fetch(buildApiUrl("/api/auth/me"), {
+          credentials: "include",
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          return { user: undefined };
+        }
+        return response.json();
+      } catch (error) {
+        // If fetch fails (network error, timeout, etc.), return undefined user
+        console.warn("⚠️ [TUTORIAL] Failed to fetch user data (non-critical):", error);
         return { user: undefined };
       }
-      return response.json();
     },
     retry: false,
     staleTime: 5 * 60 * 1000,
+    // Don't block app initialization if this query fails
+    throwOnError: false,
   });
   
   const userRole = userData?.user?.isAdmin ? 'admin' : userData?.user?.isClient ? 'client' : userData?.user?.isEmployee ? 'employee' : 'client';

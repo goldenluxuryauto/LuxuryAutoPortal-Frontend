@@ -12,6 +12,7 @@
 
 // Import pdfjs from react-pdf to ensure we configure the same instance it uses
 // This is critical - react-pdf bundles its own pdfjs-dist, so we must use its instance
+// This module is imported dynamically, so errors won't block app initialization
 import { pdfjs } from "react-pdf";
 
 // Set worker path - use CDN URL matching react-pdf's pdfjs-dist version
@@ -21,15 +22,22 @@ const WORKER_VERSION = '4.8.69'; // Match react-pdf's pdfjs-dist version
 const workerUrl = `https://unpkg.com/pdfjs-dist@${WORKER_VERSION}/build/pdf.worker.min.mjs`;
 
 // Set worker path on react-pdf's pdfjs instance (this is the one that actually gets used)
-pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
-
-console.log('✅ PDF worker set to unpkg CDN — matches react-pdf version');
-console.log('Worker URL:', pdfjs.GlobalWorkerOptions.workerSrc);
-console.log('Worker version:', WORKER_VERSION);
+try {
+  if (pdfjs && pdfjs.GlobalWorkerOptions) {
+    pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+    console.log('✅ PDF worker set to unpkg CDN — matches react-pdf version');
+    console.log('Worker URL:', pdfjs.GlobalWorkerOptions.workerSrc);
+    console.log('Worker version:', WORKER_VERSION);
+  }
+} catch (error) {
+  console.warn('⚠️ [PDF-CONFIG] Failed to set PDF worker (non-critical):', error);
+  // PDF worker config is not critical for app initialization
+  // Components will handle PDF loading errors gracefully
+}
 
 // Export the configured pdfjs instance for use in components
 export { pdfjs };
 
 // Export pdfjs version for reference (useful for cMap URLs if needed)
-export const PDFJS_VERSION = pdfjs.version;
+export const PDFJS_VERSION = pdfjs?.version || WORKER_VERSION;
 

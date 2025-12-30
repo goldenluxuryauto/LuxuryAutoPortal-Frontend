@@ -1,5 +1,5 @@
 import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
+import { queryClient, getApiBaseUrl } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -56,10 +56,21 @@ function Router() {
 function App() {
   // Log initialization for debugging
   if (typeof window !== 'undefined') {
+    const apiBaseUrl = getApiBaseUrl();
+    
     console.log('[APP] Initializing application...');
     console.log('[APP] Current URL:', window.location.href);
     console.log('[APP] User Agent:', navigator.userAgent);
     console.log('[APP] VITE_API_URL:', import.meta.env.VITE_API_URL || 'Not set');
+    console.log('[APP] API Base URL:', apiBaseUrl || 'relative (using Vite proxy)');
+    console.log('[APP] Environment:', import.meta.env.PROD ? 'Production' : 'Development');
+    
+    // Warn if VITE_API_URL is not set in production
+    if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
+      console.warn('⚠️ [APP] VITE_API_URL is not set in production!');
+      console.warn('⚠️ [APP] API calls may fail. Please set VITE_API_URL in Vercel environment variables.');
+      console.warn('⚠️ [APP] Expected value: https://luxuryautoportal-replit-1.onrender.com');
+    }
   }
 
   return (
