@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TutorialProvider } from "@/components/onboarding/OnboardingTutorial";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Home from "@/pages/home";
 import Fleet from "@/pages/fleet";
 import Onboarding from "@/pages/onboarding";
@@ -53,15 +54,25 @@ function Router() {
 }
 
 function App() {
+  // Log initialization for debugging
+  if (typeof window !== 'undefined') {
+    console.log('[APP] Initializing application...');
+    console.log('[APP] Current URL:', window.location.href);
+    console.log('[APP] User Agent:', navigator.userAgent);
+    console.log('[APP] VITE_API_URL:', import.meta.env.VITE_API_URL || 'Not set');
+  }
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <TutorialProvider>
-          <Toaster />
-          <Router />
-        </TutorialProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <TutorialProvider>
+            <Toaster />
+            <Router />
+          </TutorialProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
