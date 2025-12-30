@@ -40,7 +40,7 @@ interface CarDetail {
   year?: number;
   color?: string;
   mileage: number;
-  status: "available" | "in_use" | "maintenance" | "off_fleet";
+  status: "ACTIVE" | "INACTIVE";
   offboardReason?: "sold" | "damaged" | "end_lease" | "other" | null;
   offboardNote?: string | null;
   offboardAt?: string | null;
@@ -54,6 +54,8 @@ interface CarDetail {
     email: string | null;
   } | null;
   photos?: string[];
+  turoLink?: string | null;
+  adminTuroLink?: string | null;
 }
 
 const carSchema = z.object({
@@ -99,6 +101,9 @@ const carSchema = z.object({
   carManufacturerWebsite: z.string().optional(),
   carManufacturerUsername: z.string().optional(),
   password: z.string().optional(),
+  // Car Links
+  turoLink: z.string().optional(),
+  adminTuroLink: z.string().optional(),
   // Documents
   insuranceCardUrl: z.string().optional(),
   driversLicenseUrls: z.string().optional(), // JSON string array
@@ -341,6 +346,8 @@ export default function CarDetailPage() {
       carManufacturerWebsite: "",
       carManufacturerUsername: "",
       password: "",
+      turoLink: "",
+      adminTuroLink: "",
       insuranceCardUrl: "",
       driversLicenseUrls: "",
     },
@@ -401,6 +408,9 @@ export default function CarDetailPage() {
       formData.append("carManufacturerWebsite", data.carManufacturerWebsite || "");
       formData.append("carManufacturerUsername", data.carManufacturerUsername || "");
       formData.append("password", data.password || "");
+      // Car Links - Always send all fields to ensure backend can update them
+      formData.append("turoLink", data.turoLink || "");
+      formData.append("adminTuroLink", data.adminTuroLink || "");
       
       // Documents - Handle file uploads using state
       if (insuranceCardFile instanceof File) {
@@ -714,6 +724,9 @@ export default function CarDetailPage() {
       carManufacturerWebsite: onboarding?.carManufacturerWebsite || "",
       carManufacturerUsername: onboarding?.carManufacturerUsername || "",
       password: onboarding?.password || "",
+      // Car Links
+      turoLink: car.turoLink || "",
+      adminTuroLink: car.adminTuroLink || "",
       // Documents
       insuranceCardUrl: onboarding?.insuranceCardUrl || "",
       driversLicenseUrls: onboarding?.driversLicenseUrls ? (Array.isArray(onboarding.driversLicenseUrls) ? JSON.stringify(onboarding.driversLicenseUrls) : onboarding.driversLicenseUrls) : "",
@@ -897,10 +910,14 @@ export default function CarDetailPage() {
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
-      case "available":
+      case "ACTIVE":
         return "bg-green-500/20 text-green-400 border-green-500/30";
+      case "INACTIVE":
+        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+      // Legacy support for database values (if any still exist)
+      case "available":
       case "in_use":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+        return "bg-green-500/20 text-green-400 border-green-500/30";
       case "maintenance":
         return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
       case "off_fleet":
@@ -980,7 +997,7 @@ export default function CarDetailPage() {
           )}
         </div>
 
-        {/* Row 1: Vehicle Information and Car Photos */}
+        {/* Row 1: Vehicle Information, Car Photos, and Car Links */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           {/* Vehicle Information Card */}
           <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-6 flex flex-col">
@@ -1107,7 +1124,11 @@ export default function CarDetailPage() {
                       variant="outline"
                       className={getStatusBadgeColor(car.status)}
                     >
-                      {car.status.replace("_", " ").toUpperCase()}
+                      {car.status === "ACTIVE"
+                        ? "ACTIVE"
+                        : car.status === "INACTIVE"
+                        ? "INACTIVE"
+                        : String(car.status).replace("_", " ").toUpperCase()}
                     </Badge>
                   </div>
                   {car.owner && (
@@ -1164,108 +1185,161 @@ export default function CarDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Car Photos Carousel Card - Visible for all users */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-6 flex flex-col">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
-                <Car className="w-5 h-5" />
-                Car Photos
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              {car.photos && car.photos.length > 0 ? (
-                <div className="space-y-2 flex-1 flex flex-col">
-                    {/* Main Carousel Display - Flexible height to match Vehicle Information card */}
-                    <div className="relative w-full flex-1 bg-black rounded-lg overflow-hidden border border-[#2a2a2a]">
-                    {car.photos.map((photo, index) => {
-                      // For static assets like car photos, use buildApiUrl to get correct backend URL in production
-                      const photoPath = photo.startsWith('/') ? photo : `/${photo}`;
-                      const photoUrl = buildApiUrl(photoPath);
-                      const isActive = index === carouselIndex;
-                      return (
-                        <div
-                          key={index}
-                          className={cn(
-                            "absolute inset-0 transition-all duration-500 ease-in-out px-6",
-                            isActive ? "opacity-100 z-10" : "opacity-0 z-0"
-                          )}
-                        >
-                          <img
-                            src={photoUrl}
-                            alt={`Car photo ${index + 1}`}
-                            className="w-full h-full object-contain"
-                            onError={(e) => {
-                              console.error('Failed to load photo:', photoUrl);
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-        </div>
-                      );
-                    })}
-                    
-                    {/* Navigation Controls - Bottom Center */}
-                    {car.photos.length > 1 && (
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
-                        {/* Previous Button */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={handleCarouselPrev}
-                          className="h-9 w-9 bg-black/70 hover:bg-black/90 text-white border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
-                          aria-label="Previous image"
-                        >
-                          <ChevronLeft className="w-5 h-5" />
-                        </Button>
-                        
-                        {/* Image Counter */}
-                        <div className="bg-black/70 px-4 py-2 rounded-full border border-white/30 shadow-lg backdrop-blur-sm">
-                          <span className="text-white text-sm font-medium">
-                            {carouselIndex + 1} / {car.photos.length}
-                          </span>
+          {/* Column 2: Car Photos and Car Links stacked vertically */}
+          <div className="lg:col-span-6 flex flex-col gap-6">
+            {/* Car Photos Carousel Card */}
+            <Card className="bg-[#0f0f0f] border-[#1a1a1a] flex flex-col flex-1">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
+                  <Car className="w-5 h-5" />
+                  Car Photos
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1 flex flex-col">
+                {car.photos && car.photos.length > 0 ? (
+                  <div className="space-y-2 flex-1 flex flex-col">
+                      {/* Main Carousel Display - Flexible height to match Vehicle Information card */}
+                      <div className="relative w-full flex-1 bg-black rounded-lg overflow-hidden border border-[#2a2a2a]">
+                      {car.photos.map((photo, index) => {
+                        // For static assets like car photos, use buildApiUrl to get correct backend URL in production
+                        const photoPath = photo.startsWith('/') ? photo : `/${photo}`;
+                        const photoUrl = buildApiUrl(photoPath);
+                        const isActive = index === carouselIndex;
+                        return (
+                          <div
+                            key={index}
+                            className={cn(
+                              "absolute inset-0 transition-all duration-500 ease-in-out px-6",
+                              isActive ? "opacity-100 z-10" : "opacity-0 z-0"
+                            )}
+                          >
+                            <img
+                              src={photoUrl}
+                              alt={`Car photo ${index + 1}`}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                console.error('Failed to load photo:', photoUrl);
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+          </div>
+                        );
+                      })}
+                      
+                      {/* Navigation Controls - Bottom Center */}
+                      {car.photos.length > 1 && (
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+                          {/* Previous Button */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleCarouselPrev}
+                            className="h-9 w-9 bg-black/70 hover:bg-black/90 text-white border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                            aria-label="Previous image"
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </Button>
+                          
+                          {/* Image Counter */}
+                          <div className="bg-black/70 px-4 py-2 rounded-full border border-white/30 shadow-lg backdrop-blur-sm">
+                            <span className="text-white text-sm font-medium">
+                              {carouselIndex + 1} / {car.photos.length}
+                            </span>
+                          </div>
+                          
+                          {/* Next Button */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleCarouselNext}
+                            className="h-9 w-9 bg-black/70 hover:bg-black/90 text-white border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                            aria-label="Next image"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </Button>
                         </div>
-                        
-                        {/* Next Button */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={handleCarouselNext}
-                          className="h-9 w-9 bg-black/70 hover:bg-black/90 text-white border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
-                          aria-label="Next image"
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </Button>
+                      )}
+                    </div>
+
+                    {/* Circular Indicator Dots */}
+                    {car.photos.length > 1 && (
+                      <div className="flex items-center justify-center gap-2 flex-wrap">
+                        {car.photos.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleCarouselGoTo(index)}
+                            className={cn(
+                              "w-3 h-3 rounded-full transition-all duration-300",
+                              index === carouselIndex
+                                ? "bg-[#EAEB80] w-8"
+                                : "bg-gray-600 hover:bg-gray-500"
+                            )}
+                            aria-label={`Go to image ${index + 1}`}
+                          />
+                        ))}
                       </div>
                     )}
                   </div>
+                  ) : (
+                    <div className="flex items-center justify-center flex-1 bg-black/20 rounded-lg border border-[#2a2a2a]">
+                      <p className="text-gray-400 text-center">
+                        No photos available
+                      </p>
+                    </div>
+                  )}
+              </CardContent>
+            </Card>
 
-                  {/* Circular Indicator Dots */}
-                  {car.photos.length > 1 && (
-                    <div className="flex items-center justify-center gap-2 flex-wrap">
-                      {car.photos.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleCarouselGoTo(index)}
-                          className={cn(
-                            "w-3 h-3 rounded-full transition-all duration-300",
-                            index === carouselIndex
-                              ? "bg-[#EAEB80] w-8"
-                              : "bg-gray-600 hover:bg-gray-500"
-                          )}
-                          aria-label={`Go to image ${index + 1}`}
-                        />
-                      ))}
+            {/* Car Links Card */}
+            <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
+              <CardHeader>
+                <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
+                  <Car className="w-5 h-5" />
+                  Car Links
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Turo Link</p>
+                    {car.turoLink ? (
+                      <p className="text-white text-base break-all">
+                        <a
+                          href={car.turoLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#EAEB80] hover:underline"
+                        >
+                          {formatValue(car.turoLink)}
+                        </a>
+                      </p>
+                    ) : (
+                      <p className="text-gray-500 text-base">Not provided</p>
+                    )}
+                  </div>
+                  {isAdmin && (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Admin Turo Link</p>
+                      {car.adminTuroLink ? (
+                        <p className="text-white text-base break-all">
+                          <a
+                            href={car.adminTuroLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#EAEB80] hover:underline"
+                          >
+                            {formatValue(car.adminTuroLink)}
+                          </a>
+                        </p>
+                      ) : (
+                        <p className="text-gray-500 text-base">Not provided</p>
+                      )}
                     </div>
                   )}
                 </div>
-                ) : (
-                  <div className="flex items-center justify-center flex-1 bg-black/20 rounded-lg border border-[#2a2a2a]">
-                    <p className="text-gray-400 text-center">
-                      No photos available
-                    </p>
-                  </div>
-                )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Row 2: Documents, Vehicle Purchase Information, Car Login Information, Insurance Information */}
@@ -2502,6 +2576,54 @@ export default function CarDetailPage() {
                         </FormItem>
                       )}
                     />
+                  </div>
+                </div>
+
+                {/* Car Links Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                    Car Links
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="turoLink"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Turo Link</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="url"
+                              placeholder="https://turo.com/..."
+                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {isAdmin && (
+                      <FormField
+                        control={form.control}
+                        name="adminTuroLink"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-400">Admin Turo Link</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="url"
+                                placeholder="https://turo.com/..."
+                                className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </div>
                 </div>
 

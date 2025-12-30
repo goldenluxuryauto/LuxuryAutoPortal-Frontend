@@ -537,16 +537,11 @@ export default function CarsPage() {
                         Admin Turo Link
                       </th>
                     )}
-                    {isAdmin && (
-                      <th className="text-right text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
-                        Actions
-                      </th>
-                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#2a2a2a]">
                   {isLoading ? (
-                    <TableRowSkeleton colSpan={isAdmin ? 17 : 15} rows={5} />
+                    <TableRowSkeleton colSpan={isAdmin ? 16 : 15} rows={5} />
                   ) : cars.length > 0 ? (
                     cars.map((car, index) => {
                       const formatDate = (dateStr: string | null | undefined): string => {
@@ -684,30 +679,12 @@ export default function CarsPage() {
                               )}
                             </td>
                           )}
-                          {isAdmin && (
-                            <td className="px-4 py-3 text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEditClick(car);
-                                  }}
-                                  title="Edit"
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </td>
-                          )}
                         </tr>
                       );
                     })
                   ) : (
                     <tr>
-                      <td colSpan={isAdmin ? 17 : 15} className="px-4 py-12 text-center">
+                      <td colSpan={isAdmin ? 16 : 15} className="px-4 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <p className="text-gray-400 text-lg">No cars found</p>
                           <p className="text-gray-500 text-sm">
