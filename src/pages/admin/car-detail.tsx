@@ -990,109 +990,115 @@ export default function CarDetailPage() {
                 Vehicle Information
               </CardTitle>
             </CardHeader>
-              <CardContent className="space-y-1.5">
-                <div className="grid grid-cols-3 gap-1.5">
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-4">
                 {/* Column 1 (Left) */}
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Make & Model</p>
-                    <p className="text-white text-base">{car.makeModel}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">VIN</p>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Make & Model</p>
+                    <p className="text-white text-base font-medium">{car.makeModel}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">VIN</p>
                     <p className="text-white text-base font-mono">{car.vin}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Oil Type</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Oil Type</p>
                     <p className="text-white text-base">{onboarding?.oilType ? formatValue(onboarding.oilType) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Fuel Type</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Fuel Type</p>
                     <p className="text-white text-base">{onboarding?.fuelType ? formatValue(onboarding.fuelType) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Interior Color</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Interior Color</p>
                     <p className="text-white text-base">{onboarding?.interiorColor ? formatValue(onboarding.interiorColor) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Vehicle Ownership</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Vehicle Ownership</p>
                     <p className="text-white text-base">{onboarding?.titleType ? formatValue(onboarding.titleType) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Vehicle Recall</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Vehicle Recall</p>
                     <p className="text-white text-base">{onboarding?.vehicleRecall ? formatValue(onboarding.vehicleRecall) : "N/A"}</p>
+                  </div>
                 </div>
 
                 {/* Column 2 (Middle) */}
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Year</p>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Year</p>
                     <p className="text-white text-base">{car.year || "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Tire Size</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Tire Size</p>
                     <p className="text-white text-base">{onboarding?.tireSize ? formatValue(onboarding.tireSize) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Free Oil Change</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Free Oil Change</p>
                     <p className="text-white text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Trim</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Trim</p>
                     <p className="text-white text-base">{onboarding?.vehicleTrim ? formatValue(onboarding.vehicleTrim) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Exterior Color</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Exterior Color</p>
                     <p className="text-white text-base">{onboarding?.exteriorColor ? formatValue(onboarding.exteriorColor) : (car.color || "N/A")}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Number of Doors</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Number of Doors</p>
                     <p className="text-white text-base">{onboarding?.numberOfDoors ? formatValue(onboarding.numberOfDoors) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Number of Seats</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Number of Seats</p>
                     <p className="text-white text-base">{onboarding?.numberOfSeats ? formatValue(onboarding.numberOfSeats) : "N/A"}</p>
+                  </div>
                 </div>
 
                 {/* Column 3 (Right) */}
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">License Plate</p>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">License Plate</p>
                     <p className="text-white text-base">{car.licensePlate || "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Registration Expiration</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Registration Expiration</p>
                     <p className="text-white text-base">{onboarding?.registrationExpiration ? formatValue(onboarding.registrationExpiration) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Last Oil Change</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Last Oil Change</p>
                     <p className="text-white text-base">{onboarding?.lastOilChange ? formatValue(onboarding.lastOilChange) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Mileage</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Mileage</p>
                     <p className="text-white text-base">{onboarding?.vehicleMiles ? formatValue(onboarding.vehicleMiles) : (car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A")}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Roof Rails</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Roof Rails</p>
                     <p className="text-white text-base">{onboarding?.roofRails ? formatValue(onboarding.roofRails) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Ski Crossbars</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Ski Crossbars</p>
                     <p className="text-white text-base">{onboarding?.skiCrossBars ? formatValue(onboarding.skiCrossBars) : "N/A"}</p>
-                </div>
-                <div style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Ski Rack</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Ski Rack</p>
                     <p className="text-white text-base">{onboarding?.skiRacks ? formatValue(onboarding.skiRacks) : "N/A"}</p>
-                </div>
-                {/* Features - Full width */}
-                <div className="col-span-3" style={{ paddingTop: '5px', paddingBottom: '5px' }}>
-                  <p className="text-xs text-gray-500 mb-1">Features</p>
-                    <p className="text-white text-base">
-                      {onboarding?.vehicleFeatures && Array.isArray(onboarding.vehicleFeatures) && onboarding.vehicleFeatures.length > 0
-                        ? onboarding.vehicleFeatures.join(", ")
-                        : (onboarding?.vehicleFeatures && typeof onboarding.vehicleFeatures === 'string'
-                          ? onboarding.vehicleFeatures
-                          : "N/A")}
-                    </p>
+                  </div>
                 </div>
               </div>
+                {/* Features - Full width */}
+                <div className="pt-4 border-t border-[#2a2a2a]">
+                  <p className="text-xs text-gray-500 mb-1">Features</p>
+                  <p className="text-white text-base">
+                    {onboarding?.vehicleFeatures && Array.isArray(onboarding.vehicleFeatures) && onboarding.vehicleFeatures.length > 0
+                      ? onboarding.vehicleFeatures.join(", ")
+                      : (onboarding?.vehicleFeatures && typeof onboarding.vehicleFeatures === 'string'
+                        ? onboarding.vehicleFeatures
+                        : "N/A")}
+                  </p>
+                </div>
                 <div className="pt-1.5 border-t border-[#2a2a2a]">
                   <div className="flex items-center gap-2">
                   <div>

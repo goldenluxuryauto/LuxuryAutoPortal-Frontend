@@ -347,6 +347,11 @@ export default function ClientDetailPage() {
         phone: data.phoneOwner,
         birthday: data.birthday,
         tshirtSize: data.tshirtSize,
+        ssn: data.ssn,
+        representative: data.representative,
+        heardAboutUs: data.heardAboutUs,
+        emergencyContactName: data.emergencyContactName,
+        emergencyContactPhone: data.emergencyContactPhone,
         streetAddress: data.streetAddress,
         city: data.city,
         state: data.state,
@@ -358,8 +363,11 @@ export default function ClientDetailPage() {
         licensePlate: data.licensePlate,
         vehicleMiles: data.vehicleMiles,
         bankName: data.bankName,
+        taxClassification: data.taxClassification,
         bankRoutingNumber: data.routingNumber,
         bankAccountNumber: data.accountNumber,
+        businessName: data.businessName,
+        ein: data.ein,
         // Financial Information
         purchasePrice: data.purchasePrice,
         downPayment: data.downPayment,
@@ -568,6 +576,11 @@ export default function ClientDetailPage() {
         phoneOwner: data.phoneOwner || "",
         birthday: data.birthday || "",
         tshirtSize: data.tshirtSize || "",
+        ssn: data.ssn || "",
+        representative: data.representative || "",
+        heardAboutUs: data.heardAboutUs || "",
+        emergencyContactName: data.emergencyContactName || "",
+        emergencyContactPhone: data.emergencyContactPhone || "",
         streetAddress: data.streetAddress || "",
         city: data.city || "",
         state: data.state || "",
@@ -579,8 +592,11 @@ export default function ClientDetailPage() {
         licensePlate: data.licensePlate || "",
         vehicleMiles: data.vehicleMiles || "",
         bankName: data.bankName || "",
+        taxClassification: data.taxClassification || "",
         routingNumber: data.routingNumber || "",
         accountNumber: data.accountNumber || "",
+        businessName: data.businessName || "",
+        ein: data.ein || "",
         // Financial Information
         purchasePrice: data.purchasePrice || "",
         downPayment: data.downPayment || "",
@@ -606,6 +622,11 @@ export default function ClientDetailPage() {
         phoneOwner: client?.phone || "",
         birthday: "",
         tshirtSize: "",
+        ssn: "",
+        representative: "",
+        heardAboutUs: "",
+        emergencyContactName: "",
+        emergencyContactPhone: "",
         streetAddress: "",
         city: "",
         state: "",
@@ -617,8 +638,11 @@ export default function ClientDetailPage() {
         licensePlate: "",
         vehicleMiles: "",
         bankName: client?.bankName || "",
+        taxClassification: "",
         routingNumber: client?.bankRoutingNumber || "",
         accountNumber: client?.bankAccountNumber || "",
+        businessName: "",
+        ein: "",
         // Financial Information
         purchasePrice: "",
         downPayment: "",
@@ -1940,6 +1964,46 @@ export default function ClientDetailPage() {
                     className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
                   />
                 </div>
+                <div>
+                  <Label className="text-gray-400">SSN</Label>
+                  <Input
+                    value={editFormData.ssn || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, ssn: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Representative</Label>
+                  <Input
+                    value={editFormData.representative || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, representative: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">How Did You Hear About Us</Label>
+                  <Input
+                    value={editFormData.heardAboutUs || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, heardAboutUs: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Emergency Contact Name</Label>
+                  <Input
+                    value={editFormData.emergencyContactName || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, emergencyContactName: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Emergency Contact Phone</Label>
+                  <Input
+                    value={editFormData.emergencyContactPhone || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, emergencyContactPhone: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
               </div>
             </div>
 
@@ -1984,10 +2048,10 @@ export default function ClientDetailPage() {
               </div>
             </div>
 
-            {/* Banking Information */}
+            {/* Banking Information (ACH) */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
-                Banking Information
+                Banking Information (ACH)
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -1997,6 +2061,21 @@ export default function ClientDetailPage() {
                     onChange={(e) => setEditFormData({ ...editFormData, bankName: e.target.value })}
                     className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
                   />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Tax Classification</Label>
+                  <Select
+                    value={editFormData.taxClassification || ""}
+                    onValueChange={(value) => setEditFormData({ ...editFormData, taxClassification: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select tax classification" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="individual">Individual</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-gray-400">Routing Number</Label>
@@ -2014,6 +2093,24 @@ export default function ClientDetailPage() {
                     className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
                   />
                 </div>
+                <div>
+                  <Label className="text-gray-400">Business Name</Label>
+                  <Input
+                    value={editFormData.businessName || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, businessName: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                {editFormData.taxClassification === "business" && (
+                  <div>
+                    <Label className="text-gray-400">EIN</Label>
+                    <Input
+                      value={editFormData.ein || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, ein: e.target.value })}
+                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
