@@ -31,6 +31,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CarDetail {
   id: number;
@@ -56,6 +63,7 @@ interface CarDetail {
   photos?: string[];
   turoLink?: string | null;
   adminTuroLink?: string | null;
+  managementStatus?: "management" | "own" | "off_ride";
 }
 
 const carSchema = z.object({
@@ -104,6 +112,8 @@ const carSchema = z.object({
   // Car Links
   turoLink: z.string().optional(),
   adminTuroLink: z.string().optional(),
+  // Management Status (admin-only)
+  managementStatus: z.enum(["management", "own", "off_ride"]).optional(),
   // Documents
   insuranceCardUrl: z.string().optional(),
   driversLicenseUrls: z.string().optional(), // JSON string array
@@ -348,6 +358,7 @@ export default function CarDetailPage() {
       password: "",
       turoLink: "",
       adminTuroLink: "",
+      managementStatus: "own",
       insuranceCardUrl: "",
       driversLicenseUrls: "",
     },
@@ -411,6 +422,10 @@ export default function CarDetailPage() {
       // Car Links - Always send all fields to ensure backend can update them
       formData.append("turoLink", data.turoLink || "");
       formData.append("adminTuroLink", data.adminTuroLink || "");
+      // Management Status (admin-only) - Only send if admin and value is provided
+      if (isAdmin && data.managementStatus) {
+        formData.append("managementStatus", data.managementStatus);
+      }
       
       // Documents - Handle file uploads using state
       if (insuranceCardFile instanceof File) {
@@ -727,6 +742,8 @@ export default function CarDetailPage() {
       // Car Links
       turoLink: car.turoLink || "",
       adminTuroLink: car.adminTuroLink || "",
+      // Management Status
+      managementStatus: (car.managementStatus || "own") as "management" | "own" | "off_ride",
       // Documents
       insuranceCardUrl: onboarding?.insuranceCardUrl || "",
       driversLicenseUrls: onboarding?.driversLicenseUrls ? (Array.isArray(onboarding.driversLicenseUrls) ? JSON.stringify(onboarding.driversLicenseUrls) : onboarding.driversLicenseUrls) : "",
@@ -1015,14 +1032,14 @@ export default function CarDetailPage() {
                     <p className="text-xs text-gray-500 mb-1">Make & Model</p>
                     <p className="text-white text-base font-medium">{car.makeModel}</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">VIN</p>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">VIN</p>
                     <p className="text-white text-base font-mono">{car.vin}</p>
-                  </div>
-                  <div>
+                </div>
+                <div>
                     <p className="text-xs text-gray-500 mb-1">Oil Type</p>
                     <p className="text-white text-base">{onboarding?.oilType ? formatValue(onboarding.oilType) : "N/A"}</p>
-                  </div>
+                </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Fuel Type</p>
                     <p className="text-white text-base">{onboarding?.fuelType ? formatValue(onboarding.fuelType) : "N/A"}</p>
@@ -1043,14 +1060,14 @@ export default function CarDetailPage() {
 
                 {/* Column 2 (Middle) */}
                 <div className="space-y-4">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Year</p>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Year</p>
                     <p className="text-white text-base">{car.year || "N/A"}</p>
-                  </div>
-                  <div>
+                </div>
+                <div>
                     <p className="text-xs text-gray-500 mb-1">Tire Size</p>
                     <p className="text-white text-base">{onboarding?.tireSize ? formatValue(onboarding.tireSize) : "N/A"}</p>
-                  </div>
+                </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Free Oil Change</p>
                     <p className="text-white text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
@@ -1075,10 +1092,10 @@ export default function CarDetailPage() {
 
                 {/* Column 3 (Right) */}
                 <div className="space-y-4">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">License Plate</p>
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">License Plate</p>
                     <p className="text-white text-base">{car.licensePlate || "N/A"}</p>
-                  </div>
+                </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Registration Expiration</p>
                     <p className="text-white text-base">{onboarding?.registrationExpiration ? formatValue(onboarding.registrationExpiration) : "N/A"}</p>
@@ -1115,7 +1132,7 @@ export default function CarDetailPage() {
                         ? onboarding.vehicleFeatures
                         : "N/A")}
                   </p>
-                </div>
+              </div>
                 <div className="pt-1.5 border-t border-[#2a2a2a]">
                   <div className="flex items-center gap-2">
                   <div>
@@ -1193,8 +1210,8 @@ export default function CarDetailPage() {
                 <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
                   <Car className="w-5 h-5" />
                   Car Photos
-                </CardTitle>
-              </CardHeader>
+              </CardTitle>
+            </CardHeader>
               <CardContent className="flex-1 flex flex-col">
                 {car.photos && car.photos.length > 0 ? (
                   <div className="space-y-2 flex-1 flex flex-col">
@@ -1222,7 +1239,7 @@ export default function CarDetailPage() {
                                 (e.target as HTMLImageElement).style.display = 'none';
                               }}
                             />
-          </div>
+                </div>
                         );
                       })}
                       
@@ -1245,7 +1262,7 @@ export default function CarDetailPage() {
                             <span className="text-white text-sm font-medium">
                               {carouselIndex + 1} / {car.photos.length}
                             </span>
-                          </div>
+                  </div>
                           
                           {/* Next Button */}
                           <Button
@@ -1257,9 +1274,9 @@ export default function CarDetailPage() {
                           >
                             <ChevronRight className="w-5 h-5" />
                           </Button>
-                        </div>
+                  </div>
                       )}
-                    </div>
+                  </div>
 
                     {/* Circular Indicator Dots */}
                     {car.photos.length > 1 && (
@@ -1277,27 +1294,27 @@ export default function CarDetailPage() {
                             aria-label={`Go to image ${index + 1}`}
                           />
                         ))}
-                      </div>
-                    )}
                   </div>
-                  ) : (
+                    )}
+                </div>
+              ) : (
                     <div className="flex items-center justify-center flex-1 bg-black/20 rounded-lg border border-[#2a2a2a]">
                       <p className="text-gray-400 text-center">
                         No photos available
                       </p>
-                    </div>
-                  )}
-              </CardContent>
-            </Card>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
             {/* Car Links Card */}
             <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
-              <CardHeader>
+            <CardHeader>
                 <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
                   <Car className="w-5 h-5" />
                   Car Links
-                </CardTitle>
-              </CardHeader>
+              </CardTitle>
+            </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-4">
                   <div>
@@ -1318,7 +1335,7 @@ export default function CarDetailPage() {
                     )}
                   </div>
                   {isAdmin && (
-                    <div>
+                  <div>
                       <p className="text-xs text-gray-500 mb-1">Admin Turo Link</p>
                       {car.adminTuroLink ? (
                         <p className="text-white text-base break-all">
@@ -1331,14 +1348,14 @@ export default function CarDetailPage() {
                             {formatValue(car.adminTuroLink)}
                           </a>
                         </p>
-                      ) : (
+              ) : (
                         <p className="text-gray-500 text-base">Not provided</p>
                       )}
-                    </div>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
+              )}
+                </div>
+            </CardContent>
+          </Card>
           </div>
         </div>
 
@@ -1631,17 +1648,17 @@ export default function CarDetailPage() {
               {isLoadingOnboarding ? (
                 <div className="text-center py-4 text-gray-400">
                   <p className="text-sm">Loading...</p>
-                </div>
+        </div>
               ) : onboarding ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Provider</p>
                     <p className="text-white text-base">{formatValue(onboarding.insuranceProvider)}</p>
-                  </div>
+                        </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Phone</p>
                     <p className="text-white text-base">{formatValue(onboarding.insurancePhone)}</p>
-                  </div>
+                      </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Policy Number</p>
                     <p className="text-white text-base font-mono">{formatValue(onboarding.policyNumber)}</p>
@@ -1649,13 +1666,13 @@ export default function CarDetailPage() {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Expiration</p>
                     <p className="text-white text-base">{formatValue(onboarding.insuranceExpiration)}</p>
-                  </div>
+                    </div>
                 </div>
-              ) : (
+                ) : (
                 <div className="text-center py-4 text-gray-400">
                   <p className="text-sm">No insurance information available</p>
-                </div>
-              )}
+                  </div>
+                )}
             </CardContent>
           </Card>
 
@@ -2626,6 +2643,44 @@ export default function CarDetailPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Management Status Section (Admin Only) */}
+                {isAdmin && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                      Management Status
+                    </h3>
+                    <FormField
+                      control={form.control}
+                      name="managementStatus"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Management Status</FormLabel>
+                          <FormControl>
+                            <Select
+                              value={field.value || "own"}
+                              onValueChange={field.onChange}
+                              disabled={!isAdmin}
+                            >
+                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                                <SelectValue placeholder="Select management status" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                                <SelectItem value="management">Management</SelectItem>
+                                <SelectItem value="own">Own</SelectItem>
+                                <SelectItem value="off_ride">Off Ride</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                          <p className="text-xs text-gray-500">
+                            Only admins can change management status. Automatic updates occur on onboarding approval, offboarding, and maintenance events.
+                          </p>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
 
                 {/* Documents Section */}
                 <div className="space-y-6">

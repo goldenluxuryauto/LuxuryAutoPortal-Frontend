@@ -86,7 +86,7 @@ export default function TrainingManualPage() {
   const [videoError, setVideoError] = useState<string | null>(null);
   const [videoValid, setVideoValid] = useState<boolean | null>(null);
   const [selectedRole, setSelectedRole] = useState<'admin' | 'client' | 'employee'>('client');
-  
+
   // Video state for each step (for inline video display)
   const [stepVideoStates, setStepVideoStates] = useState<Record<number, { loading: boolean; error: boolean }>>({});
   
@@ -795,30 +795,30 @@ export default function TrainingManualPage() {
                               ) : (
                                 moduleSteps.map((step: TutorialStep) => (
                                   <Card key={step.id} className="bg-[#0f0f0f] border-[#2a2a2a] hover:border-[#EAEB80]/30 transition-colors">
-                                    <CardContent className="p-6">
-                                      <div className="flex items-start justify-between gap-4">
-                                        <div className="flex-1 space-y-4">
-                                          {/* Step Header */}
-                                          <div className="flex items-center gap-3">
-                                            <Badge variant="outline" className="bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/30 text-sm font-semibold px-3 py-1">
-                                              Step {step.id}
-                                            </Badge>
-                                            <h3 className="text-xl font-semibold text-white">{step.title}</h3>
-                                          </div>
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 space-y-4">
+                            {/* Step Header */}
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className="bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/30 text-sm font-semibold px-3 py-1">
+                                Step {step.id}
+                              </Badge>
+                              <h3 className="text-xl font-semibold text-white">{step.title}</h3>
+                            </div>
 
-                                          {/* Description */}
-                                          <div>
-                                            <p className="text-sm font-medium text-gray-300 mb-1">Description:</p>
-                                            <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
-                                          </div>
+                            {/* Description */}
+                            <div>
+                              <p className="text-sm font-medium text-gray-300 mb-1">Description:</p>
+                              <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
+                            </div>
 
                                           {/* Video Display */}
-                                          {(step.videoUrl || step.videoPlaceholder) && (
-                                            <div className="space-y-3">
-                                              <div className="flex items-center gap-2">
-                                                <Video className="w-4 h-4 text-[#EAEB80]" />
+                            {(step.videoUrl || step.videoPlaceholder) && (
+                              <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                  <Video className="w-4 h-4 text-[#EAEB80]" />
                                                 <p className="text-sm font-medium text-gray-300">Video:</p>
-                                              </div>
+                                </div>
                                               
                                               {/* Video Player */}
                                               {step.videoUrl ? (
@@ -905,83 +905,83 @@ export default function TrainingManualPage() {
                                               
                                               {/* Video URL Info (if video is available) */}
                                               {step.videoUrl && !stepVideoStates[step.id]?.error && (
-                                                <div className="space-y-2">
-                                                  <div>
-                                                    <p className="text-xs text-gray-500 mb-1">Video URL:</p>
-                                                    <div className="flex items-center gap-2">
-                                                      <p className="text-xs text-gray-400 break-all bg-[#0a0a0a] p-2 rounded border border-[#2a2a2a] flex-1">
-                                                        {step.videoUrl}
-                                                      </p>
-                                                      <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => {
-                                                          window.open(step.videoUrl, "_blank");
-                                                        }}
-                                                        className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
-                                                        title="Open video in new tab"
-                                                      >
-                                                        <PlayCircle className="w-4 h-4" />
-                                                      </Button>
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              )}
-                                            </div>
-                                          )}
+                                  <div className="space-y-2">
+                                    <div>
+                                      <p className="text-xs text-gray-500 mb-1">Video URL:</p>
+                                      <div className="flex items-center gap-2">
+                                        <p className="text-xs text-gray-400 break-all bg-[#0a0a0a] p-2 rounded border border-[#2a2a2a] flex-1">
+                                          {step.videoUrl}
+                                        </p>
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => {
+                                            window.open(step.videoUrl, "_blank");
+                                          }}
+                                          className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                                          title="Open video in new tab"
+                                        >
+                                          <PlayCircle className="w-4 h-4" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
 
-                                          {/* Instructions */}
-                                          {step.instructions && step.instructions.length > 0 && (
-                                            <div>
-                                              <p className="text-sm font-medium text-gray-300 mb-2">
-                                                Instructions ({step.instructions.length}):
-                                              </p>
-                                              <ul className="list-disc list-inside text-sm text-gray-400 space-y-1.5 bg-[#0a0a0a] p-3 rounded border border-[#2a2a2a]">
-                                                {step.instructions.map((instruction, idx) => (
-                                                  <li key={idx} className="leading-relaxed">{instruction}</li>
-                                                ))}
-                                              </ul>
-                                            </div>
-                                          )}
+                            {/* Instructions */}
+                            {step.instructions && step.instructions.length > 0 && (
+                              <div>
+                                <p className="text-sm font-medium text-gray-300 mb-2">
+                                  Instructions ({step.instructions.length}):
+                                </p>
+                                <ul className="list-disc list-inside text-sm text-gray-400 space-y-1.5 bg-[#0a0a0a] p-3 rounded border border-[#2a2a2a]">
+                                  {step.instructions.map((instruction, idx) => (
+                                    <li key={idx} className="leading-relaxed">{instruction}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
 
-                                          {/* Action Button */}
-                                          {step.actionButton && (
-                                            <div>
-                                              <p className="text-sm font-medium text-gray-300 mb-1">Action Button:</p>
-                                              <div className="flex items-center gap-2 bg-[#0a0a0a] p-2 rounded border border-[#2a2a2a]">
-                                                <Badge variant="outline" className="bg-[#EAEB80]/10 text-[#EAEB80] border-[#EAEB80]/30">
-                                                  {step.actionButton.label}
-                                                </Badge>
-                                                {step.actionButton.href && (
-                                                  <span className="text-xs text-gray-400">
-                                                    → {step.actionButton.href}
-                                                  </span>
-                                                )}
-                                              </div>
-                                            </div>
-                                          )}
-                                        </div>
+                            {/* Action Button */}
+                            {step.actionButton && (
+                              <div>
+                                <p className="text-sm font-medium text-gray-300 mb-1">Action Button:</p>
+                                <div className="flex items-center gap-2 bg-[#0a0a0a] p-2 rounded border border-[#2a2a2a]">
+                                  <Badge variant="outline" className="bg-[#EAEB80]/10 text-[#EAEB80] border-[#EAEB80]/30">
+                                    {step.actionButton.label}
+                                  </Badge>
+                                  {step.actionButton.href && (
+                                    <span className="text-xs text-gray-400">
+                                      → {step.actionButton.href}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
 
-                                        {/* Action Buttons */}
-                                        <div className="flex flex-col items-center gap-2 pt-1">
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleEditClick(step)}
-                                            className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 border border-[#EAEB80]/20"
-                                            title="Edit Step"
-                                          >
-                                            <Edit className="w-4 h-4 mr-2" />
-                                            Edit
-                                          </Button>
-                                          <ConfirmDialog
-                                            trigger={
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-red-400 hover:text-red-500 hover:bg-red-500/10 border border-red-500/20"
-                                                title="Delete Step"
+                          {/* Action Buttons */}
+                          <div className="flex flex-col items-center gap-2 pt-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditClick(step)}
+                              className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 border border-[#EAEB80]/20"
+                              title="Edit Step"
+                            >
+                              <Edit className="w-4 h-4 mr-2" />
+                              Edit
+                            </Button>
+                            <ConfirmDialog
+                              trigger={
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-400 hover:text-red-500 hover:bg-red-500/10 border border-red-500/20"
+                                  title="Delete Step"
                                                 disabled={deleteMutation.isPending && deletingStepId === step.id}
                                               >
                                                 {deleteMutation.isPending && deletingStepId === step.id ? (
@@ -1183,31 +1183,31 @@ export default function TrainingManualPage() {
                                           variant="ghost"
                                           size="sm"
                                           className="text-red-400 hover:text-red-500 hover:bg-red-500/10 border border-red-500/20"
-                                          disabled={deleteMutation.isPending && deletingStepId === step.id}
-                                        >
-                                          {deleteMutation.isPending && deletingStepId === step.id ? (
-                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                          ) : (
-                                            <Trash2 className="w-4 h-4 mr-2" />
-                                          )}
-                                          Delete
-                                        </Button>
-                                      }
-                                      title="Delete Tutorial Step"
-                                      description={`Are you sure you want to delete "${step.title}"? This action cannot be undone.`}
-                                      confirmText="Delete"
-                                      cancelText="Cancel"
-                                      variant="destructive"
-                                      onConfirm={() => {
-                                        setDeletingStepId(step.id);
-                                        deleteMutation.mutate(step.id);
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                              </CardContent>
-                            </Card>
-                            ))}
+                                  disabled={deleteMutation.isPending && deletingStepId === step.id}
+                                >
+                                  {deleteMutation.isPending && deletingStepId === step.id ? (
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                  )}
+                                  Delete
+                                </Button>
+                              }
+                              title="Delete Tutorial Step"
+                              description={`Are you sure you want to delete "${step.title}"? This action cannot be undone.`}
+                              confirmText="Delete"
+                              cancelText="Cancel"
+                              variant="destructive"
+                              onConfirm={() => {
+                                setDeletingStepId(step.id);
+                                deleteMutation.mutate(step.id);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                           </div>
                         </CardContent>
                       </Card>

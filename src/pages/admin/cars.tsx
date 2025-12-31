@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, buildApiUrl } from "@/lib/queryClient";
+import { cn } from "@/lib/utils";
 import { Plus, Edit, Search, X, ExternalLink } from "lucide-react";
 import { TableRowSkeleton } from "@/components/ui/skeletons";
 import { Textarea } from "@/components/ui/textarea";
@@ -79,6 +80,8 @@ interface Car {
   contactPhone?: string | null;
   turoLink?: string | null;
   adminTuroLink?: string | null;
+  isActive?: number; // car_is_active value: 0=management, 1=own, 2=off_ride, 3=off_ride
+  managementStatus?: "management" | "own" | "off_ride";
   owner?: {
     firstName: string;
     lastName: string;
@@ -557,11 +560,32 @@ export default function CarsPage() {
                         }
                       };
 
-                      // Determine Management value based on owner name
-                      const ownerFullName = car.owner 
-                        ? `${car.owner.firstName || ''} ${car.owner.lastName || ''}`.trim()
-                        : '';
-                      const managementValue = ownerFullName === "Jay Barton" ? "Own" : "Manage";
+                      // Get Management status from car_is_active value
+                      // Mapping: 0 = management, 1 = own, 2 = off_ride, 3 = off_ride
+                      const getManagementStatusFromIsActive = (isActive?: number): "management" | "own" | "off_ride" => {
+                        if (isActive === undefined || isActive === null) return "own"; // Default fallback
+                        if (isActive === 0) return "own";
+                        if (isActive === 1) return "management";
+                        if (isActive === 2 || isActive === 3) return "off_ride";
+                        return "own"; // Default fallback
+                      };
+                      
+                      const getManagementDisplay = (status: "management" | "own" | "off_ride") => {
+                        switch (status) {
+                          case "management":
+                            return "Management";
+                          case "own":
+                            return "Own";
+                          case "off_ride":
+                            return "Off Ride";
+                          default:
+                            return "Own";
+                        }
+                      };
+                      
+                      // Derive management status from car_is_active
+                      const derivedManagementStatus = getManagementStatusFromIsActive(car.isActive);
+                      const managementValue = getManagementDisplay(derivedManagementStatus);
 
                       // Create unique key to avoid duplicate key warnings
                       // Use combination of id, index, and vin to ensure uniqueness
@@ -599,8 +623,19 @@ export default function CarsPage() {
                               View Stats
                             </a>
                           </td>
-                          <td className="text-left text-white text-sm px-4 py-3 align-middle">
+                          <td className="text-left px-4 py-3 align-middle">
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                derivedManagementStatus === "management"
+                                  ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                                  : derivedManagementStatus === "off_ride"
+                                  ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                                  : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                              )}
+                            >
                             {managementValue}
+                            </Badge>
                           </td>
                           <td className="text-left px-4 py-3 align-middle">
                             {car.owner ? (
