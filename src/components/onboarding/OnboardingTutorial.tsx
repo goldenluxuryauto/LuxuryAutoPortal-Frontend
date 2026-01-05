@@ -156,18 +156,33 @@ function useTutorialModules(role: 'admin' | 'client' | 'employee' = 'client') {
   return useQuery<TutorialModule[]>({
     queryKey: ["/api/tutorial/modules", role],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl(`/api/tutorial/modules?role=${role}`), {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        console.warn("Failed to fetch tutorial modules");
+      try {
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
+        const response = await fetch(buildApiUrl(`/api/tutorial/modules?role=${role}`), {
+          credentials: "include",
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          console.warn("Failed to fetch tutorial modules");
+          return [];
+        }
+        const data = await response.json();
+        return data.success ? data.data : [];
+      } catch (error) {
+        // If fetch fails (network error, timeout, etc.), return empty array
+        console.warn("⚠️ [TUTORIAL] Failed to fetch tutorial modules (non-critical):", error);
         return [];
       }
-      const data = await response.json();
-      return data.success ? data.data : [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 1,
+    retry: false, // Don't retry to prevent blocking
+    throwOnError: false, // Don't throw errors
   });
 }
 
@@ -176,18 +191,33 @@ function useTutorialStepsWithModules(role: 'admin' | 'client' | 'employee' = 'cl
   return useQuery<{ modules: Array<TutorialModule & { steps: TutorialStep[] }> }>({
     queryKey: ["/api/tutorial/steps", role, "with-modules"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${role}&includeModules=true`), {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        console.warn("Failed to fetch tutorial steps with modules, using defaults");
+      try {
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
+        const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${role}&includeModules=true`), {
+          credentials: "include",
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          console.warn("Failed to fetch tutorial steps with modules, using defaults");
+          return { modules: [] };
+        }
+        const data = await response.json();
+        return data.success ? data.data : { modules: [] };
+      } catch (error) {
+        // If fetch fails (network error, timeout, etc.), return empty modules
+        console.warn("⚠️ [TUTORIAL] Failed to fetch tutorial steps with modules (non-critical):", error);
         return { modules: [] };
       }
-      const data = await response.json();
-      return data.success ? data.data : { modules: [] };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 1,
+    retry: false, // Don't retry to prevent blocking
+    throwOnError: false, // Don't throw errors
   });
 }
 
@@ -196,34 +226,49 @@ function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
   return useQuery<TutorialStep[]>({
     queryKey: ["/api/tutorial/steps", role],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${role}`), {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        console.warn("Failed to fetch tutorial steps, using defaults");
+      try {
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
+        const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${role}`), {
+          credentials: "include",
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          console.warn("Failed to fetch tutorial steps, using defaults");
+          return DEFAULT_TUTORIAL_STEPS;
+        }
+        const data = await response.json();
+        // Handle both response formats: { success: true, data: [...] } or { success: true, data: { modules: [...] } }
+        if (data.success) {
+          if (Array.isArray(data.data)) {
+          return data.data;
+          } else if (data.data.modules) {
+            // Flatten modules into steps
+            const allSteps: TutorialStep[] = [];
+            data.data.modules.forEach((module: any) => {
+              if (module.steps && Array.isArray(module.steps)) {
+                allSteps.push(...module.steps);
+              }
+            });
+            return allSteps.length > 0 ? allSteps : DEFAULT_TUTORIAL_STEPS;
+          }
+        }
+        return DEFAULT_TUTORIAL_STEPS;
+      } catch (error) {
+        // If fetch fails (network error, timeout, etc.), return default steps
+        console.warn("⚠️ [TUTORIAL] Failed to fetch tutorial steps (non-critical):", error);
         return DEFAULT_TUTORIAL_STEPS;
       }
-      const data = await response.json();
-      // Handle both response formats: { success: true, data: [...] } or { success: true, data: { modules: [...] } }
-      if (data.success) {
-        if (Array.isArray(data.data)) {
-          return data.data;
-        } else if (data.data.modules) {
-          // Flatten modules into steps
-          const allSteps: TutorialStep[] = [];
-          data.data.modules.forEach((module: any) => {
-            if (module.steps && Array.isArray(module.steps)) {
-              allSteps.push(...module.steps);
-            }
-          });
-          return allSteps.length > 0 ? allSteps : DEFAULT_TUTORIAL_STEPS;
-        }
-      }
-      return DEFAULT_TUTORIAL_STEPS;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 1,
+    retry: false, // Don't retry to prevent blocking
     placeholderData: DEFAULT_TUTORIAL_STEPS,
+    throwOnError: false, // Don't throw errors
   });
 }
 
@@ -259,17 +304,17 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
         
-        const response = await fetch(buildApiUrl("/api/auth/me"), {
-          credentials: "include",
+      const response = await fetch(buildApiUrl("/api/auth/me"), {
+        credentials: "include",
           signal: controller.signal,
-        });
+      });
         
         clearTimeout(timeoutId);
         
-        if (!response.ok) {
-          return { user: undefined };
-        }
-        return response.json();
+      if (!response.ok) {
+        return { user: undefined };
+      }
+      return response.json();
       } catch (error) {
         // If fetch fails (network error, timeout, etc.), return undefined user
         // This prevents the app from being blocked
@@ -755,7 +800,7 @@ export function OnboardingTutorial({
               </>
             ) : (
               <>
-                Step {currentStep} of {tutorialSteps.length}
+            Step {currentStep} of {tutorialSteps.length}
               </>
             )}
           </DialogDescription>

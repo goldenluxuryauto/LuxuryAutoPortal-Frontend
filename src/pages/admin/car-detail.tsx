@@ -48,6 +48,7 @@ interface CarDetail {
   color?: string;
   mileage: number;
   status: "ACTIVE" | "INACTIVE";
+  rawStatus?: "pending" | "available" | "in_use" | "maintenance" | "off_fleet"; // Raw database status
   offboardReason?: "sold" | "damaged" | "end_lease" | "other" | null;
   offboardNote?: string | null;
   offboardAt?: string | null;
@@ -1148,10 +1149,32 @@ export default function CarDetailPage() {
                         : String(car.status).replace("_", " ").toUpperCase()}
                     </Badge>
                   </div>
-                  {car.owner && (
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Assigned To</p>
-                      {car.clientId ? (
+                    {/* Display maintenance status if car is in maintenance */}
+                    {car.rawStatus === "maintenance" ? (
+                      <div>
+                        <Badge
+                          variant="outline"
+                          className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                        >
+                          Maintenance
+                        </Badge>
+                        {car.owner && (
+                          <div className="mt-2">
+                            <p className="text-white text-sm">
+                              {car.owner.firstName} {car.owner.lastName}
+                            </p>
+                            {car.owner.email && (
+                              <p className="text-gray-400 text-xs">
+                                {car.owner.email}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : car.owner ? (
+                      car.clientId ? (
                         <button
                           onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
                           className="text-left hover:text-[#EAEB80] transition-colors"
@@ -1176,9 +1199,11 @@ export default function CarDetailPage() {
                             </p>
                           )}
                         </>
+                      )
+                    ) : (
+                      <p className="text-gray-500 text-sm">Unassigned</p>
                       )}
                     </div>
-                  )}
                 </div>
               </div>
               {car.offboardAt && (

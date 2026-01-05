@@ -157,6 +157,11 @@ export default function ClientsPage() {
         credentials: "include",
       });
       if (!response.ok) {
+        // Handle 401 Unauthorized - redirect to login
+        if (response.status === 401) {
+          setLocation("/admin/login");
+          throw new Error("Unauthorized - Please log in");
+        }
         const errorData = await response.json().catch(() => ({ error: "Database connection failed" }));
         throw new Error(errorData.error || "Failed to fetch clients");
       }
@@ -806,18 +811,36 @@ export default function ClientsPage() {
                     <TableRow>
                       <TableCell colSpan={10} className="text-center py-8">
                         <div className="flex flex-col items-center gap-3">
-                          <p className="text-red-400">
-                            {error instanceof Error ? error.message : "Database connection failed. Please try again."}
-                          </p>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => refetch()}
-                            className="border-[#EAEB80] text-[#EAEB80] hover:bg-[#EAEB80]/10"
-                          >
-                            <RefreshCw className="w-4 h-4 mr-2" />
-                            Retry
-                          </Button>
+                          {error instanceof Error && error.message.includes("Unauthorized") ? (
+                            <>
+                              <p className="text-red-400">
+                                Please log in to view this page.
+                              </p>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setLocation("/admin/login")}
+                                className="border-[#EAEB80] text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                              >
+                                Go to Login
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-red-400">
+                                {error instanceof Error ? error.message : "Database connection failed. Please try again."}
+                              </p>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => refetch()}
+                                className="border-[#EAEB80] text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                              >
+                                <RefreshCw className="w-4 h-4 mr-2" />
+                                Retry
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -927,7 +950,7 @@ export default function ClientsPage() {
                                   {revokeAccessMutation.isPending && revokeClientEmail === client.email ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
                                   ) : (
-                                    <Lock className="w-4 h-4" />
+                                  <Lock className="w-4 h-4" />
                                   )}
                                 </Button>
                               ) : client.status === 1 ? (
