@@ -43,7 +43,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
-import { Plus, Edit, Search, X, ExternalLink, RefreshCw } from "lucide-react";
+import { Plus, Edit, Search, X, ExternalLink } from "lucide-react";
 import { TableRowSkeleton } from "@/components/ui/skeletons";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -174,7 +174,7 @@ export default function CarsPage() {
     },
   });
 
-  const { data: carsData, isLoading, error } = useQuery<{
+  const { data: carsData, isLoading } = useQuery<{
     success: boolean;
     data: Car[];
     pagination?: {
@@ -201,11 +201,6 @@ export default function CarsPage() {
         credentials: "include",
       });
       if (!response.ok) {
-        // Handle 401 Unauthorized - redirect to login
-        if (response.status === 401) {
-          setLocation("/admin/login");
-          throw new Error("Unauthorized - Please log in");
-        }
         const errorData = await response
           .json()
           .catch(() => ({ error: "Database connection failed" }));
@@ -550,43 +545,6 @@ export default function CarsPage() {
                 <tbody className="divide-y divide-[#2a2a2a]">
                   {isLoading ? (
                     <TableRowSkeleton colSpan={isAdmin ? 16 : 15} rows={5} />
-                  ) : error ? (
-                    <tr>
-                      <td colSpan={isAdmin ? 16 : 15} className="px-4 py-12 text-center">
-                        <div className="flex flex-col items-center gap-3">
-                          {error instanceof Error && error.message.includes("Unauthorized") ? (
-                            <>
-                              <p className="text-red-400 text-lg">
-                                Please log in to view this page.
-                              </p>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setLocation("/admin/login")}
-                                className="border-[#EAEB80] text-[#EAEB80] hover:bg-[#EAEB80]/10"
-                              >
-                                Go to Login
-                              </Button>
-                            </>
-                          ) : (
-                            <>
-                              <p className="text-red-400 text-lg">
-                                {error instanceof Error ? error.message : "Failed to load cars. Please try again."}
-                              </p>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => window.location.reload()}
-                                className="border-[#EAEB80] text-[#EAEB80] hover:bg-[#EAEB80]/10"
-                              >
-                                <RefreshCw className="w-4 h-4 mr-2" />
-                                Retry
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
                   ) : cars.length > 0 ? (
                     cars.map((car, index) => {
                       const formatDate = (dateStr: string | null | undefined): string => {
