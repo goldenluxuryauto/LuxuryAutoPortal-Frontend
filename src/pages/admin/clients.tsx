@@ -783,20 +783,20 @@ export default function ClientsPage() {
         {/* Clients Table */}
         <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <Table className="min-w-[1000px]">
                 <TableHeader>
                   <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                    <TableHead className="text-center text-[#EAEB80] font-medium px-6 py-4 w-16">No</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 min-w-[200px]">Full Name</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 min-w-[180px]">Email</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 min-w-[140px]">Phone</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 w-32">Role</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 w-28">Status</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 min-w-[140px]">Joined Date</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-6 py-4 min-w-[120px]">Online Status</TableHead>
-                    <TableHead className="text-center text-[#EAEB80] font-medium px-6 py-4 w-32">Counts of Cars</TableHead>
-                    <TableHead className="text-center text-[#EAEB80] font-medium px-6 py-4 w-28">Actions</TableHead>
+                    <TableHead className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-12 sm:w-16 text-[10px] sm:text-xs">No</TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[150px] sm:min-w-[200px] text-[10px] sm:text-xs">Full Name</TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] sm:min-w-[180px] text-[10px] sm:text-xs hidden lg:table-cell">Email</TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden xl:table-cell">Phone</TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs">Role</TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Status</TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden md:table-cell">Joined Date</TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[120px] text-[10px] sm:text-xs">Online Status</TableHead>
+                    <TableHead className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs hidden lg:table-cell">Counts of Cars</TableHead>
+                    <TableHead className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -842,30 +842,31 @@ export default function ClientsPage() {
                           key={client.id}
                           className="border-[#2a2a2a] group"
                         >
-                          <TableCell className="text-center text-[#EAEB80] font-medium px-6 py-4 align-middle">
+                          <TableCell className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
                             {rowNumber}
                           </TableCell>
-                          <TableCell className="text-left text-white font-medium px-6 py-4 align-middle">
+                          <TableCell className="text-left text-white font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
                             {client.firstName} {client.lastName}
                           </TableCell>
-                          <TableCell className="text-left text-gray-300 px-6 py-4 align-middle">
+                          <TableCell className="text-left text-gray-300 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
                             {client.email}
                           </TableCell>
-                          <TableCell className="text-left text-gray-400 px-6 py-4 align-middle">
+                          <TableCell className="text-left text-gray-400 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
                             {client.phone || <span className="text-gray-600">N/A</span>}
                           </TableCell>
-                          <TableCell className="text-left px-6 py-4 align-middle">
+                          <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
                             <Badge
                               variant="outline"
-                              className="bg-[#EAEB80]/10 text-[#EAEB80] border-[#EAEB80]/30"
+                              className="bg-[#EAEB80]/10 text-[#EAEB80] border-[#EAEB80]/30 text-xs"
                             >
                               {client.roleName}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-left px-6 py-4 align-middle">
+                          <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
                             <Badge
                               variant="outline"
                               className={cn(
+                                "text-xs",
                                 client.status === 3
                                   ? "bg-red-500/20 text-red-400 border-red-500/30"
                                   : client.status === 0
@@ -876,21 +877,21 @@ export default function ClientsPage() {
                               {client.status === 3 ? "Blocked" : client.status === 0 ? "Active" : "Inactive"}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-left text-gray-400 px-6 py-4 align-middle">
+                          <TableCell className="text-left text-gray-400 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden md:table-cell">
                             {formatDate(client.createdAt)}
                           </TableCell>
-                          <TableCell className="text-left px-6 py-4 align-middle">
+                          <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
                             <Badge
                               variant="outline"
-                              className={onlineStatusBadge.className}
+                              className={cn(onlineStatusBadge.className, "text-xs")}
                             >
                               {onlineStatusBadge.text}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-center text-gray-400 px-6 py-4 align-middle">
+                          <TableCell className="text-center text-gray-400 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
                             {client.carCount}
                           </TableCell>
-                          <TableCell className="text-center px-6 py-4 align-middle">
+                          <TableCell className="text-center px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
                             <div className="flex items-center justify-center gap-2">
                               {/* View Client - Eye icon */}
                               <Button

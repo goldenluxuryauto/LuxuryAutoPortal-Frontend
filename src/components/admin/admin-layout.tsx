@@ -191,7 +191,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         "flex-1 flex flex-col transition-all duration-300",
         sidebarOpen ? "lg:ml-64" : "lg:ml-20"
       )}>
-        <header className="h-14 bg-[#0a0a0a] border-b border-[#1a1a1a] flex items-center justify-between px-4 lg:px-6">
+        <header className="h-14 bg-[#0a0a0a] border-b border-[#1a1a1a] flex items-center justify-between px-3 sm:px-4 lg:px-6">
           <button
             onClick={() => setMobileMenuOpen(true)}
             className="lg:hidden text-gray-400 hover:text-white"
@@ -204,16 +204,16 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {user && (
-              <span className="text-sm text-gray-400">
-                {user.firstName} {user.lastName} ({user.roleName})
+              <span className="text-xs sm:text-sm text-gray-400 truncate max-w-[120px] sm:max-w-none">
+                {user.firstName} {user.lastName} <span className="hidden sm:inline">({user.roleName})</span>
               </span>
             )}
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto p-6 bg-[#0a0a0a]">
+        <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-[#0a0a0a]">
           {children}
         </main>
       </div>

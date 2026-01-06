@@ -428,11 +428,11 @@ export default function CarsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
-            <h1 className="text-2xl font-semibold text-white">Cars</h1>
-            <p className="text-gray-400 text-sm">{isAdmin ? "Manage your vehicle fleet" : "View your vehicles"}</p>
+            <h1 className="text-xl sm:text-2xl font-semibold text-white">Cars</h1>
+            <p className="text-gray-400 text-xs sm:text-sm">{isAdmin ? "Manage your vehicle fleet" : "View your vehicles"}</p>
           </div>
         </div>
 
@@ -486,57 +486,57 @@ export default function CarsPage() {
         {/* Cars Table */}
         <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <table className="w-full min-w-[1000px]">
                 <thead>
                   <tr className="border-b border-[#2a2a2a]">
-                    <th className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3 w-12">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 w-8 sm:w-12">
                       #
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3">
                       Status
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3">
                       Stats
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden md:table-cell">
                       Management
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3">
                       Owner
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3">
                       Make
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden lg:table-cell">
                       Year
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3">
                       Model/Specs
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden lg:table-cell">
                       Contact
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden xl:table-cell">
                       VIN #
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden xl:table-cell">
                       Plate #
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden xl:table-cell">
                       Gas
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden 2xl:table-cell">
                       Tire Size
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden 2xl:table-cell">
                       Oil Type
                     </th>
-                    <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden 2xl:table-cell">
                       Turo Link
                     </th>
                     {isAdmin && (
-                      <th className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-4 py-3">
+                      <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden 2xl:table-cell">
                         Admin Turo Link
                       </th>
                     )}
@@ -596,13 +596,13 @@ export default function CarsPage() {
                           key={uniqueKey}
                           className="hover:bg-[#252525] transition-colors group border-b border-[#2a2a2a]"
                         >
-                          <td className="text-center text-[#EAEB80] text-sm px-4 py-3 align-middle">
+                          <td className="text-center text-[#EAEB80] text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle">
                             {index + 1}
                           </td>
-                          <td className="text-left px-4 py-3 align-middle">
+                          <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle">
                             <Badge
                               variant="outline"
-                              className={getStatusBadgeColor(car.status)}
+                              className={cn(getStatusBadgeColor(car.status), "text-xs")}
                             >
                               {car.status === "ACTIVE"
                                 ? "ACTIVE"
@@ -611,22 +611,23 @@ export default function CarsPage() {
                                 : car.status || "ACTIVE"}
                             </Badge>
                           </td>
-                          <td className="text-left px-4 py-3 align-middle">
+                          <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle">
                             <a
                               href={`/admin/view-car/${car.id}`}
                               onClick={(e) => {
                                 e.preventDefault();
                                 setLocation(`/admin/view-car/${car.id}`);
                               }}
-                              className="text-[#EAEB80] hover:underline text-sm"
+                              className="text-[#EAEB80] hover:underline text-xs sm:text-sm"
                             >
                               View Stats
                             </a>
                           </td>
-                          <td className="text-left px-4 py-3 align-middle">
+                          <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle hidden md:table-cell">
                             <Badge
                               variant="outline"
                               className={cn(
+                                "text-xs",
                                 derivedManagementStatus === "management"
                                   ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
                                   : derivedManagementStatus === "off_ride"
@@ -637,52 +638,52 @@ export default function CarsPage() {
                             {managementValue}
                             </Badge>
                           </td>
-                          <td className="text-left px-4 py-3 align-middle">
+                          <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle">
                             {car.owner ? (
                               <div>
-                                <div className="text-white text-sm">
+                                <div className="text-white text-xs sm:text-sm">
                                   {car.owner.firstName} {car.owner.lastName}
                                 </div>
                                 {car.owner.email && (
-                                  <div className="text-gray-500 text-xs">
+                                  <div className="text-gray-500 text-[10px] sm:text-xs">
                                     {car.owner.email}
                                   </div>
                                 )}
                               </div>
                             ) : (
-                              <span className="text-gray-600 text-sm">
+                              <span className="text-gray-600 text-xs sm:text-sm">
                                 Unassigned
                               </span>
                             )}
                           </td>
-                          <td className="text-left text-white text-sm px-4 py-3 align-middle">
+                          <td className="text-left text-white text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle">
                             {car.make || "N/A"}
                           </td>
-                          <td className="text-left text-white text-sm px-4 py-3 align-middle">
+                          <td className="text-left text-white text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.year || "N/A"}
                           </td>
-                          <td className="text-left text-white text-sm px-4 py-3 align-middle">
+                          <td className="text-left text-white text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle">
                             {car.model || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 text-sm px-4 py-3 align-middle">
+                          <td className="text-left text-gray-400 text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.contactPhone || car.owner?.phone || "N/A"}
                           </td>
-                          <td className="text-left text-white font-mono text-sm px-4 py-3 align-middle">
+                          <td className="text-left text-white font-mono text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden xl:table-cell">
                             {car.vin || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 text-sm px-4 py-3 align-middle">
+                          <td className="text-left text-gray-400 text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden xl:table-cell">
                             {car.licensePlate || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 text-sm px-4 py-3 align-middle">
+                          <td className="text-left text-gray-400 text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden xl:table-cell">
                             {car.fuelType || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 text-sm px-4 py-3 align-middle">
+                          <td className="text-left text-gray-400 text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden 2xl:table-cell">
                             {car.tireSize || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 text-sm px-4 py-3 align-middle">
+                          <td className="text-left text-gray-400 text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden 2xl:table-cell">
                             {car.oilType || "N/A"}
                           </td>
-                          <td className="text-left px-4 py-3 align-middle">
+                          <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle hidden 2xl:table-cell">
                             {car.turoLink ? (
                               <a
                                 href={car.turoLink}
@@ -691,14 +692,14 @@ export default function CarsPage() {
                                 onClick={(e) => e.stopPropagation()}
                                 className="text-[#EAEB80] hover:underline inline-flex items-center"
                               >
-                                <ExternalLink className="w-4 h-4" />
+                                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                               </a>
                             ) : (
-                              <span className="text-gray-600 text-sm">N/A</span>
+                              <span className="text-gray-600 text-xs sm:text-sm">N/A</span>
                             )}
                           </td>
                           {isAdmin && (
-                            <td className="text-left px-4 py-3 align-middle">
+                            <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle hidden 2xl:table-cell">
                               {car.adminTuroLink ? (
                                 <a
                                   href={car.adminTuroLink}
@@ -707,10 +708,10 @@ export default function CarsPage() {
                                   onClick={(e) => e.stopPropagation()}
                                   className="text-[#EAEB80] hover:underline inline-flex items-center"
                                 >
-                                  <ExternalLink className="w-4 h-4" />
+                                  <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </a>
                               ) : (
-                                <span className="text-gray-600 text-sm">N/A</span>
+                                <span className="text-gray-600 text-xs sm:text-sm">N/A</span>
                               )}
                             </td>
                           )}

@@ -301,14 +301,14 @@ export default function IncomeExpensesPage() {
       <div className="flex flex-col h-full overflow-hidden">
         <div className="flex-shrink-0 space-y-6 mb-6">
           <div>
-            <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-2">Income and Expenses</h1>
-            <p className="text-gray-400 text-sm">Financial tracking and expense management</p>
+            <h1 className="text-2xl sm:text-3xl font-serif text-[#EAEB80] italic mb-2">Income and Expenses</h1>
+            <p className="text-gray-400 text-xs sm:text-sm">Financial tracking and expense management</p>
           </div>
 
           {/* Filters */}
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-end">
             <div className="w-full md:w-[400px]">
-              <label className="block text-sm font-medium text-gray-400 mb-2">Select a car</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Select a car</label>
               <Select value={selectedCar} onValueChange={setSelectedCar}>
                 <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
                   <SelectValue placeholder="Select a car" />
@@ -323,8 +323,8 @@ export default function IncomeExpensesPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="w-full md:w-[150px]" style={{ float: 'right' }}>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Year</label>
+            <div className="w-full md:w-[150px] md:ml-auto">
+              <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Year</label>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
                 <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
                   <SelectValue placeholder="Select year" />
@@ -343,8 +343,8 @@ export default function IncomeExpensesPage() {
         </div>
 
         <div className="flex-1 min-h-0 bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden">
-          <div className="h-full overflow-y-auto w-full">
-            <table className="border-collapse w-full table-fixed">
+          <div className="h-full overflow-y-auto w-full overflow-x-auto">
+            <table className="border-collapse w-full table-fixed min-w-[800px]">
               <colgroup>
                 <col style={{ width: '15%' }} />
                 {months.map((_, idx) => <col key={idx} style={{ width: '5%' }} />)}
@@ -352,13 +352,13 @@ export default function IncomeExpensesPage() {
               </colgroup>
               <thead className="bg-[#1a1a1a]">
                 <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a]">
+                  <th className="text-left px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a]">
                     Category / Expense
                   </th>
                   {months.map((month) => (
                     <th
                       key={month}
-                      className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
+                      className="text-right px-1 sm:px-2 py-2 sm:py-3 text-[10px] sm:text-xs md:text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
                     >
                       {month}
                     </th>
@@ -366,7 +366,7 @@ export default function IncomeExpensesPage() {
                   {additionalColumns.map((col) => (
                     <th
                       key={col}
-                      className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
+                      className="text-right px-1 sm:px-2 py-2 sm:py-3 text-[10px] sm:text-xs md:text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
                     >
                       {col}
                     </th>
@@ -384,16 +384,16 @@ export default function IncomeExpensesPage() {
                         className="bg-[#151515] border-b border-[#2a2a2a] cursor-pointer hover:bg-[#1a1a1a] transition-colors"
                         onClick={() => toggleCategory(categoryIndex)}
                       >
-                        <td className="px-3 py-3 text-sm font-semibold text-[#EAEB80] sticky left-0 bg-[#151515] hover:bg-[#151515] z-[50] border-r border-[#2a2a2a]">
-                          <div className="flex items-center gap-2">
-                            <span className="w-4 text-center">{category.isExpanded ? "–" : "+"}</span>
-                            <span>{category.label}</span>
+                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-[#EAEB80] sticky left-0 bg-[#151515] hover:bg-[#151515] z-[50] border-r border-[#2a2a2a]">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <span className="w-3 sm:w-4 text-center text-xs sm:text-sm">{category.isExpanded ? "–" : "+"}</span>
+                            <span className="text-xs sm:text-sm">{category.label}</span>
                           </div>
                         </td>
                         {months.map((_, monthIndex) => (
                           <td
                             key={monthIndex}
-                            className="text-right px-2 py-2 text-sm text-gray-400 border-l border-[#2a2a2a]"
+                            className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-400 border-l border-[#2a2a2a]"
                           >
                             {categoryTotal
                               ? formatCurrency(categoryTotal[monthIndex])
@@ -402,26 +402,26 @@ export default function IncomeExpensesPage() {
                         ))}
                         {categoryTotal && (
                           <>
-                            <td className="text-right px-2 py-2 text-sm text-gray-400 border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-400 border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(calculateYearEndRecon(categoryTotal))}
                             </td>
-                            <td className="text-right px-2 py-2 text-sm text-gray-400 border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-400 border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(calculateYearEndReconSplit(categoryTotal))}
                             </td>
-                            <td className="text-right px-2 py-2 text-sm font-semibold text-[#EAEB80] border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm font-semibold text-[#EAEB80] border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(calculateGrandTotal(categoryTotal))}
                             </td>
                           </>
                         )}
                         {!categoryTotal && (
                           <>
-                            <td className="text-right px-2 py-2 text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(0)}
                             </td>
-                            <td className="text-right px-2 py-2 text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(0)}
                             </td>
-                            <td className="text-right px-2 py-2 text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(0)}
                             </td>
                           </>
@@ -435,14 +435,14 @@ export default function IncomeExpensesPage() {
                             key={rowIndex}
                             className="border-b border-[#2a2a2a] hover:bg-[#151515] transition-colors"
                           >
-                            <td className="px-3 py-2 pl-12 text-sm text-gray-300 sticky left-0 bg-[#0f0f0f] z-[50] border-r border-[#2a2a2a]">
+                            <td className="px-2 sm:px-3 py-2 pl-8 sm:pl-12 text-xs sm:text-sm text-gray-300 sticky left-0 bg-[#0f0f0f] z-[50] border-r border-[#2a2a2a]">
                               {row.label}
                             </td>
                             {row.values.map((value, monthIndex) => (
                               <td
                                 key={monthIndex}
                                 className={cn(
-                                  "text-right px-2 py-2 text-sm border-l border-[#2a2a2a]",
+                                  "text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm border-l border-[#2a2a2a]",
                                   value !== 0
                                     ? "text-gray-300 font-medium"
                                     : "text-gray-500"
@@ -451,7 +451,7 @@ export default function IncomeExpensesPage() {
                                 {formatCurrency(value)}
                               </td>
                             ))}
-                            <td className="text-right px-2 py-2 text-sm border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               <span className={cn(
                                 calculateYearEndRecon(row.values) !== 0
                                   ? "text-gray-300 font-medium"

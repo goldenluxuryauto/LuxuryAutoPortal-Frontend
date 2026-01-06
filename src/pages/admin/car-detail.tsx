@@ -1052,28 +1052,28 @@ export default function CarDetailPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button
               variant="ghost"
               onClick={() => setLocation(`/admin/view-car/${carId}`)}
               className="text-gray-400 hover:text-white"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              <ArrowLeft className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Back</span>
             </Button>
             <div>
-              <h1 className="text-3xl font-serif text-[#EAEB80] italic">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#EAEB80] italic">
                 {car.makeModel}
               </h1>
-              <p className="text-gray-400 text-sm">Car Details</p>
+              <p className="text-gray-400 text-xs sm:text-sm">Car Details</p>
             </div>
           </div>
           {isAdmin && (
             <Button
               onClick={handleEditClick}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] w-full sm:w-auto"
             >
               <Edit className="w-4 h-4 mr-2" />
               Edit
@@ -1086,13 +1086,13 @@ export default function CarDetailPage() {
           {/* Vehicle Information Card */}
           <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-6 flex flex-col">
             <CardHeader className="pb-2">
-              <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
-                <Car className="w-5 h-5" />
+              <CardTitle className="text-[#EAEB80] text-base sm:text-lg flex items-center gap-2">
+                <Car className="w-4 h-4 sm:w-5 sm:h-5" />
                 Vehicle Information
               </CardTitle>
             </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {/* Column 1 (Left) */}
                 <div className="space-y-4">
                   <div>
@@ -1129,31 +1129,31 @@ export default function CarDetailPage() {
                 <div className="space-y-4">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Year</p>
-                    <p className="text-white text-base">{car.year || "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{car.year || "N/A"}</p>
                 </div>
                 <div>
                     <p className="text-xs text-gray-500 mb-1">Tire Size</p>
-                    <p className="text-white text-base">{onboarding?.tireSize ? formatValue(onboarding.tireSize) : "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.tireSize ? formatValue(onboarding.tireSize) : "N/A"}</p>
                 </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Free Oil Change</p>
-                    <p className="text-white text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Trim</p>
-                    <p className="text-white text-base">{onboarding?.vehicleTrim ? formatValue(onboarding.vehicleTrim) : "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.vehicleTrim ? formatValue(onboarding.vehicleTrim) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Exterior Color</p>
-                    <p className="text-white text-base">{onboarding?.exteriorColor ? formatValue(onboarding.exteriorColor) : (car.color || "N/A")}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.exteriorColor ? formatValue(onboarding.exteriorColor) : (car.color || "N/A")}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Number of Doors</p>
-                    <p className="text-white text-base">{onboarding?.numberOfDoors ? formatValue(onboarding.numberOfDoors) : "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.numberOfDoors ? formatValue(onboarding.numberOfDoors) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Number of Seats</p>
-                    <p className="text-white text-base">{onboarding?.numberOfSeats ? formatValue(onboarding.numberOfSeats) : "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.numberOfSeats ? formatValue(onboarding.numberOfSeats) : "N/A"}</p>
                   </div>
                 </div>
 
@@ -1161,37 +1161,37 @@ export default function CarDetailPage() {
                 <div className="space-y-4">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">License Plate</p>
-                    <p className="text-white text-base">{car.licensePlate || "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{car.licensePlate || "N/A"}</p>
                 </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Registration Expiration</p>
-                    <p className="text-white text-base">{onboarding?.registrationExpiration ? formatValue(onboarding.registrationExpiration) : "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.registrationExpiration ? formatValue(onboarding.registrationExpiration) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Last Oil Change</p>
-                    <p className="text-white text-base">{onboarding?.lastOilChange ? formatValue(onboarding.lastOilChange) : "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.lastOilChange ? formatValue(onboarding.lastOilChange) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Mileage</p>
-                    <p className="text-white text-base">{onboarding?.vehicleMiles ? formatValue(onboarding.vehicleMiles) : (car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A")}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.vehicleMiles ? formatValue(onboarding.vehicleMiles) : (car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A")}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Roof Rails</p>
-                    <p className="text-white text-base">{onboarding?.roofRails ? formatValue(onboarding.roofRails) : "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.roofRails ? formatValue(onboarding.roofRails) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Ski Crossbars</p>
-                    <p className="text-white text-base">{onboarding?.skiCrossBars ? formatValue(onboarding.skiCrossBars) : "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.skiCrossBars ? formatValue(onboarding.skiCrossBars) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Ski Rack</p>
-                    <p className="text-white text-base">{onboarding?.skiRacks ? formatValue(onboarding.skiRacks) : "N/A"}</p>
+                    <p className="text-white text-sm sm:text-base">{onboarding?.skiRacks ? formatValue(onboarding.skiRacks) : "N/A"}</p>
                   </div>
               </div>
                 <div className="pt-1.5 border-t border-[#2a2a2a]">
-                  <div className="flex items-start justify-between gap-8">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8">
                     {/* Left: Assigned To */}
-                    <div className="flex-shrink-0 text-center">
+                    <div className="flex-shrink-0 text-center lg:text-left">
                       <p className="text-xs text-gray-500 mb-1.5">Assigned To</p>
                     {/* Display maintenance status if car is in maintenance */}
                     {car.rawStatus === "maintenance" ? (
@@ -1204,11 +1204,11 @@ export default function CarDetailPage() {
                         </Badge>
                         {car.owner && (
                           <div className="mt-2">
-                              <p className="text-white text-base font-semibold">
+                              <p className="text-white text-sm sm:text-base font-semibold">
                               {car.owner.firstName} {car.owner.lastName}
                             </p>
                             {car.owner.email && (
-                                <p className="text-white text-xs mt-0.5">
+                                <p className="text-white text-xs mt-0.5 break-all">
                                 {car.owner.email}
                               </p>
                             )}
@@ -1221,41 +1221,41 @@ export default function CarDetailPage() {
                           onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
                             className="hover:text-[#EAEB80] transition-colors"
                         >
-                            <p className="text-white text-base font-semibold hover:underline">
+                            <p className="text-white text-sm sm:text-base font-semibold hover:underline">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
-                              <p className="text-white text-xs mt-0.5 hover:text-[#EAEB80]">
+                              <p className="text-white text-xs mt-0.5 hover:text-[#EAEB80] break-all">
                               {car.owner.email}
                             </p>
                           )}
                         </button>
                       ) : (
                         <>
-                            <p className="text-white text-base font-semibold">
+                            <p className="text-white text-sm sm:text-base font-semibold">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
-                              <p className="text-white text-xs mt-0.5">
+                              <p className="text-white text-xs mt-0.5 break-all">
                               {car.owner.email}
                             </p>
                           )}
                         </>
                       )
                     ) : (
-                      <p className="text-gray-500 text-sm">Unassigned</p>
+                      <p className="text-gray-500 text-xs sm:text-sm">Unassigned</p>
                       )}
                     </div>
 
                     {/* Right: Car Status, Management, Online Status, Last Login */}
-                    <div className="flex items-start gap-8 flex-1 justify-end">
+                    <div className="grid grid-cols-2 lg:flex lg:items-start lg:gap-8 lg:flex-1 lg:justify-end gap-4">
                       {/* Car Status */}
-                      <div className="text-center min-w-[100px]">
+                      <div className="text-center lg:min-w-[100px]">
                         <p className="text-xs text-gray-500 mb-1.5">Car Status</p>
                         <div className="flex justify-center">
                           <Badge
                             variant="outline"
-                            className={getStatusBadgeColor(car.status)}
+                            className={cn(getStatusBadgeColor(car.status), "text-xs")}
                           >
                             {car.status === "ACTIVE"
                               ? "ACTIVE"
@@ -1267,9 +1267,9 @@ export default function CarDetailPage() {
                       </div>
 
                       {/* Management */}
-                      <div className="text-center min-w-[100px]">
+                      <div className="text-center lg:min-w-[100px]">
                         <p className="text-xs text-gray-500 mb-1.5">Management</p>
-                        <p className="text-white text-sm font-medium">
+                        <p className="text-white text-xs sm:text-sm font-medium">
                           {car.managementStatus === "management"
                             ? "Management"
                             : car.managementStatus === "own"
@@ -1281,28 +1281,28 @@ export default function CarDetailPage() {
                       </div>
 
                       {/* Online Status */}
-                      <div className="text-center min-w-[120px]">
+                      <div className="text-center lg:min-w-[120px]">
                         <p className="text-xs text-gray-500 mb-1.5">Online Status</p>
                         {!car.owner ? (
-                          <p className="text-gray-500 text-sm">N/A</p>
+                          <p className="text-gray-500 text-xs sm:text-sm">N/A</p>
                         ) : onlineStatusBadge ? (
                           <div className="flex justify-center">
                             <Badge
                               variant="outline"
-                              className={onlineStatusBadge.className}
+                              className={cn(onlineStatusBadge.className, "text-xs")}
                             >
                               {onlineStatusBadge.text}
                             </Badge>
                           </div>
                         ) : (
-                          <p className="text-gray-500 text-sm">N/A</p>
+                          <p className="text-gray-500 text-xs sm:text-sm">N/A</p>
                         )}
                       </div>
 
                       {/* Last Login */}
-                      <div className="text-center min-w-[140px]">
+                      <div className="text-center lg:min-w-[140px] col-span-2 lg:col-span-1">
                         <p className="text-xs text-gray-500 mb-1.5">Last Login</p>
-                        <p className="text-white text-sm font-medium whitespace-normal break-words">
+                        <p className="text-white text-xs sm:text-sm font-medium whitespace-normal break-words">
                           {car.owner
                             ? formatLastLogin(car.owner.lastLoginAt)
                             : "N/A"}
