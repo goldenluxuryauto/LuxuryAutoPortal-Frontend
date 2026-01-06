@@ -231,22 +231,22 @@ function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
         
-        const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${role}`), {
-          credentials: "include",
+      const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${role}`), {
+        credentials: "include",
           signal: controller.signal,
-        });
+      });
         
         clearTimeout(timeoutId);
         
-        if (!response.ok) {
-          console.warn("Failed to fetch tutorial steps, using defaults");
-          return DEFAULT_TUTORIAL_STEPS;
-        }
-        const data = await response.json();
+      if (!response.ok) {
+        console.warn("Failed to fetch tutorial steps, using defaults");
+        return DEFAULT_TUTORIAL_STEPS;
+      }
+      const data = await response.json();
         // Handle both response formats: { success: true, data: [...] } or { success: true, data: { modules: [...] } }
         if (data.success) {
           if (Array.isArray(data.data)) {
-          return data.data;
+        return data.data;
           } else if (data.data.modules) {
             // Flatten modules into steps
             const allSteps: TutorialStep[] = [];
@@ -257,8 +257,8 @@ function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
             });
             return allSteps.length > 0 ? allSteps : DEFAULT_TUTORIAL_STEPS;
           }
-        }
-        return DEFAULT_TUTORIAL_STEPS;
+      }
+      return DEFAULT_TUTORIAL_STEPS;
       } catch (error) {
         // If fetch fails (network error, timeout, etc.), return default steps
         console.warn("⚠️ [TUTORIAL] Failed to fetch tutorial steps (non-critical):", error);

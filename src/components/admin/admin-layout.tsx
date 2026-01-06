@@ -121,7 +121,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="flex h-screen bg-[#0a0a0a]">
+    <div className="flex h-screen bg-[#0a0a0a]" style={{ overflow: 'auto' }}>
       <aside className={cn(
         "fixed inset-y-0 left-0 z-50 flex flex-col bg-[#0a0a0a] border-r border-[#1a1a1a] transition-all duration-300",
         sidebarOpen ? "w-64" : "w-20",

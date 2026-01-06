@@ -18,6 +18,14 @@ import ClientDetailPage from "@/pages/admin/client-detail";
 import FormsPage from "@/pages/admin/forms";
 import CarsPage from "@/pages/admin/cars";
 import CarDetailPage from "@/pages/admin/car-detail";
+import ViewCarPage from "@/pages/admin/view-car";
+import EarningsPage from "@/pages/admin/earnings";
+import TotalExpensesPage from "@/pages/admin/total-expenses";
+import NADADepreciationPage from "@/pages/admin/nada-depreciation";
+import PurchaseDetailsPage from "@/pages/admin/purchase-details";
+import GraphsChartsPage from "@/pages/admin/graphs-charts";
+import PaymentCalculatorPage from "@/pages/admin/payment-calculator";
+import MaintenancePage from "@/pages/admin/maintenance";
 import IncomeExpensesPage from "@/pages/admin/income-expenses";
 import SettingsPage from "@/pages/admin/settings";
 import ClientProfilePage from "@/pages/admin/profile";
@@ -42,6 +50,14 @@ function Router() {
       <Route path="/admin/clients/:id" component={ClientDetailPage} />
       <Route path="/admin/forms" component={FormsPage} />
       <Route path="/admin/cars" component={CarsPage} />
+      <Route path="/admin/view-car/:id" component={ViewCarPage} />
+      <Route path="/admin/cars/:id/earnings" component={EarningsPage} />
+      <Route path="/admin/cars/:id/expenses" component={TotalExpensesPage} />
+      <Route path="/admin/cars/:id/depreciation" component={NADADepreciationPage} />
+      <Route path="/admin/cars/:id/purchase" component={PurchaseDetailsPage} />
+      <Route path="/admin/cars/:id/graphs" component={GraphsChartsPage} />
+      <Route path="/admin/cars/:id/calculator" component={PaymentCalculatorPage} />
+      <Route path="/admin/cars/:id/maintenance" component={MaintenancePage} />
       <Route path="/admin/cars/:id" component={CarDetailPage} />
       <Route path="/admin/income-expenses" component={IncomeExpensesPage} />
       <Route path="/admin/settings" component={SettingsPage} />

@@ -832,13 +832,9 @@ export default function ClientsPage() {
                       const rowNumber = (pagination ? (pagination.page - 1) * pagination.limit : 0) + index + 1;
                       // Calculate online status badge once per client (recalculates on each render due to currentTime state)
                       // Pass account status and logout time to ensure deactivated/blocked/deleted/logged-out clients show as offline
-                      // status: 0 = Active (Access), 1 = Inactive (Access), 2 = Inactive (Suspend), 3 = Inactive (Block)
-                      const isActiveForOnlineStatus = client.status === 0; // Only status 0 is active
+                      // Online Status is based ONLY on login/logout activity, NOT on account status
                       const onlineStatusBadge = getOnlineStatusBadge(
                         client.lastLoginAt,
-                        15, // onlineThresholdMinutes
-                        isActiveForOnlineStatus, // isActive - only true for status 0
-                        client.status, // status: 0 = Active (Access), 1 = Inactive (Access), 2 = Inactive (Suspend), 3 = Inactive (Block)
                         client.lastLogoutAt // lastLogoutAt - if exists and more recent than login, user is offline
                       );
                       return (

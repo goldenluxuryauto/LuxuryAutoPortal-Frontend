@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
@@ -16,6 +16,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { getOnlineStatusBadge, formatLastLogin } from "@/lib/onlineStatus";
 import {
   Dialog,
   DialogContent,
@@ -60,6 +61,10 @@ interface CarDetail {
     firstName: string;
     lastName: string;
     email: string | null;
+    lastLoginAt?: string | null;
+    lastLogoutAt?: string | null;
+    isActive?: boolean;
+    status?: number;
   } | null;
   photos?: string[];
   turoLink?: string | null;
@@ -175,6 +180,21 @@ export default function CarDetailPage() {
     },
     enabled: !!carId,
     retry: false,
+    // Poll backend every 2 seconds to get updated lastLoginAt/lastLogoutAt values immediately
+    // This ensures login/logout events are reflected within 2 seconds
+    refetchInterval: (query) => {
+      // Only poll if query is successful and not in error state
+      if (query.state.error) {
+        return false; // Stop polling on error
+      }
+      return 2000; // Poll every 2 seconds
+    },
+    // Refetch when window regains focus
+    refetchOnWindowFocus: true,
+    // Refetch when browser tab becomes visible
+    refetchOnMount: true,
+    // Keep previous data while refetching to avoid flickering
+    placeholderData: (previousData) => previousData,
   });
 
   const car = data?.data;
@@ -209,6 +229,46 @@ export default function CarDetailPage() {
   });
 
   const onboarding = onboardingData?.success ? onboardingData?.data : null;
+
+  // Calculate online status badge (moved to top level to avoid hooks violation)
+  const onlineStatusBadge = useMemo(() => {
+    if (!car?.owner) {
+      return null;
+    }
+    
+    // Online Status is based ONLY on login/logout activity, NOT on account status
+    // No time threshold - status changes immediately based on login/logout events
+    const onlineStatus = getOnlineStatusBadge(
+      car.owner.lastLoginAt,
+      car.owner.lastLogoutAt // lastLogoutAt - if exists and more recent than login, user is offline
+    );
+    
+    // Debug logging (only in development)
+    if (import.meta.env.DEV) {
+      const now = new Date();
+      
+      console.log('[Car Detail] Online Status Calculation:', {
+        ownerName: `${car.owner.firstName} ${car.owner.lastName}`,
+        email: car.owner.email,
+        lastLoginAt: car.owner.lastLoginAt,
+        lastLogoutAt: car.owner.lastLogoutAt,
+        result: onlineStatus.text,
+        isOnline: onlineStatus.isOnline,
+        timestamp: now.toISOString(),
+      });
+      
+      // Warn if lastLoginAt is null but owner exists (might indicate database issue)
+      if (!car.owner.lastLoginAt && car.owner.email) {
+        console.warn(`⚠️ [Car Detail] Owner ${car.owner.email} has no lastLoginAt value. This could indicate:`);
+        console.warn('   1. Database columns (lastLoginAt/lastLogoutAt) don\'t exist in user table');
+        console.warn('   2. User has never logged in through /api/auth/login endpoint');
+        console.warn('   3. Login endpoint failed to update lastLoginAt');
+        console.warn('   Check backend logs for migration warnings or login update errors.');
+      }
+    }
+    
+    return onlineStatus;
+  }, [car?.owner?.lastLoginAt, car?.owner?.lastLogoutAt, car?.owner?.firstName, car?.owner?.lastName, car?.owner?.email]);
 
   // Helper functions
   const formatValue = (value: any): string => {
@@ -973,11 +1033,17 @@ export default function CarDetailPage() {
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
           <p className="text-red-400 mb-4">Failed to load car details</p>
           <Button
-            onClick={() => setLocation("/admin/cars")}
+            onClick={() => {
+              if (carId) {
+                setLocation(`/admin/view-car/${carId}`);
+              } else {
+                setLocation("/admin/cars");
+              }
+            }}
             className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Cars
+            Back
           </Button>
         </div>
       </AdminLayout>
@@ -991,7 +1057,7 @@ export default function CarDetailPage() {
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={() => setLocation("/admin/cars")}
+              onClick={() => setLocation(`/admin/view-car/${carId}`)}
               className="text-gray-400 hover:text-white"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -1121,52 +1187,28 @@ export default function CarDetailPage() {
                     <p className="text-xs text-gray-500 mb-1">Ski Rack</p>
                     <p className="text-white text-base">{onboarding?.skiRacks ? formatValue(onboarding.skiRacks) : "N/A"}</p>
                   </div>
-                </div>
-              </div>
-                {/* Features - Full width */}
-                <div className="pt-4 border-t border-[#2a2a2a]">
-                  <p className="text-xs text-gray-500 mb-1">Features</p>
-                  <p className="text-white text-base">
-                    {onboarding?.vehicleFeatures && Array.isArray(onboarding.vehicleFeatures) && onboarding.vehicleFeatures.length > 0
-                      ? onboarding.vehicleFeatures.join(", ")
-                      : (onboarding?.vehicleFeatures && typeof onboarding.vehicleFeatures === 'string'
-                        ? onboarding.vehicleFeatures
-                        : "N/A")}
-                  </p>
               </div>
                 <div className="pt-1.5 border-t border-[#2a2a2a]">
-                  <div className="flex items-center gap-2">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Status</p>
-                    <Badge
-                      variant="outline"
-                      className={getStatusBadgeColor(car.status)}
-                    >
-                      {car.status === "ACTIVE"
-                        ? "ACTIVE"
-                        : car.status === "INACTIVE"
-                        ? "INACTIVE"
-                        : String(car.status).replace("_", " ").toUpperCase()}
-                    </Badge>
-                  </div>
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Assigned To</p>
+                  <div className="flex items-start justify-between gap-8">
+                    {/* Left: Assigned To */}
+                    <div className="flex-shrink-0 text-center">
+                      <p className="text-xs text-gray-500 mb-1.5">Assigned To</p>
                     {/* Display maintenance status if car is in maintenance */}
                     {car.rawStatus === "maintenance" ? (
                       <div>
                         <Badge
                           variant="outline"
-                          className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                            className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 mb-2"
                         >
                           Maintenance
                         </Badge>
                         {car.owner && (
                           <div className="mt-2">
-                            <p className="text-white text-sm">
+                              <p className="text-white text-base font-semibold">
                               {car.owner.firstName} {car.owner.lastName}
                             </p>
                             {car.owner.email && (
-                              <p className="text-gray-400 text-xs">
+                                <p className="text-white text-xs mt-0.5">
                                 {car.owner.email}
                               </p>
                             )}
@@ -1177,24 +1219,24 @@ export default function CarDetailPage() {
                       car.clientId ? (
                         <button
                           onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                          className="text-left hover:text-[#EAEB80] transition-colors"
+                            className="hover:text-[#EAEB80] transition-colors"
                         >
-                          <p className="text-white text-base hover:underline">
+                            <p className="text-white text-base font-semibold hover:underline">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
-                            <p className="text-gray-400 text-xs hover:text-[#EAEB80]">
+                              <p className="text-white text-xs mt-0.5 hover:text-[#EAEB80]">
                               {car.owner.email}
                             </p>
                           )}
                         </button>
                       ) : (
                         <>
-                          <p className="text-white text-base">
+                            <p className="text-white text-base font-semibold">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
-                            <p className="text-gray-400 text-xs">
+                              <p className="text-white text-xs mt-0.5">
                               {car.owner.email}
                             </p>
                           )}
@@ -1203,6 +1245,70 @@ export default function CarDetailPage() {
                     ) : (
                       <p className="text-gray-500 text-sm">Unassigned</p>
                       )}
+                    </div>
+
+                    {/* Right: Car Status, Management, Online Status, Last Login */}
+                    <div className="flex items-start gap-8 flex-1 justify-end">
+                      {/* Car Status */}
+                      <div className="text-center min-w-[100px]">
+                        <p className="text-xs text-gray-500 mb-1.5">Car Status</p>
+                        <div className="flex justify-center">
+                          <Badge
+                            variant="outline"
+                            className={getStatusBadgeColor(car.status)}
+                          >
+                            {car.status === "ACTIVE"
+                              ? "ACTIVE"
+                              : car.status === "INACTIVE"
+                              ? "INACTIVE"
+                              : String(car.status).replace("_", " ").toUpperCase()}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {/* Management */}
+                      <div className="text-center min-w-[100px]">
+                        <p className="text-xs text-gray-500 mb-1.5">Management</p>
+                        <p className="text-white text-sm font-medium">
+                          {car.managementStatus === "management"
+                            ? "Management"
+                            : car.managementStatus === "own"
+                            ? "Own"
+                            : car.managementStatus === "off_ride"
+                            ? "Off Ride"
+                            : "N/A"}
+                        </p>
+                      </div>
+
+                      {/* Online Status */}
+                      <div className="text-center min-w-[120px]">
+                        <p className="text-xs text-gray-500 mb-1.5">Online Status</p>
+                        {!car.owner ? (
+                          <p className="text-gray-500 text-sm">N/A</p>
+                        ) : onlineStatusBadge ? (
+                          <div className="flex justify-center">
+                            <Badge
+                              variant="outline"
+                              className={onlineStatusBadge.className}
+                            >
+                              {onlineStatusBadge.text}
+                            </Badge>
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-sm">N/A</p>
+                        )}
+                      </div>
+
+                      {/* Last Login */}
+                      <div className="text-center min-w-[140px]">
+                        <p className="text-xs text-gray-500 mb-1.5">Last Login</p>
+                        <p className="text-white text-sm font-medium whitespace-normal break-words">
+                          {car.owner
+                            ? formatLastLogin(car.owner.lastLoginAt)
+                            : "N/A"}
+                        </p>
+                      </div>
+                    </div>
                     </div>
                 </div>
               </div>
@@ -1675,6 +1781,7 @@ export default function CarDetailPage() {
                   <p className="text-sm">Loading...</p>
         </div>
               ) : onboarding ? (
+                <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Provider</p>
@@ -1693,6 +1800,18 @@ export default function CarDetailPage() {
                     <p className="text-white text-base">{formatValue(onboarding.insuranceExpiration)}</p>
                     </div>
                 </div>
+                  {/* Features - Full width */}
+                  <div className="pt-4 border-t border-[#2a2a2a] mt-4">
+                    <p className="text-xs text-gray-500 mb-1">Features</p>
+                    <p className="text-white text-base">
+                      {onboarding?.vehicleFeatures && Array.isArray(onboarding.vehicleFeatures) && onboarding.vehicleFeatures.length > 0
+                        ? onboarding.vehicleFeatures.join(", ")
+                        : (onboarding?.vehicleFeatures && typeof onboarding.vehicleFeatures === 'string'
+                          ? onboarding.vehicleFeatures
+                          : "N/A")}
+                    </p>
+                  </div>
+                </>
                 ) : (
                 <div className="text-center py-4 text-gray-400">
                   <p className="text-sm">No insurance information available</p>

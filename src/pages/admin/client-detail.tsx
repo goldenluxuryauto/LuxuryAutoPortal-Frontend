@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
@@ -278,6 +278,22 @@ export default function ClientDetailPage() {
   }, [error, toast]);
 
   const client = data?.data;
+
+  // Calculate online status badge (moved to top level to avoid hooks violation)
+  const onlineStatusBadge = useMemo(() => {
+    if (!client) {
+      return null;
+    }
+    
+    // Online Status is based ONLY on login/logout activity, NOT on account status
+    // No time threshold - status changes immediately based on login/logout events
+    const onlineStatus = getOnlineStatusBadge(
+      client.lastLoginAt,
+      client.lastLogoutAt // lastLogoutAt - if exists and more recent than login, user is offline
+    );
+    
+    return onlineStatus;
+  }, [client?.lastLoginAt, client?.lastLogoutAt]);
 
   // Fetch totals data
   const { data: totalsData, isLoading: totalsLoading } = useQuery<{
@@ -924,18 +940,12 @@ export default function ClientDetailPage() {
                                   variant="outline"
                                   className={getOnlineStatusBadge(
                                     client?.lastLoginAt,
-                                    15, // onlineThresholdMinutes
-                                    client?.isActive, // isActive
-                                    client?.status, // status: 0 = inactive, 1 = active, 3 = blocked
-                                    client?.lastLogoutAt // lastLogoutAt
+                                    client?.lastLogoutAt // lastLogoutAt - if exists and more recent than login, user is offline
                                   ).className}
                                 >
                                   {getOnlineStatusBadge(
                                     client?.lastLoginAt,
-                                    15, // onlineThresholdMinutes
-                                    client?.isActive, // isActive
-                                    client?.status, // status: 0 = inactive, 1 = active, 3 = blocked
-                                    client?.lastLogoutAt // lastLogoutAt
+                                    client?.lastLogoutAt // lastLogoutAt - if exists and more recent than login, user is offline
                                   ).text}
                                 </Badge>
                               </div>
@@ -1173,24 +1183,18 @@ export default function ClientDetailPage() {
                           </div>
                           <div>
                             <span className="text-gray-400 block mb-1">Online Status:</span>
-                            <Badge
-                              variant="outline"
-                              className={getOnlineStatusBadge(
-                                client.lastLoginAt,
-                                15, // onlineThresholdMinutes
-                                client.isActive, // isActive
-                                client.status, // status: 0 = inactive, 1 = active, 3 = blocked
-                                client.lastLogoutAt // lastLogoutAt
-                              ).className}
-                            >
-                              {getOnlineStatusBadge(
-                                client.lastLoginAt,
-                                15, // onlineThresholdMinutes
-                                client.isActive, // isActive
-                                client.status, // status: 0 = inactive, 1 = active, 3 = blocked
-                                client.lastLogoutAt // lastLogoutAt
-                              ).text}
-                            </Badge>
+                            {!client ? (
+                              <span className="text-gray-500">N/A</span>
+                            ) : onlineStatusBadge ? (
+                              <Badge
+                                variant="outline"
+                                className={onlineStatusBadge.className}
+                              >
+                                {onlineStatusBadge.text}
+                              </Badge>
+                            ) : (
+                              <span className="text-gray-500">N/A</span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1391,10 +1395,10 @@ export default function ClientDetailPage() {
                               </TableCell>
                               <TableCell className="text-left px-4 py-3 align-middle">
                                 <a
-                                  href={`/admin/cars/${car.id}`}
+                                  href={`/admin/view-car/${car.id}`}
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    setLocation(`/admin/cars/${car.id}`);
+                                    setLocation(`/admin/view-car/${car.id}`);
                                   }}
                                   className="text-[#EAEB80] hover:underline"
                                 >
