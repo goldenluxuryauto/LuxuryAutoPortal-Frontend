@@ -68,32 +68,32 @@ export function getOnlineStatusBadge(
       const logoutDate = new Date(lastLogoutAt);
       if (!isNaN(logoutDate.getTime())) {
         const logoutTime = logoutDate.getTime();
-        
-        if (lastLoginAt) {
+    
+    if (lastLoginAt) {
           try {
             const loginDate = new Date(lastLoginAt);
             if (!isNaN(loginDate.getTime())) {
               const loginTime = loginDate.getTime();
-              // If logout is more recent or equal to login, user is offline
-              if (logoutTime >= loginTime) {
-                return {
-                  text: "Offline",
-                  className: "border-gray-500/50 text-gray-400 bg-gray-500/10",
-                  isOnline: false,
-                };
-              }
+      // If logout is more recent or equal to login, user is offline
+      if (logoutTime >= loginTime) {
+        return {
+          text: "Offline",
+          className: "border-gray-500/50 text-gray-400 bg-gray-500/10",
+          isOnline: false,
+        };
+      }
               // If login is more recent than logout, user is online
             }
           } catch (error) {
             console.error('[Online Status] Error parsing lastLoginAt:', error);
           }
-        } else {
-          // Logout exists but no login time - user has logged out (show as offline)
-          return {
-            text: "Offline",
-            className: "border-gray-500/50 text-gray-400 bg-gray-500/10",
-            isOnline: false,
-          };
+    } else {
+      // Logout exists but no login time - user has logged out (show as offline)
+      return {
+        text: "Offline",
+        className: "border-gray-500/50 text-gray-400 bg-gray-500/10",
+        isOnline: false,
+      };
         }
       }
     } catch (error) {
@@ -111,10 +111,10 @@ export function getOnlineStatusBadge(
   }
 
   // Step 3: User has logged in and hasn't logged out (or logout is older than login) → Online
-  return {
-    text: "Online",
-    className: "border-green-500/50 text-green-400 bg-green-500/10",
-    isOnline: true,
+    return {
+      text: "Online",
+      className: "border-green-500/50 text-green-400 bg-green-500/10",
+      isOnline: true,
   };
 }
 
