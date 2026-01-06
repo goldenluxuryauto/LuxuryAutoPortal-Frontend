@@ -399,6 +399,8 @@ export default function ClientDetailPage() {
         // Additional Information
         carManufacturerWebsite: data.carManufacturerWebsite,
         carManufacturerUsername: data.carManufacturerUsername,
+        // Client Status
+        status: data.status,
       };
       
       const response = await fetch(buildApiUrl(endpoint), {
@@ -597,6 +599,7 @@ export default function ClientDetailPage() {
         heardAboutUs: data.heardAboutUs || "",
         emergencyContactName: data.emergencyContactName || "",
         emergencyContactPhone: data.emergencyContactPhone || "",
+        status: client?.status !== undefined ? (client.status === 0 ? "ACTIVE" : "INACTIVE") : "ACTIVE",
         streetAddress: data.streetAddress || "",
         city: data.city || "",
         state: data.state || "",
@@ -643,6 +646,7 @@ export default function ClientDetailPage() {
         heardAboutUs: "",
         emergencyContactName: "",
         emergencyContactPhone: "",
+        status: client?.status !== undefined ? (client.status === 0 ? "ACTIVE" : "INACTIVE") : "ACTIVE",
         streetAddress: "",
         city: "",
         state: "",
@@ -2007,6 +2011,21 @@ export default function ClientDetailPage() {
                     onChange={(e) => setEditFormData({ ...editFormData, emergencyContactPhone: e.target.value })}
                     className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
                   />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Client Status</Label>
+                  <Select
+                    value={editFormData.status || "ACTIVE"}
+                    onValueChange={(value) => setEditFormData({ ...editFormData, status: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select client status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="INACTIVE">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
