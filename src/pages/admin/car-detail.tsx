@@ -118,8 +118,14 @@ const carSchema = z.object({
   // Car Links
   turoLink: z.string().optional(),
   adminTuroLink: z.string().optional(),
+  // Car Status (admin-only)
+  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
   // Management Status (admin-only)
   managementStatus: z.enum(["management", "own", "off_ride"]).optional(),
+  // Offboarding Information
+  offboardAt: z.string().optional(),
+  offboardReason: z.enum(["sold", "damaged", "end_lease", "other"]).optional(),
+  offboardNote: z.string().optional(),
   // Documents
   insuranceCardUrl: z.string().optional(),
   driversLicenseUrls: z.string().optional(), // JSON string array
@@ -419,7 +425,11 @@ export default function CarDetailPage() {
       password: "",
       turoLink: "",
       adminTuroLink: "",
+      status: "ACTIVE",
       managementStatus: "own",
+      offboardAt: "",
+      offboardReason: undefined,
+      offboardNote: "",
       insuranceCardUrl: "",
       driversLicenseUrls: "",
     },
@@ -483,10 +493,18 @@ export default function CarDetailPage() {
       // Car Links - Always send all fields to ensure backend can update them
       formData.append("turoLink", data.turoLink || "");
       formData.append("adminTuroLink", data.adminTuroLink || "");
+      // Car Status (admin-only) - Always send if admin and value is provided
+      if (isAdmin && data.status) {
+        formData.append("status", data.status);
+      }
       // Management Status (admin-only) - Only send if admin and value is provided
       if (isAdmin && data.managementStatus) {
         formData.append("managementStatus", data.managementStatus);
       }
+      // Offboarding Information - Always send all fields
+      formData.append("offboardAt", data.offboardAt || "");
+      formData.append("offboardReason", data.offboardReason || "");
+      formData.append("offboardNote", data.offboardNote || "");
       
       // Documents - Handle file uploads using state
       if (insuranceCardFile instanceof File) {
@@ -803,8 +821,14 @@ export default function CarDetailPage() {
       // Car Links
       turoLink: car.turoLink || "",
       adminTuroLink: car.adminTuroLink || "",
+      // Car Status
+      status: (car.status || "ACTIVE") as "ACTIVE" | "INACTIVE",
       // Management Status
       managementStatus: (car.managementStatus || "own") as "management" | "own" | "off_ride",
+      // Offboarding Information
+      offboardAt: car.offboardAt ? new Date(car.offboardAt).toISOString().split('T')[0] : "",
+      offboardReason: (car.offboardReason || undefined) as "sold" | "damaged" | "end_lease" | "other" | undefined,
+      offboardNote: car.offboardNote || "",
       // Documents
       insuranceCardUrl: onboarding?.insuranceCardUrl || "",
       driversLicenseUrls: onboarding?.driversLicenseUrls ? (Array.isArray(onboarding.driversLicenseUrls) ? JSON.stringify(onboarding.driversLicenseUrls) : onboarding.driversLicenseUrls) : "",
@@ -2787,6 +2811,60 @@ export default function CarDetailPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Car Status Section (Admin Only) */}
+                {isAdmin && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                      Car Status
+                    </h3>
+                    <FormField
+                      control={form.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Car Status</FormLabel>
+                          <FormControl>
+                            <Select
+                              value={field.value || "ACTIVE"}
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                // Automation: Update offboarding status based on car status
+                                if (value === "INACTIVE") {
+                                  // When status changes to INACTIVE, set offboarding status to Offboarded
+                                  // Set offboardAt to current date if not already set
+                                  const currentOffboardAt = form.getValues("offboardAt");
+                                  if (!currentOffboardAt) {
+                                    form.setValue("offboardAt", new Date().toISOString().split('T')[0]);
+                                  }
+                                  // Keep offboardReason if already set, otherwise leave it
+                                } else if (value === "ACTIVE") {
+                                  // When status changes to ACTIVE, clear offboarding status
+                                  form.setValue("offboardAt", "");
+                                  form.setValue("offboardReason", undefined);
+                                  form.setValue("offboardNote", "");
+                                }
+                              }}
+                              disabled={!isAdmin}
+                            >
+                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                                <SelectValue placeholder="Select car status" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                                <SelectItem value="ACTIVE">Active</SelectItem>
+                                <SelectItem value="INACTIVE">Inactive</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                          <p className="text-xs text-gray-500">
+                            Only admins can change car status. When set to Inactive, offboarding status will be automatically updated to Offboarded. When set to Active, offboarding status will be automatically updated to Active.
+                          </p>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
 
                 {/* Management Status Section (Admin Only) */}
                 {isAdmin && (
