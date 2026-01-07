@@ -613,14 +613,14 @@ export default function CarsPage() {
                           </td>
                           <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle">
                             <a
-                              href={`/admin/view-car/${car.id}`}
+                              href={isAdmin ? `/admin/view-car/${car.id}` : `/admin/cars/${car.id}`}
                               onClick={(e) => {
                                 e.preventDefault();
-                                setLocation(`/admin/view-car/${car.id}`);
+                                setLocation(isAdmin ? `/admin/view-car/${car.id}` : `/admin/cars/${car.id}`);
                               }}
                               className="text-[#EAEB80] hover:underline text-xs sm:text-sm"
                             >
-                              View Stats
+                              {isAdmin ? "View Stats" : "View Car"}
                             </a>
                           </td>
                           <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle hidden md:table-cell">
