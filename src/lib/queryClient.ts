@@ -168,11 +168,21 @@ export const getQueryFn: <T>(options: {
         timeoutId = null;
       }
 
-      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-        return null;
+      // Handle 401 for /api/auth/me gracefully (expected when not authenticated)
+      if (res.status === 401 && path === "/api/auth/me") {
+        // Return undefined user without throwing - this is expected when not authenticated
+        return { user: undefined } as T;
       }
 
-      await throwIfResNotOk(res);
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        return null as T;
+      }
+
+      // Only throw if response is not ok (and not a handled 401)
+      if (!res.ok) {
+        await throwIfResNotOk(res);
+      }
+      
       return await res.json();
     } catch (error) {
       // Clear timeout if error occurs

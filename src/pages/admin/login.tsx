@@ -48,7 +48,7 @@ export default function AdminLogin() {
       // This gives time for the cookie to be fully set and all components to see cached data
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      setLocation("/admin");
+      setLocation("/dashboard");
     },
     onError: (error: any) => {
       toast({

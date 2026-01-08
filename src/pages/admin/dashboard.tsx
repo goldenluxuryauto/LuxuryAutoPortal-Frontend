@@ -16,13 +16,22 @@ export default function AdminDashboard() {
   const { data: userData } = useQuery<{ user?: { id?: number; isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean; firstName?: string; lastName?: string; roleName?: string; tourCompleted?: boolean } }>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
+      try {
       const response = await fetch(buildApiUrl("/api/auth/me"), {
         credentials: "include",
       });
       if (!response.ok) {
+          // 401 is expected when not authenticated - don't log as error
+          if (response.status === 401) {
+            return { user: undefined };
+          }
+          return { user: undefined };
+        }
+        return response.json();
+      } catch (error) {
+        // Silently handle network errors
         return { user: undefined };
       }
-      return response.json();
     },
     retry: false,
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes to prevent unnecessary refetches

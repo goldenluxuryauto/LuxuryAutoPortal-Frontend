@@ -278,7 +278,7 @@ export default function EarningsPage() {
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 mb-6">
           <button
-            onClick={() => setLocation("/admin/cars")}
+            onClick={() => setLocation("/cars")}
             className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -296,69 +296,69 @@ export default function EarningsPage() {
         </div>
 
         {/* Car and Owner Information Header */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-3">Car Information</h3>
-              <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Information</h3>
+              <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-sm">Car Name: </span>
-                  <span className="text-white">{carName}</span>
+                  <span className="text-gray-400 text-xs sm:text-sm">Car Name: </span>
+                  <span className="text-white text-xs sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-sm">VIN #: </span>
-                  <span className="text-white font-mono text-sm">{car.vin}</span>
+                  <span className="text-gray-400 text-xs sm:text-sm">VIN #: </span>
+                  <span className="text-white font-mono text-xs sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-sm">License: </span>
-                  <span className="text-white">{car.licensePlate || "N/A"}</span>
+                  <span className="text-gray-400 text-xs sm:text-sm">License: </span>
+                  <span className="text-white text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-3">Owner Information</h3>
-              <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Owner Information</h3>
+              <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-sm">Name: </span>
-                  <span className="text-white">{ownerName}</span>
+                  <span className="text-gray-400 text-xs sm:text-sm">Name: </span>
+                  <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-sm">Contact #: </span>
-                  <span className="text-white">{ownerContact}</span>
+                  <span className="text-gray-400 text-xs sm:text-sm">Contact #: </span>
+                  <span className="text-white text-xs sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-sm">Email: </span>
-                  <span className="text-white text-sm break-all">{ownerEmail}</span>
+                  <span className="text-gray-400 text-xs sm:text-sm">Email: </span>
+                  <span className="text-white text-xs sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications */}
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-3">Car Specifications</h3>
-              <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Specifications</h3>
+              <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-sm">Fuel/Gas: </span>
-                  <span className="text-white">{fuelType}</span>
+                  <span className="text-gray-400 text-xs sm:text-sm">Fuel/Gas: </span>
+                  <span className="text-white text-xs sm:text-sm">{fuelType}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-sm">Tire Size: </span>
-                  <span className="text-white">{tireSize}</span>
+                  <span className="text-gray-400 text-xs sm:text-sm">Tire Size: </span>
+                  <span className="text-white text-xs sm:text-sm">{tireSize}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-sm">Oil Type: </span>
-                  <span className="text-white">{oilType}</span>
+                  <span className="text-gray-400 text-xs sm:text-sm">Oil Type: </span>
+                  <span className="text-white text-xs sm:text-sm">{oilType}</span>
                 </div>
               </div>
             </div>
 
             {/* Turo Links */}
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-3">Turo Links</h3>
-              <div className="space-y-2">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Turo Links</h3>
+              <div className="space-y-1.5 sm:space-y-2">
                 {car.turoLink && (
                   <div>
                     <a

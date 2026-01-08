@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { 
@@ -38,12 +38,12 @@ interface SidebarItem {
 }
 
 const allSidebarItems: SidebarItem[] = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   // Client-only profile link for logged-in clients
-  { href: "/admin/profile", label: "Profile", icon: User, roles: ["client"] },
+  { href: "/profile", label: "Profile", icon: User, roles: ["client"] },
   { href: "/admin/admins", label: "Admins", icon: Users, roles: ["admin"] },
   { href: "/admin/clients", label: "Clients", icon: Users, roles: ["admin"] },
-  { href: "/admin/cars", label: "Cars", icon: Car },
+  { href: "/cars", label: "Cars", icon: Car },
   { href: "/admin/income-expenses", label: "Income and Expenses", icon: DollarSign, roles: ["admin"] },
   { href: "/admin/payments", label: "Client Payments", icon: CreditCard, roles: ["admin"] },
   { href: "/admin/totals", label: "Totals", icon: Calculator },
@@ -70,13 +70,21 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
       const { buildApiUrl } = await import("@/lib/queryClient");
-      const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
-      if (!response.ok) {
-        // Don't throw error - return undefined user to prevent logout
-        // AuthGuard will handle the redirect if needed
+      try {
+        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        if (!response.ok) {
+          // 401 is expected when not authenticated - don't log as error
+          if (response.status === 401) {
+            return { user: undefined };
+          }
+          // For other errors, still return undefined but don't throw
+          return { user: undefined };
+        }
+        return response.json();
+      } catch (error) {
+        // Silently handle network errors - AuthGuard will handle redirect
         return { user: undefined };
       }
-      return response.json();
     },
     retry: false,
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes to prevent unnecessary refetches
@@ -128,7 +136,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="flex items-center justify-between h-16 px-4 border-b border-[#1a1a1a]">
-          <Link href="/admin" className="flex items-center gap-2">
+          <Link href="/dashboard" className="flex items-center gap-2">
             <img 
               src="/logo.png" 
               alt="Golden Luxury Auto" 
@@ -149,7 +157,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         <nav className="flex-1 overflow-y-auto py-2">
           {sidebarItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location === item.href || (item.href !== "/admin" && location.startsWith(item.href));
+            const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));
             
             return (
               <Link

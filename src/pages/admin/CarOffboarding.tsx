@@ -253,38 +253,39 @@ export default function CarOffboarding() {
             </div>
           ) : cars.length > 0 ? (
             <>
+              <div className="w-full overflow-hidden">
               <div className="overflow-x-auto">
-                <Table>
+                <Table className="w-full table-auto">
                   <TableHeader>
                     <TableRow className="border-b border-[#1a1a1a]">
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Name
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
                         Email
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
                         Phone
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Vehicle
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
                         VIN#
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
                         Plate #
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
                         Submitted
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Status
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
                         Contract
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
                         Car Offboarding Date
                       </TableHead>
                     </TableRow>
@@ -298,36 +299,37 @@ export default function CarOffboarding() {
                         )}
                       >
                         <TableCell
-                          className="px-6 py-4 text-white cursor-pointer"
+                          className="px-2 sm:px-3 py-3 sm:py-4 text-white text-xs sm:text-sm cursor-pointer max-w-[120px] truncate"
                           onClick={() => handleRowClick(car)}
+                          title={car.clientName}
                         >
                           {car.clientName}
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={car.clientEmail || "—"}>
                           {car.clientEmail || "—"}
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={car.clientPhone || "—"}>
                           {car.clientPhone || "—"}
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm max-w-[150px] truncate" title={car.carMakeModel}>
                           {car.carMakeModel}
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300 font-mono text-xs">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={car.vin || "—"}>
                           {car.vin || "—"}
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300 font-mono">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={car.licensePlate ? car.licensePlate.toUpperCase() : "—"}>
                           {car.licensePlate
                             ? car.licensePlate.toUpperCase()
                             : "—"}
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                           {new Date(car.createdAt).toLocaleDateString("en-US", {
                             month: "2-digit",
                             day: "2-digit",
                             year: "numeric",
                           })}
                         </TableCell>
-                        <TableCell className="px-6 py-4">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                           <Badge
                             variant="outline"
                             className={cn(
@@ -340,7 +342,7 @@ export default function CarOffboarding() {
                             {(car.status === "available" || car.status === "in_use") ? "ACTIVE" : "INACTIVE"}
                           </Badge>
                         </TableCell>
-                        <TableCell className="px-6 py-4">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
                           <Badge
                             variant="outline"
                             className={cn(
@@ -359,7 +361,7 @@ export default function CarOffboarding() {
                             {car.contractStatus ? car.contractStatus.charAt(0).toUpperCase() + car.contractStatus.slice(1) : "N/A"}
                           </Badge>
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
                           {car.offboardAt
                             ? new Date(car.offboardAt).toLocaleDateString(
                                 "en-US",
@@ -375,6 +377,7 @@ export default function CarOffboarding() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               </div>
 
               {/* Pagination */}

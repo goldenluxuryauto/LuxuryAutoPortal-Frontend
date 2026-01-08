@@ -119,7 +119,7 @@ export default function GraphsChartsPage() {
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 mb-6">
           <button
-            onClick={() => setLocation("/admin/cars")}
+            onClick={() => setLocation("/cars")}
             className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
           >
             <ArrowLeft className="w-4 h-4" />

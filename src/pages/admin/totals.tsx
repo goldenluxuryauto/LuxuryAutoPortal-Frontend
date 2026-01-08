@@ -139,7 +139,7 @@ export default function TotalsPage() {
         <div className="flex flex-col items-center justify-center h-full">
           <p className="text-red-400">Failed to load car details</p>
           <button
-            onClick={() => setLocation("/admin/cars")}
+            onClick={() => setLocation("/cars")}
             className="mt-4 text-[#EAEB80] hover:underline"
           >
             ← Back to Cars
@@ -176,7 +176,7 @@ export default function TotalsPage() {
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 mb-6">
           <button
-            onClick={() => setLocation("/admin/cars")}
+            onClick={() => setLocation("/cars")}
             className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -195,13 +195,13 @@ export default function TotalsPage() {
 
         {/* Car and Owner Information Header */}
         <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
             <div className="flex-1">
-              <h1 className="text-2xl font-semibold text-white mb-2">Totals</h1>
+              <h1 className="text-xl sm:text-2xl font-semibold text-white mb-2">Totals</h1>
             </div>
             <Button
               variant="outline"
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2"
+              className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2 w-full sm:w-auto"
             >
               <Download className="w-4 h-4" />
               Export

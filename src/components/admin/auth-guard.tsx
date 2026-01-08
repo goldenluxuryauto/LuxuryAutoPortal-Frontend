@@ -16,12 +16,21 @@ export function AuthGuard({ children }: AuthGuardProps) {
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
       const { buildApiUrl } = await import("@/lib/queryClient");
-      const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
-      if (!response.ok) {
-        // Return undefined user instead of throwing to prevent logout on refetch errors
+      try {
+        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        if (!response.ok) {
+          // 401 is expected when not authenticated - don't log as error
+          if (response.status === 401) {
+            return { user: undefined };
+          }
+          // For other errors, still return undefined but don't throw
+          return { user: undefined };
+        }
+        return response.json();
+      } catch (error) {
+        // Silently handle network errors
         return { user: undefined };
       }
-      return response.json();
     },
     retry: false,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes

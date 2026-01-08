@@ -114,7 +114,7 @@ export default function MaintenancePage() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setLocation("/admin/cars")}
+              onClick={() => setLocation("/cars")}
               className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
             >
               <ArrowLeft className="w-4 h-4" />

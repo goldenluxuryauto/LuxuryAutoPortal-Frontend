@@ -149,7 +149,7 @@ export default function PaymentsPage() {
         <div className="flex flex-col items-center justify-center h-full">
           <p className="text-red-400">Failed to load car details</p>
           <button
-            onClick={() => setLocation("/admin/cars")}
+            onClick={() => setLocation("/cars")}
             className="mt-4 text-[#EAEB80] hover:underline"
           >
             ← Back to Cars
@@ -175,7 +175,7 @@ export default function PaymentsPage() {
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 mb-6">
           <button
-            onClick={() => setLocation("/admin/cars")}
+            onClick={() => setLocation("/cars")}
             className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
           >
             <ArrowLeft className="w-4 h-4" />

@@ -47,12 +47,12 @@ function Router() {
       <Route path="/sign-contract/:token" component={SignContract} />
       <Route path="/signup" component={Signup} />
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/dashboard" component={AdminDashboard} />
       <Route path="/admin/admins" component={AdminsPage} />
       <Route path="/admin/clients" component={ClientsPage} />
       <Route path="/admin/clients/:id" component={ClientDetailPage} />
       <Route path="/admin/forms" component={FormsPage} />
-      <Route path="/admin/cars" component={CarsPage} />
+      <Route path="/cars" component={CarsPage} />
       <Route path="/admin/view-car/:id" component={ViewCarPage} />
       <Route path="/admin/cars/:id/earnings" component={EarningsPage} />
       <Route path="/admin/cars/:id/expenses" component={TotalExpensesPage} />
@@ -67,7 +67,7 @@ function Router() {
       <Route path="/admin/cars/:id" component={CarDetailPage} />
       <Route path="/admin/income-expenses" component={IncomeExpensesPage} />
       <Route path="/admin/settings" component={SettingsPage} />
-      <Route path="/admin/profile" component={ClientProfilePage} />
+      <Route path="/profile" component={ClientProfilePage} />
       <Route path="/admin/training-manual" component={TrainingManualPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
       <Route component={NotFound} />

@@ -228,44 +228,45 @@ export default function ContractManagement() {
             </div>
           ) : contractsData?.data && contractsData.data.length > 0 ? (
             <>
-              <div className="overflow-x-auto">
-            <Table>
+              <div className="w-full overflow-hidden">
+                <div className="overflow-x-auto">
+            <Table className="w-full table-auto">
               <TableHeader>
                     <TableRow className="border-b border-[#1a1a1a]">
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Name
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
                         Email
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
                         Phone
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Vehicle
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
                         VIN#
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
                         Plate #
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
                         Submitted
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Status
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
                         Contract
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
                         Car Onboarding Date
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
                         Offboarding
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-6 py-4">
+                      <TableHead className="text-left text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -278,40 +279,40 @@ export default function ContractManagement() {
                           "border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
                         )}
                   >
-                        <TableCell className="px-6 py-4 text-white">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-white text-xs sm:text-sm max-w-[120px] truncate" title={`${contract.firstNameOwner} ${contract.lastNameOwner}`}>
                           {contract.firstNameOwner} {contract.lastNameOwner}
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={contract.emailOwner}>
                           {contract.emailOwner}
                     </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={contract.phoneOwner}>
                           {contract.phoneOwner}
                     </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm max-w-[150px] truncate" title={`${contract.vehicleMake} ${contract.vehicleModel} ${contract.vehicleYear}`}>
                           {contract.vehicleMake} {contract.vehicleModel}{" "}
                           {contract.vehicleYear}
                     </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300 font-mono text-xs">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={contract.vinNumber || "—"}>
                           {contract.vinNumber || (
                             <span className="text-gray-500">—</span>
                         )}
                     </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300 font-mono text-xs">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={contract.licensePlate || "—"}>
                           {contract.licensePlate || (
                             <span className="text-gray-500">—</span>
                           )}
                         </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                           {new Date(contract.createdAt).toLocaleDateString("en-US", {
                             month: "2-digit",
                             day: "2-digit",
                             year: "numeric",
                           })}
                         </TableCell>
-                        <TableCell className="px-6 py-4">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                           {getContractStatusBadge(contract.contractStatus)}
                         </TableCell>
-                        <TableCell className="px-6 py-4">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             {contract.contractStatus === "signed" &&
                               contract.signedContractUrl ? (
@@ -339,7 +340,7 @@ export default function ContractManagement() {
                         )}
                       </div>
                     </TableCell>
-                        <TableCell className="px-6 py-4 text-gray-300">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
                           {contract.contractSignedAt ? (
                             new Date(
                               contract.contractSignedAt
@@ -352,7 +353,7 @@ export default function ContractManagement() {
                             <span className="text-gray-500">Not signed</span>
                           )}
                         </TableCell>
-                        <TableCell className="px-6 py-4">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
                           {contract.isOffboarded ? (
                             <div className="flex flex-col gap-1">
                               <Badge
@@ -411,6 +412,7 @@ export default function ContractManagement() {
                 ))}
               </TableBody>
             </Table>
+                </div>
               </div>
 
               {/* Pagination */}

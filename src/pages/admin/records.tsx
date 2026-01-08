@@ -139,7 +139,7 @@ export default function RecordsPage() {
         <div className="flex flex-col items-center justify-center h-full">
           <p className="text-red-400">Failed to load car details</p>
           <button
-            onClick={() => setLocation("/admin/cars")}
+            onClick={() => setLocation("/cars")}
             className="mt-4 text-[#EAEB80] hover:underline"
           >
             ← Back to Cars
@@ -163,39 +163,39 @@ export default function RecordsPage() {
     <AdminLayout>
       <div className="flex flex-col h-full overflow-x-hidden">
         {/* Breadcrumb Navigation */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={() => setLocation("/admin/cars")}
-              className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
+              onClick={() => setLocation("/cars")}
+              className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1 text-xs sm:text-sm"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
               <span>Cars</span>
             </button>
-            <span className="text-gray-500">/</span>
+            <span className="text-gray-500 text-xs sm:text-sm">/</span>
             <button
               onClick={() => setLocation(`/admin/view-car/${carId}`)}
-              className="text-gray-400 hover:text-[#EAEB80] transition-colors"
+              className="text-gray-400 hover:text-[#EAEB80] transition-colors text-xs sm:text-sm"
             >
               View Car
             </button>
-            <span className="text-gray-500">/</span>
-            <span className="text-gray-300">Records and Files</span>
+            <span className="text-gray-500 text-xs sm:text-sm">/</span>
+            <span className="text-gray-300 text-xs sm:text-sm">Records and Files</span>
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2"
+              className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
             >
-              <Plus className="w-4 h-4" />
-              Add
+              <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Add</span>
             </Button>
             <Button
               variant="outline"
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2"
+              className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
             >
-              <List className="w-4 h-4" />
-              Log
+              <List className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Log</span>
             </Button>
           </div>
         </div>

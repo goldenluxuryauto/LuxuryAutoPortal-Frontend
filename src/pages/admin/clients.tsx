@@ -95,6 +95,8 @@ export default function ClientsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
+  const [importErrors, setImportErrors] = useState<Array<{ row: number; error: string }>>([]);
+  const [showImportErrors, setShowImportErrors] = useState(false);
   const [deleteClientId, setDeleteClientId] = useState<number | null>(null);
   const [revokeClientEmail, setRevokeClientEmail] = useState<string | null>(null);
   const [reactivateClientEmail, setReactivateClientEmail] = useState<string | null>(null);
@@ -157,6 +159,15 @@ export default function ClientsPage() {
         credentials: "include",
       });
       if (!response.ok) {
+        // Handle 401 gracefully (expected when not authenticated)
+        if (response.status === 401) {
+          console.log("🔒 [CLIENTS] Not authenticated (401). Returning empty data.");
+          return {
+            success: true,
+            data: [],
+            pagination: { page: 1, limit: itemsPerPage, total: 0, totalPages: 0 },
+          };
+        }
         const errorData = await response.json().catch(() => ({ error: "Database connection failed" }));
         throw new Error(errorData.error || "Failed to fetch clients");
       }
@@ -309,8 +320,11 @@ export default function ClientsPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/submissions"] });
       
-      const { total, successful, failed, errors } = data.data;
+      // Handle response structure - data might be nested or flat
+      const importData = data.data || data;
+      const { total = 0, successful = 0, failed = 0, errors = [] } = importData;
       
+      // Show success toast
       toast({
         title: "Import Completed",
         description: `${successful} of ${total} records imported successfully${failed > 0 ? `. ${failed} failed.` : ''}`,
@@ -318,12 +332,16 @@ export default function ClientsPage() {
       });
 
       if (failed > 0 && errors.length > 0) {
-        console.error("Import errors:", errors);
-        // Show detailed errors in console or could show in a separate dialog
-      }
-
+        // Log errors for debugging (less alarming since we show them in UI)
+        console.log("📋 [IMPORT] Import completed with errors:", errors);
+        setImportErrors(errors);
+        setShowImportErrors(true);
+        // Keep modal open if there are errors so user can see them
+      } else {
       setIsImportModalOpen(false);
       setImportFile(null);
+        setImportErrors([]);
+      }
     },
     onError: (error: any) => {
       toast({
@@ -633,20 +651,21 @@ export default function ClientsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-2">Clients</h1>
-            <p className="text-gray-400 text-sm">Manage your client database</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#EAEB80] italic mb-1 sm:mb-2">Clients</h1>
+            <p className="text-gray-400 text-xs sm:text-sm">Manage your client database</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Button
               onClick={() => setIsImportModalOpen(true)}
               variant="outline"
-              className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+              className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10 w-full sm:w-auto"
             >
-              <Upload className="w-4 h-4 mr-2" />
-              Import
+              <Upload className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Import</span>
+              <span className="sm:hidden">Import</span>
             </Button>
             <Button
               onClick={async () => {
@@ -717,16 +736,17 @@ export default function ClientsPage() {
                 }
               }}
               variant="outline"
-              className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+              className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10 w-full sm:w-auto"
             >
-              <Download className="w-4 h-4 mr-2" />
-              Download
+              <Download className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Download</span>
+              <span className="sm:hidden">Download</span>
             </Button>
             <Button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] w-full sm:w-auto"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 sm:mr-2" />
               Add
             </Button>
           </div>
@@ -1038,9 +1058,9 @@ export default function ClientsPage() {
 
         {/* Add Client Modal */}
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-[#EAEB80]">Add New Client</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-[#EAEB80]">Add New Client</DialogTitle>
               <DialogDescription className="text-gray-400">
                 Create a new client in the system
               </DialogDescription>
@@ -1206,7 +1226,7 @@ export default function ClientsPage() {
         <Dialog open={deleteClientId !== null && deleteClientEmail === null} onOpenChange={(open) => !open && setDeleteClientId(null)}>
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-red-400">Delete Client</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-red-400">Delete Client</DialogTitle>
               <DialogDescription className="text-gray-400">
                 {deleteClientId && clients.find(c => c.id === deleteClientId) && (
                   <>Are you sure you want to delete <strong>{clients.find(c => c.id === deleteClientId)?.firstName} {clients.find(c => c.id === deleteClientId)?.lastName}</strong>? This action cannot be undone.</>
@@ -1240,7 +1260,7 @@ export default function ClientsPage() {
         <Dialog open={revokeClientEmail !== null} onOpenChange={(open) => !open && setRevokeClientEmail(null)}>
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-yellow-400">Suspend Client Access</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-yellow-400">Suspend Client Access</DialogTitle>
               <DialogDescription className="text-gray-400">
                 {revokeClientEmail && clients.find(c => c.email === revokeClientEmail) && (
                   <>
@@ -1278,7 +1298,7 @@ export default function ClientsPage() {
         <Dialog open={blockClientEmail !== null} onOpenChange={(open) => !open && setBlockClientEmail(null)}>
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-red-400">Permanently Block Account</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-red-400">Permanently Block Account</DialogTitle>
               <DialogDescription className="text-gray-400">
                 This will permanently block the client account. The user will not be able to register or access their account.
               </DialogDescription>
@@ -1315,7 +1335,7 @@ export default function ClientsPage() {
         <Dialog open={reactivateClientEmail !== null} onOpenChange={(open) => !open && setReactivateClientEmail(null)}>
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-green-400">Grant Client Access</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-green-400">Grant Client Access</DialogTitle>
               <DialogDescription className="text-gray-400">
                 {reactivateClientEmail && clients.find(c => c.email === reactivateClientEmail) && (
                   <>
@@ -1350,7 +1370,7 @@ export default function ClientsPage() {
         <Dialog open={deleteClientEmail !== null && deleteClientId !== null} onOpenChange={(open) => !open && (setDeleteClientEmail(null), setDeleteClientId(null))}>
           <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-red-400">Permanently Delete Client</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-red-400">Permanently Delete Client</DialogTitle>
               <DialogDescription className="text-gray-400">
                 {deleteClientId && deleteClientEmail && clients.find(c => c.id === deleteClientId) && (
                   <>
@@ -1386,9 +1406,9 @@ export default function ClientsPage() {
 
         {/* Import Clients and Cars Modal */}
         <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-2xl">
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-[#EAEB80] flex items-center gap-2">
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-[#EAEB80] flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5" />
                 Import Clients and Cars
               </DialogTitle>
@@ -1492,6 +1512,53 @@ export default function ClientsPage() {
                   )}
                 </Button>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Import Warning Dialog */}
+        <Dialog open={showImportErrors} onOpenChange={setShowImportErrors}>
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-yellow-400">
+                Import Warning ({importErrors.length})
+              </DialogTitle>
+              <DialogDescription className="text-gray-400">
+                The following rows failed to import. Please review and fix the issues.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4 space-y-2 max-h-[60vh] overflow-y-auto">
+              {importErrors.map((error, index) => (
+                <div
+                  key={index}
+                  className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 font-semibold text-sm">
+                      {error.row}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-300 break-words">
+                        <span className="font-medium text-white">Row {error.row}:</span> {error.error}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-[#2a2a2a]">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowImportErrors(false);
+                  setIsImportModalOpen(false);
+                  setImportFile(null);
+                  setImportErrors([]);
+                }}
+                className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+              >
+                Close
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

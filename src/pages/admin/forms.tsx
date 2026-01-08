@@ -259,7 +259,7 @@ function QRCodeSection() {
                 className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium w-full lg:w-auto"
               >
                 <Share2 className="w-4 h-4 mr-2" />
-                Share with Client
+                Copy Link
               </Button>
             </div>
           </div>
@@ -829,9 +829,9 @@ export default function FormsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <Card className="bg-[#111111] border-[#EAEB80]/20">
-          <CardContent className="p-0">
+      <div className="space-y-6 max-w-full">
+        <Card className="bg-[#111111] border-[#EAEB80]/20 max-w-full overflow-hidden">
+          <CardContent className="p-0 max-w-full overflow-hidden">
             {formSections.map((section) => {
               const SectionIcon = section.icon;
               const isExpanded = expandedSections.includes(section.id);
@@ -857,7 +857,7 @@ export default function FormsPage() {
                   </button>
 
                   {isExpanded && (
-                    <div className="bg-[#0d0d0d]">
+                    <div className="bg-[#0d0d0d] max-w-full">
                       {section.items.map((item) => {
                         const ItemIcon = item.icon;
                         const isItemExpanded = expandedItems.includes(item.id);
@@ -960,7 +960,7 @@ export default function FormsPage() {
 
                             {/* Expanded content for Car On-boarding */}
                             {isItemExpanded && item.id === "car-on" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-3 sm:px-5 py-4 space-y-6 max-w-full">
                                 {/* Show form for clients, table for admins */}
                                 {formVisibilityData?.isAdmin ||
                                 formVisibilityData?.isEmployee ? (
@@ -973,7 +973,7 @@ export default function FormsPage() {
 
                             {/* Expanded content for Car Off-boarding */}
                             {isItemExpanded && item.id === "car-off" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-3 sm:px-5 py-4 space-y-6 max-w-full">
                                 {/* Show form for clients, table for admins */}
                                 {formVisibilityData?.isAdmin ||
                                 formVisibilityData?.isEmployee ? (
@@ -986,7 +986,7 @@ export default function FormsPage() {
 
                             {/* Expanded content for LYC form */}
                             {isItemExpanded && item.id === "lyc" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4 space-y-6">
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-3 sm:px-5 py-4 space-y-6 max-w-full">
                                 {/* QR Code Section */}
                                 <QRCodeSection />
 
@@ -1023,44 +1023,45 @@ export default function FormsPage() {
                                   </div>
                                 ) : submissionsData?.data &&
                                   submissionsData.data.length > 0 ? (
+                                  <div className="w-full overflow-hidden">
                                   <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
+                                      <table className="w-full text-sm table-auto">
                                       <thead>
                                         <tr className="border-b border-[#1a1a1a]">
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs whitespace-nowrap">
                                             Name
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden md:table-cell whitespace-nowrap">
                                             Email
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden lg:table-cell whitespace-nowrap">
                                             Phone
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs whitespace-nowrap">
                                             Vehicle
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden xl:table-cell whitespace-nowrap">
                                             VIN#
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden xl:table-cell whitespace-nowrap">
                                             Plate #
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden lg:table-cell whitespace-nowrap">
                                             Submitted
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs whitespace-nowrap">
                                             Status
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden md:table-cell whitespace-nowrap">
                                             Contract
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden 2xl:table-cell whitespace-nowrap">
                                             Car Onboarding Date
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden 2xl:table-cell whitespace-nowrap">
                                             Car Offboarding Date
                                           </th>
-                                          <th className="text-left py-3 px-4 text-gray-400 font-medium">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs whitespace-nowrap">
                                             Actions
                                           </th>
                                         </tr>
@@ -1072,41 +1073,41 @@ export default function FormsPage() {
                                               key={submission.id}
                                               className="border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
                                             >
-                                              <td className="py-3 px-4 text-white">
+                                              <td className="py-3 px-2 sm:px-3 text-white text-xs sm:text-sm max-w-[120px] truncate" title={`${submission.firstNameOwner} ${submission.lastNameOwner}`}>
                                                 {submission.firstNameOwner}{" "}
                                                 {submission.lastNameOwner}
                                               </td>
-                                              <td className="py-3 px-4 text-gray-300">
+                                              <td className="py-3 px-2 sm:px-3 text-gray-300 text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={submission.emailOwner}>
                                                 {submission.emailOwner}
                                               </td>
-                                              <td className="py-3 px-4 text-gray-300">
+                                              <td className="py-3 px-2 sm:px-3 text-gray-300 text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={submission.phoneOwner}>
                                                 {submission.phoneOwner}
                                               </td>
-                                              <td className="py-3 px-4 text-gray-300">
+                                              <td className="py-3 px-2 sm:px-3 text-gray-300 text-xs sm:text-sm max-w-[150px] truncate" title={`${submission.vehicleMake} ${submission.vehicleModel} ${submission.vehicleYear}`}>
                                                 {submission.vehicleMake}{" "}
                                                 {submission.vehicleModel}{" "}
                                                 {submission.vehicleYear}
                                               </td>
-                                              <td className="py-3 px-4 text-gray-300 font-mono text-xs">
+                                              <td className="py-3 px-2 sm:px-3 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={submission.vinNumber || "N/A"}>
                                                 {submission.vinNumber || (
                                                   <span className="text-gray-500">
                                                     N/A
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-4 text-gray-300 font-mono text-xs">
+                                              <td className="py-3 px-2 sm:px-3 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={submission.licensePlate || "N/A"}>
                                                 {submission.licensePlate || (
                                                   <span className="text-gray-500">
                                                     N/A
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-4 text-gray-400">
+                                              <td className="py-3 px-2 sm:px-3 text-gray-400 text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                                                 {new Date(
                                                   submission.createdAt
                                                 ).toLocaleDateString()}
                                               </td>
-                                              <td className="py-3 px-4">
+                                              <td className="py-3 px-2 sm:px-3 whitespace-nowrap">
                                                 <Badge
                                                   variant="outline"
                                                   className={cn(
@@ -1127,7 +1128,7 @@ export default function FormsPage() {
                                                     "pending"}
                                                 </Badge>
                                               </td>
-                                              <td className="py-3 px-4">
+                                              <td className="py-3 px-2 sm:px-3 hidden md:table-cell whitespace-nowrap">
                                                 <div className="flex items-center gap-2">
                                                   {submission.contractStatus ===
                                                     "sent" && (
@@ -1206,7 +1207,7 @@ export default function FormsPage() {
                                                   )}
                                                 </div>
                                               </td>
-                                              <td className="py-3 px-4 text-gray-300">
+                                              <td className="py-3 px-2 sm:px-3 text-gray-300 text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
                                                 {submission.contractSignedAt ? (
                                                   new Date(
                                                     submission.contractSignedAt
@@ -1217,7 +1218,7 @@ export default function FormsPage() {
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-4 text-gray-300">
+                                              <td className="py-3 px-2 sm:px-3 text-gray-300 text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
                                                 {submission.carOffboardAt ? (
                                                   new Date(
                                                     submission.carOffboardAt
@@ -1228,7 +1229,7 @@ export default function FormsPage() {
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-4">
+                                              <td className="py-3 px-2 sm:px-3 whitespace-nowrap">
                                                 <div className="flex items-center gap-2">
                                                   <Button
                                                     size="sm"
@@ -1323,7 +1324,7 @@ export default function FormsPage() {
                                         )}
                                       </tbody>
                                     </table>
-
+                                    </div>
 
                                     {/* Pagination */}
                                     {submissionsData.pagination && (

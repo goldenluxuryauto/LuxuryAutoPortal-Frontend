@@ -35,6 +35,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, buildApiUrl } from "@/lib/queryClient";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { cn } from "@/lib/utils";
 import {
   Plus,
   Pencil,
@@ -412,46 +413,47 @@ export default function AdminsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-white">Admins</h1>
-            <p className="text-gray-400 text-sm">
+            <h1 className="text-xl sm:text-2xl font-semibold text-white">Admins</h1>
+            <p className="text-gray-400 text-xs sm:text-sm">
               Manage portal administrators
             </p>
           </div>
           <Button
             onClick={handleAddClick}
-            className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+            className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium w-full sm:w-auto"
             data-testid="button-add-admin"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Add New Admin
+            <Plus className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Add New Admin</span>
+            <span className="sm:hidden">Add Admin</span>
           </Button>
         </div>
 
         <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b border-[#2a2a2a]">
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Name
                     </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                       Email
                     </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Role
                     </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Status
                     </th>
-                    <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
                       Created
                     </th>
-                    <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <th className="text-right text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Actions
                     </th>
                   </tr>
@@ -473,58 +475,64 @@ export default function AdminsPage() {
                         className="hover:bg-[#252525] transition-colors"
                         data-testid={`row-admin-${user.id}`}
                       >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="w-10 h-10 bg-[#EAEB80]/20">
-                              <AvatarFallback className="bg-[#EAEB80]/20 text-[#EAEB80] text-sm font-medium">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <Avatar className="w-8 h-8 sm:w-10 sm:h-10 bg-[#EAEB80]/20">
+                              <AvatarFallback className="bg-[#EAEB80]/20 text-[#EAEB80] text-xs sm:text-sm font-medium">
                                 {getInitials(user.firstName, user.lastName)}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="text-white font-medium">
+                            <div className="flex flex-col">
+                              <span className="text-white font-medium text-xs sm:text-sm">
                               {user.firstName} {user.lastName}
                             </span>
+                              <span className="text-gray-400 text-[10px] sm:text-xs md:hidden">
+                                {user.email}
+                              </span>
+                            </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                           <div className="flex items-center gap-2 text-gray-400">
                             <Mail className="w-4 h-4" />
-                            <span>{user.email}</span>
+                            <span className="text-xs sm:text-sm">{user.email}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4">
                           <Badge
                             variant="outline"
-                            className={getRoleBadgeColor(user.role)}
+                            className={cn(getRoleBadgeColor(user.role), "text-[10px] sm:text-xs")}
                           >
                             {user.role}
                           </Badge>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4">
                           <Badge
                             variant="outline"
-                            className={
+                            className={cn(
                               user.isActive
                                 ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                : "bg-red-500/20 text-red-400 border-red-500/30"
-                            }
+                                : "bg-red-500/20 text-red-400 border-red-500/30",
+                              "text-[10px] sm:text-xs"
+                            )}
                           >
                             {user.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </td>
-                        <td className="px-6 py-4 text-gray-400 text-sm">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-400 text-xs sm:text-sm hidden lg:table-cell">
                           {format(new Date(user.createdAt), "MMM d, yyyy")}
                         </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
+                          <div className="flex items-center justify-end gap-1 sm:gap-2">
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-gray-400 hover:text-white"
+                            className="text-gray-400 hover:text-white text-xs sm:text-sm px-2 sm:px-3"
                             onClick={() => handleEditClick(user)}
                             data-testid={`button-edit-admin-${user.id}`}
                           >
-                            <Pencil className="w-4 h-4 mr-1" />
-                            Edit
+                            <Pencil className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                            <span className="hidden sm:inline">Edit</span>
                           </Button>
                           </div>
                         </td>
@@ -548,9 +556,9 @@ export default function AdminsPage() {
 
         {/* Add/Edit User Modal */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-md">
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold">
+              <DialogTitle className="text-lg sm:text-xl font-semibold">
                 {editingUser ? "Edit Admin" : "Add New Admin"}
               </DialogTitle>
               <DialogDescription className="text-gray-400">
@@ -867,9 +875,9 @@ export default function AdminsPage() {
           open={isQuickLinkModalOpen}
           onOpenChange={setIsQuickLinkModalOpen}
         >
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-md">
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold">
+              <DialogTitle className="text-lg sm:text-xl font-semibold">
                 {editingQuickLink ? "Edit Quick Link" : "Add Quick Link"}
               </DialogTitle>
               <DialogDescription className="text-gray-400">

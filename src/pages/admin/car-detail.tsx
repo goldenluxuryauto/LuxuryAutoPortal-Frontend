@@ -236,6 +236,45 @@ export default function CarDetailPage() {
 
   const onboarding = onboardingData?.success ? onboardingData?.data : null;
 
+  // Debug logging for documents (only in development)
+  useEffect(() => {
+    if (import.meta.env.DEV && onboarding) {
+      console.log('[Car Detail] Onboarding data:', {
+        hasInsuranceCardUrl: !!onboarding.insuranceCardUrl,
+        insuranceCardUrl: onboarding.insuranceCardUrl,
+        hasDriversLicenseUrls: !!onboarding.driversLicenseUrls,
+        driversLicenseUrls: onboarding.driversLicenseUrls,
+        driversLicenseUrlsType: typeof onboarding.driversLicenseUrls,
+        isArray: Array.isArray(onboarding.driversLicenseUrls),
+      });
+    }
+  }, [onboarding]);
+
+  // Memoize filtered drivers license URLs to avoid repeated filtering
+  const validDriversLicenseUrls = useMemo(() => {
+    if (!onboarding?.driversLicenseUrls) {
+      return [];
+    }
+    
+    // Handle both array and string (JSON) formats
+    let urlsArray: any[] = [];
+    if (Array.isArray(onboarding.driversLicenseUrls)) {
+      urlsArray = onboarding.driversLicenseUrls;
+    } else if (typeof onboarding.driversLicenseUrls === 'string') {
+      try {
+        const parsed = JSON.parse(onboarding.driversLicenseUrls);
+        urlsArray = Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error('[Car Detail] Failed to parse driversLicenseUrls as JSON:', e);
+        urlsArray = [];
+      }
+    }
+    
+    return urlsArray
+      .filter((url: any) => url && typeof url === 'string' && url.trim())
+      .map((url: string) => url.trim());
+  }, [onboarding?.driversLicenseUrls]);
+
   // Calculate online status badge (moved to top level to avoid hooks violation)
   const onlineStatusBadge = useMemo(() => {
     if (!car?.owner) {
@@ -321,23 +360,21 @@ export default function CarDetailPage() {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (fullScreenDocument.type === 'license' && 
-          onboarding.driversLicenseUrls && 
-          Array.isArray(onboarding.driversLicenseUrls) && 
-          onboarding.driversLicenseUrls.length > 1 && 
+          validDriversLicenseUrls.length > 1 && 
           fullScreenDocument.index !== undefined) {
         if (e.key === 'ArrowLeft' && fullScreenDocument.index > 0) {
           const prevIndex = fullScreenDocument.index - 1;
-          const prevUrl = onboarding.driversLicenseUrls[prevIndex];
-          const imageUrl = prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl);
+          const prevUrl = validDriversLicenseUrls[prevIndex];
+          const imageUrl = prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl.startsWith('/') ? prevUrl : `/${prevUrl}`);
           setFullScreenDocument({ 
             url: imageUrl, 
             type: 'license', 
             index: prevIndex 
           });
-        } else if (e.key === 'ArrowRight' && fullScreenDocument.index < onboarding.driversLicenseUrls.length - 1) {
+        } else if (e.key === 'ArrowRight' && fullScreenDocument.index < validDriversLicenseUrls.length - 1) {
           const nextIndex = fullScreenDocument.index + 1;
-          const nextUrl = onboarding.driversLicenseUrls[nextIndex];
-          const imageUrl = nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl);
+          const nextUrl = validDriversLicenseUrls[nextIndex];
+          const imageUrl = nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl.startsWith('/') ? nextUrl : `/${nextUrl}`);
           setFullScreenDocument({ 
             url: imageUrl, 
             type: 'license', 
@@ -353,7 +390,7 @@ export default function CarDetailPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [fullScreenDocument, onboarding]);
+  }, [fullScreenDocument, validDriversLicenseUrls]);
 
   // Keyboard navigation for full screen image viewer
   useEffect(() => {
@@ -1099,7 +1136,7 @@ export default function CarDetailPage() {
               if (carId) {
                 setLocation(`/admin/view-car/${carId}`);
               } else {
-                setLocation("/admin/cars");
+                setLocation("/cars");
               }
             }}
             className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
@@ -1571,11 +1608,22 @@ export default function CarDetailPage() {
                   {/* Insurance Card */}
                   <div>
                     <h4 className="text-base font-semibold text-gray-200 mb-4">Insurance Card</h4>
-                    {onboarding.insuranceCardUrl ? (() => {
-                      const documentUrl = onboarding.insuranceCardUrl.startsWith('http') 
-                        ? onboarding.insuranceCardUrl 
-                        : buildApiUrl(onboarding.insuranceCardUrl);
-                      const isPdf = isPdfDocument(onboarding.insuranceCardUrl);
+                    {onboarding.insuranceCardUrl && String(onboarding.insuranceCardUrl).trim() ? (() => {
+                      const trimmedUrl = String(onboarding.insuranceCardUrl).trim();
+                      const documentUrl = trimmedUrl.startsWith('http') 
+                        ? trimmedUrl 
+                        : buildApiUrl(trimmedUrl.startsWith('/') ? trimmedUrl : `/${trimmedUrl}`);
+                      const isPdf = isPdfDocument(trimmedUrl);
+                      
+                      // Debug logging
+                      if (import.meta.env.DEV) {
+                        console.log('[Car Detail] Insurance Card URL:', {
+                          original: onboarding.insuranceCardUrl,
+                          trimmed: trimmedUrl,
+                          documentUrl,
+                          isPdf,
+                        });
+                      }
                       
                       return (
                         <div 
@@ -1637,11 +1685,21 @@ export default function CarDetailPage() {
                   {/* Drivers License */}
                   <div>
                     <h4 className="text-base font-semibold text-gray-200 mb-4">Drivers License</h4>
-                    {onboarding.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 ? (
+                    {validDriversLicenseUrls.length > 0 ? (
                       <div className="space-y-4">
-                        {onboarding.driversLicenseUrls.map((url: string, index: number) => {
-                          const documentUrl = url.startsWith('http') ? url : buildApiUrl(url);
+                        {validDriversLicenseUrls.map((url: string, index: number) => {
+                            const documentUrl = url.startsWith('http') ? url : buildApiUrl(url.startsWith('/') ? url : `/${url}`);
                           const isPdf = isPdfDocument(url);
+                            
+                            // Debug logging
+                            if (import.meta.env.DEV && index === 0) {
+                              console.log('[Car Detail] Drivers License URL:', {
+                                url,
+                                documentUrl,
+                                isPdf,
+                                totalUrls: validDriversLicenseUrls.length,
+                              });
+                            }
                           
                           return (
                             <div 
@@ -1693,9 +1751,9 @@ export default function CarDetailPage() {
                                     PDF
                                   </div>
                                 )}
-                                {onboarding.driversLicenseUrls.length > 1 && (
+                                {validDriversLicenseUrls.length > 1 && (
                                   <div className="absolute top-2 left-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-                                    {index + 1} / {onboarding.driversLicenseUrls.length}
+                                    {index + 1} / {validDriversLicenseUrls.length}
                                   </div>
                                 )}
                               </div>
@@ -2146,9 +2204,9 @@ export default function CarDetailPage() {
               setDriversLicensePreviews([]);
             }
           }}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold">
+              <DialogTitle className="text-lg sm:text-xl font-semibold">
                 Edit Car Information
               </DialogTitle>
               <DialogDescription className="text-gray-400">
@@ -3363,22 +3421,18 @@ export default function CarDetailPage() {
             <div className="relative w-full h-full flex items-center justify-center p-8">
               {/* Image Counter - Bottom Center (for multiple drivers licenses) */}
               {fullScreenDocument.type === 'license' && 
-               onboarding?.driversLicenseUrls && 
-               Array.isArray(onboarding.driversLicenseUrls) && 
-               onboarding.driversLicenseUrls.length > 1 && 
+               validDriversLicenseUrls.length > 1 && 
                fullScreenDocument.index !== undefined && (
                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
                   <span className="text-white text-base font-semibold tracking-wide">
-                    {fullScreenDocument.index + 1} / {onboarding.driversLicenseUrls.length}
+                    {fullScreenDocument.index + 1} / {validDriversLicenseUrls.length}
                   </span>
                 </div>
               )}
 
               {/* Navigation Buttons (for multiple drivers licenses) */}
               {fullScreenDocument.type === 'license' && 
-               onboarding?.driversLicenseUrls && 
-               Array.isArray(onboarding.driversLicenseUrls) && 
-               onboarding.driversLicenseUrls.length > 1 && 
+               validDriversLicenseUrls.length > 1 && 
                fullScreenDocument.index !== undefined && (
                 <>
                   {/* Previous Button */}
@@ -3389,8 +3443,8 @@ export default function CarDetailPage() {
                       onClick={(e) => {
                         e.stopPropagation();
                         const prevIndex = fullScreenDocument.index! - 1;
-                        const prevUrl = onboarding.driversLicenseUrls[prevIndex];
-                        const imageUrl = prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl);
+                        const prevUrl = validDriversLicenseUrls[prevIndex];
+                        const imageUrl = prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl.startsWith('/') ? prevUrl : `/${prevUrl}`);
                         setFullScreenDocument({ 
                           url: imageUrl, 
                           type: 'license', 
@@ -3406,15 +3460,15 @@ export default function CarDetailPage() {
                   )}
 
                   {/* Next Button */}
-                  {fullScreenDocument.index < onboarding.driversLicenseUrls.length - 1 && (
+                  {fullScreenDocument.index < validDriversLicenseUrls.length - 1 && (
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={(e) => {
                         e.stopPropagation();
                         const nextIndex = fullScreenDocument.index! + 1;
-                        const nextUrl = onboarding.driversLicenseUrls[nextIndex];
-                        const imageUrl = nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl);
+                        const nextUrl = validDriversLicenseUrls[nextIndex];
+                        const imageUrl = nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl.startsWith('/') ? nextUrl : `/${nextUrl}`);
                         setFullScreenDocument({ 
                           url: imageUrl, 
                           type: 'license', 

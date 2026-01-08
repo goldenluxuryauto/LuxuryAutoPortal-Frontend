@@ -130,7 +130,7 @@ const DEFAULT_TUTORIAL_STEPS: TutorialStep[] = [
     ],
     actionButton: {
       label: "Profile",
-      href: "/admin/profile",
+      href: "/profile",
     },
   },
   {
@@ -312,13 +312,20 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         clearTimeout(timeoutId);
         
       if (!response.ok) {
+        // 401 is expected when not authenticated - don't log as error
+        if (response.status === 401) {
+          return { user: undefined };
+        }
         return { user: undefined };
       }
       return response.json();
       } catch (error) {
         // If fetch fails (network error, timeout, etc.), return undefined user
         // This prevents the app from being blocked
+        // Don't log 401 errors as warnings - they're expected
+        if (error instanceof Error && !error.message.includes('401')) {
         console.warn("⚠️ [TUTORIAL] Failed to fetch user data (non-critical):", error);
+        }
         return { user: undefined };
       }
     },
