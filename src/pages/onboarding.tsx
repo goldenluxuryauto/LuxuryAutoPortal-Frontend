@@ -422,7 +422,7 @@ export default function Onboarding() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 flex flex-col items-center">
             <img
-              src="/logo.png"
+              src="/logo.svg"
               alt="Golden Luxury Auto"
               className="h-[47px] md:h-[60px] lg:h-[73px] w-auto object-contain mb-4 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
             />

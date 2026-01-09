@@ -25,7 +25,7 @@ export function Navbar() {
             data-testid="link-logo"
           >
             <img 
-              src="/logo.png" 
+              src="/logo.svg" 
               alt="Golden Luxury Auto" 
               className="w-[140px] md:w-[180px] h-auto object-contain drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
             />

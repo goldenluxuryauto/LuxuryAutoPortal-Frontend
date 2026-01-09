@@ -99,7 +99,7 @@ export default function Signup() {
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <img
-            src="/logo.png"
+            src="/logo.svg"
             alt="Golden Luxury Auto"
             className="h-[200px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_15px_rgba(234,235,128,0.5)]"
           />

@@ -234,7 +234,7 @@ export default function SignContract() {
         {/* Header */}
         <div className="text-center mb-6">
           <img 
-            src="/logo.png" 
+            src="/logo.svg" 
             alt="Golden Luxury Auto" 
             className="h-20 md:h-24 w-auto mx-auto object-contain mb-3 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
           />

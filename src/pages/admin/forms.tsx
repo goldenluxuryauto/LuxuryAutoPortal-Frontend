@@ -259,7 +259,7 @@ function QRCodeSection() {
                 className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium w-full lg:w-auto"
               >
                 <Share2 className="w-4 h-4 mr-2" />
-                Copy Link
+                Click to Copy the Link
               </Button>
             </div>
           </div>

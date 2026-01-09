@@ -330,7 +330,6 @@ export default function PaymentsPage() {
                     <TableHead className="text-right text-[#EAEB80] font-medium">Payout</TableHead>
                     <TableHead className="text-right text-[#EAEB80] font-medium">Balance</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Ref #</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Invoice #</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Payment Date</TableHead>
                     <TableHead className="text-center text-[#EAEB80] font-medium">Receipt</TableHead>
                   </TableRow>
@@ -373,9 +372,6 @@ export default function PaymentsPage() {
                           {payment.refNumber || "--"}
                         </TableCell>
                         <TableCell className="text-gray-400">
-                          {payment.invoiceNumber || "--"}
-                        </TableCell>
-                        <TableCell className="text-gray-400">
                           {payment.paymentDate || "--"}
                         </TableCell>
                         <TableCell className="text-center">
@@ -390,7 +386,7 @@ export default function PaymentsPage() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={9} className="text-center py-12 text-gray-500">
                         No payment records found
                       </TableCell>
                     </TableRow>

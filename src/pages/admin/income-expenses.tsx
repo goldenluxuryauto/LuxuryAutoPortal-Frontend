@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
+import { GraphsChartsReportSection } from "@/pages/admin/components/GraphsChartsReportSection";
+import { useLocation } from "wouter";
+import { ArrowLeft, ExternalLink } from "lucide-react";
+import { buildApiUrl } from "@/lib/queryClient";
+import { CarDetailSkeleton } from "@/components/ui/skeletons";
 
 interface ExpenseRow {
   label: string;
@@ -16,20 +21,23 @@ interface ExpenseCategory {
   total?: boolean;
 }
 
-const months = [
-  "Jan 2025",
-  "Feb 2025",
-  "Mar 2025",
-  "Apr 2025",
-  "May 2025",
-  "Jun 2025",
-  "Jul 2025",
-  "Aug 2025",
-  "Sep 2025",
-  "Oct 2025",
-  "Nov 2025",
-  "Dec 2025",
-];
+const generateMonths = (year: string): string[] => {
+  const yearNum = parseInt(year, 10);
+  return [
+    `Jan ${yearNum}`,
+    `Feb ${yearNum}`,
+    `Mar ${yearNum}`,
+    `Apr ${yearNum}`,
+    `May ${yearNum}`,
+    `Jun ${yearNum}`,
+    `Jul ${yearNum}`,
+    `Aug ${yearNum}`,
+    `Sep ${yearNum}`,
+    `Oct ${yearNum}`,
+    `Nov ${yearNum}`,
+    `Dec ${yearNum}`,
+  ];
+};
 
 const additionalColumns = [
   "Yr End Recon",
@@ -42,20 +50,76 @@ const formatCurrency = (value: number): string => {
 };
 
 export default function IncomeExpensesPage() {
-  const [selectedCar, setSelectedCar] = useState<string>("all");
+  const [, setLocation] = useLocation();
+
+  // If navigated from View Car, we include `?car=:id`
+  const carIdFromQuery = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    const carParam = new URLSearchParams(window.location.search).get("car");
+    if (!carParam) return null;
+    const parsed = parseInt(carParam, 10);
+    return Number.isFinite(parsed) ? parsed : null;
+  }, []);
+  const isCarFocused = !!carIdFromQuery;
+
+  const [selectedCar, setSelectedCar] = useState<string>(carIdFromQuery ? String(carIdFromQuery) : "all");
   const [selectedYear, setSelectedYear] = useState<string>("2026");
+  const months = useMemo(() => generateMonths(selectedYear), [selectedYear]);
+
+  useEffect(() => {
+    if (carIdFromQuery) setSelectedCar(String(carIdFromQuery));
+  }, [carIdFromQuery]);
 
   // Fetch cars for the dropdown
   const { data: carsData } = useQuery({
     queryKey: ["/api/cars"],
     queryFn: async () => {
-      const response = await fetch("/api/cars");
+      const response = await fetch(buildApiUrl("/api/cars"), { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch cars");
       return response.json();
     },
   });
 
   const cars = carsData?.data || [];
+
+  const { data: carData, isLoading: isCarLoading, error: carError } = useQuery<{
+    success: boolean;
+    data: any;
+  }>({
+    queryKey: ["/api/cars", carIdFromQuery],
+    queryFn: async () => {
+      if (!carIdFromQuery) throw new Error("Invalid car ID");
+      const response = await fetch(buildApiUrl(`/api/cars/${carIdFromQuery}`), { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch car");
+      return response.json();
+    },
+    enabled: !!carIdFromQuery,
+    retry: false,
+  });
+
+  const car = carData?.data;
+
+  const { data: onboardingData } = useQuery<{
+    success: boolean;
+    data: any;
+  }>({
+    queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
+    queryFn: async () => {
+      if (!car?.vin) throw new Error("No VIN");
+      const response = await fetch(buildApiUrl(`/api/onboarding/vin/${encodeURIComponent(car.vin)}`), {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        if (response.status === 404) return { success: true, data: null };
+        throw new Error("Failed to fetch onboarding data");
+      }
+      return response.json();
+    },
+    enabled: !!car?.vin,
+    retry: false,
+  });
+
+  const onboarding = onboardingData?.data;
 
   const [categories, setCategories] = useState<ExpenseCategory[]>([
     {
@@ -268,7 +332,7 @@ export default function IncomeExpensesPage() {
       ],
       total: false,
     },
-  ]);
+  ].map((cat) => ({ ...cat, isExpanded: true })));
 
   const toggleCategory = (index: number) => {
     setCategories((prev) =>
@@ -296,9 +360,155 @@ export default function IncomeExpensesPage() {
     return calculateYearEndRecon(values);
   };
 
+  if (isCarFocused && isCarLoading) {
+    return (
+      <AdminLayout>
+        <CarDetailSkeleton />
+      </AdminLayout>
+    );
+  }
+
+  if (isCarFocused && (carError || !car)) {
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center h-full">
+          <p className="text-red-400">Failed to load car details</p>
+          <button onClick={() => setLocation("/cars")} className="mt-4 text-[#EAEB80] hover:underline">
+            ← Back to Cars
+          </button>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout>
-      <div className="flex flex-col h-full overflow-hidden">
+      {/* Allow the page to scroll inside AdminLayout (prevents the table from being pushed off-screen) */}
+      <div className="flex flex-col w-full overflow-x-hidden">
+        {/* Breadcrumb Navigation + Car Header (when opened from View Car) */}
+        {isCarFocused && (
+          <>
+            <div className="flex items-center gap-2 mb-6">
+              <button
+                onClick={() => setLocation("/cars")}
+                className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Cars</span>
+              </button>
+              <span className="text-gray-500">/</span>
+              <button
+                onClick={() => setLocation(`/admin/view-car/${carIdFromQuery}`)}
+                className="text-gray-400 hover:text-[#EAEB80] transition-colors"
+              >
+                View Car
+              </button>
+              <span className="text-gray-500">/</span>
+              <span className="text-gray-400">Income and Expense</span>
+            </div>
+
+            <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 sm:p-6 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Information</h3>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <div>
+                      <span className="text-gray-400 text-xs sm:text-sm">Car Name: </span>
+                      <span className="text-white text-xs sm:text-sm break-words">
+                        {car?.makeModel || `${car?.year || ""} ${car?.vin || ""}`.trim()}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-xs sm:text-sm">VIN #: </span>
+                      <span className="text-white font-mono text-xs sm:text-sm break-all">{car?.vin || "N/A"}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-xs sm:text-sm">License: </span>
+                      <span className="text-white text-xs sm:text-sm">{car?.licensePlate || "N/A"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Owner Information</h3>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <div>
+                      <span className="text-gray-400 text-xs sm:text-sm">Name: </span>
+                      <span className="text-white text-xs sm:text-sm break-words">
+                        {car?.owner ? `${car.owner.firstName} ${car.owner.lastName}` : "N/A"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-xs sm:text-sm">Contact #: </span>
+                      <span className="text-white text-xs sm:text-sm">{car?.owner?.phone || "N/A"}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-xs sm:text-sm">Email: </span>
+                      <span className="text-white text-xs sm:text-sm break-all">{car?.owner?.email || "N/A"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Specifications</h3>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <div>
+                      <span className="text-gray-400 text-xs sm:text-sm">Fuel/Gas: </span>
+                      <span className="text-white text-xs sm:text-sm">
+                        {onboarding?.fuelType || car?.fuelType || "N/A"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-xs sm:text-sm">Tire Size: </span>
+                      <span className="text-white text-xs sm:text-sm">
+                        {onboarding?.tireSize || car?.tireSize || "N/A"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-xs sm:text-sm">Oil Type: </span>
+                      <span className="text-white text-xs sm:text-sm">
+                        {onboarding?.oilType || car?.oilType || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Turo Links</h3>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    {car?.turoLink && (
+                      <div>
+                        <a
+                          href={car.turoLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                        >
+                          Turo Link: View Car <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
+                    {car?.adminTuroLink && (
+                      <div>
+                        <a
+                          href={car.adminTuroLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                        >
+                          Admin Turo Link: View Car <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
+                    {!car?.turoLink && !car?.adminTuroLink && (
+                      <span className="text-gray-500 text-sm">No Turo links available</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
         <div className="flex-shrink-0 space-y-6 mb-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-serif text-[#EAEB80] italic mb-2">Income and Expenses</h1>
@@ -307,22 +517,25 @@ export default function IncomeExpensesPage() {
 
           {/* Filters */}
           <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-end">
-            <div className="w-full md:w-[400px]">
-              <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Select a car</label>
-              <Select value={selectedCar} onValueChange={setSelectedCar}>
-                <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                  <SelectValue placeholder="Select a car" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                  <SelectItem value="all">All Cars</SelectItem>
-                  {cars.map((car: any) => (
-                    <SelectItem key={car.id} value={car.id.toString()}>
-                      {car.make || ""} {car.model || ""} {car.year || ""} {car.vinNumber ? `(${car.vinNumber})` : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {!isCarFocused && (
+              <div className="w-full md:w-[400px]">
+                <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Select a car</label>
+                <Select value={selectedCar} onValueChange={setSelectedCar}>
+                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                    <SelectValue placeholder="Select a car" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectItem value="all">All Cars</SelectItem>
+                    {cars.map((carItem: any) => (
+                      <SelectItem key={carItem.id} value={carItem.id.toString()}>
+                        {carItem.make || ""} {carItem.model || ""} {carItem.year || ""}{" "}
+                        {carItem.vinNumber ? `(${carItem.vinNumber})` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="w-full md:w-[150px] md:ml-auto">
               <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Year</label>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
@@ -340,10 +553,12 @@ export default function IncomeExpensesPage() {
               </Select>
             </div>
           </div>
+
         </div>
 
-        <div className="flex-1 min-h-0 bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden">
-          <div className="h-full overflow-y-auto w-full overflow-x-auto">
+        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden">
+          {/* Table scroll container */}
+          <div className="max-h-[70vh] overflow-y-auto w-full overflow-x-auto">
             <table className="border-collapse w-full table-fixed min-w-[800px]">
               <colgroup>
                 <col style={{ width: '15%' }} />
@@ -488,6 +703,9 @@ export default function IncomeExpensesPage() {
             </table>
           </div>
         </div>
+
+        {/* Graphs and Charts Report Section (moved from Graphs and Charts Report page) */}
+        <GraphsChartsReportSection className="mt-6" />
       </div>
     </AdminLayout>
   );

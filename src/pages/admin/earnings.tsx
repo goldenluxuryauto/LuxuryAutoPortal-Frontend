@@ -8,6 +8,7 @@ import { ArrowLeft, ExternalLink, Plus, Image as ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { buildApiUrl } from "@/lib/queryClient";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
+import { GraphsChartsReportSection } from "@/pages/admin/components/GraphsChartsReportSection";
 
 interface ExpenseRow {
   label: string;
@@ -665,6 +666,9 @@ export default function EarningsPage() {
             </div>
           </div>
         </div>
+
+        {/* Graphs and Charts Report Section (moved from Graphs and Charts Report page) */}
+        <GraphsChartsReportSection className="mb-6" />
       </div>
     </AdminLayout>
   );
