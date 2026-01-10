@@ -36,7 +36,7 @@ const generateMonths = (year: string): string[] => {
     `Oct ${yearNum}`,
     `Nov ${yearNum}`,
     `Dec ${yearNum}`,
-  ];
+];
 };
 
 const additionalColumns = [
@@ -518,23 +518,23 @@ export default function IncomeExpensesPage() {
           {/* Filters */}
           <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-end">
             {!isCarFocused && (
-              <div className="w-full md:w-[400px]">
+            <div className="w-full md:w-[400px]">
                 <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Select a car</label>
-                <Select value={selectedCar} onValueChange={setSelectedCar}>
-                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                    <SelectValue placeholder="Select a car" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                    <SelectItem value="all">All Cars</SelectItem>
+              <Select value={selectedCar} onValueChange={setSelectedCar}>
+                <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                  <SelectValue placeholder="Select a car" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                  <SelectItem value="all">All Cars</SelectItem>
                     {cars.map((carItem: any) => (
                       <SelectItem key={carItem.id} value={carItem.id.toString()}>
                         {carItem.make || ""} {carItem.model || ""} {carItem.year || ""}{" "}
                         {carItem.vinNumber ? `(${carItem.vinNumber})` : ""}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             )}
             <div className="w-full md:w-[150px] md:ml-auto">
               <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Year</label>

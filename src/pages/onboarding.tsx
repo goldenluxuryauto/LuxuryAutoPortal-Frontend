@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,7 +34,8 @@ import {
 } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 
-const onboardingSchema = z.object({
+const onboardingSchema = z
+  .object({
   date: z.string().min(1, "Date is required"),
   tshirtSize: z.string().min(1, "T-Shirt Size is required"),
   firstNameOwner: z.string().min(2, "First name is required"),
@@ -73,9 +74,9 @@ const onboardingSchema = z.object({
   roofRails: z.string().min(1, "Roof rails is required"),
   lastOilChange: z.string().min(1, "Last oil change is required"),
   oilType: z.string().min(1, "Oil type is required"),
-  freeDealershipOilChanges: z
-    .string()
-    .min(1, "Free dealership oil changes is required"),
+  freeDealershipOilChanges: z.enum(["Yes", "No"], {
+    required_error: "Free dealership oil changes is required",
+  }),
   oilPackageDetails: z.string().optional(),
   dealershipAddress: z.string().optional(),
   fuelType: z.string().min(1, "Fuel type is required"),
@@ -101,9 +102,17 @@ const onboardingSchema = z.object({
   carManufacturerWebsite: z.string().url("Valid URL is required"),
   carManufacturerUsername: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
-  confirmAgreement: z
-    .boolean()
-    .refine((val) => val === true, "You must confirm"),
+  confirmAgreement: z.boolean().refine((val) => val === true, "You must confirm"),
+})
+  .superRefine((data, ctx) => {
+    if (data.freeDealershipOilChanges === "Yes" && !data.oilPackageDetails?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["oilPackageDetails"],
+        message:
+          "Oil package details is required when free dealership oil changes is Yes",
+      });
+    }
 });
 
 type OnboardingFormData = z.infer<typeof onboardingSchema>;
@@ -158,8 +167,8 @@ function generateRandomData(): OnboardingFormData {
     roofRails: "Yes",
     lastOilChange: "2024-01-15",
     oilType: "5W-30",
-    freeDealershipOilChanges: "2",
-    oilPackageDetails: "Premium oil",
+    freeDealershipOilChanges: "Yes",
+    oilPackageDetails: "2 years / Premium oil package",
     dealershipAddress: "456 Oak Street",
     fuelType: "Gasoline",
     tireSize: "225/45R17",
@@ -200,7 +209,7 @@ export default function Onboarding() {
   const [isDraggingLicense, setIsDraggingLicense] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<OnboardingFormData>({
+  const form = useForm<OnboardingFormData, any, OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
       date: "",
@@ -237,7 +246,9 @@ export default function Onboarding() {
       roofRails: "",
       lastOilChange: "",
       oilType: "",
-      freeDealershipOilChanges: "",
+      freeDealershipOilChanges: undefined,
+      oilPackageDetails: "",
+      dealershipAddress: "",
       fuelType: "",
       tireSize: "",
       vehicleFeatures: [],
@@ -262,6 +273,15 @@ export default function Onboarding() {
       confirmAgreement: false,
     },
   });
+
+  const freeOilChanges = form.watch("freeDealershipOilChanges");
+
+  // Keep dependent field clean when "No" is selected
+  useEffect(() => {
+    if (freeOilChanges !== "Yes") {
+      form.setValue("oilPackageDetails", "");
+    }
+  }, [freeOilChanges, form]);
 
   const fillWithRandomData = () => {
     form.reset(generateRandomData());
@@ -1248,13 +1268,16 @@ export default function Onboarding() {
                                 </FormItem>
                               )}
                             />
+
+                            {/* Right column: dropdown (matches screenshot) */}
+                            <div className="space-y-4">
                             <FormField
                               control={form.control}
                               name="freeDealershipOilChanges"
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel className="text-gray-300">
-                                    Free Dealership Oil Changes *
+                                      Does Your Vehicle Have Free Dealership Oil Changes? *
                                   </FormLabel>
                                   <Select
                                     onValueChange={field.onChange}
@@ -1266,11 +1289,8 @@ export default function Onboarding() {
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                      {[0, 1, 2, 3, 4, 5].map((n) => (
-                                        <SelectItem key={n} value={String(n)}>
-                                          {n}
-                                        </SelectItem>
-                                      ))}
+                                        <SelectItem value="Yes">Yes</SelectItem>
+                                        <SelectItem value="No">No</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <FormMessage />
@@ -1278,6 +1298,59 @@ export default function Onboarding() {
                               )}
                             />
                           </div>
+                          </div>
+
+                          {/* Full-width row (spans both columns) */}
+                          <div className="grid grid-cols-1 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="oilPackageDetails"
+                              render={({ field }) => (
+                                <FormItem className="w-full">
+                                  <FormLabel className="text-gray-300">
+                                    If Yes, For How Many Years of Oil Changes OR What Oil Package
+                                    {freeOilChanges === "Yes" ? " *" : ""}
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder={
+                                        freeOilChanges === "Yes"
+                                          ? "e.g., 2 years / Premium oil package"
+                                          : "Select “Yes” above to enable"
+                                      }
+                                      disabled={freeOilChanges !== "Yes"}
+                                      className="w-full bg-[#0a0a0a] border-gray-700 disabled:opacity-60"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="dealershipAddress"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300">
+                                    Address of Dealership (If Applicable)
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="Dealership address (optional)"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
                           <div className="grid grid-cols-2 gap-4">
                             <FormField
                               control={form.control}

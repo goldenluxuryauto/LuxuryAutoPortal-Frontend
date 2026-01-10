@@ -96,6 +96,8 @@ const carSchema = z.object({
   oilType: z.string().optional(),
   lastOilChange: z.string().optional(),
   freeDealershipOilChanges: z.string().optional(),
+  oilPackageDetails: z.string().optional(),
+  dealershipAddress: z.string().optional(),
   fuelType: z.string().optional(),
   tireSize: z.string().optional(),
   vehicleFeatures: z.string().optional(), // JSON string array or comma-separated
@@ -444,6 +446,8 @@ export default function CarDetailPage() {
       oilType: "",
       lastOilChange: "",
       freeDealershipOilChanges: "",
+      oilPackageDetails: "",
+      dealershipAddress: "",
       fuelType: "",
       tireSize: "",
       vehicleFeatures: "",
@@ -495,6 +499,8 @@ export default function CarDetailPage() {
       formData.append("oilType", data.oilType || "");
       formData.append("lastOilChange", data.lastOilChange || "");
       formData.append("freeDealershipOilChanges", data.freeDealershipOilChanges || "");
+      formData.append("oilPackageDetails", data.oilPackageDetails || "");
+      formData.append("dealershipAddress", data.dealershipAddress || "");
       formData.append("fuelType", data.fuelType || "");
       formData.append("tireSize", data.tireSize || "");
       // Convert vehicleFeatures to JSON array if it's a comma-separated string
@@ -874,6 +880,8 @@ export default function CarDetailPage() {
       oilType: onboarding?.oilType || "",
       lastOilChange: onboarding?.lastOilChange || "",
       freeDealershipOilChanges: onboarding?.freeDealershipOilChanges || "",
+      oilPackageDetails: (onboarding as any)?.oilPackageDetails || "",
+      dealershipAddress: (onboarding as any)?.dealershipAddress || "",
       fuelType: onboarding?.fuelType || "",
       tireSize: onboarding?.tireSize || "",
       vehicleFeatures: vehicleFeaturesValue,
@@ -1237,6 +1245,14 @@ export default function CarDetailPage() {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Free Oil Change</p>
                     <p className="text-white text-sm sm:text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Oil Package Details</p>
+                    <p className="text-white text-sm sm:text-base">{(onboarding as any)?.oilPackageDetails ? formatValue((onboarding as any).oilPackageDetails) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Dealership Address</p>
+                    <p className="text-white text-sm sm:text-base">{(onboarding as any)?.dealershipAddress ? formatValue((onboarding as any).dealershipAddress) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Trim</p>
@@ -2533,6 +2549,40 @@ export default function CarDetailPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-gray-400">Free Service Center Oil Change</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="oilPackageDetails"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Oil Package Details</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="dealershipAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Dealership Address</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
