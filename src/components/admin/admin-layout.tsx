@@ -47,7 +47,6 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/income-expenses", label: "Income and Expenses", icon: DollarSign, roles: ["admin"] },
   { href: "/admin/payments", label: "Client Payments", icon: CreditCard, roles: ["admin"] },
   { href: "/admin/totals", label: "Totals", icon: Calculator },
-  { href: "/admin/earnings", label: "Earnings Calculator", icon: Calculator },
   { href: "/admin/maintenance", label: "Car Maintenance", icon: Wrench },
   { href: "/admin/forms", label: "Forms", icon: ClipboardList },
   { href: "/admin/view-client", label: "View as a Client", icon: Eye, roles: ["admin"] },
@@ -138,7 +137,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         <div className="flex items-center justify-between h-16 px-4 border-b border-[#1a1a1a]">
           <Link href="/dashboard" className="flex items-center gap-2">
             <img 
-              src="/logo.png" 
+              src="/logo.svg" 
               alt="Golden Luxury Auto" 
               className={cn(
                 "object-contain transition-all duration-300 drop-shadow-[0_0_8px_rgba(234,235,128,0.3)]",

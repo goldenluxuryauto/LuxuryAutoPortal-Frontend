@@ -1339,13 +1339,6 @@ export default function ClientDetailPage() {
                     <div className="text-center py-8">
                       <Car className="w-12 h-12 mx-auto mb-4 text-gray-600" />
                       <p className="text-gray-400 mb-4">No cars assigned to this client</p>
-                      <Button
-                        onClick={() => setIsAddCarOpen(true)}
-                        className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add First Car
-                      </Button>
                     </div>
                   ) : (
                     <div className="overflow-x-auto">

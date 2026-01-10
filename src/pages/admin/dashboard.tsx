@@ -175,7 +175,7 @@ export default function AdminDashboard() {
       <div className="space-y-6">
         <div className="text-center mb-8">
           <img 
-            src="/logo.png" 
+            src="/logo.svg" 
             alt="Golden Luxury Auto" 
             className="h-[47px] md:h-[60px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
           />

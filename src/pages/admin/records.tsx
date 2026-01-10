@@ -347,7 +347,6 @@ export default function RecordsPage() {
                 <TableHeader>
                   <TableRow className="border-[#2a2a2a] hover:bg-transparent">
                     <TableHead className="text-center text-[#EAEB80] font-medium w-12">#</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Status</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Document Name</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Date</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Remarks</TableHead>
@@ -362,18 +361,6 @@ export default function RecordsPage() {
                       >
                         <TableCell className="text-center text-gray-300">
                           {(index + 1)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={cn(
-                              "text-xs",
-                              doc.status === "Active"
-                                ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-                            )}
-                          >
-                            {doc.status}
-                          </Badge>
                         </TableCell>
                         <TableCell className="text-white">{doc.documentName}</TableCell>
                         <TableCell className="text-gray-300">{doc.date}</TableCell>
@@ -397,7 +384,7 @@ export default function RecordsPage() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={4} className="text-center py-12 text-gray-500">
                         No documents found
                       </TableCell>
                     </TableRow>
