@@ -80,7 +80,7 @@ export default function ClientsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
-  
+
   // Load items per page from localStorage, default to 10
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
     const saved = localStorage.getItem("clients_limit");
@@ -241,7 +241,7 @@ export default function ClientsPage() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
-      
+
       // Show appropriate message based on email status
       if (data.emailSent) {
         toast({
@@ -255,7 +255,7 @@ export default function ClientsPage() {
           variant: "default",
         });
       }
-      
+
       setIsAddModalOpen(false);
       form.reset();
     },
@@ -319,11 +319,11 @@ export default function ClientsPage() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
       queryClient.invalidateQueries({ queryKey: ["/api/onboarding/submissions"] });
-      
+
       // Handle response structure - data might be nested or flat
       const importData = data.data || data;
       const { total = 0, successful = 0, failed = 0, errors = [] } = importData;
-      
+
       // Show success toast
       toast({
         title: "Import Completed",
@@ -338,8 +338,8 @@ export default function ClientsPage() {
         setShowImportErrors(true);
         // Keep modal open if there are errors so user can see them
       } else {
-      setIsImportModalOpen(false);
-      setImportFile(null);
+        setIsImportModalOpen(false);
+        setImportFile(null);
         setImportErrors([]);
       }
     },
@@ -675,7 +675,7 @@ export default function ClientsPage() {
                     credentials: "include",
                     method: "GET",
                   });
-                  
+
                   if (!excelResponse.ok) {
                     // Check if response is JSON (error response)
                     const contentType = excelResponse.headers.get("content-type");
@@ -685,7 +685,7 @@ export default function ClientsPage() {
                     }
                     throw new Error(`Failed to download Excel file (${excelResponse.status} ${excelResponse.statusText})`);
                   }
-                  
+
                   const excelBlob = await excelResponse.blob();
                   const excelUrl = window.URL.createObjectURL(excelBlob);
                   const excelLink = document.createElement("a");
@@ -701,7 +701,7 @@ export default function ClientsPage() {
                     credentials: "include",
                     method: "GET",
                   });
-                  
+
                   if (!csvResponse.ok) {
                     // Check if response is JSON (error response)
                     const contentType = csvResponse.headers.get("content-type");
@@ -711,7 +711,7 @@ export default function ClientsPage() {
                     }
                     throw new Error(`Failed to download CSV file (${csvResponse.status} ${csvResponse.statusText})`);
                   }
-                  
+
                   const csvBlob = await csvResponse.blob();
                   const csvUrl = window.URL.createObjectURL(csvBlob);
                   const csvLink = document.createElement("a");
@@ -890,8 +890,8 @@ export default function ClientsPage() {
                                 client.status === 3
                                   ? "bg-red-500/20 text-red-400 border-red-500/30"
                                   : client.status === 0
-                                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                  : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                                    ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                    : "bg-gray-500/20 text-gray-400 border-gray-500/30"
                               )}
                             >
                               {client.status === 3 ? "Blocked" : client.status === 0 ? "Active" : "Inactive"}
@@ -926,7 +926,7 @@ export default function ClientsPage() {
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
-                              
+
                               {/* Grant Access / Suspend - Toggle based on status */}
                               {/* Status 0 = Active (Access) - Show Suspend button */}
                               {client.status === 0 ? (
@@ -944,7 +944,7 @@ export default function ClientsPage() {
                                   {revokeAccessMutation.isPending && revokeClientEmail === client.email ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
                                   ) : (
-                                  <Lock className="w-4 h-4" />
+                                    <Lock className="w-4 h-4" />
                                   )}
                                 </Button>
                               ) : client.status === 1 ? (
@@ -998,7 +998,7 @@ export default function ClientsPage() {
                                 </Button>
                               ) : null}
                               {/* Status 3 = Inactive (Block) - Buttons shown but disabled (except view) */}
-                              
+
                               {/* Block Account - Ban icon - Show but disable if blocked (status === 3) */}
                               {client.status === 3 ? (
                                 <Button

@@ -153,17 +153,17 @@ export default function ClientDetailPage() {
   const [maintenanceTypeFilter, setMaintenanceTypeFilter] = useState<string>("all");
   const [maintenanceStatusFilter, setMaintenanceStatusFilter] = useState<string>("all");
   const [maintenanceDateFilter, setMaintenanceDateFilter] = useState<string>("");
-  
+
   // Totals filters
   const [selectedCar, setSelectedCar] = useState<string>("all");
   const [selectedYear, setSelectedYear] = useState<string>("2025");
   const [fromYear, setFromYear] = useState<string>("2025");
   const [toYear, setToYear] = useState<string>("2025");
-  
+
   // Edit modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState<any>({});
-  
+
   // Upload contract modal state
   const [isUploadContractOpen, setIsUploadContractOpen] = useState(false);
   const [uploadContractForm, setUploadContractForm] = useState({
@@ -174,7 +174,7 @@ export default function ClientDetailPage() {
     vinNumber: "",
     licensePlate: "",
   });
-  
+
   // Add car modal state
   const [isAddCarOpen, setIsAddCarOpen] = useState(false);
   const [addCarForm, setAddCarForm] = useState({
@@ -195,7 +195,7 @@ export default function ClientDetailPage() {
     turoLink: "",
     adminTuroLink: "",
   });
-  
+
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery<{
@@ -215,16 +215,16 @@ export default function ClientDetailPage() {
       }
       const result = await response.json();
       // Log summary including lastLoginAt and lastLogoutAt for debugging
-      console.log("✅ [CLIENT DETAIL] Fetched client data:", {
-        id: result.data?.id,
-        email: result.data?.email,
-        name: result.data?.firstName + " " + result.data?.lastName,
-        lastLoginAt: result.data?.lastLoginAt,
-        lastLogoutAt: result.data?.lastLogoutAt,
-        isActive: result.data?.isActive,
-        status: result.data?.status,
-        userId: result.data?.userId,
-      });
+      // console.log("✅ [CLIENT DETAIL] Fetched client data:", {
+      //   id: result.data?.id,
+      //   email: result.data?.email,
+      //   name: result.data?.firstName + " " + result.data?.lastName,
+      //   lastLoginAt: result.data?.lastLoginAt,
+      //   lastLogoutAt: result.data?.lastLogoutAt,
+      //   isActive: result.data?.isActive,
+      //   status: result.data?.status,
+      //   userId: result.data?.userId,
+      // });
       return result;
     },
     enabled: !!clientId,
@@ -284,14 +284,14 @@ export default function ClientDetailPage() {
     if (!client) {
       return null;
     }
-    
+
     // Online Status is based ONLY on login/logout activity, NOT on account status
     // No time threshold - status changes immediately based on login/logout events
     const onlineStatus = getOnlineStatusBadge(
       client.lastLoginAt,
       client.lastLogoutAt // lastLogoutAt - if exists and more recent than login, user is offline
     );
-    
+
     return onlineStatus;
   }, [client?.lastLoginAt, client?.lastLogoutAt]);
 
@@ -347,13 +347,13 @@ export default function ClientDetailPage() {
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
       if (!clientId) throw new Error("Invalid client ID");
-      
+
       // Determine which endpoint to use based on whether onboarding data exists
       const hasOnboardingData = onboardingData?.success && onboardingData?.data;
-      const endpoint = hasOnboardingData 
+      const endpoint = hasOnboardingData
         ? `/api/clients/${clientId}/onboarding`
         : `/api/clients/${clientId}`;
-      
+
       // Transform data for the client endpoint if no onboarding data
       // Send all fields so the backend can create/update onboarding record
       const body = hasOnboardingData ? data : {
@@ -402,7 +402,7 @@ export default function ClientDetailPage() {
         // Client Status
         status: data.status,
       };
-      
+
       const response = await fetch(buildApiUrl(endpoint), {
         method: "PUT",
         headers: {
@@ -519,7 +519,7 @@ export default function ClientDetailPage() {
   const addCarMutation = useMutation({
     mutationFn: async (data: typeof addCarForm) => {
       if (!clientId) throw new Error("Invalid client ID");
-      
+
       const formData = new FormData();
       formData.append("vin", data.vin);
       formData.append("makeModel", `${data.make} ${data.model}`.trim());
@@ -554,12 +554,12 @@ export default function ClientDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/clients", clientId] });
       toast({ title: "Success", description: "Car added successfully" });
       setIsAddCarOpen(false);
-      setAddCarForm({ 
-        vin: "", 
-        make: "", 
-        model: "", 
-        year: "", 
-        licensePlate: "", 
+      setAddCarForm({
+        vin: "",
+        make: "",
+        model: "",
+        year: "",
+        licensePlate: "",
         mileage: "",
         color: "",
         interiorColor: "",
@@ -1372,92 +1372,92 @@ export default function ClientDetailPage() {
                         <TableBody>
                           {client.cars.map((car, index) => {
                             // Determine Management value based on owner name
-                            const ownerFullName = car.owner 
+                            const ownerFullName = car.owner
                               ? `${car.owner.firstName || ''} ${car.owner.lastName || ''}`.trim()
                               : '';
                             const managementValue = ownerFullName === "Jay Barton" ? "Own" : "Manage";
 
                             return (
-                            <TableRow
-                              key={car.id}
-                              className="border-[#2a2a2a] hover:bg-gray-800/50 transition-colors"
-                            >
-                              <TableCell className="text-center text-[#EAEB80] px-4 py-3 align-middle">
-                                {index + 1}
-                              </TableCell>
-                              <TableCell className="text-left px-4 py-3 align-middle">
-                                <Badge
-                                  variant="outline"
-                                  className={cn(
-                                    car.status === "available"
-                                      ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                      : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-                                  )}
-                                >
-                                  {car.status === "available" ? "Available" : "Off Fleet"}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-left px-4 py-3 align-middle">
-                                <a
-                                  href={`/admin/view-car/${car.id}`}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    setLocation(`/admin/view-car/${car.id}`);
-                                  }}
-                                  className="text-[#EAEB80] hover:underline"
-                                >
-                                  View Stats
-                                </a>
-                              </TableCell>
-                              <TableCell className="text-left text-white px-4 py-3 align-middle">
-                                {managementValue}
-                              </TableCell>
-                              <TableCell className="text-left text-white px-4 py-3 align-middle">
-                                {car.make || "N/A"}
-                              </TableCell>
-                              <TableCell className="text-left text-white px-4 py-3 align-middle">
-                                {car.year || "N/A"}
-                              </TableCell>
-                              <TableCell className="text-left text-white px-4 py-3 align-middle">
-                                {car.model || "N/A"}
-                              </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
-                                {car.contactPhone || car.owner?.phone || "N/A"}
-                              </TableCell>
-                              <TableCell className="text-left text-white font-mono text-sm px-4 py-3 align-middle">
-                                {car.vin}
-                              </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
-                                {car.licensePlate || "N/A"}
-                              </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
-                                {car.fuelType || "N/A"}
-                              </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
-                                {car.tireSize || "N/A"}
-                              </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
-                                {car.oilType || "N/A"}
-                              </TableCell>
-                              <TableCell className="text-left px-4 py-3 align-middle">
-                                <a
-                                  href="#"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="text-[#EAEB80] hover:underline"
-                                >
-                                  <ExternalLink className="w-4 h-4" />
-                                </a>
-                              </TableCell>
-                              <TableCell className="text-left px-4 py-3 align-middle">
-                                <a
-                                  href="#"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="text-[#EAEB80] hover:underline"
-                                >
-                                  <ExternalLink className="w-4 h-4" />
-                                </a>
-                              </TableCell>
-                            </TableRow>
+                              <TableRow
+                                key={car.id}
+                                className="border-[#2a2a2a] hover:bg-gray-800/50 transition-colors"
+                              >
+                                <TableCell className="text-center text-[#EAEB80] px-4 py-3 align-middle">
+                                  {index + 1}
+                                </TableCell>
+                                <TableCell className="text-left px-4 py-3 align-middle">
+                                  <Badge
+                                    variant="outline"
+                                    className={cn(
+                                      car.status === "available"
+                                        ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                        : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                                    )}
+                                  >
+                                    {car.status === "available" ? "Available" : "Off Fleet"}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-left px-4 py-3 align-middle">
+                                  <a
+                                    href={`/admin/view-car/${car.id}`}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      setLocation(`/admin/view-car/${car.id}`);
+                                    }}
+                                    className="text-[#EAEB80] hover:underline"
+                                  >
+                                    View Stats
+                                  </a>
+                                </TableCell>
+                                <TableCell className="text-left text-white px-4 py-3 align-middle">
+                                  {managementValue}
+                                </TableCell>
+                                <TableCell className="text-left text-white px-4 py-3 align-middle">
+                                  {car.make || "N/A"}
+                                </TableCell>
+                                <TableCell className="text-left text-white px-4 py-3 align-middle">
+                                  {car.year || "N/A"}
+                                </TableCell>
+                                <TableCell className="text-left text-white px-4 py-3 align-middle">
+                                  {car.model || "N/A"}
+                                </TableCell>
+                                <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                                  {car.contactPhone || car.owner?.phone || "N/A"}
+                                </TableCell>
+                                <TableCell className="text-left text-white font-mono text-sm px-4 py-3 align-middle">
+                                  {car.vin}
+                                </TableCell>
+                                <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                                  {car.licensePlate || "N/A"}
+                                </TableCell>
+                                <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                                  {car.fuelType || "N/A"}
+                                </TableCell>
+                                <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                                  {car.tireSize || "N/A"}
+                                </TableCell>
+                                <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                                  {car.oilType || "N/A"}
+                                </TableCell>
+                                <TableCell className="text-left px-4 py-3 align-middle">
+                                  <a
+                                    href="#"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="text-[#EAEB80] hover:underline"
+                                  >
+                                    <ExternalLink className="w-4 h-4" />
+                                  </a>
+                                </TableCell>
+                                <TableCell className="text-left px-4 py-3 align-middle">
+                                  <a
+                                    href="#"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="text-[#EAEB80] hover:underline"
+                                  >
+                                    <ExternalLink className="w-4 h-4" />
+                                  </a>
+                                </TableCell>
+                              </TableRow>
                             );
                           })}
                         </TableBody>
@@ -1472,7 +1472,7 @@ export default function ClientDetailPage() {
               <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                  <CardTitle className="text-[#EAEB80] text-xl">Totals</CardTitle>
+                    <CardTitle className="text-[#EAEB80] text-xl">Totals</CardTitle>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -1486,7 +1486,7 @@ export default function ClientDetailPage() {
                       Export
                     </Button>
                   </div>
-                  
+
                   {/* Filters */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
                     <Select value={selectedCar} onValueChange={setSelectedCar}>
@@ -1554,14 +1554,14 @@ export default function ClientDetailPage() {
                     </div>
                   ) : (
                     <Accordion type="multiple" className="w-full space-y-2">
-                  {/* CAR MANAGEMENT AND CAR OWNER SPLIT */}
+                      {/* CAR MANAGEMENT AND CAR OWNER SPLIT */}
                       <AccordionItem value="split" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                      <span className="text-white font-medium">CAR MANAGEMENT AND CAR OWNER SPLIT</span>
-                    </div>
+                            <span className="text-white font-medium">CAR MANAGEMENT AND CAR OWNER SPLIT</span>
+                          </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
@@ -1570,7 +1570,7 @@ export default function ClientDetailPage() {
                               <span className="text-white font-medium">
                                 ${totals?.carManagementSplit?.toFixed(2) || "0.00"}
                               </span>
-                  </div>
+                            </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Car Owner Split</span>
                               <span className="text-white font-medium">
@@ -1581,25 +1581,25 @@ export default function ClientDetailPage() {
                         </AccordionContent>
                       </AccordionItem>
 
-                  {/* INCOME */}
+                      {/* INCOME */}
                       <AccordionItem value="income" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                      <span className="text-white font-medium">INCOME</span>
-                        </div>
+                            <span className="text-white font-medium">INCOME</span>
+                          </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Rental Income</span>
                               <span className="text-white">${totals?.income?.rentalIncome?.toFixed(2) || "0.00"}</span>
-                      </div>
+                            </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Delivery Income</span>
                               <span className="text-white">${totals?.income?.deliveryIncome?.toFixed(2) || "0.00"}</span>
-                  </div>
+                            </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Electric Prepaid Income</span>
                               <span className="text-white">${totals?.income?.electricPrepaidIncome?.toFixed(2) || "0.00"}</span>
@@ -1666,25 +1666,25 @@ export default function ClientDetailPage() {
                         </AccordionContent>
                       </AccordionItem>
 
-                  {/* OPERATING EXPENSES */}
+                      {/* OPERATING EXPENSES */}
                       <AccordionItem value="expenses" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
                             <span className="text-white font-medium">OPERATING EXPENSES (COGS - Per Vehicle)</span>
-                        </div>
+                          </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Auto Body Shop / Wreck</span>
                               <span className="text-white">${totals?.expenses?.autoBodyShop?.toFixed(2) || "0.00"}</span>
-                      </div>
+                            </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Alignment</span>
                               <span className="text-white">${totals?.expenses?.alignment?.toFixed(2) || "0.00"}</span>
-                  </div>
+                            </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Battery</span>
                               <span className="text-white">${totals?.expenses?.battery?.toFixed(2) || "0.00"}</span>
@@ -1749,25 +1749,25 @@ export default function ClientDetailPage() {
                         </AccordionContent>
                       </AccordionItem>
 
-                  {/* GLA PARKING FEE & LABOR CLEANING */}
+                      {/* GLA PARKING FEE & LABOR CLEANING */}
                       <AccordionItem value="gla" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                      <span className="text-white font-medium">GLA PARKING FEE & LABOR CLEANING</span>
-                        </div>
+                            <span className="text-white font-medium">GLA PARKING FEE & LABOR CLEANING</span>
+                          </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>GLA Labor - Cleaning</span>
                               <span className="text-white">${totals?.gla?.laborCleaning?.toFixed(2) || "0.00"}</span>
-                      </div>
+                            </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>GLA Parking Fee</span>
                               <span className="text-white">${totals?.gla?.parkingFee?.toFixed(2) || "0.00"}</span>
-                  </div>
+                            </div>
                             <div className="flex justify-between text-[#EAEB80] text-sm font-bold pt-2 border-t border-[#2a2a2a]">
                               <span>Total GLA Parking Fee & Labor Cleaning</span>
                               <span>${totals?.gla?.total?.toFixed(2) || "0.00"}</span>
@@ -1776,37 +1776,37 @@ export default function ClientDetailPage() {
                         </AccordionContent>
                       </AccordionItem>
 
-                  {/* HISTORY OF THE CARS */}
+                      {/* HISTORY OF THE CARS */}
                       <AccordionItem value="history" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                      <span className="text-white font-medium">HISTORY OF THE CARS</span>
-                        </div>
+                            <span className="text-white font-medium">HISTORY OF THE CARS</span>
+                          </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Days Rented</span>
                               <span className="text-white font-medium">{totals?.history?.daysRented || 0}</span>
-                      </div>
+                            </div>
                             <div className="flex justify-between text-gray-300 text-sm">
                               <span>Trips Taken</span>
                               <span className="text-white font-medium">{totals?.history?.tripsTaken || 0}</span>
-                  </div>
+                            </div>
                           </div>
                         </AccordionContent>
                       </AccordionItem>
 
-                  {/* PAYMENT HISTORY */}
+                      {/* PAYMENT HISTORY */}
                       <AccordionItem value="payments" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
                         <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                      <span className="text-white font-medium">PAYMENT HISTORY</span>
-                        </div>
+                            <span className="text-white font-medium">PAYMENT HISTORY</span>
+                          </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
                           <div className="space-y-2 pt-2">
@@ -1815,8 +1815,8 @@ export default function ClientDetailPage() {
                               <span className="text-white font-semibold">
                                 ${totals?.payments?.total?.toFixed(2) || "0.00"}
                               </span>
-                      </div>
-                  </div>
+                            </div>
+                          </div>
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
@@ -1888,7 +1888,7 @@ export default function ClientDetailPage() {
                       </TableHeader>
                       <TableBody>
                         <TableRow>
-                      <TableCell colSpan={13} className="text-center py-12">
+                          <TableCell colSpan={13} className="text-center py-12">
                             <div className="flex flex-col items-center gap-3">
                               <Folder className="w-12 h-12 text-gray-600" />
                               <p className="text-gray-400">No data</p>
@@ -2193,8 +2193,8 @@ export default function ClientDetailPage() {
                     file:cursor-pointer
                     cursor-pointer
                     bg-[#1a1a1a] border border-[#2a2a2a] rounded-md p-2"
-                required
-              />
+                  required
+                />
                 {uploadContractForm.contractFile && (
                   <p className="text-xs text-gray-400 mt-2">
                     Selected: {uploadContractForm.contractFile.name}
@@ -2363,15 +2363,15 @@ export default function ClientDetailPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label className="text-gray-400">Mileage</Label>
-              <Input
-                type="number"
-                value={addCarForm.mileage}
-                onChange={(e) => setAddCarForm({ ...addCarForm, mileage: e.target.value })}
-                placeholder="0"
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-              />
+              <div>
+                <Label className="text-gray-400">Mileage</Label>
+                <Input
+                  type="number"
+                  value={addCarForm.mileage}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, mileage: e.target.value })}
+                  placeholder="0"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                />
               </div>
               <div>
                 <Label className="text-gray-400">Status *</Label>
