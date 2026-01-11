@@ -1,17 +1,11 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
-// Use empty string for relative URLs (works with Vite proxy in dev, and same-origin in production)
-// In development, Vite proxy handles /api requests and forwards to backend
-// In production, use VITE_API_URL if set, otherwise use relative URLs
-// 
-// IMPORTANT: In development, do NOT set VITE_API_URL to localhost:5000 (Vite server port)
-// Instead, either:
-//   1. Leave VITE_API_URL unset (uses relative URLs + Vite proxy to localhost:3000)
-//   2. Set VITE_API_URL to http://localhost:3000 (direct backend URL)
-//
-// For mobile/Replit: If VITE_API_URL is not set, use fallback backend URL
-// IMPORTANT: In production, VITE_API_URL MUST be set in Vercel environment variables
-// Fallback to known backend URL if not set (for emergency fallback only)
+/**
+ * Compute the API base URL for the frontend.
+ *
+ * - Dev: default to relative URLs so the Vite proxy can forward `/api/*` to the backend
+ * - Prod: prefer `VITE_API_URL`; if missing, fall back to known backend URL (Vercel) or same-origin
+ */
 const computeApiBaseUrl = () => {
   if (import.meta.env.VITE_API_URL) {
     const url = import.meta.env.VITE_API_URL.replace(/\/$/, "");
@@ -47,6 +41,10 @@ const API_BASE_URL = computeApiBaseUrl();
 
 export const getApiBaseUrl = () => API_BASE_URL;
 
+/**
+ * Build a full API URL from a path.
+ * - If `API_BASE_URL` is empty, returns a relative path to trigger Vite proxy in dev.
+ */
 export function buildApiUrl(path: string): string {
   if (!path) {
     return API_BASE_URL;
@@ -121,10 +119,14 @@ export async function apiRequest(
 
 
 type UnauthorizedBehavior = "returnNull" | "throw";
-export const getQueryFn: <T>(options: {
+
+/**
+ * Create a typed React Query `queryFn` that fetches JSON from an API path.
+ * Supports optional 401 handling behavior for unauthenticated states.
+ */
+export const getQueryFn = <T,>({ on401: unauthorizedBehavior }: {
   on401: UnauthorizedBehavior;
-}) => QueryFunction<T> =
-  ({ on401: unauthorizedBehavior }) =>
+}): QueryFunction<T> =>
   async ({ queryKey }) => {
     const [path] = queryKey;
     if (typeof path !== "string") {
@@ -150,7 +152,9 @@ export const getQueryFn: <T>(options: {
       }
     }
 
-    let timeoutId: NodeJS.Timeout | null = null;
+    // In browsers, `setTimeout` returns a number; in Node it returns a Timeout object.
+    // `ReturnType<typeof setTimeout>` works correctly in both environments.
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     try {
       // Add timeout to prevent hanging requests (especially on mobile/slow connections)
       const controller = new AbortController();
