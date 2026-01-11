@@ -47,7 +47,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
       // This prevents false negatives when the cookie hasn't been set yet
       const timer = setTimeout(() => {
         setInitialLoadComplete(true);
-
+        
         // Check if we have a user in the data
         if (data?.user) {
           // User is authenticated on initial load
@@ -66,10 +66,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
           }, 800);
         }
       }, 500); // Wait 500ms before initial check to allow session to stabilize
-
+      
       return () => clearTimeout(timer);
     }
-
+    
     // After initial load is complete, handle authentication state changes
     if (initialLoadComplete && !isLoading && !isFetching) {
       if (data?.user) {
