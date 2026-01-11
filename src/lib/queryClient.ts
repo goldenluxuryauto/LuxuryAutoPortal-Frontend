@@ -12,12 +12,12 @@ const computeApiBaseUrl = () => {
     console.log(`[API] Using VITE_API_URL: ${url}`);
     return url;
   }
-  
+
   // In production, if VITE_API_URL is not set, use fallback backend URL
   // This is a temporary fallback - VITE_API_URL should be set in Vercel
   if (import.meta.env.PROD && typeof window !== 'undefined') {
     const currentOrigin = window.location.origin;
-    
+
     // If accessing from Vercel, use known backend URL as fallback
     if (currentOrigin.includes('vercel.app')) {
       const fallbackUrl = 'https://luxuryautoportal-replit-1.onrender.com';
@@ -25,7 +25,7 @@ const computeApiBaseUrl = () => {
       console.warn(`⚠️ [API] Please set VITE_API_URL in Vercel environment variables to: ${fallbackUrl}`);
       return fallbackUrl;
     }
-    
+
     // For other production domains, try current origin (for same-origin setups)
     if (!currentOrigin.includes('localhost') && !currentOrigin.includes('127.0.0.1')) {
       console.warn(`⚠️ [API] VITE_API_URL not set! Using current origin as fallback: ${currentOrigin}`);
@@ -33,7 +33,7 @@ const computeApiBaseUrl = () => {
       return currentOrigin;
     }
   }
-  
+
   return ""; // Empty string = relative URLs (use Vite proxy in dev)
 };
 
@@ -55,7 +55,7 @@ export function buildApiUrl(path: string): string {
   }
 
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  
+
   // In development mode, check if VITE_API_URL is incorrectly set to localhost:5000
   // This would break the Vite proxy - warn and use relative URL instead
   if (import.meta.env.DEV && API_BASE_URL === "http://localhost:5000") {
@@ -65,7 +65,7 @@ export function buildApiUrl(path: string): string {
     );
     return normalizedPath; // Use relative URL to trigger Vite proxy
   }
-  
+
   // If API_BASE_URL is empty, return just the path (relative URL for Vite proxy)
   // Otherwise, prepend the base URL
   return API_BASE_URL ? `${API_BASE_URL}${normalizedPath}` : normalizedPath;
@@ -133,24 +133,24 @@ export const getQueryFn = <T,>({ on401: unauthorizedBehavior }: {
       throw new Error("Query keys must include the API path as the first element");
     }
 
-    const fullUrl = buildApiUrl(path);
-    
-    // Enhanced logging for mobile and production debugging
-    if (typeof window !== 'undefined') {
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const isProduction = import.meta.env.PROD;
-      
-      // Always log in production or on mobile for debugging
-      if (isProduction || isMobile) {
-        console.log(`[API] Fetching: ${fullUrl}`);
-        console.log(`[API] Current origin: ${window.location.origin}`);
-        console.log(`[API] API base URL: ${API_BASE_URL || 'relative'}`);
-        console.log(`[API] VITE_API_URL env: ${import.meta.env.VITE_API_URL || 'Not set'}`);
-        if (isMobile) {
-          console.log(`[API] Mobile device detected`);
+      const fullUrl = buildApiUrl(path);
+
+      // Enhanced logging for mobile and production debugging
+      if (typeof window !== 'undefined') {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isProduction = import.meta.env.PROD;
+
+        // Always log in production or on mobile for debugging
+        if (isProduction || isMobile) {
+          console.log(`[API] Fetching: ${fullUrl}`);
+          console.log(`[API] Current origin: ${window.location.origin}`);
+          console.log(`[API] API base URL: ${API_BASE_URL || 'relative'}`);
+          console.log(`[API] VITE_API_URL env: ${import.meta.env.VITE_API_URL || 'Not set'}`);
+          if (isMobile) {
+            console.log(`[API] Mobile device detected`);
+          }
         }
       }
-    }
 
     // In browsers, `setTimeout` returns a number; in Node it returns a Timeout object.
     // `ReturnType<typeof setTimeout>` works correctly in both environments.
@@ -162,76 +162,76 @@ export const getQueryFn = <T,>({ on401: unauthorizedBehavior }: {
         controller.abort();
       }, 10000); // 10 second timeout
 
-      const res = await fetch(fullUrl, {
-        credentials: "include",
-        signal: controller.signal,
-      });
+        const res = await fetch(fullUrl, {
+          credentials: "include",
+          signal: controller.signal,
+        });
 
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-      }
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
 
-      // Handle 401 for /api/auth/me gracefully (expected when not authenticated)
-      if (res.status === 401 && path === "/api/auth/me") {
-        // Return undefined user without throwing - this is expected when not authenticated
-        return { user: undefined } as T;
-      }
+        // Handle 401 for /api/auth/me gracefully (expected when not authenticated)
+        if (res.status === 401 && path === "/api/auth/me") {
+          // Return undefined user without throwing - this is expected when not authenticated
+          return { user: undefined } as T;
+        }
 
-      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-        return null as T;
-      }
+        if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+          return null as T;
+        }
 
-      // Only throw if response is not ok (and not a handled 401)
-      if (!res.ok) {
-        await throwIfResNotOk(res);
-      }
-      
-      return await res.json();
-    } catch (error) {
-      // Clear timeout if error occurs
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-      }
-      
-      // Enhanced error logging for mobile and production
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.error(`[API] Request timeout (10s) for ${fullUrl}`);
-      }
-      
-      // Enhanced error logging for mobile and production
-      if (typeof window !== 'undefined') {
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        const isProduction = import.meta.env.PROD;
-        
-        if (isMobile || isProduction) {
-          console.error(`[API] Fetch error for ${fullUrl}:`, error);
-          console.error(`[API] Error details:`, {
-            message: error instanceof Error ? error.message : String(error),
-            name: error instanceof Error ? error.name : 'Unknown',
-            url: fullUrl,
-            origin: window.location.origin,
-            apiBaseUrl: API_BASE_URL || 'relative',
-            viteApiUrl: import.meta.env.VITE_API_URL || 'Not set',
-            isMobile,
-            isProduction
-          });
-          
-          // Show user-friendly error message in console for debugging
-          if (isProduction) {
-            console.error(`\n❌ [API CONNECTION ERROR]`);
-            console.error(`   The app cannot connect to the backend API.`);
-            console.error(`   Current API URL: ${fullUrl}`);
-            console.error(`   Expected: Backend should be accessible at this URL`);
-            console.error(`   Solution: Set VITE_API_URL environment variable in Vercel`);
-            console.error(`   Expected value: https://luxuryautoportal-replit-1.onrender.com\n`);
+        // Only throw if response is not ok (and not a handled 401)
+        if (!res.ok) {
+          await throwIfResNotOk(res);
+        }
+
+        return await res.json();
+      } catch (error) {
+        // Clear timeout if error occurs
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+
+        // Enhanced error logging for mobile and production
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.error(`[API] Request timeout (10s) for ${fullUrl}`);
+        }
+
+        // Enhanced error logging for mobile and production
+        if (typeof window !== 'undefined') {
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          const isProduction = import.meta.env.PROD;
+
+          if (isMobile || isProduction) {
+            console.error(`[API] Fetch error for ${fullUrl}:`, error);
+            console.error(`[API] Error details:`, {
+              message: error instanceof Error ? error.message : String(error),
+              name: error instanceof Error ? error.name : 'Unknown',
+              url: fullUrl,
+              origin: window.location.origin,
+              apiBaseUrl: API_BASE_URL || 'relative',
+              viteApiUrl: import.meta.env.VITE_API_URL || 'Not set',
+              isMobile,
+              isProduction
+            });
+
+            // Show user-friendly error message in console for debugging
+            if (isProduction) {
+              console.error(`\n❌ [API CONNECTION ERROR]`);
+              console.error(`   The app cannot connect to the backend API.`);
+              console.error(`   Current API URL: ${fullUrl}`);
+              console.error(`   Expected: Backend should be accessible at this URL`);
+              console.error(`   Solution: Set VITE_API_URL environment variable in Vercel`);
+              console.error(`   Expected value: https://luxuryautoportal-replit-1.onrender.com\n`);
+            }
           }
         }
+        throw error;
       }
-      throw error;
-    }
-  };
+    };
 
 export const queryClient = new QueryClient({
   defaultOptions: {
