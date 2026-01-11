@@ -51,21 +51,97 @@ export default defineConfig({
         secure: false,
         cookieDomainRewrite: "localhost",
         cookiePathRewrite: "/",
+        timeout: 10000, // 10 second timeout
+        ws: true, // Enable WebSocket proxying
+        configure: (proxy, _options) => {
+          proxy.on("error", (err, _req, res) => {
+            console.error("Proxy error:", err.message);
+            if (res && !res.headersSent) {
+              res.writeHead(500, {
+                "Content-Type": "application/json",
+              });
+              res.end(
+                JSON.stringify({
+                  success: false,
+                  error: "Backend server is not available. Please ensure the backend server is running on port 3000.",
+                  details: process.env.NODE_ENV === "development" ? err.message : undefined,
+                })
+              );
+            }
+          });
+          proxy.on("proxyReq", (proxyReq, req, _res) => {
+            console.log(`[Proxy] ${req.method} ${req.url} -> http://localhost:3000${req.url}`);
+          });
+        },
       },
       "/contracts": {
         target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
+        timeout: 10000,
+        ws: true,
+        configure: (proxy, _options) => {
+          proxy.on("error", (err, _req, res) => {
+            console.error("Proxy error (contracts):", err.message);
+            if (res && !res.headersSent) {
+              res.writeHead(500, {
+                "Content-Type": "application/json",
+              });
+              res.end(
+                JSON.stringify({
+                  success: false,
+                  error: "Backend server is not available.",
+                })
+              );
+            }
+          });
+        },
       },
       "/signed-contracts": {
         target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
+        timeout: 10000,
+        ws: true,
+        configure: (proxy, _options) => {
+          proxy.on("error", (err, _req, res) => {
+            console.error("Proxy error (signed-contracts):", err.message);
+            if (res && !res.headersSent) {
+              res.writeHead(500, {
+                "Content-Type": "application/json",
+              });
+              res.end(
+                JSON.stringify({
+                  success: false,
+                  error: "Backend server is not available.",
+                })
+              );
+            }
+          });
+        },
       },
       "/car-photos": {
         target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
+        timeout: 10000,
+        ws: true,
+        configure: (proxy, _options) => {
+          proxy.on("error", (err, _req, res) => {
+            console.error("Proxy error (car-photos):", err.message);
+            if (res && !res.headersSent) {
+              res.writeHead(500, {
+                "Content-Type": "application/json",
+              });
+              res.end(
+                JSON.stringify({
+                  success: false,
+                  error: "Backend server is not available.",
+                })
+              );
+            }
+          });
+        },
       },
     },
   },
