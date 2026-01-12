@@ -567,13 +567,13 @@ export default function IncomeExpensesPage() {
               </colgroup>
               <thead className="bg-[#1a1a1a]">
                 <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a]">
+                  <th className="text-center px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a]">
                     Category / Expense
                   </th>
                   {months.map((month) => (
                     <th
                       key={month}
-                      className="text-right px-1 sm:px-2 py-2 sm:py-3 text-[10px] sm:text-xs md:text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
+                      className="text-center px-1 sm:px-2 py-2 sm:py-3 text-[10px] sm:text-xs md:text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
                     >
                       {month}
                     </th>
@@ -581,7 +581,7 @@ export default function IncomeExpensesPage() {
                   {additionalColumns.map((col) => (
                     <th
                       key={col}
-                      className="text-right px-1 sm:px-2 py-2 sm:py-3 text-[10px] sm:text-xs md:text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
+                      className="text-center px-1 sm:px-2 py-2 sm:py-3 text-[10px] sm:text-xs md:text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
                     >
                       {col}
                     </th>
@@ -599,8 +599,8 @@ export default function IncomeExpensesPage() {
                         className="bg-[#151515] border-b border-[#2a2a2a] cursor-pointer hover:bg-[#1a1a1a] transition-colors"
                         onClick={() => toggleCategory(categoryIndex)}
                       >
-                        <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-[#EAEB80] sticky left-0 bg-[#151515] hover:bg-[#151515] z-[50] border-r border-[#2a2a2a]">
-                          <div className="flex items-center gap-1 sm:gap-2">
+                        <td className="text-center px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-[#EAEB80] sticky left-0 bg-[#151515] hover:bg-[#151515] z-[50] border-r border-[#2a2a2a]">
+                          <div className="flex items-center justify-center gap-1 sm:gap-2">
                             <span className="w-3 sm:w-4 text-center text-xs sm:text-sm">{category.isExpanded ? "–" : "+"}</span>
                             <span className="text-xs sm:text-sm">{category.label}</span>
                           </div>
@@ -608,7 +608,7 @@ export default function IncomeExpensesPage() {
                         {months.map((_, monthIndex) => (
                           <td
                             key={monthIndex}
-                            className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-400 border-l border-[#2a2a2a]"
+                            className="text-center px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-400 border-l border-[#2a2a2a]"
                           >
                             {categoryTotal
                               ? formatCurrency(categoryTotal[monthIndex])
@@ -617,26 +617,26 @@ export default function IncomeExpensesPage() {
                         ))}
                         {categoryTotal && (
                           <>
-                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-400 border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-center px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-400 border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(calculateYearEndRecon(categoryTotal))}
                             </td>
-                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-400 border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-center px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-400 border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(calculateYearEndReconSplit(categoryTotal))}
                             </td>
-                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm font-semibold text-[#EAEB80] border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-center px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm font-semibold text-[#EAEB80] border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(calculateGrandTotal(categoryTotal))}
                             </td>
                           </>
                         )}
                         {!categoryTotal && (
                           <>
-                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-center px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(0)}
                             </td>
-                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-center px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(0)}
                             </td>
-                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-center px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm text-gray-500 border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               {formatCurrency(0)}
                             </td>
                           </>
@@ -650,14 +650,14 @@ export default function IncomeExpensesPage() {
                             key={rowIndex}
                             className="border-b border-[#2a2a2a] hover:bg-[#151515] transition-colors"
                           >
-                            <td className="px-2 sm:px-3 py-2 pl-8 sm:pl-12 text-xs sm:text-sm text-gray-300 sticky left-0 bg-[#0f0f0f] z-[50] border-r border-[#2a2a2a]">
+                            <td className="text-center px-2 sm:px-3 py-2 pl-8 sm:pl-12 text-xs sm:text-sm text-gray-300 sticky left-0 bg-[#0f0f0f] z-[50] border-r border-[#2a2a2a]">
                               {row.label}
                             </td>
                             {row.values.map((value, monthIndex) => (
                               <td
                                 key={monthIndex}
                                 className={cn(
-                                  "text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm border-l border-[#2a2a2a]",
+                                  "text-center px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm border-l border-[#2a2a2a]",
                                   value !== 0
                                     ? "text-gray-300 font-medium"
                                     : "text-gray-500"
@@ -666,7 +666,7 @@ export default function IncomeExpensesPage() {
                                 {formatCurrency(value)}
                               </td>
                             ))}
-                            <td className="text-right px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-center px-1 sm:px-2 py-2 text-[10px] sm:text-xs md:text-sm border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               <span className={cn(
                                 calculateYearEndRecon(row.values) !== 0
                                   ? "text-gray-300 font-medium"
@@ -675,7 +675,7 @@ export default function IncomeExpensesPage() {
                                 {formatCurrency(calculateYearEndRecon(row.values))}
                               </span>
                             </td>
-                            <td className="text-right px-2 py-2 text-sm border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-center px-2 py-2 text-sm border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               <span className={cn(
                                 calculateYearEndReconSplit(row.values) !== 0
                                   ? "text-gray-300 font-medium"
@@ -684,7 +684,7 @@ export default function IncomeExpensesPage() {
                                 {formatCurrency(calculateYearEndReconSplit(row.values))}
                               </span>
                             </td>
-                            <td className="text-right px-2 py-2 text-sm font-semibold border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                            <td className="text-center px-2 py-2 text-sm font-semibold border-l border-[#2a2a2a] bg-[#1f1f1f]">
                               <span className={cn(
                                 calculateGrandTotal(row.values) !== 0
                                   ? "text-gray-300"
