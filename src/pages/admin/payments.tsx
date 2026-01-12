@@ -324,13 +324,13 @@ export default function PaymentsPage() {
                 <TableHeader>
                   <TableRow className="border-[#2a2a2a] hover:bg-transparent">
                     <TableHead className="text-center text-[#EAEB80] font-medium w-12">#</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Date</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Payment Status</TableHead>
-                    <TableHead className="text-right text-[#EAEB80] font-medium">Payable</TableHead>
-                    <TableHead className="text-right text-[#EAEB80] font-medium">Payout</TableHead>
-                    <TableHead className="text-right text-[#EAEB80] font-medium">Balance</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Ref #</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Payment Date</TableHead>
+                    <TableHead className="text-center text-[#EAEB80] font-medium">Date</TableHead>
+                    <TableHead className="text-center text-[#EAEB80] font-medium">Payment Status</TableHead>
+                    <TableHead className="text-center text-[#EAEB80] font-medium">Payable</TableHead>
+                    <TableHead className="text-center text-[#EAEB80] font-medium">Payout</TableHead>
+                    <TableHead className="text-center text-[#EAEB80] font-medium">Balance</TableHead>
+                    <TableHead className="text-center text-[#EAEB80] font-medium">Ref #</TableHead>
+                    <TableHead className="text-center text-[#EAEB80] font-medium">Payment Date</TableHead>
                     <TableHead className="text-center text-[#EAEB80] font-medium">Receipt</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -344,34 +344,36 @@ export default function PaymentsPage() {
                         <TableCell className="text-center text-gray-300">
                           {index + 1}
                         </TableCell>
-                        <TableCell className="text-white">{payment.date}</TableCell>
-                        <TableCell>
-                          <Badge
-                            className={cn(
-                              "text-xs",
-                              payment.paymentStatus === "To Pay"
-                                ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-                                : payment.paymentStatus === "Paid"
-                                ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-                            )}
-                          >
-                            {payment.paymentStatus}
-                          </Badge>
+                        <TableCell className="text-center text-white">{payment.date}</TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex items-center justify-center">
+                            <Badge
+                              className={cn(
+                                "text-xs",
+                                payment.paymentStatus === "To Pay"
+                                  ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                                  : payment.paymentStatus === "Paid"
+                                  ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                  : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                              )}
+                            >
+                              {payment.paymentStatus}
+                            </Badge>
+                          </div>
                         </TableCell>
-                        <TableCell className="text-right text-white">
+                        <TableCell className="text-center text-white">
                           {formatCurrency(payment.payable)}
                         </TableCell>
-                        <TableCell className="text-right text-white">
+                        <TableCell className="text-center text-white">
                           {formatCurrency(payment.payout)}
                         </TableCell>
-                        <TableCell className="text-right text-white">
+                        <TableCell className="text-center text-white">
                           {formatBalance(payment.balance)}
                         </TableCell>
-                        <TableCell className="text-gray-400">
+                        <TableCell className="text-center text-gray-400">
                           {payment.refNumber || "--"}
                         </TableCell>
-                        <TableCell className="text-gray-400">
+                        <TableCell className="text-center text-gray-400">
                           {payment.paymentDate || "--"}
                         </TableCell>
                         <TableCell className="text-center">

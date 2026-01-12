@@ -1346,20 +1346,20 @@ export default function ClientDetailPage() {
                         <TableHeader>
                           <TableRow className="border-[#2a2a2a] hover:bg-transparent">
                             <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3 w-12">#</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Status</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Stats</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Management</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Make</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Year</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Model/Specs</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Contact</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">VIN #</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Plate #</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Gas</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Tire Size</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Oil Type</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Turo Link</TableHead>
-                            <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Admin Turo Link</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Status</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Stats</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Management</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Make</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Year</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Model/Specs</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Contact</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">VIN #</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Plate #</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Gas</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Tire Size</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Oil Type</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Turo Link</TableHead>
+                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Admin Turo Link</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -1378,19 +1378,21 @@ export default function ClientDetailPage() {
                               <TableCell className="text-center text-[#EAEB80] px-4 py-3 align-middle">
                                 {index + 1}
                               </TableCell>
-                              <TableCell className="text-left px-4 py-3 align-middle">
-                                <Badge
-                                  variant="outline"
-                                  className={cn(
-                                    car.status === "available"
-                                      ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                      : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-                                  )}
-                                >
-                                  {car.status === "available" ? "Available" : "Off Fleet"}
-                                </Badge>
+                              <TableCell className="text-center px-4 py-3 align-middle">
+                                <div className="flex items-center justify-center">
+                                  <Badge
+                                    variant="outline"
+                                    className={cn(
+                                      car.status === "available"
+                                        ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                        : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                                    )}
+                                  >
+                                    {car.status === "available" ? "Available" : "Off Fleet"}
+                                  </Badge>
+                                </div>
                               </TableCell>
-                              <TableCell className="text-left px-4 py-3 align-middle">
+                              <TableCell className="text-center px-4 py-3 align-middle">
                                 <a
                                   href={`/admin/view-car/${car.id}`}
                                   onClick={(e) => {
@@ -1402,46 +1404,48 @@ export default function ClientDetailPage() {
                                   View Stats
                                 </a>
                               </TableCell>
-                              <TableCell className="text-left text-white px-4 py-3 align-middle">
+                              <TableCell className="text-center text-white px-4 py-3 align-middle">
                                 {managementValue}
                               </TableCell>
-                              <TableCell className="text-left text-white px-4 py-3 align-middle">
+                              <TableCell className="text-center text-white px-4 py-3 align-middle">
                                 {car.make || "N/A"}
                               </TableCell>
-                              <TableCell className="text-left text-white px-4 py-3 align-middle">
+                              <TableCell className="text-center text-white px-4 py-3 align-middle">
                                 {car.year || "N/A"}
                               </TableCell>
-                              <TableCell className="text-left text-white px-4 py-3 align-middle">
+                              <TableCell className="text-center text-white px-4 py-3 align-middle">
                                 {car.model || "N/A"}
                               </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                              <TableCell className="text-center text-gray-400 px-4 py-3 align-middle">
                                 {car.contactPhone || car.owner?.phone || "N/A"}
                               </TableCell>
-                              <TableCell className="text-left text-white font-mono text-sm px-4 py-3 align-middle">
+                              <TableCell className="text-center text-white font-mono text-sm px-4 py-3 align-middle">
                                 {car.vin}
                               </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                              <TableCell className="text-center text-gray-400 px-4 py-3 align-middle">
                                 {car.licensePlate || "N/A"}
                               </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                              <TableCell className="text-center text-gray-400 px-4 py-3 align-middle">
                                 {car.fuelType || "N/A"}
                               </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                              <TableCell className="text-center text-gray-400 px-4 py-3 align-middle">
                                 {car.tireSize || "N/A"}
                               </TableCell>
-                              <TableCell className="text-left text-gray-400 px-4 py-3 align-middle">
+                              <TableCell className="text-center text-gray-400 px-4 py-3 align-middle">
                                 {car.oilType || "N/A"}
                               </TableCell>
-                              <TableCell className="text-left px-4 py-3 align-middle">
-                                <a
-                                  href="#"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="text-[#EAEB80] hover:underline"
-                                >
-                                  <ExternalLink className="w-4 h-4" />
-                                </a>
+                              <TableCell className="text-center px-4 py-3 align-middle">
+                                <div className="flex items-center justify-center">
+                                  <a
+                                    href="#"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="text-[#EAEB80] hover:underline"
+                                  >
+                                    <ExternalLink className="w-4 h-4" />
+                                  </a>
+                                </div>
                               </TableCell>
-                              <TableCell className="text-left px-4 py-3 align-middle">
+                              <TableCell className="text-center px-4 py-3 align-middle">
                                 <a
                                   href="#"
                                   onClick={(e) => e.stopPropagation()}

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Car, Upload, X, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square, FileText } from "lucide-react";
+import { ArrowLeft, Car, Upload, X, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square, FileText, Star } from "lucide-react";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -781,6 +781,44 @@ export default function CarDetailPage() {
     },
   });
 
+  /**
+   * Set the selected photo as the "main" photo.
+   * Backend models main photo as the first photo in the stored list, so the Cars page
+   * thumbnail and the carousel will both reflect the new main photo.
+   */
+  const setMainPhotoMutation = useMutation({
+    mutationFn: async (photoPath: string) => {
+      const response = await fetch(buildApiUrl(`/api/cars/${carId}/photos/main`), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ photoPath }),
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || error.message || "Failed to set main photo");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cars", carId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/cars"] }); // refresh Cars list thumbnails
+      toast({
+        title: "Success",
+        description: "Main photo updated successfully",
+      });
+      // Reset carousel to the first image (new main)
+      setCarouselIndex(0);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to set main photo",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -1465,8 +1503,23 @@ export default function CarDetailPage() {
                       <div className="relative w-full flex-1 bg-black rounded-lg overflow-hidden border border-[#2a2a2a]">
                       {car.photos.map((photo, index) => {
                         // For static assets like car photos, use buildApiUrl to get correct backend URL in production
-                        const photoPath = photo.startsWith('/') ? photo : `/${photo}`;
+                        // Ensure photo path is properly formatted
+                        let photoPath = photo;
+                        if (!photoPath) {
+                          console.warn(`[CAR DETAIL] Empty photo path at index ${index}`);
+                          photoPath = '';
+                        } else {
+                          // Remove leading slash if present, then add it back for consistency
+                          photoPath = photoPath.replace(/^\/+/, '');
+                          photoPath = `/${photoPath}`;
+                        }
                         const photoUrl = buildApiUrl(photoPath);
+                        // Log in production to help debug
+                        if (import.meta.env.PROD && index === 0) {
+                          console.log(`[CAR DETAIL] Main photo URL:`, photoUrl);
+                          console.log(`[CAR DETAIL] Photo path:`, photoPath);
+                          console.log(`[CAR DETAIL] Original photo:`, photo);
+                        }
                         const isActive = index === carouselIndex;
                         return (
                           <div
@@ -1480,9 +1533,16 @@ export default function CarDetailPage() {
                               src={photoUrl}
                               alt={`Car photo ${index + 1}`}
                               className="w-full h-full object-contain"
+                              crossOrigin="anonymous"
                               onError={(e) => {
-                                console.error('Failed to load photo:', photoUrl);
-                                (e.target as HTMLImageElement).style.display = 'none';
+                                console.error('❌ [CAR DETAIL] Failed to load photo:', photoUrl);
+                                console.error('   Photo path:', photoPath);
+                                console.error('   Original photo:', photo);
+                                console.error('   API Base URL:', import.meta.env.VITE_API_URL || 'Not set');
+                                // Don't hide the image - keep it visible but show error state
+                                const img = e.target as HTMLImageElement;
+                                img.style.opacity = '0.3';
+                                img.style.filter = 'grayscale(100%)';
                               }}
                             />
                 </div>
@@ -2069,9 +2129,25 @@ export default function CarDetailPage() {
               <div className="grid grid-cols-8 gap-4">
                 {car.photos.map((photo, index) => {
                   // For static assets like car photos, use buildApiUrl to get correct backend URL in production
-                  const photoPath = photo.startsWith('/') ? photo : `/${photo}`;
+                  // Ensure photo path is properly formatted
+                  let photoPath = photo;
+                  if (!photoPath) {
+                    console.warn(`[CAR DETAIL] Empty photo path at index ${index}`);
+                    photoPath = '';
+                  } else {
+                    // Remove leading slash if present, then add it back for consistency
+                    photoPath = photoPath.replace(/^\/+/, '');
+                    photoPath = `/${photoPath}`;
+                  }
                   const photoUrl = buildApiUrl(photoPath);
+                  // Log in production to help debug
+                  if (import.meta.env.PROD && index === 0) {
+                    console.log(`[CAR DETAIL] Main photo URL (grid):`, photoUrl);
+                    console.log(`[CAR DETAIL] Photo path (grid):`, photoPath);
+                    console.log(`[CAR DETAIL] Original photo (grid):`, photo);
+                  }
                   const isSelected = selectedPhotos.has(index);
+                  const isMain = index === 0;
                   return (
                     <div
                       key={index}
@@ -2101,11 +2177,24 @@ export default function CarDetailPage() {
                               ? "border-[#EAEB80] opacity-80"
                               : "border-[#2a2a2a] group-hover:border-[#EAEB80]/50"
                           )}
+                      crossOrigin="anonymous"
                       onError={(e) => {
-                        console.error('Failed to load photo:', photoUrl);
-                        (e.target as HTMLImageElement).style.display = 'none';
+                        console.error('❌ [CAR DETAIL] Failed to load photo (grid):', photoUrl);
+                        console.error('   Photo path:', photoPath);
+                        console.error('   Original photo:', photo);
+                        console.error('   API Base URL:', import.meta.env.VITE_API_URL || 'Not set');
+                        // Don't hide the image - keep it visible but show error state
+                        const img = e.target as HTMLImageElement;
+                        img.style.opacity = '0.3';
+                        img.style.filter = 'grayscale(100%)';
                       }}
                     />
+                        {/* Main Photo Badge */}
+                        {isMain && (
+                          <div className="absolute bottom-2 left-2 bg-black/70 text-[#EAEB80] text-[10px] px-2 py-1 rounded border border-[#EAEB80]/30">
+                            Main
+                          </div>
+                        )}
                         {/* Checkbox Overlay */}
                     {isAdmin && (
                           <div 
@@ -2174,6 +2263,28 @@ export default function CarDetailPage() {
                                 });
                               }}
                             />
+                          </div>
+                        )}
+                        {/* Set Main Button (Admin only) */}
+                        {isAdmin && !isMain && (
+                          <div
+                            className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              disabled={setMainPhotoMutation.isPending}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMainPhotoMutation.mutate(photoPath);
+                              }}
+                              className="bg-black/70 hover:bg-black/90 text-[#EAEB80] border border-[#EAEB80]/30 h-7 w-7 p-0"
+                              title="Set as main photo"
+                            >
+                              <Star className="w-4 h-4" />
+                            </Button>
                           </div>
                         )}
                         {/* Image Number Badge */}

@@ -68,9 +68,26 @@ const clientSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
+  // Personal Information (matches Edit Client Details)
+  birthday: z.string().optional(),
+  tshirtSize: z.string().optional(),
+  ssn: z.string().optional(),
+  representative: z.string().optional(),
+  heardAboutUs: z.string().optional(),
+  emergencyContactName: z.string().optional(),
+  emergencyContactPhone: z.string().optional(),
+  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+  // Address Information
+  streetAddress: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zipCode: z.string().optional(),
   bankName: z.string().optional(),
+  taxClassification: z.string().optional(),
   bankRoutingNumber: z.string().optional(),
   bankAccountNumber: z.string().optional(),
+  businessName: z.string().optional(),
+  ein: z.string().optional(),
 });
 
 type ClientFormData = z.infer<typeof clientSchema>;
@@ -219,9 +236,24 @@ export default function ClientsPage() {
       lastName: "",
       email: "",
       phone: "",
+      birthday: "",
+      tshirtSize: "",
+      ssn: "",
+      representative: "",
+      heardAboutUs: "",
+      emergencyContactName: "",
+      emergencyContactPhone: "",
+      status: "INACTIVE",
+      streetAddress: "",
+      city: "",
+      state: "",
+      zipCode: "",
       bankName: "",
+      taxClassification: "",
       bankRoutingNumber: "",
       bankAccountNumber: "",
+      businessName: "",
+      ein: "",
     },
   });
 
@@ -1067,83 +1099,259 @@ export default function ClientsPage() {
             </DialogHeader>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">First Name *</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
+                {/* Personal Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+                    Personal Information
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">First Name *</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">Last Name *</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Last Name *</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Email *</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="email" className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Phone</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="birthday"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Date of Birth</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="date" className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="tshirtSize"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">T-Shirt Size</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="ssn"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">SSN</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="representative"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Representative</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="heardAboutUs"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">How Did You Hear About Us</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="emergencyContactName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Emergency Contact Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="emergencyContactPhone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Emergency Contact Phone</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Client Status</FormLabel>
+                          <Select value={field.value || "INACTIVE"} onValueChange={field.onChange}>
+                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              <SelectValue placeholder="Select client status" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              <SelectItem value="ACTIVE">Active</SelectItem>
+                              <SelectItem value="INACTIVE">Inactive</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">Email *</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="email"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                {/* Address Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+                    Address Information
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="streetAddress"
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-2">
+                          <FormLabel className="text-gray-400">Street Address</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">Phone</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">City</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">State</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="zipCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Zip Code</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
 
-                <div className="border-t border-[#2a2a2a] pt-4">
-                  <h3 className="text-sm font-medium text-[#EAEB80] mb-4">Banking Information (Optional)</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Banking Information (ACH) */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+                    Banking Information (ACH)
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="bankName"
@@ -1151,11 +1359,28 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-gray-400">Bank Name</FormLabel>
                           <FormControl>
-                            <Input
-                              {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            />
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="taxClassification"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Tax Classification</FormLabel>
+                          <Select value={field.value || ""} onValueChange={field.onChange}>
+                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              <SelectValue placeholder="Select tax classification" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              <SelectItem value="individual">Individual</SelectItem>
+                              <SelectItem value="business">Business</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -1168,10 +1393,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-gray-400">Routing Number</FormLabel>
                           <FormControl>
-                            <Input
-                              {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            />
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1185,15 +1407,42 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-gray-400">Account Number</FormLabel>
                           <FormControl>
-                            <Input
-                              {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            />
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={form.control}
+                      name="businessName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Business Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {form.watch("taxClassification") === "business" && (
+                      <FormField
+                        control={form.control}
+                        name="ein"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-400">EIN</FormLabel>
+                            <FormControl>
+                              <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </div>
                 </div>
 
