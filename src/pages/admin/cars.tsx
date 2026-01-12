@@ -445,8 +445,23 @@ export default function CarsPage() {
       );
     }
 
-    const photoPath = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
+    // Ensure photo path is properly formatted
+    let photoPath = rawPath;
+    if (!photoPath) {
+      console.warn(`[CARS] Empty photo path for car ${car.id}`);
+      photoPath = '';
+    } else {
+      // Remove leading slash if present, then add it back for consistency
+      photoPath = photoPath.replace(/^\/+/, '');
+      photoPath = `/${photoPath}`;
+    }
     const src = buildApiUrl(photoPath);
+    // Log in production to help debug
+    if (import.meta.env.PROD) {
+      console.log(`[CARS] Thumbnail URL:`, src);
+      console.log(`[CARS] Photo path:`, photoPath);
+      console.log(`[CARS] Original photo:`, rawPath);
+    }
 
     return (
       <img
@@ -454,7 +469,12 @@ export default function CarsPage() {
         alt="Car thumbnail"
         className="h-7 w-7 sm:h-8 sm:w-8 rounded-md object-cover border border-[#2a2a2a] bg-black/30 shrink-0"
         loading="lazy"
-        onError={() => setFailed(true)}
+        onError={(e) => {
+          console.error('Failed to load car thumbnail:', src);
+          console.error('Photo path:', photoPath);
+          console.error('Original photo:', rawPath);
+          setFailed(true);
+        }}
       />
     );
   };
@@ -522,56 +542,56 @@ export default function CarsPage() {
         <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
           <CardContent className="p-0">
             <div className="overflow-x-auto -mx-3 sm:mx-0">
-              <table className="w-full min-w-[1000px]">
+              <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#2a2a2a]">
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 w-8 sm:w-12">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 w-8 sm:w-10">
                       #
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Status
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Stats
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden md:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden md:table-cell">
                       Management
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Owner
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Make
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Year
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Model/Specs
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Contact
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       VIN #
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Plate #
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Gas
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden 2xl:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                       Tire Size
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden 2xl:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                       Oil Type
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden 2xl:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                       Turo Link
                     </th>
                     {isAdmin && (
-                      <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-4 py-2 sm:py-3 hidden 2xl:table-cell">
+                      <th className="text-left text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                         Admin Turo Link
                       </th>
                     )}
@@ -579,7 +599,7 @@ export default function CarsPage() {
                 </thead>
                 <tbody className="divide-y divide-[#2a2a2a]">
                   {isLoading ? (
-                    <TableRowSkeleton colSpan={isAdmin ? 16 : 15} rows={5} />
+                    <TableRowSkeleton colSpan={isAdmin ? 13 : 12} rows={5} />
                   ) : cars.length > 0 ? (
                     cars.map((car, index) => {
                       const formatDate = (dateStr: string | null | undefined): string => {
@@ -631,11 +651,11 @@ export default function CarsPage() {
                           key={uniqueKey}
                           className="hover:bg-[#252525] transition-colors group border-b border-[#2a2a2a]"
                         >
-                          <td className="text-center text-[#EAEB80] text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle">
+                          <td className="text-center text-[#EAEB80] text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
                             {index + 1}
                           </td>
-                          <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle">
-                            <div className="flex items-center gap-2">
+                          <td className="text-left px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
+                            <div className="flex items-center gap-1.5">
                               <CarStatusThumbnail car={car} />
                               <Badge
                                 variant="outline"
@@ -649,7 +669,7 @@ export default function CarsPage() {
                               </Badge>
                             </div>
                           </td>
-                          <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle">
+                          <td className="text-left px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
                             <a
                               href={isAdmin ? `/admin/view-car/${car.id}` : `/cars/${car.id}`}
                               onClick={(e) => {
@@ -661,7 +681,7 @@ export default function CarsPage() {
                               {isAdmin ? "View Stats" : "View Car"}
                             </a>
                           </td>
-                          <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle hidden md:table-cell">
+                          <td className="text-left px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden md:table-cell">
                             <Badge
                               variant="outline"
                               className={cn(
@@ -669,14 +689,14 @@ export default function CarsPage() {
                                 derivedManagementStatus === "management"
                                   ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
                                   : derivedManagementStatus === "off_ride"
-                                  ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-                                  : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                                    ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                                    : "bg-gray-500/20 text-gray-400 border-gray-500/30"
                               )}
                             >
                             {managementValue}
                             </Badge>
                           </td>
-                          <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle">
+                          <td className="text-left px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
                             {car.owner ? (
                               <div>
                                 <div className="text-white text-xs sm:text-sm">
@@ -694,34 +714,34 @@ export default function CarsPage() {
                               </span>
                             )}
                           </td>
-                          <td className="text-left text-white text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle">
+                          <td className="text-left text-white text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
                             {car.make || "N/A"}
                           </td>
-                          <td className="text-left text-white text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-left text-white text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.year || "N/A"}
                           </td>
-                          <td className="text-left text-white text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle">
+                          <td className="text-left text-white text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
                             {car.model || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-left text-gray-400 text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.contactPhone || car.owner?.phone || "N/A"}
                           </td>
-                          <td className="text-left text-white font-mono text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden xl:table-cell">
+                          <td className="text-left text-white font-mono text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.vin || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden xl:table-cell">
+                          <td className="text-left text-gray-400 text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.licensePlate || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden xl:table-cell">
+                          <td className="text-left text-gray-400 text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.fuelType || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden 2xl:table-cell">
+                          <td className="text-left text-gray-400 text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
                             {car.tireSize || "N/A"}
                           </td>
-                          <td className="text-left text-gray-400 text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 align-middle hidden 2xl:table-cell">
+                          <td className="text-left text-gray-400 text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
                             {car.oilType || "N/A"}
                           </td>
-                          <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle hidden 2xl:table-cell">
+                          <td className="text-left px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
                             {car.turoLink ? (
                               <a
                                 href={car.turoLink}
@@ -737,7 +757,7 @@ export default function CarsPage() {
                             )}
                           </td>
                           {isAdmin && (
-                            <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle hidden 2xl:table-cell">
+                            <td className="text-left px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
                               {car.adminTuroLink ? (
                                 <a
                                   href={car.adminTuroLink}
@@ -758,7 +778,7 @@ export default function CarsPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={isAdmin ? 16 : 15} className="px-4 py-12 text-center">
+                      <td colSpan={isAdmin ? 13 : 12} className="px-4 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <p className="text-gray-400 text-lg">No cars found</p>
                           <p className="text-gray-500 text-sm">
