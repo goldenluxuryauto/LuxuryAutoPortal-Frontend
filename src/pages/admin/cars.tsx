@@ -43,7 +43,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
-import { Plus, Edit, Search, X, ExternalLink } from "lucide-react";
+import { Plus, Edit, Search, X, ExternalLink, Car as CarIcon } from "lucide-react";
 import { TableRowSkeleton } from "@/components/ui/skeletons";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -68,6 +68,11 @@ interface Car {
   color: string | null;
   mileage: number;
   status: "ACTIVE" | "INACTIVE";
+  /**
+   * Car photo paths returned by the backend (typically under `/car-photos/...`).
+   * We use the first photo as the thumbnail in the Cars table.
+   */
+  photos?: string[];
   offboardReason: "sold" | "damaged" | "end_lease" | "other" | null;
   offboardNote: string | null;
   offboardAt: string | null;
@@ -424,6 +429,36 @@ export default function CarsPage() {
     }
   };
 
+  /**
+   * Client requirement: show a small car-image icon before the Status badge.
+   * Uses the first uploaded photo as thumbnail (or a fallback icon if none).
+   */
+  const CarStatusThumbnail = ({ car }: { car: Car }) => {
+    const [failed, setFailed] = useState(false);
+
+    const rawPath = car.photos?.[0];
+    if (!rawPath || failed) {
+      return (
+        <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-black/30 border border-[#2a2a2a] flex items-center justify-center shrink-0">
+          <CarIcon className="h-4 w-4 text-gray-500" />
+        </div>
+      );
+    }
+
+    const photoPath = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
+    const src = buildApiUrl(photoPath);
+
+    return (
+      <img
+        src={src}
+        alt="Car thumbnail"
+        className="h-7 w-7 sm:h-8 sm:w-8 rounded-md object-cover border border-[#2a2a2a] bg-black/30 shrink-0"
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    );
+  };
+
   const cars = carsData?.data || [];
 
   return (
@@ -600,16 +635,19 @@ export default function CarsPage() {
                             {index + 1}
                           </td>
                           <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle">
-                            <Badge
-                              variant="outline"
-                              className={cn(getStatusBadgeColor(car.status), "text-xs")}
-                            >
-                              {car.status === "ACTIVE"
-                                ? "ACTIVE"
-                                : car.status === "INACTIVE"
-                                ? "INACTIVE"
-                                : car.status || "ACTIVE"}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              <CarStatusThumbnail car={car} />
+                              <Badge
+                                variant="outline"
+                                className={cn(getStatusBadgeColor(car.status), "text-xs")}
+                              >
+                                {car.status === "ACTIVE"
+                                  ? "ACTIVE"
+                                  : car.status === "INACTIVE"
+                                    ? "INACTIVE"
+                                    : car.status || "ACTIVE"}
+                              </Badge>
+                            </div>
                           </td>
                           <td className="text-left px-2 sm:px-4 py-2 sm:py-3 align-middle">
                             <a
