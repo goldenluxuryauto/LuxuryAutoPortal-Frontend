@@ -102,34 +102,44 @@ function QRCodeSection() {
       ? `${window.location.origin}/onboarding`
       : "/onboarding";
 
+  /**
+   * Copy text to clipboard with a safe fallback for environments where
+   * `navigator.clipboard` is unavailable (older browsers / non-secure contexts).
+   */
+  const copyToClipboard = async (text: string) => {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    // Fallback: temporary textarea + execCommand
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  };
+
+  /**
+   * Client requirement: button should copy the onboarding link (not share UI).
+   */
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Client Onboarding Form LYC",
-          text: "Fill out the Golden Luxury Auto client onboarding form",
-          url: onboardingUrl,
-        });
-        toast({
-          title: "Shared successfully",
-          description: "The form link has been shared.",
-        });
-      } catch (error: any) {
-        if (error.name !== "AbortError") {
-          // Copy to clipboard as fallback
-          navigator.clipboard.writeText(onboardingUrl);
-          toast({
-            title: "Link copied",
-            description: "Onboarding form URL copied to clipboard.",
-          });
-        }
-      }
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(onboardingUrl);
+    try {
+      await copyToClipboard(onboardingUrl);
       toast({
         title: "Link copied",
         description: "Onboarding form URL copied to clipboard.",
+      });
+    } catch (error) {
+      console.error("Failed to copy onboarding link:", error);
+      toast({
+        title: "Copy failed",
+        description: "Could not copy the link. Please copy it manually.",
+        variant: "destructive",
       });
     }
   };
@@ -254,13 +264,24 @@ function QRCodeSection() {
                 Send the onboarding form link directly to your clients via
                 email, SMS, or messaging apps.
               </p>
-              <Button
-                onClick={handleShare}
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium w-full lg:w-auto"
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                Click to Copy the Link
-              </Button>
+
+              {/* Client requirement: show the actual link next to the copy button */}
+              <div className="flex flex-col sm:flex-row gap-3 w-full items-stretch">
+                <Button
+                  onClick={handleShare}
+                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium w-full sm:w-auto whitespace-nowrap"
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Click to Copy the Link
+                </Button>
+
+                <Input
+                  value={onboardingUrl}
+                  readOnly
+                  className="bg-[#0f0f0f] border-[#2a2a2a] text-[#EAEB80] w-full"
+                  onFocus={(e) => e.currentTarget.select()}
+                />
+              </div>
             </div>
           </div>
         </div>
