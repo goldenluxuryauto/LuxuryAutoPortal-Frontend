@@ -4,6 +4,7 @@ import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { IncomeExpenseData, EditingCell } from "../types";
 
+
 interface IncomeExpenseContextType {
   data: IncomeExpenseData;
   isLoading: boolean;
