@@ -220,7 +220,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-[#0a0a0a]">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 bg-[#0a0a0a]">
           {children}
         </main>
       </div>
