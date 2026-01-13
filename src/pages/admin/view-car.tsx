@@ -87,7 +87,7 @@ export default function ViewCarPage() {
   const menuItems: MenuItem[] = [
     { label: "Car Detail", path: `/admin/cars/${carId}` },
     { label: "Earnings", path: `/admin/cars/${carId}/earnings` },
-    { label: "Income and Expense", path: `/admin/income-expenses?car=${carId}` },
+    { label: "Income and Expense", path: `/admin/cars/${carId}/income-expense` },
     { label: "NADA Depreciation Schedule", path: `/admin/cars/${carId}/depreciation` },
     { label: "Totals", path: `/admin/cars/${carId}/totals` },
     { label: "Records and Files", path: `/admin/cars/${carId}/records` },

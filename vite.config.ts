@@ -51,7 +51,7 @@ export default defineConfig({
         secure: false,
         cookieDomainRewrite: "localhost",
         cookiePathRewrite: "/",
-        timeout: 10000, // 10 second timeout
+        // No timeout - allow long-running operations like imports
         ws: true, // Enable WebSocket proxying
         configure: (proxy, _options) => {
           proxy.on("error", (err, _req, res) => {
@@ -78,7 +78,7 @@ export default defineConfig({
         target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
-        timeout: 10000,
+        // No timeout - allow long-running operations
         ws: true,
         configure: (proxy, _options) => {
           proxy.on("error", (err, _req, res) => {
@@ -101,7 +101,7 @@ export default defineConfig({
         target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
-        timeout: 10000,
+        // No timeout - allow long-running operations
         ws: true,
         configure: (proxy, _options) => {
           proxy.on("error", (err, _req, res) => {
@@ -124,7 +124,7 @@ export default defineConfig({
         target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
-        timeout: 10000,
+        // No timeout - allow long-running operations
         ws: true,
         configure: (proxy, _options) => {
           proxy.on("error", (err, _req, res) => {
