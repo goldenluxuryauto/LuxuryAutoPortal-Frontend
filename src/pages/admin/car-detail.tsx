@@ -39,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CarDetail {
   id: number;
@@ -99,7 +100,7 @@ const carSchema = z.object({
   dealershipAddress: z.string().optional(),
   fuelType: z.string().optional(),
   tireSize: z.string().optional(),
-  vehicleFeatures: z.string().optional(), // JSON string array or comma-separated
+  vehicleFeatures: z.union([z.string(), z.array(z.string())]).optional(), // JSON string array, comma-separated, or array
   // Financial Information
   purchasePrice: z.string().optional(),
   downPayment: z.string().optional(),
@@ -502,16 +503,22 @@ export default function CarDetailPage() {
       formData.append("dealershipAddress", data.dealershipAddress || "");
       formData.append("fuelType", data.fuelType || "");
       formData.append("tireSize", data.tireSize || "");
-      // Convert vehicleFeatures to JSON array if it's a comma-separated string
+      // Convert vehicleFeatures array to JSON string
       if (data.vehicleFeatures) {
-        try {
-          // Try to parse as JSON first
-          JSON.parse(data.vehicleFeatures);
-          formData.append("vehicleFeatures", data.vehicleFeatures);
-        } catch {
-          // If not JSON, treat as comma-separated and convert to JSON array
-          const featuresArray = data.vehicleFeatures.split(',').map(f => f.trim()).filter(f => f);
-          formData.append("vehicleFeatures", JSON.stringify(featuresArray));
+        if (Array.isArray(data.vehicleFeatures)) {
+          formData.append("vehicleFeatures", JSON.stringify(data.vehicleFeatures));
+        } else if (typeof data.vehicleFeatures === 'string') {
+          try {
+            // Try to parse as JSON first
+            JSON.parse(data.vehicleFeatures);
+            formData.append("vehicleFeatures", data.vehicleFeatures);
+          } catch {
+            // If not JSON, treat as comma-separated and convert to JSON array
+            const featuresArray = data.vehicleFeatures.split(',').map(f => f.trim()).filter(f => f);
+            formData.append("vehicleFeatures", JSON.stringify(featuresArray));
+          }
+        } else {
+          formData.append("vehicleFeatures", "");
         }
       } else {
         formData.append("vehicleFeatures", "");
@@ -877,22 +884,24 @@ export default function CarDetailPage() {
   const handleEditClick = () => {
     if (!car) return;
     
-    // Format vehicleFeatures for form (array to comma-separated string or JSON string)
-    let vehicleFeaturesValue = "";
+    // Format vehicleFeatures for form (parse to array for checkboxes)
+    let vehicleFeaturesValue: string[] = [];
     if (onboarding?.vehicleFeatures) {
       if (Array.isArray(onboarding.vehicleFeatures)) {
-        vehicleFeaturesValue = onboarding.vehicleFeatures.join(", ");
+        vehicleFeaturesValue = onboarding.vehicleFeatures;
       } else if (typeof onboarding.vehicleFeatures === 'string') {
         try {
           // Try to parse as JSON array
           const parsed = JSON.parse(onboarding.vehicleFeatures);
           if (Array.isArray(parsed)) {
-            vehicleFeaturesValue = parsed.join(", ");
+            vehicleFeaturesValue = parsed;
           } else {
-            vehicleFeaturesValue = onboarding.vehicleFeatures;
+            // If it's a comma-separated string, split it
+            vehicleFeaturesValue = onboarding.vehicleFeatures.split(',').map((f: string) => f.trim()).filter((f: string) => f);
           }
         } catch {
-          vehicleFeaturesValue = onboarding.vehicleFeatures;
+          // If not JSON, treat as comma-separated string
+          vehicleFeaturesValue = onboarding.vehicleFeatures.split(',').map((f: string) => f.trim()).filter((f: string) => f);
         }
       }
     }
@@ -1307,12 +1316,14 @@ export default function CarDetailPage() {
                     <p className="text-xs text-gray-500 mb-1">Does Your Vehicle Have Free Dealership Oil Changes?</p>
                     <p className="text-white text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
                   </div>
-                  {onboarding?.freeDealershipOilChanges === "Yes" && (
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">If Yes, For How Many Years of Oil Changes OR What Oil Package</p>
-                      <p className="text-white text-base">{(onboarding as any)?.oilPackageDetails ? formatValue((onboarding as any).oilPackageDetails) : "N/A"}</p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">If Yes, For How Many Years of Oil Changes, or What Oil Package</p>
+                    <p className="text-white text-base">
+                      {onboarding?.freeDealershipOilChanges === "Yes" 
+                        ? ((onboarding as any)?.oilPackageDetails ? formatValue((onboarding as any).oilPackageDetails) : "N/A")
+                        : "N/A"}
+                    </p>
+                  </div>
                   {(onboarding as any)?.dealershipAddress && (
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Dealership Address</p>
@@ -2678,13 +2689,21 @@ export default function CarDetailPage() {
                     name="freeDealershipOilChanges"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Free Service Center Oil Change</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
+                        <FormLabel className="text-gray-400">Does Your Vehicle Have Free Dealership Oil Changes?</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectItem value="Yes">Yes</SelectItem>
+                            <SelectItem value="No">No</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -2695,11 +2714,12 @@ export default function CarDetailPage() {
                     name="oilPackageDetails"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Oil Package Details</FormLabel>
+                        <FormLabel className="text-gray-400">If Yes, For How Many Years of Oil Changes, or What Oil Package</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            placeholder="e.g., 3 years or Premium Package"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2761,16 +2781,71 @@ export default function CarDetailPage() {
                   <FormField
                     control={form.control}
                     name="vehicleFeatures"
-                    render={({ field }) => (
+                    render={() => (
                       <FormItem className="col-span-2">
-                        <FormLabel className="text-gray-400">Features (comma-separated)</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            placeholder="Feature 1, Feature 2, Feature 3"
-                          />
-                        </FormControl>
+                        <div className="mb-4">
+                          <FormLabel className="text-gray-400 text-base font-semibold">
+                            Features (check all that apply)
+                          </FormLabel>
+                        </div>
+                        <div className="border border-[#2a2a2a] rounded-lg p-4 bg-[#1a1a1a]">
+                          <div className="grid grid-cols-2 gap-3">
+                            {[
+                              "All-wheel drive",
+                              "AUX input",
+                              "Blind Spot Warning",
+                              "Convertible",
+                              "Keyless Entry",
+                              "Snow Tires or Chains",
+                              "USB Charger",
+                              "Android Auto",
+                              "Back Up Camera",
+                              "Bluetooth",
+                              "GPS",
+                              "Pet Friendly",
+                              "Sunroof",
+                              "USB Input",
+                              "Apple CarPlay",
+                              "Bike Rack",
+                              "Toll Pass",
+                              "Wheelchair Accessible",
+                            ].map((feature) => (
+                              <FormField
+                                key={feature}
+                                control={form.control}
+                                name="vehicleFeatures"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={feature}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={Array.isArray(field.value) ? field.value.includes(feature) : false}
+                                          onCheckedChange={(checked) => {
+                                            const currentValue = Array.isArray(field.value) ? field.value : [];
+                                            return checked
+                                              ? field.onChange([...currentValue, feature])
+                                              : field.onChange(
+                                                  currentValue.filter(
+                                                    (value) => value !== feature
+                                                  )
+                                                );
+                                          }}
+                                          className="border-[#2a2a2a] data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-[#EAEB80]"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-gray-300 text-sm font-normal cursor-pointer">
+                                        {feature}
+                                      </FormLabel>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
