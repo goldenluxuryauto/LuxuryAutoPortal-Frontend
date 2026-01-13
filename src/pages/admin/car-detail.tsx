@@ -76,8 +76,7 @@ const carSchema = z.object({
   // Vehicle Information
   vin: z
     .string()
-    .min(1, "VIN is required")
-    .max(17, "VIN must be 17 characters or less"),
+    .length(17, "VIN must be exactly 17 characters"),
   makeModel: z.string().min(1, "Make & Model is required"),
   licensePlate: z.string().optional(),
   year: z.string().optional(),

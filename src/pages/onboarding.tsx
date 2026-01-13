@@ -61,7 +61,7 @@ const onboardingSchema = z
   exteriorColor: z.string().min(1, "Exterior color is required"),
   interiorColor: z.string().min(1, "Interior color is required"),
   titleType: z.string().min(1, "Title type is required"),
-  vinNumber: z.string().min(1, "VIN number is required"),
+  vinNumber: z.string().length(17, "VIN number must be exactly 17 characters"),
   licensePlate: z.string().min(1, "License plate is required"),
   registrationExpiration: z
     .string()

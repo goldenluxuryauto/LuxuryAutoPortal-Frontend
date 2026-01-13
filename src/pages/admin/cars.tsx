@@ -98,8 +98,7 @@ interface Car {
 const carSchema = z.object({
   vin: z
     .string()
-    .min(1, "VIN is required")
-    .max(17, "VIN must be 17 characters or less"),
+    .length(17, "VIN must be exactly 17 characters"),
   makeModel: z.string().min(1, "Make & Model is required"),
   make: z.string().optional(),
   model: z.string().optional(),
