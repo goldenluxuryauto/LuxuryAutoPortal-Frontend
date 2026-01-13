@@ -1894,6 +1894,24 @@ export default function FormsPage() {
                             </div>
                           </div>
                         )}
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            Does Your Vehicle Have Free Dealership Oil Changes?:
+                          </span>
+                          <span className="text-white">
+                            {formatValue(data.freeDealershipOilChanges)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block mb-1">
+                            If Yes, For How Many Years of Oil Changes OR What Oil Package:
+                          </span>
+                          <span className="text-white">
+                            {data.freeDealershipOilChanges === "Yes" 
+                              ? formatValue(data.oilPackageDetails)
+                              : "N/A"}
+                          </span>
+                        </div>
                       </div>
                     </div>
 

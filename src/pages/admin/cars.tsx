@@ -645,13 +645,16 @@ export default function CarsPage() {
                       // Use combination of id, index, and vin to ensure uniqueness
                       const uniqueKey = `car-${car.id}-${index}-${car.vin || 'no-vin'}`;
 
+                      // Calculate global row number across all pages
+                      const globalRowNumber = (page - 1) * itemsPerPage + index + 1;
+
                       return (
                         <tr
                           key={uniqueKey}
                           className="hover:bg-[#252525] transition-colors group border-b border-[#2a2a2a]"
                         >
                           <td className="text-center text-[#EAEB80] text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
-                            {index + 1}
+                            {globalRowNumber}
                           </td>
                           <td className="text-center px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
                             <div className="flex items-center justify-center gap-1.5">

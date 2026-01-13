@@ -1237,27 +1237,91 @@ export default function CarDetailPage() {
             </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {/* Column 1 (Left) */}
+                {/* Column 1: Basic Vehicle Information */}
                 <div className="space-y-4">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Make & Model</p>
                     <p className="text-white text-base font-medium">{car.makeModel}</p>
                   </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">VIN</p>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Year</p>
+                    <p className="text-white text-base">{car.year || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">VIN</p>
                     <p className="text-white text-base font-mono">{car.vin}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">License Plate</p>
+                    <p className="text-white text-base">{car.licensePlate || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Trim</p>
+                    <p className="text-white text-base">{onboarding?.vehicleTrim ? formatValue(onboarding.vehicleTrim) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Mileage</p>
+                    <p className="text-white text-base">{onboarding?.vehicleMiles ? formatValue(onboarding.vehicleMiles) : (car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A")}</p>
+                  </div>
                 </div>
-                <div>
-                    <p className="text-xs text-gray-500 mb-1">Oil Type</p>
-                    <p className="text-white text-base">{onboarding?.oilType ? formatValue(onboarding.oilType) : "N/A"}</p>
-                </div>
+
+                {/* Column 2: Specifications & Colors */}
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Exterior Color</p>
+                    <p className="text-white text-base">{onboarding?.exteriorColor ? formatValue(onboarding.exteriorColor) : (car.color || "N/A")}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Interior Color</p>
+                    <p className="text-white text-base">{onboarding?.interiorColor ? formatValue(onboarding.interiorColor) : "N/A"}</p>
+                  </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Fuel Type</p>
                     <p className="text-white text-base">{onboarding?.fuelType ? formatValue(onboarding.fuelType) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Interior Color</p>
-                    <p className="text-white text-base">{onboarding?.interiorColor ? formatValue(onboarding.interiorColor) : "N/A"}</p>
+                    <p className="text-xs text-gray-500 mb-1">Tire Size</p>
+                    <p className="text-white text-base">{onboarding?.tireSize ? formatValue(onboarding.tireSize) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Number of Doors</p>
+                    <p className="text-white text-base">{onboarding?.numberOfDoors ? formatValue(onboarding.numberOfDoors) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Number of Seats</p>
+                    <p className="text-white text-base">{onboarding?.numberOfSeats ? formatValue(onboarding.numberOfSeats) : "N/A"}</p>
+                  </div>
+                </div>
+
+                {/* Column 3: Maintenance & Accessories */}
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Oil Type</p>
+                    <p className="text-white text-base">{onboarding?.oilType ? formatValue(onboarding.oilType) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Last Oil Change</p>
+                    <p className="text-white text-base">{onboarding?.lastOilChange ? formatValue(onboarding.lastOilChange) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Does Your Vehicle Have Free Dealership Oil Changes?</p>
+                    <p className="text-white text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
+                  </div>
+                  {onboarding?.freeDealershipOilChanges === "Yes" && (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">If Yes, For How Many Years of Oil Changes OR What Oil Package</p>
+                      <p className="text-white text-base">{(onboarding as any)?.oilPackageDetails ? formatValue((onboarding as any).oilPackageDetails) : "N/A"}</p>
+                    </div>
+                  )}
+                  {(onboarding as any)?.dealershipAddress && (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Dealership Address</p>
+                      <p className="text-white text-base">{formatValue((onboarding as any).dealershipAddress)}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Registration Expiration</p>
+                    <p className="text-white text-base">{onboarding?.registrationExpiration ? formatValue(onboarding.registrationExpiration) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Vehicle Ownership</p>
@@ -1268,79 +1332,40 @@ export default function CarDetailPage() {
                     <p className="text-white text-base">{onboarding?.vehicleRecall ? formatValue(onboarding.vehicleRecall) : "N/A"}</p>
                   </div>
                 </div>
-
-                {/* Column 2 (Middle) */}
-                <div className="space-y-4">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Year</p>
-                    <p className="text-white text-sm sm:text-base">{car.year || "N/A"}</p>
-                </div>
-                <div>
-                    <p className="text-xs text-gray-500 mb-1">Tire Size</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.tireSize ? formatValue(onboarding.tireSize) : "N/A"}</p>
-                </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Free Oil Change</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Oil Package Details</p>
-                    <p className="text-white text-sm sm:text-base">{(onboarding as any)?.oilPackageDetails ? formatValue((onboarding as any).oilPackageDetails) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Dealership Address</p>
-                    <p className="text-white text-sm sm:text-base">{(onboarding as any)?.dealershipAddress ? formatValue((onboarding as any).dealershipAddress) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Trim</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.vehicleTrim ? formatValue(onboarding.vehicleTrim) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Exterior Color</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.exteriorColor ? formatValue(onboarding.exteriorColor) : (car.color || "N/A")}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Number of Doors</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.numberOfDoors ? formatValue(onboarding.numberOfDoors) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Number of Seats</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.numberOfSeats ? formatValue(onboarding.numberOfSeats) : "N/A"}</p>
-                  </div>
-                </div>
-
-                {/* Column 3 (Right) */}
-                <div className="space-y-4">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">License Plate</p>
-                    <p className="text-white text-sm sm:text-base">{car.licensePlate || "N/A"}</p>
-                </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Registration Expiration</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.registrationExpiration ? formatValue(onboarding.registrationExpiration) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Last Oil Change</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.lastOilChange ? formatValue(onboarding.lastOilChange) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Mileage</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.vehicleMiles ? formatValue(onboarding.vehicleMiles) : (car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A")}</p>
-                  </div>
+              </div>
+              
+              {/* Accessories Section - Full width */}
+              <div className="pt-4 border-t border-[#2a2a2a]">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Roof Rails</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.roofRails ? formatValue(onboarding.roofRails) : "N/A"}</p>
+                    <p className="text-white text-base">{onboarding?.roofRails ? formatValue(onboarding.roofRails) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Ski Crossbars</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.skiCrossBars ? formatValue(onboarding.skiCrossBars) : "N/A"}</p>
+                    <p className="text-white text-base">{onboarding?.skiCrossBars ? formatValue(onboarding.skiCrossBars) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Ski Rack</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.skiRacks ? formatValue(onboarding.skiRacks) : "N/A"}</p>
+                    <p className="text-white text-base">{onboarding?.skiRacks ? formatValue(onboarding.skiRacks) : "N/A"}</p>
                   </div>
+                </div>
               </div>
-                <div className="pt-1.5 border-t border-[#2a2a2a]">
+              
+              {/* Features - Full width */}
+              <div className="pt-4 border-t border-[#2a2a2a]">
+                <p className="text-xs text-gray-500 mb-1">Features</p>
+                <p className="text-white text-base">
+                  {onboarding?.vehicleFeatures && Array.isArray(onboarding.vehicleFeatures) && onboarding.vehicleFeatures.length > 0
+                    ? onboarding.vehicleFeatures.join(", ")
+                    : (onboarding?.vehicleFeatures && typeof onboarding.vehicleFeatures === 'string'
+                      ? onboarding.vehicleFeatures
+                      : "N/A")}
+                </p>
+              </div>
+              
+              {/* Assigned To Section */}
+              <div className="pt-1.5 border-t border-[#2a2a2a]">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8">
                     {/* Left: Assigned To */}
                     <div className="flex-shrink-0 text-center lg:text-left">
@@ -1461,9 +1486,8 @@ export default function CarDetailPage() {
                         </p>
                       </div>
                     </div>
-                    </div>
+                  </div>
                 </div>
-              </div>
               {car.offboardAt && (
                   <div className="pt-1.5 border-t border-[#2a2a2a]">
                     <p className="text-xs text-gray-500 mb-0.5">Off-boarded</p>
@@ -1858,38 +1882,45 @@ export default function CarDetailPage() {
               Purchase Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-4">
               {isLoadingOnboarding ? (
                 <div className="text-center py-4 text-gray-400">
                   <p className="text-sm">Loading...</p>
                 </div>
               ) : onboarding ? (
-                <div className="grid grid-cols-1 gap-2 text-sm">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Purchase Price</p>
-                    <p className="text-white text-base">{formatCurrency(onboarding.purchasePrice)}</p>
+                <>
+                  {/* Financial Details - 2 columns */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Purchase Price</p>
+                      <p className="text-white text-base font-medium">{formatCurrency(onboarding.purchasePrice)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Down Payment</p>
+                      <p className="text-white text-base font-medium">{formatCurrency(onboarding.downPayment)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Monthly Payment</p>
+                      <p className="text-white text-base font-medium">{formatCurrency(onboarding.monthlyPayment)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Interest Rate</p>
+                      <p className="text-white text-base font-medium">{formatValue(onboarding.interestRate)}%</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Down Payment</p>
-                    <p className="text-white text-base">{formatCurrency(onboarding.downPayment)}</p>
+                  
+                  {/* Additional Information - Full width with separator */}
+                  <div className="pt-4 border-t border-[#2a2a2a] space-y-4">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Transport City to City</p>
+                      <p className="text-white text-base">{formatValue(onboarding.transportCityToCity)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Ultimate Goal</p>
+                      <p className="text-white text-base">{formatValue(onboarding.ultimateGoal)}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Monthly Payment</p>
-                    <p className="text-white text-base">{formatCurrency(onboarding.monthlyPayment)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Interest Rate</p>
-                    <p className="text-white text-base">{formatValue(onboarding.interestRate)}%</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Transport City to City</p>
-                    <p className="text-white text-base">{formatValue(onboarding.transportCityToCity)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Ultimate Goal</p>
-                    <p className="text-white text-base">{formatValue(onboarding.ultimateGoal)}</p>
-                  </div>
-                </div>
+                </>
               ) : (
                 <div className="text-center py-4 text-gray-400">
                   <p className="text-sm">No financial information available</p>
@@ -1995,17 +2026,6 @@ export default function CarDetailPage() {
                     <p className="text-white text-base">{formatValue(onboarding.insuranceExpiration)}</p>
                     </div>
                 </div>
-                  {/* Features - Full width */}
-                  <div className="pt-4 border-t border-[#2a2a2a] mt-4">
-                    <p className="text-xs text-gray-500 mb-1">Features</p>
-                    <p className="text-white text-base">
-                      {onboarding?.vehicleFeatures && Array.isArray(onboarding.vehicleFeatures) && onboarding.vehicleFeatures.length > 0
-                        ? onboarding.vehicleFeatures.join(", ")
-                        : (onboarding?.vehicleFeatures && typeof onboarding.vehicleFeatures === 'string'
-                          ? onboarding.vehicleFeatures
-                          : "N/A")}
-                    </p>
-                  </div>
                 </>
                 ) : (
                 <div className="text-center py-4 text-gray-400">
