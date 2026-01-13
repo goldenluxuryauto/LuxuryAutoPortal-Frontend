@@ -63,6 +63,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
@@ -206,7 +207,7 @@ export default function ClientDetailPage() {
     freeDealershipOilChanges: "",
     oilPackageDetails: "",
     dealershipAddress: "",
-    vehicleFeatures: "",
+    vehicleFeatures: [] as string[],
     // Financial Information
     purchasePrice: "",
     downPayment: "",
@@ -577,7 +578,9 @@ export default function ClientDetailPage() {
       if (data.dealershipAddress) formData.append("dealershipAddress", data.dealershipAddress);
       if (data.fuelType) formData.append("fuelType", data.fuelType);
       if (data.tireSize) formData.append("tireSize", data.tireSize);
-      if (data.vehicleFeatures) formData.append("vehicleFeatures", data.vehicleFeatures);
+      if (data.vehicleFeatures && Array.isArray(data.vehicleFeatures) && data.vehicleFeatures.length > 0) {
+        formData.append("vehicleFeatures", data.vehicleFeatures.join(", "));
+      }
       // Financial Information
       if (data.purchasePrice) formData.append("purchasePrice", data.purchasePrice);
       if (data.downPayment) formData.append("downPayment", data.downPayment);
@@ -641,7 +644,7 @@ export default function ClientDetailPage() {
         freeDealershipOilChanges: "",
         oilPackageDetails: "",
         dealershipAddress: "",
-        vehicleFeatures: "",
+        vehicleFeatures: [] as string[],
         purchasePrice: "",
         downPayment: "",
         monthlyPayment: "",
@@ -2047,11 +2050,23 @@ export default function ClientDetailPage() {
                 </div>
                 <div>
                   <Label className="text-gray-400">T-Shirt Size</Label>
-                  <Input
+                  <Select
                     value={editFormData.tshirtSize || ""}
-                    onChange={(e) => setEditFormData({ ...editFormData, tshirtSize: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setEditFormData({ ...editFormData, tshirtSize: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      {["XS", "S", "M", "L", "XL", "XXL"].map(
+                        (s) => (
+                          <SelectItem key={s} value={s}>
+                            {s}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-gray-400">SSN</Label>
@@ -2071,11 +2086,19 @@ export default function ClientDetailPage() {
                 </div>
                 <div>
                   <Label className="text-gray-400">How Did You Hear About Us</Label>
-                  <Input
+                  <Select
                     value={editFormData.heardAboutUs || ""}
-                    onChange={(e) => setEditFormData({ ...editFormData, heardAboutUs: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setEditFormData({ ...editFormData, heardAboutUs: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Friend">Friend</SelectItem>
+                      <SelectItem value="Google">Google</SelectItem>
+                      <SelectItem value="Social Media">Social Media</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-gray-400">Emergency Contact Name</Label>
@@ -2481,59 +2504,102 @@ export default function ClientDetailPage() {
                 </div>
                 <div>
                   <Label className="text-gray-400">Vehicle Recall</Label>
-                  <Input
+                  <Select
                     value={addCarForm.vehicleRecall}
-                    onChange={(e) => setAddCarForm({ ...addCarForm, vehicleRecall: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, vehicleRecall: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-gray-400">Number of Seats</Label>
-                  <Input
-                    type="number"
+                  <Select
                     value={addCarForm.numberOfSeats}
-                    onChange={(e) => setAddCarForm({ ...addCarForm, numberOfSeats: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, numberOfSeats: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      {[2, 4, 5, 6, 7, 8].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {n}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-gray-400">Number of Doors</Label>
-                  <Input
-                    type="number"
+                  <Select
                     value={addCarForm.numberOfDoors}
-                    onChange={(e) => setAddCarForm({ ...addCarForm, numberOfDoors: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, numberOfDoors: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-gray-400">Ski Rack</Label>
-                  <Input
+                  <Select
                     value={addCarForm.skiRacks}
-                    onChange={(e) => setAddCarForm({ ...addCarForm, skiRacks: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, skiRacks: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-gray-400">Ski Crossbars</Label>
-                  <Input
+                  <Select
                     value={addCarForm.skiCrossBars}
-                    onChange={(e) => setAddCarForm({ ...addCarForm, skiCrossBars: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, skiCrossBars: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-gray-400">Roof Rails</Label>
-                  <Input
+                  <Select
                     value={addCarForm.roofRails}
-                    onChange={(e) => setAddCarForm({ ...addCarForm, roofRails: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, roofRails: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-gray-400">Oil Type</Label>
@@ -2557,11 +2623,18 @@ export default function ClientDetailPage() {
                 </div>
                 <div>
                   <Label className="text-gray-400">Free Service Center Oil Change</Label>
-                  <Input
+                  <Select
                     value={addCarForm.freeDealershipOilChanges}
-                    onChange={(e) => setAddCarForm({ ...addCarForm, freeDealershipOilChanges: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, freeDealershipOilChanges: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div>
@@ -2583,12 +2656,19 @@ export default function ClientDetailPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-gray-400">Fuel Type</Label>
-                  <Input
+                  <Select
                     value={addCarForm.fuelType}
-                    onChange={(e) => setAddCarForm({ ...addCarForm, fuelType: e.target.value })}
-                    placeholder="Premium"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, fuelType: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Gasoline">Gasoline</SelectItem>
+                      <SelectItem value="Diesel">Diesel</SelectItem>
+                      <SelectItem value="Electric">Electric</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-gray-400">Tire Size</Label>
@@ -2600,14 +2680,54 @@ export default function ClientDetailPage() {
                   />
                 </div>
               </div>
-              <div>
-                <Label className="text-gray-400">Features (comma-separated)</Label>
-                <Input
-                  value={addCarForm.vehicleFeatures}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, vehicleFeatures: e.target.value })}
-                  placeholder="Feature 1, Feature 2, Feature 3"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
+              <div className="col-span-2">
+                <Label className="text-gray-400 mb-4 block">Features (check all that apply)</Label>
+                <div className="border border-red-500 rounded-lg p-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      "All-wheel drive",
+                      "AUX input",
+                      "Blind Spot Warning",
+                      "Convertible",
+                      "Keyless Entry",
+                      "Snow Tires or Chains",
+                      "USB Charger",
+                      "Android Auto",
+                      "Back Up Camera",
+                      "Bluetooth",
+                      "GPS",
+                      "Pet Friendly",
+                      "Sunroof",
+                      "USB Input",
+                      "Apple CarPlay",
+                      "Bike Rack",
+                      "Toll Pass",
+                      "Wheelchair Accessible",
+                    ].map((feature) => (
+                      <div key={feature} className="flex items-center space-x-3">
+                        <Checkbox
+                          id={`feature-${feature}`}
+                          checked={addCarForm.vehicleFeatures.includes(feature)}
+                          onCheckedChange={(checked) => {
+                            const currentValue = addCarForm.vehicleFeatures || [];
+                            if (checked) {
+                              setAddCarForm({ ...addCarForm, vehicleFeatures: [...currentValue, feature] });
+                            } else {
+                              setAddCarForm({ ...addCarForm, vehicleFeatures: currentValue.filter((f) => f !== feature) });
+                            }
+                          }}
+                          className="border-gray-600"
+                        />
+                        <Label
+                          htmlFor={`feature-${feature}`}
+                          className="text-gray-300 text-sm font-normal cursor-pointer"
+                        >
+                          {feature}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
               <div>
                 <Label className="text-gray-400">Status *</Label>
