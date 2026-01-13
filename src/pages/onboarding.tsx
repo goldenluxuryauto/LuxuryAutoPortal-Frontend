@@ -2081,7 +2081,7 @@ export default function Onboarding() {
                           />
                           <div className="bg-[#0a0a0a] border border-gray-700 rounded p-4">
                             <p className="text-sm text-gray-400 mb-4">
-                              After you submit, we will send the DocuSign
+                              After you submit, we will send the contract
                               agreement to your email
                             </p>
                             <FormField

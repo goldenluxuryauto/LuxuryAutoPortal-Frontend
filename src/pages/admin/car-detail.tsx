@@ -1855,7 +1855,7 @@ export default function CarDetailPage() {
           <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
-              Vehicle Purchase Information
+              Purchase Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -2761,7 +2761,7 @@ export default function CarDetailPage() {
                 {/* Financial Information Section */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
-                    Financial Information
+                    Purchase Information
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
