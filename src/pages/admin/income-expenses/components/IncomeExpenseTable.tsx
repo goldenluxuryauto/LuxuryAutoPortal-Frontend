@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { ChevronDown, ChevronRight, Download, Upload, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useIncomeExpense } from "../context/IncomeExpenseContext";
 import EditableCell from "./EditableCell";
 import { cn } from "@/lib/utils";
@@ -12,7 +11,7 @@ interface IncomeExpenseTableProps {
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
-  const { data, monthModes, toggleMonthMode } = useIncomeExpense();
+  const { data, monthModes, toggleMonthMode, isSavingMode } = useIncomeExpense();
 
   const [expandedSections, setExpandedSections] = useState({
     managementOwner: true,
@@ -34,16 +33,37 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     }));
   };
 
-  // Helper to get value by month
+  // Helper to get value by month - checks if data exists and returns actual value or 0
   const getMonthValue = (arr: any[], month: number, field: string): number => {
-    const item = arr.find((x) => x.month === month);
-    return item ? Number(item[field] || 0) : 0;
+    if (!arr || !Array.isArray(arr)) return 0;
+    const item = arr.find((x) => x && x.month === month);
+    if (!item) return 0;
+    const value = item[field];
+    // Check if value exists (not null, not undefined)
+    if (value === null || value === undefined) return 0;
+    const numValue = Number(value);
+    return isNaN(numValue) ? 0 : numValue;
   };
 
-  // Get split percentages based on default setting
-  const defaultMgmtSplit = data.formulaSetting?.carManagementSplitPercent || 50;
-  const defaultOwnerSplit = data.formulaSetting?.carOwnerSplitPercent || 50;
-  
+  // Helper function to calculate total income for a month (sum all income items)
+  // This is reactive to data.incomeExpenses changes - recalculates on every render
+  // when income data is updated (via React Query invalidation after saves)
+  const getTotalIncomeForMonth = (month: number): number => {
+    return (
+      getMonthValue(data.incomeExpenses, month, "rentalIncome") +
+      getMonthValue(data.incomeExpenses, month, "deliveryIncome") +
+      getMonthValue(data.incomeExpenses, month, "electricPrepaidIncome") +
+      getMonthValue(data.incomeExpenses, month, "smokingFines") +
+      getMonthValue(data.incomeExpenses, month, "gasPrepaidIncome") +
+      getMonthValue(data.incomeExpenses, month, "skiRacksIncome") +
+      getMonthValue(data.incomeExpenses, month, "milesIncome") +
+      getMonthValue(data.incomeExpenses, month, "childSeatIncome") +
+      getMonthValue(data.incomeExpenses, month, "coolersIncome") +
+      getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome") +
+      getMonthValue(data.incomeExpenses, month, "otherIncome")
+    );
+  };
+
   // Helper function to get split for a specific month
   const getSplitForMonth = (month: number) => {
     const mode = monthModes[month];
@@ -65,7 +85,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               </th>
               {MONTHS.map((month, index) => {
                 const monthNum = index + 1;
-                const currentMode = monthModes[monthNum];
+                const currentMode = monthModes[monthNum] || 50;
                 return (
                   <th
                     key={month}
@@ -75,20 +95,24 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                       <span className="text-white text-xs">{month} {year}</span>
                       <button
                         onClick={() => toggleMonthMode(monthNum)}
+                        disabled={isSavingMode}
                         className={cn(
-                          "px-3 py-0.5 rounded-full text-xs font-semibold transition-colors",
+                          "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200",
+                          "disabled:opacity-50 disabled:cursor-not-allowed",
                           currentMode === 50 
-                            ? "bg-green-600 text-white hover:bg-green-700" 
-                            : "bg-blue-600 text-white hover:bg-blue-700"
+                            ? "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-lg shadow-green-600/50" 
+                            : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/50",
+                          isSavingMode && "animate-pulse"
                         )}
+                        title={isSavingMode ? "Saving mode change..." : `Click to toggle between 50:50 (green) and 30:70 (blue) split`}
                       >
-                        {currentMode}
+                        {isSavingMode ? "..." : currentMode}
                       </button>
                     </div>
                   </th>
                 );
               })}
-              <th className="border-l border-[#2a2a2a] px-2 py-2 text-center text-white min-w-[80px] bg-[#1f1f1f]">
+              <th className="sticky right-0 z-30 border-l border-[#2a2a2a] px-2 py-2 text-center text-white min-w-[100px] bg-[#1f1f1f] font-bold">
                 Total
               </th>
             </tr>
@@ -100,34 +124,53 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               title="CAR MANAGEMENT OWNER SPLIT"
               isExpanded={expandedSections.managementOwner}
               onToggle={() => toggleSection("managementOwner")}
-              hasActions={true}
-              hasImport={false}
             >
+              {/* Car Management Split - Reactive to income changes and mode toggles */}
               <CategoryRow
                 label="Car Management Split"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  const rental = getMonthValue(data.incomeExpenses, monthNum, "rentalIncome");
-                  const skiRacks = getMonthValue(data.incomeExpenses, monthNum, "skiRacksIncome");
-                  const split = getSplitForMonth(monthNum);
-                  return (rental + skiRacks) * (split.mgmt / 100);
+                  // Calculate total income for the month (sum of all income items)
+                  // This recalculates automatically when data.incomeExpenses changes
+                  const totalIncome = getTotalIncomeForMonth(monthNum);
+                  // Get mode for this month (50 or 70) - reactive to monthModes state changes
+                  const mode = monthModes[monthNum] || 50;
+                  // Calculate split amount based on mode
+                  // Mode 50: splitAmount = totalIncome × 0.50, percentage = 50
+                  // Mode 70: splitAmount = totalIncome × 0.30, percentage = 30
+                  const splitAmount = mode === 70 
+                    ? totalIncome * 0.30 
+                    : totalIncome * 0.50;
+                  return splitAmount;
                 })}
                 category="managementSplit"
                 field="carManagementSplit"
-                isEditable={true}
+                isEditable={false}
+                formatType="managementSplit"
+                monthModes={monthModes}
               />
+              {/* Car Owner Split - Reactive to income changes and mode toggles */}
               <CategoryRow
                 label="Car Owner Split"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  const rental = getMonthValue(data.incomeExpenses, monthNum, "rentalIncome");
-                  const skiRacks = getMonthValue(data.incomeExpenses, monthNum, "skiRacksIncome");
-                  const split = getSplitForMonth(monthNum);
-                  return (rental + skiRacks) * (split.owner / 100);
+                  // Calculate total income for the month (sum of all income items)
+                  // This recalculates automatically when data.incomeExpenses changes
+                  const totalIncome = getTotalIncomeForMonth(monthNum);
+                  // Get mode for this month (50 or 70) - reactive to monthModes state changes
+                  const mode = monthModes[monthNum] || 50;
+                  // Calculate split amount based on mode
+                  // Mode 50: splitAmount = totalIncome × 0.50
+                  // Mode 70: splitAmount = totalIncome × 0.70
+                  const splitAmount = mode === 70 
+                    ? totalIncome * 0.70 
+                    : totalIncome * 0.50;
+                  return splitAmount;
                 })}
                 category="managementSplit"
                 field="carOwnerSplit"
-                isEditable={true}
+                isEditable={false}
+                formatType="ownerSplit"
               />
             </CategorySection>
 
@@ -136,7 +179,6 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               title="INCOME & EXPENSES"
               isExpanded={expandedSections.incomeExpenses}
               onToggle={() => toggleSection("incomeExpenses")}
-              hasActions={true}
             >
               <CategoryRow
                 label="Rental Income"
@@ -267,7 +309,6 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               title="OPERATING EXPENSE (Direct Delivery)"
               isExpanded={expandedSections.directDelivery}
               onToggle={() => toggleSection("directDelivery")}
-              hasActions={true}
             >
               <CategoryRow
                 label="Labor - Car Cleaning"
@@ -321,7 +362,6 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               title="OPERATING EXPENSE (COGS - Per Vehicle)"
               isExpanded={expandedSections.cogs}
               onToggle={() => toggleSection("cogs")}
-              hasActions={true}
             >
               <CategoryRow
                 label="Auto Body Shop / Wreck"
@@ -508,7 +548,6 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               title="Parking Fee & Labor Cleaning"
               isExpanded={expandedSections.parkingFeeLabor}
               onToggle={() => toggleSection("parkingFeeLabor")}
-              hasActions={true}
             >
               <CategoryRow
                 label="GLA Parking Fee"
@@ -541,7 +580,6 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               title="REIMBURSE AND NON-REIMBURSE BILLS"
               isExpanded={expandedSections.reimbursedBills}
               onToggle={() => toggleSection("reimbursedBills")}
-              hasActions={true}
             >
               <CategoryRow
                 label="Electric - Reimbursed"
@@ -616,7 +654,6 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               title="HISTORY"
               isExpanded={expandedSections.history}
               onToggle={() => toggleSection("history")}
-              hasActions={true}
             >
               <CategoryRow
                 label="Days Rented"
@@ -743,71 +780,16 @@ interface CategorySectionProps {
   isExpanded: boolean;
   onToggle: () => void;
   children: React.ReactNode;
-  hasActions?: boolean;
-  hasImport?: boolean;
 }
 
-function CategorySection({ title, isExpanded, onToggle, children, hasActions = false, hasImport = true }: CategorySectionProps) {
-  const handleExport = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log("Export", title);
-    // Export logic here
-  };
-
-  const handleImport = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log("Import", title);
-    // Import logic here
-  };
-
-  const handleLog = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log("Log", title);
-    // Log logic here
-  };
-
+function CategorySection({ title, isExpanded, onToggle, children }: CategorySectionProps) {
   return (
     <>
       <tr className="bg-[#1a1a1a] hover:bg-[#222]">
         <td colSpan={14} className="sticky left-0 z-30 bg-[#1a1a1a] hover:bg-[#222] px-3 py-2 border-b border-[#2a2a2a]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 cursor-pointer flex-1" onClick={onToggle}>
-              {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-              <span className="text-xs font-semibold text-white">{title}</span>
-            </div>
-            {hasActions && (
-              <div className="flex items-center gap-1">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleExport}
-                  className="h-6 px-2 text-xs text-gray-400 hover:text-white hover:bg-[#2a2a2a]"
-                >
-                  <Download className="w-3 h-3 mr-1" />
-                  Export
-                </Button>
-                {hasImport && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={handleImport}
-                    className="h-6 px-2 text-xs text-gray-400 hover:text-white hover:bg-[#2a2a2a]"
-                  >
-                    <Upload className="w-3 h-3 mr-1" />
-                    Import
-                  </Button>
-                )}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleLog}
-                  className="h-6 px-2 text-xs text-gray-400 hover:text-white hover:bg-[#2a2a2a]"
-                >
-                  <FileText className="w-3 h-3 mr-1" />
-                  Log
-                </Button>
-              </div>
-            )}
+          <div className="flex items-center gap-2 cursor-pointer" onClick={onToggle}>
+            {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            <span className="text-xs font-semibold text-white">{title}</span>
           </div>
         </td>
       </tr>
@@ -824,6 +806,8 @@ interface CategoryRowProps {
   isEditable?: boolean;
   isInteger?: boolean;
   isTotal?: boolean;
+  formatType?: "managementSplit" | "ownerSplit";
+  monthModes?: { [month: number]: 50 | 70 };
 }
 
 function CategoryRow({
@@ -834,8 +818,53 @@ function CategoryRow({
   isEditable = true,
   isInteger = false,
   isTotal = false,
+  formatType,
+  monthModes,
 }: CategoryRowProps) {
-  const total = values.reduce((sum, val) => sum + val, 0);
+  // Calculate total - ensure all values are numbers
+  const total = values.reduce((sum, val) => {
+    const numVal = typeof val === 'number' && !isNaN(val) ? val : 0;
+    return sum + numVal;
+  }, 0);
+
+  // Helper to format value based on formatType
+  const formatValue = (value: number, month: number) => {
+    if (formatType === "managementSplit") {
+      // Get mode for this month to determine percentage
+      const mode = monthModes?.[month] || 50;
+      const percentage = mode === 70 ? 30 : 50;
+      // Format: $ {splitAmount.toFixed(2)}({percentage}%)
+      return `$ ${value.toFixed(2)}(${percentage}%)`;
+    } else if (formatType === "ownerSplit") {
+      // Format: $ {splitAmount.toFixed(2)}
+      return `$ ${value.toFixed(2)}`;
+    } else if (isInteger) {
+      return value.toString();
+    } else {
+      return `$${value.toFixed(2)}`;
+    }
+  };
+
+  // Format total based on formatType
+  // For all currency values, format as: $ {total.toFixed(2)}
+  const formatTotal = () => {
+    if (formatType === "managementSplit") {
+      // For management split, calculate average percentage or use default
+      const avgMode = monthModes 
+        ? Object.values(monthModes).reduce((sum, mode) => sum + (mode === 70 ? 30 : 50), 0) / 12
+        : 50;
+      return `$ ${total.toFixed(2)}(${Math.round(avgMode)}%)`;
+    } else if (formatType === "ownerSplit") {
+      // Owner split: $ {total.toFixed(2)}
+      return `$ ${total.toFixed(2)}`;
+    } else if (isInteger) {
+      // Integer values (like trips, days): just the number
+      return total.toString();
+    } else {
+      // All other currency values: $ {total.toFixed(2)}
+      return `$ ${total.toFixed(2)}`;
+    }
+  };
 
   return (
     <tr className={cn(
@@ -847,6 +876,8 @@ function CategoryRow({
       </td>
       {values.map((value, i) => {
         const month = i + 1;
+        // Ensure value is a number and handle null/undefined
+        const cellValue = typeof value === 'number' && !isNaN(value) ? value : 0;
         
         return (
           <td 
@@ -855,7 +886,7 @@ function CategoryRow({
           >
             {category && field && isEditable ? (
               <EditableCell
-                value={value}
+                value={cellValue}
                 month={month}
                 category={category}
                 field={field}
@@ -863,15 +894,18 @@ function CategoryRow({
                 isInteger={isInteger}
               />
             ) : (
-              <span className={cn("text-xs text-right block", value === 0 && "text-gray-600")}>
-                {isInteger ? value.toString() : `$${value.toFixed(2)}`}
+              <span className={cn("text-xs text-right block", cellValue === 0 && "text-gray-600")}>
+                {formatValue(cellValue, month)}
               </span>
             )}
           </td>
         );
       })}
-      <td className="border-l border-[#2a2a2a] px-2 py-2 text-right bg-[#1f1f1f] text-white font-semibold text-xs">
-        {isInteger ? total.toString() : `$${total.toFixed(2)}`}
+      <td className={cn(
+        "sticky right-0 z-20 border-l border-[#2a2a2a] px-2 py-2 text-right text-white font-bold text-xs",
+        isTotal ? "bg-[#0a0a0a]" : "bg-[#1f1f1f]"
+      )}>
+        {formatTotal()}
       </td>
     </tr>
   );

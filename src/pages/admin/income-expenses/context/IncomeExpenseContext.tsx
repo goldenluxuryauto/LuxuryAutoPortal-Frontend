@@ -11,10 +11,13 @@ interface IncomeExpenseContextType {
   editingCell: EditingCell | null;
   setEditingCell: (cell: EditingCell | null) => void;
   updateCell: (category: string, field: string, month: number, value: number) => void;
-  saveChanges: () => void;
+  saveChanges: (immediateChange?: { category: string; field: string; month: number; value: number }) => void;
   isSaving: boolean;
   monthModes: { [month: number]: 50 | 70 };
-  toggleMonthMode: (month: number) => void;
+  toggleMonthMode: (month: number) => Promise<void>;
+  isSavingMode: boolean;
+  year: string;
+  carId: number;
 }
 
 const IncomeExpenseContext = createContext<IncomeExpenseContextType | undefined>(undefined);
@@ -159,13 +162,18 @@ export function IncomeExpenseProvider({
 
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [pendingChanges, setPendingChanges] = useState<Map<string, any>>(new Map());
-  const [monthModes, setMonthModes] = useState<{ [month: number]: 50 | 70 }>(() => {
+  
+  // Initialize monthModes with defaults
+  const getDefaultMonthModes = (): { [month: number]: 50 | 70 } => {
     const modes: { [month: number]: 50 | 70 } = {};
     for (let i = 1; i <= 12; i++) {
       modes[i] = 50; // Default to 50:50 mode
     }
     return modes;
-  });
+  };
+  
+  const [monthModes, setMonthModes] = useState<{ [month: number]: 50 | 70 }>(getDefaultMonthModes);
+  const [isSavingMode, setIsSavingMode] = useState(false);
 
   // Fetch income/expense data
   const { data: incomeExpenseData, isLoading } = useQuery<{
@@ -186,11 +194,80 @@ export function IncomeExpenseProvider({
 
   const data = incomeExpenseData?.data || getEmptyData();
 
-  const toggleMonthMode = (month: number) => {
-    setMonthModes((prev) => ({
-      ...prev,
-      [month]: prev[month] === 50 ? 70 : 50, // Toggle between 50 and 70
-    }));
+  // Load monthModes from API response when data is fetched
+  // Use a ref to track if we've loaded modes for this carId/year combo to prevent infinite loops
+  const loadedKey = React.useRef<string>('');
+  
+  React.useEffect(() => {
+    const currentKey = `${carId}-${year}`;
+    
+    // Only load if this is a new carId/year combination
+    if (loadedKey.current !== currentKey && incomeExpenseData?.data) {
+      loadedKey.current = currentKey;
+      
+      if (incomeExpenseData.data.formulaSetting?.monthModes) {
+        // Merge with defaults to ensure all 12 months are present
+        const defaults = getDefaultMonthModes();
+        const loadedModes = { ...defaults, ...incomeExpenseData.data.formulaSetting.monthModes };
+        setMonthModes(loadedModes);
+      } else {
+        // If formulaSetting exists but no monthModes, use defaults
+        setMonthModes(getDefaultMonthModes());
+      }
+    }
+  }, [incomeExpenseData, carId, year]);
+
+  // Toggle month mode and save to backend
+  const toggleMonthMode = async (month: number) => {
+    // Optimistically update UI
+    const newModes: { [month: number]: 50 | 70 } = {
+      ...monthModes,
+      [month]: monthModes[month] === 50 ? 70 : 50,
+    };
+    setMonthModes(newModes);
+    setIsSavingMode(true);
+
+    try {
+      const response = await fetch(buildApiUrl("/api/income-expense/formula"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          carId,
+          year: parseInt(year),
+          monthModes: newModes,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save mode change");
+      }
+
+      const result = await response.json();
+      
+      // Update with server response to ensure consistency
+      if (result.data?.monthModes) {
+        setMonthModes({ ...getDefaultMonthModes(), ...result.data.monthModes });
+      }
+
+      // Invalidate query to refresh data
+      queryClient.invalidateQueries({ queryKey: ["/api/income-expense", carId, year] });
+      
+      toast({
+        title: "Success",
+        description: "Mode updated successfully",
+      });
+    } catch (error: any) {
+      // Revert on error
+      setMonthModes(monthModes);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save mode change",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingMode(false);
+    }
   };
 
   const updateCell = (category: string, field: string, month: number, value: number) => {
@@ -258,7 +335,70 @@ export function IncomeExpenseProvider({
     },
   });
 
-  const saveChanges = () => {
+  const saveChanges = (immediateChange?: { category: string; field: string; month: number; value: number }) => {
+    // If an immediate change is provided, add it to pendingChanges first
+    if (immediateChange) {
+      const key = `${immediateChange.category}-${immediateChange.field}-${immediateChange.month}`;
+      const newChanges = new Map(pendingChanges);
+      newChanges.set(key, immediateChange);
+      setPendingChanges(newChanges);
+      
+      // Use the updated map for saving
+      const changesByCategory = new Map<string, any>();
+      newChanges.forEach(({ category, field, month, value }) => {
+        const catKey = `${category}-${month}`;
+        if (!changesByCategory.has(catKey)) {
+          changesByCategory.set(catKey, { category, month, fields: {} });
+        }
+        changesByCategory.get(catKey).fields[field] = value;
+      });
+
+      // Send updates to backend
+      const promises: Promise<any>[] = [];
+      changesByCategory.forEach(({ category, month, fields }) => {
+        const endpoint = getCategoryEndpoint(category);
+        if (endpoint) {
+          promises.push(
+            fetch(buildApiUrl(endpoint), {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({
+                carId,
+                year: parseInt(year),
+                month,
+                ...fields,
+              }),
+            }).then((res) => {
+              if (!res.ok) throw new Error(`Failed to update ${category}`);
+              return res.json();
+            })
+          );
+        }
+      });
+
+      Promise.all(promises)
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ["/api/income-expense", carId, year] });
+          setPendingChanges(new Map());
+          setEditingCell(null);
+          toast({
+            title: "Success",
+            description: "Changes saved successfully",
+          });
+        })
+        .catch((error: any) => {
+          toast({
+            title: "Error",
+            description: error.message || "Failed to save changes",
+            variant: "destructive",
+          });
+        });
+      
+      return;
+    }
+
+    // Original behavior: save from pendingChanges
     if (pendingChanges.size === 0) {
       toast({
         title: "No changes",
@@ -294,6 +434,9 @@ export function IncomeExpenseProvider({
         isSaving: saveMutation.isPending,
         monthModes,
         toggleMonthMode,
+        isSavingMode,
+        year,
+        carId,
       }}
     >
       {children}

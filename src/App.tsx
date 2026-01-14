@@ -31,7 +31,13 @@ import PaymentsPage from "@/pages/admin/payments";
 import TotalsPage from "@/pages/admin/totals";
 import IncomeExpensesPage from "@/pages/admin/income-expenses/index";
 import CarIncomeExpensePage from "@/pages/admin/car-income-expense";
+import IncomeExpenseLogPage from "@/pages/admin/income-expense-log";
 import SettingsPage from "@/pages/admin/settings";
+
+// Wrapper component for IncomeExpensesPage to handle Wouter route props
+function IncomeExpensesPageWrapper() {
+  return <IncomeExpensesPage />;
+}
 import ClientProfilePage from "@/pages/admin/profile";
 import TrainingManualPage from "@/pages/admin/training-manual";
 import SignContract from "@/pages/sign-contract";
@@ -65,9 +71,10 @@ function Router() {
       <Route path="/admin/cars/:id/totals" component={TotalsPage} />
       <Route path="/admin/cars/:id/records" component={RecordsPage} />
       <Route path="/admin/cars/:id/payments" component={PaymentsPage} />
+      <Route path="/admin/cars/:id/income-expense/log" component={IncomeExpenseLogPage} />
       <Route path="/admin/cars/:id/income-expense" component={CarIncomeExpensePage} />
       <Route path="/admin/cars/:id" component={CarDetailPage} />
-      <Route path="/admin/income-expenses" component={IncomeExpensesPage} />
+      <Route path="/admin/income-expenses" component={IncomeExpensesPageWrapper} />
       <Route path="/admin/settings" component={SettingsPage} />
       <Route path="/profile" component={ClientProfilePage} />
       <Route path="/admin/training-manual" component={TrainingManualPage} />

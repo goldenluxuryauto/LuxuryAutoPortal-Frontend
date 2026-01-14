@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -12,40 +13,51 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useIncomeExpense } from "../context/IncomeExpenseContext";
+import ImagePreview from "../components/ImagePreview";
+import { Check } from "lucide-react";
+import { useImageUpload } from "../utils/useImageUpload";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function ModalEditReimbursedBills() {
-  const { editingCell, setEditingCell, updateCell, saveChanges, isSaving } = useIncomeExpense();
+  const { editingCell, setEditingCell, updateCell, saveChanges, isSaving, year, carId } = useIncomeExpense();
   const [remarks, setRemarks] = useState("");
-  const [files, setFiles] = useState<FileList | null>(null);
 
   const monthName = editingCell ? MONTHS[editingCell.month - 1] : "";
   const isOpen = !!editingCell && editingCell.category === "reimbursedBills";
 
+  const {
+    imageFiles,
+    isUploading,
+    fileInputRef,
+    handleFileChange,
+    handleRemoveImage,
+    handleConfirmUploads,
+    resetImages,
+  } = useImageUpload(
+    carId,
+    year,
+    editingCell?.category || "",
+    editingCell?.field || "",
+    editingCell?.month || 1
+  );
+
   const handleClose = () => {
     setEditingCell(null);
     setRemarks("");
-    setFiles(null);
+    resetImages();
   };
 
   const handleSave = () => {
     if (!editingCell) return;
     
-    updateCell(
-      editingCell.category,
-      editingCell.field,
-      editingCell.month,
-      editingCell.value
-    );
-    
-    saveChanges();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFiles(e.target.files);
-    }
+    // Save the change immediately, passing it directly to saveChanges
+    saveChanges({
+      category: editingCell.category,
+      field: editingCell.field,
+      month: editingCell.month,
+      value: editingCell.value,
+    });
   };
 
   if (!editingCell || editingCell.category !== "reimbursedBills") return null;
@@ -70,6 +82,9 @@ export default function ModalEditReimbursedBills() {
           <DialogTitle className="text-white text-lg">
             Update Reimbursed Bills
           </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Enter reimbursed and non-reimbursed expenses for {monthName} {year}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -81,7 +96,7 @@ export default function ModalEditReimbursedBills() {
           <div>
             <Label className="text-gray-400 text-xs">Date:</Label>
             <div className="text-white text-sm font-medium mt-1">
-              {monthName} {new Date().getFullYear()}
+              {monthName} {year}
             </div>
           </div>
 
@@ -113,13 +128,42 @@ export default function ModalEditReimbursedBills() {
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Upload Files</Label>
+            <Label className="text-gray-400 text-xs">Upload Receipt Images</Label>
             <Input
+              ref={fileInputRef}
               type="file"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
               multiple
               onChange={handleFileChange}
               className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm mt-1"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Only image files (JPEG, PNG, GIF, WebP) are allowed
+            </p>
+            
+            {imageFiles.length > 0 && (
+              <div className="mt-3">
+                <ImagePreview images={imageFiles} onRemove={handleRemoveImage} />
+                <Button
+                  type="button"
+                  onClick={handleConfirmUploads}
+                  disabled={isUploading}
+                  className="mt-3 w-full bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                >
+                  {isUploading ? (
+                    <>
+                      <Check className="w-4 h-4 mr-2 animate-pulse" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4 mr-2" />
+                      Confirm Uploads ({imageFiles.length})
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 

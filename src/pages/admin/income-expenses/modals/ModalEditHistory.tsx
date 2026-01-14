@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import { useIncomeExpense } from "../context/IncomeExpenseContext";
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function ModalEditHistory() {
-  const { editingCell, setEditingCell, updateCell, saveChanges, isSaving } = useIncomeExpense();
+  const { editingCell, setEditingCell, updateCell, saveChanges, isSaving, year } = useIncomeExpense();
 
   const monthName = editingCell ? MONTHS[editingCell.month - 1] : "";
   const isOpen = !!editingCell && editingCell.category === "history";
@@ -27,14 +28,13 @@ export default function ModalEditHistory() {
   const handleSave = () => {
     if (!editingCell) return;
     
-    updateCell(
-      editingCell.category,
-      editingCell.field,
-      editingCell.month,
-      editingCell.value
-    );
-    
-    saveChanges();
+    // Save the change immediately, passing it directly to saveChanges
+    saveChanges({
+      category: editingCell.category,
+      field: editingCell.field,
+      month: editingCell.month,
+      value: editingCell.value,
+    });
   };
 
   if (!editingCell || editingCell.category !== "history") return null;
@@ -54,6 +54,9 @@ export default function ModalEditHistory() {
           <DialogTitle className="text-white text-lg">
             Update Car History
           </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Enter rental history data for {monthName} {year}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -65,7 +68,7 @@ export default function ModalEditHistory() {
           <div>
             <Label className="text-gray-400 text-xs">Date:</Label>
             <div className="text-white text-sm font-medium mt-1">
-              {monthName} {new Date().getFullYear()}
+              {monthName} {year}
             </div>
           </div>
 

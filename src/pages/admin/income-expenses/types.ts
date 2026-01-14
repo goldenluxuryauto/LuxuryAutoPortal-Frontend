@@ -3,6 +3,7 @@
 export interface FormulaSetting {
   carManagementSplitPercent: number;
   carOwnerSplitPercent: number;
+  monthModes?: { [month: number]: 50 | 70 };
 }
 
 export interface MonthMode {
