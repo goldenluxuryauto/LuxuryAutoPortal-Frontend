@@ -63,6 +63,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
@@ -194,6 +195,35 @@ export default function ClientDetailPage() {
     gas: "",
     turoLink: "",
     adminTuroLink: "",
+    // Extended Vehicle Information
+    vehicleTrim: "",
+    registrationExpiration: "",
+    vehicleRecall: "",
+    numberOfSeats: "",
+    numberOfDoors: "",
+    skiRacks: "",
+    skiCrossBars: "",
+    roofRails: "",
+    freeDealershipOilChanges: "",
+    oilPackageDetails: "",
+    dealershipAddress: "",
+    vehicleFeatures: [] as string[],
+    // Financial Information
+    purchasePrice: "",
+    downPayment: "",
+    monthlyPayment: "",
+    interestRate: "",
+    transportCityToCity: "",
+    ultimateGoal: "",
+    // Insurance Information
+    insuranceProvider: "",
+    insurancePhone: "",
+    policyNumber: "",
+    insuranceExpiration: "",
+    // Car Login Information
+    carManufacturerWebsite: "",
+    carManufacturerUsername: "",
+    password: "",
   });
   
   const queryClient = useQueryClient();
@@ -521,6 +551,7 @@ export default function ClientDetailPage() {
       if (!clientId) throw new Error("Invalid client ID");
       
       const formData = new FormData();
+      // Vehicle Information
       formData.append("vin", data.vin);
       formData.append("makeModel", `${data.make} ${data.model}`.trim());
       if (data.make) formData.append("make", data.make);
@@ -531,11 +562,42 @@ export default function ClientDetailPage() {
       if (data.interiorColor) formData.append("interiorColor", data.interiorColor);
       if (data.mileage) formData.append("mileage", data.mileage);
       formData.append("status", data.status || "ACTIVE");
-      if (data.tireSize) formData.append("tireSize", data.tireSize);
+      // Extended Vehicle Information
+      if (data.vehicleTrim) formData.append("vehicleTrim", data.vehicleTrim);
+      if (data.registrationExpiration) formData.append("registrationExpiration", data.registrationExpiration);
+      if (data.vehicleRecall) formData.append("vehicleRecall", data.vehicleRecall);
+      if (data.numberOfSeats) formData.append("numberOfSeats", data.numberOfSeats);
+      if (data.numberOfDoors) formData.append("numberOfDoors", data.numberOfDoors);
+      if (data.skiRacks) formData.append("skiRacks", data.skiRacks);
+      if (data.skiCrossBars) formData.append("skiCrossBars", data.skiCrossBars);
+      if (data.roofRails) formData.append("roofRails", data.roofRails);
       if (data.oilType) formData.append("oilType", data.oilType);
       if (data.lastOilChange) formData.append("lastOilChange", data.lastOilChange);
+      if (data.freeDealershipOilChanges) formData.append("freeDealershipOilChanges", data.freeDealershipOilChanges);
+      if (data.oilPackageDetails) formData.append("oilPackageDetails", data.oilPackageDetails);
+      if (data.dealershipAddress) formData.append("dealershipAddress", data.dealershipAddress);
       if (data.fuelType) formData.append("fuelType", data.fuelType);
-      if (data.gas) formData.append("gas", data.gas);
+      if (data.tireSize) formData.append("tireSize", data.tireSize);
+      if (data.vehicleFeatures && Array.isArray(data.vehicleFeatures) && data.vehicleFeatures.length > 0) {
+        formData.append("vehicleFeatures", data.vehicleFeatures.join(", "));
+      }
+      // Financial Information
+      if (data.purchasePrice) formData.append("purchasePrice", data.purchasePrice);
+      if (data.downPayment) formData.append("downPayment", data.downPayment);
+      if (data.monthlyPayment) formData.append("monthlyPayment", data.monthlyPayment);
+      if (data.interestRate) formData.append("interestRate", data.interestRate);
+      if (data.transportCityToCity) formData.append("transportCityToCity", data.transportCityToCity);
+      if (data.ultimateGoal) formData.append("ultimateGoal", data.ultimateGoal);
+      // Insurance Information
+      if (data.insuranceProvider) formData.append("insuranceProvider", data.insuranceProvider);
+      if (data.insurancePhone) formData.append("insurancePhone", data.insurancePhone);
+      if (data.policyNumber) formData.append("policyNumber", data.policyNumber);
+      if (data.insuranceExpiration) formData.append("insuranceExpiration", data.insuranceExpiration);
+      // Car Login Information
+      if (data.carManufacturerWebsite) formData.append("carManufacturerWebsite", data.carManufacturerWebsite);
+      if (data.carManufacturerUsername) formData.append("carManufacturerUsername", data.carManufacturerUsername);
+      if (data.password) formData.append("password", data.password);
+      // Car Links
       if (data.turoLink) formData.append("turoLink", data.turoLink);
       if (data.adminTuroLink) formData.append("adminTuroLink", data.adminTuroLink);
 
@@ -571,6 +633,31 @@ export default function ClientDetailPage() {
         gas: "",
         turoLink: "",
         adminTuroLink: "",
+        vehicleTrim: "",
+        registrationExpiration: "",
+        vehicleRecall: "",
+        numberOfSeats: "",
+        numberOfDoors: "",
+        skiRacks: "",
+        skiCrossBars: "",
+        roofRails: "",
+        freeDealershipOilChanges: "",
+        oilPackageDetails: "",
+        dealershipAddress: "",
+        vehicleFeatures: [] as string[],
+        purchasePrice: "",
+        downPayment: "",
+        monthlyPayment: "",
+        interestRate: "",
+        transportCityToCity: "",
+        ultimateGoal: "",
+        insuranceProvider: "",
+        insurancePhone: "",
+        policyNumber: "",
+        insuranceExpiration: "",
+        carManufacturerWebsite: "",
+        carManufacturerUsername: "",
+        password: "",
       });
     },
     onError: (error: any) => {
@@ -1963,11 +2050,23 @@ export default function ClientDetailPage() {
                 </div>
                 <div>
                   <Label className="text-gray-400">T-Shirt Size</Label>
-                  <Input
+                  <Select
                     value={editFormData.tshirtSize || ""}
-                    onChange={(e) => setEditFormData({ ...editFormData, tshirtSize: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setEditFormData({ ...editFormData, tshirtSize: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      {["XS", "S", "M", "L", "XL", "XXL"].map(
+                        (s) => (
+                          <SelectItem key={s} value={s}>
+                            {s}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-gray-400">SSN</Label>
@@ -1987,11 +2086,19 @@ export default function ClientDetailPage() {
                 </div>
                 <div>
                   <Label className="text-gray-400">How Did You Hear About Us</Label>
-                  <Input
+                  <Select
                     value={editFormData.heardAboutUs || ""}
-                    onChange={(e) => setEditFormData({ ...editFormData, heardAboutUs: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  />
+                    onValueChange={(value) => setEditFormData({ ...editFormData, heardAboutUs: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Friend">Friend</SelectItem>
+                      <SelectItem value="Google">Google</SelectItem>
+                      <SelectItem value="Social Media">Social Media</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label className="text-gray-400">Emergency Contact Name</Label>
@@ -2272,7 +2379,7 @@ export default function ClientDetailPage() {
 
       {/* Add Car Dialog */}
       <Dialog open={isAddCarOpen} onOpenChange={setIsAddCarOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
           <DialogHeader>
             <DialogTitle className="text-white text-xl">Add Car</DialogTitle>
             <DialogDescription className="text-gray-400">
@@ -2284,91 +2391,343 @@ export default function ClientDetailPage() {
               e.preventDefault();
               addCarMutation.mutate(addCarForm);
             }}
-            className="space-y-4"
+            className="space-y-6"
           >
-            <div>
-              <Label className="text-gray-400">VIN Number *</Label>
-              <Input
-                value={addCarForm.vin}
-                onChange={(e) => setAddCarForm({ ...addCarForm, vin: e.target.value })}
-                placeholder="WDDNG8GB5LA123456"
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
-                required
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+            {/* Vehicle Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                Vehicle Information
+              </h3>
               <div>
-                <Label className="text-gray-400">Make *</Label>
+                <Label className="text-gray-400">VIN *</Label>
                 <Input
-                  value={addCarForm.make}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, make: e.target.value })}
-                  placeholder="Mercedes-Benz"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  value={addCarForm.vin}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, vin: e.target.value })}
+                  placeholder="WDDNG8GB5LA123456"
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                  maxLength={17}
                   required
                 />
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Make *</Label>
+                  <Input
+                    value={addCarForm.make}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, make: e.target.value })}
+                    placeholder="Mercedes-Benz"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Model *</Label>
+                  <Input
+                    value={addCarForm.model}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, model: e.target.value })}
+                    placeholder="S-Class"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Year</Label>
+                  <Input
+                    type="number"
+                    value={addCarForm.year}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, year: e.target.value })}
+                    placeholder="2024"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">License Plate</Label>
+                  <Input
+                    value={addCarForm.licensePlate}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, licensePlate: e.target.value })}
+                    placeholder="ABC1234"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Exterior Color</Label>
+                  <Input
+                    value={addCarForm.color}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, color: e.target.value })}
+                    placeholder="Black"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Interior Color</Label>
+                  <Input
+                    value={addCarForm.interiorColor}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, interiorColor: e.target.value })}
+                    placeholder="Black"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Mileage</Label>
+                  <Input
+                    type="number"
+                    value={addCarForm.mileage}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, mileage: e.target.value })}
+                    placeholder="0"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Trim</Label>
+                  <Input
+                    value={addCarForm.vehicleTrim}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, vehicleTrim: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Registration Expiration</Label>
+                  <Input
+                    type="date"
+                    value={addCarForm.registrationExpiration}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, registrationExpiration: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Vehicle Recall</Label>
+                  <Select
+                    value={addCarForm.vehicleRecall}
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, vehicleRecall: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Number of Seats</Label>
+                  <Select
+                    value={addCarForm.numberOfSeats}
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, numberOfSeats: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      {[2, 4, 5, 6, 7, 8].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {n}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-gray-400">Number of Doors</Label>
+                  <Select
+                    value={addCarForm.numberOfDoors}
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, numberOfDoors: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Ski Rack</Label>
+                  <Select
+                    value={addCarForm.skiRacks}
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, skiRacks: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-gray-400">Ski Crossbars</Label>
+                  <Select
+                    value={addCarForm.skiCrossBars}
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, skiCrossBars: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Roof Rails</Label>
+                  <Select
+                    value={addCarForm.roofRails}
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, roofRails: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-gray-400">Oil Type</Label>
+                  <Input
+                    value={addCarForm.oilType}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, oilType: e.target.value })}
+                    placeholder="5W-30"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Last Oil Change Date</Label>
+                  <Input
+                    type="date"
+                    value={addCarForm.lastOilChange}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, lastOilChange: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Free Service Center Oil Change</Label>
+                  <Select
+                    value={addCarForm.freeDealershipOilChanges}
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, freeDealershipOilChanges: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Yes">Yes</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <div>
-                <Label className="text-gray-400">Model *</Label>
+                <Label className="text-gray-400">Oil Package Details</Label>
                 <Input
-                  value={addCarForm.model}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, model: e.target.value })}
-                  placeholder="S-Class"
+                  value={addCarForm.oilPackageDetails}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, oilPackageDetails: e.target.value })}
                   className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  required
                 />
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-gray-400">Year *</Label>
+                <Label className="text-gray-400">Dealership Address</Label>
                 <Input
-                  value={addCarForm.year}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, year: e.target.value })}
-                  placeholder="2024"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  required
-                />
-              </div>
-              <div>
-                <Label className="text-gray-400">License Plate</Label>
-                <Input
-                  value={addCarForm.licensePlate}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, licensePlate: e.target.value })}
-                  placeholder="ABC1234"
+                  value={addCarForm.dealershipAddress}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, dealershipAddress: e.target.value })}
                   className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
                 />
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-gray-400">Exterior Color</Label>
-                <Input
-                  value={addCarForm.color}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, color: e.target.value })}
-                  placeholder="Black"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Fuel Type</Label>
+                  <Select
+                    value={addCarForm.fuelType}
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, fuelType: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Gasoline">Gasoline</SelectItem>
+                      <SelectItem value="Diesel">Diesel</SelectItem>
+                      <SelectItem value="Electric">Electric</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-gray-400">Tire Size</Label>
+                  <Input
+                    value={addCarForm.tireSize}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, tireSize: e.target.value })}
+                    placeholder="225/50R17"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
               </div>
-              <div>
-                <Label className="text-gray-400">Interior Color</Label>
-                <Input
-                  value={addCarForm.interiorColor}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, interiorColor: e.target.value })}
-                  placeholder="Black"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label className="text-gray-400">Mileage</Label>
-              <Input
-                type="number"
-                value={addCarForm.mileage}
-                onChange={(e) => setAddCarForm({ ...addCarForm, mileage: e.target.value })}
-                placeholder="0"
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-              />
+              <div className="col-span-2">
+                <Label className="text-gray-400 mb-4 block">Features (check all that apply)</Label>
+                <div className="border border-red-500 rounded-lg p-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      "All-wheel drive",
+                      "AUX input",
+                      "Blind Spot Warning",
+                      "Convertible",
+                      "Keyless Entry",
+                      "Snow Tires or Chains",
+                      "USB Charger",
+                      "Android Auto",
+                      "Back Up Camera",
+                      "Bluetooth",
+                      "GPS",
+                      "Pet Friendly",
+                      "Sunroof",
+                      "USB Input",
+                      "Apple CarPlay",
+                      "Bike Rack",
+                      "Toll Pass",
+                      "Wheelchair Accessible",
+                    ].map((feature) => (
+                      <div key={feature} className="flex items-center space-x-3">
+                        <Checkbox
+                          id={`feature-${feature}`}
+                          checked={addCarForm.vehicleFeatures.includes(feature)}
+                          onCheckedChange={(checked) => {
+                            const currentValue = addCarForm.vehicleFeatures || [];
+                            if (checked) {
+                              setAddCarForm({ ...addCarForm, vehicleFeatures: [...currentValue, feature] });
+                            } else {
+                              setAddCarForm({ ...addCarForm, vehicleFeatures: currentValue.filter((f) => f !== feature) });
+                            }
+                          }}
+                          className="border-gray-600"
+                        />
+                        <Label
+                          htmlFor={`feature-${feature}`}
+                          className="text-gray-300 text-sm font-normal cursor-pointer"
+                        >
+                          {feature}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
               <div>
                 <Label className="text-gray-400">Status *</Label>
@@ -2386,73 +2745,185 @@ export default function ClientDetailPage() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-gray-400">Tire Size</Label>
-                <Input
-                  value={addCarForm.tireSize}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, tireSize: e.target.value })}
-                  placeholder="225/50R17"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
+
+            {/* Financial Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                Financial Information
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Purchase Price</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={addCarForm.purchasePrice}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, purchasePrice: e.target.value })}
+                    placeholder="0.00"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Down Payment</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={addCarForm.downPayment}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, downPayment: e.target.value })}
+                    placeholder="0.00"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Monthly Payment</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={addCarForm.monthlyPayment}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, monthlyPayment: e.target.value })}
+                    placeholder="0.00"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Interest Rate (%)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={addCarForm.interestRate}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, interestRate: e.target.value })}
+                    placeholder="0.00"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Transport City to City</Label>
+                  <Input
+                    value={addCarForm.transportCityToCity}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, transportCityToCity: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Ultimate Goal</Label>
+                  <Input
+                    value={addCarForm.ultimateGoal}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, ultimateGoal: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Insurance Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                Insurance Information
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Provider</Label>
+                  <Input
+                    value={addCarForm.insuranceProvider}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, insuranceProvider: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Phone</Label>
+                  <Input
+                    type="tel"
+                    value={addCarForm.insurancePhone}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, insurancePhone: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Policy Number</Label>
+                  <Input
+                    value={addCarForm.policyNumber}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, policyNumber: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Expiration</Label>
+                  <Input
+                    type="date"
+                    value={addCarForm.insuranceExpiration}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, insuranceExpiration: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Car Login Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                Car Login Information
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Car Manufacturer Website</Label>
+                  <Input
+                    type="url"
+                    value={addCarForm.carManufacturerWebsite}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, carManufacturerWebsite: e.target.value })}
+                    placeholder="https://example.com"
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Manufacturer Username</Label>
+                  <Input
+                    value={addCarForm.carManufacturerUsername}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, carManufacturerUsername: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
               </div>
               <div>
-                <Label className="text-gray-400">Oil Type</Label>
+                <Label className="text-gray-400">Password</Label>
                 <Input
-                  value={addCarForm.oilType}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, oilType: e.target.value })}
-                  placeholder="5W-30"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  type="password"
+                  value={addCarForm.password}
+                  onChange={(e) => setAddCarForm({ ...addCarForm, password: e.target.value })}
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-gray-400">Last Oil Change</Label>
-                <Input
-                  type="date"
-                  value={addCarForm.lastOilChange}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, lastOilChange: e.target.value })}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
-              </div>
-              <div>
-                <Label className="text-gray-400">Fuel Type</Label>
-                <Input
-                  value={addCarForm.fuelType}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, fuelType: e.target.value })}
-                  placeholder="Premium"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
-              </div>
-            </div>
-            <div>
-              <Label className="text-gray-400">Gas</Label>
-              <Input
-                value={addCarForm.gas}
-                onChange={(e) => setAddCarForm({ ...addCarForm, gas: e.target.value })}
-                placeholder="Gas information"
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-gray-400">Turo Link</Label>
-                <Input
-                  value={addCarForm.turoLink}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, turoLink: e.target.value })}
-                  placeholder="https://turo.com/..."
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
-              </div>
-              <div>
-                <Label className="text-gray-400">Admin Turo Link</Label>
-                <Input
-                  value={addCarForm.adminTuroLink}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, adminTuroLink: e.target.value })}
-                  placeholder="https://turo.com/..."
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
+
+            {/* Car Links Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                Car Links
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-400">Turo Link</Label>
+                  <Input
+                    value={addCarForm.turoLink}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, turoLink: e.target.value })}
+                    placeholder="https://turo.com/..."
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400">Admin Turo Link</Label>
+                  <Input
+                    value={addCarForm.adminTuroLink}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, adminTuroLink: e.target.value })}
+                    placeholder="https://turo.com/..."
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
+                </div>
               </div>
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">

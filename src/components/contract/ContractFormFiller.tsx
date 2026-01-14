@@ -49,7 +49,7 @@ const contractFormSchema = z.object({
   exteriorColor: z.string().min(1, "Exterior color is required").max(30, "Exterior color must be 30 characters or less"),
   interiorColor: z.string().max(30, "Interior color must be 30 characters or less").optional().or(z.literal("")),
   licensePlate: z.string().min(1, "License plate is required").max(20, "License plate must be 20 characters or less"),
-  vin: z.string().min(1, "VIN number is required").max(17, "VIN must be 17 characters or less"),
+  vin: z.string().length(17, "VIN number must be exactly 17 characters"),
   modelYear: z.string().min(1, "Year is required").max(4, "Year must be 4 characters or less"),
   fuelType: z.string().max(20, "Fuel type must be 20 characters or less").optional().or(z.literal("")),
   expectedStartDate: z.string().min(1, "Estimated Start Date is required"),

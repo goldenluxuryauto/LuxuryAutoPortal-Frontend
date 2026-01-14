@@ -39,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CarDetail {
   id: number;
@@ -76,8 +77,7 @@ const carSchema = z.object({
   // Vehicle Information
   vin: z
     .string()
-    .min(1, "VIN is required")
-    .max(17, "VIN must be 17 characters or less"),
+    .length(17, "VIN must be exactly 17 characters"),
   makeModel: z.string().min(1, "Make & Model is required"),
   licensePlate: z.string().optional(),
   year: z.string().optional(),
@@ -100,7 +100,7 @@ const carSchema = z.object({
   dealershipAddress: z.string().optional(),
   fuelType: z.string().optional(),
   tireSize: z.string().optional(),
-  vehicleFeatures: z.string().optional(), // JSON string array or comma-separated
+  vehicleFeatures: z.union([z.string(), z.array(z.string())]).optional(), // JSON string array, comma-separated, or array
   // Financial Information
   purchasePrice: z.string().optional(),
   downPayment: z.string().optional(),
@@ -503,16 +503,22 @@ export default function CarDetailPage() {
       formData.append("dealershipAddress", data.dealershipAddress || "");
       formData.append("fuelType", data.fuelType || "");
       formData.append("tireSize", data.tireSize || "");
-      // Convert vehicleFeatures to JSON array if it's a comma-separated string
+      // Convert vehicleFeatures array to JSON string
       if (data.vehicleFeatures) {
-        try {
-          // Try to parse as JSON first
-          JSON.parse(data.vehicleFeatures);
-          formData.append("vehicleFeatures", data.vehicleFeatures);
-        } catch {
-          // If not JSON, treat as comma-separated and convert to JSON array
-          const featuresArray = data.vehicleFeatures.split(',').map(f => f.trim()).filter(f => f);
-          formData.append("vehicleFeatures", JSON.stringify(featuresArray));
+        if (Array.isArray(data.vehicleFeatures)) {
+          formData.append("vehicleFeatures", JSON.stringify(data.vehicleFeatures));
+        } else if (typeof data.vehicleFeatures === 'string') {
+          try {
+            // Try to parse as JSON first
+            JSON.parse(data.vehicleFeatures);
+            formData.append("vehicleFeatures", data.vehicleFeatures);
+          } catch {
+            // If not JSON, treat as comma-separated and convert to JSON array
+            const featuresArray = data.vehicleFeatures.split(',').map(f => f.trim()).filter(f => f);
+            formData.append("vehicleFeatures", JSON.stringify(featuresArray));
+          }
+        } else {
+          formData.append("vehicleFeatures", "");
         }
       } else {
         formData.append("vehicleFeatures", "");
@@ -878,22 +884,24 @@ export default function CarDetailPage() {
   const handleEditClick = () => {
     if (!car) return;
     
-    // Format vehicleFeatures for form (array to comma-separated string or JSON string)
-    let vehicleFeaturesValue = "";
+    // Format vehicleFeatures for form (parse to array for checkboxes)
+    let vehicleFeaturesValue: string[] = [];
     if (onboarding?.vehicleFeatures) {
       if (Array.isArray(onboarding.vehicleFeatures)) {
-        vehicleFeaturesValue = onboarding.vehicleFeatures.join(", ");
+        vehicleFeaturesValue = onboarding.vehicleFeatures;
       } else if (typeof onboarding.vehicleFeatures === 'string') {
         try {
           // Try to parse as JSON array
           const parsed = JSON.parse(onboarding.vehicleFeatures);
           if (Array.isArray(parsed)) {
-            vehicleFeaturesValue = parsed.join(", ");
+            vehicleFeaturesValue = parsed;
           } else {
-            vehicleFeaturesValue = onboarding.vehicleFeatures;
+            // If it's a comma-separated string, split it
+            vehicleFeaturesValue = onboarding.vehicleFeatures.split(',').map((f: string) => f.trim()).filter((f: string) => f);
           }
         } catch {
-          vehicleFeaturesValue = onboarding.vehicleFeatures;
+          // If not JSON, treat as comma-separated string
+          vehicleFeaturesValue = onboarding.vehicleFeatures.split(',').map((f: string) => f.trim()).filter((f: string) => f);
         }
       }
     }
@@ -1238,27 +1246,93 @@ export default function CarDetailPage() {
             </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {/* Column 1 (Left) */}
+                {/* Column 1: Basic Vehicle Information */}
                 <div className="space-y-4">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Make & Model</p>
                     <p className="text-white text-base font-medium">{car.makeModel}</p>
                   </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">VIN</p>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Year</p>
+                    <p className="text-white text-base">{car.year || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">VIN</p>
                     <p className="text-white text-base font-mono">{car.vin}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">License Plate</p>
+                    <p className="text-white text-base">{car.licensePlate || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Trim</p>
+                    <p className="text-white text-base">{onboarding?.vehicleTrim ? formatValue(onboarding.vehicleTrim) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Mileage</p>
+                    <p className="text-white text-base">{onboarding?.vehicleMiles ? formatValue(onboarding.vehicleMiles) : (car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A")}</p>
+                  </div>
                 </div>
-                <div>
-                    <p className="text-xs text-gray-500 mb-1">Oil Type</p>
-                    <p className="text-white text-base">{onboarding?.oilType ? formatValue(onboarding.oilType) : "N/A"}</p>
-                </div>
+
+                {/* Column 2: Specifications & Colors */}
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Exterior Color</p>
+                    <p className="text-white text-base">{onboarding?.exteriorColor ? formatValue(onboarding.exteriorColor) : (car.color || "N/A")}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Interior Color</p>
+                    <p className="text-white text-base">{onboarding?.interiorColor ? formatValue(onboarding.interiorColor) : "N/A"}</p>
+                  </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Fuel Type</p>
                     <p className="text-white text-base">{onboarding?.fuelType ? formatValue(onboarding.fuelType) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Interior Color</p>
-                    <p className="text-white text-base">{onboarding?.interiorColor ? formatValue(onboarding.interiorColor) : "N/A"}</p>
+                    <p className="text-xs text-gray-500 mb-1">Tire Size</p>
+                    <p className="text-white text-base">{onboarding?.tireSize ? formatValue(onboarding.tireSize) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Number of Doors</p>
+                    <p className="text-white text-base">{onboarding?.numberOfDoors ? formatValue(onboarding.numberOfDoors) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Number of Seats</p>
+                    <p className="text-white text-base">{onboarding?.numberOfSeats ? formatValue(onboarding.numberOfSeats) : "N/A"}</p>
+                  </div>
+                </div>
+
+                {/* Column 3: Maintenance & Accessories */}
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Oil Type</p>
+                    <p className="text-white text-base">{onboarding?.oilType ? formatValue(onboarding.oilType) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Last Oil Change</p>
+                    <p className="text-white text-base">{onboarding?.lastOilChange ? formatValue(onboarding.lastOilChange) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Does Your Vehicle Have Free Dealership Oil Changes?</p>
+                    <p className="text-white text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">If Yes, For How Many Years of Oil Changes, or What Oil Package</p>
+                    <p className="text-white text-base">
+                      {onboarding?.freeDealershipOilChanges === "Yes" 
+                        ? ((onboarding as any)?.oilPackageDetails ? formatValue((onboarding as any).oilPackageDetails) : "N/A")
+                        : "N/A"}
+                    </p>
+                  </div>
+                  {(onboarding as any)?.dealershipAddress && (
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Dealership Address</p>
+                      <p className="text-white text-base">{formatValue((onboarding as any).dealershipAddress)}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Registration Expiration</p>
+                    <p className="text-white text-base">{onboarding?.registrationExpiration ? formatValue(onboarding.registrationExpiration) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Vehicle Ownership</p>
@@ -1269,79 +1343,40 @@ export default function CarDetailPage() {
                     <p className="text-white text-base">{onboarding?.vehicleRecall ? formatValue(onboarding.vehicleRecall) : "N/A"}</p>
                   </div>
                 </div>
-
-                {/* Column 2 (Middle) */}
-                <div className="space-y-4">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">Year</p>
-                    <p className="text-white text-sm sm:text-base">{car.year || "N/A"}</p>
-                </div>
-                <div>
-                    <p className="text-xs text-gray-500 mb-1">Tire Size</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.tireSize ? formatValue(onboarding.tireSize) : "N/A"}</p>
-                </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Free Oil Change</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Oil Package Details</p>
-                    <p className="text-white text-sm sm:text-base">{(onboarding as any)?.oilPackageDetails ? formatValue((onboarding as any).oilPackageDetails) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Dealership Address</p>
-                    <p className="text-white text-sm sm:text-base">{(onboarding as any)?.dealershipAddress ? formatValue((onboarding as any).dealershipAddress) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Trim</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.vehicleTrim ? formatValue(onboarding.vehicleTrim) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Exterior Color</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.exteriorColor ? formatValue(onboarding.exteriorColor) : (car.color || "N/A")}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Number of Doors</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.numberOfDoors ? formatValue(onboarding.numberOfDoors) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Number of Seats</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.numberOfSeats ? formatValue(onboarding.numberOfSeats) : "N/A"}</p>
-                  </div>
-                </div>
-
-                {/* Column 3 (Right) */}
-                <div className="space-y-4">
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">License Plate</p>
-                    <p className="text-white text-sm sm:text-base">{car.licensePlate || "N/A"}</p>
-                </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Registration Expiration</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.registrationExpiration ? formatValue(onboarding.registrationExpiration) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Last Oil Change</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.lastOilChange ? formatValue(onboarding.lastOilChange) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Mileage</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.vehicleMiles ? formatValue(onboarding.vehicleMiles) : (car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A")}</p>
-                  </div>
+              </div>
+              
+              {/* Accessories Section - Full width */}
+              <div className="pt-4 border-t border-[#2a2a2a]">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Roof Rails</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.roofRails ? formatValue(onboarding.roofRails) : "N/A"}</p>
+                    <p className="text-white text-base">{onboarding?.roofRails ? formatValue(onboarding.roofRails) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Ski Crossbars</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.skiCrossBars ? formatValue(onboarding.skiCrossBars) : "N/A"}</p>
+                    <p className="text-white text-base">{onboarding?.skiCrossBars ? formatValue(onboarding.skiCrossBars) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Ski Rack</p>
-                    <p className="text-white text-sm sm:text-base">{onboarding?.skiRacks ? formatValue(onboarding.skiRacks) : "N/A"}</p>
+                    <p className="text-white text-base">{onboarding?.skiRacks ? formatValue(onboarding.skiRacks) : "N/A"}</p>
                   </div>
+                </div>
               </div>
-                <div className="pt-1.5 border-t border-[#2a2a2a]">
+              
+              {/* Features - Full width */}
+              <div className="pt-4 border-t border-[#2a2a2a]">
+                <p className="text-xs text-gray-500 mb-1">Features</p>
+                <p className="text-white text-base">
+                  {onboarding?.vehicleFeatures && Array.isArray(onboarding.vehicleFeatures) && onboarding.vehicleFeatures.length > 0
+                    ? onboarding.vehicleFeatures.join(", ")
+                    : (onboarding?.vehicleFeatures && typeof onboarding.vehicleFeatures === 'string'
+                      ? onboarding.vehicleFeatures
+                      : "N/A")}
+                </p>
+              </div>
+              
+              {/* Assigned To Section */}
+              <div className="pt-1.5 border-t border-[#2a2a2a]">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8">
                     {/* Left: Assigned To */}
                     <div className="flex-shrink-0 text-center lg:text-left">
@@ -1462,9 +1497,8 @@ export default function CarDetailPage() {
                         </p>
                       </div>
                     </div>
-                    </div>
+                  </div>
                 </div>
-              </div>
               {car.offboardAt && (
                   <div className="pt-1.5 border-t border-[#2a2a2a]">
                     <p className="text-xs text-gray-500 mb-0.5">Off-boarded</p>
@@ -1856,41 +1890,48 @@ export default function CarDetailPage() {
           <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">
-              Vehicle Purchase Information
+              Purchase Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-4">
               {isLoadingOnboarding ? (
                 <div className="text-center py-4 text-gray-400">
                   <p className="text-sm">Loading...</p>
                 </div>
               ) : onboarding ? (
-                <div className="grid grid-cols-1 gap-2 text-sm">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Purchase Price</p>
-                    <p className="text-white text-base">{formatCurrency(onboarding.purchasePrice)}</p>
+                <>
+                  {/* Financial Details - 2 columns */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Purchase Price</p>
+                      <p className="text-white text-base font-medium">{formatCurrency(onboarding.purchasePrice)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Down Payment</p>
+                      <p className="text-white text-base font-medium">{formatCurrency(onboarding.downPayment)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Monthly Payment</p>
+                      <p className="text-white text-base font-medium">{formatCurrency(onboarding.monthlyPayment)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Interest Rate</p>
+                      <p className="text-white text-base font-medium">{formatValue(onboarding.interestRate)}%</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Down Payment</p>
-                    <p className="text-white text-base">{formatCurrency(onboarding.downPayment)}</p>
+                  
+                  {/* Additional Information - Full width with separator */}
+                  <div className="pt-4 border-t border-[#2a2a2a] space-y-4">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Transport City to City</p>
+                      <p className="text-white text-base">{formatValue(onboarding.transportCityToCity)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Ultimate Goal</p>
+                      <p className="text-white text-base">{formatValue(onboarding.ultimateGoal)}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Monthly Payment</p>
-                    <p className="text-white text-base">{formatCurrency(onboarding.monthlyPayment)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Interest Rate</p>
-                    <p className="text-white text-base">{formatValue(onboarding.interestRate)}%</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Transport City to City</p>
-                    <p className="text-white text-base">{formatValue(onboarding.transportCityToCity)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Ultimate Goal</p>
-                    <p className="text-white text-base">{formatValue(onboarding.ultimateGoal)}</p>
-                  </div>
-                </div>
+                </>
               ) : (
                 <div className="text-center py-4 text-gray-400">
                   <p className="text-sm">No financial information available</p>
@@ -1996,17 +2037,6 @@ export default function CarDetailPage() {
                     <p className="text-white text-base">{formatValue(onboarding.insuranceExpiration)}</p>
                     </div>
                 </div>
-                  {/* Features - Full width */}
-                  <div className="pt-4 border-t border-[#2a2a2a] mt-4">
-                    <p className="text-xs text-gray-500 mb-1">Features</p>
-                    <p className="text-white text-base">
-                      {onboarding?.vehicleFeatures && Array.isArray(onboarding.vehicleFeatures) && onboarding.vehicleFeatures.length > 0
-                        ? onboarding.vehicleFeatures.join(", ")
-                        : (onboarding?.vehicleFeatures && typeof onboarding.vehicleFeatures === 'string'
-                          ? onboarding.vehicleFeatures
-                          : "N/A")}
-                    </p>
-                  </div>
                 </>
                 ) : (
                 <div className="text-center py-4 text-gray-400">
@@ -2659,13 +2689,21 @@ export default function CarDetailPage() {
                     name="freeDealershipOilChanges"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Free Service Center Oil Change</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
+                        <FormLabel className="text-gray-400">Does Your Vehicle Have Free Dealership Oil Changes?</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectItem value="Yes">Yes</SelectItem>
+                            <SelectItem value="No">No</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -2676,11 +2714,12 @@ export default function CarDetailPage() {
                     name="oilPackageDetails"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Oil Package Details</FormLabel>
+                        <FormLabel className="text-gray-400">If Yes, For How Many Years of Oil Changes, or What Oil Package</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            placeholder="e.g., 3 years or Premium Package"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2742,16 +2781,71 @@ export default function CarDetailPage() {
                   <FormField
                     control={form.control}
                     name="vehicleFeatures"
-                    render={({ field }) => (
+                    render={() => (
                       <FormItem className="col-span-2">
-                        <FormLabel className="text-gray-400">Features (comma-separated)</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            placeholder="Feature 1, Feature 2, Feature 3"
-                          />
-                        </FormControl>
+                        <div className="mb-4">
+                          <FormLabel className="text-gray-400 text-base font-semibold">
+                            Features (check all that apply)
+                          </FormLabel>
+                        </div>
+                        <div className="border border-[#2a2a2a] rounded-lg p-4 bg-[#1a1a1a]">
+                          <div className="grid grid-cols-2 gap-3">
+                            {[
+                              "All-wheel drive",
+                              "AUX input",
+                              "Blind Spot Warning",
+                              "Convertible",
+                              "Keyless Entry",
+                              "Snow Tires or Chains",
+                              "USB Charger",
+                              "Android Auto",
+                              "Back Up Camera",
+                              "Bluetooth",
+                              "GPS",
+                              "Pet Friendly",
+                              "Sunroof",
+                              "USB Input",
+                              "Apple CarPlay",
+                              "Bike Rack",
+                              "Toll Pass",
+                              "Wheelchair Accessible",
+                            ].map((feature) => (
+                              <FormField
+                                key={feature}
+                                control={form.control}
+                                name="vehicleFeatures"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={feature}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={Array.isArray(field.value) ? field.value.includes(feature) : false}
+                                          onCheckedChange={(checked) => {
+                                            const currentValue = Array.isArray(field.value) ? field.value : [];
+                                            return checked
+                                              ? field.onChange([...currentValue, feature])
+                                              : field.onChange(
+                                                  currentValue.filter(
+                                                    (value) => value !== feature
+                                                  )
+                                                );
+                                          }}
+                                          className="border-[#2a2a2a] data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-[#EAEB80]"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-gray-300 text-sm font-normal cursor-pointer">
+                                        {feature}
+                                      </FormLabel>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -2762,7 +2856,7 @@ export default function CarDetailPage() {
                 {/* Financial Information Section */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
-                    Financial Information
+                    Purchase Information
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
                     <FormField

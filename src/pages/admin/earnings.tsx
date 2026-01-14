@@ -115,7 +115,7 @@ export default function EarningsPage() {
   const [categories, setCategories] = useState<ExpenseCategory[]>([
     {
       label: "INCOME AND EXPENSES",
-      isExpanded: false,
+      isExpanded: true,
       rows: [
         { label: "Delivery Income", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
         { label: "Electric Prepaid Income", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
@@ -131,7 +131,7 @@ export default function EarningsPage() {
     },
     {
       label: "OPERATING EXPENSES (DIRECT DELIVERY)",
-      isExpanded: false,
+      isExpanded: true,
       rows: [
         { label: "Labor - Car Cleaning", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
         { label: "Labor - Driver", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
@@ -142,7 +142,7 @@ export default function EarningsPage() {
     },
     {
       label: "OPERATING EXPENSES (COGS - PER VEHICLE)",
-      isExpanded: false,
+      isExpanded: true,
       rows: [
         { label: "Auto Body Shop / Wreck", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
         { label: "Alignment", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
@@ -173,7 +173,7 @@ export default function EarningsPage() {
     },
     {
       label: "GLA PARKING FEE & LABOR CLEANING",
-      isExpanded: false,
+      isExpanded: true,
       rows: [
         { label: "GLA Labor - Cleaning", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
         { label: "GLA Parking Fee", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
@@ -182,7 +182,7 @@ export default function EarningsPage() {
     },
     {
       label: "REIMBURSED AND NON-REIMBURSED BILLS",
-      isExpanded: false,
+      isExpanded: true,
       rows: [
         { label: "Electric - Not Reimbursed", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
         { label: "Electric Reimbursed", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
