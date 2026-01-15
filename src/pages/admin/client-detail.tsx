@@ -167,14 +167,9 @@ export default function ClientDetailPage() {
   
   // Upload contract modal state
   const [isUploadContractOpen, setIsUploadContractOpen] = useState(false);
-  const [uploadContractFormErrors, setUploadContractFormErrors] = useState<{ vinNumber?: string }>({});
+  const [uploadContractFormErrors, setUploadContractFormErrors] = useState<{}>({});
   const [uploadContractForm, setUploadContractForm] = useState({
     contractFile: null as File | null,
-    vehicleYear: "",
-    vehicleMake: "",
-    vehicleModel: "",
-    vinNumber: "",
-    licensePlate: "",
   });
   
   // Add car modal state
@@ -473,26 +468,10 @@ export default function ClientDetailPage() {
       if (!clientId) throw new Error("Invalid client ID");
       if (!data.contractFile) throw new Error("Please select a PDF file to upload");
       
-      // Validate VIN number if provided
-      const vinErrors: { vinNumber?: string } = {};
-      if (data.vinNumber && data.vinNumber.trim().length > 0 && data.vinNumber.trim().length !== 17) {
-        vinErrors.vinNumber = "VIN number must be exactly 17 characters";
-      }
-      
-      if (Object.keys(vinErrors).length > 0) {
-        setUploadContractFormErrors(vinErrors);
-        throw new Error(vinErrors.vinNumber || "VIN validation failed");
-      }
-      
       setUploadContractFormErrors({});
 
       const formData = new FormData();
       formData.append("contract", data.contractFile);
-      if (data.vehicleYear) formData.append("vehicleYear", data.vehicleYear);
-      if (data.vehicleMake) formData.append("vehicleMake", data.vehicleMake);
-      if (data.vehicleModel) formData.append("vehicleModel", data.vehicleModel);
-      if (data.vinNumber) formData.append("vinNumber", data.vinNumber);
-      if (data.licensePlate) formData.append("licensePlate", data.licensePlate);
 
       const response = await fetch(buildApiUrl(`/api/clients/${clientId}/contracts`), {
         method: "POST",
@@ -512,11 +491,6 @@ export default function ClientDetailPage() {
       setUploadContractFormErrors({});
       setUploadContractForm({
         contractFile: null,
-        vehicleYear: "",
-        vehicleMake: "",
-        vehicleModel: "",
-        vinNumber: "",
-        licensePlate: "",
       });
     },
     onError: (error: any) => {
@@ -2342,69 +2316,6 @@ export default function ClientDetailPage() {
                   </p>
                 )}
                 <p className="text-xs text-gray-500 mt-1">Upload a PDF file from your local device (max 5MB)</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-gray-400">Vehicle Year</Label>
-                <Input
-                  value={uploadContractForm.vehicleYear}
-                  onChange={(e) => setUploadContractForm({ ...uploadContractForm, vehicleYear: e.target.value })}
-                  placeholder="2024"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
-              </div>
-              <div>
-                <Label className="text-gray-400">Vehicle Make</Label>
-                <Input
-                  value={uploadContractForm.vehicleMake}
-                  onChange={(e) => setUploadContractForm({ ...uploadContractForm, vehicleMake: e.target.value })}
-                  placeholder="Mercedes-Benz"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
-              </div>
-            </div>
-            <div>
-              <Label className="text-gray-400">Vehicle Model</Label>
-              <Input
-                value={uploadContractForm.vehicleModel}
-                onChange={(e) => setUploadContractForm({ ...uploadContractForm, vehicleModel: e.target.value })}
-                placeholder="S-Class"
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-gray-400">VIN Number</Label>
-                <Input
-                  value={uploadContractForm.vinNumber}
-                  onChange={(e) => {
-                    const value = e.target.value.toUpperCase().slice(0, 17);
-                    setUploadContractForm({ ...uploadContractForm, vinNumber: value });
-                    // Clear error when user types
-                    if (uploadContractFormErrors.vinNumber) {
-                      setUploadContractFormErrors({ ...uploadContractFormErrors, vinNumber: undefined });
-                    }
-                  }}
-                  placeholder="WDDNG8GB5LA123456"
-                  className={cn(
-                    "bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono",
-                    uploadContractFormErrors.vinNumber && "border-red-500"
-                  )}
-                  maxLength={17}
-                />
-                {uploadContractFormErrors.vinNumber && (
-                  <p className="text-sm text-red-500 mt-1">{uploadContractFormErrors.vinNumber}</p>
-                )}
-              </div>
-              <div>
-                <Label className="text-gray-400">License Plate</Label>
-                <Input
-                  value={uploadContractForm.licensePlate}
-                  onChange={(e) => setUploadContractForm({ ...uploadContractForm, licensePlate: e.target.value })}
-                  placeholder="ABC1234"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
               </div>
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
