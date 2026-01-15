@@ -1,10 +1,18 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
 
+export interface ExistingImage {
+  id: string;
+  url: string;
+  filename: string;
+}
+
 export function useImageUpload(carId: number, year: string, category: string, field: string, month: number) {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [isLoadingImages, setIsLoadingImages] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -35,48 +43,103 @@ export function useImageUpload(carId: number, year: string, category: string, fi
     }
   };
 
+  // Fetch existing images when modal opens
+  useEffect(() => {
+    if (carId && year && category && field && month) {
+      fetchExistingImages();
+    }
+  }, [carId, year, category, field, month]);
+
+  const fetchExistingImages = async () => {
+    setIsLoadingImages(true);
+    try {
+      const url = buildApiUrl(
+        `/api/income-expense/images?carId=${carId}&year=${year}&month=${month}&category=${category}&field=${field}`
+      );
+      
+      const response = await fetch(url, { credentials: "include" });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const images = data.images || data.data?.images || [];
+        setExistingImages(images);
+      }
+    } catch (error) {
+      // Failed to fetch images
+    } finally {
+      setIsLoadingImages(false);
+    }
+  };
+
   const handleRemoveImage = (index: number) => {
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleConfirmUploads = async () => {
-    if (imageFiles.length === 0) {
-      toast({
-        title: "No images to upload",
-        description: "Please select at least one image file",
-        variant: "destructive",
-      });
+  const handleRemoveExistingImage = async (imageId: string) => {
+    if (!window.confirm("Are you sure you want to delete this image?")) {
       return;
     }
 
+    try {
+      const response = await fetch(
+        buildApiUrl(`/api/income-expense/images/${imageId}`),
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete image");
+      }
+
+      // Remove from UI immediately
+      setExistingImages((prev) => prev.filter((img) => img.id !== imageId));
+      
+      toast({
+        title: "Success",
+        description: "Image deleted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Deletion failed",
+        description: error.message || "Failed to delete image",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const uploadImages = async () => {
     setIsUploading(true);
 
     try {
-      const formData = new FormData();
-      imageFiles.forEach((file) => {
-        formData.append("images", file);
-      });
-      formData.append("carId", carId.toString());
-      formData.append("year", year);
-      formData.append("month", month.toString());
-      formData.append("category", category);
-      formData.append("field", field);
+      // Upload new images
+      if (imageFiles.length > 0) {
+        const formData = new FormData();
+        imageFiles.forEach((file) => {
+          formData.append("images", file);
+        });
+        formData.append("carId", carId.toString());
+        formData.append("year", year);
+        formData.append("month", month.toString());
+        formData.append("category", category);
+        formData.append("field", field);
 
-      const response = await fetch(buildApiUrl("/api/income-expense/images/upload"), {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      });
+        const response = await fetch(buildApiUrl("/api/income-expense/images/upload"), {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to upload images");
+        if (!response.ok) {
+          throw new Error("Failed to upload images");
+        }
+
+        // Refresh existing images after upload
+        await fetchExistingImages();
       }
 
-      toast({
-        title: "Success",
-        description: `${imageFiles.length} image(s) uploaded successfully`,
-      });
-
+      // Clear new image files
       setImageFiles([]);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -87,6 +150,7 @@ export function useImageUpload(carId: number, year: string, category: string, fi
         description: error.message || "Failed to upload images",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setIsUploading(false);
     }
@@ -101,11 +165,14 @@ export function useImageUpload(carId: number, year: string, category: string, fi
 
   return {
     imageFiles,
+    existingImages,
     isUploading,
+    isLoadingImages,
     fileInputRef,
     handleFileChange,
     handleRemoveImage,
-    handleConfirmUploads,
+    handleRemoveExistingImage,
+    uploadImages,
     resetImages,
   };
 }

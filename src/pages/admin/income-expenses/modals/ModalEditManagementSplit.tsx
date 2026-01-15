@@ -1,5 +1,5 @@
 // Modal for CAR MANAGEMENT OWNER SPLIT category
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,41 +11,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useIncomeExpense } from "../context/IncomeExpenseContext";
-import ImagePreview from "../components/ImagePreview";
-import { Check } from "lucide-react";
-import { useImageUpload } from "../utils/useImageUpload";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function ModalEditManagementSplit() {
   const { editingCell, setEditingCell, updateCell, saveChanges, isSaving, monthModes, year, carId } = useIncomeExpense();
-  const [remarks, setRemarks] = useState("");
 
   const monthName = editingCell ? MONTHS[editingCell.month - 1] : "";
   const isOpen = !!editingCell && editingCell.category === "managementSplit";
 
-  const {
-    imageFiles,
-    isUploading,
-    fileInputRef,
-    handleFileChange,
-    handleRemoveImage,
-    handleConfirmUploads,
-    resetImages,
-  } = useImageUpload(
-    carId,
-    year,
-    editingCell?.category || "",
-    editingCell?.field || "",
-    editingCell?.month || 1
-  );
-
   const handleClose = () => {
     setEditingCell(null);
-    setRemarks("");
-    resetImages();
   };
 
   const handleSave = () => {
@@ -139,55 +116,6 @@ export default function ModalEditManagementSplit() {
               disabled
               className="bg-[#1a1a1a] border-[#2a2a2a] text-gray-400 text-sm mt-1"
             />
-          </div>
-
-          <div>
-            <Label className="text-gray-400 text-xs">Remarks</Label>
-            <Textarea
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Add any notes..."
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm min-h-[80px] mt-1"
-            />
-          </div>
-
-          <div>
-            <Label className="text-gray-400 text-xs">Upload Receipt Images</Label>
-            <Input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-              multiple
-              onChange={handleFileChange}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm mt-1"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Only image files (JPEG, PNG, GIF, WebP) are allowed
-            </p>
-            
-            {imageFiles.length > 0 && (
-              <div className="mt-3">
-                <ImagePreview images={imageFiles} onRemove={handleRemoveImage} />
-                <Button
-                  type="button"
-                  onClick={handleConfirmUploads}
-                  disabled={isUploading}
-                  className="mt-3 w-full bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-                >
-                  {isUploading ? (
-                    <>
-                      <Check className="w-4 h-4 mr-2 animate-pulse" />
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4 mr-2" />
-                      Confirm Uploads ({imageFiles.length})
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
           </div>
         </div>
 

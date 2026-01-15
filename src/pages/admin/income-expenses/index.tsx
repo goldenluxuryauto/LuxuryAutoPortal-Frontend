@@ -18,6 +18,7 @@ import ModalEditCOGS from "./modals/ModalEditCOGS";
 import ModalEditParkingFeeLabor from "./modals/ModalEditParkingFeeLabor";
 import ModalEditReimbursedBills from "./modals/ModalEditReimbursedBills";
 import ModalEditHistory from "./modals/ModalEditHistory";
+import ModalEditDynamicSubcategory from "./modals/ModalEditDynamicSubcategory";
 
 interface IncomeExpensesPageProps {
   carIdFromRoute?: number; // When accessed from /admin/cars/:id/income-expense
@@ -287,7 +288,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
             <IncomeExpenseTable year={selectedYear} />
           </div>
 
-          {/* Category-specific Edit Modals (7 total) */}
+          {/* Category-specific Edit Modals */}
           <ModalEditManagementSplit />
           <ModalEditIncomeExpense />
           <ModalEditDirectDelivery />
@@ -295,6 +296,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           <ModalEditParkingFeeLabor />
           <ModalEditReimbursedBills />
           <ModalEditHistory />
+          <ModalEditDynamicSubcategory />
         </div>
       </AdminLayout>
     </IncomeExpenseProvider>
