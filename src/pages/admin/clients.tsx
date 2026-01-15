@@ -1194,11 +1194,11 @@ export default function ClientsPage() {
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <FormControl>
+                          <FormControl>
                               <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
-                            </FormControl>
+                          </FormControl>
                             <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
                               {["XS", "S", "M", "L", "XL", "XXL"].map(
                                 (s) => (
@@ -1252,11 +1252,11 @@ export default function ClientsPage() {
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <FormControl>
+                          <FormControl>
                               <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
-                            </FormControl>
+                          </FormControl>
                             <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
                               <SelectItem value="Friend">Friend</SelectItem>
                               <SelectItem value="Google">Google</SelectItem>
