@@ -167,6 +167,7 @@ export default function ClientDetailPage() {
   
   // Upload contract modal state
   const [isUploadContractOpen, setIsUploadContractOpen] = useState(false);
+  const [uploadContractFormErrors, setUploadContractFormErrors] = useState<{ vinNumber?: string }>({});
   const [uploadContractForm, setUploadContractForm] = useState({
     contractFile: null as File | null,
     vehicleYear: "",
@@ -178,6 +179,7 @@ export default function ClientDetailPage() {
   
   // Add car modal state
   const [isAddCarOpen, setIsAddCarOpen] = useState(false);
+  const [addCarFormErrors, setAddCarFormErrors] = useState<{ vin?: string }>({});
   const [addCarForm, setAddCarForm] = useState({
     vin: "",
     make: "",
@@ -470,6 +472,19 @@ export default function ClientDetailPage() {
     mutationFn: async (data: typeof uploadContractForm) => {
       if (!clientId) throw new Error("Invalid client ID");
       if (!data.contractFile) throw new Error("Please select a PDF file to upload");
+      
+      // Validate VIN number if provided
+      const vinErrors: { vinNumber?: string } = {};
+      if (data.vinNumber && data.vinNumber.trim().length > 0 && data.vinNumber.trim().length !== 17) {
+        vinErrors.vinNumber = "VIN number must be exactly 17 characters";
+      }
+      
+      if (Object.keys(vinErrors).length > 0) {
+        setUploadContractFormErrors(vinErrors);
+        throw new Error(vinErrors.vinNumber || "VIN validation failed");
+      }
+      
+      setUploadContractFormErrors({});
 
       const formData = new FormData();
       formData.append("contract", data.contractFile);
@@ -494,6 +509,7 @@ export default function ClientDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/clients", clientId] });
       toast({ title: "Success", description: "Contract uploaded successfully" });
       setIsUploadContractOpen(false);
+      setUploadContractFormErrors({});
       setUploadContractForm({
         contractFile: null,
         vehicleYear: "",
@@ -549,6 +565,21 @@ export default function ClientDetailPage() {
   const addCarMutation = useMutation({
     mutationFn: async (data: typeof addCarForm) => {
       if (!clientId) throw new Error("Invalid client ID");
+      
+      // Validate VIN number
+      const vinErrors: { vin?: string } = {};
+      if (!data.vin || data.vin.trim().length === 0) {
+        vinErrors.vin = "VIN number is required";
+      } else if (data.vin.trim().length !== 17) {
+        vinErrors.vin = "VIN number must be exactly 17 characters";
+      }
+      
+      if (Object.keys(vinErrors).length > 0) {
+        setAddCarFormErrors(vinErrors);
+        throw new Error(vinErrors.vin || "VIN validation failed");
+      }
+      
+      setAddCarFormErrors({});
       
       const formData = new FormData();
       // Vehicle Information
@@ -616,6 +647,7 @@ export default function ClientDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/clients", clientId] });
       toast({ title: "Success", description: "Car added successfully" });
       setIsAddCarOpen(false);
+      setAddCarFormErrors({});
       setAddCarForm({ 
         vin: "", 
         make: "", 
@@ -2263,7 +2295,12 @@ export default function ClientDetailPage() {
       </Dialog>
 
       {/* Upload Contract Dialog */}
-      <Dialog open={isUploadContractOpen} onOpenChange={setIsUploadContractOpen}>
+      <Dialog open={isUploadContractOpen} onOpenChange={(open) => {
+        setIsUploadContractOpen(open);
+        if (!open) {
+          setUploadContractFormErrors({});
+        }
+      }}>
         <DialogContent className="max-w-lg bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
           <DialogHeader>
             <DialogTitle className="text-white text-xl">Upload Contract</DialogTitle>
@@ -2341,10 +2378,24 @@ export default function ClientDetailPage() {
                 <Label className="text-gray-400">VIN Number</Label>
                 <Input
                   value={uploadContractForm.vinNumber}
-                  onChange={(e) => setUploadContractForm({ ...uploadContractForm, vinNumber: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value.toUpperCase().slice(0, 17);
+                    setUploadContractForm({ ...uploadContractForm, vinNumber: value });
+                    // Clear error when user types
+                    if (uploadContractFormErrors.vinNumber) {
+                      setUploadContractFormErrors({ ...uploadContractFormErrors, vinNumber: undefined });
+                    }
+                  }}
                   placeholder="WDDNG8GB5LA123456"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                  className={cn(
+                    "bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono",
+                    uploadContractFormErrors.vinNumber && "border-red-500"
+                  )}
+                  maxLength={17}
                 />
+                {uploadContractFormErrors.vinNumber && (
+                  <p className="text-sm text-red-500 mt-1">{uploadContractFormErrors.vinNumber}</p>
+                )}
               </div>
               <div>
                 <Label className="text-gray-400">License Plate</Label>
@@ -2378,7 +2429,12 @@ export default function ClientDetailPage() {
       </Dialog>
 
       {/* Add Car Dialog */}
-      <Dialog open={isAddCarOpen} onOpenChange={setIsAddCarOpen}>
+      <Dialog open={isAddCarOpen} onOpenChange={(open) => {
+        setIsAddCarOpen(open);
+        if (!open) {
+          setAddCarFormErrors({});
+        }
+      }}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
           <DialogHeader>
             <DialogTitle className="text-white text-xl">Add Car</DialogTitle>
@@ -2402,12 +2458,25 @@ export default function ClientDetailPage() {
                 <Label className="text-gray-400">VIN *</Label>
                 <Input
                   value={addCarForm.vin}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, vin: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value.toUpperCase().slice(0, 17);
+                    setAddCarForm({ ...addCarForm, vin: value });
+                    // Clear error when user types
+                    if (addCarFormErrors.vin) {
+                      setAddCarFormErrors({ ...addCarFormErrors, vin: undefined });
+                    }
+                  }}
                   placeholder="WDDNG8GB5LA123456"
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                  className={cn(
+                    "bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono",
+                    addCarFormErrors.vin && "border-red-500"
+                  )}
                   maxLength={17}
                   required
                 />
+                {addCarFormErrors.vin && (
+                  <p className="text-sm text-red-500 mt-1">{addCarFormErrors.vin}</p>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
