@@ -33,6 +33,7 @@ const carOffboardingSchema = z.object({
   plateNumber: z.string().min(1, "Plate number is required").max(50),
   pickUpDate: z.string().min(1, "Pick-up date is required"),
   pickUpTime: z.string().min(1, "Pick-up time is required"),
+  dealershipAddress: z.string().optional(),
 });
 
 type CarOffboardingFormData = z.infer<typeof carOffboardingSchema>;
@@ -95,6 +96,7 @@ export default function CarOffboardingForm() {
       plateNumber: "",
       pickUpDate: new Date().toISOString().split('T')[0],
       pickUpTime: "09:00",
+      dealershipAddress: "",
     },
   });
 
@@ -135,6 +137,7 @@ export default function CarOffboardingForm() {
         plateNumber: data.plateNumber,
         pickUpDate: pickUpDateTime,
         carId: data.carId, // Include carId to update car status
+        dealershipAddress: data.dealershipAddress || "",
       };
 
       const response = await fetch(buildApiUrl("/api/car-offboarding/submit"), {
@@ -169,6 +172,7 @@ export default function CarOffboardingForm() {
         plateNumber: "",
         pickUpDate: now.toISOString().split('T')[0],
         pickUpTime: "09:00",
+        dealershipAddress: "",
       });
       setSelectedCarId("");
     } catch (error: any) {
@@ -289,44 +293,64 @@ export default function CarOffboardingForm() {
               )}
             />
 
-            {/* Auto-filled Car Details */}
-            <FormField
-              control={form.control}
-              name="carMakeModelYear"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300">Car Make/Model/Year *</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Select a car above to auto-fill"
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                      readOnly
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Car Details Row: Make/Model/Year, Plate Number, Dealership Address */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="carMakeModelYear"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Car Make/Model/Year *</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Select a car above to auto-fill"
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        readOnly
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="plateNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300">Plate Number *</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Enter plate number or auto-filled from car"
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] uppercase"
-                      style={{ textTransform: "uppercase" }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="plateNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Plate Number *</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Enter plate number or auto-filled from car"
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] uppercase"
+                        style={{ textTransform: "uppercase" }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dealershipAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Address of Dealership</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Enter dealership address (if applicable)"
+                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Pick-Up Date and Time */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
