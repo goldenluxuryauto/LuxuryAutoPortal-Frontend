@@ -1,5 +1,5 @@
 // Modal for OPERATING EXPENSE (COGS - Per Vehicle) category
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,12 +16,34 @@ import { useIncomeExpense } from "../context/IncomeExpenseContext";
 import ImagePreview from "../components/ImagePreview";
 import { Upload, Image as ImageIcon } from "lucide-react";
 import { useImageUpload } from "../utils/useImageUpload";
+import { buildApiUrl } from "@/lib/queryClient";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function ModalEditCOGS() {
   const { editingCell, setEditingCell, updateCell, saveChanges, isSaving, year, carId } = useIncomeExpense();
   const [remarks, setRemarks] = useState("");
+
+  // Load remarks when modal opens
+  useEffect(() => {
+    if (editingCell) {
+      const loadRemarks = async () => {
+        try {
+          const response = await fetch(
+            buildApiUrl(`/api/income-expense/remarks?carId=${carId}&year=${year}&month=${editingCell.month}&category=${editingCell.category}&field=${editingCell.field}`),
+            { credentials: "include" }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setRemarks(data.remarks || "");
+          }
+        } catch (error) {
+          // Failed to load remarks
+        }
+      };
+      loadRemarks();
+    }
+  }, [editingCell, carId, year]);
 
   const monthName = editingCell ? MONTHS[editingCell.month - 1] : "";
   const isOpen = !!editingCell && editingCell.category === "cogs";
@@ -58,6 +80,28 @@ export default function ModalEditCOGS() {
       // Upload images first if there are any new ones
       if (imageFiles.length > 0) {
         await uploadImages();
+      }
+      
+      // Save remarks
+      try {
+        const response = await fetch(buildApiUrl("/api/income-expense/remarks"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            carId,
+            year: parseInt(year),
+            month: editingCell.month,
+            category: editingCell.category,
+            field: editingCell.field,
+            remarks: remarks.trim(),
+          }),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to save remarks");
+        }
+      } catch (error) {
+        console.error("Error saving remarks:", error);
       }
       
       // Save the change immediately, passing it directly to saveChanges

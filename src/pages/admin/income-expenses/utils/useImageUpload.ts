@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
 
@@ -14,6 +14,7 @@ export function useImageUpload(carId: number, year: string, category: string, fi
   const [isUploading, setIsUploading] = useState(false);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fetchingRef = useRef<string | null>(null);
   const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,15 +44,18 @@ export function useImageUpload(carId: number, year: string, category: string, fi
     }
   };
 
-  // Fetch existing images when modal opens
-  useEffect(() => {
-    if (carId && year && category && field && month) {
-      fetchExistingImages();
+  const fetchExistingImages = useCallback(async () => {
+    // Create a unique key for this fetch request
+    const fetchKey = `${carId}-${year}-${month}-${category}-${field}`;
+    
+    // Prevent duplicate simultaneous requests
+    if (fetchingRef.current === fetchKey) {
+      return;
     }
-  }, [carId, year, category, field, month]);
-
-  const fetchExistingImages = async () => {
+    
+    fetchingRef.current = fetchKey;
     setIsLoadingImages(true);
+    
     try {
       const url = buildApiUrl(
         `/api/income-expense/images?carId=${carId}&year=${year}&month=${month}&category=${category}&field=${field}`
@@ -68,8 +72,16 @@ export function useImageUpload(carId: number, year: string, category: string, fi
       // Failed to fetch images
     } finally {
       setIsLoadingImages(false);
+      fetchingRef.current = null;
     }
-  };
+  }, [carId, year, category, field, month]);
+
+  // Fetch existing images when modal opens
+  useEffect(() => {
+    if (carId && year && category && field && month) {
+      fetchExistingImages();
+    }
+  }, [carId, year, category, field, month, fetchExistingImages]);
 
   const handleRemoveImage = (index: number) => {
     setImageFiles((prev) => prev.filter((_, i) => i !== index));

@@ -1537,21 +1537,25 @@ export default function CarDetailPage() {
                       <div className="relative w-full flex-1 bg-black rounded-lg overflow-hidden border border-[#2a2a2a]">
                       {car.photos.map((photo, index) => {
                         // For static assets like car photos, use buildApiUrl to get correct backend URL in production
-                        // Ensure photo path is properly formatted
-                        let photoPath = photo;
-                        if (!photoPath) {
+                        // Handle photo path - check if it's a full GCS URL or a local path
+                        let photoUrl: string;
+                        if (!photo) {
                           console.warn(`[CAR DETAIL] Empty photo path at index ${index}`);
-                          photoPath = '';
+                          photoUrl = '';
+                        } else if (photo.startsWith('http://') || photo.startsWith('https://')) {
+                          // Full URL (GCS) - use directly
+                          photoUrl = photo;
                         } else {
+                          // Local path - use buildApiUrl to proxy through backend
+                          let photoPath = photo;
                           // Remove leading slash if present, then add it back for consistency
                           photoPath = photoPath.replace(/^\/+/, '');
                           photoPath = `/${photoPath}`;
+                          photoUrl = buildApiUrl(photoPath);
                         }
-                        const photoUrl = buildApiUrl(photoPath);
                         // Log in production to help debug
                         if (import.meta.env.PROD && index === 0) {
                           console.log(`[CAR DETAIL] Main photo URL:`, photoUrl);
-                          console.log(`[CAR DETAIL] Photo path:`, photoPath);
                           console.log(`[CAR DETAIL] Original photo:`, photo);
                         }
                         const isActive = index === carouselIndex;
@@ -1568,9 +1572,9 @@ export default function CarDetailPage() {
                               alt={`Car photo ${index + 1}`}
                               className="w-full h-full object-contain"
                               crossOrigin="anonymous"
+                              
                               onError={(e) => {
                                 console.error('❌ [CAR DETAIL] Failed to load photo:', photoUrl);
-                                console.error('   Photo path:', photoPath);
                                 console.error('   Original photo:', photo);
                                 console.error('   API Base URL:', import.meta.env.VITE_API_URL || 'Not set');
                                 // Don't hide the image - keep it visible but show error state
@@ -2158,22 +2162,26 @@ export default function CarDetailPage() {
             {car.photos && car.photos.length > 0 ? (
               <div className="grid grid-cols-8 gap-4">
                 {car.photos.map((photo, index) => {
-                  // For static assets like car photos, use buildApiUrl to get correct backend URL in production
-                  // Ensure photo path is properly formatted
-                  let photoPath = photo;
-                  if (!photoPath) {
+                  // Handle photo path - check if it's a full GCS URL or a local path
+                  let photoUrl: string;
+                  if (!photo) {
                     console.warn(`[CAR DETAIL] Empty photo path at index ${index}`);
-                    photoPath = '';
+                    photoUrl = '';
+                  } else if (photo.startsWith('http://') || photo.startsWith('https://')) {
+                    // Full URL (GCS) - use directly
+                    photoUrl = photo;
                   } else {
+                    // Local path - use buildApiUrl to proxy through backend
+                    let photoPath = photo;
                     // Remove leading slash if present, then add it back for consistency
                     photoPath = photoPath.replace(/^\/+/, '');
                     photoPath = `/${photoPath}`;
+                    photoUrl = buildApiUrl(photoPath);
                   }
-                  const photoUrl = buildApiUrl(photoPath);
                   // Log in production to help debug
                   if (import.meta.env.PROD && index === 0) {
                     console.log(`[CAR DETAIL] Main photo URL (grid):`, photoUrl);
-                    console.log(`[CAR DETAIL] Photo path (grid):`, photoPath);
+                    console.log(`[CAR DETAIL] Photo path (grid):`, photo);
                     console.log(`[CAR DETAIL] Original photo (grid):`, photo);
                   }
                   const isSelected = selectedPhotos.has(index);
@@ -2209,11 +2217,7 @@ export default function CarDetailPage() {
                           )}
                       crossOrigin="anonymous"
                       onError={(e) => {
-                        console.error('❌ [CAR DETAIL] Failed to load photo (grid):', photoUrl);
-                        console.error('   Photo path:', photoPath);
-                        console.error('   Original photo:', photo);
-                        console.error('   API Base URL:', import.meta.env.VITE_API_URL || 'Not set');
-                        // Don't hide the image - keep it visible but show error state
+                       // Don't hide the image - keep it visible but show error state
                         const img = e.target as HTMLImageElement;
                         img.style.opacity = '0.3';
                         img.style.filter = 'grayscale(100%)';
@@ -2308,7 +2312,7 @@ export default function CarDetailPage() {
                               disabled={setMainPhotoMutation.isPending}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setMainPhotoMutation.mutate(photoPath);
+                                setMainPhotoMutation.mutate(photo);
                               }}
                               className="bg-black/70 hover:bg-black/90 text-[#EAEB80] border border-[#EAEB80]/30 h-7 w-7 p-0"
                               title="Set as main photo"
@@ -3629,7 +3633,9 @@ export default function CarDetailPage() {
               {/* Full Screen Image - High Resolution Display */}
               {car.photos && car.photos[fullScreenImageIndex] && (
                 <img
-                  src={buildApiUrl(car.photos[fullScreenImageIndex].startsWith('/') ? car.photos[fullScreenImageIndex] : `/${car.photos[fullScreenImageIndex]}`)}
+                  src={car.photos[fullScreenImageIndex].startsWith('http://') || car.photos[fullScreenImageIndex].startsWith('https://') 
+                    ? car.photos[fullScreenImageIndex] 
+                    : buildApiUrl(car.photos[fullScreenImageIndex].startsWith('/') ? car.photos[fullScreenImageIndex] : `/${car.photos[fullScreenImageIndex]}`)}
                   alt={`Car photo ${fullScreenImageIndex + 1}`}
                   className="w-full h-full object-contain"
                   onClick={(e) => e.stopPropagation()}

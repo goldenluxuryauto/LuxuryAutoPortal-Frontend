@@ -1210,8 +1210,8 @@ export default function ClientDetailPage() {
                                           rel="noopener noreferrer"
                                           className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-[#EAEB80] text-black hover:bg-[#d4d570] transition-colors"
                                         >
-                                          <Download className="w-4 h-4" />
-                                          Download
+                                          <Eye className="w-4 h-4" />
+                                          View
                                         </a>
                                       )}
                                     </div>
@@ -1382,8 +1382,8 @@ export default function ClientDetailPage() {
                                       rel="noopener noreferrer"
                                       className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-[#EAEB80] text-black hover:bg-[#d4d570] transition-colors"
                                     >
-                                      <Download className="w-4 h-4" />
-                                      Download
+                                      <Eye className="w-4 h-4" />
+                                      View
                                     </a>
                                   )}
                                 </div>

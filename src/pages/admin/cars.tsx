@@ -444,21 +444,25 @@ export default function CarsPage() {
       );
     }
 
-    // Ensure photo path is properly formatted
-    let photoPath = rawPath;
-    if (!photoPath) {
+    // Handle photo path - check if it's a full GCS URL or a local path
+    let src: string;
+    if (!rawPath) {
       console.warn(`[CARS] Empty photo path for car ${car.id}`);
-      photoPath = '';
+      src = '';
+    } else if (rawPath.startsWith('http://') || rawPath.startsWith('https://')) {
+      // Full URL (GCS) - use directly
+      src = rawPath;
     } else {
+      // Local path - use buildApiUrl to proxy through backend
+      let photoPath = rawPath;
       // Remove leading slash if present, then add it back for consistency
       photoPath = photoPath.replace(/^\/+/, '');
       photoPath = `/${photoPath}`;
+      src = buildApiUrl(photoPath);
     }
-    const src = buildApiUrl(photoPath);
     // Log in production to help debug
     if (import.meta.env.PROD) {
       console.log(`[CARS] Thumbnail URL:`, src);
-      console.log(`[CARS] Photo path:`, photoPath);
       console.log(`[CARS] Original photo:`, rawPath);
     }
 
@@ -470,7 +474,6 @@ export default function CarsPage() {
         loading="lazy"
         onError={(e) => {
           console.error('Failed to load car thumbnail:', src);
-          console.error('Photo path:', photoPath);
           console.error('Original photo:', rawPath);
           setFailed(true);
         }}
