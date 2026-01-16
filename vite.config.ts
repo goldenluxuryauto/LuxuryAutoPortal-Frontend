@@ -143,6 +143,29 @@ export default defineConfig({
           });
         },
       },
+      "/income-expense-images": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        secure: false,
+        // No timeout - allow long-running operations
+        ws: true,
+        configure: (proxy, _options) => {
+          proxy.on("error", (err, _req, res) => {
+            console.error("Proxy error (income-expense-images):", err.message);
+            if (res && !res.headersSent) {
+              res.writeHead(500, {
+                "Content-Type": "application/json",
+              });
+              res.end(
+                JSON.stringify({
+                  success: false,
+                  error: "Backend server is not available.",
+                })
+              );
+            }
+          });
+        },
+      },
     },
   },
 });

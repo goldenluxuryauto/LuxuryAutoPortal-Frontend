@@ -18,6 +18,18 @@ interface IncomeExpenseContextType {
   isSavingMode: boolean;
   year: string;
   carId: number;
+  // Dynamic subcategories
+  dynamicSubcategories: {
+    directDelivery: any[];
+    cogs: any[];
+    parkingFeeLabor: any[];
+    reimbursedBills: any[];
+  };
+  refreshDynamicSubcategories: () => Promise<void>;
+  addDynamicSubcategory: (categoryType: string, name: string) => Promise<void>;
+  updateDynamicSubcategoryName: (categoryType: string, metadataId: number, newName: string) => Promise<void>;
+  deleteDynamicSubcategory: (categoryType: string, metadataId: number) => Promise<void>;
+  updateDynamicSubcategoryValue: (categoryType: string, metadataId: number, month: number, value: number, subcategoryName: string) => Promise<void>;
 }
 
 const IncomeExpenseContext = createContext<IncomeExpenseContextType | undefined>(undefined);
@@ -174,6 +186,12 @@ export function IncomeExpenseProvider({
   
   const [monthModes, setMonthModes] = useState<{ [month: number]: 50 | 70 }>(getDefaultMonthModes);
   const [isSavingMode, setIsSavingMode] = useState(false);
+  const [dynamicSubcategories, setDynamicSubcategories] = useState({
+    directDelivery: [] as any[],
+    cogs: [] as any[],
+    parkingFeeLabor: [] as any[],
+    reimbursedBills: [] as any[],
+  });
 
   // Fetch income/expense data
   const { data: incomeExpenseData, isLoading } = useQuery<{
@@ -193,6 +211,185 @@ export function IncomeExpenseProvider({
   });
 
   const data = incomeExpenseData?.data || getEmptyData();
+
+  // Fetch dynamic subcategories
+  const fetchDynamicSubcategories = async () => {
+    const categories: Array<'directDelivery' | 'cogs' | 'parkingFeeLabor' | 'reimbursedBills'> = [
+      'directDelivery',
+      'cogs',
+      'parkingFeeLabor',
+      'reimbursedBills',
+    ];
+    
+    const promises = categories.map(async (categoryType) => {
+      try {
+        const response = await fetch(
+          buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${year}/${categoryType}`),
+          { credentials: "include" }
+        );
+        if (response.ok) {
+          const result = await response.json();
+          return { categoryType, data: result.data || [] };
+        }
+        return { categoryType, data: [] };
+      } catch (error) {
+        console.error(`Error fetching ${categoryType} subcategories:`, error);
+        return { categoryType, data: [] };
+      }
+    });
+    
+    const results = await Promise.all(promises);
+    const newSubcategories: any = {
+      directDelivery: [],
+      cogs: [],
+      parkingFeeLabor: [],
+      reimbursedBills: [],
+    };
+    
+    results.forEach(({ categoryType, data }) => {
+      newSubcategories[categoryType] = data;
+    });
+    
+    setDynamicSubcategories(newSubcategories);
+  };
+
+  // Fetch dynamic subcategories when carId or year changes
+  React.useEffect(() => {
+    if (carId && year) {
+      fetchDynamicSubcategories();
+    }
+  }, [carId, year]);
+
+  const refreshDynamicSubcategories = async () => {
+    await fetchDynamicSubcategories();
+  };
+
+  const addDynamicSubcategory = async (categoryType: string, name: string) => {
+    try {
+      const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/add"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          carId,
+          year: parseInt(year),
+          categoryType,
+          subcategoryName: name,
+        }),
+      });
+      
+      if (!response.ok) throw new Error("Failed to add subcategory");
+      
+      await fetchDynamicSubcategories();
+      toast({
+        title: "Success",
+        description: "Subcategory added successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add subcategory",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  const updateDynamicSubcategoryName = async (categoryType: string, metadataId: number, newName: string) => {
+    try {
+      const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/update-name"), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          metadataId,
+          newName,
+          carId,
+          year: parseInt(year),
+          categoryType,
+        }),
+      });
+      
+      if (!response.ok) throw new Error("Failed to update subcategory name");
+      
+      await fetchDynamicSubcategories();
+      toast({
+        title: "Success",
+        description: "Subcategory name updated successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update subcategory name",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  const deleteDynamicSubcategory = async (categoryType: string, metadataId: number) => {
+    try {
+      const response = await fetch(
+        buildApiUrl(`/api/income-expense/dynamic-subcategories/${metadataId}?carId=${carId}&year=${year}&categoryType=${categoryType}`),
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      
+      if (!response.ok) throw new Error("Failed to delete subcategory");
+      
+      await fetchDynamicSubcategories();
+      toast({
+        title: "Success",
+        description: "Subcategory deleted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete subcategory",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  const updateDynamicSubcategoryValue = async (
+    categoryType: string,
+    metadataId: number,
+    month: number,
+    value: number,
+    subcategoryName: string
+  ) => {
+    try {
+      const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/update-value"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          metadataId,
+          month,
+          value,
+          carId,
+          year: parseInt(year),
+          categoryType,
+          subcategoryName,
+        }),
+      });
+      
+      if (!response.ok) throw new Error("Failed to update subcategory value");
+      
+      await fetchDynamicSubcategories();
+      queryClient.invalidateQueries({ queryKey: ["/api/income-expense", carId, year] });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update subcategory value",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
 
   // Load monthModes from API response when data is fetched
   // Use a ref to track if we've loaded modes for this carId/year combo to prevent infinite loops
@@ -220,14 +417,37 @@ export function IncomeExpenseProvider({
   // Toggle month mode and save to backend
   const toggleMonthMode = async (month: number) => {
     // Optimistically update UI
+    const newMode = monthModes[month] === 50 ? 70 : 50;
     const newModes: { [month: number]: 50 | 70 } = {
       ...monthModes,
-      [month]: monthModes[month] === 50 ? 70 : 50,
+      [month]: newMode,
     };
     setMonthModes(newModes);
+    
+    // Update percentage values in database
+    const newMgmtPercent = newMode === 70 ? 70 : 50; // 70:30 split when mode is 70 (Car Management : Car Owner)
+    const newOwnerPercent = newMode === 70 ? 30 : 50; // 70:30 split when mode is 70 (Car Management : Car Owner)
+    
     setIsSavingMode(true);
 
     try {
+      // Update percentages for this month
+      await Promise.all([
+        saveChanges({
+          category: "income",
+          field: "carManagementSplit",
+          month,
+          value: newMgmtPercent,
+        }),
+        saveChanges({
+          category: "income",
+          field: "carOwnerSplit",
+          month,
+          value: newOwnerPercent,
+        }),
+      ]);
+      
+      // Then update the mode setting
       const response = await fetch(buildApiUrl("/api/income-expense/formula"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -437,6 +657,12 @@ export function IncomeExpenseProvider({
         isSavingMode,
         year,
         carId,
+        dynamicSubcategories,
+        refreshDynamicSubcategories,
+        addDynamicSubcategory,
+        updateDynamicSubcategoryName,
+        deleteDynamicSubcategory,
+        updateDynamicSubcategoryValue,
       }}
     >
       {children}

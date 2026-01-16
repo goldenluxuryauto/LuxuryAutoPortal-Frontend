@@ -1,4 +1,3 @@
-// Modal for Parking Fee & Labor Cleaning category
 import React, { useState } from "react";
 import {
   Dialog,
@@ -11,60 +10,79 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useIncomeExpense } from "../context/IncomeExpenseContext";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export default function ModalEditParkingFeeLabor() {
-  const { editingCell, setEditingCell, updateCell, saveChanges, isSaving, year, carId } = useIncomeExpense();
-  const [remarks, setRemarks] = useState("");
+export default function ModalEditDynamicSubcategory() {
+  const {
+    editingCell,
+    setEditingCell,
+    updateDynamicSubcategoryValue,
+    dynamicSubcategories,
+    year,
+    carId,
+  } = useIncomeExpense();
+  const [value, setValue] = useState(0);
 
-  const monthName = editingCell ? MONTHS[editingCell.month - 1] : "";
-  const isOpen = !!editingCell && editingCell.category === "parkingFeeLabor";
+  React.useEffect(() => {
+    if (editingCell) {
+      setValue(editingCell.value);
+    }
+  }, [editingCell]);
+
+  const isOpen = !!editingCell && editingCell.category?.startsWith("dynamic-");
+
+  if (!isOpen || !editingCell) return null;
+
+  const categoryType = editingCell.category.replace("dynamic-", "");
+  const metadataIdMatch = editingCell.field.match(/subcategory-(\d+)/);
+  const metadataId = metadataIdMatch ? parseInt(metadataIdMatch[1]) : 0;
+
+  // Find the subcategory to get its name
+  const subcategory = dynamicSubcategories[categoryType as keyof typeof dynamicSubcategories]?.find(
+    (subcat: any) => subcat.id === metadataId
+  );
+
+  if (!subcategory) return null;
+
+  const monthName = MONTHS[editingCell.month - 1];
 
   const handleClose = () => {
     setEditingCell(null);
-    setRemarks("");
+    setValue(0);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!editingCell) return;
-    
-    // Save the change immediately, passing it directly to saveChanges
-    saveChanges({
-      category: editingCell.category,
-      field: editingCell.field,
-      month: editingCell.month,
-      value: editingCell.value,
-    });
+
+    await updateDynamicSubcategoryValue(
+      categoryType,
+      metadataId,
+      editingCell.month,
+      value,
+      subcategory.name
+    );
+
+    handleClose();
   };
-
-  if (!editingCell || editingCell.category !== "parkingFeeLabor") return null;
-
-  const fieldNames: { [key: string]: string } = {
-    glaParkingFee: "GLA Parking Fee",
-    laborCleaning: "Labor - Detailing",
-  };
-
-  const fieldName = fieldNames[editingCell.field] || editingCell.field;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="bg-[#0f0f0f] border-[#1a1a1a] text-white max-w-md">
         <DialogHeader>
           <DialogTitle className="text-white text-lg">
-            Update Parking Fee & Labor
+            Update {subcategory.name}
           </DialogTitle>
           <DialogDescription className="text-gray-400">
-            Enter parking fees and labor expenses for {monthName} {year}
+            Enter the amount for {subcategory.name} for {monthName} {year}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div>
             <Label className="text-gray-400 text-xs">Type:</Label>
-            <div className="text-white text-sm font-medium mt-1">{fieldName}</div>
+            <div className="text-white text-sm font-medium mt-1">{subcategory.name}</div>
           </div>
 
           <div>
@@ -78,13 +96,8 @@ export default function ModalEditParkingFeeLabor() {
             <Label className="text-gray-400 text-xs">Amount</Label>
             <Input
               type="number"
-              value={editingCell.value}
-              onChange={(e) =>
-                setEditingCell({
-                  ...editingCell,
-                  value: parseFloat(e.target.value) || 0,
-                })
-              }
+              value={value}
+              onChange={(e) => setValue(parseFloat(e.target.value) || 0)}
               className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm mt-1"
               step="0.01"
               autoFocus
@@ -92,12 +105,11 @@ export default function ModalEditParkingFeeLabor() {
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Remarks</Label>
-            <Textarea
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Add any notes..."
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm min-h-[80px] mt-1"
+            <Label className="text-gray-400 text-xs">Inputted Amount:</Label>
+            <Input
+              value={`$${value.toFixed(2)}`}
+              disabled
+              className="bg-[#1a1a1a] border-[#2a2a2a] text-gray-400 text-sm mt-1"
             />
           </div>
         </div>
@@ -112,10 +124,9 @@ export default function ModalEditParkingFeeLabor() {
           </Button>
           <Button
             onClick={handleSave}
-            disabled={isSaving}
             className="flex-1 bg-[#EAEB80] text-black hover:bg-[#d4d570]"
           >
-            {isSaving ? "Saving..." : "Save"}
+            Save
           </Button>
         </DialogFooter>
       </DialogContent>

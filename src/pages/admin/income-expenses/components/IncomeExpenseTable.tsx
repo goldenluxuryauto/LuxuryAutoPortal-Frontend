@@ -1,8 +1,19 @@
 import React, { useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Pencil, Trash2 } from "lucide-react";
 import { useIncomeExpense } from "../context/IncomeExpenseContext";
 import EditableCell from "./EditableCell";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface IncomeExpenseTableProps {
   year: string;
@@ -11,7 +22,31 @@ interface IncomeExpenseTableProps {
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
-  const { data, monthModes, toggleMonthMode, isSavingMode } = useIncomeExpense();
+  const {
+    data,
+    monthModes,
+    toggleMonthMode,
+    isSavingMode,
+    dynamicSubcategories,
+    addDynamicSubcategory,
+    updateDynamicSubcategoryName,
+    deleteDynamicSubcategory,
+    updateDynamicSubcategoryValue,
+  } = useIncomeExpense();
+  
+  const [addSubcategoryModal, setAddSubcategoryModal] = useState<{
+    open: boolean;
+    categoryType: string;
+    name: string;
+  }>({ open: false, categoryType: "", name: "" });
+  
+  const [editSubcategoryModal, setEditSubcategoryModal] = useState<{
+    open: boolean;
+    categoryType: string;
+    metadataId: number;
+    currentName: string;
+    newName: string;
+  }>({ open: false, categoryType: "", metadataId: 0, currentName: "", newName: "" });
 
   const [expandedSections, setExpandedSections] = useState({
     managementOwner: true,
@@ -64,11 +99,225 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     );
   };
 
+  // Helper to get total operating expense (Direct Delivery) for a month (including dynamic subcategories)
+  const getTotalDirectDeliveryForMonth = (month: number): number => {
+    const fixedTotal = (
+      getMonthValue(data.directDelivery, month, "laborCarCleaning") +
+      getMonthValue(data.directDelivery, month, "laborDelivery") +
+      getMonthValue(data.directDelivery, month, "parkingAirport") +
+      getMonthValue(data.directDelivery, month, "parkingLot") +
+      getMonthValue(data.directDelivery, month, "uberLyftLime")
+    );
+    const dynamicTotal = dynamicSubcategories.directDelivery.reduce((sum, subcat) => {
+      const monthValue = subcat.values.find((v: any) => v.month === month);
+      return sum + (monthValue?.value || 0);
+    }, 0);
+    return fixedTotal + dynamicTotal;
+  };
+
+  // Helper to get total operating expense (COGS) for a month (including dynamic subcategories)
+  const getTotalCogsForMonth = (month: number): number => {
+    const fixedTotal = (
+      getMonthValue(data.cogs, month, "autoBodyShopWreck") +
+      getMonthValue(data.cogs, month, "alignment") +
+      getMonthValue(data.cogs, month, "battery") +
+      getMonthValue(data.cogs, month, "brakes") +
+      getMonthValue(data.cogs, month, "carPayment") +
+      getMonthValue(data.cogs, month, "carInsurance") +
+      getMonthValue(data.cogs, month, "carSeats") +
+      getMonthValue(data.cogs, month, "cleaningSuppliesTools") +
+      getMonthValue(data.cogs, month, "emissions") +
+      getMonthValue(data.cogs, month, "gpsSystem") +
+      getMonthValue(data.cogs, month, "keyFob") +
+      getMonthValue(data.cogs, month, "laborCleaning") +
+      getMonthValue(data.cogs, month, "licenseRegistration") +
+      getMonthValue(data.cogs, month, "mechanic") +
+      getMonthValue(data.cogs, month, "oilLube") +
+      getMonthValue(data.cogs, month, "parts") +
+      getMonthValue(data.cogs, month, "skiRacks") +
+      getMonthValue(data.cogs, month, "tickets") +
+      getMonthValue(data.cogs, month, "tiredAirStation") +
+      getMonthValue(data.cogs, month, "tires") +
+      getMonthValue(data.cogs, month, "towingImpoundFees") +
+      getMonthValue(data.cogs, month, "uberLyftLime") +
+      getMonthValue(data.cogs, month, "windshield") +
+      getMonthValue(data.cogs, month, "wipers")
+    );
+    const dynamicTotal = dynamicSubcategories.cogs.reduce((sum, subcat) => {
+      const monthValue = subcat.values.find((v: any) => v.month === month);
+      return sum + (monthValue?.value || 0);
+    }, 0);
+    return fixedTotal + dynamicTotal;
+  };
+
+  // Helper to get total reimbursed bills for a month (including dynamic subcategories)
+  const getTotalReimbursedBillsForMonth = (month: number): number => {
+    const fixedTotal = (
+      getMonthValue(data.reimbursedBills, month, "electricReimbursed") +
+      getMonthValue(data.reimbursedBills, month, "electricNotReimbursed") +
+      getMonthValue(data.reimbursedBills, month, "gasReimbursed") +
+      getMonthValue(data.reimbursedBills, month, "gasNotReimbursed") +
+      getMonthValue(data.reimbursedBills, month, "gasServiceRun") +
+      getMonthValue(data.reimbursedBills, month, "parkingAirport") +
+      getMonthValue(data.reimbursedBills, month, "uberLyftLimeNotReimbursed") +
+      getMonthValue(data.reimbursedBills, month, "uberLyftLimeReimbursed")
+    );
+    const dynamicTotal = dynamicSubcategories.reimbursedBills.reduce((sum, subcat) => {
+      const monthValue = subcat.values.find((v: any) => v.month === month);
+      return sum + (monthValue?.value || 0);
+    }, 0);
+    return fixedTotal + dynamicTotal;
+  };
+
+  // Calculate Car Management Split based on formula:
+  // =IF(O10+O11+O13+O14+(O12*90%+O16*O2+O17*O2+O18*O2+O19*O2)-O76+(O9+O20-O10-O11-O13-O12-O15-O14-O16-O17-O18-O19-O33-O60)*O2>=0,
+  //     O10+O11+O13+O14+(O12*90%+O16*O2+O17*O2+O18*O2+O19*O2)-O76+(O9+O20-O10-O11-O13-O12-O15-O14-O16-O17-O18-O19-O33-O60)*O2,
+  //     0)
+  const calculateCarManagementSplit = (month: number): number => {
+    // Use stored percentage, default to 0 if not set (independent of car owner split)
+    const storedPercent = getMonthValue(data.incomeExpenses, month, "carManagementSplit") || 0;
+    const mgmtPercent = storedPercent / 100; // Split percentage for management
+    
+    const rentalIncome = getMonthValue(data.incomeExpenses, month, "rentalIncome");
+    const deliveryIncome = getMonthValue(data.incomeExpenses, month, "deliveryIncome");
+    const electricPrepaidIncome = getMonthValue(data.incomeExpenses, month, "electricPrepaidIncome");
+    const smokingFines = getMonthValue(data.incomeExpenses, month, "smokingFines");
+    const gasPrepaidIncome = getMonthValue(data.incomeExpenses, month, "gasPrepaidIncome");
+    const skiRacksIncome = getMonthValue(data.incomeExpenses, month, "skiRacksIncome");
+    const milesIncome = getMonthValue(data.incomeExpenses, month, "milesIncome");
+    const childSeatIncome = getMonthValue(data.incomeExpenses, month, "childSeatIncome");
+    const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
+    const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
+    const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
+    const negativeBalanceCarryOver = getMonthValue(data.incomeExpenses, month, "negativeBalanceCarryOver");
+    const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
+    const totalCogs = getTotalCogsForMonth(month);
+    const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
+    
+    // Part 1: O10+O11+O13+O14+(O12*90%+O16*O2+O17*O2+O18*O2+O19*O2)
+    const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + skiRacksIncome + 
+                  (smokingFines * 0.90 + childSeatIncome * mgmtPercent + coolersIncome * mgmtPercent + 
+                   insuranceWreckIncome * mgmtPercent + otherIncome * mgmtPercent);
+    
+    // Part 2: (O9+O20-O10-O11-O13-O12-O15-O14-O16-O17-O18-O19-O33-O60)*O2
+    const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                   gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - childSeatIncome - 
+                   coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs) * mgmtPercent;
+    
+    // Full calculation: part1 - O76 + part2
+    const calculation = part1 - totalReimbursedBills + part2;
+    
+    return calculation >= 0 ? calculation : 0;
+  };
+
+  // Calculate Car Owner Split based on formula:
+  // =IF((O15)+(O12*10%+O16*O3+O17*O3+O18*O3+O19*O3)+(O9+O20-O10-O11-O12-O13-O15-O14-O16-O17-O18-O19-O33-O60)*O3>=0,
+  //     O15+(O12*10%+O16*O3+O17*O3+O18*O3+O19*O3)+(O9+O20-O10-O11-O12-O13-O15-O14-O16-O17-O18-O19-O33-O60)*O3,
+  //     0)
+  const calculateCarOwnerSplit = (month: number): number => {
+    // Use stored percentage, default to 0 if not set (independent of car management split)
+    const storedPercent = getMonthValue(data.incomeExpenses, month, "carOwnerSplit") || 0;
+    const ownerPercent = storedPercent / 100; // Split percentage for owner
+    
+    const rentalIncome = getMonthValue(data.incomeExpenses, month, "rentalIncome");
+    const deliveryIncome = getMonthValue(data.incomeExpenses, month, "deliveryIncome");
+    const electricPrepaidIncome = getMonthValue(data.incomeExpenses, month, "electricPrepaidIncome");
+    const smokingFines = getMonthValue(data.incomeExpenses, month, "smokingFines");
+    const gasPrepaidIncome = getMonthValue(data.incomeExpenses, month, "gasPrepaidIncome");
+    const skiRacksIncome = getMonthValue(data.incomeExpenses, month, "skiRacksIncome");
+    const milesIncome = getMonthValue(data.incomeExpenses, month, "milesIncome");
+    const childSeatIncome = getMonthValue(data.incomeExpenses, month, "childSeatIncome");
+    const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
+    const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
+    const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
+    const negativeBalanceCarryOver = getMonthValue(data.incomeExpenses, month, "negativeBalanceCarryOver");
+    const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
+    const totalCogs = getTotalCogsForMonth(month);
+    
+    // Part 1: O15 (milesIncome)
+    const part1 = milesIncome;
+    
+    // Part 2: O12*10%+O16*O3+O17*O3+O18*O3+O19*O3
+    const part2 = smokingFines * 0.10 + childSeatIncome * ownerPercent + coolersIncome * ownerPercent + 
+                  insuranceWreckIncome * ownerPercent + otherIncome * ownerPercent;
+    
+    // Part 3: (O9+O20-O10-O11-O12-O13-O15-O14-O16-O17-O18-O19-O33-O60)*O3
+    const part3 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                   smokingFines - gasPrepaidIncome - milesIncome - skiRacksIncome - childSeatIncome - 
+                   coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs) * ownerPercent;
+    
+    const calculation = part1 + part2 + part3;
+    
+    return calculation >= 0 ? calculation : 0;
+  };
+
+  // Calculate Negative Balance Carry Over:
+  // =IF(M9-M10-M11-M13-M15-M14-M16-M17-M18-M19-M33-M60-M20> 0,0,(M9-M10-M11-M13-M15-M14-M16-M17-M18-M19-M33-M60-M20))
+  // This uses the previous month's data (M = previous month)
+  // Note: Uses the calculated (not stored) value from previous month, and displays absolute value
+  // January uses the stored value (manually entered), all other months are calculated
+  const calculateNegativeBalanceCarryOver = (month: number): number => {
+    if (month === 1) {
+      // January uses the stored value (manually entered)
+      const storedValue = getMonthValue(data.incomeExpenses, 1, "negativeBalanceCarryOver");
+      return Math.abs(storedValue);
+    }
+    
+    const prevMonth = month - 1;
+    const prevRentalIncome = getMonthValue(data.incomeExpenses, prevMonth, "rentalIncome");
+    const prevDeliveryIncome = getMonthValue(data.incomeExpenses, prevMonth, "deliveryIncome");
+    const prevElectricPrepaidIncome = getMonthValue(data.incomeExpenses, prevMonth, "electricPrepaidIncome");
+    const prevSmokingFines = getMonthValue(data.incomeExpenses, prevMonth, "smokingFines");
+    const prevGasPrepaidIncome = getMonthValue(data.incomeExpenses, prevMonth, "gasPrepaidIncome");
+    const prevSkiRacksIncome = getMonthValue(data.incomeExpenses, prevMonth, "skiRacksIncome");
+    const prevMilesIncome = getMonthValue(data.incomeExpenses, prevMonth, "milesIncome");
+    const prevChildSeatIncome = getMonthValue(data.incomeExpenses, prevMonth, "childSeatIncome");
+    const prevCoolersIncome = getMonthValue(data.incomeExpenses, prevMonth, "coolersIncome");
+    const prevInsuranceWreckIncome = getMonthValue(data.incomeExpenses, prevMonth, "insuranceWreckIncome");
+    const prevOtherIncome = getMonthValue(data.incomeExpenses, prevMonth, "otherIncome");
+    // Use the calculated value from previous month (recursive call)
+    const prevNegativeBalanceCarryOver = calculateNegativeBalanceCarryOver(prevMonth);
+    const prevTotalDirectDelivery = getTotalDirectDeliveryForMonth(prevMonth);
+    const prevTotalCogs = getTotalCogsForMonth(prevMonth);
+    
+    const calculation = prevRentalIncome - prevDeliveryIncome - prevElectricPrepaidIncome - 
+                       prevGasPrepaidIncome - prevMilesIncome - prevSkiRacksIncome - 
+                       prevChildSeatIncome - prevCoolersIncome - prevInsuranceWreckIncome - 
+                       prevOtherIncome - prevTotalDirectDelivery - prevTotalCogs - prevNegativeBalanceCarryOver;
+    
+    // Return absolute value (remove negative sign)
+    const result = calculation > 0 ? 0 : calculation;
+    return Math.abs(result);
+  };
+
+  // Calculate Car Management Total Expenses:
+  // "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" + ("TOTAL OPERATING EXPENSE (Direct Delivery)" * "Car Management Split %") + ("TOTAL OPERATING EXPENSE (COGS - Per Vehicle)" * "Car Management Split %")
+  const calculateCarManagementTotalExpenses = (month: number): number => {
+    const storedMgmtPercent = Number(getMonthValue(data.incomeExpenses, month, "carManagementSplit")) || 0;
+    const mgmtPercent = storedMgmtPercent / 100; // Convert percentage to decimal
+    const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
+    const totalCogs = getTotalCogsForMonth(month);
+    const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
+    
+    return totalReimbursedBills + (totalDirectDelivery * mgmtPercent) + (totalCogs * mgmtPercent);
+  };
+
+  // Calculate Car Owner Total Expenses:
+  // ("TOTAL OPERATING EXPENSE (Direct Delivery)" * "Car Owner Split %") + ("TOTAL OPERATING EXPENSE (COGS - Per Vehicle)" * "Car Owner Split %")
+  const calculateCarOwnerTotalExpenses = (month: number): number => {
+    const storedOwnerPercent = Number(getMonthValue(data.incomeExpenses, month, "carOwnerSplit")) || 0;
+    const ownerPercent = storedOwnerPercent / 100; // Convert percentage to decimal
+    const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
+    const totalCogs = getTotalCogsForMonth(month);
+    
+    return (totalDirectDelivery * ownerPercent) + (totalCogs * ownerPercent);
+  };
+
   // Helper function to get split for a specific month
   const getSplitForMonth = (month: number) => {
     const mode = monthModes[month];
     if (mode === 70) {
-      return { mgmt: 30, owner: 70 }; // 70 mode = 30:70 split
+      return { mgmt: 70, owner: 30 }; // 70 mode = 70:30 split (Car Management : Car Owner)
     }
     return { mgmt: 50, owner: 50 }; // 50 mode = 50:50 split
   };
@@ -104,7 +353,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                             : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/50",
                           isSavingMode && "animate-pulse"
                         )}
-                        title={isSavingMode ? "Saving mode change..." : `Click to toggle between 50:50 (green) and 30:70 (blue) split`}
+                        title={isSavingMode ? "Saving mode change..." : `Click to toggle between 50:50 (green) and 70:30 (blue) split`}
                       >
                         {isSavingMode ? "..." : currentMode}
                       </button>
@@ -125,52 +374,43 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               isExpanded={expandedSections.managementOwner}
               onToggle={() => toggleSection("managementOwner")}
             >
-              {/* Car Management Split - Reactive to income changes and mode toggles */}
+              {/* Car Management Split - Shows calculated amount + percentage */}
               <CategoryRow
                 label="Car Management Split"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  // Calculate total income for the month (sum of all income items)
-                  // This recalculates automatically when data.incomeExpenses changes
-                  const totalIncome = getTotalIncomeForMonth(monthNum);
-                  // Get mode for this month (50 or 70) - reactive to monthModes state changes
-                  const mode = monthModes[monthNum] || 50;
-                  // Calculate split amount based on mode
-                  // Mode 50: splitAmount = totalIncome × 0.50, percentage = 50
-                  // Mode 70: splitAmount = totalIncome × 0.30, percentage = 30
-                  const splitAmount = mode === 70 
-                    ? totalIncome * 0.30 
-                    : totalIncome * 0.50;
-                  return splitAmount;
+                  const calculatedAmount = calculateCarManagementSplit(monthNum);
+                  return calculatedAmount; // Return calculated amount for display
                 })}
-                category="managementSplit"
+                percentageValues={MONTHS.map((_, i) => {
+                  const monthNum = i + 1;
+                  return getMonthValue(data.incomeExpenses, monthNum, "carManagementSplit");
+                })}
+                category="income"
                 field="carManagementSplit"
-                isEditable={false}
+                isEditable={true}
                 formatType="managementSplit"
                 monthModes={monthModes}
+                showAmountAndPercentage={true}
               />
-              {/* Car Owner Split - Reactive to income changes and mode toggles */}
+              {/* Car Owner Split - Shows calculated amount + percentage */}
               <CategoryRow
                 label="Car Owner Split"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  // Calculate total income for the month (sum of all income items)
-                  // This recalculates automatically when data.incomeExpenses changes
-                  const totalIncome = getTotalIncomeForMonth(monthNum);
-                  // Get mode for this month (50 or 70) - reactive to monthModes state changes
-                  const mode = monthModes[monthNum] || 50;
-                  // Calculate split amount based on mode
-                  // Mode 50: splitAmount = totalIncome × 0.50
-                  // Mode 70: splitAmount = totalIncome × 0.70
-                  const splitAmount = mode === 70 
-                    ? totalIncome * 0.70 
-                    : totalIncome * 0.50;
-                  return splitAmount;
+                  const calculatedAmount = calculateCarOwnerSplit(monthNum);
+                  return calculatedAmount; // Return calculated amount for display
                 })}
-                category="managementSplit"
+                percentageValues={MONTHS.map((_, i) => {
+                  const monthNum = i + 1;
+                  return getMonthValue(data.incomeExpenses, monthNum, "carOwnerSplit");
+                })}
+                category="income"
                 field="carOwnerSplit"
-                isEditable={false}
+                isEditable={true}
                 formatType="ownerSplit"
+                monthModes={monthModes}
+                showAmountAndPercentage={true}
               />
             </CategorySection>
 
@@ -235,7 +475,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 field="coolersIncome"
               />
               <CategoryRow
-                label="Insurance Wreck Income"
+                label="Income insurance and Client Wrecks"
                 values={MONTHS.map((_, i) => getMonthValue(data.incomeExpenses, i + 1, "insuranceWreckIncome"))}
                 category="income"
                 field="insuranceWreckIncome"
@@ -248,33 +488,39 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               />
               <CategoryRow
                 label="Negative Balance Carry Over"
-                values={MONTHS.map((_, i) => getMonthValue(data.incomeExpenses, i + 1, "negativeBalanceCarryOver"))}
+                values={MONTHS.map((_, i) => calculateNegativeBalanceCarryOver(i + 1))}
                 category="income"
                 field="negativeBalanceCarryOver"
+                isEditable={true}
+                isEditablePerMonth={(month) => month === 1} // Only January is editable
               />
               <CategoryRow
                 label="Car Payment"
-                values={MONTHS.map((_, i) => getMonthValue(data.incomeExpenses, i + 1, "carPayment"))}
+                values={MONTHS.map((_, i) => getMonthValue(data.cogs, i + 1, "carPayment"))}
                 category="income"
                 field="carPayment"
+                isEditable={false}
               />
               <CategoryRow
                 label="Car Management Total Expenses"
-                values={MONTHS.map((_, i) => getMonthValue(data.incomeExpenses, i + 1, "carManagementTotalExpenses"))}
+                values={MONTHS.map((_, i) => calculateCarManagementTotalExpenses(i + 1))}
                 category="income"
                 field="carManagementTotalExpenses"
+                isEditable={false}
               />
               <CategoryRow
                 label="Car Owner Total Expenses"
-                values={MONTHS.map((_, i) => getMonthValue(data.incomeExpenses, i + 1, "carOwnerTotalExpenses"))}
+                values={MONTHS.map((_, i) => calculateCarOwnerTotalExpenses(i + 1))}
                 category="income"
                 field="carOwnerTotalExpenses"
+                isEditable={false}
               />
               <CategoryRow
                 label="Total Expenses"
                 values={MONTHS.map((_, i) => {
-                  const mgmt = getMonthValue(data.incomeExpenses, i + 1, "carManagementTotalExpenses");
-                  const owner = getMonthValue(data.incomeExpenses, i + 1, "carOwnerTotalExpenses");
+                  const monthNum = i + 1;
+                  const mgmt = calculateCarManagementTotalExpenses(monthNum);
+                  const owner = calculateCarOwnerTotalExpenses(monthNum);
                   return mgmt + owner;
                 })}
                 isEditable={false}
@@ -283,22 +529,11 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 label="Total Car Profit"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  const rental = getMonthValue(data.incomeExpenses, monthNum, "rentalIncome");
-                  const delivery = getMonthValue(data.incomeExpenses, monthNum, "deliveryIncome");
-                  const electric = getMonthValue(data.incomeExpenses, monthNum, "electricPrepaidIncome");
-                  const smoking = getMonthValue(data.incomeExpenses, monthNum, "smokingFines");
-                  const gas = getMonthValue(data.incomeExpenses, monthNum, "gasPrepaidIncome");
-                  const skiRacks = getMonthValue(data.incomeExpenses, monthNum, "skiRacksIncome");
-                  const miles = getMonthValue(data.incomeExpenses, monthNum, "milesIncome");
-                  const childSeat = getMonthValue(data.incomeExpenses, monthNum, "childSeatIncome");
-                  const coolers = getMonthValue(data.incomeExpenses, monthNum, "coolersIncome");
-                  const insurance = getMonthValue(data.incomeExpenses, monthNum, "insuranceWreckIncome");
-                  const other = getMonthValue(data.incomeExpenses, monthNum, "otherIncome");
-                  const mgmt = getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses");
-                  const owner = getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses");
-                  const totalIncome = rental + delivery + electric + smoking + gas + skiRacks + miles + childSeat + coolers + insurance + other;
+                  const rentalIncome = getMonthValue(data.incomeExpenses, monthNum, "rentalIncome");
+                  const mgmt = calculateCarManagementTotalExpenses(monthNum);
+                  const owner = calculateCarOwnerTotalExpenses(monthNum);
                   const totalExpenses = mgmt + owner;
-                  return totalIncome - totalExpenses;
+                  return rentalIncome - totalExpenses;
                 })}
                 isEditable={false}
               />
@@ -311,7 +546,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               onToggle={() => toggleSection("directDelivery")}
             >
               <CategoryRow
-                label="Labor - Car Cleaning"
+                label="Labor - Detailing"
                 values={MONTHS.map((_, i) => getMonthValue(data.directDelivery, i + 1, "laborCarCleaning"))}
                 category="directDelivery"
                 field="laborCarCleaning"
@@ -340,17 +575,55 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 category="directDelivery"
                 field="uberLyftLime"
               />
+              {/* Dynamic Subcategories */}
+              {dynamicSubcategories.directDelivery.map((subcat) => (
+                <DynamicSubcategoryRow
+                  key={subcat.id}
+                  subcategory={subcat}
+                  categoryType="directDelivery"
+                  onEditName={() => setEditSubcategoryModal({
+                    open: true,
+                    categoryType: "directDelivery",
+                    metadataId: subcat.id,
+                    currentName: subcat.name,
+                    newName: subcat.name,
+                  })}
+                  onDelete={() => {
+                    if (confirm(`Are you sure you want to delete "${subcat.name}"?`)) {
+                      deleteDynamicSubcategory("directDelivery", subcat.id);
+                    }
+                  }}
+                  onUpdateValue={updateDynamicSubcategoryValue}
+                />
+              ))}
+              {/* Add Subcategory Button */}
+              <tr>
+                <td colSpan={14} className="px-3 py-2">
+                  <button
+                    onClick={() => setAddSubcategoryModal({ open: true, categoryType: "directDelivery", name: "" })}
+                    className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Subcategory
+                  </button>
+                </td>
+              </tr>
               <CategoryRow
                 label="TOTAL OPERATING EXPENSE (Direct Delivery)"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  return (
+                  const fixedTotal = (
                     getMonthValue(data.directDelivery, monthNum, "laborCarCleaning") +
                     getMonthValue(data.directDelivery, monthNum, "laborDelivery") +
                     getMonthValue(data.directDelivery, monthNum, "parkingAirport") +
                     getMonthValue(data.directDelivery, monthNum, "parkingLot") +
                     getMonthValue(data.directDelivery, monthNum, "uberLyftLime")
                   );
+                  const dynamicTotal = dynamicSubcategories.directDelivery.reduce((sum, subcat) => {
+                    const monthValue = subcat.values.find((v: any) => v.month === monthNum);
+                    return sum + (monthValue?.value || 0);
+                  }, 0);
+                  return fixedTotal + dynamicTotal;
                 })}
                 isEditable={false}
                 isTotal
@@ -430,7 +703,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 field="keyFob"
               />
               <CategoryRow
-                label="Labor - Cleaning"
+                label="Labor - Detailing"
                 values={MONTHS.map((_, i) => getMonthValue(data.cogs, i + 1, "laborCleaning"))}
                 category="cogs"
                 field="laborCleaning"
@@ -466,7 +739,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 field="skiRacks"
               />
               <CategoryRow
-                label="Tickets"
+                label="Tickets & Tolls"
                 values={MONTHS.map((_, i) => getMonthValue(data.cogs, i + 1, "tickets"))}
                 category="cogs"
                 field="tickets"
@@ -507,11 +780,44 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 category="cogs"
                 field="wipers"
               />
+              {/* Dynamic Subcategories */}
+              {dynamicSubcategories.cogs.map((subcat) => (
+                <DynamicSubcategoryRow
+                  key={subcat.id}
+                  subcategory={subcat}
+                  categoryType="cogs"
+                  onEditName={() => setEditSubcategoryModal({
+                    open: true,
+                    categoryType: "cogs",
+                    metadataId: subcat.id,
+                    currentName: subcat.name,
+                    newName: subcat.name,
+                  })}
+                  onDelete={() => {
+                    if (confirm(`Are you sure you want to delete "${subcat.name}"?`)) {
+                      deleteDynamicSubcategory("cogs", subcat.id);
+                    }
+                  }}
+                  onUpdateValue={updateDynamicSubcategoryValue}
+                />
+              ))}
+              {/* Add Subcategory Button */}
+              <tr>
+                <td colSpan={14} className="px-3 py-2">
+                  <button
+                    onClick={() => setAddSubcategoryModal({ open: true, categoryType: "cogs", name: "" })}
+                    className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Subcategory
+                  </button>
+                </td>
+              </tr>
               <CategoryRow
                 label="TOTAL OPERATING EXPENSE (COGS - Per Vehicle)"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  return (
+                  const fixedTotal = (
                     getMonthValue(data.cogs, monthNum, "autoBodyShopWreck") +
                     getMonthValue(data.cogs, monthNum, "alignment") +
                     getMonthValue(data.cogs, monthNum, "battery") +
@@ -537,6 +843,11 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                     getMonthValue(data.cogs, monthNum, "windshield") +
                     getMonthValue(data.cogs, monthNum, "wipers")
                   );
+                  const dynamicTotal = dynamicSubcategories.cogs.reduce((sum, subcat) => {
+                    const monthValue = subcat.values.find((v: any) => v.month === monthNum);
+                    return sum + (monthValue?.value || 0);
+                  }, 0);
+                  return fixedTotal + dynamicTotal;
                 })}
                 isEditable={false}
                 isTotal
@@ -556,19 +867,57 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 field="glaParkingFee"
               />
               <CategoryRow
-                label="Labor - Cleaning"
+                label="Labor - Detailing"
                 values={MONTHS.map((_, i) => getMonthValue(data.parkingFeeLabor, i + 1, "laborCleaning"))}
                 category="parkingFeeLabor"
                 field="laborCleaning"
               />
+              {/* Dynamic Subcategories */}
+              {dynamicSubcategories.parkingFeeLabor.map((subcat) => (
+                <DynamicSubcategoryRow
+                  key={subcat.id}
+                  subcategory={subcat}
+                  categoryType="parkingFeeLabor"
+                  onEditName={() => setEditSubcategoryModal({
+                    open: true,
+                    categoryType: "parkingFeeLabor",
+                    metadataId: subcat.id,
+                    currentName: subcat.name,
+                    newName: subcat.name,
+                  })}
+                  onDelete={() => {
+                    if (confirm(`Are you sure you want to delete "${subcat.name}"?`)) {
+                      deleteDynamicSubcategory("parkingFeeLabor", subcat.id);
+                    }
+                  }}
+                  onUpdateValue={updateDynamicSubcategoryValue}
+                />
+              ))}
+              {/* Add Subcategory Button */}
+              <tr>
+                <td colSpan={14} className="px-3 py-2">
+                  <button
+                    onClick={() => setAddSubcategoryModal({ open: true, categoryType: "parkingFeeLabor", name: "" })}
+                    className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Subcategory
+                  </button>
+                </td>
+              </tr>
               <CategoryRow
                 label="Total Parking Fee & Labor Cleaning"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  return (
+                  const fixedTotal = (
                     getMonthValue(data.parkingFeeLabor, monthNum, "glaParkingFee") +
                     getMonthValue(data.parkingFeeLabor, monthNum, "laborCleaning")
                   );
+                  const dynamicTotal = dynamicSubcategories.parkingFeeLabor.reduce((sum, subcat) => {
+                    const monthValue = subcat.values.find((v: any) => v.month === monthNum);
+                    return sum + (monthValue?.value || 0);
+                  }, 0);
+                  return fixedTotal + dynamicTotal;
                 })}
                 isEditable={false}
                 isTotal
@@ -629,11 +978,44 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 category="reimbursedBills"
                 field="uberLyftLimeReimbursed"
               />
+              {/* Dynamic Subcategories */}
+              {dynamicSubcategories.reimbursedBills.map((subcat) => (
+                <DynamicSubcategoryRow
+                  key={subcat.id}
+                  subcategory={subcat}
+                  categoryType="reimbursedBills"
+                  onEditName={() => setEditSubcategoryModal({
+                    open: true,
+                    categoryType: "reimbursedBills",
+                    metadataId: subcat.id,
+                    currentName: subcat.name,
+                    newName: subcat.name,
+                  })}
+                  onDelete={() => {
+                    if (confirm(`Are you sure you want to delete "${subcat.name}"?`)) {
+                      deleteDynamicSubcategory("reimbursedBills", subcat.id);
+                    }
+                  }}
+                  onUpdateValue={updateDynamicSubcategoryValue}
+                />
+              ))}
+              {/* Add Subcategory Button */}
+              <tr>
+                <td colSpan={14} className="px-3 py-2">
+                  <button
+                    onClick={() => setAddSubcategoryModal({ open: true, categoryType: "reimbursedBills", name: "" })}
+                    className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Subcategory
+                  </button>
+                </td>
+              </tr>
               <CategoryRow
                 label="TOTAL REIMBURSE AND NON-REIMBURSE BILLS"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  return (
+                  const fixedTotal = (
                     getMonthValue(data.reimbursedBills, monthNum, "electricReimbursed") +
                     getMonthValue(data.reimbursedBills, monthNum, "electricNotReimbursed") +
                     getMonthValue(data.reimbursedBills, monthNum, "gasReimbursed") +
@@ -643,6 +1025,11 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                     getMonthValue(data.reimbursedBills, monthNum, "uberLyftLimeNotReimbursed") +
                     getMonthValue(data.reimbursedBills, monthNum, "uberLyftLimeReimbursed")
                   );
+                  const dynamicTotal = dynamicSubcategories.reimbursedBills.reduce((sum, subcat) => {
+                    const monthValue = subcat.values.find((v: any) => v.month === monthNum);
+                    return sum + (monthValue?.value || 0);
+                  }, 0);
+                  return fixedTotal + dynamicTotal;
                 })}
                 isEditable={false}
                 isTotal
@@ -657,16 +1044,14 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
             >
               <CategoryRow
                 label="Days Rented"
-                values={MONTHS.map((_, i) => getMonthValue(data.history, i + 1, "daysRented"))}
-                category="history"
-                field="daysRented"
+                values={MONTHS.map((_, i) => getMonthValue(data.reimbursedBills, i + 1, "gasNotReimbursed"))}
+                isEditable={false}
                 isInteger
               />
               <CategoryRow
                 label="Cars Available For Rent"
-                values={MONTHS.map((_, i) => getMonthValue(data.history, i + 1, "carsAvailableForRent"))}
-                category="history"
-                field="carsAvailableForRent"
+                values={MONTHS.map((_, i) => getMonthValue(data.reimbursedBills, i + 1, "gasServiceRun"))}
+                isEditable={false}
                 isInteger
               />
               <CategoryRow
@@ -723,14 +1108,14 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               />
               <CategoryRow
                 label="Total Parking Airport"
-                values={MONTHS.map((_, i) => getMonthValue(data.directDelivery, i + 1, "parkingAirport"))}
+                values={MONTHS.map((_, i) => getMonthValue(data.reimbursedBills, i + 1, "parkingAirport"))}
                 isEditable={false}
               />
               <CategoryRow
                 label="Average per trip"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  const parking = getMonthValue(data.directDelivery, monthNum, "parkingAirport");
+                  const parking = getMonthValue(data.reimbursedBills, monthNum, "parkingAirport");
                   const trips = getMonthValue(data.history, monthNum, "tripsTaken");
                   return trips > 0 ? parking / trips : 0;
                 })}
@@ -753,14 +1138,15 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               />
               <CategoryRow
                 label="Total Parking Airport"
-                values={MONTHS.map((_, i) => getMonthValue(data.reimbursedBills, i + 1, "parkingAirport"))}
+                values={MONTHS.map((_, i) => getMonthValue(data.history, i + 1, "tripsTaken"))}
                 isEditable={false}
+                isInteger
               />
               <CategoryRow
                 label="Average per trip"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  const parking = getMonthValue(data.reimbursedBills, monthNum, "parkingAirport");
+                  const parking = getMonthValue(data.history, monthNum, "tripsTaken");
                   const trips = getMonthValue(data.history, monthNum, "tripsTaken");
                   return trips > 0 ? parking / trips : 0;
                 })}
@@ -770,7 +1156,175 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
           </tbody>
         </table>
       </div>
+
+      {/* Add Subcategory Modal */}
+      <Dialog open={addSubcategoryModal.open} onOpenChange={(open) => setAddSubcategoryModal({ ...addSubcategoryModal, open })}>
+        <DialogContent className="bg-[#0f0f0f] border-[#1a1a1a] text-white">
+          <DialogHeader>
+            <DialogTitle>Add Subcategory</DialogTitle>
+            <DialogDescription>Enter a name for the new subcategory</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Subcategory Name</Label>
+              <Input
+                value={addSubcategoryModal.name}
+                onChange={(e) => setAddSubcategoryModal({ ...addSubcategoryModal, name: e.target.value })}
+                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                autoFocus
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setAddSubcategoryModal({ open: false, categoryType: "", name: "" })}
+              className="border-[#2a2a2a] text-gray-400 hover:text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                if (addSubcategoryModal.name.trim()) {
+                  await addDynamicSubcategory(addSubcategoryModal.categoryType, addSubcategoryModal.name.trim());
+                  setAddSubcategoryModal({ open: false, categoryType: "", name: "" });
+                }
+              }}
+              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              disabled={!addSubcategoryModal.name.trim()}
+            >
+              Add
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Subcategory Name Modal */}
+      <Dialog open={editSubcategoryModal.open} onOpenChange={(open) => setEditSubcategoryModal({ ...editSubcategoryModal, open })}>
+        <DialogContent className="bg-[#0f0f0f] border-[#1a1a1a] text-white">
+          <DialogHeader>
+            <DialogTitle>Edit Subcategory Name</DialogTitle>
+            <DialogDescription>Update the name of this subcategory</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Subcategory Name</Label>
+              <Input
+                value={editSubcategoryModal.newName}
+                onChange={(e) => setEditSubcategoryModal({ ...editSubcategoryModal, newName: e.target.value })}
+                className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                autoFocus
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEditSubcategoryModal({ open: false, categoryType: "", metadataId: 0, currentName: "", newName: "" })}
+              className="border-[#2a2a2a] text-gray-400 hover:text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                if (editSubcategoryModal.newName.trim()) {
+                  await updateDynamicSubcategoryName(
+                    editSubcategoryModal.categoryType,
+                    editSubcategoryModal.metadataId,
+                    editSubcategoryModal.newName.trim()
+                  );
+                  setEditSubcategoryModal({ open: false, categoryType: "", metadataId: 0, currentName: "", newName: "" });
+                }
+              }}
+              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              disabled={!editSubcategoryModal.newName.trim()}
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+// Dynamic Subcategory Row Component
+interface DynamicSubcategoryRowProps {
+  subcategory: any;
+  categoryType: string;
+  onEditName: () => void;
+  onDelete: () => void;
+  onUpdateValue: (categoryType: string, metadataId: number, month: number, value: number, subcategoryName: string) => Promise<void>;
+}
+
+function DynamicSubcategoryRow({
+  subcategory,
+  categoryType,
+  onEditName,
+  onDelete,
+  onUpdateValue,
+}: DynamicSubcategoryRowProps) {
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const { setEditingCell } = useIncomeExpense();
+  
+  const total = subcategory.values.reduce((sum: number, val: any) => sum + (val.value || 0), 0);
+  
+  const handleCellClick = (month: number, currentValue: number) => {
+    setEditingCell({
+      category: `dynamic-${categoryType}`,
+      field: `subcategory-${subcategory.id}`,
+      month,
+      value: currentValue,
+    });
+  };
+  
+  return (
+    <tr className="border-b border-[#1a1a1a] hover:bg-[#151515]">
+      <td className="sticky left-0 z-20 bg-[#0f0f0f] px-3 py-2 text-left text-gray-300 border-r border-[#1a1a1a] text-xs">
+        <div className="flex items-center gap-2">
+          <span>{subcategory.name}</span>
+          <button
+            onClick={onEditName}
+            className="text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+            title="Edit name"
+          >
+            <Pencil className="w-3 h-3" />
+          </button>
+          <button
+            onClick={onDelete}
+            className="text-red-400 hover:text-red-300 transition-colors"
+            title="Delete"
+          >
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
+      </td>
+      {MONTHS.map((_, i) => {
+        const month = i + 1;
+        const monthValue = subcategory.values.find((v: any) => v.month === month);
+        const value = monthValue?.value || 0;
+        
+        return (
+          <td key={month} className="border-l border-[#1a1a1a] px-2 py-2 text-right">
+            <span
+              onClick={() => handleCellClick(month, value)}
+              className={cn(
+                "cursor-pointer hover:bg-[#2a2a2a] px-2 py-1 rounded block text-xs text-right transition-colors",
+                value === 0 ? "text-gray-600" : "text-[#EAEB80]"
+              )}
+            >
+              ${value.toFixed(2)}
+            </span>
+          </td>
+        );
+      })}
+      <td className={cn(
+        "sticky right-0 z-20 border-l border-[#2a2a2a] px-2 py-2 text-right font-bold text-xs bg-[#1f1f1f]",
+        total === 0 ? "text-gray-600" : "text-[#EAEB80]"
+      )}>
+        ${total.toFixed(2)}
+      </td>
+    </tr>
   );
 }
 
@@ -780,9 +1334,10 @@ interface CategorySectionProps {
   isExpanded: boolean;
   onToggle: () => void;
   children: React.ReactNode;
+  hasActions?: boolean;
 }
 
-function CategorySection({ title, isExpanded, onToggle, children }: CategorySectionProps) {
+function CategorySection({ title, isExpanded, onToggle, children, hasActions = true }: CategorySectionProps) {
   return (
     <>
       <tr className="bg-[#1a1a1a] hover:bg-[#222]">
@@ -801,25 +1356,33 @@ function CategorySection({ title, isExpanded, onToggle, children }: CategorySect
 interface CategoryRowProps {
   label: string;
   values: number[];
+  percentageValues?: number[]; // For split rows, this stores the percentage
   category?: string;
   field?: string;
   isEditable?: boolean;
+  isEditablePerMonth?: (month: number) => boolean; // Function to determine if a specific month is editable
   isInteger?: boolean;
   isTotal?: boolean;
   formatType?: "managementSplit" | "ownerSplit";
   monthModes?: { [month: number]: 50 | 70 };
+  isPercentage?: boolean;
+  showAmountAndPercentage?: boolean; // Show both amount and percentage
 }
 
 function CategoryRow({
   label,
   values,
+  percentageValues,
   category,
   field,
   isEditable = true,
+  isEditablePerMonth,
   isInteger = false,
   isTotal = false,
   formatType,
   monthModes,
+  isPercentage = false,
+  showAmountAndPercentage = false,
 }: CategoryRowProps) {
   // Calculate total - ensure all values are numbers
   const total = values.reduce((sum, val) => {
@@ -829,10 +1392,17 @@ function CategoryRow({
 
   // Helper to format value based on formatType
   const formatValue = (value: number, month: number) => {
-    if (formatType === "managementSplit") {
+    if (showAmountAndPercentage && percentageValues) {
+      // Show both calculated amount and percentage
+      const percentage = percentageValues[month - 1] || 0;
+      return `$${value.toFixed(2)} (${percentage.toFixed(0)}%)`;
+    } else if (isPercentage) {
+      // Format as percentage: 50%
+      return `${value.toFixed(0)}%`;
+    } else if (formatType === "managementSplit") {
       // Get mode for this month to determine percentage
       const mode = monthModes?.[month] || 50;
-      const percentage = mode === 70 ? 30 : 50;
+      const percentage = mode === 70 ? 70 : 50; // 70:30 split when mode is 70 (Car Management : Car Owner)
       // Format: $ {splitAmount.toFixed(2)}({percentage}%)
       return `$ ${value.toFixed(2)}(${percentage}%)`;
     } else if (formatType === "ownerSplit") {
@@ -848,10 +1418,18 @@ function CategoryRow({
   // Format total based on formatType
   // For all currency values, format as: $ {total.toFixed(2)}
   const formatTotal = () => {
-    if (formatType === "managementSplit") {
+    if (showAmountAndPercentage && percentageValues) {
+      // Show both total amount and average percentage
+      const avgPercentage = percentageValues.reduce((sum, val) => sum + (val || 0), 0) / 12;
+      return `$${total.toFixed(2)} (${avgPercentage.toFixed(0)}%)`;
+    } else if (isPercentage) {
+      // For percentages, show average
+      const avg = total / 12;
+      return `${avg.toFixed(0)}%`;
+    } else if (formatType === "managementSplit") {
       // For management split, calculate average percentage or use default
       const avgMode = monthModes 
-        ? Object.values(monthModes).reduce((sum, mode) => sum + (mode === 70 ? 30 : 50), 0) / 12
+        ? Object.values(monthModes).reduce((sum, mode) => sum + (mode === 70 ? 70 : 50), 0) / 12 // 70:30 split when mode is 70
         : 50;
       return `$ ${total.toFixed(2)}(${Math.round(avgMode)}%)`;
     } else if (formatType === "ownerSplit") {
@@ -878,21 +1456,44 @@ function CategoryRow({
         const month = i + 1;
         // Ensure value is a number and handle null/undefined
         const cellValue = typeof value === 'number' && !isNaN(value) ? value : 0;
+        // Determine if this specific month is editable
+        const isMonthEditable = isEditablePerMonth ? isEditablePerMonth(month) : isEditable;
         
         return (
           <td 
             key={month} 
             className="border-l border-[#1a1a1a] px-2 py-2 text-right"
           >
-            {category && field && isEditable ? (
-              <EditableCell
-                value={cellValue}
-                month={month}
-                category={category}
-                field={field}
-                isEditable={isEditable}
-                isInteger={isInteger}
-              />
+            {category && field && isMonthEditable ? (
+              showAmountAndPercentage && percentageValues ? (
+                // For split rows, edit the percentage value
+                <>
+                  <div className="text-xs text-right">
+                    <span className={cn(cellValue === 0 && "text-gray-600")}>
+                      ${cellValue.toFixed(2)}
+                    </span>
+                  </div>
+                  <EditableCell
+                    value={percentageValues[month - 1] || 0}
+                    month={month}
+                    category={category}
+                    field={field}
+                    isEditable={isEditable}
+                    isInteger={false}
+                    isPercentage={true}
+                  />
+                </>
+              ) : (
+                <EditableCell
+                  value={cellValue}
+                  month={month}
+                  category={category}
+                  field={field}
+                  isEditable={isEditable}
+                  isInteger={isInteger}
+                  isPercentage={isPercentage}
+                />
+              )
             ) : (
               <span className={cn("text-xs text-right block", cellValue === 0 && "text-gray-600")}>
                 {formatValue(cellValue, month)}

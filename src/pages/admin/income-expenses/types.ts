@@ -129,6 +129,13 @@ export interface HistoryMonth {
   tripsTaken: number;
 }
 
+export interface DynamicSubcategory {
+  id: number;
+  name: string;
+  displayOrder: number;
+  values: Array<{ month: number; value: number }>;
+}
+
 export interface IncomeExpenseData {
   formulaSetting: FormulaSetting | null;
   incomeExpenses: IncomeExpenseMonth[];
@@ -138,6 +145,12 @@ export interface IncomeExpenseData {
   reimbursedBills: ReimbursedBillsMonth[];
   officeSupport: OfficeSupportMonth[];
   history: HistoryMonth[];
+  dynamicSubcategories?: {
+    directDelivery: DynamicSubcategory[];
+    cogs: DynamicSubcategory[];
+    parkingFeeLabor: DynamicSubcategory[];
+    reimbursedBills: DynamicSubcategory[];
+  };
 }
 
 export interface EditingCell {

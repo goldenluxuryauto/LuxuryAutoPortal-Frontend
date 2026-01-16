@@ -9,6 +9,7 @@ interface EditableCellProps {
   field: string;
   isEditable: boolean;
   isInteger?: boolean;
+  isPercentage?: boolean;
 }
 
 export default function EditableCell({
@@ -18,6 +19,7 @@ export default function EditableCell({
   field,
   isEditable,
   isInteger = false,
+  isPercentage = false,
 }: EditableCellProps) {
   const { setEditingCell, editingCell } = useIncomeExpense();
 
@@ -31,7 +33,11 @@ export default function EditableCell({
     setEditingCell({ category, field, month, value });
   };
 
-  const displayValue = isInteger ? value.toString() : `$${value.toFixed(2)}`;
+  const displayValue = isPercentage 
+    ? `${value.toFixed(0)}%` 
+    : isInteger 
+    ? value.toString() 
+    : `$${value.toFixed(2)}`;
 
   if (!isEditable) {
     return (
