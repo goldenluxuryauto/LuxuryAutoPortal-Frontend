@@ -1080,9 +1080,9 @@ export default function NADADepreciationPage() {
                                 : formatCurrency(row.current)}
                         </span>
                       </td>
-                        </tr>
-                      );
-                    })}
+                    </tr>
+                  );
+                })}
                     {/* Total Equity Row */}
                     <tr className="border-b border-[#2a2a2a] font-semibold">
                       <td className="px-3 py-2 text-sm text-[#EAEB80] sticky left-0 bg-[#151515] z-[50] border-r border-[#2a2a2a]">
