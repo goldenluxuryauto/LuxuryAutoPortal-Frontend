@@ -129,6 +129,11 @@ export interface HistoryMonth {
   tripsTaken: number;
 }
 
+export interface ParkingAirportQBMonth {
+  month: number;
+  totalParkingAirport: number;
+}
+
 export interface DynamicSubcategory {
   id: number;
   name: string;
@@ -145,6 +150,7 @@ export interface IncomeExpenseData {
   reimbursedBills: ReimbursedBillsMonth[];
   officeSupport: OfficeSupportMonth[];
   history: HistoryMonth[];
+  parkingAirportQB: ParkingAirportQBMonth[];
   dynamicSubcategories?: {
     directDelivery: DynamicSubcategory[];
     cogs: DynamicSubcategory[];

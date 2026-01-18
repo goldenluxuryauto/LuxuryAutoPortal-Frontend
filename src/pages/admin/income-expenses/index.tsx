@@ -18,6 +18,7 @@ import ModalEditCOGS from "./modals/ModalEditCOGS";
 import ModalEditParkingFeeLabor from "./modals/ModalEditParkingFeeLabor";
 import ModalEditReimbursedBills from "./modals/ModalEditReimbursedBills";
 import ModalEditHistory from "./modals/ModalEditHistory";
+import ModalEditParkingAirportQB from "./modals/ModalEditParkingAirportQB";
 import ModalEditDynamicSubcategory from "./modals/ModalEditDynamicSubcategory";
 
 interface IncomeExpensesPageProps {
@@ -45,7 +46,11 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   const [selectedCar, setSelectedCar] = useState<string>(
     carIdFromQuery ? String(carIdFromQuery) : "all"
   );
-  const [selectedYear, setSelectedYear] = useState<string>("2025");
+  
+  // Get current year and generate year options (past 5 years + current + future 2 years)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 8 }, (_, i) => currentYear - 5 + i);
+  const [selectedYear, setSelectedYear] = useState<string>(String(currentYear));
 
   // Update selected car when carIdFromQuery changes
   useEffect(() => {
@@ -184,10 +189,11 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                   <SelectValue placeholder="Year" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                  <SelectItem value="2026">2026</SelectItem>
-                  <SelectItem value="2025">2025</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
+                  {yearOptions.map((yr) => (
+                    <SelectItem key={yr} value={String(yr)}>
+                      {yr}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -296,6 +302,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           <ModalEditParkingFeeLabor />
           <ModalEditReimbursedBills />
           <ModalEditHistory />
+          <ModalEditParkingAirportQB />
           <ModalEditDynamicSubcategory />
         </div>
       </AdminLayout>

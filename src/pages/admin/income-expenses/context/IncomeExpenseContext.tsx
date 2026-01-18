@@ -154,8 +154,12 @@ function getEmptyData(): IncomeExpenseData {
     history: emptyMonthData.map((m) => ({
       ...m,
       daysRented: 0,
-      carsAvailableForRent: 1,
+      carsAvailableForRent: 0,
       tripsTaken: 0,
+    })),
+    parkingAirportQB: emptyMonthData.map((m) => ({
+      ...m,
+      totalParkingAirport: 0,
     })),
   };
 }
@@ -638,6 +642,7 @@ export function IncomeExpenseProvider({
       reimbursedBills: "/api/income-expense/reimbursed-bills",
       officeSupport: "/api/income-expense/office-support",
       history: "/api/income-expense/history",
+      parkingAirportQB: "/api/income-expense/parking-airport-qb",
     };
     return endpoints[category] || null;
   }

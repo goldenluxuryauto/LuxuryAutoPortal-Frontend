@@ -645,23 +645,23 @@ export function exportAllIncomeExpenseData(
   });
   csvContent += `YER,YER SPLIT,TOTAL\n`;
   
-  // Days Rented = Gas - Not Reimbursed (formula-based)
+  // Days Rented (manual entry)
   csvContent += `Days Rented,`;
   let daysRentedTotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
-    const value = Number(getMonthValue(data.reimbursedBills, monthNum, "gasNotReimbursed")) || 0;
+    const value = Number(getMonthValue(data.history, monthNum, "daysRented")) || 0;
     csvContent += `${Number(value)},`;
     daysRentedTotal += Number(value);
   });
   csvContent += `0,0,${daysRentedTotal}\n`;
   
-  // Cars Available For Rent = Gas - Service Run (formula-based)
+  // Cars Available For Rent (manual entry)
   csvContent += `Cars Available For Rent,`;
   let carsAvailableTotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
-    const value = Number(getMonthValue(data.reimbursedBills, monthNum, "gasServiceRun")) || 0;
+    const value = Number(getMonthValue(data.history, monthNum, "carsAvailableForRent")) || 0;
     csvContent += `${Number(value)},`;
     carsAvailableTotal += Number(value);
   });

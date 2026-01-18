@@ -155,25 +155,25 @@ export default function ImagePreview({
                     {file.name}
                   </span>
                   <div className="flex gap-1">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                       onClick={() => handleZoom(newImageUrls[index])}
                       className="h-7 w-7 p-0 bg-white/20 hover:bg-white/30 text-white"
-                    >
+                >
                       <ZoomIn className="w-3.5 h-3.5" />
-                    </Button>
+                </Button>
                     {onRemoveNew && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                         onClick={() => onRemoveNew(index)}
                         className="h-7 w-7 p-0 bg-red-500/80 hover:bg-red-600 text-white"
-                      >
+                >
                         <X className="w-3.5 h-3.5" />
-                      </Button>
+                </Button>
                     )}
                   </div>
                 </div>

@@ -35,6 +35,10 @@ export default function TableActions({
   const { data, monthModes, year, dynamicSubcategories } = useIncomeExpense();
   const queryClient = useQueryClient();
   
+  // Get current year and generate year options (past 5 years + current + future 2 years)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 8 }, (_, i) => currentYear - 5 + i);
+  
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -205,10 +209,11 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
             <SelectValue placeholder="Year" />
           </SelectTrigger>
           <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-            <SelectItem value="2026">2026</SelectItem>
-            <SelectItem value="2025">2025</SelectItem>
-            <SelectItem value="2024">2024</SelectItem>
-            <SelectItem value="2023">2023</SelectItem>
+            {yearOptions.map((yr) => (
+              <SelectItem key={yr} value={String(yr)}>
+                {yr}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 

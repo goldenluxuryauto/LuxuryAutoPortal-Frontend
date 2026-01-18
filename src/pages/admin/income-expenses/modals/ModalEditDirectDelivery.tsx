@@ -1,5 +1,5 @@
 // Modal for OPERATING EXPENSE (Direct Delivery) category
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,7 @@ import { useIncomeExpense } from "../context/IncomeExpenseContext";
 import ImagePreview from "../components/ImagePreview";
 import { Upload, Image as ImageIcon } from "lucide-react";
 import { useImageUpload } from "../utils/useImageUpload";
+import { buildApiUrl } from "@/lib/queryClient";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -45,6 +46,27 @@ export default function ModalEditDirectDelivery() {
     editingCell?.month || 1
   );
 
+  // Load remarks when modal opens
+  useEffect(() => {
+    if (isOpen && editingCell) {
+      const loadRemarks = async () => {
+        try {
+          const response = await fetch(
+            buildApiUrl(`/api/income-expense/remarks?carId=${carId}&year=${year}&month=${editingCell.month}&category=${editingCell.category}&field=${editingCell.field}`),
+            { credentials: "include" }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setRemarks(data.remarks || "");
+          }
+        } catch (error) {
+          // Failed to load remarks
+        }
+      };
+      loadRemarks();
+    }
+  }, [isOpen, editingCell, carId, year]);
+
   const handleClose = () => {
     setEditingCell(null);
     setRemarks("");
@@ -55,6 +77,21 @@ export default function ModalEditDirectDelivery() {
     if (!editingCell) return;
     
     try {
+      // Save remarks
+      await fetch(buildApiUrl("/api/income-expense/remarks"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          carId,
+          year: parseInt(year),
+          month: editingCell.month,
+          category: editingCell.category,
+          field: editingCell.field,
+          remarks: remarks.trim(),
+        }),
+      });
+
       // Upload images first if there are any new ones
       if (imageFiles.length > 0) {
         await uploadImages();
@@ -68,7 +105,7 @@ export default function ModalEditDirectDelivery() {
         value: editingCell.value,
       });
     } catch (error) {
-      // Error already handled in uploadImages
+      // Error already handled in uploadImages or fetch
       console.error("Error saving:", error);
     }
   };
