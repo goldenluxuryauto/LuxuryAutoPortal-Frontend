@@ -71,6 +71,24 @@ interface CarDetail {
   turoLink?: string | null;
   adminTuroLink?: string | null;
   managementStatus?: "management" | "own" | "off_ride";
+  // Vehicle Information fields from car table
+  interiorColor?: string | null;
+  vehicleTrim?: string | null;
+  vehicleRecall?: string | null;
+  numberOfSeats?: string | null;
+  numberOfDoors?: string | null;
+  skiRacks?: string | null;
+  skiCrossBars?: string | null;
+  roofRails?: string | null;
+  freeDealershipOilChanges?: string | null;
+  oilPackageDetails?: string | null;
+  dealershipAddress?: string | null;
+  vehicleFeatures?: string | string[] | null;
+  tireSize?: string | null;
+  oilType?: string | null;
+  lastOilChange?: string | null;
+  fuelType?: string | null;
+  registrationExpiration?: string | null;
 }
 
 const carSchema = z.object({
@@ -682,11 +700,12 @@ export default function CarDetailPage() {
 
   const deletePhotoMutation = useMutation({
     mutationFn: async (photoPath: string) => {
-      // Extract filename from path (e.g., "car-photos/1/filename.jpg" -> "filename.jpg")
-      const filename = photoPath.split("/").pop() || photoPath;
+      // Send the full photo path/URL to backend for proper matching
+      // Backend will handle extraction of filename and matching
+      // Use encodeURIComponent to safely encode URLs and paths
       const response = await fetch(
         buildApiUrl(
-          `/api/cars/${carId}/photos/${encodeURIComponent(filename)}`
+          `/api/cars/${carId}/photos/${encodeURIComponent(photoPath)}`
         ),
         {
           method: "DELETE",
@@ -726,10 +745,12 @@ export default function CarDetailPage() {
       
       for (const photoPath of photoPaths) {
         try {
-          const filename = photoPath.split("/").pop() || photoPath;
+          // Send the full photo path/URL to backend for proper matching
+          // Extract a short identifier for error messages
+          const shortId = photoPath.split("/").pop()?.split("?")[0] || photoPath.substring(0, 50);
           const response = await fetch(
             buildApiUrl(
-              `/api/cars/${carId}/photos/${encodeURIComponent(filename)}`
+              `/api/cars/${carId}/photos/${encodeURIComponent(photoPath)}`
             ),
             {
               method: "DELETE",
@@ -739,14 +760,14 @@ export default function CarDetailPage() {
           
           if (!response.ok) {
             const error = await response.json();
-            errors.push(`${filename}: ${error.error || "Failed to delete"}`);
+            errors.push(`${shortId}: ${error.error || "Failed to delete"}`);
           } else {
             const result = await response.json();
             results.push(result);
           }
         } catch (error: any) {
-          const filename = photoPath.split("/").pop() || photoPath;
-          errors.push(`${filename}: ${error.message || "Failed to delete"}`);
+          const shortId = photoPath.split("/").pop()?.split("?")[0] || photoPath.substring(0, 50);
+          errors.push(`${shortId}: ${error.message || "Failed to delete"}`);
         }
       }
       
@@ -906,44 +927,70 @@ export default function CarDetailPage() {
       }
     }
     
+    // Helper function to format date for date input fields (YYYY-MM-DD)
+    const formatDateForInput = (dateValue: any): string => {
+      if (!dateValue) return "";
+      try {
+        // Handle various date formats
+        const date = new Date(dateValue);
+        if (isNaN(date.getTime())) return "";
+        return date.toISOString().split('T')[0];
+      } catch {
+        // If it's already in YYYY-MM-DD format, return as is
+        if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+          return dateValue;
+        }
+        return "";
+      }
+    };
+
+    // Helper function to safely convert number to string
+    const numToString = (value: any): string => {
+      if (value === null || value === undefined) return "";
+      if (typeof value === 'number') return value.toString();
+      if (typeof value === 'string') return value;
+      return String(value || "");
+    };
+
     form.reset({
-      vin: car.vin,
-      makeModel: car.makeModel,
+      vin: car.vin || "",
+      makeModel: car.makeModel || "",
       licensePlate: car.licensePlate || "",
-      year: car.year?.toString() || "",
+      year: numToString(car.year),
       color: car.color || "",
-      mileage: car.mileage?.toString() || "",
+      // Mileage: Check both onboarding.vehicleMiles and car.mileage (onboarding takes precedence)
+      mileage: numToString(onboarding?.vehicleMiles || car.mileage),
       // Extended Vehicle Information
       vehicleTrim: onboarding?.vehicleTrim || "",
-      interiorColor: onboarding?.interiorColor || "",
-      registrationExpiration: onboarding?.registrationExpiration || "",
+      interiorColor: onboarding?.interiorColor || car.interiorColor || "",
+      registrationExpiration: formatDateForInput(onboarding?.registrationExpiration),
       vehicleRecall: onboarding?.vehicleRecall || "",
-      numberOfSeats: onboarding?.numberOfSeats || "",
-      numberOfDoors: onboarding?.numberOfDoors || "",
+      numberOfSeats: numToString(onboarding?.numberOfSeats),
+      numberOfDoors: numToString(onboarding?.numberOfDoors),
       skiRacks: onboarding?.skiRacks || "",
       skiCrossBars: onboarding?.skiCrossBars || "",
       roofRails: onboarding?.roofRails || "",
-      oilType: onboarding?.oilType || "",
-      lastOilChange: onboarding?.lastOilChange || "",
+      oilType: onboarding?.oilType || car.oilType || "",
+      lastOilChange: onboarding?.lastOilChange || car.lastOilChange || "",
       freeDealershipOilChanges: onboarding?.freeDealershipOilChanges || "",
       oilPackageDetails: (onboarding as any)?.oilPackageDetails || "",
       dealershipAddress: (onboarding as any)?.dealershipAddress || "",
-      fuelType: onboarding?.fuelType || "",
-      tireSize: onboarding?.tireSize || "",
+      fuelType: onboarding?.fuelType || car.fuelType || "",
+      tireSize: onboarding?.tireSize || car.tireSize || "",
       vehicleFeatures: vehicleFeaturesValue,
       // Financial Information
-      purchasePrice: onboarding?.purchasePrice || "",
-      downPayment: onboarding?.downPayment || "",
-      monthlyPayment: onboarding?.monthlyPayment || "",
-      interestRate: onboarding?.interestRate || "",
+      purchasePrice: onboarding?.purchasePrice ? numToString(onboarding.purchasePrice) : "",
+      downPayment: onboarding?.downPayment ? numToString(onboarding.downPayment) : "",
+      monthlyPayment: onboarding?.monthlyPayment ? numToString(onboarding.monthlyPayment) : "",
+      interestRate: onboarding?.interestRate ? numToString(onboarding.interestRate) : "",
       transportCityToCity: onboarding?.transportCityToCity || "",
       ultimateGoal: onboarding?.ultimateGoal || "",
       // Insurance Information
       insuranceProvider: onboarding?.insuranceProvider || "",
       insurancePhone: onboarding?.insurancePhone || "",
       policyNumber: onboarding?.policyNumber || "",
-      insuranceExpiration: onboarding?.insuranceExpiration || "",
-      // Additional Information
+      insuranceExpiration: formatDateForInput(onboarding?.insuranceExpiration),
+      // Additional Information (Car Login)
       carManufacturerWebsite: onboarding?.carManufacturerWebsite || "",
       carManufacturerUsername: onboarding?.carManufacturerUsername || "",
       password: onboarding?.password || "",
@@ -955,7 +1002,7 @@ export default function CarDetailPage() {
       // Management Status
       managementStatus: (car.managementStatus || "own") as "management" | "own" | "off_ride",
       // Offboarding Information
-      offboardAt: car.offboardAt ? new Date(car.offboardAt).toISOString().split('T')[0] : "",
+      offboardAt: formatDateForInput(car.offboardAt),
       offboardReason: (car.offboardReason || undefined) as "sold" | "damaged" | "end_lease" | "other" | undefined,
       offboardNote: car.offboardNote || "",
       // Documents
@@ -1266,11 +1313,11 @@ export default function CarDetailPage() {
                 </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Trim</p>
-                    <p className="text-white text-base">{onboarding?.vehicleTrim ? formatValue(onboarding.vehicleTrim) : "N/A"}</p>
+                    <p className="text-white text-base">{car.vehicleTrim ? formatValue(car.vehicleTrim) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Mileage</p>
-                    <p className="text-white text-base">{onboarding?.vehicleMiles ? formatValue(onboarding.vehicleMiles) : (car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A")}</p>
+                    <p className="text-white text-base">{car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A"}</p>
                   </div>
                 </div>
 
@@ -1278,27 +1325,27 @@ export default function CarDetailPage() {
                 <div className="space-y-4">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Exterior Color</p>
-                    <p className="text-white text-base">{onboarding?.exteriorColor ? formatValue(onboarding.exteriorColor) : (car.color || "N/A")}</p>
+                    <p className="text-white text-base">{car.color ? formatValue(car.color) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Interior Color</p>
-                    <p className="text-white text-base">{onboarding?.interiorColor ? formatValue(onboarding.interiorColor) : "N/A"}</p>
+                    <p className="text-white text-base">{car.interiorColor ? formatValue(car.interiorColor) : "N/A"}</p>
                   </div>
                 <div>
                     <p className="text-xs text-gray-500 mb-1">Fuel Type</p>
-                    <p className="text-white text-base">{onboarding?.fuelType ? formatValue(onboarding.fuelType) : "N/A"}</p>
+                    <p className="text-white text-base">{car.fuelType ? formatValue(car.fuelType) : "N/A"}</p>
                 </div>
                 <div>
                     <p className="text-xs text-gray-500 mb-1">Tire Size</p>
-                    <p className="text-white text-base">{onboarding?.tireSize ? formatValue(onboarding.tireSize) : "N/A"}</p>
+                    <p className="text-white text-base">{car.tireSize ? formatValue(car.tireSize) : "N/A"}</p>
                 </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Number of Doors</p>
-                    <p className="text-white text-base">{onboarding?.numberOfDoors ? formatValue(onboarding.numberOfDoors) : "N/A"}</p>
+                    <p className="text-white text-base">{car.numberOfDoors ? formatValue(car.numberOfDoors) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Number of Seats</p>
-                    <p className="text-white text-base">{onboarding?.numberOfSeats ? formatValue(onboarding.numberOfSeats) : "N/A"}</p>
+                    <p className="text-white text-base">{car.numberOfSeats ? formatValue(car.numberOfSeats) : "N/A"}</p>
                   </div>
                   </div>
 
@@ -1306,41 +1353,37 @@ export default function CarDetailPage() {
                 <div className="space-y-4">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Oil Type</p>
-                    <p className="text-white text-base">{onboarding?.oilType ? formatValue(onboarding.oilType) : "N/A"}</p>
+                    <p className="text-white text-base">{car.oilType ? formatValue(car.oilType) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Last Oil Change</p>
-                    <p className="text-white text-base">{onboarding?.lastOilChange ? formatValue(onboarding.lastOilChange) : "N/A"}</p>
+                    <p className="text-white text-base">{car.lastOilChange ? formatValue(car.lastOilChange) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Does Your Vehicle Have Free Dealership Oil Changes?</p>
-                    <p className="text-white text-base">{onboarding?.freeDealershipOilChanges ? formatValue(onboarding.freeDealershipOilChanges) : "N/A"}</p>
+                    <p className="text-white text-base">{car.freeDealershipOilChanges ? formatValue(car.freeDealershipOilChanges) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">If Yes, For How Many Years of Oil Changes, or What Oil Package</p>
                     <p className="text-white text-base">
-                      {onboarding?.freeDealershipOilChanges === "Yes" 
-                        ? ((onboarding as any)?.oilPackageDetails ? formatValue((onboarding as any).oilPackageDetails) : "N/A")
+                      {car.freeDealershipOilChanges === "Yes" 
+                        ? (car.oilPackageDetails ? formatValue(car.oilPackageDetails) : "N/A")
                         : "N/A"}
                     </p>
                   </div>
-                  {(onboarding as any)?.dealershipAddress && (
+                  {car.dealershipAddress && (
                 <div>
                       <p className="text-xs text-gray-500 mb-1">Dealership Address</p>
-                      <p className="text-white text-base">{formatValue((onboarding as any).dealershipAddress)}</p>
+                      <p className="text-white text-base">{formatValue(car.dealershipAddress)}</p>
                 </div>
                   )}
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Registration Expiration</p>
-                    <p className="text-white text-base">{onboarding?.registrationExpiration ? formatValue(onboarding.registrationExpiration) : "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Vehicle Ownership</p>
-                    <p className="text-white text-base">{onboarding?.titleType ? formatValue(onboarding.titleType) : "N/A"}</p>
+                    <p className="text-white text-base">{car.registrationExpiration ? formatValue(car.registrationExpiration) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Vehicle Recall</p>
-                    <p className="text-white text-base">{onboarding?.vehicleRecall ? formatValue(onboarding.vehicleRecall) : "N/A"}</p>
+                    <p className="text-white text-base">{car.vehicleRecall ? formatValue(car.vehicleRecall) : "N/A"}</p>
                   </div>
                 </div>
               </div>
@@ -1350,15 +1393,15 @@ export default function CarDetailPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Roof Rails</p>
-                    <p className="text-white text-base">{onboarding?.roofRails ? formatValue(onboarding.roofRails) : "N/A"}</p>
+                    <p className="text-white text-base">{car.roofRails ? formatValue(car.roofRails) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Ski Crossbars</p>
-                    <p className="text-white text-base">{onboarding?.skiCrossBars ? formatValue(onboarding.skiCrossBars) : "N/A"}</p>
+                    <p className="text-white text-base">{car.skiCrossBars ? formatValue(car.skiCrossBars) : "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Ski Rack</p>
-                    <p className="text-white text-base">{onboarding?.skiRacks ? formatValue(onboarding.skiRacks) : "N/A"}</p>
+                    <p className="text-white text-base">{car.skiRacks ? formatValue(car.skiRacks) : "N/A"}</p>
                   </div>
               </div>
               </div>
@@ -1367,10 +1410,10 @@ export default function CarDetailPage() {
               <div className="pt-4 border-t border-[#2a2a2a]">
                 <p className="text-xs text-gray-500 mb-1">Features</p>
                 <p className="text-white text-base">
-                  {onboarding?.vehicleFeatures && Array.isArray(onboarding.vehicleFeatures) && onboarding.vehicleFeatures.length > 0
-                    ? onboarding.vehicleFeatures.join(", ")
-                    : (onboarding?.vehicleFeatures && typeof onboarding.vehicleFeatures === 'string'
-                      ? onboarding.vehicleFeatures
+                  {car.vehicleFeatures && Array.isArray(car.vehicleFeatures) && car.vehicleFeatures.length > 0
+                    ? car.vehicleFeatures.join(", ")
+                    : (car.vehicleFeatures && typeof car.vehicleFeatures === 'string'
+                      ? car.vehicleFeatures
                       : "N/A")}
                 </p>
               </div>
