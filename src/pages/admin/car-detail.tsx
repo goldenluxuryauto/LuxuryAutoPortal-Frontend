@@ -2838,12 +2838,27 @@ export default function CarDetailPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-gray-400">Fuel Type</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectValue placeholder="Select fuel type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Regular">Regular</SelectItem>
+                            <SelectItem value="Premium">Premium</SelectItem>
+                            <SelectItem value="Premium 91 Unleaded">Premium 91 Unleaded</SelectItem>
+                            <SelectItem value="Regular Unleaded">Regular Unleaded</SelectItem>
+                            <SelectItem value="91 Unleaded">91 Unleaded</SelectItem>
+                            <SelectItem value="Gasoline">Gasoline</SelectItem>
+                            <SelectItem value="Electric">Electric</SelectItem>
+                            <SelectItem value="Diesel">Diesel</SelectItem>
+                            <SelectItem value="Others">Others</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}

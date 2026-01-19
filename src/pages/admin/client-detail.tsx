@@ -2644,9 +2644,15 @@ export default function ClientDetailPage() {
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Regular">Regular</SelectItem>
+                      <SelectItem value="Premium">Premium</SelectItem>
+                      <SelectItem value="Premium 91 Unleaded">Premium 91 Unleaded</SelectItem>
+                      <SelectItem value="Regular Unleaded">Regular Unleaded</SelectItem>
+                      <SelectItem value="91 Unleaded">91 Unleaded</SelectItem>
                       <SelectItem value="Gasoline">Gasoline</SelectItem>
-                      <SelectItem value="Diesel">Diesel</SelectItem>
                       <SelectItem value="Electric">Electric</SelectItem>
+                      <SelectItem value="Diesel">Diesel</SelectItem>
+                      <SelectItem value="Others">Others</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
