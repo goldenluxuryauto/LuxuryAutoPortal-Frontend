@@ -86,7 +86,17 @@ export function getProxiedImageUrl(url: string): string {
   // If it's a GCS URL (storage.googleapis.com), proxy it through the backend
   if (url.startsWith("https://storage.googleapis.com/")) {
     const encodedUrl = encodeURIComponent(url);
-    return buildApiUrl(`/api/gcs-image-proxy?url=${encodedUrl}`);
+    const proxyUrl = buildApiUrl(`/api/gcs-image-proxy?url=${encodedUrl}`);
+    
+    // Debug logging in development
+    if (import.meta.env.DEV) {
+      console.log(`[IMAGE PROXY] Converting GCS URL to proxy:`, {
+        original: url.substring(0, 100) + '...',
+        proxy: proxyUrl.substring(0, 100) + '...'
+      });
+    }
+    
+    return proxyUrl;
   }
 
   // For other URLs (http/https), return as-is
