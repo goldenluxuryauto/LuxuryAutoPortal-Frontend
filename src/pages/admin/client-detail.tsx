@@ -1140,10 +1140,16 @@ export default function ClientDetailPage() {
                                   <span className="text-white">{formatValue(data.businessName)}</span>
                                 </div>
                               )}
-                              {data.ein && data.taxClassification === "business" && (
+                              {data.ein && (
                                 <div>
                                   <span className="text-gray-400 block mb-1">EIN:</span>
                                   <span className="text-white font-mono">{formatValue(data.ein)}</span>
+                                </div>
+                              )}
+                              {data.ssn && (
+                                <div>
+                                  <span className="text-gray-400 block mb-1">SSN:</span>
+                                  <span className="text-white font-mono">{formatValue(data.ssn)}</span>
                                 </div>
                               )}
                             </div>
@@ -2644,9 +2650,15 @@ export default function ClientDetailPage() {
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Regular">Regular</SelectItem>
+                      <SelectItem value="Premium">Premium</SelectItem>
+                      <SelectItem value="Premium 91 Unleaded">Premium 91 Unleaded</SelectItem>
+                      <SelectItem value="Regular Unleaded">Regular Unleaded</SelectItem>
+                      <SelectItem value="91 Unleaded">91 Unleaded</SelectItem>
                       <SelectItem value="Gasoline">Gasoline</SelectItem>
-                      <SelectItem value="Diesel">Diesel</SelectItem>
                       <SelectItem value="Electric">Electric</SelectItem>
+                      <SelectItem value="Diesel">Diesel</SelectItem>
+                      <SelectItem value="Others">Others</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

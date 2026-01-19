@@ -146,12 +146,13 @@ export default function CarsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Get current user to check if admin
-  const { data: userData } = useQuery<{ user?: { isAdmin?: boolean } }>({
+  // Get current user to check role
+  const { data: userData } = useQuery<{ user?: { isAdmin?: boolean; isClient?: boolean } }>({
     queryKey: ["/api/auth/me"],
     retry: false,
   });
   const isAdmin = userData?.user?.isAdmin === true;
+  const isClient = userData?.user?.isClient === true;
 
   const form = useForm<CarFormData>({
     resolver: zodResolver(carSchema),
@@ -188,9 +189,115 @@ export default function CarsPage() {
       totalPages: number;
     };
   }>({
-    queryKey: ["/api/cars", statusFilter, searchQuery, page, itemsPerPage],
+    queryKey: isClient
+      ? ["/api/client/cars", statusFilter, searchQuery, page, itemsPerPage]
+      : ["/api/cars", statusFilter, searchQuery, page, itemsPerPage],
     placeholderData: keepPreviousData,
     queryFn: async () => {
+      if (isClient) {
+        const includeReturned = statusFilter === "all" ? "true" : "false";
+        const url = buildApiUrl(`/api/client/cars?includeReturned=${includeReturned}`);
+        const response = await fetch(url, { credentials: "include" });
+        if (!response.ok) {
+          const errorData = await response
+            .json()
+            .catch(() => ({ error: "Failed to fetch client cars" }));
+          throw new Error(errorData.error || "Failed to fetch client cars");
+        }
+        const result = await response.json();
+        const clientCars = Array.isArray(result?.data) ? result.data : [];
+
+        const mapClientStatus = (carStatus?: string, isActive?: boolean): "ACTIVE" | "INACTIVE" => {
+          if (carStatus === "off_fleet") return "INACTIVE";
+          if (carStatus === "available" || carStatus === "in_use" || carStatus === "pending") return "ACTIVE";
+          return isActive ? "ACTIVE" : "INACTIVE";
+        };
+
+        const parsePhotos = (rawPhoto: unknown): string[] => {
+          if (!rawPhoto) return [];
+          if (Array.isArray(rawPhoto)) {
+            return rawPhoto.filter((item) => typeof item === "string") as string[];
+          }
+          if (typeof rawPhoto === "string") {
+            try {
+              const parsed = JSON.parse(rawPhoto);
+              if (Array.isArray(parsed)) {
+                return parsed.filter((item) => typeof item === "string") as string[];
+              }
+              if (typeof parsed === "string") {
+                return [parsed];
+              }
+            } catch {
+              return [rawPhoto];
+            }
+            return [rawPhoto];
+          }
+          return [];
+        };
+
+        const normalizedCars: Car[] = clientCars.map((car: any) => ({
+          id: car.id,
+          vin: car.vin || "",
+          makeModel: car.makeModel || [car.make, car.model, car.year].filter(Boolean).join(" ") || "N/A",
+          make: car.make || null,
+          model: car.model || null,
+          licensePlate: car.plateNumber || null,
+          year: car.year || null,
+          color: null,
+          mileage: typeof car.mileage === "number" ? car.mileage : 0,
+          status: mapClientStatus(car.carStatus, car.isActive),
+          photos: parsePhotos(car.photo),
+          offboardReason: null,
+          offboardNote: null,
+          offboardAt: car.returnedAt || null,
+          tireSize: car.tireSize || null,
+          oilType: car.oilType || null,
+          lastOilChange: null,
+          fuelType: car.fuelType || null,
+          turoLink: car.turoLink || null,
+          adminTuroLink: car.adminTuroLink || null,
+          isActive: car.isActive ? 1 : 0,
+          managementStatus: undefined,
+          contactPhone: car.contactPhone || null,
+          owner: car.ownerFirstName || car.ownerLastName
+            ? {
+                firstName: car.ownerFirstName || "",
+                lastName: car.ownerLastName || "",
+                email: null,
+                phone: car.contactPhone || null,
+              }
+            : null,
+        }));
+
+        const normalizedSearch = searchQuery.trim().toLowerCase();
+        const matchesSearch = (car: Car) =>
+          !normalizedSearch ||
+          car.makeModel.toLowerCase().includes(normalizedSearch) ||
+          (car.licensePlate || "").toLowerCase().includes(normalizedSearch);
+
+        const matchesStatus = (car: Car) => {
+          if (statusFilter === "all") return true;
+          return car.status === statusFilter;
+        };
+
+        const filteredCars = normalizedCars.filter((car) => matchesSearch(car) && matchesStatus(car));
+        const total = filteredCars.length;
+        const totalPages = Math.max(1, Math.ceil(total / itemsPerPage));
+        const startIndex = (page - 1) * itemsPerPage;
+        const paginatedCars = filteredCars.slice(startIndex, startIndex + itemsPerPage);
+
+        return {
+          success: true,
+          data: paginatedCars,
+          pagination: {
+            page,
+            limit: itemsPerPage,
+            total,
+            totalPages,
+          },
+        };
+      }
+
       const params = new URLSearchParams();
       if (statusFilter !== "all") {
         params.append("status", statusFilter);
@@ -212,6 +319,7 @@ export default function CarsPage() {
       }
       return response.json();
     },
+    enabled: !!userData?.user,
     retry: false,
   });
 
@@ -1130,13 +1238,27 @@ export default function CarsPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-gray-400">Fuel Type</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                            placeholder="Premium"
-                          />
-                        </FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectValue placeholder="Select fuel type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Regular">Regular</SelectItem>
+                            <SelectItem value="Premium">Premium</SelectItem>
+                            <SelectItem value="Premium 91 Unleaded">Premium 91 Unleaded</SelectItem>
+                            <SelectItem value="Regular Unleaded">Regular Unleaded</SelectItem>
+                            <SelectItem value="91 Unleaded">91 Unleaded</SelectItem>
+                            <SelectItem value="Gasoline">Gasoline</SelectItem>
+                            <SelectItem value="Electric">Electric</SelectItem>
+                            <SelectItem value="Diesel">Diesel</SelectItem>
+                            <SelectItem value="Others">Others</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}

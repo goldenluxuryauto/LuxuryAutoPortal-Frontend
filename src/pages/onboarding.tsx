@@ -1099,23 +1099,15 @@ export default function Onboarding() {
                                   <FormLabel className="text-gray-300">
                                     Number of Seats *
                                   </FormLabel>
-                                  <Select
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                  >
-                                    <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
-                                        <SelectValue placeholder="Select" />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                      {[2, 4, 5, 6, 7, 8].map((n) => (
-                                        <SelectItem key={n} value={String(n)}>
-                                          {n}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      min="1"
+                                      placeholder="e.g., 5"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -1128,20 +1120,15 @@ export default function Onboarding() {
                                   <FormLabel className="text-gray-300">
                                     Number of Doors *
                                   </FormLabel>
-                                  <Select
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                  >
-                                    <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
-                                        <SelectValue placeholder="Select" />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                      <SelectItem value="2">2</SelectItem>
-                                      <SelectItem value="4">4</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      min="1"
+                                      placeholder="e.g., 4"
+                                      className="bg-[#0a0a0a] border-gray-700"
+                                    />
+                                  </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -1370,15 +1357,15 @@ export default function Onboarding() {
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                      <SelectItem value="Gasoline">
-                                        Gasoline
-                                      </SelectItem>
-                                      <SelectItem value="Diesel">
-                                        Diesel
-                                      </SelectItem>
-                                      <SelectItem value="Electric">
-                                        Electric
-                                      </SelectItem>
+                                      <SelectItem value="Regular">Regular</SelectItem>
+                                      <SelectItem value="Premium">Premium</SelectItem>
+                                      <SelectItem value="Premium 91 Unleaded">Premium 91 Unleaded</SelectItem>
+                                      <SelectItem value="Regular Unleaded">Regular Unleaded</SelectItem>
+                                      <SelectItem value="91 Unleaded">91 Unleaded</SelectItem>
+                                      <SelectItem value="Gasoline">Gasoline</SelectItem>
+                                      <SelectItem value="Electric">Electric</SelectItem>
+                                      <SelectItem value="Diesel">Diesel</SelectItem>
+                                      <SelectItem value="Others">Others</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <FormMessage />

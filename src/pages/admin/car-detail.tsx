@@ -1650,12 +1650,25 @@ export default function CarDetailPage() {
                               src={photoUrl}
                               alt={`Car photo ${index + 1}`}
                               className="w-full h-full object-contain"
-                              crossOrigin="anonymous"
-                              
                               onError={(e) => {
                                 console.error('❌ [CAR DETAIL] Failed to load photo:', photoUrl);
                                 console.error('   Original photo:', photo);
                                 console.error('   API Base URL:', import.meta.env.VITE_API_URL || 'Not set');
+                                console.error('   Photo URL type:', photo?.startsWith('https://storage.googleapis.com/') ? 'GCS' : 'Other');
+                                console.error('   Proxy URL:', photoUrl);
+                                
+                                // Try to fetch the image directly to see what error we get
+                                if (photoUrl && photoUrl.includes('/api/gcs-image-proxy')) {
+                                  fetch(photoUrl)
+                                    .then(res => {
+                                      console.error('   Proxy response status:', res.status);
+                                      console.error('   Proxy response headers:', Object.fromEntries(res.headers.entries()));
+                                      return res.text();
+                                    })
+                                    .then(text => console.error('   Proxy response body:', text.substring(0, 200)))
+                                    .catch(err => console.error('   Proxy fetch error:', err));
+                                }
+                                
                                 // Don't hide the image - keep it visible but show error state
                                 const img = e.target as HTMLImageElement;
                                 img.style.opacity = '0.3';
@@ -2287,7 +2300,6 @@ export default function CarDetailPage() {
                               ? "border-[#EAEB80] opacity-80"
                               : "border-[#2a2a2a] group-hover:border-[#EAEB80]/50"
                           )}
-                      crossOrigin="anonymous"
                       onError={(e) => {
                        // Don't hide the image - keep it visible but show error state
                         const img = e.target as HTMLImageElement;
@@ -2826,12 +2838,27 @@ export default function CarDetailPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-gray-400">Fuel Type</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
-                          />
-                        </FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectValue placeholder="Select fuel type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Regular">Regular</SelectItem>
+                            <SelectItem value="Premium">Premium</SelectItem>
+                            <SelectItem value="Premium 91 Unleaded">Premium 91 Unleaded</SelectItem>
+                            <SelectItem value="Regular Unleaded">Regular Unleaded</SelectItem>
+                            <SelectItem value="91 Unleaded">91 Unleaded</SelectItem>
+                            <SelectItem value="Gasoline">Gasoline</SelectItem>
+                            <SelectItem value="Electric">Electric</SelectItem>
+                            <SelectItem value="Diesel">Diesel</SelectItem>
+                            <SelectItem value="Others">Others</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
