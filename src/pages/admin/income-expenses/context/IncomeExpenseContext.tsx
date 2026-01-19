@@ -270,12 +270,13 @@ export function IncomeExpenseProvider({
 
   const addDynamicSubcategory = async (categoryType: string, name: string) => {
     try {
+      // Add subcategory globally (applies to all cars)
       const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/add"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          carId,
+          carId, // Optional - if provided, initializes values for this car
           year: parseInt(year),
           categoryType,
           subcategoryName: name,
@@ -287,7 +288,7 @@ export function IncomeExpenseProvider({
       await fetchDynamicSubcategories();
       toast({
         title: "Success",
-        description: "Subcategory added successfully",
+        description: "Subcategory added globally (applies to all cars)",
       });
     } catch (error: any) {
       toast({
@@ -301,6 +302,7 @@ export function IncomeExpenseProvider({
 
   const updateDynamicSubcategoryName = async (categoryType: string, metadataId: number, newName: string) => {
     try {
+      // Update subcategory name globally (affects all cars)
       const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/update-name"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -308,7 +310,7 @@ export function IncomeExpenseProvider({
         body: JSON.stringify({
           metadataId,
           newName,
-          carId,
+          carId, // Optional - if provided, returns updated list for this car
           year: parseInt(year),
           categoryType,
         }),
@@ -319,7 +321,7 @@ export function IncomeExpenseProvider({
       await fetchDynamicSubcategories();
       toast({
         title: "Success",
-        description: "Subcategory name updated successfully",
+        description: "Subcategory name updated globally (affects all cars)",
       });
     } catch (error: any) {
       toast({
@@ -333,6 +335,7 @@ export function IncomeExpenseProvider({
 
   const deleteDynamicSubcategory = async (categoryType: string, metadataId: number) => {
     try {
+      // Delete subcategory globally (removes from all cars)
       const response = await fetch(
         buildApiUrl(`/api/income-expense/dynamic-subcategories/${metadataId}?carId=${carId}&year=${year}&categoryType=${categoryType}`),
         {
@@ -346,7 +349,7 @@ export function IncomeExpenseProvider({
       await fetchDynamicSubcategories();
       toast({
         title: "Success",
-        description: "Subcategory deleted successfully",
+        description: "Subcategory deleted globally (removed from all cars)",
       });
     } catch (error: any) {
       toast({

@@ -127,25 +127,25 @@ export function useImageUpload(carId: number, year: string, category: string, fi
     try {
       // Upload new images
       if (imageFiles.length > 0) {
-        const formData = new FormData();
-        imageFiles.forEach((file) => {
-          formData.append("images", file);
-        });
-        formData.append("carId", carId.toString());
-        formData.append("year", year);
-        formData.append("month", month.toString());
-        formData.append("category", category);
-        formData.append("field", field);
+      const formData = new FormData();
+      imageFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+      formData.append("carId", carId.toString());
+      formData.append("year", year);
+      formData.append("month", month.toString());
+      formData.append("category", category);
+      formData.append("field", field);
 
-        const response = await fetch(buildApiUrl("/api/income-expense/images/upload"), {
-          method: "POST",
-          credentials: "include",
-          body: formData,
-        });
+      const response = await fetch(buildApiUrl("/api/income-expense/images/upload"), {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
 
-        if (!response.ok) {
-          throw new Error("Failed to upload images");
-        }
+      if (!response.ok) {
+        throw new Error("Failed to upload images");
+      }
 
         // Refresh existing images after upload
         await fetchExistingImages();
