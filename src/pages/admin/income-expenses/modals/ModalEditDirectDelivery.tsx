@@ -96,14 +96,14 @@ export default function ModalEditDirectDelivery() {
       if (imageFiles.length > 0) {
         await uploadImages();
       }
-      
-      // Save the change immediately, passing it directly to saveChanges
-      saveChanges({
-        category: editingCell.category,
-        field: editingCell.field,
-        month: editingCell.month,
-        value: editingCell.value,
-      });
+    
+    // Save the change immediately, passing it directly to saveChanges
+    saveChanges({
+      category: editingCell.category,
+      field: editingCell.field,
+      month: editingCell.month,
+      value: editingCell.value,
+    });
     } catch (error) {
       // Error already handled in uploadImages or fetch
       console.error("Error saving:", error);
@@ -189,11 +189,11 @@ export default function ModalEditDirectDelivery() {
             {/* Beautiful Upload Button */}
             <div className="relative">
               <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                multiple
-                onChange={handleFileChange}
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+              multiple
+              onChange={handleFileChange}
                 className="hidden"
                 id="receipt-upload"
               />
@@ -221,14 +221,14 @@ export default function ModalEditDirectDelivery() {
               <div className="mt-4">
                 {isLoadingImages ? (
                   <div className="text-center py-4 text-gray-400 text-sm">Loading images...</div>
-                ) : (
+                  ) : (
                   <ImagePreview
                     newImages={imageFiles}
                     existingImages={existingImages}
                     onRemoveNew={handleRemoveImage}
                     onRemoveExisting={handleRemoveExistingImage}
                   />
-                )}
+                  )}
               </div>
             )}
           </div>

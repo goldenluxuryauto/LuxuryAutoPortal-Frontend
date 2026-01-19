@@ -37,7 +37,7 @@ export default function ModalEditIncomeExpense() {
 
   const monthName = editingCell ? MONTHS[editingCell.month - 1] : "";
   const isOpen = !!editingCell && editingCell.category === "income";
-  
+
   const {
     imageFiles,
     existingImages,
@@ -107,14 +107,14 @@ export default function ModalEditIncomeExpense() {
       if (imageFiles.length > 0 && editingCell.field !== "carManagementSplit" && editingCell.field !== "carOwnerSplit") {
         await uploadImages();
       }
-      
-      // Save the change immediately, passing it directly to saveChanges
-      saveChanges({
-        category: editingCell.category,
-        field: editingCell.field,
-        month: editingCell.month,
-        value: editingCell.value,
-      });
+    
+    // Save the change immediately, passing it directly to saveChanges
+    saveChanges({
+      category: editingCell.category,
+      field: editingCell.field,
+      month: editingCell.month,
+      value: editingCell.value,
+    });
     } catch (error) {
       // Error already handled in uploadImages or fetch
       console.error("Error saving:", error);
@@ -324,15 +324,15 @@ export default function ModalEditIncomeExpense() {
           </div>
 
           {editingCell.field !== "carManagementSplit" && editingCell.field !== "carOwnerSplit" && (
-            <div>
-              <Label className="text-gray-400 text-xs">Remarks</Label>
-              <Textarea
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-                placeholder="Add any notes..."
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm min-h-[100px] mt-1"
-              />
-            </div>
+          <div>
+            <Label className="text-gray-400 text-xs">Remarks</Label>
+            <Textarea
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              placeholder="Add any notes..."
+              className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm min-h-[100px] mt-1"
+            />
+          </div>
           )}
 
           {/* All Subcategory Values Display for Management/Owner Split */}
@@ -656,17 +656,17 @@ export default function ModalEditIncomeExpense() {
           )}
 
           {editingCell.field !== "carManagementSplit" && editingCell.field !== "carOwnerSplit" && (
-            <div>
+          <div>
               <Label className="text-gray-400 text-xs mb-2 block">Receipt Images</Label>
               
               {/* Beautiful Upload Button */}
               <div className="relative">
                 <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                  multiple
-                  onChange={handleFileChange}
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+              multiple
+              onChange={handleFileChange}
                   className="hidden"
                   id="receipt-upload-income"
                 />
@@ -702,9 +702,9 @@ export default function ModalEditIncomeExpense() {
                       onRemoveExisting={handleRemoveExistingImage}
                     />
                   )}
-                </div>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
           )}
         </div>
 
