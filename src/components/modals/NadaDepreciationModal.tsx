@@ -242,8 +242,7 @@ export function NadaDepreciationModal({
           nada_depreciation_with_add_date: formData.date,
           nada_depreciation_with_add_amount: parseFloat(formData.amount),
           car_backlog_item: `NADA-depreciation-schedule-${year}`,
-          car_backlog_client_id: clientId?.toString() || "0",
-          car_backlog_user_id: userId?.toString() || "0",
+          // Backend will get clientId from car table and userId from session
           car_backlog_category_name: categoryName,
           car_backlog_old_values: itemEdit
             ? itemEdit.nadaDepreciationWithAddAmount?.toString() || "0"
@@ -257,8 +256,7 @@ export function NadaDepreciationModal({
           // Include MILES ID from previous year (matching original implementation)
           nada_depreciation_with_add_id: milesId || undefined,
           car_backlog_item: `NADA-depreciation-schedule-${year}`,
-          car_backlog_client_id: clientId?.toString() || "0",
-          car_backlog_user_id: userId?.toString() || "0",
+          // Backend will get clientId from car table and userId from session
           car_backlog_category_name: categoryName,
           car_backlog_old_values: itemEdit
             ? itemEdit.nadaDepreciationAmount?.toString() || "0"

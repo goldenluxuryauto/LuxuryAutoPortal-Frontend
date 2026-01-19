@@ -764,7 +764,7 @@ export default function NADADepreciationPage() {
             <table className="border-collapse w-full table-auto">
               <thead className="bg-[#1a1a1a]">
                 <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a] whitespace-nowrap">
+                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-index-[auto] border-r border-[#2a2a2a] whitespace-nowrap">
                     Current Cost of Vehicle
                   </th>
                   {months.map((month) => (
@@ -887,7 +887,7 @@ export default function NADADepreciationPage() {
             <table className="border-collapse w-full table-auto">
               <thead className="bg-[#1a1a1a]">
                 <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a] whitespace-nowrap">
+                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-index-[auto] border-r border-[#2a2a2a] whitespace-nowrap">
                     Category
                   </th>
                   {months.map((month) => (
@@ -975,7 +975,7 @@ export default function NADADepreciationPage() {
             <table className="border-collapse w-full table-auto">
               <thead className="bg-[#1a1a1a]">
                 <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a] whitespace-nowrap">
+                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-index-[auto] border-r border-[#2a2a2a] whitespace-nowrap">
                     Current Cost of Vehicle
                   </th>
                   {months.map((month) => (
