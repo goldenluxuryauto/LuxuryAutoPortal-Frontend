@@ -11,7 +11,7 @@ interface IncomeExpenseContextType {
   editingCell: EditingCell | null;
   setEditingCell: (cell: EditingCell | null) => void;
   updateCell: (category: string, field: string, month: number, value: number) => void;
-  saveChanges: (immediateChange?: { category: string; field: string; month: number; value: number }) => void;
+  saveChanges: (immediateChange?: { category: string; field: string; month: number; value: number; remarks?: string }) => void;
   isSaving: boolean;
   monthModes: { [month: number]: 50 | 70 };
   toggleMonthMode: (month: number) => Promise<void>;
@@ -562,7 +562,7 @@ export function IncomeExpenseProvider({
     },
   });
 
-  const saveChanges = (immediateChange?: { category: string; field: string; month: number; value: number }) => {
+  const saveChanges = (immediateChange?: { category: string; field: string; month: number; value: number; remarks?: string }) => {
     // If an immediate change is provided, add it to pendingChanges first
     if (immediateChange) {
       const key = `${immediateChange.category}-${immediateChange.field}-${immediateChange.month}`;
@@ -572,30 +572,52 @@ export function IncomeExpenseProvider({
       
       // Use the updated map for saving
       const changesByCategory = new Map<string, any>();
-      newChanges.forEach(({ category, field, month, value }) => {
+      const remarksByField: { [key: string]: string } = {};
+      
+      newChanges.forEach(({ category, field, month, value, remarks }) => {
         const catKey = `${category}-${month}`;
         if (!changesByCategory.has(catKey)) {
           changesByCategory.set(catKey, { category, month, fields: {} });
         }
         changesByCategory.get(catKey).fields[field] = value;
+        
+        // Collect remarks by field
+        if (remarks) {
+          remarksByField[field] = remarks;
+        }
       });
 
-      // Send updates to backend
+      // Send updates to backend with remarks
       const promises: Promise<any>[] = [];
       changesByCategory.forEach(({ category, month, fields }) => {
         const endpoint = getCategoryEndpoint(category);
         if (endpoint) {
+          // Include remarks in the request
+          const requestBody: any = {
+            carId,
+            year: parseInt(year),
+            month,
+            ...fields,
+          };
+          
+          // Add remarks if any exist for fields in this category/month
+          const categoryRemarks: { [key: string]: string } = {};
+          Object.keys(fields).forEach(field => {
+            if (remarksByField[field]) {
+              categoryRemarks[field] = remarksByField[field];
+            }
+          });
+          
+          if (Object.keys(categoryRemarks).length > 0) {
+            requestBody.remarks = categoryRemarks;
+          }
+          
           promises.push(
             fetch(buildApiUrl(endpoint), {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               credentials: "include",
-              body: JSON.stringify({
-                carId,
-                year: parseInt(year),
-                month,
-                ...fields,
-              }),
+              body: JSON.stringify(requestBody),
             }).then((res) => {
               if (!res.ok) throw new Error(`Failed to update ${category}`);
               return res.json();

@@ -14,8 +14,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useIncomeExpense } from "../context/IncomeExpenseContext";
 import { exportAllIncomeExpenseData, parseImportedCSV } from "../utils/exportImportUtils";
 import { buildApiUrl } from "@/lib/queryClient";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import type { IncomeExpenseData } from "../types";
 
 interface TableActionsProps {
   selectedYear: string;
@@ -43,8 +44,29 @@ export default function TableActions({
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
 
+  // Fetch previous year data for January's Negative Balance Carry Over calculation
+  const previousYear = String(parseInt(selectedYear) - 1);
+  const { data: previousYearData } = useQuery<{
+    success: boolean;
+    data: IncomeExpenseData;
+  }>({
+    queryKey: ["/api/income-expense", carId, previousYear],
+    queryFn: async () => {
+      const response = await fetch(
+        buildApiUrl(`/api/income-expense/${carId}/${previousYear}`),
+        { credentials: "include" }
+      );
+      if (!response.ok) {
+        return { success: true, data: null as any };
+      }
+      return response.json();
+    },
+    retry: false,
+    enabled: !!carId && !!selectedYear,
+  });
+
   const handleExportCSV = () => {
-    exportAllIncomeExpenseData(data, car, selectedYear, monthModes, dynamicSubcategories);
+    exportAllIncomeExpenseData(data, car, selectedYear, monthModes, dynamicSubcategories, previousYearData?.data || null);
     toast({
       title: "Export Successful",
       description: `CSV file downloaded for ${car?.makeModel || 'car'} (${selectedYear})`,

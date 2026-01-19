@@ -1,5 +1,5 @@
 // Modal for INCOME & EXPENSES category
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -57,26 +57,40 @@ export default function ModalEditIncomeExpense() {
     editingCell?.month || 1
   );
 
-  // Load remarks when modal opens
+  // Load remarks only when modal opens (not on every editingCell change)
+  // Use a ref to track if we've already loaded remarks for this cell
+  const remarksLoadedRef = useRef<string>("");
+  
   useEffect(() => {
     if (isOpen && editingCell) {
-      const loadRemarks = async () => {
-        try {
-          const response = await fetch(
-            buildApiUrl(`/api/income-expense/remarks?carId=${carId}&year=${year}&month=${editingCell.month}&category=${editingCell.category}&field=${editingCell.field}`),
-            { credentials: "include" }
-          );
-          if (response.ok) {
-            const data = await response.json();
-            setRemarks(data.remarks || "");
+      // Create a unique key for this cell
+      const cellKey = `${editingCell.category}-${editingCell.field}-${editingCell.month}`;
+      
+      // Only load remarks if we haven't loaded them for this cell yet
+      if (remarksLoadedRef.current !== cellKey) {
+        remarksLoadedRef.current = cellKey;
+        
+        const loadRemarks = async () => {
+          try {
+            const response = await fetch(
+              buildApiUrl(`/api/income-expense/remarks?carId=${carId}&year=${year}&month=${editingCell.month}&category=${editingCell.category}&field=${editingCell.field}`),
+              { credentials: "include" }
+            );
+            if (response.ok) {
+              const data = await response.json();
+              setRemarks(data.remarks || "");
+            }
+          } catch (error) {
+            // Failed to load remarks
           }
-        } catch (error) {
-          // Failed to load remarks
-        }
-      };
-      loadRemarks();
+        };
+        loadRemarks();
+      }
+    } else if (!isOpen) {
+      // Reset the ref when modal closes
+      remarksLoadedRef.current = "";
     }
-  }, [isOpen, editingCell, carId, year]);
+  }, [isOpen, editingCell?.category, editingCell?.field, editingCell?.month, carId, year]);
 
   const handleClose = () => {
     setEditingCell(null);
@@ -88,33 +102,20 @@ export default function ModalEditIncomeExpense() {
     if (!editingCell) return;
     
     try {
-      // Save remarks
-      await fetch(buildApiUrl("/api/income-expense/remarks"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          carId,
-          year: parseInt(year),
-          month: editingCell.month,
-          category: editingCell.category,
-          field: editingCell.field,
-          remarks: remarks.trim(),
-        }),
-      });
-
       // Upload images first if there are any new ones (skip for management/owner split)
       if (imageFiles.length > 0 && editingCell.field !== "carManagementSplit" && editingCell.field !== "carOwnerSplit") {
         await uploadImages();
       }
     
-    // Save the change immediately, passing it directly to saveChanges
-    saveChanges({
-      category: editingCell.category,
-      field: editingCell.field,
-      month: editingCell.month,
-      value: editingCell.value,
-    });
+      // Save the change with remarks - remarks will be included in the save request
+      // The saveChanges function will send remarks along with the value
+      saveChanges({
+        category: editingCell.category,
+        field: editingCell.field,
+        month: editingCell.month,
+        value: editingCell.value,
+        remarks: remarks.trim(), // Include remarks in the save
+      });
     } catch (error) {
       // Error already handled in uploadImages or fetch
       console.error("Error saving:", error);
