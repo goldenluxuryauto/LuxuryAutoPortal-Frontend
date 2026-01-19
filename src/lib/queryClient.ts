@@ -88,13 +88,13 @@ export function getProxiedImageUrl(url: string): string {
     const encodedUrl = encodeURIComponent(url);
     const proxyUrl = buildApiUrl(`/api/gcs-image-proxy?url=${encodedUrl}`);
     
-    // Debug logging in development
-    if (import.meta.env.DEV) {
-      console.log(`[IMAGE PROXY] Converting GCS URL to proxy:`, {
-        original: url.substring(0, 100) + '...',
-        proxy: proxyUrl.substring(0, 100) + '...'
-      });
-    }
+    // Debug logging in both dev and production to help diagnose issues
+    console.log(`[IMAGE PROXY] Converting GCS URL to proxy:`, {
+      original: url.substring(0, 150) + (url.length > 150 ? '...' : ''),
+      proxy: proxyUrl.substring(0, 150) + (proxyUrl.length > 150 ? '...' : ''),
+      apiBaseUrl: API_BASE_URL || 'relative',
+      isProduction: import.meta.env.PROD
+    });
     
     return proxyUrl;
   }

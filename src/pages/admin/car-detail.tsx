@@ -1654,6 +1654,21 @@ export default function CarDetailPage() {
                                 console.error('❌ [CAR DETAIL] Failed to load photo:', photoUrl);
                                 console.error('   Original photo:', photo);
                                 console.error('   API Base URL:', import.meta.env.VITE_API_URL || 'Not set');
+                                console.error('   Photo URL type:', photo?.startsWith('https://storage.googleapis.com/') ? 'GCS' : 'Other');
+                                console.error('   Proxy URL:', photoUrl);
+                                
+                                // Try to fetch the image directly to see what error we get
+                                if (photoUrl && photoUrl.includes('/api/gcs-image-proxy')) {
+                                  fetch(photoUrl)
+                                    .then(res => {
+                                      console.error('   Proxy response status:', res.status);
+                                      console.error('   Proxy response headers:', Object.fromEntries(res.headers.entries()));
+                                      return res.text();
+                                    })
+                                    .then(text => console.error('   Proxy response body:', text.substring(0, 200)))
+                                    .catch(err => console.error('   Proxy fetch error:', err));
+                                }
+                                
                                 // Don't hide the image - keep it visible but show error state
                                 const img = e.target as HTMLImageElement;
                                 img.style.opacity = '0.3';
