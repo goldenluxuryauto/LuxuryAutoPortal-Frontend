@@ -120,7 +120,26 @@ export default function AdminDashboard() {
   const { data: stats, isLoading } = useQuery<{ activeVehicles?: number; totalClients?: number; monthlyRevenue?: number; growthRate?: number }>({
     queryKey: ["/api/admin/dashboard"],
     retry: false,
-    enabled: !!user, // Only fetch if user is authenticated
+    enabled: !!user && isAdmin, // Only fetch admin stats when admin is authenticated
+  });
+
+  const { data: clientStats, isLoading: isClientStatsLoading } = useQuery<{
+    success?: boolean;
+    data?: { activeVehicles: number; returnedVehicles: number; totalVehicles: number };
+  }>({
+    queryKey: ["/api/client/cars/stats"],
+    queryFn: async () => {
+      const response = await fetch(buildApiUrl("/api/client/cars/stats"), {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Failed to fetch client car stats" }));
+        throw new Error(errorData.error || "Failed to fetch client car stats");
+      }
+      return response.json();
+    },
+    enabled: !!user && isClient,
+    retry: false,
   });
 
   const quickStartSteps = [
@@ -257,7 +276,7 @@ export default function AdminDashboard() {
                     <span className="text-sm text-gray-400">My Vehicles</span>
                   </div>
                   <p className="text-3xl font-bold text-white" data-testid="stat-vehicles">
-                    {isLoading ? "..." : stats?.activeVehicles || 0}
+                    {isClientStatsLoading ? "..." : clientStats?.data?.totalVehicles || 0}
                   </p>
                 </CardContent>
               </Card>

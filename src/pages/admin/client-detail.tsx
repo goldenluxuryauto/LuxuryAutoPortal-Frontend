@@ -1140,10 +1140,16 @@ export default function ClientDetailPage() {
                                   <span className="text-white">{formatValue(data.businessName)}</span>
                                 </div>
                               )}
-                              {data.ein && data.taxClassification === "business" && (
+                              {data.ein && (
                                 <div>
                                   <span className="text-gray-400 block mb-1">EIN:</span>
                                   <span className="text-white font-mono">{formatValue(data.ein)}</span>
+                                </div>
+                              )}
+                              {data.ssn && (
+                                <div>
+                                  <span className="text-gray-400 block mb-1">SSN:</span>
+                                  <span className="text-white font-mono">{formatValue(data.ssn)}</span>
                                 </div>
                               )}
                             </div>
