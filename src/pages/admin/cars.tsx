@@ -41,7 +41,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, buildApiUrl } from "@/lib/queryClient";
+import { apiRequest, buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { Plus, Edit, Search, X, ExternalLink, Car as CarIcon } from "lucide-react";
 import { TableRowSkeleton } from "@/components/ui/skeletons";
@@ -444,21 +444,14 @@ export default function CarsPage() {
       );
     }
 
-    // Handle photo path - check if it's a full GCS URL or a local path
+    // Use getProxiedImageUrl to handle both GCS URLs and local paths
+    // This ensures CORS issues are avoided by proxying GCS URLs through the backend
     let src: string;
     if (!rawPath) {
       console.warn(`[CARS] Empty photo path for car ${car.id}`);
       src = '';
-    } else if (rawPath.startsWith('http://') || rawPath.startsWith('https://')) {
-      // Full URL (GCS) - use directly
-      src = rawPath;
     } else {
-      // Local path - use buildApiUrl to proxy through backend
-      let photoPath = rawPath;
-      // Remove leading slash if present, then add it back for consistency
-      photoPath = photoPath.replace(/^\/+/, '');
-      photoPath = `/${photoPath}`;
-      src = buildApiUrl(photoPath);
+      src = getProxiedImageUrl(rawPath);
     }
     // Log in production to help debug
     if (import.meta.env.PROD) {
