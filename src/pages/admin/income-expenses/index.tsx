@@ -113,6 +113,38 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
 
   const cars = carsData?.data || [];
 
+  // Helper function to format car display name: "Make Model Year - Plate # - VIN #"
+  // Format: "Car Make Model Year - Plate # - VIN #"
+  const formatCarDisplayName = (car: any): string => {
+    const makeModel = (car.makeModel || "").trim();
+    const year = car.year ? String(car.year) : null;
+    const plate = (car.licensePlate || "").trim();
+    const vin = (car.vin || "").trim();
+    
+    // Build parts: Make Model Year, Plate, VIN
+    const parts: string[] = [];
+    
+    // Part 1: Make Model Year
+    if (makeModel) {
+      parts.push(year ? `${makeModel} ${year}` : makeModel);
+    } else if (year) {
+      parts.push(year);
+    }
+    
+    // Part 2: Plate #
+    if (plate) {
+      parts.push(plate);
+    }
+    
+    // Part 3: VIN #
+    if (vin) {
+      parts.push(vin);
+    }
+    
+    // Join with " - " separator
+    return parts.length > 0 ? parts.join(" - ") : "Unknown Car";
+  };
+
   if (isCarLoading && isCarFocused) {
     return (
       <AdminLayout>
@@ -170,7 +202,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                   <SelectItem value="all">-- Select a Car --</SelectItem>
                   {cars.map((carItem: any) => (
                     <SelectItem key={carItem.id} value={carItem.id.toString()}>
-                      {carItem.makeModel || ""} - {carItem.vin || ""}
+                      {formatCarDisplayName(carItem)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -267,7 +299,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                     <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
                       {cars.map((carItem: any) => (
                         <SelectItem key={carItem.id} value={carItem.id.toString()}>
-                          {carItem.makeModel || ""} - {carItem.vin || ""}
+                          {formatCarDisplayName(carItem)}
                         </SelectItem>
                       ))}
                     </SelectContent>
