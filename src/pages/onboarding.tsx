@@ -1370,15 +1370,15 @@ export default function Onboarding() {
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                      <SelectItem value="Gasoline">
-                                        Gasoline
-                                      </SelectItem>
-                                      <SelectItem value="Diesel">
-                                        Diesel
-                                      </SelectItem>
-                                      <SelectItem value="Electric">
-                                        Electric
-                                      </SelectItem>
+                                      <SelectItem value="Regular">Regular</SelectItem>
+                                      <SelectItem value="Premium">Premium</SelectItem>
+                                      <SelectItem value="Premium 91 Unleaded">Premium 91 Unleaded</SelectItem>
+                                      <SelectItem value="Regular Unleaded">Regular Unleaded</SelectItem>
+                                      <SelectItem value="91 Unleaded">91 Unleaded</SelectItem>
+                                      <SelectItem value="Gasoline">Gasoline</SelectItem>
+                                      <SelectItem value="Electric">Electric</SelectItem>
+                                      <SelectItem value="Diesel">Diesel</SelectItem>
+                                      <SelectItem value="Others">Others</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <FormMessage />
