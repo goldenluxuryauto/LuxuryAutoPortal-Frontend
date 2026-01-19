@@ -1650,8 +1650,6 @@ export default function CarDetailPage() {
                               src={photoUrl}
                               alt={`Car photo ${index + 1}`}
                               className="w-full h-full object-contain"
-                              crossOrigin="anonymous"
-                              
                               onError={(e) => {
                                 console.error('❌ [CAR DETAIL] Failed to load photo:', photoUrl);
                                 console.error('   Original photo:', photo);
@@ -2287,7 +2285,6 @@ export default function CarDetailPage() {
                               ? "border-[#EAEB80] opacity-80"
                               : "border-[#2a2a2a] group-hover:border-[#EAEB80]/50"
                           )}
-                      crossOrigin="anonymous"
                       onError={(e) => {
                        // Don't hide the image - keep it visible but show error state
                         const img = e.target as HTMLImageElement;
