@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Car, Upload, X, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square, FileText, Star } from "lucide-react";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
-import { buildApiUrl } from "@/lib/queryClient";
+import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -224,6 +224,22 @@ export default function CarDetailPage() {
   });
 
   const car = data?.data;
+  
+  // Debug logging for photos
+  useEffect(() => {
+    if (car?.photos) {
+      console.log(`📸 [CAR DETAIL] Car photos loaded:`, {
+        count: car.photos.length,
+        photos: car.photos.map((p: string, i: number) => ({
+          index: i,
+          url: p?.substring(0, 100) || 'empty',
+          isGcs: p?.startsWith('https://storage.googleapis.com/') || false
+        }))
+      });
+    } else {
+      console.log(`📸 [CAR DETAIL] No photos found for car ${carId}`);
+    }
+  }, [car?.photos, carId]);
 
   // Fetch onboarding data for financial, insurance, and additional information
   // Use VIN from vehicle information card to fetch the correct onboarding record
@@ -881,11 +897,40 @@ export default function CarDetailPage() {
       }
 
       const result = await response.json();
-      queryClient.invalidateQueries({ queryKey: ["/api/cars", carId] });
-      // Reset carousel to first image if no images were present before
-      if (!car?.photos || car.photos.length === 0) {
-        setCarouselIndex(0);
+      
+      console.log('📸 [CAR DETAIL] Photo upload response:', {
+        success: result.success,
+        message: result.message,
+        hasData: !!result.data,
+        photoCount: result.data?.photos?.length || 0,
+        photos: result.data?.photos || []
+      });
+      
+      // Update the query cache with the new car data immediately
+      if (result.data) {
+        queryClient.setQueryData(["/api/cars", carId], {
+          success: true,
+          data: result.data,
+        });
+        console.log('✅ [CAR DETAIL] Updated query cache with new car data:', {
+          photoCount: result.data.photos?.length || 0,
+          photos: result.data.photos || []
+        });
       }
+      
+      // Also invalidate and refetch to ensure fresh data
+      await queryClient.invalidateQueries({ queryKey: ["/api/cars", carId] });
+      
+      // Force a refetch to ensure photos are loaded
+      await queryClient.refetchQueries({ queryKey: ["/api/cars", carId] });
+      
+      // Reset carousel to first image if no images were present before
+      const hadNoPhotos = !car?.photos || car.photos.length === 0;
+      if (hadNoPhotos && result.data?.photos && result.data.photos.length > 0) {
+        setCarouselIndex(0);
+        console.log('🔄 [CAR DETAIL] Reset carousel to first image');
+      }
+      
       toast({
         title: "Success",
         description: result.message || "Photos uploaded successfully",
@@ -1579,27 +1624,18 @@ export default function CarDetailPage() {
                       {/* Main Carousel Display - Flexible height to match Vehicle Information card */}
                       <div className="relative w-full flex-1 bg-black rounded-lg overflow-hidden border border-[#2a2a2a]">
                       {car.photos.map((photo, index) => {
-                        // For static assets like car photos, use buildApiUrl to get correct backend URL in production
-                        // Handle photo path - check if it's a full GCS URL or a local path
+                        // Use getProxiedImageUrl to handle both GCS URLs and local paths
+                        // This ensures CORS issues are avoided by proxying GCS URLs through the backend
                         let photoUrl: string;
                         if (!photo) {
-                          console.warn(`[CAR DETAIL] Empty photo path at index ${index}`);
+                          console.warn(`⚠️ [CAR DETAIL] Empty photo path at index ${index}`);
                           photoUrl = '';
-                        } else if (photo.startsWith('http://') || photo.startsWith('https://')) {
-                          // Full URL (GCS) - use directly
-                          photoUrl = photo;
                         } else {
-                          // Local path - use buildApiUrl to proxy through backend
-                          let photoPath = photo;
-                          // Remove leading slash if present, then add it back for consistency
-                          photoPath = photoPath.replace(/^\/+/, '');
-                          photoPath = `/${photoPath}`;
-                          photoUrl = buildApiUrl(photoPath);
-                        }
-                        // Log in production to help debug
-                        if (import.meta.env.PROD && index === 0) {
-                          console.log(`[CAR DETAIL] Main photo URL:`, photoUrl);
-                          console.log(`[CAR DETAIL] Original photo:`, photo);
+                          photoUrl = getProxiedImageUrl(photo);
+                          // Log first photo for debugging
+                          if (index === 0) {
+                            console.log(`📸 [CAR DETAIL] Photo ${index + 1}: Using proxied URL:`, photoUrl.substring(0, 100) + '...');
+                          }
                         }
                         const isActive = index === carouselIndex;
                         return (
@@ -2205,21 +2241,14 @@ export default function CarDetailPage() {
             {car.photos && car.photos.length > 0 ? (
               <div className="grid grid-cols-8 gap-4">
                 {car.photos.map((photo, index) => {
-                  // Handle photo path - check if it's a full GCS URL or a local path
+                  // Use getProxiedImageUrl to handle both GCS URLs and local paths
+                  // This ensures CORS issues are avoided by proxying GCS URLs through the backend
                   let photoUrl: string;
                   if (!photo) {
                     console.warn(`[CAR DETAIL] Empty photo path at index ${index}`);
                     photoUrl = '';
-                  } else if (photo.startsWith('http://') || photo.startsWith('https://')) {
-                    // Full URL (GCS) - use directly
-                    photoUrl = photo;
                   } else {
-                    // Local path - use buildApiUrl to proxy through backend
-                    let photoPath = photo;
-                    // Remove leading slash if present, then add it back for consistency
-                    photoPath = photoPath.replace(/^\/+/, '');
-                    photoPath = `/${photoPath}`;
-                    photoUrl = buildApiUrl(photoPath);
+                    photoUrl = getProxiedImageUrl(photo);
                   }
                   // Log in production to help debug
                   if (import.meta.env.PROD && index === 0) {
@@ -3676,9 +3705,7 @@ export default function CarDetailPage() {
               {/* Full Screen Image - High Resolution Display */}
               {car.photos && car.photos[fullScreenImageIndex] && (
                 <img
-                  src={car.photos[fullScreenImageIndex].startsWith('http://') || car.photos[fullScreenImageIndex].startsWith('https://') 
-                    ? car.photos[fullScreenImageIndex] 
-                    : buildApiUrl(car.photos[fullScreenImageIndex].startsWith('/') ? car.photos[fullScreenImageIndex] : `/${car.photos[fullScreenImageIndex]}`)}
+                  src={getProxiedImageUrl(car.photos[fullScreenImageIndex])}
                   alt={`Car photo ${fullScreenImageIndex + 1}`}
                   className="w-full h-full object-contain"
                   onClick={(e) => e.stopPropagation()}
