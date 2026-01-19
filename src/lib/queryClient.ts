@@ -71,6 +71,34 @@ export function buildApiUrl(path: string): string {
   return API_BASE_URL ? `${API_BASE_URL}${normalizedPath}` : normalizedPath;
 }
 
+/**
+ * Convert a Google Cloud Storage URL to a proxy URL to avoid CORS issues.
+ * If the URL is not a GCS URL, returns it as-is.
+ * 
+ * @param url - The GCS URL or any other URL
+ * @returns The proxy URL for GCS URLs, or the original URL for non-GCS URLs
+ */
+export function getProxiedImageUrl(url: string): string {
+  if (!url) {
+    return url;
+  }
+
+  // If it's a GCS URL (storage.googleapis.com), proxy it through the backend
+  if (url.startsWith("https://storage.googleapis.com/")) {
+    const encodedUrl = encodeURIComponent(url);
+    return buildApiUrl(`/api/gcs-image-proxy?url=${encodedUrl}`);
+  }
+
+  // For other URLs (http/https), return as-is
+  // For local paths, use buildApiUrl to proxy through backend
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  // Local path - use buildApiUrl to proxy through backend
+  return buildApiUrl(url.startsWith("/") ? url : `/${url}`);
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
