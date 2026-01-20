@@ -83,14 +83,21 @@ export function getProxiedImageUrl(url: string): string {
     return url;
   }
 
+  // Normalize GCS URLs: Convert http:// to https:// (GCS only supports https)
+  let normalizedUrl = url;
+  if (url.startsWith("http://storage.googleapis.com/")) {
+    normalizedUrl = url.replace("http://", "https://");
+    console.warn(`[IMAGE PROXY] Normalized GCS URL from http to https: ${normalizedUrl.substring(0, 100)}...`);
+  }
+
   // If it's a GCS URL (storage.googleapis.com), proxy it through the backend
-  if (url.startsWith("https://storage.googleapis.com/")) {
-    const encodedUrl = encodeURIComponent(url);
+  if (normalizedUrl.startsWith("https://storage.googleapis.com/")) {
+    const encodedUrl = encodeURIComponent(normalizedUrl);
     const proxyUrl = buildApiUrl(`/api/gcs-image-proxy?url=${encodedUrl}`);
     
     // Debug logging in both dev and production to help diagnose issues
     console.log(`[IMAGE PROXY] Converting GCS URL to proxy:`, {
-      original: url.substring(0, 150) + (url.length > 150 ? '...' : ''),
+      original: normalizedUrl.substring(0, 150) + (normalizedUrl.length > 150 ? '...' : ''),
       proxy: proxyUrl.substring(0, 150) + (proxyUrl.length > 150 ? '...' : ''),
       apiBaseUrl: API_BASE_URL || 'relative',
       isProduction: import.meta.env.PROD
@@ -101,12 +108,12 @@ export function getProxiedImageUrl(url: string): string {
 
   // For other URLs (http/https), return as-is
   // For local paths, use buildApiUrl to proxy through backend
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
+  if (normalizedUrl.startsWith("http://") || normalizedUrl.startsWith("https://")) {
+    return normalizedUrl;
   }
 
   // Local path - use buildApiUrl to proxy through backend
-  return buildApiUrl(url.startsWith("/") ? url : `/${url}`);
+  return buildApiUrl(normalizedUrl.startsWith("/") ? normalizedUrl : `/${normalizedUrl}`);
 }
 
 async function throwIfResNotOk(res: Response) {

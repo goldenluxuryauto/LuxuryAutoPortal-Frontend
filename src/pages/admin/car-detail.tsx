@@ -206,19 +206,12 @@ export default function CarDetailPage() {
     },
     enabled: !!carId,
     retry: false,
-    // Poll backend every 2 seconds to get updated lastLoginAt/lastLogoutAt values immediately
-    // This ensures login/logout events are reflected within 2 seconds
-    refetchInterval: (query) => {
-      // Only poll if query is successful and not in error state
-      if (query.state.error) {
-        return false; // Stop polling on error
-      }
-      return 2000; // Poll every 2 seconds
-    },
-    // Refetch when window regains focus
-    refetchOnWindowFocus: true,
-    // Refetch when browser tab becomes visible
-    refetchOnMount: true,
+    // Only fetch on initial load - disable all automatic refetching
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on mount if data already exists
+    refetchOnReconnect: false, // Don't refetch on reconnect
+    staleTime: Infinity, // Data never becomes stale, preventing automatic refetches
+    gcTime: Infinity, // Keep data in cache indefinitely
     // Keep previous data while refetching to avoid flickering
     placeholderData: (previousData) => previousData,
   });
