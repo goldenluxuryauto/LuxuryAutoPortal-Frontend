@@ -16,6 +16,9 @@ interface IncomeExpenseContextType {
   monthModes: { [month: number]: 50 | 70 };
   toggleMonthMode: (month: number) => Promise<void>;
   isSavingMode: boolean;
+  skiRacksOwner: { [month: number]: "GLA" | "CAR_OWNER" };
+  toggleSkiRacksOwner: (month: number) => Promise<void>;
+  isSavingSkiRacksOwner: boolean;
   year: string;
   carId: number;
   // Dynamic subcategories
@@ -190,6 +193,18 @@ export function IncomeExpenseProvider({
   
   const [monthModes, setMonthModes] = useState<{ [month: number]: 50 | 70 }>(getDefaultMonthModes);
   const [isSavingMode, setIsSavingMode] = useState(false);
+  
+  // Initialize skiRacksOwner with defaults
+  const getDefaultSkiRacksOwner = (): { [month: number]: "GLA" | "CAR_OWNER" } => {
+    const owners: { [month: number]: "GLA" | "CAR_OWNER" } = {};
+    for (let i = 1; i <= 12; i++) {
+      owners[i] = "GLA"; // Default to GLA
+    }
+    return owners;
+  };
+  
+  const [skiRacksOwner, setSkiRacksOwner] = useState<{ [month: number]: "GLA" | "CAR_OWNER" }>(getDefaultSkiRacksOwner);
+  const [isSavingSkiRacksOwner, setIsSavingSkiRacksOwner] = useState(false);
   const [dynamicSubcategories, setDynamicSubcategories] = useState({
     directDelivery: [] as any[],
     cogs: [] as any[],
@@ -398,7 +413,7 @@ export function IncomeExpenseProvider({
     }
   };
 
-  // Load monthModes from API response when data is fetched
+  // Load monthModes and skiRacksOwner from API response when data is fetched
   // Use a ref to track if we've loaded modes for this carId/year combo to prevent infinite loops
   const loadedKey = React.useRef<string>('');
   
@@ -418,6 +433,16 @@ export function IncomeExpenseProvider({
         // If formulaSetting exists but no monthModes, use defaults
         setMonthModes(getDefaultMonthModes());
       }
+      
+      if (incomeExpenseData.data.formulaSetting?.skiRacksOwner) {
+        // Merge with defaults to ensure all 12 months are present
+        const defaults = getDefaultSkiRacksOwner();
+        const loadedOwners = { ...defaults, ...incomeExpenseData.data.formulaSetting.skiRacksOwner };
+        setSkiRacksOwner(loadedOwners);
+      } else {
+        // If formulaSetting exists but no skiRacksOwner, use defaults
+        setSkiRacksOwner(getDefaultSkiRacksOwner());
+      }
     }
   }, [incomeExpenseData, carId, year]);
 
@@ -432,8 +457,10 @@ export function IncomeExpenseProvider({
     setMonthModes(newModes);
     
     // Update percentage values in database
-    const newMgmtPercent = newMode === 70 ? 70 : 50; // 70:30 split when mode is 70 (Car Management : Car Owner)
-    const newOwnerPercent = newMode === 70 ? 30 : 50; // 70:30 split when mode is 70 (Car Management : Car Owner)
+    // Mode 50 = 50:50 split (Car Management : Car Owner)
+    // Mode 70 = 30:70 split (Car Management : Car Owner) - NOT 70:30
+    const newMgmtPercent = newMode === 70 ? 30 : 50;
+    const newOwnerPercent = newMode === 70 ? 70 : 50;
     
     setIsSavingMode(true);
 
@@ -494,6 +521,87 @@ export function IncomeExpenseProvider({
       });
     } finally {
       setIsSavingMode(false);
+    }
+  };
+
+  // Toggle ski racks owner and save to backend
+  const toggleSkiRacksOwner = async (month: number) => {
+    // Use functional update to get current state and calculate new value
+    let newOwners: { [month: number]: "GLA" | "CAR_OWNER" } | undefined;
+    let previousOwners: { [month: number]: "GLA" | "CAR_OWNER" } | undefined;
+    
+    setSkiRacksOwner((currentOwners) => {
+      // Store current for error rollback
+      previousOwners = { ...currentOwners };
+      
+      // Calculate new owner value
+      const currentOwner = currentOwners[month] || "GLA";
+      const newOwner = currentOwner === "GLA" ? "CAR_OWNER" : "GLA";
+      
+      // Create new owners object
+      newOwners = {
+        ...currentOwners,
+        [month]: newOwner,
+      };
+      
+      return newOwners;
+    });
+    
+    if (!newOwners || !previousOwners) {
+      console.error("State update failed");
+      return;
+    }
+    
+    setIsSavingSkiRacksOwner(true);
+
+    try {
+      // Update the ski racks owner setting
+      const response = await fetch(buildApiUrl("/api/income-expense/formula"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          carId,
+          year: parseInt(year),
+          skiRacksOwner: newOwners,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to save ski racks owner change: ${errorText}`);
+      }
+
+      const result = await response.json();
+      
+      // Update with server response to ensure consistency
+      // The backend returns { success: true, data: { monthModes, skiRacksOwner, ... } }
+      if (result.success && result.data) {
+        if (result.data.skiRacksOwner) {
+          const defaults = getDefaultSkiRacksOwner();
+          setSkiRacksOwner({ ...defaults, ...result.data.skiRacksOwner });
+        }
+        // If no skiRacksOwner in response, keep the optimistic update (newOwners)
+      }
+
+      // Invalidate query to refresh data (but don't wait for it)
+      queryClient.invalidateQueries({ queryKey: ["/api/income-expense", carId, year] });
+      
+      toast({
+        title: "Success",
+        description: "Ski racks owner updated successfully",
+      });
+    } catch (error: any) {
+      // Revert on error
+      console.error("Error toggling ski racks owner:", error);
+      setSkiRacksOwner(previousOwners);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save ski racks owner change",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingSkiRacksOwner(false);
     }
   };
 
@@ -685,6 +793,9 @@ export function IncomeExpenseProvider({
         monthModes,
         toggleMonthMode,
         isSavingMode,
+        skiRacksOwner,
+        toggleSkiRacksOwner,
+        isSavingSkiRacksOwner,
         year,
         carId,
         dynamicSubcategories,

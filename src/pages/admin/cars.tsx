@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   useQuery,
   useMutation,
@@ -539,14 +539,49 @@ export default function CarsPage() {
   /**
    * Client requirement: show a small car-image icon before the Status badge.
    * Uses the first uploaded photo as thumbnail (or a fallback icon if none).
+   * Optimized for performance with lazy loading and intersection observer.
    */
   const CarStatusThumbnail = ({ car }: { car: Car }) => {
     const [failed, setFailed] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const imgRef = React.useRef<HTMLDivElement>(null);
+
+    // Use Intersection Observer for better lazy loading - only load when visible
+    React.useEffect(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setIsVisible(true);
+              observer.disconnect(); // Disconnect after first visibility
+            }
+          });
+        },
+        {
+          rootMargin: "50px", // Start loading 50px before visible
+          threshold: 0.01,
+        }
+      );
+
+      if (imgRef.current) {
+        observer.observe(imgRef.current);
+      }
+
+      return () => {
+        if (imgRef.current) {
+          observer.unobserve(imgRef.current);
+        }
+        observer.disconnect();
+      };
+    }, []);
 
     const rawPath = car.photos?.[0];
     if (!rawPath || failed) {
       return (
-        <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-black/30 border border-[#2a2a2a] flex items-center justify-center shrink-0">
+        <div 
+          ref={imgRef}
+          className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-black/30 border border-[#2a2a2a] flex items-center justify-center shrink-0"
+        >
           <CarIcon className="h-4 w-4 text-gray-500" />
         </div>
       );
@@ -560,25 +595,43 @@ export default function CarsPage() {
       src = '';
     } else {
       src = getProxiedImageUrl(rawPath);
-    }
-    // Log in production to help debug
-    if (import.meta.env.PROD) {
-      console.log(`[CARS] Thumbnail URL:`, src);
-      console.log(`[CARS] Original photo:`, rawPath);
+      // Add size parameter for optimization if using GCS proxy
+      if (src.includes('/api/gcs-image-proxy')) {
+        // Request a smaller thumbnail (64x64 for 32px display, 2x for retina = 128x128)
+        src += (src.includes('?') ? '&' : '?') + 'size=128';
+      }
     }
 
     return (
-      <img
-        src={src}
-        alt="Car thumbnail"
-        className="h-7 w-7 sm:h-8 sm:w-8 rounded-md object-cover border border-[#2a2a2a] bg-black/30 shrink-0"
-        loading="lazy"
-        onError={(e) => {
-          console.error('Failed to load car thumbnail:', src);
-          console.error('Original photo:', rawPath);
-          setFailed(true);
-        }}
-      />
+      <div 
+        ref={imgRef}
+        className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-black/30 border border-[#2a2a2a] shrink-0 relative overflow-hidden"
+      >
+        {isVisible ? (
+          <img
+            src={src}
+            alt="Car thumbnail"
+            className="h-full w-full rounded-md object-cover"
+            loading="lazy"
+            decoding="async"
+            width={32}
+            height={32}
+            onError={(e) => {
+              console.error('Failed to load car thumbnail:', src);
+              console.error('Original photo:', rawPath);
+              setFailed(true);
+            }}
+            onLoad={() => {
+              // Image loaded successfully
+            }}
+          />
+        ) : (
+          // Show skeleton while waiting for visibility
+          <div className="h-full w-full flex items-center justify-center">
+            <CarIcon className="h-4 w-4 text-gray-600 animate-pulse" />
+          </div>
+        )}
+      </div>
     );
   };
 

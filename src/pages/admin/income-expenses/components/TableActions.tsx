@@ -32,7 +32,8 @@ export default function TableActions({
   car,
 }: TableActionsProps) {
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  const isReadOnly = location.startsWith("/admin/income-expenses");
   const { data, monthModes, year, dynamicSubcategories } = useIncomeExpense();
   const queryClient = useQueryClient();
   
@@ -240,26 +241,30 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
         </Select>
 
         {/* Import Button */}
-        <Button
-          onClick={() => setIsImportModalOpen(true)}
-          variant="outline"
-          size="sm"
-          className="border-[#2a2a2a] text-gray-300 hover:text-white hover:bg-[#2a2a2a]"
-        >
-          <Upload className="w-4 h-4 mr-2" />
-          Import
-        </Button>
+        {!isReadOnly && (
+          <Button
+            onClick={() => setIsImportModalOpen(true)}
+            variant="outline"
+            size="sm"
+            className="border-[#2a2a2a] text-gray-300 hover:text-white hover:bg-[#2a2a2a]"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Import
+          </Button>
+        )}
 
         {/* Download Template Button */}
-        <Button
-          onClick={handleDownloadTemplate}
-          variant="outline"
-          size="sm"
-          className="border-[#2a2a2a] text-gray-300 hover:text-white hover:bg-[#2a2a2a]"
-        >
-          <FileText className="w-4 h-4 mr-2" />
-          Download Template
-        </Button>
+        {!isReadOnly && (
+          <Button
+            onClick={handleDownloadTemplate}
+            variant="outline"
+            size="sm"
+            className="border-[#2a2a2a] text-gray-300 hover:text-white hover:bg-[#2a2a2a]"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            Download Template
+          </Button>
+        )}
 
         {/* Export Button */}
         <Button

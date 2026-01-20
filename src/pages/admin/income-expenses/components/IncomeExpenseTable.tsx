@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLocation } from "wouter";
 
 interface IncomeExpenseTableProps {
   year: string;
@@ -25,11 +26,17 @@ interface IncomeExpenseTableProps {
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
+  const [location] = useLocation();
+  const isReadOnly = location.startsWith("/admin/income-expenses");
+  
   const {
     data,
     monthModes,
     toggleMonthMode,
     isSavingMode,
+    skiRacksOwner,
+    toggleSkiRacksOwner,
+    isSavingSkiRacksOwner,
     dynamicSubcategories,
     addDynamicSubcategory,
     updateDynamicSubcategoryName,
@@ -337,6 +344,8 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
   };
 
   // Calculate Car Management Split based on formula:
+  // If ski racks income exists and ski racks owner is set, use special formulas
+  // Otherwise use standard formula:
   // MAX(
   //   Delivery Income + 
   //   Electric Prepaid Income +
@@ -367,13 +376,66 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     const electricPrepaidIncome = getMonthValue(data.incomeExpenses, month, "electricPrepaidIncome");
     const smokingFines = getMonthValue(data.incomeExpenses, month, "smokingFines");
     const gasPrepaidIncome = getMonthValue(data.incomeExpenses, month, "gasPrepaidIncome");
+    const skiRacksIncome = getMonthValue(data.incomeExpenses, month, "skiRacksIncome");
     const milesIncome = getMonthValue(data.incomeExpenses, month, "milesIncome");
+    const childSeatIncome = getMonthValue(data.incomeExpenses, month, "childSeatIncome");
+    const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
+    const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
+    const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
     // Use the calculated Negative Balance Carry Over (not stored in data)
     const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
     
+    // Check if ski racks income exists and use appropriate formula
+    if (skiRacksIncome > 0) {
+      const owner = skiRacksOwner[month] || "GLA";
+      
+      if (owner === "GLA") {
+        // If GLA owns ski racks:
+        // Car Management (SKI RACKS OWNER) = IF(
+        //   Delivery Income + Electric Prepaid Income + Smoking Fines + Child Seat Income + 
+        //   Coolers Income + Insurance Wreck Income + Other Income + Gas Prepaid Income + 
+        //   (Ski Racks Income * 90%) - TOTAL REIMBURSE AND NON-REIMBURSE BILLS +
+        //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
+        //    Smoking Fines - Ski Racks Income - Miles Income - Gas Prepaid Income - Child Seat Income - 
+        //    Coolers Income - Insurance Wreck Income - Other Income - TOTAL OPERATING EXPENSE (Direct Delivery) - 
+        //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Management Split % >= 0,
+        //   [calculation], 0)
+        const part1 = deliveryIncome + electricPrepaidIncome + smokingFines + childSeatIncome + 
+                     coolersIncome + insuranceWreckIncome + otherIncome + gasPrepaidIncome + 
+                     (skiRacksIncome * 0.9) - totalReimbursedBills;
+        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                      smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
+                      coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
+        const part2 = profit * mgmtPercent;
+        const calculation = part1 + part2;
+        return calculation >= 0 ? calculation : 0;
+      } else {
+        // If car owner owns ski racks:
+        // Car Management = IF(
+        //   Delivery Income + Electric Prepaid Income + Smoking Fines + Child Seat Income + 
+        //   Coolers Income + Insurance Wreck Income + Other Income + 
+        //   (Ski Racks Income * 90%) - TOTAL REIMBURSE AND NON-REIMBURSE BILLS +
+        //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
+        //    Smoking Fines - Ski Racks Income - Miles Income - Gas Prepaid Income - Child Seat Income - 
+        //    Coolers Income - Insurance Wreck Income - Other Income - TOTAL OPERATING EXPENSE (Direct Delivery) - 
+        //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Management Split % >= 0,
+        //   [calculation], 0)
+        const part1 = deliveryIncome + electricPrepaidIncome + smokingFines + childSeatIncome + 
+                     coolersIncome + insuranceWreckIncome + otherIncome + 
+                     (skiRacksIncome * 0.9) - totalReimbursedBills;
+        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                      smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
+                      coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
+        const part2 = profit * mgmtPercent;
+        const calculation = part1 + part2;
+        return calculation >= 0 ? calculation : 0;
+      }
+    }
+    
+    // Standard formula when no ski racks income
     // Part 1: Delivery Income + Electric Prepaid Income + Smoking Fines + Gas Prepaid Income - TOTAL REIMBURSE AND NON-REIMBURSE BILLS
     const part1 = deliveryIncome + electricPrepaidIncome + smokingFines + gasPrepaidIncome - totalReimbursedBills;
     
@@ -388,6 +450,8 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
   };
 
   // Calculate Car Owner Split based on formula:
+  // If ski racks income exists and ski racks owner is set, use special formulas
+  // Otherwise use standard formula:
   // MAX(
   //   (Miles Income) + 
   //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
@@ -405,12 +469,57 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     const electricPrepaidIncome = getMonthValue(data.incomeExpenses, month, "electricPrepaidIncome");
     const smokingFines = getMonthValue(data.incomeExpenses, month, "smokingFines");
     const gasPrepaidIncome = getMonthValue(data.incomeExpenses, month, "gasPrepaidIncome");
+    const skiRacksIncome = getMonthValue(data.incomeExpenses, month, "skiRacksIncome");
     const milesIncome = getMonthValue(data.incomeExpenses, month, "milesIncome");
+    const childSeatIncome = getMonthValue(data.incomeExpenses, month, "childSeatIncome");
+    const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
+    const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
+    const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
     // Use the calculated Negative Balance Carry Over (not stored in data)
     const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     
+    // Check if ski racks income exists and use appropriate formula
+    if (skiRacksIncome > 0) {
+      const owner = skiRacksOwner[month] || "GLA";
+      
+      if (owner === "GLA") {
+        // If GLA owns ski racks:
+        // Car Owner Split = IF(
+        //   (Miles Income) + (Ski Racks Income * 10%) +
+        //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
+        //    Smoking Fines - Ski Racks Income - Miles Income - Gas Prepaid Income - Child Seat Income - 
+        //    Coolers Income - Insurance Wreck Income - Other Income - TOTAL OPERATING EXPENSE (Direct Delivery) - 
+        //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Owner Split % >= 0,
+        //   [calculation], 0)
+        const part1 = milesIncome + (skiRacksIncome * 0.1);
+        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                      smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
+                      coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
+        const part2 = profit * ownerPercent;
+        const calculation = part1 + part2;
+        return calculation >= 0 ? calculation : 0;
+      } else {
+        // If car owner owns ski racks:
+        // Car Owner Split (SKI RACKS OWNER) = IF(
+        //   (Miles Income + Gas Prepaid Income) + (Ski Racks Income * 10%) +
+        //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
+        //    Smoking Fines - Ski Racks Income - Miles Income - Gas Prepaid Income - Child Seat Income - 
+        //    Coolers Income - Insurance Wreck Income - Other Income - TOTAL OPERATING EXPENSE (Direct Delivery) - 
+        //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Owner Split % >= 0,
+        //   [calculation], 0)
+        const part1 = milesIncome + gasPrepaidIncome + (skiRacksIncome * 0.1);
+        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                      smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
+                      coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
+        const part2 = profit * ownerPercent;
+        const calculation = part1 + part2;
+        return calculation >= 0 ? calculation : 0;
+      }
+    }
+    
+    // Standard formula when no ski racks income
     // Part 1: Miles Income
     const part1 = milesIncome;
     
@@ -452,7 +561,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
   const getSplitForMonth = (month: number) => {
     const mode = monthModes[month];
     if (mode === 70) {
-      return { mgmt: 70, owner: 30 }; // 70 mode = 70:30 split (Car Management : Car Owner)
+      return { mgmt: 30, owner: 70 }; // 70 mode = 30:70 split (Car Management : Car Owner)
     }
     return { mgmt: 50, owner: 50 }; // 50 mode = 50:50 split
   };
@@ -470,6 +579,8 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               {MONTHS.map((month, index) => {
                 const monthNum = index + 1;
                 const currentMode = monthModes[monthNum] || 50;
+                const currentSkiRacksOwner = skiRacksOwner[monthNum] || "GLA";
+                const hasSkiRacksIncome = getMonthValue(data.incomeExpenses, monthNum, "skiRacksIncome") > 0;
                 return (
                   <th
                     key={month}
@@ -477,21 +588,46 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                   >
                     <div className="flex flex-col items-center gap-1">
                       <span className="text-white text-xs">{month} {year}</span>
-                      <button
-                        onClick={() => toggleMonthMode(monthNum)}
-                        disabled={isSavingMode}
-                        className={cn(
-                          "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200",
-                          "disabled:opacity-50 disabled:cursor-not-allowed",
-                          currentMode === 50 
-                            ? "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-lg shadow-green-600/50" 
-                            : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/50",
-                          isSavingMode && "animate-pulse"
-                        )}
-                        title={isSavingMode ? "Saving mode change..." : `Click to toggle between 50:50 (green) and 70:30 (blue) split`}
-                      >
-                        {isSavingMode ? "..." : currentMode}
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => toggleMonthMode(monthNum)}
+                          disabled={isSavingMode}
+                          className={cn(
+                            "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200",
+                            "disabled:opacity-50 disabled:cursor-not-allowed",
+                            currentMode === 50 
+                              ? "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-lg shadow-green-600/50" 
+                              : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/50",
+                            isSavingMode && "animate-pulse"
+                          )}
+                          title={isSavingMode ? "Saving mode change..." : `Click to toggle between 50:50 (green) and 30:70 (blue) split`}
+                        >
+                          {isSavingMode ? "..." : currentMode}
+                        </button>
+                        <button
+                          onClick={() => toggleSkiRacksOwner(monthNum)}
+                          disabled={isSavingSkiRacksOwner}
+                          className={cn(
+                            "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px]",
+                            "disabled:opacity-50 disabled:cursor-not-allowed",
+                            !hasSkiRacksIncome 
+                              ? "bg-gray-600 text-gray-400 hover:bg-gray-700"
+                              : currentSkiRacksOwner === "GLA"
+                                ? "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 shadow-lg shadow-purple-600/50"
+                                : "bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800 shadow-lg shadow-orange-600/50",
+                            isSavingSkiRacksOwner && "animate-pulse"
+                          )}
+                          title={
+                            isSavingSkiRacksOwner 
+                              ? "Saving ski racks owner..." 
+                              : !hasSkiRacksIncome
+                                ? "No ski racks income - toggle available but won't affect calculations"
+                                : `Click to toggle ski racks owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"}`
+                          }
+                        >
+                          {isSavingSkiRacksOwner ? "..." : currentSkiRacksOwner === "GLA" ? "M" : "O"}
+                        </button>
+                      </div>
                     </div>
                   </th>
                 );
@@ -523,7 +659,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 })}
                 category="income"
                 field="carManagementSplit"
-                isEditable={true}
+                isEditable={!isReadOnly}
                 formatType="managementSplit"
                 monthModes={monthModes}
                 showAmountAndPercentage={true}
@@ -542,7 +678,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 })}
                 category="income"
                 field="carOwnerSplit"
-                isEditable={true}
+                isEditable={!isReadOnly}
                 formatType="ownerSplit"
                 monthModes={monthModes}
                 showAmountAndPercentage={true}
@@ -729,20 +865,23 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                     }
                   }}
                   onUpdateValue={updateDynamicSubcategoryValue}
+                  isReadOnly={isReadOnly}
                 />
               ))}
               {/* Add Subcategory Button */}
-              <tr>
-                <td colSpan={14} className="px-3 py-2">
-                  <button
-                    onClick={() => setAddSubcategoryModal({ open: true, categoryType: "directDelivery", name: "" })}
-                    className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Subcategory
-                  </button>
-                </td>
-              </tr>
+              {!isReadOnly && (
+                <tr>
+                  <td colSpan={14} className="px-3 py-2">
+                    <button
+                      onClick={() => setAddSubcategoryModal({ open: true, categoryType: "directDelivery", name: "" })}
+                      className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Subcategory
+                    </button>
+                  </td>
+                </tr>
+              )}
               <CategoryRow
                 label="TOTAL OPERATING EXPENSE (Direct Delivery)"
                 values={MONTHS.map((_, i) => {
@@ -934,20 +1073,23 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                     }
                   }}
                   onUpdateValue={updateDynamicSubcategoryValue}
+                  isReadOnly={isReadOnly}
                 />
               ))}
               {/* Add Subcategory Button */}
-              <tr>
-                <td colSpan={14} className="px-3 py-2">
-                  <button
-                    onClick={() => setAddSubcategoryModal({ open: true, categoryType: "cogs", name: "" })}
-                    className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Subcategory
-                  </button>
-                </td>
-              </tr>
+              {!isReadOnly && (
+                <tr>
+                  <td colSpan={14} className="px-3 py-2">
+                    <button
+                      onClick={() => setAddSubcategoryModal({ open: true, categoryType: "cogs", name: "" })}
+                      className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Subcategory
+                    </button>
+                  </td>
+                </tr>
+              )}
               <CategoryRow
                 label="TOTAL OPERATING EXPENSE (COGS - Per Vehicle)"
                 values={MONTHS.map((_, i) => {
@@ -1026,20 +1168,23 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                     }
                   }}
                   onUpdateValue={updateDynamicSubcategoryValue}
+                  isReadOnly={isReadOnly}
                 />
               ))}
               {/* Add Subcategory Button */}
-              <tr>
-                <td colSpan={14} className="px-3 py-2">
-                  <button
-                    onClick={() => setAddSubcategoryModal({ open: true, categoryType: "parkingFeeLabor", name: "" })}
-                    className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Subcategory
-                  </button>
-                </td>
-              </tr>
+              {!isReadOnly && (
+                <tr>
+                  <td colSpan={14} className="px-3 py-2">
+                    <button
+                      onClick={() => setAddSubcategoryModal({ open: true, categoryType: "parkingFeeLabor", name: "" })}
+                      className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Subcategory
+                    </button>
+                  </td>
+                </tr>
+              )}
               <CategoryRow
                 label="Total Parking Fee & Labor Cleaning"
                 values={MONTHS.map((_, i) => {
@@ -1132,20 +1277,23 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                     }
                   }}
                   onUpdateValue={updateDynamicSubcategoryValue}
+                  isReadOnly={isReadOnly}
                 />
               ))}
               {/* Add Subcategory Button */}
-              <tr>
-                <td colSpan={14} className="px-3 py-2">
-                  <button
-                    onClick={() => setAddSubcategoryModal({ open: true, categoryType: "reimbursedBills", name: "" })}
-                    className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Subcategory
-                  </button>
-                </td>
-              </tr>
+              {!isReadOnly && (
+                <tr>
+                  <td colSpan={14} className="px-3 py-2">
+                    <button
+                      onClick={() => setAddSubcategoryModal({ open: true, categoryType: "reimbursedBills", name: "" })}
+                      className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Subcategory
+                    </button>
+                  </td>
+                </tr>
+              )}
               <CategoryRow
                 label="TOTAL REIMBURSE AND NON-REIMBURSE BILLS"
                 values={MONTHS.map((_, i) => {
@@ -1396,6 +1544,7 @@ interface DynamicSubcategoryRowProps {
   onEditName: () => void;
   onDelete: () => void;
   onUpdateValue: (categoryType: string, metadataId: number, month: number, value: number, subcategoryName: string) => Promise<void>;
+  isReadOnly?: boolean;
 }
 
 function DynamicSubcategoryRow({
@@ -1404,6 +1553,7 @@ function DynamicSubcategoryRow({
   onEditName,
   onDelete,
   onUpdateValue,
+  isReadOnly = false,
 }: DynamicSubcategoryRowProps) {
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const { setEditingCell } = useIncomeExpense();
@@ -1411,6 +1561,7 @@ function DynamicSubcategoryRow({
   const total = subcategory.values.reduce((sum: number, val: any) => sum + (val.value || 0), 0);
   
   const handleCellClick = (month: number, currentValue: number) => {
+    if (isReadOnly) return;
     setEditingCell({
       category: `dynamic-${categoryType}`,
       field: `subcategory-${subcategory.id}`,
@@ -1424,20 +1575,24 @@ function DynamicSubcategoryRow({
       <td className="sticky left-0 z-20 bg-[#0f0f0f] px-3 py-2 text-left text-gray-300 border-r border-[#1a1a1a] text-xs">
         <div className="flex items-center gap-2">
           <span>{subcategory.name}</span>
-          <button
-            onClick={onEditName}
-            className="text-[#EAEB80] hover:text-[#d4d570] transition-colors"
-            title="Edit name"
-          >
-            <Pencil className="w-3 h-3" />
-          </button>
-          <button
-            onClick={onDelete}
-            className="text-red-400 hover:text-red-300 transition-colors"
-            title="Delete"
-          >
-            <Trash2 className="w-3 h-3" />
-          </button>
+          {!isReadOnly && (
+            <>
+              <button
+                onClick={onEditName}
+                className="text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                title="Edit name"
+              >
+                <Pencil className="w-3 h-3" />
+              </button>
+              <button
+                onClick={onDelete}
+                className="text-red-400 hover:text-red-300 transition-colors"
+                title="Delete"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </>
+          )}
         </div>
       </td>
       {MONTHS.map((_, i) => {
@@ -1450,7 +1605,10 @@ function DynamicSubcategoryRow({
             <span
               onClick={() => handleCellClick(month, value)}
               className={cn(
-                "cursor-pointer hover:bg-[#2a2a2a] px-2 py-1 rounded block text-xs text-right transition-colors",
+                "px-2 py-1 rounded block text-xs text-right transition-colors",
+                isReadOnly 
+                  ? "cursor-default" 
+                  : "cursor-pointer hover:bg-[#2a2a2a]",
                 value === 0 ? "text-gray-600" : "text-[#EAEB80]"
               )}
             >
@@ -1527,6 +1685,11 @@ function CategoryRow({
   isPercentage = false,
   showAmountAndPercentage = false,
 }: CategoryRowProps) {
+  const [location] = useLocation();
+  const isReadOnly = location.startsWith("/admin/income-expenses");
+  // Override isEditable if in read-only mode
+  const effectiveIsEditable = isReadOnly ? false : isEditable;
+  
   // Calculate total - ensure all values are numbers
   const total = values.reduce((sum, val) => {
     const numVal = typeof val === 'number' && !isNaN(val) ? val : 0;
@@ -1545,7 +1708,7 @@ function CategoryRow({
     } else if (formatType === "managementSplit") {
       // Get mode for this month to determine percentage
       const mode = monthModes?.[month] || 50;
-      const percentage = mode === 70 ? 70 : 50; // 70:30 split when mode is 70 (Car Management : Car Owner)
+      const percentage = mode === 70 ? 30 : 50; // 30:70 split when mode is 70 (Car Management : Car Owner)
       // Format: $ {splitAmount.toFixed(2)}({percentage}%)
       return `$ ${value.toFixed(2)}(${percentage}%)`;
     } else if (formatType === "ownerSplit") {
@@ -1572,7 +1735,7 @@ function CategoryRow({
     } else if (formatType === "managementSplit") {
       // For management split, calculate average percentage or use default
       const avgMode = monthModes 
-        ? Object.values(monthModes).reduce((sum, mode) => sum + (mode === 70 ? 70 : 50), 0) / 12 // 70:30 split when mode is 70
+        ? Object.values(monthModes).reduce((sum, mode) => sum + (mode === 70 ? 30 : 50), 0) / 12 // 30:70 split when mode is 70
         : 50;
       return `$ ${total.toFixed(2)}(${Math.round(avgMode)}%)`;
     } else if (formatType === "ownerSplit") {
@@ -1600,7 +1763,7 @@ function CategoryRow({
         // Ensure value is a number and handle null/undefined
         const cellValue = typeof value === 'number' && !isNaN(value) ? value : 0;
         // Determine if this specific month is editable
-        const isMonthEditable = isEditablePerMonth ? isEditablePerMonth(month) : isEditable;
+        const isMonthEditable = isReadOnly ? false : (isEditablePerMonth ? isEditablePerMonth(month) : effectiveIsEditable);
         
         return (
           <td 
@@ -1621,7 +1784,7 @@ function CategoryRow({
                     month={month}
                     category={category}
                     field={field}
-                    isEditable={isEditable}
+                    isEditable={effectiveIsEditable}
                     isInteger={false}
                     isPercentage={true}
                   />
@@ -1632,7 +1795,7 @@ function CategoryRow({
                   month={month}
                   category={category}
                   field={field}
-                  isEditable={isEditable}
+                  isEditable={effectiveIsEditable}
                   isInteger={isInteger}
                   isPercentage={isPercentage}
                 />
