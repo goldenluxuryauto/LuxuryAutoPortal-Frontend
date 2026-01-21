@@ -64,6 +64,9 @@ interface RecordFileView {
   recordsFileViewDatetime: string;
 }
 
+// Cache for image blobs to avoid re-fetching
+const imageBlobCache = new Map<number, string>();
+
 interface PageData {
   data: RecordFileView[];
   page: number;
@@ -88,6 +91,8 @@ export default function ViewRecordFilesPage() {
   const [itemEdit, setItemEdit] = useState<RecordFileView | null>(null);
   const [viewingFile, setViewingFile] = useState<RecordFileView | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
+  const [imageUrls, setImageUrls] = useState<Map<number, string>>(new Map());
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   const queryClient = useQueryClient();
 
   // Fetch car details
@@ -231,6 +236,65 @@ export default function ViewRecordFilesPage() {
       setCurrentPage(totalPages);
     }
   }, [totalPages, currentPage]);
+
+  // Load images as blobs with credentials (required for authenticated endpoints)
+  useEffect(() => {
+    if (!recordsData?.data) return;
+
+    const loadImages = async () => {
+      const newImageUrls = new Map<number, string>();
+      const newImageErrors = new Set<number>();
+
+      for (const file of recordsData.data) {
+        // Check if it's an image file
+        const fileExt = file.recordsFileViewName.split('.').pop()?.toLowerCase() || '';
+        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(fileExt);
+        
+        if (!isImage) {
+          continue;
+        }
+
+        // Skip if already loaded or failed
+        if (imageUrls.has(file.recordsFileViewAid) || imageErrors.has(file.recordsFileViewAid)) {
+          continue;
+        }
+
+        try {
+          const url = getFileContentUrl(file.recordsFileViewAid);
+          const response = await fetch(url, {
+            credentials: 'include',
+            method: 'GET',
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to load image: ${response.status}`);
+          }
+
+          const blob = await response.blob();
+          const objectUrl = URL.createObjectURL(blob);
+          newImageUrls.set(file.recordsFileViewAid, objectUrl);
+        } catch (error) {
+          console.error(`Failed to load image for file ${file.recordsFileViewAid}:`, error);
+          newImageErrors.add(file.recordsFileViewAid);
+        }
+      }
+
+      if (newImageUrls.size > 0 || newImageErrors.size > 0) {
+        setImageUrls(prev => new Map([...prev, ...newImageUrls]));
+        setImageErrors(prev => new Set([...prev, ...newImageErrors]));
+      }
+    };
+
+    loadImages();
+
+    // Cleanup: revoke object URLs when component unmounts
+    return () => {
+      imageUrls.forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recordsData?.data]);
 
   // Handle search
   const handleSearch = () => {
@@ -668,7 +732,7 @@ export default function ViewRecordFilesPage() {
             ) : files.length > 0 ? (
               viewMode === "grid" ? (
                 // Grid View with Image Thumbnails
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                   {files.map((file: RecordFileView, index: number) => {
                     const fileNumber = startIndex + index + 1;
                     // Use backend endpoint for authenticated file access
@@ -688,16 +752,26 @@ export default function ViewRecordFilesPage() {
                             }}
                             className="block w-full h-full cursor-pointer"
                           >
-                            <img
-                              src={fileContentUrl}
-                              alt={file.recordsFileViewName}
-                              className="w-full h-full object-contain"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                // Final fallback to placeholder
-                                target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%231a1a1a' width='200' height='200'/%3E%3Ctext fill='%23ffffff' font-family='Arial' font-size='14' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ENo Preview%3C/text%3E%3C/svg%3E";
-                              }}
-                            />
+                            {imageUrls.has(file.recordsFileViewAid) ? (
+                              <img
+                                src={imageUrls.get(file.recordsFileViewAid)}
+                                alt={file.recordsFileViewName}
+                                className="w-full h-full object-contain"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  // Final fallback to placeholder
+                                  target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%231a1a1a' width='200' height='200'/%3E%3Ctext fill='%23ffffff' font-family='Arial' font-size='14' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ENo Preview%3C/text%3E%3C/svg%3E";
+                                }}
+                              />
+                            ) : imageErrors.has(file.recordsFileViewAid) ? (
+                              <div className="w-full h-full flex items-center justify-center bg-[#1a1a1a]">
+                                <span className="text-gray-400 text-sm">No Preview</span>
+                              </div>
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-[#1a1a1a]">
+                                <span className="text-gray-400 text-sm animate-pulse">Loading...</span>
+                              </div>
+                            )}
                           </button>
                           {/* File Number Badge */}
                           <div className="absolute top-2 left-2 bg-[#EAEB80] text-black text-xs font-semibold px-2 py-1 rounded">
@@ -714,7 +788,7 @@ export default function ViewRecordFilesPage() {
                                 className="bg-[#1a1a1a]/90 hover:bg-[#2a2a2a] p-1.5 rounded text-white"
                                 title="View"
                               >
-                                <Eye className="w-3 h-3" />
+                                <Eye className="w-4 h-4" />
                               </button>
                               <a
                                 href={fileContentUrl}
@@ -722,7 +796,7 @@ export default function ViewRecordFilesPage() {
                                 className="bg-[#1a1a1a]/90 hover:bg-[#2a2a2a] p-1.5 rounded text-white"
                                 title="Download"
                               >
-                                <Download className="w-3 h-3" />
+                                <Download className="w-4 h-4" />
                               </a>
                               <button
                                 onClick={() => {
@@ -732,14 +806,14 @@ export default function ViewRecordFilesPage() {
                                 className="bg-[#1a1a1a]/90 hover:bg-[#2a2a2a] p-1.5 rounded text-white"
                                 title="Edit"
                               >
-                                <Edit className="w-3 h-3" />
+                                <Edit className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleArchive(file)}
                                 className="bg-[#1a1a1a]/90 hover:bg-yellow-500/90 p-1.5 rounded text-white"
                                 title="Archive"
                               >
-                                <Archive className="w-3 h-3" />
+                                <Archive className="w-4 h-4" />
                               </button>
                             </div>
                           )}
@@ -750,14 +824,14 @@ export default function ViewRecordFilesPage() {
                                 className="bg-[#1a1a1a]/90 hover:bg-green-500/90 p-1.5 rounded text-white"
                                 title="Restore"
                               >
-                                <History className="w-3 h-3" />
+                                <History className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleDelete(file)}
                                 className="bg-[#1a1a1a]/90 hover:bg-red-500/90 p-1.5 rounded text-white"
                                 title="Delete"
                               >
-                                <Trash2 className="w-3 h-3" />
+                                <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
                           )}
@@ -815,7 +889,7 @@ export default function ViewRecordFilesPage() {
                                     className="text-gray-400 hover:text-[#EAEB80] transition-colors"
                                     title="View"
                                   >
-                                    <Eye className="w-4 h-4" />
+                                    <Eye className="w-5 h-5" />
                                   </button>
                                   <a
                                     href={getFileContentUrl(file.recordsFileViewAid)}
@@ -823,7 +897,7 @@ export default function ViewRecordFilesPage() {
                                     className="text-gray-400 hover:text-blue-400 transition-colors"
                                     title="Download"
                                   >
-                                    <Download className="w-4 h-4" />
+                                    <Download className="w-5 h-5" />
                                   </a>
                                   <button
                                     onClick={() => {
@@ -833,7 +907,7 @@ export default function ViewRecordFilesPage() {
                                     className="text-gray-400 hover:text-[#EAEB80] transition-colors"
                                     aria-label="Edit file"
                                   >
-                                    <Edit className="w-4 h-4" />
+                                    <Edit className="w-5 h-5" />
                                   </button>
                                   <button
                                     onClick={() => handleArchive(file)}
@@ -841,7 +915,7 @@ export default function ViewRecordFilesPage() {
                                     aria-label="Archive file"
                                     title="Archive"
                                   >
-                                    <Archive className="w-4 h-4" />
+                                    <Archive className="w-5 h-5" />
                                   </button>
                                 </>
                               )}
@@ -853,7 +927,7 @@ export default function ViewRecordFilesPage() {
                                     aria-label="Restore file"
                                     title="Restore"
                                   >
-                                    <History className="w-4 h-4" />
+                                    <History className="w-5 h-5" />
                                   </button>
                                   <button
                                     onClick={() => handleDelete(file)}
@@ -861,7 +935,7 @@ export default function ViewRecordFilesPage() {
                                     aria-label="Delete file"
                                     title="Delete"
                                   >
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="w-5 h-5" />
                                   </button>
                                 </>
                               )}
