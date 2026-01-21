@@ -110,30 +110,29 @@ export default function MaintenancePage() {
   return (
     <AdminLayout>
       <div className="flex flex-col w-full overflow-x-hidden">
-        {/* Breadcrumb Navigation */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setLocation("/cars")}
-              className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Cars</span>
-            </button>
-            <span className="text-gray-500">/</span>
-            <button
-              onClick={() => setLocation(`/admin/view-car/${carId}`)}
-              className="text-gray-400 hover:text-[#EAEB80] transition-colors"
-            >
-              View Car
-            </button>
-            <span className="text-gray-500">/</span>
-            <span className="text-gray-300">Maintenance</span>
+        {/* Header */}
+        <div className="mb-6">
+          <button
+            onClick={() => setLocation(`/admin/view-car/${carId}`)}
+            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to View Car</span>
+          </button>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white">Car Maintenance</h1>
+              {car && (
+                <p className="text-sm text-gray-400 mt-1">
+                  Car: {car.makeModel || "Unknown Car"}
+                </p>
+              )}
+            </div>
+            <Button className="bg-[#EAEB80] text-black hover:bg-[#d4d570]">
+              <Plus className="w-4 h-4 mr-2" />
+              Add
+            </Button>
           </div>
-          <Button className="bg-[#EAEB80] text-black hover:bg-[#d4d570]">
-            <Plus className="w-4 h-4 mr-2" />
-            Add
-          </Button>
         </div>
 
         {/* Header Section */}

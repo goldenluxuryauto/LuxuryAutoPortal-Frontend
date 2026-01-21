@@ -6,6 +6,10 @@ import { buildApiUrl } from "@/lib/queryClient";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { ArrowLeft } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import CarHeader from "./components/CarHeader";
 import IncomeExpenseTable from "./components/IncomeExpenseTable";
 import TableActions from "./components/TableActions";
@@ -117,6 +121,8 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   });
 
   const cars = carsData?.data || [];
+  const [carComboboxOpen, setCarComboboxOpen] = useState(false);
+  const [carComboboxOpenPerCar, setCarComboboxOpenPerCar] = useState(false);
 
   // Helper function to format car display name: "Make Model Year - Plate # - VIN #"
   // Format: "Car Make Model Year - Plate # - VIN #"
@@ -199,19 +205,76 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               <label className="block text-sm font-medium text-gray-400 mb-2">
                 Select a car
               </label>
-              <Select value={selectedCar} onValueChange={setSelectedCar}>
-                <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                  <SelectValue placeholder="Select a car" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                  <SelectItem value="all">-- Select a Car --</SelectItem>
-                  {cars.map((carItem: any) => (
-                    <SelectItem key={carItem.id} value={carItem.id.toString()}>
-                      {formatCarDisplayName(carItem)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={carComboboxOpen} onOpenChange={setCarComboboxOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={carComboboxOpen}
+                    className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+                  >
+                    {selectedCar === "all"
+                      ? "-- Select a Car --"
+                      : (() => {
+                          const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
+                          return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
+                        })()}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px] p-0 bg-[#1a1a1a] border-[#2a2a2a]">
+                  <Command className="bg-[#1a1a1a]">
+                    <CommandInput 
+                      placeholder="Search car by make, model, plate, or VIN..." 
+                      className="text-white placeholder:text-gray-500"
+                    />
+                    <CommandList>
+                      <CommandEmpty className="text-gray-400 py-6 text-center text-sm">
+                        No car found.
+                      </CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="all"
+                          onSelect={() => {
+                            setSelectedCar("all");
+                            setCarComboboxOpen(false);
+                          }}
+                          className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              selectedCar === "all" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          -- Select a Car --
+                        </CommandItem>
+                        {cars.map((carItem: any) => {
+                          const carDisplayName = formatCarDisplayName(carItem);
+                          const isSelected = selectedCar === carItem.id.toString();
+                          return (
+                            <CommandItem
+                              key={carItem.id}
+                              value={carDisplayName}
+                              onSelect={() => {
+                                setSelectedCar(carItem.id.toString());
+                                setCarComboboxOpen(false);
+                              }}
+                              className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  isSelected ? "opacity-100" : "opacity-0"
+                                }`}
+                              />
+                              {carDisplayName}
+                            </CommandItem>
+                          );
+                        })}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="w-[150px]">
@@ -248,42 +311,35 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
     <IncomeExpenseProvider carId={activeCarId} year={selectedYear}>
       <AdminLayout>
         <div className="flex flex-col w-full h-full overflow-hidden">
-          {/* Breadcrumb Navigation - Different based on source */}
-          <div className="flex items-center gap-2 mb-2 flex-shrink-0">
+          {/* Header */}
+          <div className="mb-2 flex-shrink-0">
             {isFromRoute ? (
               // From View Car menu
-              <>
-                <button
-                  onClick={() => setLocation("/cars")}
-                  className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Cars</span>
-                </button>
-                <span className="text-gray-500">/</span>
-                <button
-                  onClick={() => setLocation(`/admin/view-car/${activeCarId}`)}
-                  className="text-gray-400 hover:text-[#EAEB80] transition-colors"
-                >
-                  View Car
-                </button>
-                <span className="text-gray-500">/</span>
-                <span className="text-gray-400">Income and Expense</span>
-              </>
+              <button
+                onClick={() => setLocation(`/admin/view-car/${activeCarId}`)}
+                className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to View Car</span>
+              </button>
             ) : (
               // From admin Income and Expenses menu
-              <>
-                <button
-                  onClick={() => setLocation("/admin/income-expenses")}
-                  className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Income and Expenses</span>
-                </button>
-                <span className="text-gray-500">/</span>
-                <span className="text-gray-400">{car?.makeModel || "Car Details"}</span>
-              </>
+              <button
+                onClick={() => setLocation("/cars")}
+                className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Cars</span>
+              </button>
             )}
+            <div>
+              <h1 className="text-2xl font-bold text-white">Income and Expenses</h1>
+              {car && (
+                <p className="text-sm text-gray-400 mt-1">
+                  Car: {car.makeModel || "Unknown Car"}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Car Header */}
@@ -298,18 +354,61 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               {/* Show car selector only in admin all-cars view */}
               {!isFromRoute && (
                 <div className="w-[300px]">
-                  <Select value={selectedCar} onValueChange={setSelectedCar}>
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm">
-                      <SelectValue placeholder="Select car" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                      {cars.map((carItem: any) => (
-                        <SelectItem key={carItem.id} value={carItem.id.toString()}>
-                          {formatCarDisplayName(carItem)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover open={carComboboxOpenPerCar} onOpenChange={setCarComboboxOpenPerCar}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={carComboboxOpenPerCar}
+                        className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] text-sm"
+                      >
+                        {selectedCar === "all"
+                          ? "-- Select a Car --"
+                          : (() => {
+                              const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
+                              return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
+                            })()}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0 bg-[#1a1a1a] border-[#2a2a2a]">
+                      <Command className="bg-[#1a1a1a]">
+                        <CommandInput 
+                          placeholder="Search car by make, model, plate, or VIN..." 
+                          className="text-white placeholder:text-gray-500"
+                        />
+                        <CommandList>
+                          <CommandEmpty className="text-gray-400 py-6 text-center text-sm">
+                            No car found.
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {cars.map((carItem: any) => {
+                              const carDisplayName = formatCarDisplayName(carItem);
+                              const isSelected = selectedCar === carItem.id.toString();
+                              return (
+                                <CommandItem
+                                  key={carItem.id}
+                                  value={carDisplayName}
+                                  onSelect={() => {
+                                    setSelectedCar(carItem.id.toString());
+                                    setCarComboboxOpenPerCar(false);
+                                  }}
+                                  className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                                >
+                                  <Check
+                                    className={`mr-2 h-4 w-4 ${
+                                      isSelected ? "opacity-100" : "opacity-0"
+                                    }`}
+                                  />
+                                  {carDisplayName}
+                                </CommandItem>
+                              );
+                            })}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               )}
               <TableActions
