@@ -140,17 +140,23 @@ export default function ViewCarPage() {
   return (
     <AdminLayout>
       <div className="flex flex-col h-full overflow-x-hidden">
-        {/* Breadcrumb Navigation */}
-        <div className="flex items-center gap-2 mb-6">
+        {/* Header */}
+        <div className="mb-6">
           <button
             onClick={() => setLocation("/cars")}
-            className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
+            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Cars</span>
+            <span>Back to Cars</span>
           </button>
-          <span className="text-gray-500">/</span>
-          <span className="text-gray-400">View Car</span>
+          <div>
+            <h1 className="text-2xl font-bold text-white">View Car</h1>
+            {car && (
+              <p className="text-sm text-gray-400 mt-1">
+                Car: {car.makeModel || "Unknown Car"}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Car and Owner Information Header */}

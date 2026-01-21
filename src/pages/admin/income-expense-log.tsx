@@ -96,23 +96,20 @@ export default function IncomeExpenseLogPage() {
     <AdminLayout>
       <div className="flex flex-col w-full h-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="mb-4">
           <button
             onClick={() => setLocation(`/admin/cars/${carId}/income-expense`)}
-            className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
+            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Income & Expense</span>
           </button>
-        </div>
-
-        <div className="mb-6">
-          <h1 className="text-2xl font-serif text-[#EAEB80] italic mb-2">
-            Edit History & Log
-          </h1>
-          <p className="text-gray-400 text-sm">
-            Track all changes made to income and expense data
-          </p>
+          <div>
+            <h1 className="text-2xl font-bold text-white">Edit History & Log</h1>
+            <p className="text-sm text-gray-400 mt-1">
+              Track all changes made to income and expense data
+            </p>
+          </div>
         </div>
 
         {/* Filters */}

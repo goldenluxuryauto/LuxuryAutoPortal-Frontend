@@ -870,22 +870,24 @@ export default function ClientDetailPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400">
+        {/* Header */}
+        <div className="mb-6">
           <button
             onClick={() => setLocation("/admin/clients")}
-            className="hover:text-[#EAEB80] transition-colors"
+            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
           >
-            Clients
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Clients</span>
           </button>
-          <span>/</span>
-          <span className="text-[#EAEB80]">View Info</span>
-        </div>
-
-        {/* Header */}
-        <h1 className="text-4xl font-serif text-[#EAEB80] italic">
+          <div>
+            <h1 className="text-2xl font-bold text-white">
           {client.firstName} {client.lastName}
         </h1>
+            <p className="text-sm text-gray-400 mt-1">
+              Client Details
+            </p>
+          </div>
+        </div>
 
         {/* Main Layout: Sidebar + Content */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -2233,6 +2235,24 @@ export default function ClientDetailPage() {
                   />
                 </div>
                 <div>
+                  <Label className="text-gray-400">SSN</Label>
+                  <Input
+                    value={editFormData.ssn || ""}
+                    onChange={(e) => setEditFormData({ ...editFormData, ssn: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                    placeholder="Enter SSN"
+                  />
+                </div>
+                  <div>
+                    <Label className="text-gray-400">EIN</Label>
+                    <Input
+                      value={editFormData.ein || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, ein: e.target.value })}
+                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                    placeholder="Enter EIN"
+                    />
+                  </div>
+                <div>
                   <Label className="text-gray-400">Business Name</Label>
                   <Input
                     value={editFormData.businessName || ""}
@@ -2240,16 +2260,6 @@ export default function ClientDetailPage() {
                     className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
                   />
                 </div>
-                {editFormData.taxClassification === "business" && (
-                  <div>
-                    <Label className="text-gray-400">EIN</Label>
-                    <Input
-                      value={editFormData.ein || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, ein: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
-                    />
-                  </div>
-                )}
               </div>
             </div>
 

@@ -6,19 +6,19 @@ import { Input } from "@/components/ui/input";
 import { buildApiUrl } from "@/lib/queryClient";
 import { format } from "date-fns";
 
-interface NadaDepreciationLogModalProps {
+interface RecordFilesLogModalProps {
   isOpen: boolean;
   onClose: () => void;
   carId: number;
-  item?: string;
+  carBacklogPage?: "records-and-files" | "records-and-files-view";
 }
 
-export function NadaDepreciationLogModal({
+export function RecordFilesLogModal({
   isOpen,
   onClose,
   carId,
-  item,
-}: NadaDepreciationLogModalProps) {
+  carBacklogPage = "records-and-files",
+}: RecordFilesLogModalProps) {
   const [searchValue, setSearchValue] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -81,7 +81,7 @@ export function NadaDepreciationLogModal({
     queryKey: [
       "/api/car-backlog",
       carId,
-      item,
+      carBacklogPage,
       onSearch,
       searchValue,
       dateFrom,
@@ -93,14 +93,10 @@ export function NadaDepreciationLogModal({
       const params = new URLSearchParams({
         carId: carId.toString(),
         page: page.toString(),
-        car_backlog_page: "nada-depreciation-schedule",
+        car_backlog_page: carBacklogPage,
       });
 
-      if (item) {
-        params.append("item", item);
-      }
-
-      if (searchValue) {
+      if (searchValue && searchValue.trim() !== "") {
         params.append("searchValue", searchValue);
       }
 
@@ -152,6 +148,13 @@ export function NadaDepreciationLogModal({
     refetchOnWindowFocus: true,
   });
 
+  // Load more when in view
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   const handleSearch = () => {
     if (searchValue.trim() !== "") {
       setOnSearch(true);
@@ -188,32 +191,18 @@ export function NadaDepreciationLogModal({
     }
   }, [dateFrom, dateTo]);
 
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+  const formatDate = (dateString: string | null | undefined, fallback: string = "--"): string => {
+    if (!dateString) return fallback;
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return fallback;
+      return format(date, "MMM dd, yyyy");
+    } catch {
+      return fallback;
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  };
 
   const logs = data?.pages.flatMap((page) => page.data) || [];
-
-  // Format month year from YYYY-MM format
-  const formatMonthYear = (dateStr: string) => {
-    if (!dateStr) return "N/A";
-    try {
-      const [year, month] = dateStr.split("-");
-      const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-      return format(date, "MMM yyyy");
-    } catch {
-      return dateStr;
-    }
-  };
-
-  // Format currency
-  const formatCurrency = (value: string | number) => {
-    if (!value || value === "0" || value === 0) return "$0.00";
-    const num = typeof value === "string" ? parseFloat(value) : value;
-    return `$${num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
-  };
 
   if (!isOpen) return null;
 
@@ -222,7 +211,7 @@ export function NadaDepreciationLogModal({
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg w-full max-w-6xl max-h-[90vh] p-6 relative flex flex-col">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-white">
-            NADA Depreciation Schedule Edit History
+            Records and Files Edit History
           </h3>
           <button
             onClick={onClose}
@@ -284,7 +273,7 @@ export function NadaDepreciationLogModal({
               <Search className="w-4 h-4" />
             </Button>
           </div>
-                    </div>
+        </div>
 
         {/* Table */}
         <div className="flex-1 overflow-auto">
@@ -293,14 +282,14 @@ export function NadaDepreciationLogModal({
               <div className="mb-2">Error loading data.</div>
               <div className="text-sm text-gray-400 mb-4">
                 {error instanceof Error ? error.message : "Please try again."}
-                    </div>
+              </div>
               <Button
                 onClick={() => refetch()}
                 className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
               >
                 Retry
               </Button>
-                    </div>
+            </div>
           )}
 
           {!error && (status === "pending" || (isFetching && !isFetchingNextPage)) ? (
@@ -308,7 +297,7 @@ export function NadaDepreciationLogModal({
           ) : !error && logs.length === 0 ? (
             <div className="text-center text-gray-400 py-8">
               No edit history found
-                    </div>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -324,19 +313,22 @@ export function NadaDepreciationLogModal({
                       Date Time
                     </th>
                     <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 min-w-[8rem]">
-                      Item
+                      Action
+                    </th>
+                    <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 min-w-[8rem]">
+                      Old Date
+                    </th>
+                    <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 min-w-[8rem]">
+                      New Date
                     </th>
                     <th className="text-left px-3 py-3 text-sm font-medium text-gray-300">
-                      Category
+                      Old Document Name
                     </th>
                     <th className="text-left px-3 py-3 text-sm font-medium text-gray-300">
-                      Month Year
+                      New Document Name
                     </th>
-                    <th className="text-right px-3 py-3 text-sm font-medium text-gray-300">
-                      Old Values
-                    </th>
-                    <th className="text-right px-3 py-3 text-sm font-medium text-gray-300">
-                      New Values
+                    <th className="text-left px-3 py-3 text-sm font-medium text-gray-300">
+                      Remarks
                     </th>
                   </tr>
                 </thead>
@@ -355,12 +347,12 @@ export function NadaDepreciationLogModal({
                           {log.fullname || "N/A"}
                         </td>
                         <td className="px-3 py-2 text-sm text-gray-300">
-                        {log.carBacklogCreated
-                          ? format(
-                              new Date(log.carBacklogCreated),
-                              "MMM dd, yyyy HH:mm"
-                            )
-                          : "N/A"}
+                          {log.carBacklogCreated
+                            ? format(
+                                new Date(log.carBacklogCreated),
+                                "MMM dd, yyyy HH:mm"
+                              )
+                            : "N/A"}
                         </td>
                         <td className="px-3 py-2 text-sm text-gray-300 capitalize">
                           {log.carBacklogItem
@@ -368,20 +360,19 @@ export function NadaDepreciationLogModal({
                             : "N/A"}
                         </td>
                         <td className="px-3 py-2 text-sm text-gray-300">
-                          {log.carBacklogCategoryName || "N/A"}
+                          {formatDate(log.carBacklogOldAmount, "N/A")}
+                        </td>
+                        <td className="px-3 py-2 text-sm text-[#EAEB80] font-medium">
+                          {formatDate(log.carBacklogNewAmount, "N/A")}
                         </td>
                         <td className="px-3 py-2 text-sm text-gray-300">
-                          {formatMonthYear(log.carBacklogDate)}
+                          {log.carBacklogOldValues || "N/A"}
                         </td>
-                        <td className="px-3 py-2 text-sm text-gray-300 text-right">
-                          {formatCurrency(
-                            log.carBacklogOldAmount || log.carBacklogOldValues || "0"
-                          )}
+                        <td className="px-3 py-2 text-sm text-[#EAEB80] font-medium">
+                          {log.carBacklogNewValues || "N/A"}
                         </td>
-                        <td className="px-3 py-2 text-sm text-[#EAEB80] font-medium text-right">
-                          {formatCurrency(
-                            log.carBacklogNewAmount || log.carBacklogNewValues || "0"
-                          )}
+                        <td className="px-3 py-2 text-sm text-gray-300">
+                          {log.carBacklogRemarks || "N/A"}
                         </td>
                       </tr>
                     );
@@ -403,8 +394,8 @@ export function NadaDepreciationLogModal({
                       Load More
                     </Button>
                   )}
-                      </div>
-                    )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -421,3 +412,4 @@ export function NadaDepreciationLogModal({
     </div>
   );
 }
+

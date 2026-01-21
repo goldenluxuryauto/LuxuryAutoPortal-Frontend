@@ -27,6 +27,7 @@ import GraphsChartsPage from "@/pages/admin/graphs-charts";
 import PaymentCalculatorPage from "@/pages/admin/payment-calculator";
 import MaintenancePage from "@/pages/admin/maintenance";
 import RecordsPage from "@/pages/admin/records";
+import ViewRecordFilesPage from "@/pages/admin/view-record-files";
 import PaymentsPage from "@/pages/admin/payments";
 import TotalsPage from "@/pages/admin/totals";
 import IncomeExpensesPage from "@/pages/admin/income-expenses/index";
@@ -70,6 +71,7 @@ function Router() {
       <Route path="/admin/cars/:id/maintenance" component={MaintenancePage} />
       <Route path="/admin/cars/:id/totals" component={TotalsPage} />
       <Route path="/admin/cars/:id/records" component={RecordsPage} />
+      <Route path="/admin/cars/:carId/records/:recordId/files" component={ViewRecordFilesPage} />
       <Route path="/admin/cars/:id/payments" component={PaymentsPage} />
       <Route path="/admin/cars/:id/income-expense/log" component={IncomeExpenseLogPage} />
       <Route path="/admin/cars/:id/income-expense" component={CarIncomeExpensePage} />
