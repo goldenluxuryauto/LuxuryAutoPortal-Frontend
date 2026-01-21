@@ -173,24 +173,23 @@ export default function TotalsPage() {
   return (
     <AdminLayout>
       <div className="flex flex-col h-full overflow-y-auto overflow-x-hidden">
-        {/* Breadcrumb Navigation */}
-        <div className="flex items-center gap-2 mb-6">
-          <button
-            onClick={() => setLocation("/cars")}
-            className="text-gray-400 hover:text-[#EAEB80] transition-colors flex items-center gap-1"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Cars</span>
-          </button>
-          <span className="text-gray-500">/</span>
+        {/* Header */}
+        <div className="mb-6">
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-gray-400 hover:text-[#EAEB80] transition-colors"
+            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
           >
-            View Car
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to View Car</span>
           </button>
-          <span className="text-gray-500">/</span>
-          <span className="text-gray-300">Totals</span>
+          <div>
+            <h1 className="text-2xl font-bold text-white">Totals</h1>
+            {car && (
+              <p className="text-sm text-gray-400 mt-1">
+                Car: {car.makeModel || "Unknown Car"}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Car and Owner Information Header */}
