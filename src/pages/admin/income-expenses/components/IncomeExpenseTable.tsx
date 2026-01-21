@@ -388,8 +388,13 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     const totalCogs = getTotalCogsForMonth(month);
     const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
     
+    // From 2026 onwards, use formulas that include ski racks income
+    // Before 2026, ignore ski racks income and always use standard formula
+    const currentYear = parseInt(year, 10);
+    const useSkiRacksFormula = currentYear >= 2026 && skiRacksIncome > 0;
+    
     // Check if ski racks income exists and use appropriate formula
-    if (skiRacksIncome > 0) {
+    if (useSkiRacksFormula) {
       const owner = skiRacksOwner[month] || "GLA";
       
       if (owner === "GLA") {
@@ -480,8 +485,13 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     
+    // From 2026 onwards, use formulas that include ski racks income
+    // Before 2026, ignore ski racks income and always use standard formula
+    const currentYear = parseInt(year, 10);
+    const useSkiRacksFormula = currentYear >= 2026 && skiRacksIncome > 0;
+    
     // Check if ski racks income exists and use appropriate formula
-    if (skiRacksIncome > 0) {
+    if (useSkiRacksFormula) {
       const owner = skiRacksOwner[month] || "GLA";
       
       if (owner === "GLA") {

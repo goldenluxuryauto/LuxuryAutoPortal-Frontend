@@ -4,8 +4,12 @@ import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import CarHeader from "./components/CarHeader";
 import IncomeExpenseTable from "./components/IncomeExpenseTable";
 import TableActions from "./components/TableActions";
@@ -46,6 +50,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   const [selectedCar, setSelectedCar] = useState<string>(
     carIdFromQuery ? String(carIdFromQuery) : "all"
   );
+  const [carSelectOpen, setCarSelectOpen] = useState(false);
   
   // Get current year and generate year options (past 5 years + current + future 2 years)
   const currentYear = new Date().getFullYear();
@@ -199,19 +204,68 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               <label className="block text-sm font-medium text-gray-400 mb-2">
                 Select a car
               </label>
-              <Select value={selectedCar} onValueChange={setSelectedCar}>
-                <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                  <SelectValue placeholder="Select a car" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                  <SelectItem value="all">-- Select a Car --</SelectItem>
-                  {cars.map((carItem: any) => (
-                    <SelectItem key={carItem.id} value={carItem.id.toString()}>
-                      {formatCarDisplayName(carItem)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={carSelectOpen} onOpenChange={setCarSelectOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={carSelectOpen}
+                    className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#222] hover:text-white"
+                  >
+                    {selectedCar === "all"
+                      ? "-- Select a Car --"
+                      : cars.find((carItem: any) => carItem.id.toString() === selectedCar)
+                        ? formatCarDisplayName(cars.find((carItem: any) => carItem.id.toString() === selectedCar))
+                        : "Select a car..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px] p-0 bg-[#1a1a1a] border-[#2a2a2a]">
+                  <Command className="bg-[#1a1a1a] text-white">
+                    <CommandInput placeholder="Search cars..." className="text-white" />
+                    <CommandList>
+                      <CommandEmpty>No car found.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="all"
+                          onSelect={() => {
+                            setSelectedCar("all");
+                            setCarSelectOpen(false);
+                          }}
+                          className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedCar === "all" ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          -- Select a Car --
+                        </CommandItem>
+                        {cars.map((carItem: any) => (
+                          <CommandItem
+                            key={carItem.id}
+                            value={`${formatCarDisplayName(carItem)} ${carItem.id} ${carItem.makeModel} ${carItem.year} ${carItem.licensePlate} ${carItem.vin}`}
+                            onSelect={() => {
+                              setSelectedCar(carItem.id.toString());
+                              setCarSelectOpen(false);
+                            }}
+                            className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedCar === carItem.id.toString() ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {formatCarDisplayName(carItem)}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="w-[150px]">
@@ -298,18 +352,52 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               {/* Show car selector only in admin all-cars view */}
               {!isFromRoute && (
                 <div className="w-[300px]">
-                  <Select value={selectedCar} onValueChange={setSelectedCar}>
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm">
-                      <SelectValue placeholder="Select car" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                      {cars.map((carItem: any) => (
-                        <SelectItem key={carItem.id} value={carItem.id.toString()}>
-                          {formatCarDisplayName(carItem)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover open={carSelectOpen} onOpenChange={setCarSelectOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={carSelectOpen}
+                        className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#222] hover:text-white text-sm"
+                      >
+                        {selectedCar === "all"
+                          ? "Select car"
+                          : cars.find((carItem: any) => carItem.id.toString() === selectedCar)
+                            ? formatCarDisplayName(cars.find((carItem: any) => carItem.id.toString() === selectedCar))
+                            : "Select car..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0 bg-[#1a1a1a] border-[#2a2a2a]">
+                      <Command className="bg-[#1a1a1a] text-white">
+                        <CommandInput placeholder="Search cars..." className="text-white" />
+                        <CommandList>
+                          <CommandEmpty>No car found.</CommandEmpty>
+                          <CommandGroup>
+                            {cars.map((carItem: any) => (
+                              <CommandItem
+                                key={carItem.id}
+                                value={`${formatCarDisplayName(carItem)} ${carItem.id} ${carItem.makeModel} ${carItem.year} ${carItem.licensePlate} ${carItem.vin}`}
+                                onSelect={() => {
+                                  setSelectedCar(carItem.id.toString());
+                                  setCarSelectOpen(false);
+                                }}
+                                className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    selectedCar === carItem.id.toString() ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {formatCarDisplayName(carItem)}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               )}
               <TableActions
