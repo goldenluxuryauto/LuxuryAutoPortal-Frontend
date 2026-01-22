@@ -246,11 +246,12 @@ export function getNadaChange(
   let currentChangeRough = 0;
 
   if (nadaDepreciationWithAdd.length > 0 && nadaDepreciation.length > 0) {
+    const previousYear = (parseInt(year) - 1).toString();
     nadaDepreciationWithAdd.forEach((withItem) => {
       const withDateYear = withItem.nadaDepreciationWithAddDate.split("-")[0];
       const withDateMonth = parseInt(withItem.nadaDepreciationWithAddDate.split("-")[1]);
 
-      if (withDateMonth === monthKey && withDateYear === year) {
+      if (withDateMonth === monthKey && withDateYear === previousYear) {
         nadaDepreciation.forEach((nadaItem) => {
           const nadaDateYear = nadaItem.nadaDepreciationDate.split("-")[0];
           const nadaDateMonth = parseInt(nadaItem.nadaDepreciationDate.split("-")[1]);
@@ -334,12 +335,13 @@ export function getNadaChangeCurrent(
   let prevAmount = 0;
   let currentAmount = 0;
 
+  const previousYear = (parseInt(year) - 1).toString();
   const highestDateValWithAdd: number[] = [];
   const highestDateVal: number[] = [];
 
   nadaDepreciationWithAdd.forEach((e) => {
     const dateYear = e.nadaDepreciationWithAddDate.split("-")[0];
-    if (dateYear === year) {
+    if (dateYear === previousYear) {
       const month = parseInt(e.nadaDepreciationWithAddDate.split("-")[1]);
       highestDateValWithAdd.push(month);
     }
@@ -365,10 +367,10 @@ export function getNadaChangeCurrent(
     const itemDate = new Date(item.nadaDepreciationWithAddDate + "-01");
     const dateMonth = parseInt(item.nadaDepreciationWithAddDate.split("-")[1]);
 
-    // Match original exactly: itemDate.getFullYear() === Number(year)
+    // Match original exactly: itemDate.getFullYear() === Number(previousYear)
     if (
       item.nadaDepreciationWithAddId === categoryId &&
-      itemDate.getFullYear() === Number(year) &&
+      itemDate.getFullYear() === Number(previousYear) &&
       itemDate > prevMaxDate &&
       dateMonth === maxValueWithAdd
     ) {
