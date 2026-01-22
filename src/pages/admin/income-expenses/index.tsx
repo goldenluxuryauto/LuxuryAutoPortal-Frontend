@@ -4,11 +4,10 @@ import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CarHeader from "./components/CarHeader";
 import IncomeExpenseTable from "./components/IncomeExpenseTable";
@@ -50,6 +49,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   const [selectedCar, setSelectedCar] = useState<string>(
     carIdFromQuery ? String(carIdFromQuery) : "all"
   );
+  const [carSelectOpen, setCarSelectOpen] = useState(false);
   
   // Get current year and generate year options (past 5 years + current + future 2 years)
   const currentYear = new Date().getFullYear();

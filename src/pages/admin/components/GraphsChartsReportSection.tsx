@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import React, { useMemo } from "react";
 import {
+  BarChart,
+  Bar,
   LineChart,
   Line,
   XAxis,
@@ -11,184 +11,285 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-
-type GraphOption = "Total Rental Income and Expenses";
+import type { IncomeExpenseData } from "@/pages/admin/income-expenses/types";
 
 interface GraphsChartsReportSectionProps {
   title?: string;
   className?: string;
+  incomeExpenseData?: IncomeExpenseData;
+  selectedYear: string;
+  calculateCarManagementSplit: (month: number) => number;
+  calculateCarOwnerSplit: (month: number) => number;
+  calculateCarManagementTotalExpenses: (month: number) => number;
+  calculateCarOwnerTotalExpenses: (month: number) => number;
+  getMonthValue: (arr: any[], month: number, field: string) => number;
 }
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 export function GraphsChartsReportSection({
-  title = "Graphs and Charts Report",
+  title = "GRAPHS AND CHART REPORT",
   className,
+  incomeExpenseData,
+  selectedYear,
+  calculateCarManagementSplit,
+  calculateCarOwnerSplit,
+  calculateCarManagementTotalExpenses,
+  calculateCarOwnerTotalExpenses,
+  getMonthValue,
 }: GraphsChartsReportSectionProps) {
-  const [selectedGraph, setSelectedGraph] = useState<GraphOption>("Total Rental Income and Expenses");
-  const [fromYear, setFromYear] = useState<string>("2026");
-  const [toYear, setToYear] = useState<string>("2026");
+  // Prepare monthly data for charts
+  const monthlyData = useMemo(() => {
+    if (!incomeExpenseData) return [];
+    
+    return MONTHS.map((month, index) => {
+      const monthNum = index + 1;
+      const rentalIncome = getMonthValue(incomeExpenseData.incomeExpenses || [], monthNum, "rentalIncome");
+      const carManagementSplit = calculateCarManagementSplit(monthNum);
+      const carOwnerSplit = calculateCarOwnerSplit(monthNum);
+      const carManagementTotalExpenses = calculateCarManagementTotalExpenses(monthNum);
+      const carOwnerTotalExpenses = calculateCarOwnerTotalExpenses(monthNum);
+      const daysRented = getMonthValue(incomeExpenseData.history || [], monthNum, "daysRented");
+      const tripsTaken = getMonthValue(incomeExpenseData.history || [], monthNum, "tripsTaken");
+      const carManagementProfit = carManagementSplit - carManagementTotalExpenses;
+      const carOwnerProfit = carOwnerSplit - carOwnerTotalExpenses;
+      const avePerRental = tripsTaken > 0 ? rentalIncome / tripsTaken : 0;
 
-  // Placeholder chart data (currently no backend data source wired up)
-  const chartData = useMemo(() => {
-    return [
+      return {
+        month: month,
+        "Rental Income": rentalIncome,
+        "Car Management Profit": carManagementProfit,
+        "Car Owner Profit": carOwnerProfit,
+        "Car Management Total Expenses": carManagementTotalExpenses,
+        "Car Owner Total Expenses": carOwnerTotalExpenses,
+        "Days Rented": daysRented,
+        "Trips Taken": tripsTaken,
+        "Ave Per Rental": avePerRental,
+      };
+    });
+  }, [incomeExpenseData, selectedYear, calculateCarManagementSplit, calculateCarOwnerSplit, calculateCarManagementTotalExpenses, calculateCarOwnerTotalExpenses, getMonthValue]);
+
+  // Calculate yearly totals
+  const yearlyTotals = useMemo(() => {
+    const totals = monthlyData.reduce(
+      (acc, data) => ({
+        "Rental Income": acc["Rental Income"] + data["Rental Income"],
+        "Car Management Profit": acc["Car Management Profit"] + data["Car Management Profit"],
+        "Car Owner Profit": acc["Car Owner Profit"] + data["Car Owner Profit"],
+        "Car Management Total Expenses": acc["Car Management Total Expenses"] + data["Car Management Total Expenses"],
+        "Car Owner Total Expenses": acc["Car Owner Total Expenses"] + data["Car Owner Total Expenses"],
+        "Days Rented": acc["Days Rented"] + data["Days Rented"],
+        "Trips Taken": acc["Trips Taken"] + data["Trips Taken"],
+        "Ave Per Rental": acc["Trips Taken"] > 0 ? acc["Rental Income"] / acc["Trips Taken"] : 0,
+      }),
       {
-        year: fromYear === toYear ? fromYear : `${fromYear}-${toYear}`,
         "Rental Income": 0,
-        "Total Expenses": 0,
-      },
-    ];
-  }, [fromYear, toYear]);
+        "Car Management Profit": 0,
+        "Car Owner Profit": 0,
+        "Car Management Total Expenses": 0,
+        "Car Owner Total Expenses": 0,
+        "Days Rented": 0,
+        "Trips Taken": 0,
+        "Ave Per Rental": 0,
+      }
+    );
+    return totals;
+  }, [monthlyData]);
 
-  const hasData = false;
+  const formatCurrency = (value: number): string => {
+    return `$${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  const formatTooltip = (value: number, name: string) => {
+    if (name.includes("Days") || name.includes("Trips")) {
+      return [value.toString(), name];
+    }
+    return [formatCurrency(value), name];
+  };
 
   return (
     <div className={className}>
       <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-6">{title}</h1>
 
-      {/* Graph Selection and Date Range */}
+      {/* Rental Income Chart */}
       <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-6 items-start md:items-end">
-          <div className="flex-1">
-            <Label className="text-sm text-gray-400 mb-2 block">Select Graphs and Charts</Label>
-            <Select value={selectedGraph} onValueChange={(v) => setSelectedGraph(v as GraphOption)}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                <SelectItem value="Total Rental Income and Expenses">Total Rental Income and Expenses</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex gap-4">
-            <div>
-              <Label className="text-sm text-gray-400 mb-2 block">From</Label>
-              <Select value={fromYear} onValueChange={setFromYear}>
-                <SelectTrigger className="w-[120px] bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                  <SelectItem value="2026">2026</SelectItem>
-                  <SelectItem value="2025">2025</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                  <SelectItem value="2022">2022</SelectItem>
-                  <SelectItem value="2021">2021</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="text-sm text-gray-400 mb-2 block">To</Label>
-              <Select value={toYear} onValueChange={setToYear}>
-                <SelectTrigger className="w-[120px] bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                  <SelectItem value="2026">2026</SelectItem>
-                  <SelectItem value="2025">2025</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                  <SelectItem value="2022">2022</SelectItem>
-                  <SelectItem value="2021">2021</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+        <h2 className="text-lg font-semibold text-gray-300 mb-4">Rental Income</h2>
+        <div className="mb-4 text-sm text-gray-400">
+          <div>Yearly Total: {formatCurrency(yearlyTotals["Rental Income"])}</div>
         </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={monthlyData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+            <XAxis dataKey="month" stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <YAxis stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1a1a1a",
+                border: "1px solid #2a2a2a",
+                color: "#fff",
+              }}
+              formatter={formatTooltip}
+            />
+            <Legend wrapperStyle={{ color: "#9ca3af" }} />
+            <Bar dataKey="Rental Income" fill="#38bdf8" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
-      {/* Chart Area */}
-      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden">
-        <div className="p-6">
-          <h2 className="text-lg font-semibold text-gray-300 text-center mb-6">{selectedGraph}</h2>
-
-          {hasData ? (
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
-                <XAxis dataKey="year" stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
-                <YAxis
-                  stroke="#9ca3af"
-                  tick={{ fill: "#9ca3af" }}
-                  domain={[0, 1.0]}
-                  ticks={[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1a1a1a",
-                    border: "1px solid #2a2a2a",
-                    color: "#fff",
-                  }}
-                />
-                <Legend wrapperStyle={{ color: "#9ca3af" }} iconType="square" />
-                <Line
-                  type="monotone"
-                  dataKey="Rental Income"
-                  stroke="#38bdf8"
-                  strokeWidth={2}
-                  dot={{ fill: "#38bdf8", r: 4 }}
-                  name="Rental Income"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="Total Expenses"
-                  stroke="#a78bfa"
-                  strokeWidth={2}
-                  dot={{ fill: "#a78bfa", r: 4 }}
-                  name="Total Expenses"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="relative" style={{ height: "400px" }}>
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
-                  <XAxis dataKey="year" stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
-                  <YAxis
-                    stroke="#9ca3af"
-                    tick={{ fill: "#9ca3af" }}
-                    domain={[0, 1.0]}
-                    ticks={[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#1a1a1a",
-                      border: "1px solid #2a2a2a",
-                      color: "#fff",
-                    }}
-                  />
-                  <Legend wrapperStyle={{ color: "#9ca3af" }} iconType="square" />
-                  <Line
-                    type="monotone"
-                    dataKey="Rental Income"
-                    stroke="#38bdf8"
-                    strokeWidth={2}
-                    dot={{ fill: "#38bdf8", r: 4 }}
-                    name="Rental Income"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="Total Expenses"
-                    stroke="#a78bfa"
-                    strokeWidth={2}
-                    dot={{ fill: "#a78bfa", r: 4 }}
-                    name="Total Expenses"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="flex gap-8">
-                  <div className="bg-black/80 px-4 py-2 rounded text-white text-sm">No data</div>
-                  <div className="bg-black/80 px-4 py-2 rounded text-white text-sm">No data</div>
-                </div>
-              </div>
-            </div>
-          )}
+      {/* Car Management Profit Chart */}
+      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-300 mb-4">Car Management Profit</h2>
+        <div className="mb-4 text-sm text-gray-400">
+          <div>Yearly Total: {formatCurrency(yearlyTotals["Car Management Profit"])}</div>
         </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={monthlyData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+            <XAxis dataKey="month" stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <YAxis stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1a1a1a",
+                border: "1px solid #2a2a2a",
+                color: "#fff",
+              }}
+              formatter={formatTooltip}
+            />
+            <Legend wrapperStyle={{ color: "#9ca3af" }} />
+            <Bar dataKey="Car Management Profit" fill="#10b981" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Car Owner Management Profit Chart */}
+      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-300 mb-4">Car Owner Management Profit</h2>
+        <div className="mb-4 text-sm text-gray-400">
+          <div>Yearly Total: {formatCurrency(yearlyTotals["Car Owner Profit"])}</div>
+        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={monthlyData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+            <XAxis dataKey="month" stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <YAxis stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1a1a1a",
+                border: "1px solid #2a2a2a",
+                color: "#fff",
+              }}
+              formatter={formatTooltip}
+            />
+            <Legend wrapperStyle={{ color: "#9ca3af" }} />
+            <Bar dataKey="Car Owner Profit" fill="#f59e0b" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Car Owner Total Expenses Chart */}
+      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-300 mb-4">Car Owner Total Expenses</h2>
+        <div className="mb-4 text-sm text-gray-400">
+          <div>Yearly Total: {formatCurrency(yearlyTotals["Car Owner Total Expenses"])}</div>
+        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={monthlyData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+            <XAxis dataKey="month" stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <YAxis stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1a1a1a",
+                border: "1px solid #2a2a2a",
+                color: "#fff",
+              }}
+              formatter={formatTooltip}
+            />
+            <Legend wrapperStyle={{ color: "#9ca3af" }} />
+            <Bar dataKey="Car Owner Total Expenses" fill="#ef4444" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Car Management Total Expenses Chart */}
+      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-300 mb-4">Car Management Total Expenses</h2>
+        <div className="mb-4 text-sm text-gray-400">
+          <div>Yearly Total: {formatCurrency(yearlyTotals["Car Management Total Expenses"])}</div>
+        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={monthlyData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+            <XAxis dataKey="month" stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <YAxis stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1a1a1a",
+                border: "1px solid #2a2a2a",
+                color: "#fff",
+              }}
+              formatter={formatTooltip}
+            />
+            <Legend wrapperStyle={{ color: "#9ca3af" }} />
+            <Bar dataKey="Car Management Total Expenses" fill="#8b5cf6" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* History Chart */}
+      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-300 mb-4">History</h2>
+        <div className="mb-4 text-sm text-gray-400">
+          <div>Days Rented - Yearly Total: {yearlyTotals["Days Rented"]}</div>
+          <div>Trips Taken - Yearly Total: {yearlyTotals["Trips Taken"]}</div>
+        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={monthlyData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+            <XAxis dataKey="month" stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <YAxis stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1a1a1a",
+                border: "1px solid #2a2a2a",
+                color: "#fff",
+              }}
+            />
+            <Legend wrapperStyle={{ color: "#9ca3af" }} />
+            <Line type="monotone" dataKey="Days Rented" stroke="#06b6d4" strokeWidth={2} />
+            <Line type="monotone" dataKey="Trips Taken" stroke="#ec4899" strokeWidth={2} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* CAR RENTAL VALUE PER MONTH Chart */}
+      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-300 mb-4">CAR RENTAL VALUE PER MONTH</h2>
+        <div className="mb-4 text-sm text-gray-400">
+          <div>Total Car Rental Income - Yearly Total: {formatCurrency(yearlyTotals["Rental Income"])}</div>
+          <div>Trips Taken - Yearly Total: {yearlyTotals["Trips Taken"]}</div>
+          <div>Ave Per Rental Per Trips Taken - Yearly Average: {formatCurrency(yearlyTotals["Ave Per Rental"])}</div>
+        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={monthlyData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+            <XAxis dataKey="month" stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <YAxis stroke="#9ca3af" tick={{ fill: "#9ca3af" }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1a1a1a",
+                border: "1px solid #2a2a2a",
+                color: "#fff",
+              }}
+              formatter={formatTooltip}
+            />
+            <Legend wrapperStyle={{ color: "#9ca3af" }} />
+            <Bar dataKey="Rental Income" fill="#38bdf8" name="Total Car Rental Income" />
+            <Bar dataKey="Trips Taken" fill="#ec4899" name="Trips Taken" />
+            <Bar dataKey="Ave Per Rental" fill="#10b981" name="Ave Per Rental Per Trips Taken" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
 }
-
-
