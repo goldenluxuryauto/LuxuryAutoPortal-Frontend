@@ -489,7 +489,7 @@ export function getAllUniqueYears(
 }
 
 /**
- * Export NADA Depreciation Schedule to CSV
+ * Export NADA Depreciation Schedule to CSV (Template Format)
  */
 export function handleExportNada(
   currentCostWithAdd: CurrentCostWithAdd[],
@@ -525,289 +525,162 @@ export function handleExportNada(
     "Dec",
   ];
 
-  let str =
-    "CAR NAME ," +
-    `${car?.makeModel || ""} ${car?.year || ""}`
-      .replaceAll(/,/g, " ")
-      .replaceAll(/(\r\n|\n|\r)/g, " ") +
-    "\n" +
-    "VIN #," +
-    `${car?.vin || ""}`
-      .replaceAll(/,/g, " ")
-      .replaceAll(/(\r\n|\n|\r)/g, " ") +
-    "\n" +
-    "LICENSE ," +
-    `${car?.licensePlate || ""}`
-      .replaceAll(/,/g, " ")
-      .replaceAll(/(\r\n|\n|\r)/g, " ") +
-    "\n" +
-    "NAME ," +
-    `${car?.owner ? `${car.owner.firstName} ${car.owner.lastName}` : ""}`
-      .replaceAll(/,/g, " ")
-      .replaceAll(/(\r\n|\n|\r)/g, " ") +
-    "\n" +
-    "CONTACT # ," +
-    `${car?.owner?.phone || ""}`
-      .replaceAll(/,/g, " ")
-      .replaceAll(/(\r\n|\n|\r)/g, " ") +
-    "\n" +
-    "EMAIL # ," +
-    `${car?.owner?.email || ""}`
-      .replaceAll(/,/g, " ")
-      .replaceAll(/(\r\n|\n|\r)/g, " ") +
-    "\n" +
-    "TURO LINK ," +
-    (car?.turoLink || "")
-      .replaceAll(/,/g, " ")
-      .replaceAll(/(\r\n|\n|\r)/g, " ") +
-    "\n" +
-    "ADMIN TURO LINK ," +
-    (car?.adminTuroLink || "")
-      .replaceAll(/,/g, " ")
-      .replaceAll(/(\r\n|\n|\r)/g, " ") +
-    "\n\n";
+  // Extract year suffix for month headers (e.g., "26" from "2026")
+  const yearSuffix = year.length >= 2 ? year.slice(-2) : year;
+  
+  // Calculate previous year
+  const previousYear = (parseInt(year) - 1).toString();
+  const previousYearSuffix = previousYear.length >= 2 ? previousYear.slice(-2) : previousYear;
 
-  const previousYear = car?.year ? (parseInt(car.year) - 1).toString() : year;
+  let str = "";
 
-  str += `,NADA DEPRECIATION SCHEDULE ${previousYear}\n `;
-  str += ",CURRENT COST OF VEHICLES , ";
-
+  // Section 1: Previous Year NADA Depreciation Schedule
+  str += `NADA Depreciation Schedule,${previousYear}\n`;
+  str += "Current Cost of Vehicle,";
   getAllMonths.forEach((mItem) => {
-    str += `${mItem} ${year}, `;
+    str += `${mItem}-${previousYearSuffix},`;
   });
-  str += "CURRENT \n";
+  str += "\n";
 
-  // Previous year data
-  currentCostWithAdd.forEach((item) => {
-    str +=
-      "," +
-      `${item.currentCostWithAddName}`
-        .replaceAll(/,/g, " ")
-        .replaceAll(/(\r\n|\n|\r)/g, " ") +
-      ",";
-
+  // Previous year data rows (sorted by ID: Retail, Clean, Average, Rough, MILES)
+  const sortedCostWithAdd = [...currentCostWithAdd].sort((a, b) => a.currentCostWithAddAid - b.currentCostWithAddAid);
+  sortedCostWithAdd.forEach((item) => {
+    str += `${item.currentCostWithAddName},`;
     for (let i = 0; i < 12; i++) {
-      const result = getCurrentCostWithAdd(
-        i + 1,
-        item.currentCostWithAddAid,
-        nadaDepreciationWithAdd,
-        year
-      );
-      const currentAmount = result.amount;
-
       if (item.currentCostWithAddName.includes("MILES")) {
-        str +=
-          `${Number(currentAmount)}`
-            .replaceAll(/,/g, " ")
-            .replaceAll(/(\r\n|\n|\r)/g, " ") + ",";
+        str += "0,";
       } else {
-        str +=
-          `$ ${currentAmount}`
-            .replaceAll(/,/g, " ")
-            .replaceAll(/(\r\n|\n|\r)/g, " ") + ",";
+        str += "$ 0.00,";
       }
     }
-
-    const current = getCurrentCostWithAdd(
-      null,
-      item.currentCostWithAddAid,
-      nadaDepreciationWithAdd,
-      year
-    ).currentAmount;
-
-    if (item.currentCostWithAddName.includes("MILES")) {
-      str +=
-        `${Number(current)}`
-          .replaceAll(/,/g, " ")
-          .replaceAll(/(\r\n|\n|\r)/g, " ") + "\n";
-    } else {
-      str +=
-        `$ ${Number(current)}`
-          .replaceAll(/,/g, " ")
-          .replaceAll(/(\r\n|\n|\r)/g, " ") + "\n";
-    }
+    str += "\n";
   });
 
-  str += `\n ,NADA CHANGE % ${previousYear} ${car?.year || year}\n `;
-  str += ",CATEGORY , ";
+  str += "\n"; // Empty row
 
+  // Section 2: Current Year NADA Depreciation Schedule
+  str += `NADA Depreciation Schedule,${year}\n`;
+  str += "Current Cost of Vehicle,";
   getAllMonths.forEach((mItem) => {
-    str += `${mItem} ${year}, `;
+    str += `${mItem}-${yearSuffix},`;
   });
-  str += "AVERAGE ,CURRENT \n";
+  str += "\n";
 
-  const nadaChangeList = [
-    {
-      name: "NADA Change Retail %",
-      code: "changeRetail" as const,
-      current: "currentChangeRetail" as const,
-      id: 1,
-    },
-    {
-      name: "NADA Change Clean %",
-      code: "changeClean" as const,
-      current: "currentChangeClean" as const,
-      id: 2,
-    },
-    {
-      name: "NADA Change Average %",
-      code: "changeAverage" as const,
-      current: "currentChangeAverage" as const,
-      id: 3,
-    },
-    {
-      name: "NADA Change Rough",
-      code: "changeRough" as const,
-      current: "currentChangeRough" as const,
-      id: 4,
-    },
-  ];
-
-  let count = 0;
-  nadaChangeList.forEach((item) => {
-    str += `,${item.name} ,`;
-    let totalAverage = 0;
-    let totalCurrent = 0;
-    let current = 0;
-    let amount = 0;
-
+  // Current year data rows (sorted by ID: Retail, Clean, Average, Rough, MILES, Amount Owed)
+  const sortedCost = [...currentCost].sort((a, b) => a.currentCostAid - b.currentCostAid);
+  sortedCost.forEach((costItem) => {
+    str += `${costItem.currentCostName},`;
     for (let i = 0; i < 12; i++) {
-      // Use code parameter to get individual value directly (matches original)
-      amount = getNadaChange(
-        i + 1,
-        nadaDepreciationWithAdd,
-        nadaDepreciation,
-        year,
-        item.code
-      ) as number;
-
-      totalAverage += Number(amount) / 12;
-      
-      // Get current value using code parameter (matches original)
-      totalCurrent = Number(
-        getNadaChange(
-          i + 1,
-          nadaDepreciationWithAdd,
-          nadaDepreciation,
-          year,
-          item.current
-        )
-      );
-
-      str +=
-        `${amount.toFixed(2)}`
-          .replaceAll(/,/g, " ")
-          .replaceAll(/(\r\n|\n|\r)/g, " ") + "%,";
-    }
-    
-    count += 1;
-    current = getNadaChangeCurrent(
-      year,
-      count,
-      nadaDepreciationWithAdd,
-      nadaDepreciation
-    );
-
-    // For "NADA Change Retail %", use totalCurrent; for others, use current (matches original)
-    if (item.name === "NADA Change Retail %") {
-      str +=
-        `${totalAverage.toFixed(2)}`
-          .replaceAll(/,/g, " ")
-          .replaceAll(/(\r\n|\n|\r)/g, " ") +
-        "%," +
-        `${totalCurrent.toFixed(2)}`
-          .replaceAll(/,/g, " ")
-          .replaceAll(/(\r\n|\n|\r)/g, " ") +
-        "%\n";
-    } else {
-      str +=
-        `${totalAverage.toFixed(2)}`
-          .replaceAll(/,/g, " ")
-          .replaceAll(/(\r\n|\n|\r)/g, " ") +
-        "%," +
-        `${current.toFixed(2)}`
-          .replaceAll(/,/g, " ")
-          .replaceAll(/(\r\n|\n|\r)/g, " ") +
-        "%\n";
-    }
-  });
-
-  str += `\n ,NADA DEPRECIATION SCHEDULE ${car?.year || year}\n `;
-  str += ",CURRENT COST OF VEHICLES , ";
-
-  getAllMonths.forEach((mItem) => {
-    str += `${mItem} ${year}, `;
-  });
-  str += "CURRENT \n";
-
-  // Current year data
-  currentCost.forEach((costItem) => {
-    str +=
-      "," +
-      `${costItem.currentCostName}`
-        .replaceAll(/,/g, " ")
-        .replaceAll(/(\r\n|\n|\r)/g, " ") +
-      ",";
-
-    for (let i = 0; i < 12; i++) {
-      const result = getCurrentCost(
-        i + 1,
-        costItem.currentCostAid,
-        nadaDepreciation,
-        year
-      );
-      const currentAmount = result.amount;
-
       if (costItem.currentCostName.includes("MILES")) {
-        str +=
-          `${currentAmount}`
-            .replaceAll(/,/g, " ")
-            .replaceAll(/(\r\n|\n|\r)/g, " ") + ",";
+        str += "0,";
       } else {
-        str +=
-          `$ ${Number(currentAmount).toFixed(2)}`
-            .replaceAll(/,/g, " ")
-            .replaceAll(/(\r\n|\n|\r)/g, " ") + ",";
+        str += "$ 0.00,";
       }
     }
-
-    const current = getCurrentCost(
-      null,
-      costItem.currentCostAid,
-      nadaDepreciation,
-      year
-    ).currentAmount;
-
-    if (costItem.currentCostName.includes("MILES")) {
-      str +=
-        `${current}`
-          .replaceAll(/,/g, " ")
-          .replaceAll(/(\r\n|\n|\r)/g, " ") + "\n";
-    } else {
-      str +=
-        `$ ${Number(current).toFixed(2)}`
-          .replaceAll(/,/g, " ")
-          .replaceAll(/(\r\n|\n|\r)/g, " ") + "\n";
-    }
+    str += "\n";
   });
 
-  str += ",Total Equity in Car ,";
-  for (let i = 0; i < 12; i++) {
-    const totalEquityAmount = getTotalEquity(
-      i + 1,
-      nadaDepreciation,
-      year,
-      currentCost
-    );
-
-    str +=
-      `$ ${Number(totalEquityAmount).toFixed(2)}`
-        .replaceAll(/,/g, " ")
-        .replaceAll(/(\r\n|\n|\r)/g, " ") + ",";
-  }
-
-  const fileName = `Export ${year} ${car?.makeModel || ""}-${car?.owner ? `${car.owner.firstName} ${car.owner.lastName}` : ""} NADA depreciation schedule.csv`;
-
+  const fileName = `NADA Depreciation Schedule Template.csv`;
   saveData(str, fileName);
+}
+
+/**
+ * Export NADA Depreciation Schedule to Excel
+ */
+export function handleExportNadaExcel(
+  currentCostWithAdd: CurrentCostWithAdd[],
+  nadaDepreciationWithAdd: NadaDepreciationWithAdd[],
+  nadaDepreciation: NadaDepreciation[],
+  currentCost: CurrentCost[],
+  car: any,
+  year: string
+): void {
+  // Dynamic import of xlsx to avoid loading it if not needed
+  import('xlsx').then((XLSX) => {
+    const getAllMonths = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    // Extract year suffix for month headers (e.g., "26" from "2026")
+    const yearSuffix = year.length >= 2 ? year.slice(-2) : year;
+    
+    // Calculate previous year
+    const previousYear = (parseInt(year) - 1).toString();
+    const previousYearSuffix = previousYear.length >= 2 ? previousYear.slice(-2) : previousYear;
+
+    const workbook = XLSX.utils.book_new();
+    const worksheetData: any[][] = [];
+
+    // Section 1: Previous Year NADA Depreciation Schedule
+    worksheetData.push(["NADA Depreciation Schedule", previousYear]);
+    const previousHeader = ["Current Cost of Vehicle"];
+    getAllMonths.forEach((mItem) => {
+      previousHeader.push(`${mItem}-${previousYearSuffix}`);
+    });
+    worksheetData.push(previousHeader);
+
+    // Previous year data rows (sorted by ID: Retail, Clean, Average, Rough, MILES)
+    const sortedCostWithAdd = [...currentCostWithAdd].sort((a, b) => a.currentCostWithAddAid - b.currentCostWithAddAid);
+    sortedCostWithAdd.forEach((item) => {
+      const row: any[] = [item.currentCostWithAddName];
+      for (let i = 0; i < 12; i++) {
+        row.push(0); // Template format - all values are 0
+      }
+      worksheetData.push(row);
+    });
+
+    worksheetData.push([]); // Empty row
+
+    // Section 2: Current Year NADA Depreciation Schedule
+    worksheetData.push(["NADA Depreciation Schedule", year]);
+    const currentHeader = ["Current Cost of Vehicle"];
+    getAllMonths.forEach((mItem) => {
+      currentHeader.push(`${mItem}-${yearSuffix}`);
+    });
+    worksheetData.push(currentHeader);
+
+    // Current year data rows (sorted by ID: Retail, Clean, Average, Rough, MILES, Amount Owed)
+    const sortedCost = [...currentCost].sort((a, b) => a.currentCostAid - b.currentCostAid);
+    sortedCost.forEach((costItem) => {
+      const row: any[] = [costItem.currentCostName];
+      for (let i = 0; i < 12; i++) {
+        row.push(0); // Template format - all values are 0
+      }
+      worksheetData.push(row);
+    });
+
+    // Create worksheet
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    // Set column widths
+    const colWidths = [{ wch: 25 }]; // First column
+    for (let i = 0; i < 12; i++) {
+      colWidths.push({ wch: 12 }); // Month columns
+    }
+    worksheet['!cols'] = colWidths;
+
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, "NADA Depreciation");
+
+    // Generate filename
+    const fileName = `NADA Depreciation Schedule Template.xlsx`;
+
+    // Write file
+    XLSX.writeFile(workbook, fileName);
+  }).catch((error) => {
+    console.error("Failed to export Excel file:", error);
+    alert("Failed to export Excel file. Please ensure xlsx library is installed.");
+  });
 }
 

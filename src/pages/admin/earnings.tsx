@@ -181,6 +181,14 @@ export default function EarningsPage() {
       total: true,
     },
     {
+      label: "HISTORY",
+      isExpanded: true,
+      rows: [
+        { label: "CAR RENTAL VALUE PER MONTH", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+      ],
+      total: false,
+    },
+    {
       label: "REIMBURSED AND NON-REIMBURSED BILLS",
       isExpanded: true,
       rows: [
@@ -223,6 +231,7 @@ export default function EarningsPage() {
     { type: 'standalone', label: "Rental Income", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
     { type: 'standalone', label: "Car Owner Split", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
     { type: 'category', label: "GLA PARKING FEE & LABOR CLEANING", category: categories.find(c => c.label === "GLA PARKING FEE & LABOR CLEANING")! },
+    { type: 'category', label: "HISTORY", category: categories.find(c => c.label === "HISTORY")! },
     { type: 'category', label: "REIMBURSED AND NON-REIMBURSED BILLS", category: reimbursedBillsCategory },
     { type: 'standalone', label: "TOTAL REIMBURSED AND NON-REIMBURSED BILLS", values: totalReimbursedBills },
   ];
