@@ -24,6 +24,24 @@ export default function MaintenancePage() {
   const [dateFilter, setDateFilter] = useState<string>("none");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+  // Get user data to check role
+  const { data: userData } = useQuery<{ user?: any }>({
+    queryKey: ["/api/auth/me"],
+    queryFn: async () => {
+      try {
+        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        if (!response.ok) return { user: undefined };
+        return response.json();
+      } catch (error) {
+        return { user: undefined };
+      }
+    },
+    retry: false,
+  });
+
+  const user = userData?.user;
+  const isClient = user?.isClient === true;
+
   const { data, isLoading, error } = useQuery<{
     success: boolean;
     data: any;
@@ -128,10 +146,12 @@ export default function MaintenancePage() {
                 </p>
               )}
             </div>
-            <Button className="bg-[#EAEB80] text-black hover:bg-[#d4d570]">
-              <Plus className="w-4 h-4 mr-2" />
-              Add
-            </Button>
+            {!isClient && (
+              <Button className="bg-[#EAEB80] text-black hover:bg-[#d4d570]">
+                <Plus className="w-4 h-4 mr-2" />
+                Add
+              </Button>
+            )}
           </div>
         </div>
 

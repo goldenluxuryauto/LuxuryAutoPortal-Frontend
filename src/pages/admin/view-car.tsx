@@ -38,6 +38,24 @@ export default function ViewCarPage() {
   const [, setLocation] = useLocation();
   const carId = params?.id ? parseInt(params.id, 10) : null;
 
+  // Get user data to check role
+  const { data: userData } = useQuery<{ user?: any }>({
+    queryKey: ["/api/auth/me"],
+    queryFn: async () => {
+      try {
+        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        if (!response.ok) return { user: undefined };
+        return response.json();
+      } catch (error) {
+        return { user: undefined };
+      }
+    },
+    retry: false,
+  });
+
+  const user = userData?.user;
+  const isClient = user?.isClient === true;
+
   const { data, isLoading, error } = useQuery<{
     success: boolean;
     data: CarDetail;
@@ -84,7 +102,8 @@ export default function ViewCarPage() {
 
   const onboarding = onboardingData?.success ? onboardingData?.data : null;
 
-  const menuItems: MenuItem[] = [
+  // Filter menu items based on user role
+  const allMenuItems: MenuItem[] = [
     { label: "Car Detail", path: `/admin/cars/${carId}` },
     { label: "Earnings", path: `/admin/cars/${carId}/earnings` },
     { label: "Income and Expense", path: `/admin/cars/${carId}/income-expense` },
@@ -94,6 +113,11 @@ export default function ViewCarPage() {
     { label: "Maintenance", path: `/admin/cars/${carId}/maintenance` },
     { label: "Payment history", path: `/admin/cars/${carId}/payments` },
   ];
+
+  // Hide "Income and Expense" for clients
+  const menuItems = isClient
+    ? allMenuItems.filter(item => item.label !== "Income and Expense")
+    : allMenuItems;
 
   const handleMenuItemClick = (item: MenuItem) => {
     if (item.external) {
