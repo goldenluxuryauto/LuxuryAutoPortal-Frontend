@@ -95,6 +95,17 @@ export default function ViewRecordFilesPage() {
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   const queryClient = useQueryClient();
 
+  // Fetch user data
+  const { data: userData } = useQuery<{ user?: any }>({
+    queryKey: ["/api/auth/me"],
+    queryFn: async () => {
+      const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const user = userData?.user;
+
   // Fetch car details
   const { data: carData, isLoading, error } = useQuery<{
     success: boolean;
@@ -509,29 +520,31 @@ export default function ViewRecordFilesPage() {
                 </p>
               )}
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsLogModalOpen(true)}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
-              >
-                <List className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Log</span>
-              </Button>
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setItemEdit(null);
-                  setIsAddModalOpen(true);
-                }}
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-                type="button"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Add File</span>
-              </Button>
-            </div>
+            {user?.isClient !== true && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsLogModalOpen(true)}
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
+                >
+                  <List className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Log</span>
+                </Button>
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setItemEdit(null);
+                    setIsAddModalOpen(true);
+                  }}
+                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                  type="button"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Add File</span>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
