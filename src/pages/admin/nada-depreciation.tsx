@@ -11,12 +11,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import {
   ArrowLeft,
   ExternalLink,
   Plus,
   Download,
   FileText,
+  Upload,
 } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
@@ -40,6 +42,7 @@ import {
   formatCurrency,
   formatPercentage,
   handleExportNada,
+  handleExportNadaExcel,
   type NadaDepreciation,
   type NadaDepreciationWithAdd,
   type CurrentCost,
@@ -47,6 +50,13 @@ import {
 } from "@/lib/nadaDepreciationUtils";
 import { NadaDepreciationModal } from "@/components/modals/NadaDepreciationModal";
 import { NadaDepreciationLogModal } from "@/components/modals/NadaDepreciationLogModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export default function NADADepreciationPage() {
   const [, params] = useRoute("/admin/cars/:id/depreciation");
@@ -56,10 +66,35 @@ export default function NADADepreciationPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAddModalWithAddOpen, setIsAddModalWithAddOpen] = useState(false);
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [itemEdit, setItemEdit] = useState<any>(null);
   const [isNadaWithAdd, setIsNadaWithAdd] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
+  const previousYear = (parseInt(selectedYear) - 1).toString();
   const months = generateMonths(selectedYear);
+  const monthsPreviousYear = generateMonths(previousYear);
+
+  // Get user data to check role
+  const { data: userData } = useQuery<{ user?: any }>({
+    queryKey: ["/api/auth/me"],
+    queryFn: async () => {
+      try {
+        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        if (!response.ok) return { user: undefined };
+        return response.json();
+      } catch (error) {
+        return { user: undefined };
+      }
+    },
+    retry: false,
+  });
+
+  const user = userData?.user;
+  const isClient = user?.isClient === true;
 
   // Fetch car data
   const { data: carData, isLoading: isLoadingCar, error: carError } = useQuery<{
@@ -229,7 +264,7 @@ export default function NADADepreciationPage() {
     data: NadaDepreciationWithAdd[];
     all_year: Array<{ date_year: string }>;
   }>({
-    queryKey: ["/api/nada-depreciation-with-add/read", carId, selectedYear],
+    queryKey: ["/api/nada-depreciation-with-add/read", carId, previousYear],
     queryFn: async () => {
       if (!carId) throw new Error("Invalid car ID");
       const url = buildApiUrl("/api/nada-depreciation-with-add/read");
@@ -241,7 +276,7 @@ export default function NADADepreciationPage() {
         credentials: "include",
         body: JSON.stringify({
           nada_depreciation_with_add_car_id: carId,
-          nada_depreciation_with_add_date: selectedYear,
+          nada_depreciation_with_add_date: previousYear,
         }),
       });
       if (!response.ok) {
@@ -252,7 +287,8 @@ export default function NADADepreciationPage() {
       console.log("✅ [NADA Depreciation] Fetched previous year data:", {
         count: result.count,
         records: result.data?.length || 0,
-        year: selectedYear,
+        year: previousYear,
+        requestedYear: selectedYear,
         carId
       });
       return result;
@@ -299,12 +335,12 @@ export default function NADADepreciationPage() {
   const nadaPreviousRows = useMemo(() => {
     const sortedCostWithAdd = [...currentCostWithAdd].sort((a, b) => a.currentCostWithAddAid - b.currentCostWithAddAid);
     return sortedCostWithAdd.map((costItem) => {
-      const values = months.map((_, index) => {
+      const values = monthsPreviousYear.map((_, index) => {
         const result = getCurrentCostWithAdd(
           index + 1,
           costItem.currentCostWithAddAid,
           nadaDepreciationWithAdd,
-          selectedYear
+          previousYear
         );
         return result.amount;
       });
@@ -312,7 +348,7 @@ export default function NADADepreciationPage() {
         null,
         costItem.currentCostWithAddAid,
         nadaDepreciationWithAdd,
-        selectedYear
+        previousYear
       ).currentAmount;
 
       return {
@@ -326,8 +362,8 @@ export default function NADADepreciationPage() {
   }, [
     currentCostWithAdd,
     nadaDepreciationWithAdd,
-    selectedYear,
-    months,
+    previousYear,
+    monthsPreviousYear,
   ]);
 
   // Calculate table rows for current year
@@ -499,6 +535,7 @@ export default function NADADepreciationPage() {
 
   const handleExport = () => {
     if (car && currentCostWithAdd.length > 0 && currentCost.length > 0) {
+      // Export CSV template
       handleExportNada(
         currentCostWithAdd,
         nadaDepreciationWithAdd,
@@ -507,6 +544,79 @@ export default function NADADepreciationPage() {
         car,
         selectedYear
       );
+      
+      // Export Excel template (with a small delay to allow CSV download to complete)
+      setTimeout(() => {
+        handleExportNadaExcel(
+          currentCostWithAdd,
+          nadaDepreciationWithAdd,
+          nadaDepreciation,
+          currentCost,
+          car,
+          selectedYear
+        );
+      }, 500);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!importFile || !carId) {
+      toast({
+        title: "No File Selected",
+        description: "Please select a file to import",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", importFile);
+      formData.append("carId", carId.toString());
+
+      const url = buildApiUrl("/api/nada-depreciation/import");
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        // Show detailed error message
+        const errorMsg = result.error || result.message || "Failed to import file";
+        const details = result.details ? `\n\nDetails: ${result.details}` : "";
+        throw new Error(`${errorMsg}${details}`);
+      }
+
+      // Show success message
+      toast({
+        title: "Import Successful",
+        description: `Previous Year (${previousYear}): ${result.data.previousYear.inserted} inserted, ${result.data.previousYear.updated} updated\nCurrent Year (${selectedYear}): ${result.data.currentYear.inserted} inserted, ${result.data.currentYear.updated} updated`,
+      });
+
+      // Close modal and reset file
+      setIsImportModalOpen(false);
+      setImportFile(null);
+
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ["/api/nada-depreciation/read", carId, selectedYear] });
+      queryClient.invalidateQueries({ queryKey: ["/api/nada-depreciation-with-add/read", carId, selectedYear] });
+      refetchNadaDepreciation();
+      refetchNadaDepreciationWithAdd();
+    } catch (error: any) {
+      console.error("Error importing file:", error);
+      // Show more detailed error message
+      const errorMessage = error.message || "Failed to import file. Please check the file format and try again.";
+      toast({
+        title: "Import Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -543,8 +653,6 @@ export default function NADADepreciationPage() {
   const fuelType = onboarding?.fuelType || car.fuelType || "N/A";
   const tireSize = onboarding?.tireSize || car.tireSize || "N/A";
   const oilType = onboarding?.oilType || car.oilType || "N/A";
-  // Previous year is one year before the selected year
-  const previousYear = (parseInt(selectedYear) - 1).toString();
 
   // Log data status for debugging
   if (nadaDepreciationData || nadaDepreciationWithAddData) {
@@ -715,6 +823,14 @@ export default function NADADepreciationPage() {
               </Button>
               <Button
                 className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border border-[#2a2a2a]"
+                onClick={() => setIsImportModalOpen(true)}
+                disabled={!car}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Import
+              </Button>
+              <Button
+                className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border border-[#2a2a2a]"
                 onClick={() => setIsLogModalOpen(true)}
               >
                 <FileText className="w-4 h-4 mr-2" />
@@ -749,15 +865,8 @@ export default function NADADepreciationPage() {
         <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden mb-6">
           <div className="flex justify-between items-center p-4 border-b border-[#2a2a2a]">
             <h2 className="text-lg font-semibold text-gray-300">
-              NADA Depreciation Schedule {previousYear}
+              NADA Depreciation Schedule {parseInt(selectedYear) - 1}
             </h2>
-            <Button
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-              onClick={() => handleAdd(true)}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add
-            </Button>
           </div>
           <div className="w-full overflow-x-auto">
             <table className="border-collapse w-full table-auto">
@@ -766,7 +875,7 @@ export default function NADADepreciationPage() {
                   <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-index-[auto] border-r border-[#2a2a2a] whitespace-nowrap">
                     Current Cost of Vehicle
                   </th>
-                  {months.map((month) => (
+                  {monthsPreviousYear.map((month) => (
                     <th
                       key={month}
                       className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
@@ -962,13 +1071,15 @@ export default function NADADepreciationPage() {
              <h2 className="text-lg font-semibold text-[#EAEB80]">
                NADA Depreciation Schedule {selectedYear}
              </h2>
-            <Button
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-              onClick={() => handleAdd(false)}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add
-            </Button>
+            {!isClient && (
+              <Button
+                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                onClick={() => handleAdd(false)}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add
+              </Button>
+            )}
           </div>
           <div className="w-full overflow-x-auto">
             <table className="border-collapse w-full table-auto">
@@ -1385,6 +1496,60 @@ export default function NADADepreciationPage() {
           item={`NADA-depreciation-schedule-${selectedYear}`}
         />
       )}
+
+      {/* Import Modal */}
+      <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
+        <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white">Import NADA Depreciation Schedule</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Upload a CSV or Excel file with the NADA Depreciation Schedule template format.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Select File (CSV or Excel)
+              </label>
+              <input
+                type="file"
+                accept=".csv,.xls,.xlsx"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setImportFile(file);
+                  }
+                }}
+                className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#EAEB80] file:text-black hover:file:bg-[#d4d570] file:cursor-pointer"
+              />
+              {importFile && (
+                <p className="mt-2 text-sm text-gray-400">
+                  Selected: {importFile.name}
+                </p>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsImportModalOpen(false);
+                  setImportFile(null);
+                }}
+                className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border-[#2a2a2a]"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleImport}
+                disabled={!importFile || isImporting}
+                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              >
+                {isImporting ? "Importing..." : "Import"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }
