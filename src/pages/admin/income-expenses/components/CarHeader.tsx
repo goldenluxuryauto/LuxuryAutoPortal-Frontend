@@ -4,9 +4,10 @@ import { ExternalLink } from "lucide-react";
 interface CarHeaderProps {
   car: any;
   onboarding: any;
+  onNavigateToClient?: (clientId: number) => void;
 }
 
-export default function CarHeader({ car, onboarding }: CarHeaderProps) {
+export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHeaderProps) {
   return (
     <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-3">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -37,13 +38,26 @@ export default function CarHeader({ car, onboarding }: CarHeaderProps) {
           <div className="space-y-1">
             <div>
               <span className="text-gray-400 text-xs">Name: </span>
-              <span className="text-white text-xs">
-                {car?.owner 
-                  ? `${car.owner.firstName} ${car.owner.lastName}` 
-                  : car?.ownerFirstName && car?.ownerLastName
-                  ? `${car.ownerFirstName} ${car.ownerLastName}`
-                  : "N/A"}
-              </span>
+              {car?.clientId && onNavigateToClient ? (
+                <button
+                  onClick={() => onNavigateToClient(car.clientId)}
+                  className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-xs cursor-pointer"
+                >
+                  {car?.owner 
+                    ? `${car.owner.firstName} ${car.owner.lastName}` 
+                    : car?.ownerFirstName && car?.ownerLastName
+                    ? `${car.ownerFirstName} ${car.ownerLastName}`
+                    : "N/A"}
+                </button>
+              ) : (
+                <span className="text-white text-xs">
+                  {car?.owner 
+                    ? `${car.owner.firstName} ${car.owner.lastName}` 
+                    : car?.ownerFirstName && car?.ownerLastName
+                    ? `${car.ownerFirstName} ${car.ownerLastName}`
+                    : "N/A"}
+                </span>
+              )}
             </div>
             <div>
               <span className="text-gray-400 text-xs">Contact #: </span>
