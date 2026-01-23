@@ -207,7 +207,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
   // Calculate Negative Balance Carry Over:
   // =IF(M9-M10-M11-M13-M15-M14-M16-M17-M18-M19-M33-M60-M20> 0,0,(M9-M10-M11-M13-M15-M14-M16-M17-M18-M19-M33-M60-M20))
   // This uses the previous month's data (M = previous month)
-  // Note: Uses the calculated (not stored) value from previous month, and displays absolute value
+  // Note: Returns negative value when calculation is negative, 0 when positive
   // January uses December of previous year, all other months use previous month
   const calculateNegativeBalanceCarryOver = (month: number): number => {
     if (month === 1) {
@@ -277,7 +277,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                            prevChildSeatIncome - prevCoolersIncome - prevInsuranceWreckIncome - 
                            prevOtherIncome - prevTotalDirectDelivery - prevTotalCogs - prevNegativeBalance;
         const result = calculation > 0 ? 0 : calculation;
-        return Math.abs(result);
+        return result;
       };
       
       const decNegativeBalanceCarryOver = calculateDecNegativeBalance(12, prevYearDecData);
@@ -311,9 +311,9 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                          decChildSeatIncome - decCoolersIncome - decInsuranceWreckIncome - 
                          decOtherIncome - decTotalDirectDelivery - decTotalCogs - decNegativeBalanceCarryOver;
       
-      // Return absolute value (remove negative sign)
+      // Return negative value (preserve negative sign)
       const result = calculation > 0 ? 0 : calculation;
-      return Math.abs(result);
+      return result;
     }
     
     const prevMonth = month - 1;
@@ -338,9 +338,9 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                        prevChildSeatIncome - prevCoolersIncome - prevInsuranceWreckIncome - 
                        prevOtherIncome - prevTotalDirectDelivery - prevTotalCogs - prevNegativeBalanceCarryOver;
     
-    // Return absolute value (remove negative sign)
+    // Return negative value (preserve negative sign)
     const result = calculation > 0 ? 0 : calculation;
-    return Math.abs(result);
+    return result;
   };
 
   // Calculate Car Management Split based on formula:
@@ -391,7 +391,9 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     // From 2026 onwards, use formulas that include ski racks income
     // Before 2026, ignore ski racks income and always use standard formula
     const currentYear = parseInt(year, 10);
-    const useSkiRacksFormula = currentYear >= 2026 && skiRacksIncome > 0;
+    const isYear2026OrLater = currentYear >= 2026;
+    const useSkiRacksFormula = isYear2026OrLater && skiRacksIncome > 0;
+    const use2026NoSkiRacksFormula = isYear2026OrLater && skiRacksIncome === 0;
     
     // Check if ski racks income exists and use appropriate formula
     if (useSkiRacksFormula) {
@@ -440,7 +442,25 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
       }
     }
     
-    // Standard formula when no ski racks income
+    // For year >= 2026 with no ski racks income, use special formula
+    if (use2026NoSkiRacksFormula) {
+      // Car Management Split for 2026+ with no ski racks income:
+      // =MAX(
+      //   Delivery Income + Electric Prepaid Income + Gas Prepaid Income + Smoking Fines * 90% - 
+      //   TOTAL REIMBURSE AND NON-REIMBURSE BILLS + 
+      //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
+      //    Smoking Fines - Gas Prepaid Income - Miles Income - TOTAL OPERATING EXPENSE (Direct Delivery) - 
+      //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Management Split %, 
+      //   0
+      // )
+      const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + (smokingFines * 0.9) - totalReimbursedBills;
+      const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                    smokingFines - gasPrepaidIncome - milesIncome - totalDirectDelivery - totalCogs) * mgmtPercent;
+      const calculation = part1 + part2;
+      return calculation >= 0 ? calculation : 0;
+    }
+    
+    // Standard formula when year < 2026
     // Part 1: Delivery Income + Electric Prepaid Income + Smoking Fines + Gas Prepaid Income - TOTAL REIMBURSE AND NON-REIMBURSE BILLS
     const part1 = deliveryIncome + electricPrepaidIncome + smokingFines + gasPrepaidIncome - totalReimbursedBills;
     
@@ -488,7 +508,9 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     // From 2026 onwards, use formulas that include ski racks income
     // Before 2026, ignore ski racks income and always use standard formula
     const currentYear = parseInt(year, 10);
-    const useSkiRacksFormula = currentYear >= 2026 && skiRacksIncome > 0;
+    const isYear2026OrLater = currentYear >= 2026;
+    const useSkiRacksFormula = isYear2026OrLater && skiRacksIncome > 0;
+    const use2026NoSkiRacksFormula = isYear2026OrLater && skiRacksIncome === 0;
     
     // Check if ski racks income exists and use appropriate formula
     if (useSkiRacksFormula) {
@@ -529,7 +551,24 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
       }
     }
     
-    // Standard formula when no ski racks income
+    // For year >= 2026 with no ski racks income, use special formula
+    if (use2026NoSkiRacksFormula) {
+      // Car Owner Split for 2026+ with no ski racks income:
+      // =MAX(
+      //   Miles Income + Smoking Fines * 10% +
+      //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
+      //    Smoking Fines - Gas Prepaid Income - Miles Income - TOTAL OPERATING EXPENSE (Direct Delivery) - 
+      //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Owner Split %, 
+      //   0
+      // )
+      const part1 = milesIncome + (smokingFines * 0.1);
+      const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                    smokingFines - gasPrepaidIncome - milesIncome - totalDirectDelivery - totalCogs) * ownerPercent;
+      const calculation = part1 + part2;
+      return calculation >= 0 ? calculation : 0;
+    }
+    
+    // Standard formula when year < 2026
     // Part 1: Miles Income
     const part1 = milesIncome;
     
@@ -588,6 +627,8 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               </th>
               {MONTHS.map((month, index) => {
                 const monthNum = index + 1;
+                const currentYear = parseInt(year, 10);
+                const showToggles = currentYear >= 2026;
                 const currentMode = monthModes[monthNum] || 50;
                 const currentSkiRacksOwner = skiRacksOwner[monthNum] || "GLA";
                 const hasSkiRacksIncome = getMonthValue(data.incomeExpenses, monthNum, "skiRacksIncome") > 0;
@@ -598,46 +639,48 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                   >
                     <div className="flex flex-col items-center gap-1">
                       <span className="text-white text-xs">{month} {year}</span>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => toggleMonthMode(monthNum)}
-                          disabled={isSavingMode}
-                          className={cn(
-                            "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200",
-                            "disabled:opacity-50 disabled:cursor-not-allowed",
-                            currentMode === 50 
-                              ? "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-lg shadow-green-600/50" 
-                              : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/50",
-                            isSavingMode && "animate-pulse"
-                          )}
-                          title={isSavingMode ? "Saving mode change..." : `Click to toggle between 50:50 (green) and 30:70 (blue) split`}
-                        >
-                          {isSavingMode ? "..." : currentMode}
-                        </button>
-                        <button
-                          onClick={() => toggleSkiRacksOwner(monthNum)}
-                          disabled={isSavingSkiRacksOwner}
-                          className={cn(
-                            "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px]",
-                            "disabled:opacity-50 disabled:cursor-not-allowed",
-                            !hasSkiRacksIncome 
-                              ? "bg-gray-600 text-gray-400 hover:bg-gray-700"
-                              : currentSkiRacksOwner === "GLA"
-                                ? "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 shadow-lg shadow-purple-600/50"
-                                : "bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800 shadow-lg shadow-orange-600/50",
-                            isSavingSkiRacksOwner && "animate-pulse"
-                          )}
-                          title={
-                            isSavingSkiRacksOwner 
-                              ? "Saving ski racks owner..." 
-                              : !hasSkiRacksIncome
-                                ? "No ski racks income - toggle available but won't affect calculations"
-                                : `Click to toggle ski racks owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"}`
-                          }
-                        >
-                          {isSavingSkiRacksOwner ? "..." : currentSkiRacksOwner === "GLA" ? "M" : "O"}
-                        </button>
-                      </div>
+                      {showToggles && (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => toggleMonthMode(monthNum)}
+                            disabled={isSavingMode}
+                            className={cn(
+                              "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200",
+                              "disabled:opacity-50 disabled:cursor-not-allowed",
+                              currentMode === 50 
+                                ? "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-lg shadow-green-600/50" 
+                                : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/50",
+                              isSavingMode && "animate-pulse"
+                            )}
+                            title={isSavingMode ? "Saving mode change..." : `Click to toggle between 50:50 (green) and 30:70 (blue) split`}
+                          >
+                            {isSavingMode ? "..." : currentMode}
+                          </button>
+                          <button
+                            onClick={() => toggleSkiRacksOwner(monthNum)}
+                            disabled={isSavingSkiRacksOwner}
+                            className={cn(
+                              "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px]",
+                              "disabled:opacity-50 disabled:cursor-not-allowed",
+                              !hasSkiRacksIncome 
+                                ? "bg-gray-600 text-gray-400 hover:bg-gray-700"
+                                : currentSkiRacksOwner === "GLA"
+                                  ? "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 shadow-lg shadow-purple-600/50"
+                                  : "bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800 shadow-lg shadow-orange-600/50",
+                              isSavingSkiRacksOwner && "animate-pulse"
+                            )}
+                            title={
+                              isSavingSkiRacksOwner 
+                                ? "Saving ski racks owner..." 
+                                : !hasSkiRacksIncome
+                                  ? "No ski racks income - toggle available but won't affect calculations"
+                                  : `Click to toggle ski racks owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"}`
+                            }
+                          >
+                            {isSavingSkiRacksOwner ? "..." : currentSkiRacksOwner === "GLA" ? "M" : "O"}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </th>
                 );
@@ -1708,6 +1751,11 @@ function CategoryRow({
 
   // Helper to format value based on formatType
   const formatValue = (value: number, month: number) => {
+    // For Negative Balance Carry Over, display absolute value (remove minus sign)
+    if (field === "negativeBalanceCarryOver") {
+      return `$${Math.abs(value).toFixed(2)}`;
+    }
+    
     if (showAmountAndPercentage && percentageValues) {
       // Show both calculated amount and percentage
       const percentage = percentageValues[month - 1] || 0;
