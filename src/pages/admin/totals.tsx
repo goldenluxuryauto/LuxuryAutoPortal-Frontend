@@ -22,6 +22,7 @@ interface CarDetail {
   year?: number;
   mileage: number;
   status: "ACTIVE" | "INACTIVE";
+  clientId?: number | null;
   owner?: {
     firstName: string;
     lastName: string;
@@ -232,7 +233,16 @@ export default function TotalsPage() {
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Name: </span>
-                  <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
+                  {car?.clientId ? (
+                    <button
+                      onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
+                      className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
+                    >
+                      {ownerName}
+                    </button>
+                  ) : (
+                    <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
+                  )}
                 </div>
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Contact #: </span>

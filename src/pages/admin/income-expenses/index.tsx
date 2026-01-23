@@ -344,7 +344,11 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
 
           {/* Car Header */}
           <div className="flex-shrink-0 mb-2">
-            <CarHeader car={car} onboarding={onboarding} />
+            <CarHeader 
+              car={car} 
+              onboarding={onboarding} 
+              onNavigateToClient={(clientId) => setLocation(`/admin/clients/${clientId}`)}
+            />
           </div>
 
           {/* Page Title and Actions */}

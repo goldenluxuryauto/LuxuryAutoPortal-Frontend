@@ -818,7 +818,16 @@ export default function EarningsPage() {
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Name: </span>
-                  <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
+                  {car?.clientId ? (
+                    <button
+                      onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
+                      className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
+                    >
+                      {ownerName}
+                    </button>
+                  ) : (
+                    <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
+                  )}
                 </div>
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Contact #: </span>
@@ -931,8 +940,8 @@ export default function EarningsPage() {
                     const hasSkiRacksIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], monthNum, "skiRacksIncome") > 0;
                     
                     return (
-                      <th
-                        key={month}
+                    <th
+                      key={month}
                         className="border-l border-[#2a2a2a] px-2 py-2 text-center min-w-[100px] sticky top-0 bg-[#1a1a1a] z-30"
                       >
                         <div className="flex flex-col items-center gap-1">
@@ -972,7 +981,7 @@ export default function EarningsPage() {
                             )}
                           </div>
                         </div>
-                      </th>
+                    </th>
                     );
                   })}
                   <th className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-30 border-l border-[#2a2a2a] whitespace-nowrap">
