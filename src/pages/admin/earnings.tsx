@@ -68,6 +68,7 @@ export default function EarningsPage() {
     directDelivery: true,
     cogs: true,
     parkingFeeLabor: true,
+    parkingAverageQB: true,
     reimbursedBills: true,
   });
   const [uploadingChart, setUploadingChart] = useState<{ [month: number]: boolean }>({});
@@ -1058,57 +1059,6 @@ export default function EarningsPage() {
                   />
                 </CategorySection>
 
-                {/* HISTORY */}
-                <CategorySection
-                  title="HISTORY"
-                  isExpanded={expandedSections.history}
-                  onToggle={() => toggleSection("history")}
-                >
-                  <TableRow
-                    label="Days Rented"
-                    values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.history || [], i + 1, "daysRented"))}
-                    isInteger
-                  />
-                  {isAdmin && (
-                    <TableRow
-                      label="Cars Available For Rent"
-                      values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.history || [], i + 1, "carsAvailableForRent"))}
-                      isInteger
-                    />
-                  )}
-                  <TableRow
-                    label="Trips Taken"
-                    values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.history || [], i + 1, "tripsTaken"))}
-                    isInteger
-                  />
-                </CategorySection>
-
-                {/* CAR RENTAL VALUE PER MONTH */}
-                <CategorySection
-                  title="CAR RENTAL VALUE PER MONTH"
-                  isExpanded={expandedSections.rentalValue}
-                  onToggle={() => toggleSection("rentalValue")}
-                >
-                  <TableRow
-                    label="Total Car Rental Income"
-                    values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], i + 1, "rentalIncome"))}
-                  />
-                  <TableRow
-                    label="Trips Taken"
-                    values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.history || [], i + 1, "tripsTaken"))}
-                    isInteger
-                  />
-                  <TableRow
-                    label="Ave Per Rental Per Trips Taken"
-                    values={MONTHS.map((_, i) => {
-                      const monthNum = i + 1;
-                      const rental = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], monthNum, "rentalIncome");
-                      const trips = getMonthValue(incomeExpenseDataValue?.history || [], monthNum, "tripsTaken");
-                      return trips > 0 ? rental / trips : 0;
-                    })}
-                  />
-                </CategorySection>
-
                 {/* OPERATING EXPENSE (Direct Delivery) */}
                 <CategorySection
                   title="OPERATING EXPENSE (DIRECT DELIVERY)"
@@ -1116,7 +1066,7 @@ export default function EarningsPage() {
                   onToggle={() => toggleSection("directDelivery")}
                 >
                   <TableRow
-                    label="Labor - Detailing"
+                    label="Labor - Cleaning"
                     values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.directDelivery || [], i + 1, "laborCarCleaning"))}
                   />
                   <TableRow
@@ -1193,7 +1143,7 @@ export default function EarningsPage() {
                     values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.cogs || [], i + 1, "keyFob"))}
                   />
                   <TableRow
-                    label="Labor - Detailing"
+                    label="Labor - Cleaning"
                     values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.cogs || [], i + 1, "laborCleaning"))}
                   />
                   <TableRow
@@ -1262,8 +1212,85 @@ export default function EarningsPage() {
                     values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.parkingFeeLabor || [], i + 1, "glaParkingFee"))}
                   />
                   <TableRow
-                    label="Labor - Detailing"
+                    label="Labor - Cleaning"
                     values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.parkingFeeLabor || [], i + 1, "laborCleaning"))}
+                  />
+                </CategorySection>
+
+                {/* PARKING AIRPORT AVERAGE PER TRIP - QB */}
+                <CategorySection
+                  title="PARKING AIRPORT AVERAGE PER TRIP - QB"
+                  isExpanded={expandedSections.parkingAverageQB}
+                  onToggle={() => toggleSection("parkingAverageQB")}
+                >
+                  <TableRow
+                    label="Total Trips Taken"
+                    values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.history || [], i + 1, "tripsTaken"))}
+                    isInteger
+                  />
+                  <TableRow
+                    label="Total Parking Airport"
+                    values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.parkingAirportQB || [], i + 1, "totalParkingAirport"))}
+                  />
+                  <TableRow
+                    label="Average per trip"
+                    values={MONTHS.map((_, i) => {
+                      const monthNum = i + 1;
+                      const parking = getMonthValue(incomeExpenseDataValue?.parkingAirportQB || [], monthNum, "totalParkingAirport");
+                      const trips = getMonthValue(incomeExpenseDataValue?.history || [], monthNum, "tripsTaken");
+                      return trips > 0 ? parking / trips : 0;
+                    })}
+                  />
+                </CategorySection>
+
+                {/* HISTORY */}
+                <CategorySection
+                  title="HISTORY"
+                  isExpanded={expandedSections.history}
+                  onToggle={() => toggleSection("history")}
+                >
+                  <TableRow
+                    label="Days Rented"
+                    values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.history || [], i + 1, "daysRented"))}
+                    isInteger
+                  />
+                  {isAdmin && (
+                    <TableRow
+                      label="Cars Available For Rent"
+                      values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.history || [], i + 1, "carsAvailableForRent"))}
+                      isInteger
+                    />
+                  )}
+                  <TableRow
+                    label="Trips Taken"
+                    values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.history || [], i + 1, "tripsTaken"))}
+                    isInteger
+                  />
+                </CategorySection>
+
+                {/* CAR RENTAL VALUE PER MONTH */}
+                <CategorySection
+                  title="CAR RENTAL VALUE PER MONTH"
+                  isExpanded={expandedSections.rentalValue}
+                  onToggle={() => toggleSection("rentalValue")}
+                >
+                  <TableRow
+                    label="Total Car Rental Income"
+                    values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], i + 1, "rentalIncome"))}
+                  />
+                  <TableRow
+                    label="Trips Taken"
+                    values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.history || [], i + 1, "tripsTaken"))}
+                    isInteger
+                  />
+                  <TableRow
+                    label="Ave Per Rental Per Trips Taken"
+                    values={MONTHS.map((_, i) => {
+                      const monthNum = i + 1;
+                      const rental = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], monthNum, "rentalIncome");
+                      const trips = getMonthValue(incomeExpenseDataValue?.history || [], monthNum, "tripsTaken");
+                      return trips > 0 ? rental / trips : 0;
+                    })}
                   />
                 </CategorySection>
 

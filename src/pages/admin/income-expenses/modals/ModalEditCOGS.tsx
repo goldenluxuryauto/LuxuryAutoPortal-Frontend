@@ -131,7 +131,7 @@ export default function ModalEditCOGS() {
     emissions: "Emissions",
     gpsSystem: "GPS System",
     keyFob: "Key & Fob",
-    laborCleaning: "Labor - Detailing",
+    laborCleaning: "Labor - Cleaning",
     licenseRegistration: "License & Registration",
     mechanic: "Mechanic",
     oilLube: "Oil/Lube",

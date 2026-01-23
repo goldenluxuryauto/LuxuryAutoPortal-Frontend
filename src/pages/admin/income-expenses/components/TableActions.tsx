@@ -34,7 +34,7 @@ export default function TableActions({
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const isReadOnly = location.startsWith("/admin/income-expenses");
-  const { data, monthModes, year, dynamicSubcategories } = useIncomeExpense();
+  const { data, monthModes, year, dynamicSubcategories, skiRacksOwner } = useIncomeExpense();
   const queryClient = useQueryClient();
   
   // Get current year and generate year options (past 5 years + current + future 2 years)
@@ -67,7 +67,7 @@ export default function TableActions({
   });
 
   const handleExportCSV = () => {
-    exportAllIncomeExpenseData(data, car, selectedYear, monthModes, dynamicSubcategories, previousYearData?.data || null);
+    exportAllIncomeExpenseData(data, car, selectedYear, monthModes, dynamicSubcategories, previousYearData?.data || null, skiRacksOwner);
     toast({
       title: "Export Successful",
       description: `CSV file downloaded for ${car?.makeModel || 'car'} (${selectedYear})`,
@@ -153,7 +153,7 @@ Other Income,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$
 ,,,,,,,,,,,,
 OPERATING EXPENSE (Direct Delivery),,,,,,,,,,,,
 Category,Jan-${selectedYear.slice(-2)},Feb-${selectedYear.slice(-2)},Mar-${selectedYear.slice(-2)},Apr-${selectedYear.slice(-2)},May-${selectedYear.slice(-2)},Jun-${selectedYear.slice(-2)},Jul-${selectedYear.slice(-2)},Aug-${selectedYear.slice(-2)},Sep-${selectedYear.slice(-2)},Oct-${selectedYear.slice(-2)},Nov-${selectedYear.slice(-2)},Dec-${selectedYear.slice(-2)}
-Labor - Detailing,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
+Labor - Cleaning,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Labor - Delivery,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Parking - Airport,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Parking - Lot,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
@@ -171,7 +171,7 @@ Cleaning Supplies / Tools,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,
 Emissions,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 GPS System,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Key & Fob,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
-Labor - Detailing,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
+Labor - Cleaning,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 License & Registration,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Mechanic,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Oil/Lube,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
@@ -187,7 +187,7 @@ Wipers,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 ,,,,,,,,,,,,
 PARKING FEE & LABOR CLEANING,Jan-${selectedYear.slice(-2)},Feb-${selectedYear.slice(-2)},Mar-${selectedYear.slice(-2)},Apr-${selectedYear.slice(-2)},May-${selectedYear.slice(-2)},Jun-${selectedYear.slice(-2)},Jul-${selectedYear.slice(-2)},Aug-${selectedYear.slice(-2)},Sep-${selectedYear.slice(-2)},Oct-${selectedYear.slice(-2)},Nov-${selectedYear.slice(-2)},Dec-${selectedYear.slice(-2)}
 GLA Parking Fee,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
-Labor - Detailing,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
+Labor - Cleaning,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 ,,,,,,,,,,,,
 REIMBURSE AND NON-REIMBURSE BILLS,Jan-${selectedYear.slice(-2)},Feb-${selectedYear.slice(-2)},Mar-${selectedYear.slice(-2)},Apr-${selectedYear.slice(-2)},May-${selectedYear.slice(-2)},Jun-${selectedYear.slice(-2)},Jul-${selectedYear.slice(-2)},Aug-${selectedYear.slice(-2)},Sep-${selectedYear.slice(-2)},Oct-${selectedYear.slice(-2)},Nov-${selectedYear.slice(-2)},Dec-${selectedYear.slice(-2)}
 Electric - Reimbursed,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00

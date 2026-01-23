@@ -44,7 +44,7 @@ export default function ModalEditParkingFeeLabor() {
 
   const fieldNames: { [key: string]: string } = {
     glaParkingFee: "GLA Parking Fee",
-    laborCleaning: "Labor - Detailing",
+    laborCleaning: "Labor - Cleaning",
   };
 
   const fieldName = fieldNames[editingCell.field] || editingCell.field;

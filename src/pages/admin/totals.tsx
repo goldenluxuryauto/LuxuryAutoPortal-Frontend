@@ -548,7 +548,7 @@ export default function TotalsPage() {
                           </span>
                         </div>
                         <div className="flex justify-between text-gray-300 text-sm">
-                          <span>Labor - Detailing</span>
+                          <span>Labor - Cleaning</span>
                           <span className="text-white">
                             {formatCurrency(totals?.expenses?.laborDetailing || 0)}
                           </span>

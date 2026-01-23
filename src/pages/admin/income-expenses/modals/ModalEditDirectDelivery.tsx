@@ -113,7 +113,7 @@ export default function ModalEditDirectDelivery() {
   if (!editingCell || editingCell.category !== "directDelivery") return null;
 
   const fieldNames: { [key: string]: string } = {
-    laborCarCleaning: "Labor - Detailing",
+    laborCarCleaning: "Labor - Cleaning",
     laborDelivery: "Labor - Delivery",
     parkingAirport: "Parking - Airport",
     parkingLot: "Parking - Lot",

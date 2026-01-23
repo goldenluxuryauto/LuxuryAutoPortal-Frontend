@@ -870,7 +870,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               onToggle={() => toggleSection("directDelivery")}
             >
               <CategoryRow
-                label="Labor - Detailing"
+                label="Labor - Cleaning"
                 values={MONTHS.map((_, i) => getMonthValue(data.directDelivery, i + 1, "laborCarCleaning"))}
                 category="directDelivery"
                 field="laborCarCleaning"
@@ -1030,7 +1030,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 field="keyFob"
               />
               <CategoryRow
-                label="Labor - Detailing"
+                label="Labor - Cleaning"
                 values={MONTHS.map((_, i) => getMonthValue(data.cogs, i + 1, "laborCleaning"))}
                 category="cogs"
                 field="laborCleaning"
@@ -1197,7 +1197,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 field="glaParkingFee"
               />
               <CategoryRow
-                label="Labor - Detailing"
+                label="Labor - Cleaning"
                 values={MONTHS.map((_, i) => getMonthValue(data.parkingFeeLabor, i + 1, "laborCleaning"))}
                 category="parkingFeeLabor"
                 field="laborCleaning"

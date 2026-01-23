@@ -1874,7 +1874,7 @@ export default function ClientDetailPage() {
                               <span className="text-white">${totals?.expenses?.keysFob?.toFixed(2) || "0.00"}</span>
                             </div>
                             <div className="flex justify-between text-gray-300 text-sm">
-                              <span>Labor - Detailing</span>
+                              <span>Labor - Cleaning</span>
                               <span className="text-white">${totals?.expenses?.laborDetailing?.toFixed(2) || "0.00"}</span>
                             </div>
                             <div className="flex justify-between text-gray-300 text-sm">

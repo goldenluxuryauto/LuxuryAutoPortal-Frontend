@@ -299,7 +299,7 @@ export default function ModalEditManagementSplit() {
               <div className="text-[#EAEB80] text-xs font-semibold mb-2">OPERATING EXPENSE (Direct Delivery)</div>
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between text-gray-300">
-                  <span>Labor - Detailing:</span>
+                  <span>Labor - Cleaning:</span>
                   <span>${directDeliveryValues.laborCarCleaning.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-300">
@@ -384,7 +384,7 @@ export default function ModalEditManagementSplit() {
                   <span>${cogsValues.keyFob.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-300">
-                  <span>Labor - Detailing:</span>
+                  <span>Labor - Cleaning:</span>
                   <span>${cogsValues.laborCleaning.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-300">
@@ -461,7 +461,7 @@ export default function ModalEditManagementSplit() {
                   <span>${parkingFeeLaborValues.glaParkingFee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-300">
-                  <span>Labor - Detailing:</span>
+                  <span>Labor - Cleaning:</span>
                   <span>${parkingFeeLaborValues.laborCleaning.toFixed(2)}</span>
                 </div>
                 {dynamicSubcategories.parkingFeeLabor.map((subcat) => {
