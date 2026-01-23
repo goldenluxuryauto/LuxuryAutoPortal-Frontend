@@ -324,9 +324,8 @@ export default function ContractManagement() {
                                   className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20"
                                   onClick={() => {
                                     window.open(
-                                      contract.signedContractUrl!,
-                                      "_blank"
-                                    );
+                                      buildApiUrl(`/api/contracts/${contract.id}/view`),
+                                      "_blank");
                                   }}
                                 >
                                   <ExternalLink className="w-3 h-3 mr-1" />

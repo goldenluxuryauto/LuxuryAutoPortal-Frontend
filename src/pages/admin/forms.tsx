@@ -1183,23 +1183,11 @@ export default function FormsPage() {
                                                         variant="outline"
                                                         className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20"
                                                         onClick={() => {
-                                                          // Use signed_contract_url from database if available
-                                                          if (
-                                                            submission.signedContractUrl
-                                                          ) {
-                                                            window.open(
-                                                              submission.signedContractUrl,
-                                                              "_blank"
-                                                            );
-                                                          } else {
-                                                            // Fallback to old pattern if URL not in database
-                                                            window.open(
-                                                              buildApiUrl(
-                                                                `/signed-contracts/submission_${submission.id}.pdf`
-                                                              ),
-                                                              "_blank"
-                                                            );
-                                                          }
+                                                          // Use proxy endpoint for authenticated access
+                                                          window.open(
+                                                            buildApiUrl(`/api/contracts/${submission.id}/view`),
+                                                            "_blank"
+                                                          );
                                                         }}
                                                       >
                                                         <ExternalLink className="w-3 h-3 mr-1" />
@@ -2183,24 +2171,11 @@ export default function FormsPage() {
                           <div className="md:col-span-2">
                             <Button
                               onClick={() => {
-                                if (data.signedContractUrl) {
-                                  // signedContractUrl is a full URL, use it directly
-                                  window.open(data.signedContractUrl, "_blank");
-                                } else {
-                                  // Fallback to old pattern if URL not in database
-                                  window.open(
-                                    buildApiUrl(
-                                      `/signed-contracts/submission_${data.id}.pdf`
-                                    ),
-                                    "_blank"
-                                  );
-                                  window.open(
-                                    buildApiUrl(
-                                      `/signed-contracts/submission_${data.id}.pdf`
-                                    ),
-                                    "_blank"
-                                  );
-                                }
+                                // Use proxy endpoint for authenticated access
+                                window.open(
+                                  buildApiUrl(`/api/contracts/${data.id}/view`),
+                                  "_blank"
+                                );
                               }}
                               className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
                             >
@@ -2210,7 +2185,7 @@ export default function FormsPage() {
                           </div>
                         )}
                       </div>
-                      </div>
+                    </div>
 
                     {/* Health Insurance Card & Driver's License */}
                     <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
@@ -2271,13 +2246,13 @@ export default function FormsPage() {
                                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                                     <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
                                       {isPdf ? 'Click to open PDF' : 'Click to view full screen'}
-                            </div>
+                                    </div>
                                   </div>
                                   {isPdf && (
                                     <div className="absolute top-2 right-2 bg-[#EAEB80]/90 text-black text-xs px-2 py-1 rounded font-semibold">
                                       PDF
-                          </div>
-                        )}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             );

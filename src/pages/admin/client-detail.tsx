@@ -167,9 +167,10 @@ export default function ClientDetailPage() {
   
   // Upload contract modal state
   const [isUploadContractOpen, setIsUploadContractOpen] = useState(false);
-  const [uploadContractFormErrors, setUploadContractFormErrors] = useState<{}>({});
+  const [uploadContractFormErrors, setUploadContractFormErrors] = useState<{ selectedCarId?: string }>({});
   const [uploadContractForm, setUploadContractForm] = useState({
     contractFile: null as File | null,
+    selectedCarId: "" as string,
   });
   
   // Add car modal state
@@ -464,19 +465,71 @@ export default function ClientDetailPage() {
 
   // Upload contract mutation
   const uploadContractMutation = useMutation({
-    mutationFn: async (data: typeof uploadContractForm) => {
+    mutationFn: async (formData: typeof uploadContractForm) => {
       if (!clientId) throw new Error("Invalid client ID");
-      if (!data.contractFile) throw new Error("Please select a PDF file to upload");
+      if (!formData.contractFile) throw new Error("Please select a PDF file to upload");
+      if (!formData.selectedCarId) {
+        setUploadContractFormErrors({ selectedCarId: "Please select a car" });
+        throw new Error("Please select a car");
+      }
       
       setUploadContractFormErrors({});
 
-      const formData = new FormData();
-      formData.append("contract", data.contractFile);
+      // Get client data from query cache to ensure we have the latest data
+      const clientQueryData = queryClient.getQueryData<{
+        success: boolean;
+        data: ClientDetail;
+      }>(["/api/clients", clientId]);
+      
+      const client = clientQueryData?.data;
+      
+      // Check if the selected car has already been onboarded
+      const onboardedVins = new Set(
+        (client?.signedContracts || [])
+          .map((contract: any) => contract.vinNumber?.toUpperCase().trim())
+          .filter((vin: string) => vin)
+      );
+      
+      const selectedCar = client?.cars?.find(
+        (car: any) => car.id === parseInt(formData.selectedCarId)
+      );
+
+      if (!selectedCar) {
+        setUploadContractFormErrors({ selectedCarId: "Selected car not found" });
+        throw new Error("Selected car not found");
+      }
+      
+      // Verify the selected car is not already onboarded
+      const carVin = selectedCar.vin?.toUpperCase().trim();
+      if (carVin && onboardedVins.has(carVin)) {
+        setUploadContractFormErrors({ selectedCarId: "This car has already been onboarded" });
+        throw new Error("This car has already been onboarded. Please select a different car.");
+      }
+
+      const requestFormData = new FormData();
+      requestFormData.append("contract", formData.contractFile);
+      
+      // Append vehicle information from selected car
+      if (selectedCar.vin) {
+        requestFormData.append("vinNumber", selectedCar.vin);
+      }
+      if (selectedCar.year) {
+        requestFormData.append("vehicleYear", selectedCar.year.toString());
+      }
+      if (selectedCar.make) {
+        requestFormData.append("vehicleMake", selectedCar.make);
+      }
+      if (selectedCar.model) {
+        requestFormData.append("vehicleModel", selectedCar.model);
+      }
+      if (selectedCar.licensePlate) {
+        requestFormData.append("licensePlate", selectedCar.licensePlate);
+      }
 
       const response = await fetch(buildApiUrl(`/api/clients/${clientId}/contracts`), {
         method: "POST",
         credentials: "include",
-        body: formData,
+        body: requestFormData,
       });
       if (!response.ok) {
         const error = await response.json();
@@ -491,6 +544,7 @@ export default function ClientDetailPage() {
       setUploadContractFormErrors({});
       setUploadContractForm({
         contractFile: null,
+        selectedCarId: "",
       });
     },
     onError: (error: any) => {
@@ -1213,7 +1267,7 @@ export default function ClientDetailPage() {
                                       </Badge>
                                       {contract.signedContractUrl && (
                                         <a
-                                          href={contract.signedContractUrl}
+                                          href={buildApiUrl(`/api/contracts/${contract.id}/view`)}
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-[#EAEB80] text-black hover:bg-[#d4d570] transition-colors"
@@ -1385,7 +1439,7 @@ export default function ClientDetailPage() {
                                   </Badge>
                                   {contract.signedContractUrl && (
                                     <a
-                                      href={contract.signedContractUrl}
+                                      href={buildApiUrl(`/api/contracts/${contract.id}/view`)}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-[#EAEB80] text-black hover:bg-[#d4d570] transition-colors"
@@ -2289,13 +2343,17 @@ export default function ClientDetailPage() {
         setIsUploadContractOpen(open);
         if (!open) {
           setUploadContractFormErrors({});
+          setUploadContractForm({
+            contractFile: null,
+            selectedCarId: "",
+          });
         }
       }}>
         <DialogContent className="max-w-lg bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
           <DialogHeader>
             <DialogTitle className="text-white text-xl">Upload Contract</DialogTitle>
             <DialogDescription className="text-gray-400">
-              Manually upload a signed contract for this client
+              Manually upload a signed contract for this client. Select the car to associate with this contract.
             </DialogDescription>
           </DialogHeader>
           <form
@@ -2305,6 +2363,60 @@ export default function ClientDetailPage() {
             }}
             className="space-y-4"
           >
+            <div>
+              <Label className="text-gray-400">Select Car *</Label>
+              {(() => {
+                // Filter out cars that have already been onboarded (have a signed contract)
+                const onboardedVins = new Set(
+                  (data?.data?.signedContracts || [])
+                    .map((contract: any) => contract.vinNumber?.toUpperCase().trim())
+                    .filter((vin: string) => vin)
+                );
+                
+                const nonOnboardedCars = (data?.data?.cars || []).filter((car: any) => {
+                  const carVin = car.vin?.toUpperCase().trim();
+                  return carVin && !onboardedVins.has(carVin);
+                });
+                
+                if (nonOnboardedCars.length === 0) {
+                  return (
+                    <div className="space-y-2">
+                      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-md p-3 text-gray-400 text-sm">
+                        No non-onboarded cars available. All cars for this client have already been onboarded.
+                      </div>
+                      <p className="text-xs text-gray-500">You cannot upload a contract when all cars are already onboarded.</p>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <>
+                    <Select
+                      value={uploadContractForm.selectedCarId}
+                      onValueChange={(value) => {
+                        setUploadContractForm({ ...uploadContractForm, selectedCarId: value });
+                        setUploadContractFormErrors({});
+                      }}
+                    >
+                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectValue placeholder="Select a car" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        {nonOnboardedCars.map((car: any) => (
+                          <SelectItem key={car.id} value={car.id.toString()}>
+                            {car.make || "N/A"} {car.model || ""} {car.year ? `(${car.year})` : ""} - VIN: {car.vin || "N/A"}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {uploadContractFormErrors.selectedCarId && (
+                      <p className="text-xs text-red-400 mt-1">{uploadContractFormErrors.selectedCarId}</p>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">Select a car that hasn't been onboarded yet</p>
+                  </>
+                );
+              })()}
+            </div>
             <div>
               <Label className="text-gray-400">Contract PDF File *</Label>
               <div className="mt-2">
