@@ -183,7 +183,16 @@ export default function MaintenancePage() {
               <div className="space-y-2">
                 <div>
                   <span className="text-xs text-gray-500">Name:</span>
-                  <p className="text-sm text-gray-300">{ownerName}</p>
+                  {car?.clientId ? (
+                    <button
+                      onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
+                      className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-sm cursor-pointer"
+                    >
+                      {ownerName}
+                    </button>
+                  ) : (
+                    <p className="text-sm text-gray-300">{ownerName}</p>
+                  )}
                 </div>
                 <div>
                   <span className="text-xs text-gray-500">Contact #:</span>

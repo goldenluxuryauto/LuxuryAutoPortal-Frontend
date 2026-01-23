@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeft, Plus, Trash2, Edit, FileText, X, Calendar } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Edit, FileText, X } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { cn } from "@/lib/utils";
@@ -37,7 +37,6 @@ interface CarDetail {
   year?: number;
   mileage: number;
   status: "ACTIVE" | "INACTIVE";
-  clientId?: number | null;
   owner?: {
     firstName: string;
     lastName: string;
@@ -287,33 +286,8 @@ export default function PaymentsPage() {
     );
   }
 
-  // Format vehicle information: Make Model Year - #Plate - VIN
-  // Example: "Toyota Tacoma 2025 - #3AZ432 - 3TYLC5LN2ST030937"
-  const formatVehicleInfo = (car: CarDetail): string => {
-    if (!car) return "";
-    
-    const makeModel = car.makeModel || "";
-    const year = car.year ? String(car.year) : "";
-    const plate = car.licensePlate ? car.licensePlate.trim() : "";
-    const vin = car.vin ? car.vin.trim() : "";
-    
-    const parts: string[] = [];
-    if (makeModel && year) {
-      parts.push(`${makeModel} ${year}`);
-    } else if (makeModel) {
-      parts.push(makeModel);
-    }
-    if (plate) {
-      parts.push(`#${plate}`);
-    }
-    if (vin) {
-      parts.push(vin);
-    }
-    return parts.length > 0 ? parts.join(" - ") : "";
-  };
-
-  const vehicleInfo = car ? formatVehicleInfo(car) : "";
-  const ownerName = car?.owner
+  const carName = car.makeModel || `${car.year || ""} ${car.vin}`.trim();
+  const ownerName = car.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
     : "N/A";
 
@@ -332,41 +306,15 @@ export default function PaymentsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-white">Payment History</h1>
-              {(vehicleInfo || ownerName !== "N/A") && (
+              {car && (
                 <p className="text-sm text-gray-400 mt-1">
-                  {vehicleInfo && ownerName !== "N/A" ? (
-                    <>
-                      {vehicleInfo} -{" "}
-                      {car?.clientId ? (
-                        <button
-                          onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                          className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors cursor-pointer"
-                        >
-                          {ownerName}
-                        </button>
-                      ) : (
-                        <span>{ownerName}</span>
-                      )}
-                    </>
-                  ) : (
-                    vehicleInfo || ownerName
-                  )}
+                  Car: {carName} - Owner: {ownerName}
                 </p>
               )}
             </div>
             {isAdmin && (
               <Button
-                onClick={() => {
-                  if (!car?.clientId) {
-                    toast({
-                      title: "Error",
-                      description: "Cannot create payment: Car does not have an associated client. Please ensure the car is linked to a client.",
-                      variant: "destructive",
-                    });
-                    return;
-                  }
-                  setIsAddModalOpen(true);
-                }}
+                onClick={() => setIsAddModalOpen(true)}
                 className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -400,19 +348,12 @@ export default function PaymentsPage() {
 
               <div className="flex items-center gap-2">
                 <label className="text-gray-400 text-sm">Month:</label>
-                <div className="relative">
-                  <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white pointer-events-none z-10" />
                 <Input
                   type="month"
                   value={monthFilter}
                   onChange={(e) => setMonthFilter(e.target.value)}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[180px] pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-moz-calendar-picker-indicator]:opacity-0"
-                    style={{
-                      colorScheme: 'dark',
-                      paddingRight: '2.5rem'
-                    }}
-                  />
-                </div>
+                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[180px]"
+                />
               </div>
 
               {(filterStatus !== "All" || monthFilter) && (
@@ -438,7 +379,6 @@ export default function PaymentsPage() {
                     <TableHead className="text-left text-[#EAEB80] font-medium w-12">#</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Status</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Date</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Car</TableHead>
                     <TableHead className="text-right text-[#EAEB80] font-medium">Payable</TableHead>
                     <TableHead className="text-right text-[#EAEB80] font-medium">Payout</TableHead>
                     <TableHead className="text-right text-[#EAEB80] font-medium">Balance</TableHead>
@@ -454,35 +394,13 @@ export default function PaymentsPage() {
                 <TableBody>
                   {isLoadingPayments ? (
                     <TableRow>
-                      <TableCell colSpan={isAdmin ? 12 : 11} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={isAdmin ? 11 : 10} className="text-center py-12 text-gray-500">
                         Loading...
                       </TableCell>
                     </TableRow>
                   ) : payments.length > 0 ? (
                     <>
-                      {payments.map((payment, index) => {
-                        // Format car name: Make Model Year - #Plate - VIN
-                        // Example: "Toyota Tacoma 2025 - #3AZ432 - 3TYLC5LN2ST030937"
-                        const makeModel = payment.car_make_model || "";
-                        const year = payment.car_year ? String(payment.car_year) : "";
-                        const plate = payment.car_plate_number ? payment.car_plate_number.trim() : "";
-                        const vin = payment.car_vin_number ? payment.car_vin_number.trim() : "";
-                        
-                        const carParts: string[] = [];
-                        if (makeModel && year) {
-                          carParts.push(`${makeModel} ${year}`);
-                        } else if (makeModel) {
-                          carParts.push(makeModel);
-                        }
-                        if (plate) {
-                          carParts.push(`#${plate}`);
-                        }
-                        if (vin) {
-                          carParts.push(vin);
-                        }
-                        const carName = carParts.length > 0 ? carParts.join(" - ") : "--";
-                        
-                        return (
+                      {payments.map((payment, index) => (
                         <TableRow
                           key={payment.payments_aid}
                           className="border-[#2a2a2a] hover:bg-[#1a1a1a] transition-colors"
@@ -504,9 +422,6 @@ export default function PaymentsPage() {
                           <TableCell className="text-left text-white">
                             {formatYearMonth(payment.payments_year_month)}
                           </TableCell>
-                            <TableCell className="text-left text-white">
-                              {carName}
-                            </TableCell>
                           <TableCell className="text-right text-white">
                             {formatCurrency(payment.payments_amount)}
                           </TableCell>
@@ -558,11 +473,10 @@ export default function PaymentsPage() {
                             </TableCell>
                           )}
                         </TableRow>
-                        );
-                      })}
+                      ))}
                       {/* Totals Row */}
                       <TableRow className="border-t-2 border-[#2a2a2a] bg-[#1a1a1a]/50">
-                        <TableCell colSpan={4} className="text-right font-bold text-white">
+                        <TableCell colSpan={3} className="text-right font-bold text-white">
                           Total:
                         </TableCell>
                         <TableCell className="text-right font-bold text-[#EAEB80]">
@@ -579,7 +493,7 @@ export default function PaymentsPage() {
                     </>
                   ) : (
                     <TableRow>
-                        <TableCell colSpan={isAdmin ? 12 : 11} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={isAdmin ? 11 : 10} className="text-center py-12 text-gray-500">
                         No payment records found
                       </TableCell>
                     </TableRow>
@@ -601,7 +515,7 @@ export default function PaymentsPage() {
             }}
             payment={selectedPayment}
             carId={carId || 0}
-            clientId={car?.clientId || (selectedPayment ? selectedPayment.payments_client_id : 0)}
+            clientId={car?.owner ? parseInt(String((car.owner as any).id || 0)) : 0}
           />
         )}
 
