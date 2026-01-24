@@ -41,12 +41,18 @@ const formatCurrency = (value: number): string => {
 };
 
 export default function TotalsPage() {
-  const [, params] = useRoute("/admin/cars/:id/totals");
+  const [individualRoute, individualParams] = useRoute("/admin/cars/:id/totals");
+  const [allCarsRoute] = useRoute("/admin/totals/all");
   const [, setLocation] = useLocation();
-  const carId = params?.id ? parseInt(params.id, 10) : null;
+  
+  const isAllCarsReport = !!allCarsRoute;
+  const carId = individualParams?.id ? parseInt(individualParams.id, 10) : null;
+  
   const [filterType, setFilterType] = useState<string>("Year");
-  const [fromYear, setFromYear] = useState<string>("2026");
-  const [toYear, setToYear] = useState<string>("2026");
+  const [fromYear, setFromYear] = useState<string>(new Date().getFullYear().toString());
+  const [toYear, setToYear] = useState<string>(new Date().getFullYear().toString());
+  const [fromMonth, setFromMonth] = useState<string>("1");
+  const [toMonth, setToMonth] = useState<string>("12");
 
   const { data, isLoading, error } = useQuery<{
     success: boolean;
@@ -62,11 +68,11 @@ export default function TotalsPage() {
       if (!response.ok) throw new Error("Failed to fetch car");
       return response.json();
     },
-    enabled: !!carId,
+    enabled: !!carId && !isAllCarsReport,
     retry: false,
   });
 
-  const car = data?.data;
+  const car: CarDetail | undefined = data?.data;
 
   // Fetch onboarding data for additional car info
   const { data: onboardingData } = useQuery<{
@@ -94,39 +100,45 @@ export default function TotalsPage() {
 
   const onboarding = onboardingData?.success ? onboardingData?.data : null;
 
-  // Fetch totals data (placeholder - will be replaced with actual API call)
-  const { data: totalsData } = useQuery<{
+  // Fetch totals data
+  const { data: totalsData, isLoading: totalsLoading } = useQuery<{
     success: boolean;
     data: any;
   }>({
-    queryKey: ["/api/cars", carId, "totals", filterType, fromYear, toYear],
+    queryKey: isAllCarsReport 
+      ? ["/api/cars/totals/all", filterType, fromYear, toYear, fromMonth, toMonth]
+      : ["/api/cars", carId, "totals", filterType, fromYear, toYear, fromMonth, toMonth],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
-      // TODO: Replace with actual API endpoint
-      const url = buildApiUrl(`/api/cars/${carId}/totals?filter=${filterType}&from=${fromYear}&to=${toYear}`);
+      const params = new URLSearchParams({
+        filter: filterType,
+        from: fromYear,
+        to: toYear,
+      });
+      
+      if (filterType === "Month" || filterType === "Quarter") {
+        params.append("fromMonth", fromMonth);
+        params.append("toMonth", toMonth);
+      }
+      
+      const url = isAllCarsReport
+        ? buildApiUrl(`/api/cars/totals/all?${params.toString()}`)
+        : buildApiUrl(`/api/cars/${carId}/totals?${params.toString()}`);
+        
       const response = await fetch(url, {
         credentials: "include",
       });
       if (!response.ok) {
-        // Return empty data if endpoint doesn't exist yet
-        return { success: true, data: null };
+        throw new Error("Failed to fetch totals");
       }
       return response.json();
     },
-    enabled: !!carId,
+    enabled: isAllCarsReport || !!carId,
     retry: false,
   });
 
   const totals = totalsData?.data || null;
 
-  // Calculate totals for each category (placeholder values)
-  const calculateTotal = (category: string): number => {
-    if (!totals) return 0;
-    // TODO: Replace with actual calculation based on API response
-    return 0;
-  };
-
-  if (isLoading) {
+  if ((isLoading || totalsLoading) && !isAllCarsReport) {
     return (
       <AdminLayout>
         <CarDetailSkeleton />
@@ -134,7 +146,7 @@ export default function TotalsPage() {
     );
   }
 
-  if (error || !car) {
+  if (!isAllCarsReport && (error || !car)) {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
@@ -150,25 +162,27 @@ export default function TotalsPage() {
     );
   }
 
-  const carName = car.makeModel || `${car.year || ""} ${car.vin}`.trim();
-  const ownerName = car.owner
+  // Define car-related variables only when car is defined (i.e., when not in all cars report)
+  const carName = car ? (car.makeModel || `${car.year || ""} ${car.vin}`.trim()) : "";
+  const ownerName = car?.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
     : "N/A";
-  const ownerContact = car.owner?.phone || "N/A";
-  const ownerEmail = car.owner?.email || "N/A";
-  const fuelType = onboarding?.fuelType || car.fuelType || "N/A";
-  const tireSize = onboarding?.tireSize || car.tireSize || "N/A";
-  const oilType = onboarding?.oilType || car.oilType || "N/A";
+  const ownerContact = car?.owner?.phone || "N/A";
+  const ownerEmail = car?.owner?.email || "N/A";
+  const fuelType = onboarding?.fuelType || car?.fuelType || "N/A";
+  const tireSize = onboarding?.tireSize || car?.tireSize || "N/A";
+  const oilType = onboarding?.oilType || car?.oilType || "N/A";
 
   const categories = [
-    { id: "expenses", label: "EXPENSES", total: calculateTotal("expenses") },
-    { id: "income", label: "INCOME", total: calculateTotal("income") },
-    { id: "operating-expenses-direct", label: "OPERATING EXPENSES (DIRECT DELIVERY)", total: calculateTotal("operating-expenses-direct") },
-    { id: "operating-expenses-cogs", label: "OPERATING EXPENSES (COGS - Per Vehicle)", total: calculateTotal("operating-expenses-cogs") },
-    { id: "gla", label: "GLA PARKING FEE & LABOR CLEANING", total: calculateTotal("gla") },
-    { id: "operating-expenses-office", label: "OPERATING EXPENSES (Office Support)", total: calculateTotal("operating-expenses-office") },
-    { id: "history", label: "HISTORY OF THE CARS", total: calculateTotal("history") },
-    { id: "payments", label: "PAYMENT HISTORY", total: calculateTotal("payments") },
+    { id: "expenses", label: "EXPENSES", total: totals?.carManagementSplit || 0 },
+    { id: "income", label: "INCOME", total: totals?.income?.totalProfit || 0 },
+    { id: "operating-expenses-direct", label: "OPERATING EXPENSES (DIRECT DELIVERY)", total: totals?.operatingExpensesDirect?.total || 0 },
+    { id: "operating-expenses-cogs", label: "OPERATING EXPENSES (COGS - Per Vehicle)", total: totals?.expenses?.totalOperatingExpenses || 0 },
+    { id: "gla", label: "GLA PARKING FEE & LABOR CLEANING", total: totals?.gla?.total || 0 },
+    ...(isAllCarsReport ? [{ id: "operating-expenses-office", label: "OPERATING EXPENSES (Office Support)", total: totals?.operatingExpensesOffice?.total || 0 }] : []),
+    { id: "reimbursed-bills", label: "REIMBURSED AND NON-REIMBURSED BILLS", total: (totals?.reimbursedBills?.electricReimbursed || 0) + (totals?.reimbursedBills?.gasReimbursed || 0) + (totals?.reimbursedBills?.uberLyftLimeReimbursed || 0) },
+    { id: "history", label: "VEHICLE HISTORY", total: totals?.history?.daysRented || 0 },
+    { id: "payments", label: "PAYMENT HISTORY", total: totals?.payments?.total || 0 },
   ];
 
   return (
@@ -176,16 +190,20 @@ export default function TotalsPage() {
       <div className="flex flex-col h-full overflow-y-auto overflow-x-hidden">
         {/* Header */}
         <div className="mb-6">
-          <button
-            onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to View Car</span>
-          </button>
+          {!isAllCarsReport && (
+            <button
+              onClick={() => setLocation(`/admin/view-car/${carId}`)}
+              className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to View Car</span>
+            </button>
+          )}
           <div>
-            <h1 className="text-2xl font-bold text-white">Totals</h1>
-            {car && (
+            <h1 className="text-2xl font-bold text-white">
+              {isAllCarsReport ? "ALL CARS REPORT - TOTALS" : "INDIVIDUAL CAR REPORT - TOTALS"}
+            </h1>
+            {!isAllCarsReport && car && (
               <p className="text-sm text-gray-400 mt-1">
                 Car: {car.makeModel || "Unknown Car"}
               </p>
@@ -194,20 +212,21 @@ export default function TotalsPage() {
         </div>
 
         {/* Car and Owner Information Header */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
-            <div className="flex-1">
-              <h1 className="text-xl sm:text-2xl font-semibold text-white mb-2">Totals</h1>
+        {!isAllCarsReport && car && (
+          <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
+              <div className="flex-1">
+                <h1 className="text-xl sm:text-2xl font-semibold text-white mb-2">Totals</h1>
+              </div>
+              <Button
+                variant="outline"
+                className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2 w-full sm:w-auto"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2 w-full sm:w-auto"
-            >
-              <Download className="w-4 h-4" />
-              Export
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Car Information */}
             <div>
               <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Information</h3>
@@ -233,7 +252,7 @@ export default function TotalsPage() {
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Name: </span>
-                  {car?.clientId ? (
+                  {car.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
                       className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
@@ -311,6 +330,7 @@ export default function TotalsPage() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Filters Section */}
         <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 mb-6">
@@ -326,31 +346,55 @@ export default function TotalsPage() {
               </SelectContent>
             </Select>
 
+            {(filterType === "Month" || filterType === "Quarter") && (
+              <>
+                <Select value={fromMonth} onValueChange={setFromMonth}>
+                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[120px]">
+                    <SelectValue placeholder="From Month" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                      <SelectItem key={month} value={month.toString()}>
+                        {new Date(2000, month - 1).toLocaleString('default', { month: 'short' })}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={toMonth} onValueChange={setToMonth}>
+                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[120px]">
+                    <SelectValue placeholder="To Month" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                      <SelectItem key={month} value={month.toString()}>
+                        {new Date(2000, month - 1).toLocaleString('default', { month: 'short' })}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </>
+            )}
+
             <Select value={fromYear} onValueChange={setFromYear}>
               <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[120px]">
-                <SelectValue placeholder="From" />
+                <SelectValue placeholder="From Year" />
               </SelectTrigger>
               <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                <SelectItem value="2026">2026</SelectItem>
-                <SelectItem value="2025">2025</SelectItem>
-                <SelectItem value="2024">2024</SelectItem>
-                <SelectItem value="2023">2023</SelectItem>
-                <SelectItem value="2022">2022</SelectItem>
-                <SelectItem value="2021">2021</SelectItem>
+                {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                  <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
             <Select value={toYear} onValueChange={setToYear}>
               <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[120px]">
-                <SelectValue placeholder="To" />
+                <SelectValue placeholder="To Year" />
               </SelectTrigger>
               <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                <SelectItem value="2026">2026</SelectItem>
-                <SelectItem value="2025">2025</SelectItem>
-                <SelectItem value="2024">2024</SelectItem>
-                <SelectItem value="2023">2023</SelectItem>
-                <SelectItem value="2022">2022</SelectItem>
-                <SelectItem value="2021">2021</SelectItem>
+                {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                  <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -867,7 +911,81 @@ export default function TotalsPage() {
                 );
               }
 
-              // Special handling for OPERATING EXPENSES (Office Support) category
+              // Special handling for REIMBURSED AND NON-REIMBURSED BILLS category
+              if (category.id === "reimbursed-bills") {
+                return (
+                  <AccordionItem
+                    key={category.id}
+                    value={category.id}
+                    className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                  >
+                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                      <div className="flex items-center justify-between w-full pr-4">
+                        <div className="flex items-center gap-2">
+                          <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
+                          <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
+                          <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                        </div>
+                        <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                      <div className="space-y-2 pt-2">
+                        <div className="flex justify-between text-gray-300 text-sm">
+                          <span>Electric - Reimbursed</span>
+                          <span className="text-white">
+                            {formatCurrency(totals?.reimbursedBills?.electricReimbursed || 0)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-gray-300 text-sm">
+                          <span>Electric - Not Reimbursed</span>
+                          <span className="text-white">
+                            {formatCurrency(totals?.reimbursedBills?.electricNotReimbursed || 0)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-gray-300 text-sm">
+                          <span>Gas - Reimbursed</span>
+                          <span className="text-white">
+                            {formatCurrency(totals?.reimbursedBills?.gasReimbursed || 0)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-gray-300 text-sm">
+                          <span>Gas - Not Reimbursed</span>
+                          <span className="text-white">
+                            {formatCurrency(totals?.reimbursedBills?.gasNotReimbursed || 0)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-gray-300 text-sm">
+                          <span>Gas - Service Run</span>
+                          <span className="text-white">
+                            {formatCurrency(totals?.reimbursedBills?.gasServiceRun || 0)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-gray-300 text-sm">
+                          <span>Parking Airport</span>
+                          <span className="text-white">
+                            {formatCurrency(totals?.reimbursedBills?.parkingAirport || 0)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-gray-300 text-sm">
+                          <span>Uber/Lyft/Lime - Reimbursed</span>
+                          <span className="text-white">
+                            {formatCurrency(totals?.reimbursedBills?.uberLyftLimeReimbursed || 0)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-gray-300 text-sm">
+                          <span>Uber/Lyft/Lime - Not Reimbursed</span>
+                          <span className="text-white">
+                            {formatCurrency(totals?.reimbursedBills?.uberLyftLimeNotReimbursed || 0)}
+                          </span>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              }
+
+              // Special handling for OPERATING EXPENSES (Office Support) category - Only for All Cars Report
               if (category.id === "operating-expenses-office") {
                 return (
                   <AccordionItem

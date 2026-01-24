@@ -468,7 +468,8 @@ export default function EarningsPage() {
     const coolersIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "otherIncome");
-    const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
+    // January should NOT use Negative Balance Carry Over (use 0 instead)
+    const negativeBalanceCarryOver = month === 1 ? 0 : calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
@@ -484,9 +485,14 @@ export default function EarningsPage() {
       const owner = skiRacksOwner[month] || "GLA";
       
       if (owner === "GLA") {
-        const part1 = deliveryIncome + electricPrepaidIncome + smokingFines + childSeatIncome + 
-                     coolersIncome + insuranceWreckIncome + otherIncome + gasPrepaidIncome + 
-                     (skiRacksIncome * 0.9) - totalReimbursedBills;
+        // Car Management Split (GLA owns ski racks) = MAX(Part 1 + Part 2, 0)
+        // Part 1 = Delivery Income + Electric Prepaid Income + Gas Prepaid Income + 
+        //          Child Seat Income + Coolers Income + Insurance Wreck Income + 
+        //          Other Income + Ski Racks Income + (Smoking Fines × 90%) - 
+        //          TOTAL REIMBURSE AND NON-REIMBURSE BILLS
+        const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
+                     childSeatIncome + coolersIncome + insuranceWreckIncome + 
+                     otherIncome + skiRacksIncome + (smokingFines * 0.9) - totalReimbursedBills;
         const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
@@ -494,9 +500,14 @@ export default function EarningsPage() {
         const calculation = part1 + part2;
         return calculation >= 0 ? calculation : 0;
       } else {
-        const part1 = deliveryIncome + electricPrepaidIncome + smokingFines + childSeatIncome + 
-                     coolersIncome + insuranceWreckIncome + otherIncome + 
-                     (skiRacksIncome * 0.9) - totalReimbursedBills;
+        // Car Management Split (Owner owns ski racks) = MAX(Part 1 + Part 2, 0)
+        // Part 1 = Delivery Income + Electric Prepaid Income + Gas Prepaid Income + 
+        //          Child Seat Income + Coolers Income + Insurance Wreck Income + 
+        //          Other Income + (Smoking Fines × 90%) - 
+        //          TOTAL REIMBURSE AND NON-REIMBURSE BILLS
+        const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
+                     childSeatIncome + coolersIncome + insuranceWreckIncome + 
+                     otherIncome + (smokingFines * 0.9) - totalReimbursedBills;
         const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
@@ -549,7 +560,8 @@ export default function EarningsPage() {
     const coolersIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "otherIncome");
-    const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
+    // January should NOT use Negative Balance Carry Over (use 0 instead)
+    const negativeBalanceCarryOver = month === 1 ? 0 : calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     
@@ -564,7 +576,9 @@ export default function EarningsPage() {
       const owner = skiRacksOwner[month] || "GLA";
       
       if (owner === "GLA") {
-        const part1 = milesIncome + (skiRacksIncome * 0.1);
+        // Car Owner Split (GLA owns ski racks) = MAX(Part 1 + Part 2, 0)
+        // Part 1 = Miles Income + (Smoking Fines × 10%)
+        const part1 = milesIncome + (smokingFines * 0.1);
         const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
@@ -572,7 +586,9 @@ export default function EarningsPage() {
         const calculation = part1 + part2;
         return calculation >= 0 ? calculation : 0;
       } else {
-        const part1 = milesIncome + gasPrepaidIncome + (skiRacksIncome * 0.1);
+        // Car Owner Split (Owner owns ski racks) = MAX(Part 1 + Part 2, 0)
+        // Part 1 = Miles Income + Gas Prepaid Income + (Smoking Fines × 10%)
+        const part1 = milesIncome + gasPrepaidIncome + (smokingFines * 0.1);
         const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
@@ -827,7 +843,7 @@ export default function EarningsPage() {
                       {ownerName}
                     </button>
                   ) : (
-                    <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
+                  <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
                   )}
                 </div>
                 <div>
@@ -929,53 +945,34 @@ export default function EarningsPage() {
               </colgroup>
               <thead className="bg-[#1a1a1a]">
                 <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a]">
+                  <th className="text-left px-3 py-2 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a] align-middle">
                     Category / Expense
                   </th>
                   {months.map((month, index) => {
                     const monthNum = index + 1;
                     const year = parseInt(selectedYear, 10);
                     const showSkiRacksToggle = year >= 2026;
-                    const currentMode = monthModes[monthNum] || 50;
                     const currentSkiRacksOwner = skiRacksOwner[monthNum] || "GLA";
                     const hasSkiRacksIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], monthNum, "skiRacksIncome") > 0;
                     
                     return (
                     <th
                       key={month}
-                        className="border-l border-[#2a2a2a] px-2 py-2 text-center min-w-[100px] sticky top-0 bg-[#1a1a1a] z-30"
+                        className="border-l border-[#2a2a2a] px-2 py-2 text-center min-w-[100px] sticky top-0 bg-[#1a1a1a] z-[50] align-middle"
                       >
-                        <div className="flex flex-col items-center gap-1">
+                        <div className="flex flex-col items-center gap-1 justify-center">
                           <span className="text-white text-xs">{month}</span>
-                          <div className="flex items-center gap-1">
-                            {/* Rate Mode Toggle (Read-only) */}
-                            <div
-                              className={cn(
-                                "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200",
-                                currentMode === 50 
-                                  ? "bg-green-600 text-white" 
-                                  : "bg-blue-600 text-white"
-                              )}
-                              title={`Split mode: ${currentMode === 50 ? "50:50 (green)" : "30:70 (blue)"}`}
-                            >
-                              {currentMode}
-                            </div>
-                            {/* Ski Racks Owner Toggle (Read-only) - Only show for years >= 2026 */}
-                            {showSkiRacksToggle && (
+                          <div className="flex items-center justify-center gap-1 h-[24px]">
+                            {/* Ski Racks Owner Toggle (Read-only) - Only show for years >= 2026 and when ski racks income exists */}
+                            {showSkiRacksToggle && hasSkiRacksIncome && (
                               <div
                                 className={cn(
-                                  "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px]",
-                                  !hasSkiRacksIncome 
-                                    ? "bg-gray-600 text-gray-400"
-                                    : currentSkiRacksOwner === "GLA"
-                                      ? "bg-purple-600 text-white"
-                                      : "bg-orange-600 text-white"
+                                  "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px] cursor-default",
+                                  currentSkiRacksOwner === "GLA"
+                                    ? "bg-purple-600 text-white"
+                                    : "bg-orange-600 text-white"
                                 )}
-                                title={
-                                  !hasSkiRacksIncome
-                                    ? "No ski racks income"
-                                    : `Ski racks owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"}`
-                                }
+                                title={`Ski racks owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"} (Read-only)`}
                               >
                                 {currentSkiRacksOwner === "GLA" ? "M" : "O"}
                               </div>
@@ -985,9 +982,9 @@ export default function EarningsPage() {
                     </th>
                     );
                   })}
-                  <th className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-30 border-l border-[#2a2a2a] whitespace-nowrap">
+                  <th className="text-right px-2 py-2 text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-[50] border-l border-[#2a2a2a] whitespace-nowrap align-middle">
                     Total
-                    </th>
+                  </th>
                 </tr>
               </thead>
               <tbody className="relative">
@@ -1569,7 +1566,7 @@ function CategorySection({ title, isExpanded, onToggle, children }: CategorySect
   return (
     <>
       <tr className="bg-[#1a1a1a] hover:bg-[#222]">
-        <td colSpan={14} className="sticky left-0 z-30 bg-[#1a1a1a] hover:bg-[#222] px-3 py-2 border-b border-[#2a2a2a]">
+        <td colSpan={14} className="sticky left-0 z-[40] bg-[#1a1a1a] hover:bg-[#222] px-3 py-2 border-b border-[#2a2a2a]">
           <div className="flex items-center gap-2 cursor-pointer" onClick={onToggle}>
             {isExpanded ? <ChevronDown className="w-4 h-4 text-[#EAEB80]" /> : <ChevronRight className="w-4 h-4 text-[#EAEB80]" />}
             <span className="text-sm font-semibold text-[#EAEB80]">{title}</span>
@@ -1599,7 +1596,7 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
       isTotal && "bg-[#0a0a0a] font-semibold"
     )}>
       <td className={cn(
-        "px-3 py-2 text-sm sticky left-0 z-[50] border-r border-[#2a2a2a]",
+        "px-3 py-2 text-sm sticky left-0 z-[40] border-r border-[#2a2a2a]",
         isTotal ? "text-[#EAEB80] bg-[#0a0a0a]" : "text-gray-300 bg-[#0f0f0f]"
       )}>
         <span className="whitespace-nowrap">{label}</span>

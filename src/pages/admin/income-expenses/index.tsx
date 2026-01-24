@@ -211,15 +211,17 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                     variant="outline"
                     role="combobox"
                     aria-expanded={carComboboxOpen}
-                    className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+                    className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] overflow-hidden"
                   >
-                    {selectedCar === "all"
-                      ? "-- Select a Car --"
-                      : (() => {
-                          const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
-                          return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
-                        })()}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <span className="truncate text-left flex-1 min-w-0">
+                      {selectedCar === "all"
+                        ? "-- Select a Car --"
+                        : (() => {
+                            const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
+                            return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
+                          })()}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[400px] p-0 bg-[#1a1a1a] border-[#2a2a2a]">
@@ -364,15 +366,17 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         variant="outline"
                         role="combobox"
                         aria-expanded={carComboboxOpenPerCar}
-                        className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] text-sm"
+                        className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] text-sm overflow-hidden"
                       >
-                        {selectedCar === "all"
-                          ? "-- Select a Car --"
-                          : (() => {
-                              const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
-                              return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
-                            })()}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        <span className="truncate text-left flex-1 min-w-0">
+                          {selectedCar === "all"
+                            ? "-- Select a Car --"
+                            : (() => {
+                                const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
+                                return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
+                              })()}
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[300px] p-0 bg-[#1a1a1a] border-[#2a2a2a]">

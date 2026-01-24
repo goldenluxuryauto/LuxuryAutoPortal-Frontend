@@ -208,112 +208,11 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
   // =IF(M9-M10-M11-M13-M15-M14-M16-M17-M18-M19-M33-M60-M20> 0,0,(M9-M10-M11-M13-M15-M14-M16-M17-M18-M19-M33-M60-M20))
   // This uses the previous month's data (M = previous month)
   // Note: Returns negative value when calculation is negative, 0 when positive
-  // January uses December of previous year, all other months use previous month
+  // January is always 0 (no formula), all other months use previous month
   const calculateNegativeBalanceCarryOver = (month: number): number => {
     if (month === 1) {
-      // January uses December of previous year
-      if (!prevYearDecData) {
-        // If no previous year data, return 0
-        return 0;
-      }
-      
-      // Get December (month 12) data from previous year
-      const decRentalIncome = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "rentalIncome");
-      const decDeliveryIncome = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "deliveryIncome");
-      const decElectricPrepaidIncome = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "electricPrepaidIncome");
-      const decSmokingFines = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "smokingFines");
-      const decGasPrepaidIncome = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "gasPrepaidIncome");
-      const decSkiRacksIncome = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "skiRacksIncome");
-      const decMilesIncome = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "milesIncome");
-      const decChildSeatIncome = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "childSeatIncome");
-      const decCoolersIncome = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "coolersIncome");
-      const decInsuranceWreckIncome = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "insuranceWreckIncome");
-      const decOtherIncome = getMonthValue(prevYearDecData.incomeExpenses || [], 12, "otherIncome");
-      
-      // Calculate December's negative balance carry over (recursive call for previous months)
-      // For December, we need to use November's data
-      const calculateDecNegativeBalance = (m: number, prevData: IncomeExpenseData): number => {
-        if (m === 1) return 0; // No data before January
-        const prevM = m - 1;
-        const prevRentalIncome = getMonthValue(prevData.incomeExpenses || [], prevM, "rentalIncome");
-        const prevDeliveryIncome = getMonthValue(prevData.incomeExpenses || [], prevM, "deliveryIncome");
-        const prevElectricPrepaidIncome = getMonthValue(prevData.incomeExpenses || [], prevM, "electricPrepaidIncome");
-        const prevSmokingFines = getMonthValue(prevData.incomeExpenses || [], prevM, "smokingFines");
-        const prevGasPrepaidIncome = getMonthValue(prevData.incomeExpenses || [], prevM, "gasPrepaidIncome");
-        const prevSkiRacksIncome = getMonthValue(prevData.incomeExpenses || [], prevM, "skiRacksIncome");
-        const prevMilesIncome = getMonthValue(prevData.incomeExpenses || [], prevM, "milesIncome");
-        const prevChildSeatIncome = getMonthValue(prevData.incomeExpenses || [], prevM, "childSeatIncome");
-        const prevCoolersIncome = getMonthValue(prevData.incomeExpenses || [], prevM, "coolersIncome");
-        const prevInsuranceWreckIncome = getMonthValue(prevData.incomeExpenses || [], prevM, "insuranceWreckIncome");
-        const prevOtherIncome = getMonthValue(prevData.incomeExpenses || [], prevM, "otherIncome");
-        const prevNegativeBalance = prevM === 1 ? 0 : calculateDecNegativeBalance(prevM, prevData);
-        
-        // Calculate totals
-        const prevTotalDirectDelivery = (prevData.directDelivery || []).reduce((sum: number, m: any) => {
-          if (m.month === prevM) {
-            return sum + (Number(m.laborCarCleaning) || 0) + (Number(m.laborDelivery) || 0) + 
-                   (Number(m.parkingAirport) || 0) + (Number(m.parkingLot) || 0) + (Number(m.uberLyftLime) || 0);
-          }
-          return sum;
-        }, 0);
-        
-        const prevTotalCogs = (prevData.cogs || []).reduce((sum: number, m: any) => {
-          if (m.month === prevM) {
-            return sum + (Number(m.autoBodyShopWreck) || 0) + (Number(m.alignment) || 0) + 
-                   (Number(m.battery) || 0) + (Number(m.brakes) || 0) + (Number(m.carPayment) || 0) +
-                   (Number(m.carInsurance) || 0) + (Number(m.carSeats) || 0) + (Number(m.cleaningSuppliesTools) || 0) +
-                   (Number(m.emissions) || 0) + (Number(m.gpsSystem) || 0) + (Number(m.keyFob) || 0) +
-                   (Number(m.laborCleaning) || 0) + (Number(m.licenseRegistration) || 0) + (Number(m.mechanic) || 0) +
-                   (Number(m.oilLube) || 0) + (Number(m.parts) || 0) + (Number(m.skiRacks) || 0) +
-                   (Number(m.tickets) || 0) + (Number(m.tiredAirStation) || 0) + (Number(m.tires) || 0) +
-                   (Number(m.towingImpoundFees) || 0) + (Number(m.uberLyftLime) || 0) + (Number(m.windshield) || 0) +
-                   (Number(m.wipers) || 0);
-          }
-          return sum;
-        }, 0);
-        
-        const calculation = prevRentalIncome - prevDeliveryIncome - prevElectricPrepaidIncome - 
-                           prevGasPrepaidIncome - prevMilesIncome - prevSkiRacksIncome - 
-                           prevChildSeatIncome - prevCoolersIncome - prevInsuranceWreckIncome - 
-                           prevOtherIncome - prevTotalDirectDelivery - prevTotalCogs - prevNegativeBalance;
-        const result = calculation > 0 ? 0 : calculation;
-        return result;
-      };
-      
-      const decNegativeBalanceCarryOver = calculateDecNegativeBalance(12, prevYearDecData);
-      
-      // Calculate totals for December
-      const decTotalDirectDelivery = (prevYearDecData.directDelivery || []).reduce((sum: number, m: any) => {
-        if (m.month === 12) {
-          return sum + (Number(m.laborCarCleaning) || 0) + (Number(m.laborDelivery) || 0) + 
-                 (Number(m.parkingAirport) || 0) + (Number(m.parkingLot) || 0) + (Number(m.uberLyftLime) || 0);
-        }
-        return sum;
-      }, 0);
-      
-      const decTotalCogs = (prevYearDecData.cogs || []).reduce((sum: number, m: any) => {
-        if (m.month === 12) {
-          return sum + (Number(m.autoBodyShopWreck) || 0) + (Number(m.alignment) || 0) + 
-                 (Number(m.battery) || 0) + (Number(m.brakes) || 0) + (Number(m.carPayment) || 0) +
-                 (Number(m.carInsurance) || 0) + (Number(m.carSeats) || 0) + (Number(m.cleaningSuppliesTools) || 0) +
-                 (Number(m.emissions) || 0) + (Number(m.gpsSystem) || 0) + (Number(m.keyFob) || 0) +
-                 (Number(m.laborCleaning) || 0) + (Number(m.licenseRegistration) || 0) + (Number(m.mechanic) || 0) +
-                 (Number(m.oilLube) || 0) + (Number(m.parts) || 0) + (Number(m.skiRacks) || 0) +
-                 (Number(m.tickets) || 0) + (Number(m.tiredAirStation) || 0) + (Number(m.tires) || 0) +
-                 (Number(m.towingImpoundFees) || 0) + (Number(m.uberLyftLime) || 0) + (Number(m.windshield) || 0) +
-                 (Number(m.wipers) || 0);
-        }
-        return sum;
-      }, 0);
-      
-      const calculation = decRentalIncome - decDeliveryIncome - decElectricPrepaidIncome - 
-                         decGasPrepaidIncome - decMilesIncome - decSkiRacksIncome - 
-                         decChildSeatIncome - decCoolersIncome - decInsuranceWreckIncome - 
-                         decOtherIncome - decTotalDirectDelivery - decTotalCogs - decNegativeBalanceCarryOver;
-      
-      // Return negative value (preserve negative sign)
-      const result = calculation > 0 ? 0 : calculation;
-      return result;
+      // January is always 0 - no formula, not editable
+      return 0;
     }
     
     const prevMonth = month - 1;
@@ -382,8 +281,8 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
-    // Use the calculated Negative Balance Carry Over (not stored in data)
-    const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
+    // January should NOT use Negative Balance Carry Over (use 0 instead)
+    const negativeBalanceCarryOver = month === 1 ? 0 : calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
@@ -401,18 +300,14 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
       
       if (owner === "GLA") {
         // If GLA owns ski racks:
-        // Car Management (SKI RACKS OWNER) = IF(
-        //   Delivery Income + Electric Prepaid Income + Smoking Fines + Child Seat Income + 
-        //   Coolers Income + Insurance Wreck Income + Other Income + Gas Prepaid Income + 
-        //   (Ski Racks Income * 90%) - TOTAL REIMBURSE AND NON-REIMBURSE BILLS +
-        //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
-        //    Smoking Fines - Ski Racks Income - Miles Income - Gas Prepaid Income - Child Seat Income - 
-        //    Coolers Income - Insurance Wreck Income - Other Income - TOTAL OPERATING EXPENSE (Direct Delivery) - 
-        //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Management Split % >= 0,
-        //   [calculation], 0)
-        const part1 = deliveryIncome + electricPrepaidIncome + smokingFines + childSeatIncome + 
-                     coolersIncome + insuranceWreckIncome + otherIncome + gasPrepaidIncome + 
-                     (skiRacksIncome * 0.9) - totalReimbursedBills;
+        // Car Management Split = MAX(Part 1 + Part 2, 0)
+        // Part 1 = Delivery Income + Electric Prepaid Income + Gas Prepaid Income + 
+        //          Child Seat Income + Coolers Income + Insurance Wreck Income + 
+        //          Other Income + Ski Racks Income + (Smoking Fines × 90%) - 
+        //          TOTAL REIMBURSE AND NON-REIMBURSE BILLS
+        const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
+                     childSeatIncome + coolersIncome + insuranceWreckIncome + 
+                     otherIncome + skiRacksIncome + (smokingFines * 0.9) - totalReimbursedBills;
         const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
@@ -421,18 +316,14 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
         return calculation >= 0 ? calculation : 0;
       } else {
         // If car owner owns ski racks:
-        // Car Management = IF(
-        //   Delivery Income + Electric Prepaid Income + Smoking Fines + Child Seat Income + 
-        //   Coolers Income + Insurance Wreck Income + Other Income + 
-        //   (Ski Racks Income * 90%) - TOTAL REIMBURSE AND NON-REIMBURSE BILLS +
-        //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
-        //    Smoking Fines - Ski Racks Income - Miles Income - Gas Prepaid Income - Child Seat Income - 
-        //    Coolers Income - Insurance Wreck Income - Other Income - TOTAL OPERATING EXPENSE (Direct Delivery) - 
-        //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Management Split % >= 0,
-        //   [calculation], 0)
-        const part1 = deliveryIncome + electricPrepaidIncome + smokingFines + childSeatIncome + 
-                     coolersIncome + insuranceWreckIncome + otherIncome + 
-                     (skiRacksIncome * 0.9) - totalReimbursedBills;
+        // Car Management Split = MAX(Part 1 + Part 2, 0)
+        // Part 1 = Delivery Income + Electric Prepaid Income + Gas Prepaid Income + 
+        //          Child Seat Income + Coolers Income + Insurance Wreck Income + 
+        //          Other Income + (Smoking Fines × 90%) - 
+        //          TOTAL REIMBURSE AND NON-REIMBURSE BILLS
+        const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
+                     childSeatIncome + coolersIncome + insuranceWreckIncome + 
+                     otherIncome + (smokingFines * 0.9) - totalReimbursedBills;
         const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
@@ -484,6 +375,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
   //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Owner Split % 
   // , 0
   // )
+  // Note: January should NOT use Negative Balance Carry Over (use 0 instead)
   const calculateCarOwnerSplit = (month: number): number => {
     // Use stored percentage, default to 0 if not set (independent of car management split)
     const storedPercent = getMonthValue(data.incomeExpenses, month, "carOwnerSplit") || 0;
@@ -500,8 +392,8 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
-    // Use the calculated Negative Balance Carry Over (not stored in data)
-    const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
+    // January should NOT use Negative Balance Carry Over (use 0 instead)
+    const negativeBalanceCarryOver = month === 1 ? 0 : calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     
@@ -518,14 +410,9 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
       
       if (owner === "GLA") {
         // If GLA owns ski racks:
-        // Car Owner Split = IF(
-        //   (Miles Income) + (Ski Racks Income * 10%) +
-        //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
-        //    Smoking Fines - Ski Racks Income - Miles Income - Gas Prepaid Income - Child Seat Income - 
-        //    Coolers Income - Insurance Wreck Income - Other Income - TOTAL OPERATING EXPENSE (Direct Delivery) - 
-        //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Owner Split % >= 0,
-        //   [calculation], 0)
-        const part1 = milesIncome + (skiRacksIncome * 0.1);
+        // Car Owner Split = MAX(Part 1 + Part 2, 0)
+        // Part 1 = Miles Income + (Smoking Fines × 10%)
+        const part1 = milesIncome + (smokingFines * 0.1);
         const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
@@ -534,14 +421,9 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
         return calculation >= 0 ? calculation : 0;
       } else {
         // If car owner owns ski racks:
-        // Car Owner Split (SKI RACKS OWNER) = IF(
-        //   (Miles Income + Gas Prepaid Income) + (Ski Racks Income * 10%) +
-        //   (Rental Income + Negative Balance Carry Over - Delivery Income - Electric Prepaid Income - 
-        //    Smoking Fines - Ski Racks Income - Miles Income - Gas Prepaid Income - Child Seat Income - 
-        //    Coolers Income - Insurance Wreck Income - Other Income - TOTAL OPERATING EXPENSE (Direct Delivery) - 
-        //    TOTAL OPERATING EXPENSE (COGS - Per Vehicle)) * Car Owner Split % >= 0,
-        //   [calculation], 0)
-        const part1 = milesIncome + gasPrepaidIncome + (skiRacksIncome * 0.1);
+        // Car Owner Split = MAX(Part 1 + Part 2, 0)
+        // Part 1 = Miles Income + Gas Prepaid Income + (Smoking Fines × 10%)
+        const part1 = milesIncome + gasPrepaidIncome + (smokingFines * 0.1);
         const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
@@ -628,7 +510,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               {MONTHS.map((month, index) => {
                 const monthNum = index + 1;
                 const currentYear = parseInt(year, 10);
-                const showToggles = currentYear >= 2026;
+                const showSkiRacksToggle = currentYear >= 2026;
                 const currentMode = monthModes[monthNum] || 50;
                 const currentSkiRacksOwner = skiRacksOwner[monthNum] || "GLA";
                 const hasSkiRacksIncome = getMonthValue(data.incomeExpenses, monthNum, "skiRacksIncome") > 0;
@@ -639,48 +521,44 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                   >
                     <div className="flex flex-col items-center gap-1">
                       <span className="text-white text-xs">{month} {year}</span>
-                      {showToggles && (
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => toggleMonthMode(monthNum)}
-                            disabled={isSavingMode}
-                            className={cn(
-                              "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200",
-                              "disabled:opacity-50 disabled:cursor-not-allowed",
-                              currentMode === 50 
-                                ? "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-lg shadow-green-600/50" 
-                                : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/50",
-                              isSavingMode && "animate-pulse"
-                            )}
-                            title={isSavingMode ? "Saving mode change..." : `Click to toggle between 50:50 (green) and 30:70 (blue) split`}
-                          >
-                            {isSavingMode ? "..." : currentMode}
-                          </button>
-                          <button
-                            onClick={() => toggleSkiRacksOwner(monthNum)}
-                            disabled={isSavingSkiRacksOwner}
-                            className={cn(
-                              "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px]",
-                              "disabled:opacity-50 disabled:cursor-not-allowed",
-                              !hasSkiRacksIncome 
-                                ? "bg-gray-600 text-gray-400 hover:bg-gray-700"
-                                : currentSkiRacksOwner === "GLA"
-                                  ? "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 shadow-lg shadow-purple-600/50"
-                                  : "bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800 shadow-lg shadow-orange-600/50",
-                              isSavingSkiRacksOwner && "animate-pulse"
-                            )}
-                            title={
-                              isSavingSkiRacksOwner 
-                                ? "Saving ski racks owner..." 
-                                : !hasSkiRacksIncome
-                                  ? "No ski racks income - toggle available but won't affect calculations"
-                                  : `Click to toggle ski racks owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"}`
-                            }
-                          >
-                            {isSavingSkiRacksOwner ? "..." : currentSkiRacksOwner === "GLA" ? "M" : "O"}
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => toggleMonthMode(monthNum)}
+                          disabled={isSavingMode}
+                          className={cn(
+                            "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200",
+                            "disabled:opacity-50 disabled:cursor-not-allowed",
+                            currentMode === 50 
+                              ? "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-lg shadow-green-600/50" 
+                              : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/50",
+                            isSavingMode && "animate-pulse"
+                          )}
+                          title={isSavingMode ? "Saving mode change..." : `Click to toggle between 50:50 (green) and 30:70 (blue) split`}
+                        >
+                          {isSavingMode ? "..." : currentMode}
+                        </button>
+                        {showSkiRacksToggle && hasSkiRacksIncome && (
+                        <button
+                          onClick={() => toggleSkiRacksOwner(monthNum)}
+                          disabled={isSavingSkiRacksOwner}
+                          className={cn(
+                            "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px]",
+                            "disabled:opacity-50 disabled:cursor-not-allowed",
+                            currentSkiRacksOwner === "GLA"
+                              ? "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 shadow-lg shadow-purple-600/50"
+                              : "bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800 shadow-lg shadow-orange-600/50",
+                            isSavingSkiRacksOwner && "animate-pulse"
+                          )}
+                          title={
+                            isSavingSkiRacksOwner 
+                              ? "Saving ski racks owner..." 
+                              : `Click to toggle ski racks owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"}`
+                          }
+                        >
+                          {isSavingSkiRacksOwner ? "..." : currentSkiRacksOwner === "GLA" ? "M" : "O"}
+                        </button>
+                        )}
+                      </div>
                     </div>
                   </th>
                 );
@@ -815,7 +693,7 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
                 values={MONTHS.map((_, i) => calculateNegativeBalanceCarryOver(i + 1))}
                 category="income"
                 field="negativeBalanceCarryOver"
-                isEditable={false} // All months are calculated (January uses previous year December)
+                isEditable={false} // All months are calculated (January is always 0, not editable)
                 hideTotal={true} // Hide total column
               />
               <CategoryRow
