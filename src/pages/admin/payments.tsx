@@ -438,7 +438,6 @@ export default function PaymentsPage() {
                     <TableHead className="text-left text-[#EAEB80] font-medium w-12">#</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Status</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Date</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Car</TableHead>
                     <TableHead className="text-right text-[#EAEB80] font-medium">Payable</TableHead>
                     <TableHead className="text-right text-[#EAEB80] font-medium">Payout</TableHead>
                     <TableHead className="text-right text-[#EAEB80] font-medium">Balance</TableHead>
@@ -454,34 +453,13 @@ export default function PaymentsPage() {
                 <TableBody>
                   {isLoadingPayments ? (
                     <TableRow>
-                      <TableCell colSpan={isAdmin ? 12 : 11} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={isAdmin ? 11 : 10} className="text-center py-12 text-gray-500">
                         Loading...
                       </TableCell>
                     </TableRow>
                   ) : payments.length > 0 ? (
                     <>
                       {payments.map((payment, index) => {
-                        // Format car name: Make Model Year - #Plate - VIN
-                        // Example: "Toyota Tacoma 2025 - #3AZ432 - 3TYLC5LN2ST030937"
-                        const makeModel = payment.car_make_model || "";
-                        const year = payment.car_year ? String(payment.car_year) : "";
-                        const plate = payment.car_plate_number ? payment.car_plate_number.trim() : "";
-                        const vin = payment.car_vin_number ? payment.car_vin_number.trim() : "";
-                        
-                        const carParts: string[] = [];
-                        if (makeModel && year) {
-                          carParts.push(`${makeModel} ${year}`);
-                        } else if (makeModel) {
-                          carParts.push(makeModel);
-                        }
-                        if (plate) {
-                          carParts.push(`#${plate}`);
-                        }
-                        if (vin) {
-                          carParts.push(vin);
-                        }
-                        const carName = carParts.length > 0 ? carParts.join(" - ") : "--";
-                        
                         return (
                         <TableRow
                           key={payment.payments_aid}
@@ -504,9 +482,6 @@ export default function PaymentsPage() {
                           <TableCell className="text-left text-white">
                             {formatYearMonth(payment.payments_year_month)}
                           </TableCell>
-                            <TableCell className="text-left text-white">
-                              {carName}
-                            </TableCell>
                           <TableCell className="text-right text-white">
                             {formatCurrency(payment.payments_amount)}
                           </TableCell>
@@ -562,7 +537,7 @@ export default function PaymentsPage() {
                       })}
                       {/* Totals Row */}
                       <TableRow className="border-t-2 border-[#2a2a2a] bg-[#1a1a1a]/50">
-                        <TableCell colSpan={4} className="text-right font-bold text-white">
+                        <TableCell colSpan={3} className="text-right font-bold text-white">
                           Total:
                         </TableCell>
                         <TableCell className="text-right font-bold text-[#EAEB80]">
@@ -579,7 +554,7 @@ export default function PaymentsPage() {
                     </>
                   ) : (
                     <TableRow>
-                        <TableCell colSpan={isAdmin ? 12 : 11} className="text-center py-12 text-gray-500">
+                        <TableCell colSpan={isAdmin ? 11 : 10} className="text-center py-12 text-gray-500">
                         No payment records found
                       </TableCell>
                     </TableRow>

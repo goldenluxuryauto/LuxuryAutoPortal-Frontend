@@ -44,6 +44,7 @@ import {
   Minus,
   Edit,
   Upload,
+  Trash2,
 } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -66,6 +67,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { AddEditBankingInfoModal } from "@/components/modals/AddEditBankingInfoModal";
 
 interface ClientDetail {
   id: number;
@@ -176,6 +178,12 @@ export default function ClientDetailPage() {
   // Add car modal state
   const [isAddCarOpen, setIsAddCarOpen] = useState(false);
   const [addCarFormErrors, setAddCarFormErrors] = useState<{ vin?: string }>({});
+  
+  // Banking info modal state
+  const [isBankingModalOpen, setIsBankingModalOpen] = useState(false);
+  const [editingBankingInfo, setEditingBankingInfo] = useState<any>(null);
+  const [deletingBankingId, setDeletingBankingId] = useState<number | null>(null);
+  
   const [addCarForm, setAddCarForm] = useState({
     vin: "",
     make: "",
@@ -285,6 +293,26 @@ export default function ClientDetailPage() {
           return { success: false, data: null };
         }
         throw new Error(errorData.error || `Failed to fetch onboarding: ${response.statusText}`);
+      }
+      const result = await response.json();
+      return result;
+    },
+    enabled: !!clientId,
+    retry: false,
+  });
+
+  // Fetch banking information for the client
+  const { data: bankingInfoData, isLoading: isLoadingBankingInfo } = useQuery<any[]>({
+    queryKey: [`/api/clients/${clientId}/banking-info`],
+    queryFn: async () => {
+      if (!clientId) return [];
+      const url = buildApiUrl(`/api/clients/${clientId}/banking-info`);
+      const response = await fetch(url, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        console.error("Failed to fetch banking info");
+        return [];
       }
       const result = await response.json();
       return result;
@@ -724,6 +752,44 @@ export default function ClientDetailPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to add car",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete banking info mutation
+  const deleteBankingInfoMutation = useMutation({
+    mutationFn: async (bankingInfoId: number) => {
+      const response = await fetch(
+        buildApiUrl(`/api/clients/banking-info/${bankingInfoId}`),
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete banking information");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients", clientId] });
+      queryClient.invalidateQueries({
+        queryKey: [`/api/clients/${clientId}/banking-info`],
+      });
+      toast({
+        title: "Success",
+        description: "Banking information deleted successfully",
+      });
+      setDeletingBankingId(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -1170,45 +1236,137 @@ export default function ClientDetailPage() {
 
                           {/* Banking Information */}
                           <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                            <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
-                              Banking Information (ACH)
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <span className="text-gray-400 block mb-1">Bank Name:</span>
-                                <span className="text-white">{formatValue(data.bankName)}</span>
-                              </div>
-                              <div>
-                                <span className="text-gray-400 block mb-1">Tax Classification:</span>
-                                <span className="text-white">{formatValue(data.taxClassification)}</span>
-                              </div>
-                              <div>
-                                <span className="text-gray-400 block mb-1">Routing Number:</span>
-                                <span className="text-white font-mono">{formatValue(data.routingNumber)}</span>
-                              </div>
-                              <div>
-                                <span className="text-gray-400 block mb-1">Account Number:</span>
-                                <span className="text-white font-mono">{formatValue(data.accountNumber)}</span>
-                              </div>
-                              {data.businessName && (
-                                <div>
-                                  <span className="text-gray-400 block mb-1">Business Name:</span>
-                                  <span className="text-white">{formatValue(data.businessName)}</span>
-                                </div>
-                              )}
-                              {data.ein && (
-                                <div>
-                                  <span className="text-gray-400 block mb-1">EIN:</span>
-                                  <span className="text-white font-mono">{formatValue(data.ein)}</span>
-                                </div>
-                              )}
-                              {data.ssn && (
-                                <div>
-                                  <span className="text-gray-400 block mb-1">SSN:</span>
-                                  <span className="text-white font-mono">{formatValue(data.ssn)}</span>
-                                </div>
-                              )}
+                            <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAEB80]/30">
+                              <h3 className="text-lg font-semibold text-[#EAEB80]">
+                                Banking Information (ACH)
+                              </h3>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                                onClick={() => {
+                                  setEditingBankingInfo(null);
+                                  setIsBankingModalOpen(true);
+                                }}
+                              >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Add Banking Info
+                              </Button>
                             </div>
+                            {isLoadingBankingInfo ? (
+                              <div className="text-center py-6 text-gray-400">Loading...</div>
+                            ) : bankingInfoData && bankingInfoData.length > 0 ? (
+                              <div className="space-y-4">
+                                {bankingInfoData.map((bankInfo: any, index: number) => (
+                                  <div
+                                    key={bankInfo.banking_info_aid}
+                                    className="bg-[#111111] border border-[#EAEB80]/10 rounded-lg p-4"
+                                  >
+                                    <div className="flex items-start justify-between mb-3">
+                                      <div className="flex items-center gap-2">
+                                        <h4 className="text-white font-medium">
+                                          {bankInfo.banking_info_car_id && (bankInfo.car_make || bankInfo.car_specs)
+                                            ? `${[bankInfo.car_make, bankInfo.car_specs].filter(Boolean).join(" ")}${
+                                                bankInfo.car_year ? ` ${bankInfo.car_year}` : ""
+                                              }${
+                                                bankInfo.car_plate_number
+                                                  ? ` - #${bankInfo.car_plate_number}`
+                                                  : ""
+                                              }`
+                                            : "Default Banking Info"}
+                                        </h4>
+                                        {bankInfo.banking_info_is_default === 1 && (
+                                          <Badge
+                                            variant="outline"
+                                            className="border-[#EAEB80]/50 text-[#EAEB80] bg-[#EAEB80]/10"
+                                          >
+                                            Default
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="text-gray-400 hover:text-[#EAEB80] h-8 w-8 p-0"
+                                          onClick={() => {
+                                            setEditingBankingInfo(bankInfo);
+                                            setIsBankingModalOpen(true);
+                                          }}
+                                        >
+                                          <Edit className="w-4 h-4" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="text-gray-400 hover:text-red-400 h-8 w-8 p-0"
+                                          onClick={() =>
+                                            setDeletingBankingId(bankInfo.banking_info_aid)
+                                          }
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                      <div>
+                                        <span className="text-gray-400 block mb-1">Bank Name:</span>
+                                        <span className="text-white">
+                                          {formatValue(bankInfo.banking_info_bank_name)}
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-400 block mb-1">Tax Classification:</span>
+                                        <span className="text-white">
+                                          {formatValue(bankInfo.banking_info_tax_classification)}
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-400 block mb-1">Routing Number:</span>
+                                        <span className="text-white font-mono">
+                                          {formatValue(bankInfo.banking_info_routing_number)}
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-400 block mb-1">Account Number:</span>
+                                        <span className="text-white font-mono">
+                                          {formatValue(bankInfo.banking_info_account_number)}
+                                        </span>
+                                      </div>
+                                      {bankInfo.banking_info_business_name && (
+                                        <div>
+                                          <span className="text-gray-400 block mb-1">Business Name:</span>
+                                          <span className="text-white">
+                                            {formatValue(bankInfo.banking_info_business_name)}
+                                          </span>
+                                        </div>
+                                      )}
+                                      {bankInfo.banking_info_ein && (
+                                        <div>
+                                          <span className="text-gray-400 block mb-1">EIN:</span>
+                                          <span className="text-white font-mono">
+                                            {formatValue(bankInfo.banking_info_ein)}
+                                          </span>
+                                        </div>
+                                      )}
+                                      {bankInfo.banking_info_ssn && (
+                                        <div>
+                                          <span className="text-gray-400 block mb-1">SSN:</span>
+                                          <span className="text-white font-mono">
+                                            {formatValue(bankInfo.banking_info_ssn)}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                                <DollarSign className="w-8 h-8 mb-2 text-gray-600" />
+                                <p>No banking information available yet.</p>
+                              </div>
+                            )}
                           </div>
 
                           {/* Signed Contracts Section */}
@@ -3058,6 +3216,53 @@ export default function ClientDetailPage() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Banking Info Modal */}
+      <AddEditBankingInfoModal
+        isOpen={isBankingModalOpen}
+        onClose={() => {
+          setIsBankingModalOpen(false);
+          setEditingBankingInfo(null);
+        }}
+        clientId={clientId!}
+        bankingInfo={editingBankingInfo}
+        cars={client?.cars || []}
+      />
+
+      {/* Delete Banking Info Confirmation Dialog */}
+      <Dialog
+        open={deletingBankingId !== null}
+        onOpenChange={(open) => !open && setDeletingBankingId(null)}
+      >
+        <DialogContent className="bg-[#0a0a0a] border-[#2a2a2a] text-white">
+          <DialogHeader>
+            <DialogTitle className="text-[#EAEB80]">Delete Banking Information</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Are you sure you want to delete this banking information? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setDeletingBankingId(null)}
+              className="border-[#2a2a2a] text-gray-300 hover:bg-[#1a1a1a]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (deletingBankingId) {
+                  deleteBankingInfoMutation.mutate(deletingBankingId);
+                }
+              }}
+              disabled={deleteBankingInfoMutation.isPending}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              {deleteBankingInfoMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </AdminLayout>

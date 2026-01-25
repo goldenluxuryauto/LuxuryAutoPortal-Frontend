@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   Dialog,
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Upload, X, FileText, Image as ImageIcon } from "lucide-react";
 
 interface Payment {
   payments_aid: number;
@@ -74,6 +75,8 @@ export function AddEditPaymentModal({
   const [invoiceId, setInvoiceId] = useState("");
   const [paymentDate, setPaymentDate] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [receiptFiles, setReceiptFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch payment statuses
   const { data: statusesData } = useQuery<{
@@ -125,8 +128,18 @@ export function AddEditPaymentModal({
       setBalance(payment.payments_amount_balance.toString());
       setReferenceNumber(payment.payments_reference_number || "");
       setInvoiceId(payment.payments_invoice_id || "");
-      setPaymentDate(payment.payments_invoice_date || "");
+      
+      // Format payment date for input field (YYYY-MM-DD)
+      if (payment.payments_invoice_date) {
+        const date = new Date(payment.payments_invoice_date);
+        const formattedDate = date.toISOString().split('T')[0];
+        setPaymentDate(formattedDate);
+      } else {
+        setPaymentDate("");
+      }
+      
       setRemarks(payment.payments_remarks || "");
+      setReceiptFiles([]);
     } else {
       // Reset form for new payment
       const today = new Date();
@@ -140,8 +153,9 @@ export function AddEditPaymentModal({
       setInvoiceId("");
       setPaymentDate("");
       setRemarks("");
+      setReceiptFiles([]);
     }
-  }, [payment]);
+  }, [payment, isOpen]);
 
   // Auto-calculate balance when payout or payable changes
   useEffect(() => {
@@ -162,17 +176,53 @@ export function AddEditPaymentModal({
     }
   }, [incomeExpenseData, isEdit]);
 
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files);
+      setReceiptFiles((prev) => [...prev, ...newFiles]);
+    }
+    // Reset input value so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // Remove file from list
+  const handleRemoveFile = (index: number) => {
+    setReceiptFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       const url = buildApiUrl("/api/payments");
+      
+      // Create FormData for file uploads
+      const formData = new FormData();
+      formData.append("paymentsClientId", data.paymentsClientId.toString());
+      formData.append("paymentsStatusId", data.paymentsStatusId.toString());
+      formData.append("paymentsCarId", data.paymentsCarId.toString());
+      formData.append("paymentsYearMonth", data.paymentsYearMonth);
+      formData.append("paymentsAmount", data.paymentsAmount.toString());
+      formData.append("paymentsAmountPayout", data.paymentsAmountPayout.toString());
+      formData.append("paymentsReferenceNumber", data.paymentsReferenceNumber || "");
+      formData.append("paymentsInvoiceId", data.paymentsInvoiceId || "");
+      formData.append("paymentsInvoiceDate", data.paymentsInvoiceDate || "");
+      formData.append("paymentsRemarks", data.paymentsRemarks || "");
+      
+      // Append receipt files
+      if (data.receiptFiles && data.receiptFiles.length > 0) {
+        data.receiptFiles.forEach((file: File) => {
+          formData.append("receiptFiles", file);
+        });
+      }
+      
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         credentials: "include",
-        body: JSON.stringify(data),
+        body: formData,
       });
       if (!response.ok) {
         const error = await response.json();
@@ -202,13 +252,31 @@ export function AddEditPaymentModal({
     mutationFn: async (data: any) => {
       if (!payment) throw new Error("No payment to update");
       const url = buildApiUrl(`/api/payments/${payment.payments_aid}`);
+      
+      // Create FormData for file uploads
+      const formData = new FormData();
+      formData.append("paymentsClientId", data.paymentsClientId.toString());
+      formData.append("paymentsStatusId", data.paymentsStatusId.toString());
+      formData.append("paymentsCarId", data.paymentsCarId.toString());
+      formData.append("paymentsYearMonth", data.paymentsYearMonth);
+      formData.append("paymentsAmount", data.paymentsAmount.toString());
+      formData.append("paymentsAmountPayout", data.paymentsAmountPayout.toString());
+      formData.append("paymentsReferenceNumber", data.paymentsReferenceNumber || "");
+      formData.append("paymentsInvoiceId", data.paymentsInvoiceId || "");
+      formData.append("paymentsInvoiceDate", data.paymentsInvoiceDate || "");
+      formData.append("paymentsRemarks", data.paymentsRemarks || "");
+      
+      // Append receipt files
+      if (data.receiptFiles && data.receiptFiles.length > 0) {
+        data.receiptFiles.forEach((file: File) => {
+          formData.append("receiptFiles", file);
+        });
+      }
+      
       const response = await fetch(url, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
         credentials: "include",
-        body: JSON.stringify(data),
+        body: formData,
       });
       if (!response.ok) {
         const error = await response.json();
@@ -284,6 +352,7 @@ export function AddEditPaymentModal({
       paymentsInvoiceId: invoiceId || "",
       paymentsInvoiceDate: paymentDate || null,
       paymentsRemarks: remarks || "",
+      receiptFiles: receiptFiles,
     };
 
     if (isEdit) {
@@ -467,6 +536,70 @@ export function AddEditPaymentModal({
               disabled={isPending}
               className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1"
             />
+          </div>
+
+          {/* Receipt Upload */}
+          <div>
+            <Label className="text-gray-300">Receipt Upload</Label>
+            <div className="mt-2 space-y-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.pdf"
+                multiple
+                onChange={handleFileChange}
+                disabled={isPending}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isPending}
+                className="w-full bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                {receiptFiles.length > 0 ? "Add More Files" : "Upload Receipt"}
+              </Button>
+              
+              {receiptFiles.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs text-gray-400">
+                    {receiptFiles.length} file(s) selected
+                  </p>
+                  {receiptFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between bg-[#0a0a0a] border border-[#2a2a2a] rounded p-2"
+                    >
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        {file.type.startsWith("image/") ? (
+                          <ImageIcon className="w-4 h-4 text-[#EAEB80] flex-shrink-0" />
+                        ) : (
+                          <FileText className="w-4 h-4 text-[#EAEB80] flex-shrink-0" />
+                        )}
+                        <span className="text-sm text-white truncate">
+                          {file.name}
+                        </span>
+                        <span className="text-xs text-gray-400 flex-shrink-0">
+                          ({(file.size / 1024).toFixed(1)} KB)
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveFile(index)}
+                        disabled={isPending}
+                        className="text-red-400 hover:text-red-300 hover:bg-red-400/10 ml-2"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Remarks */}

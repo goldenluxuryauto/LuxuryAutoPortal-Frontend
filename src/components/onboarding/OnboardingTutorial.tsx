@@ -281,24 +281,53 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [location] = useLocation();
+  
+  // Don't fetch user data on login/signup pages
+  const isAuthPage = location === '/login' || location === '/signup' || location === '/';
   
   // Fetch user role to determine which tutorial to show
   // Add timeout and error handling to prevent blocking app initialization
   // Use enabled: false initially and enable after a short delay to prevent blocking
-  const [enableAuthQuery, setEnableAuthQuery] = useState(false);
+  // But never enable on auth pages
+  const [enableAuthQuery, setEnableAuthQuery] = useState(false); // Always start false
   
-  // Enable query after initial render to prevent blocking
+  // Enable query after initial render to prevent blocking (but not on auth pages)
   useEffect(() => {
+    // Immediately disable if on auth page
+    if (isAuthPage) {
+      setEnableAuthQuery(false);
+      // Cancel any in-flight requests and remove cached data when on auth pages
+      queryClient.cancelQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.removeQueries({ queryKey: ["/api/auth/me", location] });
+      return;
+    }
+    
+    // Only enable after a delay if NOT on auth page
     const timer = setTimeout(() => {
-      setEnableAuthQuery(true);
-    }, 100); // Small delay to let app render first
+      // Double-check we're still not on auth page before enabling
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/login' && currentPath !== '/signup' && currentPath !== '/') {
+        setEnableAuthQuery(true);
+      }
+    }, 200); // Slightly longer delay to ensure location is stable
     
     return () => clearTimeout(timer);
-  }, []);
+  }, [isAuthPage, location, queryClient]);
+  
+  // Only create the query if we're NOT on an auth page
+  const shouldFetchUser = !isAuthPage && enableAuthQuery;
   
   const { data: userData } = useQuery<{ user?: { isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean } }>({
-    queryKey: ["/api/auth/me"],
+    queryKey: ["/api/auth/me", location], // Include location in query key to prevent cross-page caching
     queryFn: async () => {
+      // CRITICAL: Double-check we're not on auth page before making any network call
+      const currentLocation = window.location.pathname;
+      if (currentLocation === '/login' || currentLocation === '/signup' || currentLocation === '/') {
+        // Return immediately without making any network request
+        return { user: undefined };
+      }
+      
       try {
         // Add timeout to prevent hanging
         const controller = new AbortController();
@@ -312,7 +341,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         clearTimeout(timeoutId);
         
       if (!response.ok) {
-        // 401 is expected when not authenticated - don't log as error
+        // 401 is expected when not authenticated - silently return undefined
         if (response.status === 401) {
           return { user: undefined };
         }
@@ -320,18 +349,18 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
       }
       return response.json();
       } catch (error) {
-        // If fetch fails (network error, timeout, etc.), return undefined user
-        // This prevents the app from being blocked
-        // Don't log 401 errors as warnings - they're expected
-        if (error instanceof Error && !error.message.includes('401')) {
-        console.warn("⚠️ [TUTORIAL] Failed to fetch user data (non-critical):", error);
-        }
+        // Silently handle errors - don't log 401s or network errors
+        // This prevents console spam
         return { user: undefined };
       }
     },
     retry: false,
     staleTime: 5 * 60 * 1000,
-    enabled: enableAuthQuery, // Don't fetch until enabled
+    gcTime: 0, // Don't cache on auth pages
+    enabled: shouldFetchUser, // Only enable when not on auth page and explicitly enabled
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on component mount
+    refetchOnReconnect: false, // Don't refetch on reconnect
     // Don't block app initialization if this query fails
     throwOnError: false,
   });
