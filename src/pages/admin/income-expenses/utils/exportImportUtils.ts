@@ -117,8 +117,8 @@ export function exportAllIncomeExpenseData(
     const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
-    // January should NOT use Negative Balance Carry Over (use 0 instead) - MUST match page logic
-    const negativeBalanceCarryOver = month === 1 ? 0 : calculateNegativeBalanceCarryOver(month);
+    // Use calculated Negative Balance Carry Over (January 2019 will be 0, other Januaries use previous year's December) - MUST match page logic
+    const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
@@ -143,7 +143,7 @@ export function exportAllIncomeExpenseData(
         const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
                      childSeatIncome + coolersIncome + insuranceWreckIncome + 
                      otherIncome + skiRacksIncome + (smokingFines * 0.9) - totalReimbursedBills;
-        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+        const profit = rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
         const part2 = profit * mgmtPercent;
@@ -158,7 +158,7 @@ export function exportAllIncomeExpenseData(
         const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
                      childSeatIncome + coolersIncome + insuranceWreckIncome + 
                      otherIncome + (smokingFines * 0.9) - totalReimbursedBills;
-        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+        const profit = rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
         const part2 = profit * mgmtPercent;
@@ -170,7 +170,7 @@ export function exportAllIncomeExpenseData(
     // For year >= 2026 with no ski racks income, use special formula
     if (use2026NoSkiRacksFormula) {
       const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + (smokingFines * 0.9) - totalReimbursedBills;
-    const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+    const part2 = (rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                    smokingFines - gasPrepaidIncome - milesIncome - totalDirectDelivery - totalCogs) * mgmtPercent;
       const calculation = part1 + part2;
       return calculation >= 0 ? calculation : 0;
@@ -178,7 +178,7 @@ export function exportAllIncomeExpenseData(
     
     // Standard formula when year < 2026
     const part1 = deliveryIncome + electricPrepaidIncome + smokingFines + gasPrepaidIncome - totalReimbursedBills;
-    const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+    const part2 = (rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                    smokingFines - gasPrepaidIncome - milesIncome - totalDirectDelivery - totalCogs) * mgmtPercent;
     const calculation = part1 + part2;
     
@@ -221,7 +221,7 @@ export function exportAllIncomeExpenseData(
         // Car Owner Split (GLA owns ski racks) = MAX(Part 1 + Part 2, 0)
         // Part 1 = Miles Income + (Smoking Fines × 10%)
         const part1 = milesIncome + (smokingFines * 0.1);
-        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+        const profit = rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
         const part2 = profit * ownerPercent;
@@ -231,7 +231,7 @@ export function exportAllIncomeExpenseData(
         // Car Owner Split (Owner owns ski racks) = MAX(Part 1 + Part 2, 0)
         // Part 1 = Miles Income + Gas Prepaid Income + (Smoking Fines × 10%)
         const part1 = milesIncome + gasPrepaidIncome + (smokingFines * 0.1);
-        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+        const profit = rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
         const part2 = profit * ownerPercent;
@@ -243,7 +243,7 @@ export function exportAllIncomeExpenseData(
     // For year >= 2026 with no ski racks income, use special formula
     if (use2026NoSkiRacksFormula) {
       const part1 = milesIncome + (smokingFines * 0.1);
-    const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+    const part2 = (rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                    smokingFines - gasPrepaidIncome - milesIncome - totalDirectDelivery - totalCogs) * ownerPercent;
       const calculation = part1 + part2;
       return calculation >= 0 ? calculation : 0;
@@ -251,20 +251,151 @@ export function exportAllIncomeExpenseData(
     
     // Standard formula when year < 2026
     const part1 = milesIncome;
-    const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+    const part2 = (rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                    smokingFines - gasPrepaidIncome - milesIncome - totalDirectDelivery - totalCogs) * ownerPercent;
     const calculation = part1 + part2;
     
     return calculation >= 0 ? calculation : 0;
   };
   
-  const calculateNegativeBalanceCarryOver = (month: number): number => {
-    if (month === 1) {
-      // January is always 0 - no formula, not editable - MUST match page logic
+  // Helper to get value from previous year data by month
+  const getPrevYearValue = (arr: any[], month: number, field: string): number => {
+    if (!arr || !Array.isArray(arr)) return 0;
+    const item = arr.find((x) => x && x.month === month);
+    return item && typeof item[field] === 'number' ? item[field] : 0;
+  };
+
+  // Helper to get total from previous year for Direct Delivery by month
+  const getPrevYearTotalDirectDelivery = (month: number): number => {
+    if (!previousYearData) return 0;
+    const prevData = previousYearData;
+    return (
+      getPrevYearValue(prevData.directDelivery || [], month, "laborCarCleaning") +
+      getPrevYearValue(prevData.directDelivery || [], month, "laborDelivery") +
+      getPrevYearValue(prevData.directDelivery || [], month, "parkingAirport") +
+      getPrevYearValue(prevData.directDelivery || [], month, "parkingLot") +
+      getPrevYearValue(prevData.directDelivery || [], month, "uberLyftLime")
+    );
+  };
+
+  // Helper to get total from previous year for COGS by month
+  const getPrevYearTotalCogs = (month: number): number => {
+    if (!previousYearData) return 0;
+    const prevData = previousYearData;
+    return (
+      getPrevYearValue(prevData.cogs || [], month, "autoBodyShopWreck") +
+      getPrevYearValue(prevData.cogs || [], month, "alignment") +
+      getPrevYearValue(prevData.cogs || [], month, "battery") +
+      getPrevYearValue(prevData.cogs || [], month, "brakes") +
+      getPrevYearValue(prevData.cogs || [], month, "carPayment") +
+      getPrevYearValue(prevData.cogs || [], month, "carInsurance") +
+      getPrevYearValue(prevData.cogs || [], month, "carSeats") +
+      getPrevYearValue(prevData.cogs || [], month, "cleaningSuppliesTools") +
+      getPrevYearValue(prevData.cogs || [], month, "emissions") +
+      getPrevYearValue(prevData.cogs || [], month, "gpsSystem") +
+      getPrevYearValue(prevData.cogs || [], month, "keyFob") +
+      getPrevYearValue(prevData.cogs || [], month, "laborCleaning") +
+      getPrevYearValue(prevData.cogs || [], month, "licenseRegistration") +
+      getPrevYearValue(prevData.cogs || [], month, "mechanic") +
+      getPrevYearValue(prevData.cogs || [], month, "oilLube") +
+      getPrevYearValue(prevData.cogs || [], month, "parts") +
+      getPrevYearValue(prevData.cogs || [], month, "skiRacks") +
+      getPrevYearValue(prevData.cogs || [], month, "tickets") +
+      getPrevYearValue(prevData.cogs || [], month, "tiredAirStation") +
+      getPrevYearValue(prevData.cogs || [], month, "tires") +
+      getPrevYearValue(prevData.cogs || [], month, "towingImpoundFees") +
+      getPrevYearValue(prevData.cogs || [], month, "uberLyftLime") +
+      getPrevYearValue(prevData.cogs || [], month, "windshield") +
+      getPrevYearValue(prevData.cogs || [], month, "wipers")
+    );
+  };
+
+  // Calculate negative balance carry over for previous year (recursive)
+  const calculatePrevYearNegativeBalance = (month: number): number => {
+    if (!previousYearData) return 0;
+    
+    const prevYear = parseInt(year, 10) - 1;
+    
+    // January 2019: Always 0
+    if (month === 1 && prevYear === 2019) {
+      return 0;
+    }
+    
+    // January of other years (2020+): Use 0 as previous negative balance
+    // since we're already using December's data
+    if (month === 1 && prevYear > 2019) {
       return 0;
     }
     
     // For months 2-12, calculate from previous month
+    const prevMonth = month - 1;
+    const prevRentalIncome = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "rentalIncome");
+    const prevDeliveryIncome = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "deliveryIncome");
+    const prevElectricPrepaidIncome = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "electricPrepaidIncome");
+    const prevSmokingFines = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "smokingFines");
+    const prevGasPrepaidIncome = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "gasPrepaidIncome");
+    const prevSkiRacksIncome = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "skiRacksIncome");
+    const prevMilesIncome = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "milesIncome");
+    const prevChildSeatIncome = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "childSeatIncome");
+    const prevCoolersIncome = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "coolersIncome");
+    const prevInsuranceWreckIncome = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "insuranceWreckIncome");
+    const prevOtherIncome = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "otherIncome");
+    const prevNegativeBalanceCarryOver = calculatePrevYearNegativeBalance(prevMonth);
+    const prevTotalDirectDelivery = getPrevYearTotalDirectDelivery(prevMonth);
+    const prevTotalCogs = getPrevYearTotalCogs(prevMonth);
+    
+    // Formula: Rental Income + Negative Balance Carry Over (from previous month) - All Expenses
+    // Since prevNegativeBalanceCarryOver is already negative, we ADD it (not subtract)
+    const calculation = Number(prevRentalIncome) + Number(prevNegativeBalanceCarryOver) - Number(prevDeliveryIncome) - Number(prevElectricPrepaidIncome) - 
+                       Number(prevGasPrepaidIncome) - Number(prevMilesIncome) - Number(prevSkiRacksIncome) - 
+                       Number(prevChildSeatIncome) - Number(prevCoolersIncome) - Number(prevInsuranceWreckIncome) - 
+                       Number(prevOtherIncome) - Number(prevTotalDirectDelivery) - Number(prevTotalCogs);
+    
+    const result = Number(calculation) > 0 ? 0 : Number(calculation);
+    return result;
+  };
+
+  const calculateNegativeBalanceCarryOver = (month: number): number => {
+    const currentYear = parseInt(year, 10);
+    
+    // January 2019: Always 0 (no formula, not editable)
+    if (month === 1 && currentYear === 2019) {
+      return 0;
+    }
+    
+    // January of other years (2020+): Use December of previous year
+    if (month === 1 && currentYear > 2019) {
+      const prevDec = 12;
+      const prevDecRentalIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "rentalIncome");
+      const prevDecDeliveryIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "deliveryIncome");
+      const prevDecElectricPrepaidIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "electricPrepaidIncome");
+      const prevDecSmokingFines = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "smokingFines");
+      const prevDecGasPrepaidIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "gasPrepaidIncome");
+      const prevDecSkiRacksIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "skiRacksIncome");
+      const prevDecMilesIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "milesIncome");
+      const prevDecChildSeatIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "childSeatIncome");
+      const prevDecCoolersIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "coolersIncome");
+      const prevDecInsuranceWreckIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "insuranceWreckIncome");
+      const prevDecOtherIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "otherIncome");
+      
+      // Calculate previous year December's negative balance carry over (from November)
+      const prevDecNegativeBalanceCarryOver = calculatePrevYearNegativeBalance(prevDec);
+      
+      const prevDecTotalDirectDelivery = getPrevYearTotalDirectDelivery(prevDec);
+      const prevDecTotalCogs = getPrevYearTotalCogs(prevDec);
+      
+      // Formula: Rental Income + Negative Balance Carry Over (from previous month) - All Expenses
+      // Since prevDecNegativeBalanceCarryOver is already negative, we ADD it (not subtract)
+      const calculation = Number(prevDecRentalIncome) + Number(prevDecNegativeBalanceCarryOver) - Number(prevDecDeliveryIncome) - Number(prevDecElectricPrepaidIncome) - 
+                         Number(prevDecGasPrepaidIncome) - Number(prevDecMilesIncome) - Number(prevDecSkiRacksIncome) - 
+                         Number(prevDecChildSeatIncome) - Number(prevDecCoolersIncome) - Number(prevDecInsuranceWreckIncome) - 
+                         Number(prevDecOtherIncome) - Number(prevDecTotalDirectDelivery) - Number(prevDecTotalCogs);
+      
+      const result = Number(calculation) > 0 ? 0 : Number(calculation);
+      return result;
+    }
+    
+    // All other months (Feb-Dec): Use previous month
     const prevMonth = month - 1;
     const prevRentalIncome = getMonthValue(data.incomeExpenses, prevMonth, "rentalIncome");
     const prevDeliveryIncome = getMonthValue(data.incomeExpenses, prevMonth, "deliveryIncome");
@@ -282,10 +413,12 @@ export function exportAllIncomeExpenseData(
     const prevTotalDirectDelivery = getTotalDirectDeliveryForMonth(prevMonth);
     const prevTotalCogs = getTotalCogsForMonth(prevMonth);
     
-    const calculation = Number(prevRentalIncome) - Number(prevDeliveryIncome) - Number(prevElectricPrepaidIncome) - 
+    // Formula: Rental Income + Negative Balance Carry Over (from previous month) - All Expenses
+    // Since prevNegativeBalanceCarryOver is already negative, we ADD it (not subtract)
+    const calculation = Number(prevRentalIncome) + Number(prevNegativeBalanceCarryOver) - Number(prevDeliveryIncome) - Number(prevElectricPrepaidIncome) - 
                        Number(prevGasPrepaidIncome) - Number(prevMilesIncome) - Number(prevSkiRacksIncome) - 
                        Number(prevChildSeatIncome) - Number(prevCoolersIncome) - Number(prevInsuranceWreckIncome) - 
-                       Number(prevOtherIncome) - Number(prevTotalDirectDelivery) - Number(prevTotalCogs) - Number(prevNegativeBalanceCarryOver);
+                       Number(prevOtherIncome) - Number(prevTotalDirectDelivery) - Number(prevTotalCogs);
     
     // Return negative value (preserve negative sign)
     const result = Number(calculation) > 0 ? 0 : Number(calculation);

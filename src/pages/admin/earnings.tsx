@@ -468,8 +468,8 @@ export default function EarningsPage() {
     const coolersIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "otherIncome");
-    // January should NOT use Negative Balance Carry Over (use 0 instead)
-    const negativeBalanceCarryOver = month === 1 ? 0 : calculateNegativeBalanceCarryOver(month);
+    // Use calculated Negative Balance Carry Over (January 2019 will be 0, other Januaries use previous year's December)
+    const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
@@ -493,7 +493,7 @@ export default function EarningsPage() {
         const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
                      childSeatIncome + coolersIncome + insuranceWreckIncome + 
                      otherIncome + skiRacksIncome + (smokingFines * 0.9) - totalReimbursedBills;
-        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+        const profit = rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
         const part2 = profit * mgmtPercent;
@@ -508,7 +508,7 @@ export default function EarningsPage() {
         const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
                      childSeatIncome + coolersIncome + insuranceWreckIncome + 
                      otherIncome + (smokingFines * 0.9) - totalReimbursedBills;
-        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+        const profit = rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
         const part2 = profit * mgmtPercent;
@@ -529,7 +529,7 @@ export default function EarningsPage() {
       //   0
       // )
       const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + (smokingFines * 0.9) - totalReimbursedBills;
-      const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+      const part2 = (rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                     smokingFines - gasPrepaidIncome - milesIncome - totalDirectDelivery - totalCogs) * mgmtPercent;
       const calculation = part1 + part2;
       return calculation >= 0 ? calculation : 0;
@@ -537,7 +537,7 @@ export default function EarningsPage() {
     
     // Standard formula when year < 2026
     const part1 = deliveryIncome + electricPrepaidIncome + smokingFines + gasPrepaidIncome - totalReimbursedBills;
-    const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+    const part2 = (rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                    smokingFines - gasPrepaidIncome - milesIncome - totalDirectDelivery - totalCogs) * mgmtPercent;
     const calculation = part1 + part2;
     
@@ -560,8 +560,8 @@ export default function EarningsPage() {
     const coolersIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "otherIncome");
-    // January should NOT use Negative Balance Carry Over (use 0 instead)
-    const negativeBalanceCarryOver = month === 1 ? 0 : calculateNegativeBalanceCarryOver(month);
+    // Use calculated Negative Balance Carry Over (January 2019 will be 0, other Januaries use previous year's December)
+    const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     
@@ -579,7 +579,7 @@ export default function EarningsPage() {
         // Car Owner Split (GLA owns ski racks) = MAX(Part 1 + Part 2, 0)
         // Part 1 = Miles Income + (Smoking Fines × 10%)
         const part1 = milesIncome + (smokingFines * 0.1);
-        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+        const profit = rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
         const part2 = profit * ownerPercent;
@@ -589,7 +589,7 @@ export default function EarningsPage() {
         // Car Owner Split (Owner owns ski racks) = MAX(Part 1 + Part 2, 0)
         // Part 1 = Miles Income + Gas Prepaid Income + (Smoking Fines × 10%)
         const part1 = milesIncome + gasPrepaidIncome + (smokingFines * 0.1);
-        const profit = rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+        const profit = rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                       smokingFines - skiRacksIncome - milesIncome - gasPrepaidIncome - childSeatIncome - 
                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs;
         const part2 = profit * ownerPercent;
@@ -609,7 +609,7 @@ export default function EarningsPage() {
       //   0
       // )
       const part1 = milesIncome + (smokingFines * 0.1);
-      const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+      const part2 = (rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                     smokingFines - gasPrepaidIncome - milesIncome - totalDirectDelivery - totalCogs) * ownerPercent;
       const calculation = part1 + part2;
       return calculation >= 0 ? calculation : 0;
@@ -617,7 +617,7 @@ export default function EarningsPage() {
     
     // Standard formula when year < 2026
     const part1 = milesIncome;
-    const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+    const part2 = (rentalIncome - Math.abs(negativeBalanceCarryOver) - deliveryIncome - electricPrepaidIncome - 
                    smokingFines - gasPrepaidIncome - milesIncome - totalDirectDelivery - totalCogs) * ownerPercent;
     const calculation = part1 + part2;
     
@@ -945,7 +945,7 @@ export default function EarningsPage() {
               </colgroup>
               <thead className="bg-[#1a1a1a]">
                 <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-2 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a] align-middle">
+                  <th className="text-left px-3 py-2 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[5] border-r border-[#2a2a2a] align-middle">
                     Category / Expense
                   </th>
                   {months.map((month, index) => {
@@ -958,7 +958,7 @@ export default function EarningsPage() {
                     return (
                     <th
                       key={month}
-                        className="border-l border-[#2a2a2a] px-2 py-2 text-center min-w-[100px] sticky top-0 bg-[#1a1a1a] z-[50] align-middle"
+                        className="border-l border-[#2a2a2a] px-2 py-2 text-center min-w-[100px] sticky top-0 bg-[#1a1a1a] z-[5] align-middle"
                       >
                         <div className="flex flex-col items-center gap-1 justify-center">
                           <span className="text-white text-xs">{month}</span>
@@ -982,7 +982,7 @@ export default function EarningsPage() {
                     </th>
                     );
                   })}
-                  <th className="text-right px-2 py-2 text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-[50] border-l border-[#2a2a2a] whitespace-nowrap align-middle">
+                  <th className="text-right px-2 py-2 text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-[5] border-l border-[#2a2a2a] whitespace-nowrap align-middle">
                     Total
                   </th>
                 </tr>
@@ -1566,7 +1566,7 @@ function CategorySection({ title, isExpanded, onToggle, children }: CategorySect
   return (
     <>
       <tr className="bg-[#1a1a1a] hover:bg-[#222]">
-        <td colSpan={14} className="sticky left-0 z-[40] bg-[#1a1a1a] hover:bg-[#222] px-3 py-2 border-b border-[#2a2a2a]">
+        <td colSpan={14} className="sticky left-0 z-[3] bg-[#1a1a1a] hover:bg-[#222] px-3 py-2 border-b border-[#2a2a2a]">
           <div className="flex items-center gap-2 cursor-pointer" onClick={onToggle}>
             {isExpanded ? <ChevronDown className="w-4 h-4 text-[#EAEB80]" /> : <ChevronRight className="w-4 h-4 text-[#EAEB80]" />}
             <span className="text-sm font-semibold text-[#EAEB80]">{title}</span>
@@ -1596,15 +1596,23 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
       isTotal && "bg-[#0a0a0a] font-semibold"
     )}>
       <td className={cn(
-        "px-3 py-2 text-sm sticky left-0 z-[40] border-r border-[#2a2a2a]",
+        "px-3 py-2 text-sm sticky left-0 z-[3] border-r border-[#2a2a2a]",
         isTotal ? "text-[#EAEB80] bg-[#0a0a0a]" : "text-gray-300 bg-[#0f0f0f]"
       )}>
         <span className="whitespace-nowrap">{label}</span>
       </td>
       {values.map((value, i) => {
         const cellValue = typeof value === 'number' && !isNaN(value) ? value : 0;
-        // For Negative Balance Carry Over, display absolute value
-        const displayValue = isNegativeBalance ? Math.abs(cellValue) : cellValue;
+        // For Negative Balance Carry Over, display in parentheses format for negative values
+        // e.g., -3 => (3), -100 => (100), 0 => $0.00
+        let displayText: string;
+        if (isNegativeBalance && cellValue < 0) {
+          displayText = `(${Math.abs(cellValue).toFixed(2)})`;
+        } else if (isInteger) {
+          displayText = cellValue.toString();
+        } else {
+          displayText = formatCurrency(cellValue);
+        }
         return (
           <td
             key={i}
@@ -1615,15 +1623,19 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
                 : "text-gray-500"
             )}
           >
-            {isInteger ? cellValue.toString() : formatCurrency(displayValue)}
+            {displayText}
           </td>
         );
       })}
       <td className={cn(
-        "text-right px-2 py-2 text-sm font-semibold border-l border-[#2a2a2a] bg-[#1f1f1f] sticky right-0 z-20",
+        "text-right px-2 py-2 text-sm font-semibold border-l border-[#2a2a2a] bg-[#1f1f1f] sticky right-0 z-[3]",
         isTotal ? "text-[#EAEB80]" : total !== 0 ? "text-gray-300" : "text-gray-400"
       )}>
-        {isInteger ? total.toString() : formatCurrency(isNegativeBalance ? Math.abs(total) : total)}
+        {isNegativeBalance && total < 0 
+          ? `(${Math.abs(total).toFixed(2)})`
+          : isInteger 
+            ? total.toString() 
+            : formatCurrency(total)}
       </td>
     </tr>
   );

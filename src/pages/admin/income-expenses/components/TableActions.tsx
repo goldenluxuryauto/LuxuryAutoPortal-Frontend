@@ -37,9 +37,11 @@ export default function TableActions({
   const { data, monthModes, year, dynamicSubcategories, skiRacksOwner } = useIncomeExpense();
   const queryClient = useQueryClient();
   
-  // Get current year and generate year options (past 5 years + current + future 2 years)
+  // Get current year and generate year options (from 2019 to current year + 2 years)
   const currentYear = new Date().getFullYear();
-  const yearOptions = Array.from({ length: 8 }, (_, i) => currentYear - 5 + i);
+  const startYear = 2019;
+  const endYear = currentYear + 2;
+  const yearOptions = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
   
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);

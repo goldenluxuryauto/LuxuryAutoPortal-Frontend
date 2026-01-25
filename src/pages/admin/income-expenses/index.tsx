@@ -51,9 +51,11 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   );
   const [carSelectOpen, setCarSelectOpen] = useState(false);
   
-  // Get current year and generate year options (past 5 years + current + future 2 years)
+  // Get current year and generate year options (from 2019 to current year + 2 years)
   const currentYear = new Date().getFullYear();
-  const yearOptions = Array.from({ length: 8 }, (_, i) => currentYear - 5 + i);
+  const startYear = 2019;
+  const endYear = currentYear + 2;
+  const yearOptions = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
   const [selectedYear, setSelectedYear] = useState<string>(String(currentYear));
 
   // Update selected car when carIdFromQuery changes
@@ -214,12 +216,12 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                     className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] overflow-hidden"
                   >
                     <span className="truncate text-left flex-1 min-w-0">
-                      {selectedCar === "all"
-                        ? "-- Select a Car --"
-                        : (() => {
-                            const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
-                            return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
-                          })()}
+                    {selectedCar === "all"
+                      ? "-- Select a Car --"
+                      : (() => {
+                          const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
+                          return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
+                        })()}
                     </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
                   </Button>
@@ -369,12 +371,12 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] text-sm overflow-hidden"
                       >
                         <span className="truncate text-left flex-1 min-w-0">
-                          {selectedCar === "all"
-                            ? "-- Select a Car --"
-                            : (() => {
-                                const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
-                                return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
-                              })()}
+                        {selectedCar === "all"
+                          ? "-- Select a Car --"
+                          : (() => {
+                              const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
+                              return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
+                            })()}
                         </span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
                       </Button>
