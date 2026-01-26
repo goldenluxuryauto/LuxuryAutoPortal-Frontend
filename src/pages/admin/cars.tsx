@@ -77,6 +77,7 @@ interface Car {
   offboardNote: string | null;
   offboardAt: string | null;
   userId?: number | null;
+  clientId?: number | null;
   tireSize?: string | null;
   oilType?: string | null;
   lastOilChange?: string | null;
@@ -250,6 +251,7 @@ export default function CarsPage() {
           offboardReason: null,
           offboardNote: null,
           offboardAt: car.returnedAt || null,
+          clientId: car.clientId || null,
           tireSize: car.tireSize || null,
           oilType: car.oilType || null,
           lastOilChange: null,
@@ -858,13 +860,42 @@ export default function CarsPage() {
                           <td className="text-center px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
                             {car.owner ? (
                               <div>
-                                <div className="text-white text-xs sm:text-sm">
-                                  {car.owner.firstName} {car.owner.lastName}
-                                </div>
-                                {car.owner.email && (
-                                  <div className="text-gray-500 text-[10px] sm:text-xs">
-                                    {car.owner.email}
-                                  </div>
+                                {car.clientId ? (
+                                  <>
+                                    <a
+                                      href={`/admin/clients/${car.clientId}`}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        setLocation(`/admin/clients/${car.clientId}`);
+                                      }}
+                                      className="text-[#EAEB80] hover:underline text-xs sm:text-sm font-medium cursor-pointer block"
+                                    >
+                                      {car.owner.firstName} {car.owner.lastName}
+                                    </a>
+                                    {car.owner.email && (
+                                      <a
+                                        href={`/admin/clients/${car.clientId}`}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          setLocation(`/admin/clients/${car.clientId}`);
+                                        }}
+                                        className="text-[#EAEB80] hover:underline text-[10px] sm:text-xs cursor-pointer block mt-0.5"
+                                      >
+                                        {car.owner.email}
+                                      </a>
+                                    )}
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="text-white text-xs sm:text-sm">
+                                      {car.owner.firstName} {car.owner.lastName}
+                                    </div>
+                                    {car.owner.email && (
+                                      <div className="text-gray-500 text-[10px] sm:text-xs">
+                                        {car.owner.email}
+                                      </div>
+                                    )}
+                                  </>
                                 )}
                               </div>
                             ) : (
