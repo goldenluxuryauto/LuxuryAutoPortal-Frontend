@@ -89,6 +89,7 @@ interface CarDetail {
   lastOilChange?: string | null;
   fuelType?: string | null;
   registrationExpiration?: string | null;
+  titleType?: string | null;
 }
 
 const carSchema = z.object({
@@ -118,6 +119,7 @@ const carSchema = z.object({
   dealershipAddress: z.string().optional(),
   fuelType: z.string().optional(),
   tireSize: z.string().optional(),
+  titleType: z.string().optional(),
   vehicleFeatures: z.union([z.string(), z.array(z.string())]).optional(), // JSON string array, comma-separated, or array
   // Financial Information
   purchasePrice: z.string().optional(),
@@ -271,11 +273,33 @@ export default function CarDetailPage() {
       console.log('[Car Detail] Onboarding data:', {
         hasInsuranceCardUrl: !!onboarding.insuranceCardUrl,
         insuranceCardUrl: onboarding.insuranceCardUrl,
+        insuranceCardUrlType: typeof onboarding.insuranceCardUrl,
+        insuranceCardUrlLength: onboarding.insuranceCardUrl?.length,
         hasDriversLicenseUrls: !!onboarding.driversLicenseUrls,
         driversLicenseUrls: onboarding.driversLicenseUrls,
         driversLicenseUrlsType: typeof onboarding.driversLicenseUrls,
         isArray: Array.isArray(onboarding.driversLicenseUrls),
       });
+      
+      // Check if insuranceCardUrl looks like a Google Drive ID
+      if (onboarding.insuranceCardUrl) {
+        const trimmed = String(onboarding.insuranceCardUrl).trim();
+        const looksLikeGoogleDriveId = trimmed && 
+          !trimmed.includes('/') && 
+          !trimmed.includes('.') && 
+          trimmed.length >= 10 && 
+          /^[a-zA-Z0-9_-]+$/.test(trimmed) &&
+          !trimmed.startsWith('http');
+        console.log('[Car Detail] Insurance Card ID Analysis:', {
+          trimmed,
+          looksLikeGoogleDriveId,
+          hasSlash: trimmed.includes('/'),
+          hasDot: trimmed.includes('.'),
+          startsWithHttp: trimmed.startsWith('http'),
+          length: trimmed.length,
+          matchesPattern: /^[a-zA-Z0-9_-]+$/.test(trimmed),
+        });
+      }
     }
   }, [onboarding]);
 
@@ -394,20 +418,44 @@ export default function CarDetailPage() {
         if (e.key === 'ArrowLeft' && fullScreenDocument.index > 0) {
           const prevIndex = fullScreenDocument.index - 1;
           const prevUrl = validDriversLicenseUrls[prevIndex];
-          const imageUrl = prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl.startsWith('/') ? prevUrl : `/${prevUrl}`);
+          // Check if it's a Google Drive file ID
+          const isGoogleDriveId = prevUrl && 
+            !prevUrl.includes('/') && 
+            !prevUrl.includes('.') && 
+            prevUrl.length >= 10 && 
+            /^[a-zA-Z0-9_-]+$/.test(prevUrl) &&
+            !prevUrl.startsWith('http');
+          const imageUrl = isGoogleDriveId
+            ? buildApiUrl(`/api/cars/documents/file-content?fileId=${encodeURIComponent(prevUrl)}`)
+            : prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl.startsWith('/') ? prevUrl : `/${prevUrl}`);
           setFullScreenDocument({ 
             url: imageUrl, 
             type: 'license', 
-            index: prevIndex 
+            index: prevIndex,
+            isPdf: isGoogleDriveId
+              ? (prevUrl.toLowerCase().includes('pdf') || prevUrl.toLowerCase().endsWith('.pdf'))
+              : isPdfDocument(prevUrl)
           });
         } else if (e.key === 'ArrowRight' && fullScreenDocument.index < validDriversLicenseUrls.length - 1) {
           const nextIndex = fullScreenDocument.index + 1;
           const nextUrl = validDriversLicenseUrls[nextIndex];
-          const imageUrl = nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl.startsWith('/') ? nextUrl : `/${nextUrl}`);
+          // Check if it's a Google Drive file ID
+          const isGoogleDriveId = nextUrl && 
+            !nextUrl.includes('/') && 
+            !nextUrl.includes('.') && 
+            nextUrl.length >= 10 && 
+            /^[a-zA-Z0-9_-]+$/.test(nextUrl) &&
+            !nextUrl.startsWith('http');
+          const imageUrl = isGoogleDriveId
+            ? buildApiUrl(`/api/cars/documents/file-content?fileId=${encodeURIComponent(nextUrl)}`)
+            : nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl.startsWith('/') ? nextUrl : `/${nextUrl}`);
           setFullScreenDocument({ 
             url: imageUrl, 
             type: 'license', 
-            index: nextIndex 
+            index: nextIndex,
+            isPdf: isGoogleDriveId
+              ? (nextUrl.toLowerCase().includes('pdf') || nextUrl.toLowerCase().endsWith('.pdf'))
+              : isPdfDocument(nextUrl)
           });
         }
       }
@@ -477,6 +525,7 @@ export default function CarDetailPage() {
       dealershipAddress: "",
       fuelType: "",
       tireSize: "",
+      titleType: "",
       vehicleFeatures: "",
       purchasePrice: "",
       downPayment: "",
@@ -530,6 +579,7 @@ export default function CarDetailPage() {
       formData.append("dealershipAddress", data.dealershipAddress || "");
       formData.append("fuelType", data.fuelType || "");
       formData.append("tireSize", data.tireSize || "");
+      formData.append("titleType", data.titleType || "");
       // Convert vehicleFeatures array to JSON string
       if (data.vehicleFeatures) {
         if (Array.isArray(data.vehicleFeatures)) {
@@ -1015,6 +1065,7 @@ export default function CarDetailPage() {
       dealershipAddress: (onboarding as any)?.dealershipAddress || "",
       fuelType: onboarding?.fuelType || car.fuelType || "",
       tireSize: onboarding?.tireSize || car.tireSize || "",
+      titleType: onboarding?.titleType || "",
       vehicleFeatures: vehicleFeaturesValue,
       // Financial Information
       purchasePrice: onboarding?.purchasePrice ? numToString(onboarding.purchasePrice) : "",
@@ -1350,6 +1401,10 @@ export default function CarDetailPage() {
                     <p className="text-white text-base">{car.licensePlate || "N/A"}</p>
                 </div>
                   <div>
+                    <p className="text-xs text-gray-500 mb-1">Title Type</p>
+                    <p className="text-white text-base">{onboarding?.titleType ? formatValue(onboarding.titleType) : "N/A"}</p>
+                  </div>
+                  <div>
                     <p className="text-xs text-gray-500 mb-1">Trim</p>
                     <p className="text-white text-base">{car.vehicleTrim ? formatValue(car.vehicleTrim) : "N/A"}</p>
                   </div>
@@ -1404,9 +1459,7 @@ export default function CarDetailPage() {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">If Yes, For How Many Years of Oil Changes, or What Oil Package</p>
                     <p className="text-white text-base">
-                      {car.freeDealershipOilChanges === "Yes" 
-                        ? (car.oilPackageDetails ? formatValue(car.oilPackageDetails) : "N/A")
-                        : "N/A"}
+                      {car.oilPackageDetails ? formatValue(car.oilPackageDetails) : "N/A"}
                     </p>
                   </div>
                   {car.dealershipAddress && (
@@ -1809,16 +1862,42 @@ export default function CarDetailPage() {
                     <h4 className="text-base font-semibold text-gray-200 mb-4">Insurance Card</h4>
                     {onboarding.insuranceCardUrl && String(onboarding.insuranceCardUrl).trim() ? (() => {
                       const trimmedUrl = String(onboarding.insuranceCardUrl).trim();
-                      const documentUrl = trimmedUrl.startsWith('http') 
-                        ? trimmedUrl 
-                        : buildApiUrl(trimmedUrl.startsWith('/') ? trimmedUrl : `/${trimmedUrl}`);
-                      const isPdf = isPdfDocument(trimmedUrl);
+                      
+                      // Check if it's a Google Drive file ID
+                      // Google Drive IDs are typically: alphanumeric with hyphens/underscores, no slashes, no dots (unless it's a full URL)
+                      // Length is usually 28-44 characters, but we'll accept anything >= 10 that matches the pattern
+                      // Also check: if it doesn't look like a URL or local path, treat it as a Google Drive ID
+                      const looksLikeUrl = trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://') || trimmedUrl.startsWith('/');
+                      const looksLikeLocalPath = trimmedUrl.includes('/') && (trimmedUrl.includes('.') || trimmedUrl.startsWith('/'));
+                      
+                      // More lenient detection: if it doesn't look like a URL or local path, and matches Google Drive ID pattern, treat it as one
+                      const isGoogleDriveId = trimmedUrl && 
+                        !looksLikeUrl &&
+                        !looksLikeLocalPath &&
+                        trimmedUrl.length >= 10 && 
+                        /^[a-zA-Z0-9_-]+$/.test(trimmedUrl);
+                      
+                      // Determine document URL - use proxy endpoint for Google Drive IDs
+                      const documentUrl = isGoogleDriveId
+                        ? buildApiUrl(`/api/cars/documents/file-content?fileId=${encodeURIComponent(trimmedUrl)}`)
+                        : trimmedUrl.startsWith('http') 
+                          ? trimmedUrl 
+                          : buildApiUrl(trimmedUrl.startsWith('/') ? trimmedUrl : `/${trimmedUrl}`);
+                      
+                      // For Google Drive IDs, we can't determine MIME type from the ID alone
+                      // We'll default to treating it as an image, and the proxy endpoint will set the correct Content-Type
+                      // The browser will handle PDFs correctly based on the Content-Type header
+                      // For local files, use existing logic
+                      const isPdf = isGoogleDriveId 
+                        ? false // Default to image, proxy endpoint will handle PDFs via Content-Type
+                        : isPdfDocument(trimmedUrl);
                       
                       // Debug logging
                       if (import.meta.env.DEV) {
                         console.log('[Car Detail] Insurance Card URL:', {
                           original: onboarding.insuranceCardUrl,
                           trimmed: trimmedUrl,
+                          isGoogleDriveId,
                           documentUrl,
                           isPdf,
                         });
@@ -1842,6 +1921,37 @@ export default function CarDetailPage() {
                                 <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
                                 <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
                               </div>
+                            ) : isGoogleDriveId ? (
+                              // For Google Drive files, try image first, fallback to iframe for PDFs
+                              <>
+                                <img
+                                  src={documentUrl}
+                                  alt="Insurance Card"
+                                  className="w-full h-full object-contain p-2"
+                                  onError={(e) => {
+                                    // If image fails to load, it might be a PDF - try iframe
+                                    const target = e.target as HTMLImageElement;
+                                    const parent = target.parentElement;
+                                    if (parent && !parent.querySelector('iframe')) {
+                                      target.style.display = "none";
+                                      const iframe = document.createElement('iframe');
+                                      iframe.src = documentUrl;
+                                      iframe.className = "w-full h-full border-0";
+                                      iframe.title = "Insurance Card";
+                                      parent.appendChild(iframe);
+                                    } else {
+                                      // Already tried iframe or no parent, show error
+                                      target.style.display = "none";
+                                      if (parent && !parent.querySelector(".error-message")) {
+                                        const errorDiv = document.createElement("div");
+                                        errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                        errorDiv.textContent = "Failed to load document";
+                                        parent.appendChild(errorDiv);
+                                      }
+                                    }
+                                  }}
+                                />
+                              </>
                             ) : (
                               <img
                                 src={documentUrl}
@@ -1887,16 +1997,46 @@ export default function CarDetailPage() {
                     {validDriversLicenseUrls.length > 0 ? (
                       <div className="space-y-4">
                         {validDriversLicenseUrls.map((url: string, index: number) => {
-                            const documentUrl = url.startsWith('http') ? url : buildApiUrl(url.startsWith('/') ? url : `/${url}`);
-                          const isPdf = isPdfDocument(url);
+                            // Check if it's a Google Drive file ID
+                            // Google Drive IDs are typically: alphanumeric with hyphens/underscores, no slashes, no dots (unless it's a full URL)
+                            // Length is usually 28-44 characters, but we'll accept anything >= 10 that matches the pattern
+                            // Also check: if it doesn't look like a URL or local path, treat it as a Google Drive ID
+                            const looksLikeUrl = url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/');
+                            const looksLikeLocalPath = url.includes('/') && (url.includes('.') || url.startsWith('/'));
                             
-                            // Debug logging
-                            if (import.meta.env.DEV && index === 0) {
+                            // More lenient detection: if it doesn't look like a URL or local path, and matches Google Drive ID pattern, treat it as one
+                            const isGoogleDriveId = url && 
+                              !looksLikeUrl &&
+                              !looksLikeLocalPath &&
+                              url.length >= 10 && 
+                              /^[a-zA-Z0-9_-]+$/.test(url);
+                            
+                            // Determine document URL - use proxy endpoint for Google Drive IDs
+                            const documentUrl = isGoogleDriveId
+                              ? buildApiUrl(`/api/cars/documents/file-content?fileId=${encodeURIComponent(url)}`)
+                              : url.startsWith('http') ? url : buildApiUrl(url.startsWith('/') ? url : `/${url}`);
+                            
+                            // For Google Drive IDs, we can't determine MIME type from the ID alone
+                            // We'll default to treating it as an image, and the proxy endpoint will set the correct Content-Type
+                            // The browser will handle PDFs correctly based on the Content-Type header
+                            // For local files, use existing logic
+                            const isPdf = isGoogleDriveId
+                              ? false // Default to image, proxy endpoint will handle PDFs via Content-Type
+                              : isPdfDocument(url);
+                            
+                            // Debug logging (always log to help diagnose issues)
+                            if (index === 0) {
                               console.log('[Car Detail] Drivers License URL:', {
                                 url,
+                                isGoogleDriveId,
                                 documentUrl,
                                 isPdf,
                                 totalUrls: validDriversLicenseUrls.length,
+                                looksLikeUrl: url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/'),
+                                hasSlash: url.includes('/'),
+                                hasDot: url.includes('.'),
+                                length: url.length,
+                                matchesPattern: /^[a-zA-Z0-9_-]+$/.test(url),
                               });
                             }
                           
@@ -1921,6 +2061,37 @@ export default function CarDetailPage() {
                                     <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
                                     <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
                                   </div>
+                                ) : isGoogleDriveId ? (
+                                  // For Google Drive files, try image first, fallback to iframe for PDFs
+                                  <>
+                                    <img
+                                      src={documentUrl}
+                                      alt={`Drivers License ${index + 1}`}
+                                      className="w-full h-full object-contain p-2"
+                                      onError={(e) => {
+                                        // If image fails to load, it might be a PDF - try iframe
+                                        const target = e.target as HTMLImageElement;
+                                        const parent = target.parentElement;
+                                        if (parent && !parent.querySelector('iframe')) {
+                                          target.style.display = "none";
+                                          const iframe = document.createElement('iframe');
+                                          iframe.src = documentUrl;
+                                          iframe.className = "w-full h-full border-0";
+                                          iframe.title = `Drivers License ${index + 1}`;
+                                          parent.appendChild(iframe);
+                                        } else {
+                                          // Already tried iframe or no parent, show error
+                                          target.style.display = "none";
+                                          if (parent && !parent.querySelector(".error-message")) {
+                                            const errorDiv = document.createElement("div");
+                                            errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                            errorDiv.textContent = "Failed to load document";
+                                            parent.appendChild(errorDiv);
+                                          }
+                                        }
+                                      }}
+                                    />
+                                  </>
                                 ) : (
                                   <img
                                     src={documentUrl}
@@ -2566,6 +2737,23 @@ export default function CarDetailPage() {
                             <Input
                               {...field}
                               type="number"
+                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="titleType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Title Type</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
                             className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
                           />
                         </FormControl>
@@ -3372,10 +3560,22 @@ export default function CarDetailPage() {
                           <p className="text-xs text-gray-500 font-medium">Current Document</p>
                           <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-[#2a2a2a] overflow-hidden shadow-lg hover:border-[#EAEB80]/30 transition-all">
                             {(() => {
-                              const documentUrl = onboarding.insuranceCardUrl.startsWith('http') 
-                                ? onboarding.insuranceCardUrl 
-                                : buildApiUrl(onboarding.insuranceCardUrl);
-                              const isPdf = isPdfDocument(onboarding.insuranceCardUrl);
+                              const trimmedUrl = String(onboarding.insuranceCardUrl).trim();
+                              // Check if it's a Google Drive file ID
+                              const isGoogleDriveId = trimmedUrl && 
+                                !trimmedUrl.includes('/') && 
+                                !trimmedUrl.includes('.') && 
+                                trimmedUrl.length >= 10 && 
+                                /^[a-zA-Z0-9_-]+$/.test(trimmedUrl) &&
+                                !trimmedUrl.startsWith('http');
+                              const documentUrl = isGoogleDriveId
+                                ? buildApiUrl(`/api/cars/documents/file-content?fileId=${encodeURIComponent(trimmedUrl)}`)
+                                : trimmedUrl.startsWith('http') 
+                                  ? trimmedUrl 
+                                  : buildApiUrl(trimmedUrl.startsWith('/') ? trimmedUrl : `/${trimmedUrl}`);
+                              const isPdf = isGoogleDriveId
+                                ? (trimmedUrl.toLowerCase().includes('pdf') || trimmedUrl.toLowerCase().endsWith('.pdf'))
+                                : isPdfDocument(trimmedUrl);
                               
                               return isPdf ? (
                                 <div className="w-full h-full flex flex-col items-center justify-center p-4">
@@ -3386,7 +3586,7 @@ export default function CarDetailPage() {
                                     </div>
                                   </div>
                                   <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
-                                  <p className="text-gray-400 text-xs mt-1 truncate max-w-full px-2">{onboarding.insuranceCardUrl.split("/").pop()}</p>
+                                  <p className="text-gray-400 text-xs mt-1 truncate max-w-full px-2">{isGoogleDriveId ? 'Google Drive File' : onboarding.insuranceCardUrl.split("/").pop()}</p>
                                 </div>
                               ) : (
                                 <img
@@ -3485,8 +3685,19 @@ export default function CarDetailPage() {
                             <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-[#2a2a2a] overflow-hidden shadow-lg hover:border-[#EAEB80]/30 transition-all">
                               {(() => {
                                 const url = onboarding.driversLicenseUrls[0];
-                                const documentUrl = url.startsWith('http') ? url : buildApiUrl(url);
-                                const isPdf = isPdfDocument(url);
+                                // Check if it's a Google Drive file ID
+                                const isGoogleDriveId = url && 
+                                  !url.includes('/') && 
+                                  !url.includes('.') && 
+                                  url.length >= 10 && 
+                                  /^[a-zA-Z0-9_-]+$/.test(url) &&
+                                  !url.startsWith('http');
+                                const documentUrl = isGoogleDriveId
+                                  ? buildApiUrl(`/api/cars/documents/file-content?fileId=${encodeURIComponent(url)}`)
+                                  : url.startsWith('http') ? url : buildApiUrl(url);
+                                const isPdf = isGoogleDriveId
+                                  ? (url.toLowerCase().includes('pdf') || url.toLowerCase().endsWith('.pdf'))
+                                  : isPdfDocument(url);
                                 
                                 return isPdf ? (
                                   <div className="w-full h-full flex flex-col items-center justify-center p-4">
@@ -3497,7 +3708,7 @@ export default function CarDetailPage() {
                                       </div>
                                     </div>
                                     <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
-                                    <p className="text-gray-400 text-xs mt-1 truncate max-w-full px-2">{url.split("/").pop()}</p>
+                                    <p className="text-gray-400 text-xs mt-1 truncate max-w-full px-2">{isGoogleDriveId ? 'Google Drive File' : url.split("/").pop()}</p>
                                   </div>
                                 ) : (
                                   <img
@@ -3512,8 +3723,19 @@ export default function CarDetailPage() {
                             // Multiple documents - grid layout
                             <div className="grid grid-cols-2 gap-3">
                               {onboarding.driversLicenseUrls.map((url: string, index: number) => {
-                                const documentUrl = url.startsWith('http') ? url : buildApiUrl(url);
-                                const isPdf = isPdfDocument(url);
+                                // Check if it's a Google Drive file ID
+                                const isGoogleDriveId = url && 
+                                  !url.includes('/') && 
+                                  !url.includes('.') && 
+                                  url.length >= 10 && 
+                                  /^[a-zA-Z0-9_-]+$/.test(url) &&
+                                  !url.startsWith('http');
+                                const documentUrl = isGoogleDriveId
+                                  ? buildApiUrl(`/api/cars/documents/file-content?fileId=${encodeURIComponent(url)}`)
+                                  : url.startsWith('http') ? url : buildApiUrl(url);
+                                const isPdf = isGoogleDriveId
+                                  ? (url.toLowerCase().includes('pdf') || url.toLowerCase().endsWith('.pdf'))
+                                  : isPdfDocument(url);
                                 
                                 return (
                                 <div key={index} className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-[#2a2a2a] overflow-hidden shadow-lg hover:border-[#EAEB80]/30 transition-all">
@@ -3795,12 +4017,23 @@ export default function CarDetailPage() {
                         e.stopPropagation();
                         const prevIndex = fullScreenDocument.index! - 1;
                         const prevUrl = validDriversLicenseUrls[prevIndex];
-                        const imageUrl = prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl.startsWith('/') ? prevUrl : `/${prevUrl}`);
+                        // Check if it's a Google Drive file ID
+                        const isGoogleDriveId = prevUrl && 
+                          !prevUrl.includes('/') && 
+                          !prevUrl.includes('.') && 
+                          prevUrl.length >= 10 && 
+                          /^[a-zA-Z0-9_-]+$/.test(prevUrl) &&
+                          !prevUrl.startsWith('http');
+                        const imageUrl = isGoogleDriveId
+                          ? buildApiUrl(`/api/cars/documents/file-content?fileId=${encodeURIComponent(prevUrl)}`)
+                          : prevUrl.startsWith('http') ? prevUrl : buildApiUrl(prevUrl.startsWith('/') ? prevUrl : `/${prevUrl}`);
                         setFullScreenDocument({ 
                           url: imageUrl, 
                           type: 'license', 
                           index: prevIndex,
-                          isPdf: isPdfDocument(prevUrl)
+                          isPdf: isGoogleDriveId 
+                            ? (prevUrl.toLowerCase().includes('pdf') || prevUrl.toLowerCase().endsWith('.pdf'))
+                            : isPdfDocument(prevUrl)
                         });
                       }}
                       className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
@@ -3819,12 +4052,23 @@ export default function CarDetailPage() {
                         e.stopPropagation();
                         const nextIndex = fullScreenDocument.index! + 1;
                         const nextUrl = validDriversLicenseUrls[nextIndex];
-                        const imageUrl = nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl.startsWith('/') ? nextUrl : `/${nextUrl}`);
+                        // Check if it's a Google Drive file ID
+                        const isGoogleDriveId = nextUrl && 
+                          !nextUrl.includes('/') && 
+                          !nextUrl.includes('.') && 
+                          nextUrl.length >= 10 && 
+                          /^[a-zA-Z0-9_-]+$/.test(nextUrl) &&
+                          !nextUrl.startsWith('http');
+                        const imageUrl = isGoogleDriveId
+                          ? buildApiUrl(`/api/cars/documents/file-content?fileId=${encodeURIComponent(nextUrl)}`)
+                          : nextUrl.startsWith('http') ? nextUrl : buildApiUrl(nextUrl.startsWith('/') ? nextUrl : `/${nextUrl}`);
                         setFullScreenDocument({ 
                           url: imageUrl, 
                           type: 'license', 
                           index: nextIndex,
-                          isPdf: isPdfDocument(nextUrl)
+                          isPdf: isGoogleDriveId
+                            ? (nextUrl.toLowerCase().includes('pdf') || nextUrl.toLowerCase().endsWith('.pdf'))
+                            : isPdfDocument(nextUrl)
                         });
                       }}
                       className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
