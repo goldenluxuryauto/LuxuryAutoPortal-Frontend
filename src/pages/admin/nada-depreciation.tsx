@@ -830,21 +830,25 @@ export default function NADADepreciationPage() {
                 <Download className="w-4 h-4 mr-2" />
                 Export
               </Button>
-              <Button
-                className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border border-[#2a2a2a]"
-                onClick={() => setIsImportModalOpen(true)}
-                disabled={!car}
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Import
-              </Button>
-              <Button
-                className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border border-[#2a2a2a]"
-                onClick={() => setIsLogModalOpen(true)}
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Log
-              </Button>
+              {!isClient && (
+                <Button
+                  className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border border-[#2a2a2a]"
+                  onClick={() => setIsImportModalOpen(true)}
+                  disabled={!car}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import
+                </Button>
+              )}
+              {!isClient && (
+                <Button
+                  className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border border-[#2a2a2a]"
+                  onClick={() => setIsLogModalOpen(true)}
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Log
+                </Button>
+              )}
             </div>
           </div>
         </div>
