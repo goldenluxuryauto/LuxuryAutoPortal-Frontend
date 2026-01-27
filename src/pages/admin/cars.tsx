@@ -83,6 +83,7 @@ interface Car {
   lastOilChange?: string | null;
   fuelType?: string | null;
   registrationExpiration?: string | null;
+  titleType?: string | null;
   contactPhone?: string | null;
   turoLink?: string | null;
   adminTuroLink?: string | null;
@@ -113,6 +114,7 @@ const carSchema = z.object({
   oilType: z.string().optional(),
   lastOilChange: z.string().optional(),
   fuelType: z.string().optional(),
+  titleType: z.string().optional(),
   turoLink: z.string().url().optional().or(z.literal("")),
   adminTuroLink: z.string().url().optional().or(z.literal("")),
   offboardAt: z.string().optional(),
@@ -172,6 +174,7 @@ export default function CarsPage() {
       oilType: "",
       lastOilChange: "",
       fuelType: "",
+      titleType: "",
       turoLink: "",
       adminTuroLink: "",
       offboardAt: "",
@@ -342,6 +345,7 @@ export default function CarsPage() {
       if (data.oilType) formData.append("oilType", data.oilType);
       if (data.lastOilChange) formData.append("lastOilChange", data.lastOilChange);
       if (data.fuelType) formData.append("fuelType", data.fuelType);
+      if (data.titleType) formData.append("titleType", data.titleType);
       if (data.turoLink) formData.append("turoLink", data.turoLink);
       if (data.adminTuroLink) formData.append("adminTuroLink", data.adminTuroLink);
 
@@ -402,6 +406,7 @@ export default function CarsPage() {
       formData.append("oilType", data.oilType || "");
       formData.append("lastOilChange", data.lastOilChange || "");
       formData.append("fuelType", data.fuelType || "");
+      formData.append("titleType", data.titleType || "");
       formData.append("turoLink", data.turoLink || "");
       formData.append("adminTuroLink", data.adminTuroLink || "");
       formData.append("offboardAt", data.offboardAt || "");
@@ -487,6 +492,7 @@ export default function CarsPage() {
       oilType: "",
       lastOilChange: "",
       fuelType: "",
+      titleType: "",
       turoLink: "",
       adminTuroLink: "",
     });
@@ -1348,6 +1354,24 @@ export default function CarsPage() {
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="titleType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-400">Title Type</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          placeholder="Enter title type"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <div className="grid grid-cols-1 gap-4">
                   <FormField
