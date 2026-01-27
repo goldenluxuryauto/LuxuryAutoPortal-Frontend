@@ -1,10 +1,11 @@
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Folder, Download, ExternalLink } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Folder, Download, ExternalLink, Edit2, Save, X } from "lucide-react";
 import { ProfileSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,11 @@ interface ClientProfileResponse {
 
 export default function ClientProfilePage() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isEditingBanking, setIsEditingBanking] = useState(false);
+  const [ssnValue, setSsnValue] = useState("");
+  const [einValue, setEinValue] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const {
     data,
@@ -56,8 +62,67 @@ export default function ClientProfilePage() {
 
   const profile = data?.data;
   const onboarding = profile?.onboarding;
+  const bankingInfo = profile?.bankingInfo;
   const signedContracts: any[] = profile?.signedContracts || [];
   const cars: any[] = profile?.cars || [];
+
+  // Initialize form values when banking info is loaded
+  useEffect(() => {
+    if (bankingInfo && !isEditingBanking) {
+      setSsnValue(bankingInfo.ssn || "");
+      setEinValue(bankingInfo.ein || "");
+    }
+  }, [bankingInfo, isEditingBanking]);
+
+  const handleSaveBankingInfo = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch(buildApiUrl("/api/client/profile/banking-info"), {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          ssn: ssnValue.trim() || "",
+          ein: einValue.trim() || "",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to update banking information");
+      }
+
+      toast({
+        title: "Success",
+        description: "Banking information updated successfully",
+      });
+
+      setIsEditingBanking(false);
+      // Invalidate and refetch profile data
+      queryClient.invalidateQueries({ queryKey: ["/api/client/profile"] });
+    } catch (error: any) {
+      console.error("Error updating banking info:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update banking information",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    // Reset to original values
+    if (bankingInfo) {
+      setSsnValue(bankingInfo.ssn || "");
+      setEinValue(bankingInfo.ein || "");
+    }
+    setIsEditingBanking(false);
+  };
 
   const formatValue = (value: any): string => {
     if (value === null || value === undefined || value === "") {
@@ -282,14 +347,27 @@ export default function ClientProfilePage() {
 
                           {/* Banking Information */}
                             <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                              <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
-                                Banking Information (ACH)
-                              </h3>
+                              <div className="flex justify-between items-center mb-4 pb-2 border-b border-[#EAEB80]/30">
+                                <h3 className="text-lg font-semibold text-[#EAEB80]">
+                                  Banking Information (ACH)
+                                </h3>
+                                {!isEditingBanking && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setIsEditingBanking(true)}
+                                    className="text-[#EAEB80] hover:text-[#d4d570] hover:bg-[#EAEB80]/10"
+                                  >
+                                    <Edit2 className="w-4 h-4 mr-2" />
+                                    Edit SSN/EIN
+                                  </Button>
+                                )}
+                              </div>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                   <div>
                                     <span className="text-gray-400 block mb-1">Bank Name:</span>
                       <span className="text-white">
-                        {formatValue(onboarding.bankName)}
+                        {formatValue(bankingInfo?.bankName || onboarding?.bankName)}
                       </span>
                                   </div>
                                   <div>
@@ -297,7 +375,7 @@ export default function ClientProfilePage() {
                         Tax Classification:
                       </span>
                       <span className="text-white">
-                        {formatValue(onboarding.taxClassification)}
+                        {formatValue(bankingInfo?.taxClassification || onboarding?.taxClassification)}
                       </span>
                                   </div>
                                   <div>
@@ -305,7 +383,7 @@ export default function ClientProfilePage() {
                         Routing Number:
                       </span>
                       <span className="text-white font-mono">
-                        {formatValue(onboarding.routingNumber)}
+                        {formatValue(bankingInfo?.routingNumber || onboarding?.routingNumber)}
                       </span>
                                   </div>
                                   <div>
@@ -313,28 +391,80 @@ export default function ClientProfilePage() {
                         Account Number:
                       </span>
                       <span className="text-white font-mono">
-                        {formatValue(onboarding.accountNumber)}
+                        {formatValue(bankingInfo?.accountNumber || onboarding?.accountNumber)}
                       </span>
                                   </div>
-                    {onboarding.businessName && (
+                    {(bankingInfo?.businessName || onboarding?.businessName) && (
                                   <div>
                         <span className="text-gray-400 block mb-1">
                           Business Name:
                         </span>
                         <span className="text-white">
-                          {formatValue(onboarding.businessName)}
+                          {formatValue(bankingInfo?.businessName || onboarding?.businessName)}
                         </span>
                                   </div>
                                 )}
-                    {onboarding.ein && onboarding.taxClassification === "business" && (
+                                  {/* SSN Field - Editable */}
+                                  <div>
+                                    <span className="text-gray-400 block mb-1">SSN:</span>
+                                    {isEditingBanking ? (
+                                      <Input
+                                        type="text"
+                                        value={ssnValue}
+                                        onChange={(e) => setSsnValue(e.target.value)}
+                                        placeholder="Enter SSN"
+                                        className="bg-[#0a0a0a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]"
+                                        maxLength={11}
+                                      />
+                                    ) : (
+                                      <span className="text-white font-mono">
+                                        {formatValue(bankingInfo?.ssn || onboarding?.ssn)}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {/* EIN Field - Editable (always visible) */}
                                   <div>
                                     <span className="text-gray-400 block mb-1">EIN:</span>
-                        <span className="text-white font-mono">
-                          {formatValue(onboarding.ein)}
-                        </span>
+                                    {isEditingBanking ? (
+                                      <Input
+                                        type="text"
+                                        value={einValue}
+                                        onChange={(e) => setEinValue(e.target.value)}
+                                        placeholder="Enter EIN"
+                                        className="bg-[#0a0a0a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]"
+                                        maxLength={10}
+                                      />
+                                    ) : (
+                                      <span className="text-white font-mono">
+                                        {formatValue(bankingInfo?.ein || onboarding?.ein)}
+                                      </span>
+                                    )}
                                   </div>
-                                )}
                               </div>
+                              {/* Save/Cancel Buttons */}
+                              {isEditingBanking && (
+                                <div className="flex gap-2 mt-4 pt-4 border-t border-[#2a2a2a]">
+                                  <Button
+                                    onClick={handleSaveBankingInfo}
+                                    disabled={isSaving}
+                                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                                    size="sm"
+                                  >
+                                    <Save className="w-4 h-4 mr-2" />
+                                    {isSaving ? "Saving..." : "Save"}
+                                  </Button>
+                                  <Button
+                                    onClick={handleCancelEdit}
+                                    disabled={isSaving}
+                                    variant="outline"
+                                    className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border-[#2a2a2a]"
+                                    size="sm"
+                                  >
+                                    <X className="w-4 h-4 mr-2" />
+                                    Cancel
+                                  </Button>
+                                </div>
+                              )}
                             </div>
 
                         </>
