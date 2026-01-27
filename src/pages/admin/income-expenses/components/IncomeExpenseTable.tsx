@@ -204,6 +204,19 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     return fixedTotal + dynamicTotal;
   };
 
+  // Helper to get total parking fee & labor cleaning for a month (including dynamic subcategories)
+  const getTotalParkingFeeLaborForMonth = (month: number): number => {
+    const fixedTotal = (
+      getMonthValue(data.parkingFeeLabor, month, "glaParkingFee") +
+      getMonthValue(data.parkingFeeLabor, month, "laborCleaning")
+    );
+    const dynamicTotal = dynamicSubcategories.parkingFeeLabor.reduce((sum, subcat) => {
+      const monthValue = subcat.values.find((v: any) => v.month === month);
+      return sum + (monthValue?.value || 0);
+    }, 0);
+    return fixedTotal + dynamicTotal;
+  };
+
   // Helper to get value from previous year data by month
   const getPrevYearValue = (arr: any[], month: number, field: string): number => {
     if (!arr || !Array.isArray(arr)) return 0;
@@ -257,23 +270,19 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
   };
 
   // Calculate negative balance carry over for previous year (recursive)
-  const calculatePrevYearNegativeBalance = (month: number): number => {
+  // Uses the same formulas as calculateNegativeBalanceCarryOver but for previous year data
+  const calculatePrevYearNegativeBalance = (month: number, prevYearMode?: 50 | 70): number => {
     if (!prevYearDecData) return 0;
     
     const prevYear = parseInt(year, 10) - 1;
     
-    // January 2019: Always 0
-    if (month === 1 && prevYear === 2019) {
+    // Year 2019: Always 0
+    if (prevYear === 2019) {
       return 0;
     }
     
-    // January of other years (2020+): Use December of previous year (would need another level of recursion)
-    // For now, if it's January and not 2019, we'll calculate from December of the year before
-    // But this is getting complex. Let's simplify: for January, we'll use 0 as the previous negative balance
-    // since we're already using December's data
+    // January of other years (2020+): Use 0 (would need another level of recursion)
     if (month === 1 && prevYear > 2019) {
-      // For January of previous year, we'd need December of year before that
-      // For simplicity, use 0
       return 0;
     }
     
@@ -290,95 +299,186 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
     const prevCoolersIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevMonth, "coolersIncome");
     const prevInsuranceWreckIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevMonth, "insuranceWreckIncome");
     const prevOtherIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevMonth, "otherIncome");
-    const prevNegativeBalanceCarryOver = calculatePrevYearNegativeBalance(prevMonth);
+    const prevNegativeBalanceCarryOver = calculatePrevYearNegativeBalance(prevMonth, prevYearMode);
     const prevTotalDirectDelivery = getPrevYearTotalDirectDelivery(prevMonth);
     const prevTotalCogs = getPrevYearTotalCogs(prevMonth);
     
-    // Formula: Rental Income + Negative Balance Carry Over (from previous month) - All Expenses
-    // Since prevNegativeBalanceCarryOver is already negative, we ADD it (not subtract)
-    const calculation = prevRentalIncome + prevNegativeBalanceCarryOver - prevDeliveryIncome - prevElectricPrepaidIncome - 
-                       prevGasPrepaidIncome - prevMilesIncome - prevSkiRacksIncome - 
-                       prevChildSeatIncome - prevCoolersIncome - prevInsuranceWreckIncome - 
-                       prevOtherIncome - prevTotalDirectDelivery - prevTotalCogs;
+    // Get car owner split percentage from previous year data
+    const prevCarOwnerSplitPercent = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevMonth, "carOwnerSplit") || 0;
+    const prevCarOwnerSplitDecimal = prevCarOwnerSplitPercent / 100;
     
-    const result = calculation > 0 ? 0 : calculation;
-    return result;
+    // Determine mode: if prevYearMode is provided, use it; otherwise default to 50 (50:50)
+    const mode = prevYearMode || 50;
+    
+    let calculation: number;
+    
+    if (mode === 70) {
+      // 30:70 Mode Formula
+      // =IF(
+      //   (Miles Income + (Smoking Fines*10%)) - TOTAL OPERATING EXPENSE (Direct Delivery) 
+      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) - TOTAL OPERATING EXPENSE (COGS - Per Vehicle)
+      //   + Negative Balance Carry Over
+      //   + (Rental Income - Delivery Income - Electric Prepaid Income - Smoking Fines - Gas Prepaid Income 
+      //      - Miles Income - Ski Racks Income - Child Seat Income - Coolers Income - Insurance Wreck Income - Other Income)
+      //   * Car Owner Split% <=0,
+      //   [return calculation],
+      //   0
+      // )
+      const part1 = prevMilesIncome + (prevSmokingFines * 0.1);
+      const part2 = prevRentalIncome - prevDeliveryIncome - prevElectricPrepaidIncome - prevSmokingFines 
+                   - prevGasPrepaidIncome - prevMilesIncome - prevSkiRacksIncome - prevChildSeatIncome 
+                   - prevCoolersIncome - prevInsuranceWreckIncome - prevOtherIncome;
+      calculation = part1 - prevTotalDirectDelivery - prevTotalCogs - prevTotalCogs 
+                   + prevNegativeBalanceCarryOver + (part2 * prevCarOwnerSplitDecimal);
+      
+      // If calculation <= 0, return calculation; otherwise return 0
+      return calculation <= 0 ? calculation : 0;
+    } else {
+      // 50:50 Mode Formula
+      // =IF(
+      //   Rental Income - Delivery Income - Electric Prepaid Income - Gas Prepaid Income - Smoking Fines
+      //   - Miles Income - Ski Racks Income - Child Seat Income - Coolers Income - Insurance Wreck Income - Other Income
+      //   - TOTAL OPERATING EXPENSE (Direct Delivery) - TOTAL OPERATING EXPENSE (COGS - Per Vehicle)
+      //   + Negative Balance Carry Over > 0,
+      //   0,
+      //   [return calculation]
+      // )
+      calculation = prevRentalIncome - prevDeliveryIncome - prevElectricPrepaidIncome - prevGasPrepaidIncome 
+                   - prevSmokingFines - prevMilesIncome - prevSkiRacksIncome - prevChildSeatIncome 
+                   - prevCoolersIncome - prevInsuranceWreckIncome - prevOtherIncome 
+                   - prevTotalDirectDelivery - prevTotalCogs + prevNegativeBalanceCarryOver;
+      
+      // If calculation > 0, return 0; otherwise return calculation
+      return calculation > 0 ? 0 : calculation;
+    }
   };
 
   // Calculate Negative Balance Carry Over:
-  // =IF(M9-M10-M11-M13-M15-M14-M16-M17-M18-M19-M33-M60-M20> 0,0,(M9-M10-M11-M13-M15-M14-M16-M17-M18-M19-M33-M60-M20))
-  // Note: Returns negative value when calculation is negative, 0 when positive
-  // January 2019: Always 0 (no formula, not editable)
+  // Uses different formulas based on mode (30:70 or 50:50)
+  // Year 2019: Always 0
   // January of other years (2020+): Uses December of previous year
   // All other months: Uses previous month
   const calculateNegativeBalanceCarryOver = (month: number): number => {
     const currentYear = parseInt(year, 10);
     
-    // January 2019: Always 0 (no formula, not editable)
-    if (month === 1 && currentYear === 2019) {
+    // Year 2019: Always 0
+    if (currentYear === 2019) {
       return 0;
     }
+    
+    // Get the mode for the previous month (or December of previous year for January)
+    let prevMonthMode: 50 | 70 = 50;
+    let prevRentalIncome: number;
+    let prevDeliveryIncome: number;
+    let prevElectricPrepaidIncome: number;
+    let prevSmokingFines: number;
+    let prevGasPrepaidIncome: number;
+    let prevSkiRacksIncome: number;
+    let prevMilesIncome: number;
+    let prevChildSeatIncome: number;
+    let prevCoolersIncome: number;
+    let prevInsuranceWreckIncome: number;
+    let prevOtherIncome: number;
+    let prevNegativeBalanceCarryOver: number;
+    let prevTotalDirectDelivery: number;
+    let prevTotalCogs: number;
+    let prevCarOwnerSplitPercent: number;
     
     // January of other years (2020+): Use December of previous year
     if (month === 1 && currentYear > 2019) {
       const prevDec = 12;
-      const prevDecRentalIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "rentalIncome");
-      const prevDecDeliveryIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "deliveryIncome");
-      const prevDecElectricPrepaidIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "electricPrepaidIncome");
-      const prevDecSmokingFines = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "smokingFines");
-      const prevDecGasPrepaidIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "gasPrepaidIncome");
-      const prevDecSkiRacksIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "skiRacksIncome");
-      const prevDecMilesIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "milesIncome");
-      const prevDecChildSeatIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "childSeatIncome");
-      const prevDecCoolersIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "coolersIncome");
-      const prevDecInsuranceWreckIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "insuranceWreckIncome");
-      const prevDecOtherIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "otherIncome");
+      prevRentalIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "rentalIncome");
+      prevDeliveryIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "deliveryIncome");
+      prevElectricPrepaidIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "electricPrepaidIncome");
+      prevSmokingFines = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "smokingFines");
+      prevGasPrepaidIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "gasPrepaidIncome");
+      prevSkiRacksIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "skiRacksIncome");
+      prevMilesIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "milesIncome");
+      prevChildSeatIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "childSeatIncome");
+      prevCoolersIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "coolersIncome");
+      prevInsuranceWreckIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "insuranceWreckIncome");
+      prevOtherIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "otherIncome");
       
-      // Calculate previous year December's negative balance carry over (from November)
-      const prevDecNegativeBalanceCarryOver = calculatePrevYearNegativeBalance(prevDec);
+      // Calculate previous year December's negative balance carry over
+      // Note: We need to get the mode from previous year, but we don't have that data easily accessible
+      // For now, we'll default to 50 (50:50) for previous year calculations
+      prevNegativeBalanceCarryOver = calculatePrevYearNegativeBalance(prevDec, 50);
       
-      const prevDecTotalDirectDelivery = getPrevYearTotalDirectDelivery(prevDec);
-      const prevDecTotalCogs = getPrevYearTotalCogs(prevDec);
+      prevTotalDirectDelivery = getPrevYearTotalDirectDelivery(prevDec);
+      prevTotalCogs = getPrevYearTotalCogs(prevDec);
+      prevCarOwnerSplitPercent = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "carOwnerSplit") || 0;
       
-      // Formula: Rental Income + Negative Balance Carry Over (from previous month) - All Expenses
-      // Since prevDecNegativeBalanceCarryOver is already negative, we ADD it (not subtract)
-      const calculation = prevDecRentalIncome + prevDecNegativeBalanceCarryOver - prevDecDeliveryIncome - prevDecElectricPrepaidIncome - 
-                         prevDecGasPrepaidIncome - prevDecMilesIncome - prevDecSkiRacksIncome - 
-                         prevDecChildSeatIncome - prevDecCoolersIncome - prevDecInsuranceWreckIncome - 
-                         prevDecOtherIncome - prevDecTotalDirectDelivery - prevDecTotalCogs;
+      // Default to 50:50 mode for previous year (we don't have easy access to previous year's monthModes)
+      prevMonthMode = 50;
+    } else {
+      // All other months (Feb-Dec): Use previous month
+      const prevMonth = month - 1;
+      prevRentalIncome = getMonthValue(data.incomeExpenses, prevMonth, "rentalIncome");
+      prevDeliveryIncome = getMonthValue(data.incomeExpenses, prevMonth, "deliveryIncome");
+      prevElectricPrepaidIncome = getMonthValue(data.incomeExpenses, prevMonth, "electricPrepaidIncome");
+      prevSmokingFines = getMonthValue(data.incomeExpenses, prevMonth, "smokingFines");
+      prevGasPrepaidIncome = getMonthValue(data.incomeExpenses, prevMonth, "gasPrepaidIncome");
+      prevSkiRacksIncome = getMonthValue(data.incomeExpenses, prevMonth, "skiRacksIncome");
+      prevMilesIncome = getMonthValue(data.incomeExpenses, prevMonth, "milesIncome");
+      prevChildSeatIncome = getMonthValue(data.incomeExpenses, prevMonth, "childSeatIncome");
+      prevCoolersIncome = getMonthValue(data.incomeExpenses, prevMonth, "coolersIncome");
+      prevInsuranceWreckIncome = getMonthValue(data.incomeExpenses, prevMonth, "insuranceWreckIncome");
+      prevOtherIncome = getMonthValue(data.incomeExpenses, prevMonth, "otherIncome");
       
-      const result = calculation > 0 ? 0 : calculation;
-      return result;
+      // Use the calculated value from previous month (recursive call)
+      prevNegativeBalanceCarryOver = calculateNegativeBalanceCarryOver(prevMonth);
+      
+      prevTotalDirectDelivery = getTotalDirectDeliveryForMonth(prevMonth);
+      prevTotalCogs = getTotalCogsForMonth(prevMonth);
+      prevCarOwnerSplitPercent = getMonthValue(data.incomeExpenses, prevMonth, "carOwnerSplit") || 0;
+      
+      // Get mode from previous month
+      prevMonthMode = monthModes[prevMonth] || 50;
     }
     
-    // All other months (Feb-Dec): Use previous month
-    const prevMonth = month - 1;
-    const prevRentalIncome = getMonthValue(data.incomeExpenses, prevMonth, "rentalIncome");
-    const prevDeliveryIncome = getMonthValue(data.incomeExpenses, prevMonth, "deliveryIncome");
-    const prevElectricPrepaidIncome = getMonthValue(data.incomeExpenses, prevMonth, "electricPrepaidIncome");
-    const prevSmokingFines = getMonthValue(data.incomeExpenses, prevMonth, "smokingFines");
-    const prevGasPrepaidIncome = getMonthValue(data.incomeExpenses, prevMonth, "gasPrepaidIncome");
-    const prevSkiRacksIncome = getMonthValue(data.incomeExpenses, prevMonth, "skiRacksIncome");
-    const prevMilesIncome = getMonthValue(data.incomeExpenses, prevMonth, "milesIncome");
-    const prevChildSeatIncome = getMonthValue(data.incomeExpenses, prevMonth, "childSeatIncome");
-    const prevCoolersIncome = getMonthValue(data.incomeExpenses, prevMonth, "coolersIncome");
-    const prevInsuranceWreckIncome = getMonthValue(data.incomeExpenses, prevMonth, "insuranceWreckIncome");
-    const prevOtherIncome = getMonthValue(data.incomeExpenses, prevMonth, "otherIncome");
-    // Use the calculated value from previous month (recursive call)
-    const prevNegativeBalanceCarryOver = calculateNegativeBalanceCarryOver(prevMonth);
-    const prevTotalDirectDelivery = getTotalDirectDeliveryForMonth(prevMonth);
-    const prevTotalCogs = getTotalCogsForMonth(prevMonth);
+    const prevCarOwnerSplitDecimal = prevCarOwnerSplitPercent / 100;
     
-    // Formula: Rental Income + Negative Balance Carry Over (from previous month) - All Expenses
-    // Since prevNegativeBalanceCarryOver is already negative, we ADD it (not subtract)
-    const calculation = prevRentalIncome + prevNegativeBalanceCarryOver - prevDeliveryIncome - prevElectricPrepaidIncome - 
-                       prevGasPrepaidIncome - prevMilesIncome - prevSkiRacksIncome - 
-                       prevChildSeatIncome - prevCoolersIncome - prevInsuranceWreckIncome - 
-                       prevOtherIncome - prevTotalDirectDelivery - prevTotalCogs;
+    let calculation: number;
     
-    // Return negative value (preserve negative sign)
-    const result = calculation > 0 ? 0 : calculation;
-    return result;
+    if (prevMonthMode === 70) {
+      // 30:70 Mode Formula
+      // =IF(
+      //   (Miles Income + (Smoking Fines*10%)) - TOTAL OPERATING EXPENSE (Direct Delivery) 
+      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) - TOTAL OPERATING EXPENSE (COGS - Per Vehicle)
+      //   + Negative Balance Carry Over
+      //   + (Rental Income - Delivery Income - Electric Prepaid Income - Smoking Fines - Gas Prepaid Income 
+      //      - Miles Income - Ski Racks Income - Child Seat Income - Coolers Income - Insurance Wreck Income - Other Income)
+      //   * Car Owner Split% <=0,
+      //   [return calculation],
+      //   0
+      // )
+      const part1 = prevMilesIncome + (prevSmokingFines * 0.1);
+      const part2 = prevRentalIncome - prevDeliveryIncome - prevElectricPrepaidIncome - prevSmokingFines 
+                   - prevGasPrepaidIncome - prevMilesIncome - prevSkiRacksIncome - prevChildSeatIncome 
+                   - prevCoolersIncome - prevInsuranceWreckIncome - prevOtherIncome;
+      calculation = part1 - prevTotalDirectDelivery - prevTotalCogs - prevTotalCogs 
+                   + prevNegativeBalanceCarryOver + (part2 * prevCarOwnerSplitDecimal);
+      
+      // If calculation <= 0, return calculation; otherwise return 0
+      return calculation <= 0 ? calculation : 0;
+    } else {
+      // 50:50 Mode Formula
+      // =IF(
+      //   Rental Income - Delivery Income - Electric Prepaid Income - Gas Prepaid Income - Smoking Fines
+      //   - Miles Income - Ski Racks Income - Child Seat Income - Coolers Income - Insurance Wreck Income - Other Income
+      //   - TOTAL OPERATING EXPENSE (Direct Delivery) - TOTAL OPERATING EXPENSE (COGS - Per Vehicle)
+      //   + Negative Balance Carry Over > 0,
+      //   0,
+      //   [return calculation]
+      // )
+      calculation = prevRentalIncome - prevDeliveryIncome - prevElectricPrepaidIncome - prevGasPrepaidIncome 
+                   - prevSmokingFines - prevMilesIncome - prevSkiRacksIncome - prevChildSeatIncome 
+                   - prevCoolersIncome - prevInsuranceWreckIncome - prevOtherIncome 
+                   - prevTotalDirectDelivery - prevTotalCogs + prevNegativeBalanceCarryOver;
+      
+      // If calculation > 0, return 0; otherwise return calculation
+      return calculation > 0 ? 0 : calculation;
+    }
   };
 
   // Calculate Car Management Split based on formula:
@@ -605,26 +705,48 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
   };
 
   // Calculate Car Management Total Expenses:
-  // "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" + ("TOTAL OPERATING EXPENSE (Direct Delivery)" * "Car Management Split %") + ("TOTAL OPERATING EXPENSE (COGS - Per Vehicle)" * "Car Management Split %")
+  // In 30:70 mode: "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" only
+  // In 50:50 mode: "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" + ("TOTAL OPERATING EXPENSE (Direct Delivery)" + "TOTAL OPERATING EXPENSE (COGS - Per Vehicle)") * "Car Management Split %"
   const calculateCarManagementTotalExpenses = (month: number): number => {
+    const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
+    
+    // Get the mode for this month
+    const mode = monthModes[month] || 50;
+    
+    // In 30:70 mode, return only TOTAL REIMBURSE AND NON-REIMBURSE BILLS
+    if (mode === 70) {
+      return totalReimbursedBills;
+    }
+    
+    // In 50:50 mode, use the full formula
     const storedMgmtPercent = Number(getMonthValue(data.incomeExpenses, month, "carManagementSplit")) || 0;
     const mgmtPercent = storedMgmtPercent / 100; // Convert percentage to decimal
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
-    const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
     
-    return totalReimbursedBills + (totalDirectDelivery * mgmtPercent) + (totalCogs * mgmtPercent);
+    return totalReimbursedBills + ((totalDirectDelivery + totalCogs) * mgmtPercent);
   };
 
   // Calculate Car Owner Total Expenses:
-  // ("TOTAL OPERATING EXPENSE (Direct Delivery)" * "Car Owner Split %") + ("TOTAL OPERATING EXPENSE (COGS - Per Vehicle)" * "Car Owner Split %")
+  // In 30:70 mode: "TOTAL OPERATING EXPENSE (Direct Delivery)" + "TOTAL OPERATING EXPENSE (COGS - Per Vehicle)" + "Total Parking Fee & Labor Cleaning"
+  // In 50:50 mode: ("TOTAL OPERATING EXPENSE (Direct Delivery)" + "TOTAL OPERATING EXPENSE (COGS - Per Vehicle)") * "Car Owner Split %"
   const calculateCarOwnerTotalExpenses = (month: number): number => {
-    const storedOwnerPercent = Number(getMonthValue(data.incomeExpenses, month, "carOwnerSplit")) || 0;
-    const ownerPercent = storedOwnerPercent / 100; // Convert percentage to decimal
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
     
-    return (totalDirectDelivery * ownerPercent) + (totalCogs * ownerPercent);
+    // Get the mode for this month
+    const mode = monthModes[month] || 50;
+    
+    if (mode === 70) {
+      // 30:70 mode: Direct Delivery + COGS + Total Parking Fee & Labor Cleaning
+      const totalParkingFeeLabor = getTotalParkingFeeLaborForMonth(month);
+      return totalDirectDelivery + totalCogs + totalParkingFeeLabor;
+    } else {
+      // 50:50 mode: (Direct Delivery + COGS) * Car Owner Split %
+      const storedOwnerPercent = Number(getMonthValue(data.incomeExpenses, month, "carOwnerSplit")) || 0;
+      const ownerPercent = storedOwnerPercent / 100; // Convert percentage to decimal
+      return (totalDirectDelivery + totalCogs) * ownerPercent;
+    }
   };
 
   // Helper function to get split for a specific month
