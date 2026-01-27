@@ -204,6 +204,7 @@ export default function ClientDetailPage() {
     // Extended Vehicle Information
     vehicleTrim: "",
     registrationExpiration: "",
+    titleType: "",
     vehicleRecall: "",
     numberOfSeats: "",
     numberOfDoors: "",
@@ -652,6 +653,7 @@ export default function ClientDetailPage() {
       // Extended Vehicle Information
       if (data.vehicleTrim) formData.append("vehicleTrim", data.vehicleTrim);
       if (data.registrationExpiration) formData.append("registrationExpiration", data.registrationExpiration);
+      if (data.titleType) formData.append("titleType", data.titleType);
       if (data.vehicleRecall) formData.append("vehicleRecall", data.vehicleRecall);
       if (data.numberOfSeats) formData.append("numberOfSeats", data.numberOfSeats);
       if (data.numberOfDoors) formData.append("numberOfDoors", data.numberOfDoors);
@@ -723,6 +725,7 @@ export default function ClientDetailPage() {
         adminTuroLink: "",
         vehicleTrim: "",
         registrationExpiration: "",
+        titleType: "",
         vehicleRecall: "",
         numberOfSeats: "",
         numberOfDoors: "",
@@ -2769,6 +2772,26 @@ export default function ClientDetailPage() {
                   />
                 </div>
                 <div>
+                  <Label className="text-gray-400">Title Type</Label>
+                  <Select
+                    value={addCarForm.titleType}
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, titleType: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select title type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Clean">Clean</SelectItem>
+                      <SelectItem value="Salvage">Salvage</SelectItem>
+                      <SelectItem value="Rebuilt">Rebuilt</SelectItem>
+                      <SelectItem value="Branded">Branded</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
                   <Label className="text-gray-400">Vehicle Recall</Label>
                   <Select
                     value={addCarForm.vehicleRecall}
@@ -2782,6 +2805,14 @@ export default function ClientDetailPage() {
                       <SelectItem value="No">No</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div>
+                  <Label className="text-gray-400">Oil Package Details</Label>
+                  <Input
+                    value={addCarForm.oilPackageDetails}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, oilPackageDetails: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -2902,14 +2933,6 @@ export default function ClientDetailPage() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              <div>
-                <Label className="text-gray-400">Oil Package Details</Label>
-                <Input
-                  value={addCarForm.oilPackageDetails}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, oilPackageDetails: e.target.value })}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
               </div>
               <div>
                 <Label className="text-gray-400">Dealership Address</Label>
