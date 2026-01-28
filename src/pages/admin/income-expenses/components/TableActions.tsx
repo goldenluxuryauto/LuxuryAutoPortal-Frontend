@@ -68,8 +68,69 @@ export default function TableActions({
     enabled: !!carId && !!selectedYear,
   });
 
+  // Fetch previous year's dynamic subcategories separately (they might not be in the main API response)
+  const { data: prevYearDynamicSubcategories } = useQuery<{
+    directDelivery: any[];
+    cogs: any[];
+    parkingFeeLabor: any[];
+    reimbursedBills: any[];
+  }>({
+    queryKey: ["/api/income-expense/dynamic-subcategories", carId, previousYear],
+    queryFn: async () => {
+      if (!carId || !previousYear) return { directDelivery: [], cogs: [], parkingFeeLabor: [], reimbursedBills: [] };
+      
+      const categories: Array<'directDelivery' | 'cogs' | 'parkingFeeLabor' | 'reimbursedBills'> = [
+        'directDelivery',
+        'cogs',
+        'parkingFeeLabor',
+        'reimbursedBills',
+      ];
+      
+      const promises = categories.map(async (categoryType) => {
+        try {
+          const response = await fetch(
+            buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${previousYear}/${categoryType}`),
+            { credentials: "include" }
+          );
+          if (response.ok) {
+            const result = await response.json();
+            return { categoryType, data: result.data || [] };
+          }
+          return { categoryType, data: [] };
+        } catch (error) {
+          console.error(`Error fetching previous year ${categoryType} subcategories:`, error);
+          return { categoryType, data: [] };
+        }
+      });
+      
+      const results = await Promise.all(promises);
+      const subcategories: any = {
+        directDelivery: [],
+        cogs: [],
+        parkingFeeLabor: [],
+        reimbursedBills: [],
+      };
+      
+      results.forEach(({ categoryType, data }) => {
+        subcategories[categoryType] = data;
+      });
+      
+      return subcategories;
+    },
+    retry: false,
+    enabled: !!carId && !!selectedYear && !!previousYearData?.data, // Only fetch if we have previous year data
+  });
+
   const handleExportCSV = () => {
-    exportAllIncomeExpenseData(data, car, selectedYear, monthModes, dynamicSubcategories, previousYearData?.data || null, skiRacksOwner);
+    // Merge previous year's dynamic subcategories into previousYearData if they exist
+    let prevYearDataForExport = previousYearData?.data || null;
+    if (prevYearDataForExport && prevYearDynamicSubcategories) {
+      prevYearDataForExport = {
+        ...prevYearDataForExport,
+        dynamicSubcategories: prevYearDynamicSubcategories,
+      };
+    }
+    exportAllIncomeExpenseData(data, car, selectedYear, monthModes, dynamicSubcategories, prevYearDataForExport, skiRacksOwner);
     toast({
       title: "Export Successful",
       description: `CSV file downloaded for ${car?.makeModel || 'car'} (${selectedYear})`,
