@@ -40,4 +40,3 @@ export { pdfjs };
 
 // Export pdfjs version for reference (useful for cMap URLs if needed)
 export const PDFJS_VERSION = pdfjs?.version || WORKER_VERSION;
-

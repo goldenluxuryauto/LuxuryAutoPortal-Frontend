@@ -204,6 +204,7 @@ export default function ClientDetailPage() {
     // Extended Vehicle Information
     vehicleTrim: "",
     registrationExpiration: "",
+    titleType: "",
     vehicleRecall: "",
     numberOfSeats: "",
     numberOfDoors: "",
@@ -652,6 +653,7 @@ export default function ClientDetailPage() {
       // Extended Vehicle Information
       if (data.vehicleTrim) formData.append("vehicleTrim", data.vehicleTrim);
       if (data.registrationExpiration) formData.append("registrationExpiration", data.registrationExpiration);
+      if (data.titleType) formData.append("titleType", data.titleType);
       if (data.vehicleRecall) formData.append("vehicleRecall", data.vehicleRecall);
       if (data.numberOfSeats) formData.append("numberOfSeats", data.numberOfSeats);
       if (data.numberOfDoors) formData.append("numberOfDoors", data.numberOfDoors);
@@ -723,6 +725,7 @@ export default function ClientDetailPage() {
         adminTuroLink: "",
         vehicleTrim: "",
         registrationExpiration: "",
+        titleType: "",
         vehicleRecall: "",
         numberOfSeats: "",
         numberOfDoors: "",
@@ -1516,34 +1519,35 @@ export default function ClientDetailPage() {
                         </div>
                       </div>
 
-                      {/* Banking Information (if available) */}
-                      {(client.bankName || client.bankRoutingNumber || client.bankAccountNumber) && (
-                        <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                          <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
-                            Banking Information
-                          </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            {client.bankName && (
-                              <div>
-                                <span className="text-gray-400 block mb-1">Bank Name:</span>
-                                <span className="text-white">{client.bankName}</span>
-                              </div>
-                            )}
-                            {client.bankRoutingNumber && (
-                              <div>
-                                <span className="text-gray-400 block mb-1">Routing Number:</span>
-                                <span className="text-white font-mono">{client.bankRoutingNumber}</span>
-                              </div>
-                            )}
-                            {client.bankAccountNumber && (
-                              <div>
-                                <span className="text-gray-400 block mb-1">Account Number:</span>
-                                <span className="text-white font-mono">{client.bankAccountNumber}</span>
-                              </div>
-                            )}
+                      {/* Banking Information (legacy fallback, only if no ACH records) */}
+                      {(!bankingInfoData || bankingInfoData.length === 0) &&
+                        (client.bankName || client.bankRoutingNumber || client.bankAccountNumber) && (
+                          <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                            <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                              Banking Information
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                              {client.bankName && (
+                                <div>
+                                  <span className="text-gray-400 block mb-1">Bank Name:</span>
+                                  <span className="text-white">{client.bankName}</span>
+                                </div>
+                              )}
+                              {client.bankRoutingNumber && (
+                                <div>
+                                  <span className="text-gray-400 block mb-1">Routing Number:</span>
+                                  <span className="text-white font-mono">{client.bankRoutingNumber}</span>
+                                </div>
+                              )}
+                              {client.bankAccountNumber && (
+                                <div>
+                                  <span className="text-gray-400 block mb-1">Account Number:</span>
+                                  <span className="text-white font-mono">{client.bankAccountNumber}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       {/* Signed Contracts for manually created clients */}
                       <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
@@ -2769,6 +2773,26 @@ export default function ClientDetailPage() {
                   />
                 </div>
                 <div>
+                  <Label className="text-gray-400">Title Type</Label>
+                  <Select
+                    value={addCarForm.titleType}
+                    onValueChange={(value) => setAddCarForm({ ...addCarForm, titleType: value })}
+                  >
+                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectValue placeholder="Select title type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectItem value="Clean">Clean</SelectItem>
+                      <SelectItem value="Salvage">Salvage</SelectItem>
+                      <SelectItem value="Rebuilt">Rebuilt</SelectItem>
+                      <SelectItem value="Branded">Branded</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
                   <Label className="text-gray-400">Vehicle Recall</Label>
                   <Select
                     value={addCarForm.vehicleRecall}
@@ -2782,6 +2806,14 @@ export default function ClientDetailPage() {
                       <SelectItem value="No">No</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div>
+                  <Label className="text-gray-400">Oil Package Details</Label>
+                  <Input
+                    value={addCarForm.oilPackageDetails}
+                    onChange={(e) => setAddCarForm({ ...addCarForm, oilPackageDetails: e.target.value })}
+                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -2902,14 +2934,6 @@ export default function ClientDetailPage() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              <div>
-                <Label className="text-gray-400">Oil Package Details</Label>
-                <Input
-                  value={addCarForm.oilPackageDetails}
-                  onChange={(e) => setAddCarForm({ ...addCarForm, oilPackageDetails: e.target.value })}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                />
               </div>
               <div>
                 <Label className="text-gray-400">Dealership Address</Label>

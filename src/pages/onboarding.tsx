@@ -120,7 +120,7 @@ type OnboardingFormData = z.infer<typeof onboardingSchema>;
 const steps = [
   { id: 1, title: "GOLDEN LUXURY AUTO'S NEW CLIENT ONBOARDING FORM" },
   { id: 2, title: "OWNER INFORMATION" },
-  { id: 3, title: "CAR INFORMATION" },
+  { id: 3, title: "VEHICLE INFORMATION" },
   { id: 4, title: "VEHICLE INSURANCE INFO" },
   { id: 5, title: "VEHICLE PURCHASE INFO" },
   { id: 6, title: "ACH DIRECT DEPOSIT PAYMENT INFORMATION" },
