@@ -1216,27 +1216,24 @@ export default function ClientsPage() {
 
                     <FormField
                       control={form.control}
-                      name="ssn"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-400">SSN</FormLabel>
-                          <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
                       name="representative"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-gray-400">Representative</FormLabel>
-                          <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
-                          </FormControl>
+                          <Select onValueChange={field.onChange} value={field.value || undefined}>
+                            <FormControl>
+                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              {["Jay Barton", "Jenn Mason", "Brynn Lunn", "Other"].map((rep) => (
+                                <SelectItem key={rep} value={rep}>
+                                  {rep}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -1365,6 +1362,31 @@ export default function ClientsPage() {
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={form.control}
+                      name="numberOfDoors"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Number of Doors</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              <SelectItem value="2">2</SelectItem>
+                              <SelectItem value="4">4</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
@@ -1388,31 +1410,6 @@ export default function ClientsPage() {
                                   {n}
                                 </SelectItem>
                               ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="numberOfDoors"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-400">Number of Doors</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                                <SelectValue placeholder="Select" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                              <SelectItem value="2">2</SelectItem>
-                              <SelectItem value="4">4</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -1568,21 +1565,33 @@ export default function ClientsPage() {
                       )}
                     />
 
-                    {form.watch("taxClassification") === "business" && (
-                      <FormField
-                        control={form.control}
-                        name="ein"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-400">EIN</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    )}
+                    <FormField
+                      control={form.control}
+                      name="ssn"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">SSN</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="ein"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">EIN</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </div>
 

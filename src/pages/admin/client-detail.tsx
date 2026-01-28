@@ -1519,34 +1519,35 @@ export default function ClientDetailPage() {
                         </div>
                       </div>
 
-                      {/* Banking Information (if available) */}
-                      {(client.bankName || client.bankRoutingNumber || client.bankAccountNumber) && (
-                        <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                          <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
-                            Banking Information
-                          </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            {client.bankName && (
-                              <div>
-                                <span className="text-gray-400 block mb-1">Bank Name:</span>
-                                <span className="text-white">{client.bankName}</span>
-                              </div>
-                            )}
-                            {client.bankRoutingNumber && (
-                              <div>
-                                <span className="text-gray-400 block mb-1">Routing Number:</span>
-                                <span className="text-white font-mono">{client.bankRoutingNumber}</span>
-                              </div>
-                            )}
-                            {client.bankAccountNumber && (
-                              <div>
-                                <span className="text-gray-400 block mb-1">Account Number:</span>
-                                <span className="text-white font-mono">{client.bankAccountNumber}</span>
-                              </div>
-                            )}
+                      {/* Banking Information (legacy fallback, only if no ACH records) */}
+                      {(!bankingInfoData || bankingInfoData.length === 0) &&
+                        (client.bankName || client.bankRoutingNumber || client.bankAccountNumber) && (
+                          <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
+                            <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                              Banking Information
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                              {client.bankName && (
+                                <div>
+                                  <span className="text-gray-400 block mb-1">Bank Name:</span>
+                                  <span className="text-white">{client.bankName}</span>
+                                </div>
+                              )}
+                              {client.bankRoutingNumber && (
+                                <div>
+                                  <span className="text-gray-400 block mb-1">Routing Number:</span>
+                                  <span className="text-white font-mono">{client.bankRoutingNumber}</span>
+                                </div>
+                              )}
+                              {client.bankAccountNumber && (
+                                <div>
+                                  <span className="text-gray-400 block mb-1">Account Number:</span>
+                                  <span className="text-white font-mono">{client.bankAccountNumber}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       {/* Signed Contracts for manually created clients */}
                       <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
