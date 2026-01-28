@@ -66,6 +66,25 @@ export default function ClientProfilePage() {
   const signedContracts: any[] = profile?.signedContracts || [];
   const cars: any[] = profile?.cars || [];
 
+  // Debug: Log banking info to console
+  useEffect(() => {
+    if (bankingInfo) {
+      console.log("🏦 [PROFILE PAGE] Banking Info received:", {
+        id: bankingInfo.id,
+        bankName: bankingInfo.bankName,
+        routingNumber: bankingInfo.routingNumber ? '***' : null,
+        accountNumber: bankingInfo.accountNumber ? '***' : null,
+        taxClassification: bankingInfo.taxClassification,
+        ssn: bankingInfo.ssn ? '***' : null,
+        ein: bankingInfo.ein ? '***' : null,
+        businessName: bankingInfo.businessName,
+        isDefault: bankingInfo.isDefault,
+      });
+    } else {
+      console.log("⚠️ [PROFILE PAGE] No banking info in profile data");
+    }
+  }, [bankingInfo]);
+
   // Initialize form values when banking info is loaded
   useEffect(() => {
     if (bankingInfo && !isEditingBanking) {
@@ -364,63 +383,40 @@ export default function ClientProfilePage() {
                                 )}
                               </div>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                  {/* Bank Name */}
                                   <div>
                                     <span className="text-gray-400 block mb-1">Bank Name:</span>
-                      <span className="text-white">
-                        {formatValue(bankingInfo?.bankName || onboarding?.bankName)}
-                      </span>
+                                    <span className="text-white">
+                                      {formatValue(bankingInfo?.bankName)}
+                                    </span>
                                   </div>
+                                  {/* Tax Classification */}
                                   <div>
-                      <span className="text-gray-400 block mb-1">
-                        Tax Classification:
-                      </span>
-                      <span className="text-white">
-                        {formatValue(bankingInfo?.taxClassification || onboarding?.taxClassification)}
-                      </span>
+                                    <span className="text-gray-400 block mb-1">Tax Classification:</span>
+                                    <span className="text-white">
+                                      {formatValue(bankingInfo?.taxClassification)}
+                                    </span>
                                   </div>
+                                  {/* Routing Number */}
                                   <div>
-                      <span className="text-gray-400 block mb-1">
-                        Routing Number:
-                      </span>
-                      <span className="text-white font-mono">
-                        {formatValue(bankingInfo?.routingNumber || onboarding?.routingNumber)}
-                      </span>
+                                    <span className="text-gray-400 block mb-1">Routing Number:</span>
+                                    <span className="text-white font-mono">
+                                      {formatValue(bankingInfo?.routingNumber)}
+                                    </span>
                                   </div>
+                                  {/* Account Number */}
                                   <div>
-                      <span className="text-gray-400 block mb-1">
-                        Account Number:
-                      </span>
-                      <span className="text-white font-mono">
-                        {formatValue(bankingInfo?.accountNumber || onboarding?.accountNumber)}
-                      </span>
+                                    <span className="text-gray-400 block mb-1">Account Number:</span>
+                                    <span className="text-white font-mono">
+                                      {formatValue(bankingInfo?.accountNumber)}
+                                    </span>
                                   </div>
-                    {(bankingInfo?.businessName || onboarding?.businessName) && (
+                                  {/* Business Name */}
                                   <div>
-                        <span className="text-gray-400 block mb-1">
-                          Business Name:
-                        </span>
-                        <span className="text-white">
-                          {formatValue(bankingInfo?.businessName || onboarding?.businessName)}
-                        </span>
-                                  </div>
-                                )}
-                                  {/* SSN Field - Editable */}
-                                  <div>
-                                    <span className="text-gray-400 block mb-1">SSN:</span>
-                                    {isEditingBanking ? (
-                                      <Input
-                                        type="text"
-                                        value={ssnValue}
-                                        onChange={(e) => setSsnValue(e.target.value)}
-                                        placeholder="Enter SSN"
-                                        className="bg-[#0a0a0a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]"
-                                        maxLength={11}
-                                      />
-                                    ) : (
-                                      <span className="text-white font-mono">
-                                        {formatValue(bankingInfo?.ssn || onboarding?.ssn)}
-                                      </span>
-                                    )}
+                                    <span className="text-gray-400 block mb-1">Business Name:</span>
+                                    <span className="text-white">
+                                      {formatValue(bankingInfo?.businessName)}
+                                    </span>
                                   </div>
                                   {/* EIN Field - Editable (always visible) */}
                                   <div>
@@ -436,7 +432,25 @@ export default function ClientProfilePage() {
                                       />
                                     ) : (
                                       <span className="text-white font-mono">
-                                        {formatValue(bankingInfo?.ein || onboarding?.ein)}
+                                        {formatValue(bankingInfo?.ein)}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {/* SSN Field - Editable */}
+                                  <div>
+                                    <span className="text-gray-400 block mb-1">SSN:</span>
+                                    {isEditingBanking ? (
+                                      <Input
+                                        type="text"
+                                        value={ssnValue}
+                                        onChange={(e) => setSsnValue(e.target.value)}
+                                        placeholder="Enter SSN"
+                                        className="bg-[#0a0a0a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]"
+                                        maxLength={11}
+                                      />
+                                    ) : (
+                                      <span className="text-white font-mono">
+                                        {formatValue(bankingInfo?.ssn)}
                                       </span>
                                     )}
                                   </div>
