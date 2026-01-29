@@ -880,6 +880,15 @@ export default function NADADepreciationPage() {
             <h2 className="text-lg font-semibold text-gray-300">
               NADA Depreciation Schedule {parseInt(selectedYear) - 1}
             </h2>
+            {!isClient && (
+              <Button
+                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                onClick={() => handleAdd(true)}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add
+              </Button>
+            )}
           </div>
           <div className="w-full overflow-x-auto">
             <table className="border-collapse w-full table-auto">
