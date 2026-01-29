@@ -130,6 +130,7 @@ export function exportAllIncomeExpenseData(
     const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
+    // Use calculated Negative Balance Carry Over (January 2019 will be 0, other Januaries use previous year's December) - MUST match page logic
     const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
@@ -138,44 +139,47 @@ export function exportAllIncomeExpenseData(
     
     const currentYear = parseInt(year, 10);
     const mode = monthModes[month] || 50;
-    const skiRacksOwnerForMonth = skiRacksOwner?.[month] || "GLA";
-    
-    let calculation: number;
+    const isYear2026OrLater = currentYear >= 2026;
+    const isYear2019To2025 = currentYear >= 2019 && currentYear <= 2025;
     
     // Year >= 2026
-    if (currentYear >= 2026) {
+    if (isYear2026OrLater) {
       // 50:50 mode
       if (mode === 50) {
         // A) No ski racks income
         if (skiRacksIncome === 0) {
-          const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + childSeatIncome + 
-                        coolersIncome + insuranceWreckIncome + otherIncome + 
+          const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
+                        childSeatIncome + coolersIncome + insuranceWreckIncome + otherIncome + 
                         (smokingFines * 0.9 + skiRacksIncome * mgmtPercent) - totalReimbursedBills;
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
-                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - childSeatIncome - 
-                         coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs) * mgmtPercent;
-          calculation = part1 + part2;
+                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                         childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                         totalDirectDelivery - totalCogs) * mgmtPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
         // B) If Car Management (GLA) is ski racks owner
-        else if (skiRacksOwnerForMonth === "GLA") {
-          const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + childSeatIncome + 
-                        coolersIncome + insuranceWreckIncome + otherIncome + skiRacksIncome + 
-                        (smokingFines * 0.9) - totalReimbursedBills;
+        else if ((skiRacksOwner?.[month] || "GLA") === "GLA") {
+          const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
+                        childSeatIncome + coolersIncome + insuranceWreckIncome + otherIncome + 
+                        skiRacksIncome + (smokingFines * 0.9) - totalReimbursedBills;
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
-                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - childSeatIncome - 
-                         coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs) * mgmtPercent;
-          calculation = part1 + part2;
+                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                         childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                         totalDirectDelivery - totalCogs) * mgmtPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
         // C) If Car Owner is ski racks owner
         else {
-          const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + childSeatIncome + 
-                        coolersIncome + insuranceWreckIncome + otherIncome + (smokingFines * 0.9) - totalReimbursedBills;
+          const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
+                        childSeatIncome + coolersIncome + insuranceWreckIncome + otherIncome + 
+                        (smokingFines * 0.9) - totalReimbursedBills;
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
-                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - childSeatIncome - 
-                         coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs) * mgmtPercent;
-          calculation = part1 + part2;
+                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                         childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                         totalDirectDelivery - totalCogs) * mgmtPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
       }
@@ -183,50 +187,53 @@ export function exportAllIncomeExpenseData(
       else {
         // A) No ski racks income
         if (skiRacksIncome === 0) {
-          const part1 = deliveryIncome + electricPrepaidIncome + (gasPrepaidIncome * mgmtPercent) + 
-                        childSeatIncome + coolersIncome + insuranceWreckIncome + (smokingFines * 0.9) + 
-                        otherIncome - totalReimbursedBills + totalParkingFeeLabor;
+          const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
+                        (skiRacksIncome * mgmtPercent) + childSeatIncome + coolersIncome + 
+                        insuranceWreckIncome + (smokingFines * 0.9) + otherIncome - 
+                        totalReimbursedBills + totalParkingFeeLabor;
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
-                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - insuranceWreckIncome - 
-                         smokingFines - otherIncome) * mgmtPercent;
-          calculation = part1 + part2;
+                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                         insuranceWreckIncome - smokingFines - otherIncome) * mgmtPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
         // B) If Car Management (GLA) is ski racks owner
-        else if (skiRacksOwnerForMonth === "GLA") {
-          const part1 = deliveryIncome + electricPrepaidIncome + skiRacksIncome + childSeatIncome + 
-                        coolersIncome + insuranceWreckIncome + (smokingFines * 0.9) + otherIncome - 
-                        totalReimbursedBills + totalParkingFeeLabor;
+        else if ((skiRacksOwner?.[month] || "GLA") === "GLA") {
+          const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + skiRacksIncome + 
+                        childSeatIncome + coolersIncome + insuranceWreckIncome + (smokingFines * 0.9) + 
+                        otherIncome - totalReimbursedBills + totalParkingFeeLabor;
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
-                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - insuranceWreckIncome - 
-                         smokingFines - otherIncome) * mgmtPercent;
-          calculation = part1 + part2;
+                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                         insuranceWreckIncome - smokingFines - otherIncome) * mgmtPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
         // C) If Car Owner is ski racks owner
         else {
-          const part1 = deliveryIncome + electricPrepaidIncome + (gasPrepaidIncome * mgmtPercent) + 
-                        childSeatIncome + coolersIncome + insuranceWreckIncome + (smokingFines * 0.9) + 
-                        otherIncome - totalReimbursedBills + totalParkingFeeLabor;
+          const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + childSeatIncome + 
+                        coolersIncome + insuranceWreckIncome + (smokingFines * 0.9) + otherIncome - 
+                        totalReimbursedBills + totalParkingFeeLabor;
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
-                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - insuranceWreckIncome - 
-                         smokingFines - otherIncome) * mgmtPercent;
-          calculation = part1 + part2;
+                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                         insuranceWreckIncome - smokingFines - otherIncome) * mgmtPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
       }
     }
     // Year 2019-2025
-    else {
+    else if (isYear2019To2025) {
       // 50:50 mode
       if (mode === 50) {
         const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + smokingFines + 
-                      (skiRacksIncome * mgmtPercent + childSeatIncome * mgmtPercent + coolersIncome * mgmtPercent + 
-                       insuranceWreckIncome * mgmtPercent + otherIncome * mgmtPercent) - totalReimbursedBills;
+                      (skiRacksIncome * mgmtPercent + childSeatIncome * mgmtPercent + 
+                       coolersIncome * mgmtPercent + insuranceWreckIncome * mgmtPercent + 
+                       otherIncome * mgmtPercent) - totalReimbursedBills;
         const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
-                       gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - childSeatIncome - 
-                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs) * mgmtPercent;
-        calculation = part1 + part2;
+                       gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                       childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                       totalDirectDelivery - totalCogs) * mgmtPercent;
+        const calculation = part1 + part2;
         return calculation >= 0 ? calculation : 0;
       }
       // 70:30 mode
@@ -235,12 +242,15 @@ export function exportAllIncomeExpenseData(
                       childSeatIncome + coolersIncome + insuranceWreckIncome + (smokingFines * 0.9) + 
                       otherIncome - totalReimbursedBills + totalParkingFeeLabor;
         const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
-                       milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - insuranceWreckIncome - 
-                       smokingFines - otherIncome) * mgmtPercent;
-        calculation = part1 + part2;
+                       milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                       insuranceWreckIncome - smokingFines - otherIncome) * mgmtPercent;
+        const calculation = part1 + part2;
         return calculation >= 0 ? calculation : 0;
       }
     }
+    
+    // Default (should not reach here, but return 0 for safety)
+    return 0;
   };
   
   // Calculate Car Owner Split - MUST match IncomeExpenseTable.tsx logic exactly
@@ -259,6 +269,7 @@ export function exportAllIncomeExpenseData(
     const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
+    // Use the calculated Negative Balance Carry Over (not stored in data) - MUST match page logic
     const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
@@ -266,39 +277,41 @@ export function exportAllIncomeExpenseData(
     
     const currentYear = parseInt(year, 10);
     const mode = monthModes[month] || 50;
-    const skiRacksOwnerForMonth = skiRacksOwner?.[month] || "GLA";
-    
-    let calculation: number;
+    const isYear2026OrLater = currentYear >= 2026;
+    const isYear2019To2025 = currentYear >= 2019 && currentYear <= 2025;
     
     // Year >= 2026
-    if (currentYear >= 2026) {
+    if (isYear2026OrLater) {
       // 50:50 mode
       if (mode === 50) {
         // A) No ski racks income
         if (skiRacksIncome === 0) {
           const part1 = milesIncome + (smokingFines * 0.1 + skiRacksIncome * ownerPercent);
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
-                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - childSeatIncome - 
-                         coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs) * ownerPercent;
-          calculation = part1 + part2;
+                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                         childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                         totalDirectDelivery - totalCogs) * ownerPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
         // B) If Car Management (GLA) is ski racks owner
-        else if (skiRacksOwnerForMonth === "GLA") {
+        else if ((skiRacksOwner?.[month] || "GLA") === "GLA") {
           const part1 = milesIncome + (smokingFines * 0.1);
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
-                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - childSeatIncome - 
-                         coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs) * ownerPercent;
-          calculation = part1 + part2;
+                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                         childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                         totalDirectDelivery - totalCogs) * ownerPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
         // C) If Car Owner is ski racks owner
         else {
           const part1 = (milesIncome + skiRacksIncome) + (smokingFines * 0.1);
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
-                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - childSeatIncome - 
-                         coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs) * ownerPercent;
-          calculation = part1 + part2;
+                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                         childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                         totalDirectDelivery - totalCogs) * ownerPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
       }
@@ -306,46 +319,48 @@ export function exportAllIncomeExpenseData(
       else {
         // A) No ski racks income
         if (skiRacksIncome === 0) {
-          const part1 = (gasPrepaidIncome * ownerPercent + milesIncome) - totalDirectDelivery - totalCogs - 
+          const part1 = (skiRacksIncome * ownerPercent + milesIncome) - totalDirectDelivery - totalCogs - 
                         totalParkingFeeLabor + negativeBalanceCarryOver + (smokingFines * 0.1);
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
-                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - insuranceWreckIncome - 
-                         smokingFines - otherIncome) * ownerPercent;
-          calculation = part1 + part2;
+                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                         insuranceWreckIncome - smokingFines - otherIncome) * ownerPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
         // B) If Car Management (GLA) is ski racks owner
-        else if (skiRacksOwnerForMonth === "GLA") {
+        else if ((skiRacksOwner?.[month] || "GLA") === "GLA") {
           const part1 = milesIncome - totalDirectDelivery - totalCogs - totalParkingFeeLabor + 
                         negativeBalanceCarryOver + (smokingFines * 0.1);
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
-                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - insuranceWreckIncome - 
-                         smokingFines - otherIncome) * ownerPercent;
-          calculation = part1 + part2;
+                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                         insuranceWreckIncome - smokingFines - otherIncome) * ownerPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
         // C) If Car Owner is ski racks owner
         else {
-          const part1 = skiRacksIncome + (gasPrepaidIncome * ownerPercent + milesIncome) - totalDirectDelivery - 
-                        totalCogs - totalParkingFeeLabor + negativeBalanceCarryOver + (smokingFines * 0.1);
+          const part1 = skiRacksIncome + milesIncome - totalDirectDelivery - totalCogs - 
+                        totalParkingFeeLabor + negativeBalanceCarryOver + (smokingFines * 0.1);
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
-                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - insuranceWreckIncome - 
-                         smokingFines - otherIncome) * ownerPercent;
-          calculation = part1 + part2;
+                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                         insuranceWreckIncome - smokingFines - otherIncome) * ownerPercent;
+          const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
       }
     }
     // Year 2019-2025
-    else {
+    else if (isYear2019To2025) {
       // 50:50 mode
       if (mode === 50) {
         const part1 = milesIncome + (skiRacksIncome * ownerPercent + childSeatIncome * ownerPercent + 
-                      coolersIncome * ownerPercent + insuranceWreckIncome * ownerPercent + otherIncome * ownerPercent);
+                      coolersIncome * ownerPercent + insuranceWreckIncome * ownerPercent + 
+                      otherIncome * ownerPercent);
         const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
-                       gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - childSeatIncome - 
-                       coolersIncome - insuranceWreckIncome - otherIncome - totalDirectDelivery - totalCogs) * ownerPercent;
-        calculation = part1 + part2;
+                       gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                       childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                       totalDirectDelivery - totalCogs) * ownerPercent;
+        const calculation = part1 + part2;
         return calculation >= 0 ? calculation : 0;
       }
       // 70:30 mode
@@ -353,12 +368,15 @@ export function exportAllIncomeExpenseData(
         const part1 = milesIncome - totalDirectDelivery - totalCogs - totalParkingFeeLabor + 
                       negativeBalanceCarryOver + (smokingFines * 0.1);
         const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
-                       milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - insuranceWreckIncome - 
-                       smokingFines - otherIncome) * ownerPercent;
-        calculation = part1 + part2;
+                       milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                       insuranceWreckIncome - smokingFines - otherIncome) * ownerPercent;
+        const calculation = part1 + part2;
         return calculation >= 0 ? calculation : 0;
       }
     }
+    
+    // Default (should not reach here, but return 0 for safety)
+    return 0;
   };
   
   // Helper to get value from previous year data by month
