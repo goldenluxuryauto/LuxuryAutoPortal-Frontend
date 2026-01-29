@@ -379,13 +379,13 @@ export default function PaymentsPage() {
                     <TableHead className="text-left text-[#EAEB80] font-medium w-12">#</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Status</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Date</TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium">Payment Date</TableHead>
                     <TableHead className="text-right text-[#EAEB80] font-medium">Payable</TableHead>
                     <TableHead className="text-right text-[#EAEB80] font-medium">Payout</TableHead>
                     <TableHead className="text-right text-[#EAEB80] font-medium">Balance</TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium">Ref #</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Invoice #</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Payment Date</TableHead>
                     <TableHead className="text-center text-[#EAEB80] font-medium">Receipt</TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium">Remarks</TableHead>
                     {isAdmin && (
                       <TableHead className="text-center text-[#EAEB80] font-medium">Actions</TableHead>
                     )}
@@ -422,6 +422,9 @@ export default function PaymentsPage() {
                           <TableCell className="text-left text-white">
                             {formatYearMonth(payment.payments_year_month)}
                           </TableCell>
+                          <TableCell className="text-left text-gray-400">
+                            {formatDate(payment.payments_invoice_date)}
+                          </TableCell>
                           <TableCell className="text-right text-white">
                             {formatCurrency(payment.payments_amount)}
                           </TableCell>
@@ -434,12 +437,6 @@ export default function PaymentsPage() {
                           <TableCell className="text-left text-gray-400">
                             {payment.payments_reference_number || "--"}
                           </TableCell>
-                          <TableCell className="text-left text-gray-400">
-                            {payment.payments_invoice_id || "--"}
-                          </TableCell>
-                          <TableCell className="text-left text-gray-400">
-                            {formatDate(payment.payments_invoice_date)}
-                          </TableCell>
                           <TableCell className="text-center">
                             <Button
                               variant="ghost"
@@ -449,6 +446,9 @@ export default function PaymentsPage() {
                             >
                               <FileText className="w-4 h-4" />
                             </Button>
+                          </TableCell>
+                          <TableCell className="text-left text-gray-400 max-w-[200px] truncate" title={payment.payments_remarks || undefined}>
+                            {payment.payments_remarks || "--"}
                           </TableCell>
                           {isAdmin && (
                             <TableCell className="text-center">
@@ -476,7 +476,7 @@ export default function PaymentsPage() {
                       ))}
                       {/* Totals Row */}
                       <TableRow className="border-t-2 border-[#2a2a2a] bg-[#1a1a1a]/50">
-                        <TableCell colSpan={3} className="text-right font-bold text-white">
+                        <TableCell colSpan={4} className="text-right font-bold text-white">
                           Total:
                         </TableCell>
                         <TableCell className="text-right font-bold text-[#EAEB80]">
@@ -488,7 +488,7 @@ export default function PaymentsPage() {
                         <TableCell className="text-right font-bold text-[#EAEB80]">
                           {formatCurrency(totals.balance)}
                         </TableCell>
-                        <TableCell colSpan={isAdmin ? 5 : 4}></TableCell>
+                        <TableCell colSpan={isAdmin ? 4 : 3}></TableCell>
                       </TableRow>
                     </>
                   ) : (
