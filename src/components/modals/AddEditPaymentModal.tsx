@@ -72,7 +72,6 @@ export function AddEditPaymentModal({
   const [payout, setPayout] = useState("");
   const [balance, setBalance] = useState("");
   const [referenceNumber, setReferenceNumber] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
   const [paymentDate, setPaymentDate] = useState("");
   const [remarks, setRemarks] = useState("");
   const [receiptFiles, setReceiptFiles] = useState<File[]>([]);
@@ -127,7 +126,6 @@ export function AddEditPaymentModal({
       setPayout(payment.payments_amount_payout.toString());
       setBalance(payment.payments_amount_balance.toString());
       setReferenceNumber(payment.payments_reference_number || "");
-      setInvoiceId(payment.payments_invoice_id || "");
       
       // Format payment date for input field (YYYY-MM-DD)
       if (payment.payments_invoice_date) {
@@ -150,7 +148,6 @@ export function AddEditPaymentModal({
       setPayout("0");
       setBalance("0");
       setReferenceNumber("");
-      setInvoiceId("");
       setPaymentDate("");
       setRemarks("");
       setReceiptFiles([]);
@@ -208,7 +205,7 @@ export function AddEditPaymentModal({
       formData.append("paymentsAmount", data.paymentsAmount.toString());
       formData.append("paymentsAmountPayout", data.paymentsAmountPayout.toString());
       formData.append("paymentsReferenceNumber", data.paymentsReferenceNumber || "");
-      formData.append("paymentsInvoiceId", data.paymentsInvoiceId || "");
+      formData.append("paymentsInvoiceId", "");
       formData.append("paymentsInvoiceDate", data.paymentsInvoiceDate || "");
       formData.append("paymentsRemarks", data.paymentsRemarks || "");
       
@@ -226,7 +223,7 @@ export function AddEditPaymentModal({
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to create payment");
+        throw new Error(error.message || error.error || "Failed to create payment");
       }
       return response.json();
     },
@@ -262,7 +259,7 @@ export function AddEditPaymentModal({
       formData.append("paymentsAmount", data.paymentsAmount.toString());
       formData.append("paymentsAmountPayout", data.paymentsAmountPayout.toString());
       formData.append("paymentsReferenceNumber", data.paymentsReferenceNumber || "");
-      formData.append("paymentsInvoiceId", data.paymentsInvoiceId || "");
+      formData.append("paymentsInvoiceId", "");
       formData.append("paymentsInvoiceDate", data.paymentsInvoiceDate || "");
       formData.append("paymentsRemarks", data.paymentsRemarks || "");
       
@@ -280,7 +277,7 @@ export function AddEditPaymentModal({
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update payment");
+        throw new Error(error.message || error.error || "Failed to update payment");
       }
       return response.json();
     },
@@ -349,7 +346,7 @@ export function AddEditPaymentModal({
       paymentsAmount: parseFloat(payable) || 0,
       paymentsAmountPayout: parseFloat(payout) || 0,
       paymentsReferenceNumber: referenceNumber || "",
-      paymentsInvoiceId: invoiceId || "",
+      paymentsInvoiceId: "",
       paymentsInvoiceDate: paymentDate || null,
       paymentsRemarks: remarks || "",
       receiptFiles: receiptFiles,
@@ -504,22 +501,6 @@ export function AddEditPaymentModal({
               disabled={isPending}
               className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1"
               placeholder="Enter reference number"
-            />
-          </div>
-
-          {/* Invoice ID */}
-          <div>
-            <Label htmlFor="invoiceId" className="text-gray-300">
-              Invoice ID
-            </Label>
-            <Input
-              id="invoiceId"
-              type="text"
-              value={invoiceId}
-              onChange={(e) => setInvoiceId(e.target.value)}
-              disabled={isPending}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1"
-              placeholder="Enter invoice ID"
             />
           </div>
 
