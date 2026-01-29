@@ -521,37 +521,38 @@ export function exportAllIncomeExpenseData(
     if (currentMonthMode === 70) {
       // 30:70 Mode Formula
       // =IF(
-      //   (Miles Income + (Smoking Fines*10%)) - TOTAL OPERATING EXPENSE (Direct Delivery) 
-      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) - TOTAL OPERATING EXPENSE (COGS - Per Vehicle)
-      //   + Negative Balance Carry Over
-      //   + (Rental Income - Delivery Income - Electric Prepaid Income - Smoking Fines - Gas Prepaid Income 
-      //      - Miles Income - Ski Racks Income - Child Seat Income - Coolers Income - Insurance Wreck Income - Other Income)
-      //   * Car Owner Split% <=0,
-      //   (Miles Income + (Smoking Fines*10%)) - TOTAL OPERATING EXPENSE (Direct Delivery) 
-      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) - Total Parking Fee & Labor Cleaning
-      //   + Negative Balance Carry Over
-      //   + (Rental Income - Delivery Income - Electric Prepaid Income - Smoking Fines - Gas Prepaid Income 
-      //      - Miles Income - Ski Racks Income - Child Seat Income - Coolers Income - Insurance Wreck Income - Other Income)
-      //   * Car Owner Split%,
-      //   0)
+      //   (Miles Income + (Smoking Fines × 10%))
+      //   - TOTAL OPERATING EXPENSE (Direct Delivery) 
+      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) 
+      //   - Total Parking Fee & Labor Cleaning
+      //   + Negative Balance Carry Over 
+      //   + (Rental Income - Delivery Income - Electric Prepaid Income 
+      //      - Smoking Fines - Gas Prepaid Income - Miles Income 
+      //      - Ski Racks Income - Child Seat Income - Coolers Income 
+      //      - Insurance Wreck Income - Other Income)
+      //    × Car Owner Split% > 0,
+      //   0,
+      //   (Miles Income + (Smoking Fines × 10%))
+      //   - TOTAL OPERATING EXPENSE (Direct Delivery) 
+      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) 
+      //   - Total Parking Fee & Labor Cleaning
+      //   + Negative Balance Carry Over 
+      //   + (Rental Income - Delivery Income - Electric Prepaid Income 
+      //      - Smoking Fines - Gas Prepaid Income - Miles Income 
+      //      - Ski Racks Income - Child Seat Income - Coolers Income 
+      //      - Insurance Wreck Income - Other Income)
+      //    × Car Owner Split%)
       const part1 = Number(prevMilesIncome) + (Number(prevSmokingFines) * 0.1);
       const part2 = Number(prevRentalIncome) - Number(prevDeliveryIncome) - Number(prevElectricPrepaidIncome) - Number(prevSmokingFines) 
                    - Number(prevGasPrepaidIncome) - Number(prevMilesIncome) - Number(prevSkiRacksIncome) - Number(prevChildSeatIncome) 
                    - Number(prevCoolersIncome) - Number(prevInsuranceWreckIncome) - Number(prevOtherIncome);
       
-      // First calculation with 2x COGS
-      const calculationWith2xCogs = part1 - Number(prevTotalDirectDelivery) - Number(prevTotalCogs) - Number(prevTotalCogs) 
-                                    + Number(prevNegativeBalanceCarryOver) + (part2 * prevCarOwnerSplitDecimal);
+      // Calculate with Total Parking Fee & Labor Cleaning
+      calculation = part1 - Number(prevTotalDirectDelivery) - Number(prevTotalCogs) - Number(prevTotalParkingFeeLabor) 
+                   + Number(prevNegativeBalanceCarryOver) + (part2 * prevCarOwnerSplitDecimal);
       
-      // IF condition <= 0, use formula with Total Parking Fee & Labor Cleaning
-      if (calculationWith2xCogs <= 0) {
-        calculation = part1 - Number(prevTotalDirectDelivery) - Number(prevTotalCogs) - Number(prevTotalParkingFeeLabor) 
-                     + Number(prevNegativeBalanceCarryOver) + (part2 * prevCarOwnerSplitDecimal);
-        return calculation;
-      } else {
-        // ELSE return 0
-        return 0;
-      }
+      // IF result > 0, return 0; otherwise return calculation
+      return calculation > 0 ? 0 : calculation;
     } else {
       // 50:50 Mode Formula
       calculation = Number(prevRentalIncome) - Number(prevDeliveryIncome) - Number(prevElectricPrepaidIncome) - Number(prevGasPrepaidIncome) 
@@ -648,37 +649,38 @@ export function exportAllIncomeExpenseData(
     if (currentMonthMode === 70) {
       // 30:70 Mode Formula
       // =IF(
-      //   (Miles Income + (Smoking Fines*10%)) - TOTAL OPERATING EXPENSE (Direct Delivery) 
-      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) - TOTAL OPERATING EXPENSE (COGS - Per Vehicle)
-      //   + Negative Balance Carry Over
-      //   + (Rental Income - Delivery Income - Electric Prepaid Income - Smoking Fines - Gas Prepaid Income 
-      //      - Miles Income - Ski Racks Income - Child Seat Income - Coolers Income - Insurance Wreck Income - Other Income)
-      //   * Car Owner Split% <=0,
-      //   (Miles Income + (Smoking Fines*10%)) - TOTAL OPERATING EXPENSE (Direct Delivery) 
-      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) - Total Parking Fee & Labor Cleaning
-      //   + Negative Balance Carry Over
-      //   + (Rental Income - Delivery Income - Electric Prepaid Income - Smoking Fines - Gas Prepaid Income 
-      //      - Miles Income - Ski Racks Income - Child Seat Income - Coolers Income - Insurance Wreck Income - Other Income)
-      //   * Car Owner Split%,
-      //   0)
+      //   (Miles Income + (Smoking Fines × 10%))
+      //   - TOTAL OPERATING EXPENSE (Direct Delivery) 
+      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) 
+      //   - Total Parking Fee & Labor Cleaning
+      //   + Negative Balance Carry Over 
+      //   + (Rental Income - Delivery Income - Electric Prepaid Income 
+      //      - Smoking Fines - Gas Prepaid Income - Miles Income 
+      //      - Ski Racks Income - Child Seat Income - Coolers Income 
+      //      - Insurance Wreck Income - Other Income)
+      //    × Car Owner Split% > 0,
+      //   0,
+      //   (Miles Income + (Smoking Fines × 10%))
+      //   - TOTAL OPERATING EXPENSE (Direct Delivery) 
+      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) 
+      //   - Total Parking Fee & Labor Cleaning
+      //   + Negative Balance Carry Over 
+      //   + (Rental Income - Delivery Income - Electric Prepaid Income 
+      //      - Smoking Fines - Gas Prepaid Income - Miles Income 
+      //      - Ski Racks Income - Child Seat Income - Coolers Income 
+      //      - Insurance Wreck Income - Other Income)
+      //    × Car Owner Split%)
       const part1 = Number(prevMilesIncome) + (Number(prevSmokingFines) * 0.1);
       const part2 = Number(prevRentalIncome) - Number(prevDeliveryIncome) - Number(prevElectricPrepaidIncome) - Number(prevSmokingFines) 
                    - Number(prevGasPrepaidIncome) - Number(prevMilesIncome) - Number(prevSkiRacksIncome) - Number(prevChildSeatIncome) 
                    - Number(prevCoolersIncome) - Number(prevInsuranceWreckIncome) - Number(prevOtherIncome);
       
-      // First calculation with 2x COGS
-      const calculationWith2xCogs = part1 - Number(prevTotalDirectDelivery) - Number(prevTotalCogs) - Number(prevTotalCogs) 
-                                    + Number(prevNegativeBalanceCarryOver) + (part2 * prevCarOwnerSplitDecimal);
+      // Calculate with Total Parking Fee & Labor Cleaning
+      calculation = part1 - Number(prevTotalDirectDelivery) - Number(prevTotalCogs) - Number(prevTotalParkingFeeLabor) 
+                   + Number(prevNegativeBalanceCarryOver) + (part2 * prevCarOwnerSplitDecimal);
       
-      // IF condition <= 0, use formula with Total Parking Fee & Labor Cleaning
-      if (calculationWith2xCogs <= 0) {
-        calculation = part1 - Number(prevTotalDirectDelivery) - Number(prevTotalCogs) - Number(prevTotalParkingFeeLabor) 
-                     + Number(prevNegativeBalanceCarryOver) + (part2 * prevCarOwnerSplitDecimal);
-        return calculation;
-      } else {
-        // ELSE return 0
-        return 0;
-      }
+      // IF result > 0, return 0; otherwise return calculation
+      return calculation > 0 ? 0 : calculation;
     } else {
       // 50:50 Mode Formula
       calculation = Number(prevRentalIncome) - Number(prevDeliveryIncome) - Number(prevElectricPrepaidIncome) - Number(prevGasPrepaidIncome) 
