@@ -41,6 +41,102 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 
+/**
+ * Fetch document URL with credentials and return a blob URL for display.
+ * Required in production when frontend and backend are on different origins:
+ * <img src="..."> does not send cookies cross-origin, so the auth proxy returns 401.
+ * Fetching with credentials: 'include' sends cookies and we display the result via blob URL.
+ */
+function useDocumentBlobUrl(apiUrl: string | null) {
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const isProxyUrl = Boolean(apiUrl?.includes("/api/cars/documents/file-content"));
+
+  useEffect(() => {
+    if (!apiUrl || !apiUrl.trim()) {
+      setBlobUrl(null);
+      setLoading(false);
+      setError(false);
+      return;
+    }
+    if (!isProxyUrl) {
+      setBlobUrl(apiUrl);
+      setLoading(false);
+      setError(false);
+      return;
+    }
+    setLoading(true);
+    setError(false);
+    let revoked = false;
+    fetch(apiUrl, { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.blob();
+      })
+      .then((blob) => {
+        if (revoked) return;
+        const url = URL.createObjectURL(blob);
+        setBlobUrl(url);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!revoked) {
+          setError(true);
+          setLoading(false);
+          setBlobUrl(null);
+        }
+      });
+    return () => {
+      revoked = true;
+    };
+  }, [apiUrl, isProxyUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
+  }, [blobUrl]);
+
+  return {
+    src: isProxyUrl ? blobUrl : apiUrl,
+    loading: isProxyUrl && loading,
+    error: isProxyUrl && error,
+  };
+}
+
+/** Renders an img for a document URL; uses credentialled fetch for proxy URLs so it works in published (cross-origin) project. */
+function DocumentImageWithAuth({
+  url,
+  alt,
+  className,
+  onLoad,
+  onError,
+}: {
+  url: string;
+  alt: string;
+  className?: string;
+  onLoad?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
+  onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
+}) {
+  const { src, loading, error } = useDocumentBlobUrl(url);
+  if (loading) {
+    return (
+      <div className={cn("w-full h-full flex items-center justify-center text-gray-500 text-sm", className)}>
+        Loading...
+      </div>
+    );
+  }
+  if (error || !src) {
+    return (
+      <div className={cn("w-full h-full flex items-center justify-center text-gray-500 text-sm", className)}>
+        Failed to load document
+      </div>
+    );
+  }
+  return <img src={src} alt={alt} className={className} onLoad={onLoad} onError={onError} />;
+}
+
 interface CarDetail {
   id: number;
   vin: string;
@@ -1922,41 +2018,42 @@ export default function CarDetailPage() {
                                 <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
                               </div>
                             ) : isGoogleDriveId ? (
-                              // For Google Drive files, try image first, fallback to iframe for PDFs
-                              <>
-                                <img
-                                  src={documentUrl}
-                                  alt="Insurance Card"
-                                  className="w-full h-full object-contain p-2"
-                                  onError={(e) => {
-                                    // If image fails to load, it might be a PDF - try iframe
-                                    const target = e.target as HTMLImageElement;
-                                    const parent = target.parentElement;
-                                    if (parent && !parent.querySelector('iframe')) {
-                                      target.style.display = "none";
-                                      const iframe = document.createElement('iframe');
-                                      iframe.src = documentUrl;
-                                      iframe.className = "w-full h-full border-0";
-                                      iframe.title = "Insurance Card";
-                                      parent.appendChild(iframe);
-                                    } else {
-                                      // Already tried iframe or no parent, show error
-                                      target.style.display = "none";
-                                      if (parent && !parent.querySelector(".error-message")) {
-                                        const errorDiv = document.createElement("div");
-                                        errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
-                                        errorDiv.textContent = "Failed to load document";
-                                        parent.appendChild(errorDiv);
-                                      }
-                                    }
-                                  }}
-                                />
-                              </>
+                              // For Google Drive: use credentialled fetch so documents display in published (cross-origin) project
+                              <DocumentImageWithAuth
+                                url={documentUrl}
+                                alt="Insurance Card"
+                                className="w-full h-full object-contain p-2"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  const parent = target.parentElement;
+                                  if (parent && !parent.querySelector('iframe')) {
+                                    target.style.display = "none";
+                                    const iframe = document.createElement('iframe');
+                                    iframe.src = documentUrl;
+                                    iframe.className = "w-full h-full border-0";
+                                    iframe.title = "Insurance Card";
+                                    parent.appendChild(iframe);
+                                  } else if (parent && !parent.querySelector(".error-message")) {
+                                    const errorDiv = document.createElement("div");
+                                    errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                    errorDiv.textContent = "Failed to load document";
+                                    parent.appendChild(errorDiv);
+                                  }
+                                }}
+                              />
                             ) : (
                               <img
                                 src={documentUrl}
                                 alt="Insurance Card"
                                 className="w-full h-full object-contain p-2"
+                                onLoad={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  const parent = target.parentElement?.parentElement;
+                                  if (parent) {
+                                    const errorMessage = parent.querySelector(".error-message");
+                                    if (errorMessage) errorMessage.remove();
+                                  }
+                                }}
                                 onError={(e) => {
                                   console.error('Failed to load insurance card image:', onboarding.insuranceCardUrl);
                                   const target = e.target as HTMLImageElement;
@@ -2062,41 +2159,42 @@ export default function CarDetailPage() {
                                     <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
                                   </div>
                                 ) : isGoogleDriveId ? (
-                                  // For Google Drive files, try image first, fallback to iframe for PDFs
-                                  <>
-                                    <img
-                                      src={documentUrl}
-                                      alt={`Drivers License ${index + 1}`}
-                                      className="w-full h-full object-contain p-2"
-                                      onError={(e) => {
-                                        // If image fails to load, it might be a PDF - try iframe
-                                        const target = e.target as HTMLImageElement;
-                                        const parent = target.parentElement;
-                                        if (parent && !parent.querySelector('iframe')) {
-                                          target.style.display = "none";
-                                          const iframe = document.createElement('iframe');
-                                          iframe.src = documentUrl;
-                                          iframe.className = "w-full h-full border-0";
-                                          iframe.title = `Drivers License ${index + 1}`;
-                                          parent.appendChild(iframe);
-                                        } else {
-                                          // Already tried iframe or no parent, show error
-                                          target.style.display = "none";
-                                          if (parent && !parent.querySelector(".error-message")) {
-                                            const errorDiv = document.createElement("div");
-                                            errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
-                                            errorDiv.textContent = "Failed to load document";
-                                            parent.appendChild(errorDiv);
-                                          }
-                                        }
-                                      }}
-                                    />
-                                  </>
+                                  // For Google Drive: use credentialled fetch so documents display in published (cross-origin) project
+                                  <DocumentImageWithAuth
+                                    url={documentUrl}
+                                    alt={`Drivers License ${index + 1}`}
+                                    className="w-full h-full object-contain p-2"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      const parent = target.parentElement;
+                                      if (parent && !parent.querySelector('iframe')) {
+                                        target.style.display = "none";
+                                        const iframe = document.createElement('iframe');
+                                        iframe.src = documentUrl;
+                                        iframe.className = "w-full h-full border-0";
+                                        iframe.title = `Drivers License ${index + 1}`;
+                                        parent.appendChild(iframe);
+                                      } else if (parent && !parent.querySelector(".error-message")) {
+                                        const errorDiv = document.createElement("div");
+                                        errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                        errorDiv.textContent = "Failed to load document";
+                                        parent.appendChild(errorDiv);
+                                      }
+                                    }}
+                                  />
                                 ) : (
                                   <img
                                     src={documentUrl}
                                     alt={`Drivers License ${index + 1}`}
                                     className="w-full h-full object-contain p-2"
+                                    onLoad={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      const parent = target.parentElement?.parentElement;
+                                      if (parent) {
+                                        const errorMessage = parent.querySelector(".error-message");
+                                        if (errorMessage) errorMessage.remove();
+                                      }
+                                    }}
                                     onError={(e) => {
                                       console.error('Failed to load drivers license image:', url);
                                       const target = e.target as HTMLImageElement;
