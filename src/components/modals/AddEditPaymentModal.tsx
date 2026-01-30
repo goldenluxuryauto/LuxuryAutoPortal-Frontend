@@ -95,27 +95,402 @@ export function AddEditPaymentModal({
 
   const statuses = statusesData?.data || [];
 
-  // Fetch payable amount from Income & Expense (when creating new payment)
+  // Extract year and month from yearMonth
+  const [year, month] = yearMonth ? yearMonth.split("-").map(Number) : [null, null];
+
+  // Fetch income/expense data to calculate car owner split
   const { data: incomeExpenseData, isLoading: isLoadingIncomeExpense } = useQuery<{
     success: boolean;
     data: any;
   }>({
-    queryKey: ["/api/income-expense", carId, yearMonth],
+    queryKey: ["/api/income-expense", carId, year],
     queryFn: async () => {
-      if (!yearMonth) throw new Error("Year/Month not set");
-      const [year, month] = yearMonth.split("-");
+      if (!year || !carId) throw new Error("Year or Car ID not set");
       const url = buildApiUrl(`/api/income-expense/${carId}/${year}`);
       const response = await fetch(url, {
         credentials: "include",
       });
       if (!response.ok) {
-        // If income/expense not found, that's okay - admin will enter manually
+        // If income/expense not found, return empty data
         return { success: false, data: null };
       }
       return response.json();
     },
-    enabled: !isEdit && !!yearMonth && !!carId,
+    enabled: !!yearMonth && !!carId && !!year,
   });
+
+  // Fetch dynamic subcategories for the year
+  const { data: dynamicSubcategoriesData } = useQuery<{
+    success: boolean;
+    data: {
+      directDelivery: any[];
+      cogs: any[];
+      parkingFeeLabor: any[];
+      reimbursedBills: any[];
+    };
+  }>({
+    queryKey: ["/api/income-expense/dynamic-subcategories", carId, year],
+    queryFn: async () => {
+      if (!carId || !year) throw new Error("Car ID or Year not set");
+      const categories: Array<'directDelivery' | 'cogs' | 'parkingFeeLabor' | 'reimbursedBills'> = [
+        'directDelivery',
+        'cogs',
+        'parkingFeeLabor',
+        'reimbursedBills',
+      ];
+      
+      const promises = categories.map(async (categoryType) => {
+        try {
+          const response = await fetch(
+            buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${year}/${categoryType}`),
+            { credentials: "include" }
+          );
+          if (response.ok) {
+            const result = await response.json();
+            return { categoryType, data: result.data || [] };
+          }
+          return { categoryType, data: [] };
+        } catch (error) {
+          console.error(`Error fetching ${categoryType} subcategories:`, error);
+          return { categoryType, data: [] };
+        }
+      });
+      
+      const results = await Promise.all(promises);
+      const subcategories: any = {
+        directDelivery: [],
+        cogs: [],
+        parkingFeeLabor: [],
+        reimbursedBills: [],
+      };
+      
+      results.forEach(({ categoryType, data }) => {
+        subcategories[categoryType] = data;
+      });
+      
+      return { success: true, data: subcategories };
+    },
+    enabled: !!yearMonth && !!carId && !!year,
+    retry: false,
+  });
+
+  const dynamicSubcategories = dynamicSubcategoriesData?.data || {
+    directDelivery: [],
+    cogs: [],
+    parkingFeeLabor: [],
+    reimbursedBills: [],
+  };
+
+  // Fetch previous year data for January calculations
+  const previousYear = year ? String(year - 1) : null;
+  const { data: previousYearData } = useQuery<{
+    success: boolean;
+    data: any;
+  }>({
+    queryKey: ["/api/income-expense", carId, previousYear],
+    queryFn: async () => {
+      if (!carId || !previousYear) throw new Error("Car ID or Previous Year not set");
+      const response = await fetch(
+        buildApiUrl(`/api/income-expense/${carId}/${previousYear}`),
+        { credentials: "include" }
+      );
+      if (!response.ok) {
+        return { success: true, data: null };
+      }
+      return response.json();
+    },
+    enabled: !!yearMonth && !!carId && !!year && month === 1,
+    retry: false,
+  });
+
+  const incomeExpenseDataValue = incomeExpenseData?.data;
+  const prevYearDecData = previousYearData?.data;
+  const monthModes = incomeExpenseDataValue?.formulaSetting?.monthModes || {};
+  const skiRacksOwner = incomeExpenseDataValue?.formulaSetting?.skiRacksOwner || {};
+
+  // Helper to get value by month from income-expense data
+  const getMonthValue = (arr: any[], monthNum: number, field: string): number => {
+    if (!arr || !Array.isArray(arr)) return 0;
+    const item = arr.find((x) => x && x.month === monthNum);
+    if (!item) return 0;
+    const value = item[field];
+    if (value === null || value === undefined) return 0;
+    const numValue = Number(value);
+    return isNaN(numValue) ? 0 : numValue;
+  };
+
+  // Helper to get value from previous year data by month
+  const getPrevYearValue = (arr: any[], monthNum: number, field: string): number => {
+    if (!arr || !Array.isArray(arr)) return 0;
+    const item = arr.find((x) => x && x.month === monthNum);
+    if (!item) return 0;
+    const value = item[field];
+    if (value === null || value === undefined) return 0;
+    const numValue = Number(value);
+    return isNaN(numValue) ? 0 : numValue;
+  };
+
+  // Helper to get total Direct Delivery for a month (including dynamic subcategories)
+  const getTotalDirectDeliveryForMonth = (monthNum: number): number => {
+    if (!incomeExpenseDataValue) return 0;
+    const fixedTotal = (
+      getMonthValue(incomeExpenseDataValue.directDelivery || [], monthNum, "laborCarCleaning") +
+      getMonthValue(incomeExpenseDataValue.directDelivery || [], monthNum, "laborDelivery") +
+      getMonthValue(incomeExpenseDataValue.directDelivery || [], monthNum, "parkingAirport") +
+      getMonthValue(incomeExpenseDataValue.directDelivery || [], monthNum, "parkingLot") +
+      getMonthValue(incomeExpenseDataValue.directDelivery || [], monthNum, "uberLyftLime")
+    );
+    const dynamicTotal = dynamicSubcategories.directDelivery.reduce((sum, subcat) => {
+      const monthValue = subcat.values?.find((v: any) => v.month === monthNum);
+      return sum + (monthValue?.value || 0);
+    }, 0);
+    return fixedTotal + dynamicTotal;
+  };
+
+  // Helper to get total COGS for a month (including dynamic subcategories)
+  const getTotalCogsForMonth = (monthNum: number): number => {
+    if (!incomeExpenseDataValue) return 0;
+    const fixedTotal = (
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "autoBodyShopWreck") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "alignment") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "battery") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "brakes") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "carPayment") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "carInsurance") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "carSeats") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "cleaningSuppliesTools") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "emissions") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "gpsSystem") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "keyFob") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "laborCleaning") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "licenseRegistration") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "mechanic") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "oilLube") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "parts") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "skiRacks") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "tickets") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "tiredAirStation") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "tires") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "towingImpoundFees") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "uberLyftLime") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "windshield") +
+      getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "wipers")
+    );
+    const dynamicTotal = dynamicSubcategories.cogs.reduce((sum, subcat) => {
+      const monthValue = subcat.values?.find((v: any) => v.month === monthNum);
+      return sum + (monthValue?.value || 0);
+    }, 0);
+    return fixedTotal + dynamicTotal;
+  };
+
+  // Helper to get total parking fee & labor for a month (including dynamic subcategories)
+  const getTotalParkingFeeLaborForMonth = (monthNum: number): number => {
+    if (!incomeExpenseDataValue) return 0;
+    const fixedTotal = (
+      getMonthValue(incomeExpenseDataValue.parkingFeeLabor || [], monthNum, "glaParkingFee") +
+      getMonthValue(incomeExpenseDataValue.parkingFeeLabor || [], monthNum, "laborCleaning")
+    );
+    const dynamicTotal = dynamicSubcategories.parkingFeeLabor.reduce((sum, subcat) => {
+      const monthValue = subcat.values?.find((v: any) => v.month === monthNum);
+      return sum + (monthValue?.value || 0);
+    }, 0);
+    return fixedTotal + dynamicTotal;
+  };
+
+  // Calculate Negative Balance Carry Over (simplified version for modal)
+  const calculateNegativeBalanceCarryOver = (monthNum: number): number => {
+    if (!incomeExpenseDataValue || !year) return 0;
+    const currentYear = parseInt(String(year), 10);
+    
+    if (currentYear === 2019) return 0;
+    
+    const currentMonthMode: 50 | 70 = monthModes[monthNum] || 50;
+    
+    let prevRentalIncome: number;
+    let prevDeliveryIncome: number;
+    let prevElectricPrepaidIncome: number;
+    let prevSmokingFines: number;
+    let prevGasPrepaidIncome: number;
+    let prevSkiRacksIncome: number;
+    let prevMilesIncome: number;
+    let prevChildSeatIncome: number;
+    let prevCoolersIncome: number;
+    let prevInsuranceWreckIncome: number;
+    let prevOtherIncome: number;
+    let prevNegativeBalanceCarryOver: number;
+    let prevTotalDirectDelivery: number;
+    let prevTotalCogs: number;
+    let prevTotalParkingFeeLabor: number;
+    let prevCarOwnerSplitPercent: number;
+    
+    if (monthNum === 1 && currentYear > 2019 && prevYearDecData) {
+      const prevDec = 12;
+      prevRentalIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "rentalIncome");
+      prevDeliveryIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "deliveryIncome");
+      prevElectricPrepaidIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "electricPrepaidIncome");
+      prevSmokingFines = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "smokingFines");
+      prevGasPrepaidIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "gasPrepaidIncome");
+      prevSkiRacksIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "skiRacksIncome");
+      prevMilesIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "milesIncome");
+      prevChildSeatIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "childSeatIncome");
+      prevCoolersIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "coolersIncome");
+      prevInsuranceWreckIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "insuranceWreckIncome");
+      prevOtherIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "otherIncome");
+      prevCarOwnerSplitPercent = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "carOwnerSplit") || 0;
+      
+      // For January, we'll use 0 for negative balance carry over from previous year December
+      // (full calculation would require recursive calculation of previous year)
+      prevNegativeBalanceCarryOver = 0;
+      prevTotalDirectDelivery = 0; // Simplified
+      prevTotalCogs = 0; // Simplified
+      prevTotalParkingFeeLabor = 0; // Simplified
+    } else {
+      const prevMonth = monthNum - 1;
+      prevRentalIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "rentalIncome");
+      prevDeliveryIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "deliveryIncome");
+      prevElectricPrepaidIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "electricPrepaidIncome");
+      prevSmokingFines = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "smokingFines");
+      prevGasPrepaidIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "gasPrepaidIncome");
+      prevSkiRacksIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "skiRacksIncome");
+      prevMilesIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "milesIncome");
+      prevChildSeatIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "childSeatIncome");
+      prevCoolersIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "coolersIncome");
+      prevInsuranceWreckIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "insuranceWreckIncome");
+      prevOtherIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "otherIncome");
+      prevCarOwnerSplitPercent = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], prevMonth, "carOwnerSplit") || 0;
+      prevNegativeBalanceCarryOver = calculateNegativeBalanceCarryOver(prevMonth);
+      prevTotalDirectDelivery = getTotalDirectDeliveryForMonth(prevMonth);
+      prevTotalCogs = getTotalCogsForMonth(prevMonth);
+      prevTotalParkingFeeLabor = getTotalParkingFeeLaborForMonth(prevMonth);
+    }
+    
+    const prevCarOwnerSplitDecimal = prevCarOwnerSplitPercent / 100;
+    
+    let calculation: number;
+    
+    if (currentMonthMode === 70) {
+      const part1 = prevMilesIncome + (prevSmokingFines * 0.1);
+      const part2 = prevRentalIncome - prevDeliveryIncome - prevElectricPrepaidIncome - prevSmokingFines 
+                   - prevGasPrepaidIncome - prevMilesIncome - prevSkiRacksIncome - prevChildSeatIncome 
+                   - prevCoolersIncome - prevInsuranceWreckIncome - prevOtherIncome;
+      calculation = part1 - prevTotalDirectDelivery - prevTotalCogs - prevTotalParkingFeeLabor 
+                   + prevNegativeBalanceCarryOver + (part2 * prevCarOwnerSplitDecimal);
+      return calculation > 0 ? 0 : calculation;
+    } else {
+      calculation = prevRentalIncome - prevDeliveryIncome - prevElectricPrepaidIncome - prevGasPrepaidIncome 
+                   - prevSmokingFines - prevMilesIncome - prevSkiRacksIncome - prevChildSeatIncome 
+                   - prevCoolersIncome - prevInsuranceWreckIncome - prevOtherIncome 
+                   - prevTotalDirectDelivery - prevTotalCogs + prevNegativeBalanceCarryOver;
+      return calculation > 0 ? 0 : calculation;
+    }
+  };
+
+  // Calculate Car Owner Split (same logic as earnings.tsx)
+  const calculateCarOwnerSplit = (monthNum: number): number => {
+    if (!incomeExpenseDataValue || !year || !monthNum) return 0;
+    
+    const storedPercent = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "carOwnerSplit") || 0;
+    const ownerPercent = storedPercent / 100;
+    
+    const rentalIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "rentalIncome");
+    const deliveryIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "deliveryIncome");
+    const electricPrepaidIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "electricPrepaidIncome");
+    const smokingFines = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "smokingFines");
+    const gasPrepaidIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "gasPrepaidIncome");
+    const skiRacksIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "skiRacksIncome");
+    const milesIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "milesIncome");
+    const childSeatIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "childSeatIncome");
+    const coolersIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "coolersIncome");
+    const insuranceWreckIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "insuranceWreckIncome");
+    const otherIncome = getMonthValue(incomeExpenseDataValue.incomeExpenses || [], monthNum, "otherIncome");
+    const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(monthNum);
+    const totalDirectDelivery = getTotalDirectDeliveryForMonth(monthNum);
+    const totalCogs = getTotalCogsForMonth(monthNum);
+    const totalParkingFeeLabor = getTotalParkingFeeLaborForMonth(monthNum);
+    
+    const currentYear = parseInt(String(year), 10);
+    const mode = monthModes[monthNum] || 50;
+    const isYear2026OrLater = currentYear >= 2026;
+    const isYear2019To2025 = currentYear >= 2019 && currentYear <= 2025;
+    
+    if (isYear2026OrLater) {
+      if (mode === 50) {
+        if (skiRacksIncome === 0) {
+          const part1 = milesIncome + (smokingFines * 0.1 + skiRacksIncome * ownerPercent);
+          const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                         childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                         totalDirectDelivery - totalCogs) * ownerPercent;
+          const calculation = part1 + part2;
+          return calculation >= 0 ? calculation : 0;
+        } else if ((skiRacksOwner[monthNum] || "GLA") === "GLA") {
+          const part1 = milesIncome + (smokingFines * 0.1);
+          const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                         childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                         totalDirectDelivery - totalCogs) * ownerPercent;
+          const calculation = part1 + part2;
+          return calculation >= 0 ? calculation : 0;
+        } else {
+          const part1 = (milesIncome + skiRacksIncome) + (smokingFines * 0.1);
+          const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                         gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                         childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                         totalDirectDelivery - totalCogs) * ownerPercent;
+          const calculation = part1 + part2;
+          return calculation >= 0 ? calculation : 0;
+        }
+      } else {
+        if (skiRacksIncome === 0) {
+          const part1 = (skiRacksIncome * ownerPercent + milesIncome) - totalDirectDelivery - totalCogs - 
+                        totalParkingFeeLabor + negativeBalanceCarryOver + (smokingFines * 0.1);
+          const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
+                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                         insuranceWreckIncome - smokingFines - otherIncome) * ownerPercent;
+          const calculation = part1 + part2;
+          return calculation >= 0 ? calculation : 0;
+        } else if ((skiRacksOwner[monthNum] || "GLA") === "GLA") {
+          const part1 = milesIncome - totalDirectDelivery - totalCogs - totalParkingFeeLabor + 
+                        negativeBalanceCarryOver + (smokingFines * 0.1);
+          const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
+                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                         insuranceWreckIncome - smokingFines - otherIncome) * ownerPercent;
+          const calculation = part1 + part2;
+          return calculation >= 0 ? calculation : 0;
+        } else {
+          const part1 = skiRacksIncome + milesIncome - totalDirectDelivery - totalCogs - 
+                        totalParkingFeeLabor + negativeBalanceCarryOver + (smokingFines * 0.1);
+          const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
+                         milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                         insuranceWreckIncome - smokingFines - otherIncome) * ownerPercent;
+          const calculation = part1 + part2;
+          return calculation >= 0 ? calculation : 0;
+        }
+      }
+    } else if (isYear2019To2025) {
+      if (mode === 50) {
+        const part1 = milesIncome + (skiRacksIncome * ownerPercent + childSeatIncome * ownerPercent + 
+                      coolersIncome * ownerPercent + insuranceWreckIncome * ownerPercent + 
+                      otherIncome * ownerPercent);
+        const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
+                       gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
+                       childSeatIncome - coolersIncome - insuranceWreckIncome - otherIncome - 
+                       totalDirectDelivery - totalCogs) * ownerPercent;
+        const calculation = part1 + part2;
+        return calculation >= 0 ? calculation : 0;
+      } else {
+        const part1 = milesIncome - totalDirectDelivery - totalCogs - totalParkingFeeLabor + 
+                      negativeBalanceCarryOver + (smokingFines * 0.1);
+        const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
+                       milesIncome - skiRacksIncome - childSeatIncome - coolersIncome - 
+                       insuranceWreckIncome - smokingFines - otherIncome) * ownerPercent;
+        const calculation = part1 + part2;
+        return calculation >= 0 ? calculation : 0;
+      }
+    }
+    
+    return 0;
+  };
 
   // Initialize form with payment data (for edit mode)
   useEffect(() => {
@@ -162,16 +537,19 @@ export function AddEditPaymentModal({
     setBalance(balanceNum.toFixed(2));
   }, [payout, payable]);
 
-  // Update payable when income/expense data is fetched
+  // Update payable when income/expense data is fetched and year/month changes
+  // Always calculate from income/expense data (both add and edit modes)
   useEffect(() => {
-    if (incomeExpenseData?.success && incomeExpenseData?.data && !isEdit) {
-      // Extract owner's split from income/expense data
-      // This depends on your income/expense data structure
-      // For now, set a placeholder - you'll need to adjust this based on actual data
-      const ownerSplit = incomeExpenseData.data.owner_split || 0;
-      setPayable(ownerSplit.toString());
+    if (year && month && incomeExpenseData?.success && incomeExpenseData?.data) {
+      // Calculate car owner split for the selected month
+      const ownerSplit = calculateCarOwnerSplit(month);
+      setPayable(ownerSplit.toFixed(2));
+    } else if (year && month && incomeExpenseData && !incomeExpenseData.success) {
+      // If income/expense data not found, set to 0
+      setPayable("0.00");
     }
-  }, [incomeExpenseData, isEdit]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [incomeExpenseData?.success, incomeExpenseData?.data, year, month, dynamicSubcategories, previousYearData, monthModes, skiRacksOwner]);
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -392,7 +770,7 @@ export function AddEditPaymentModal({
             />
           </div>
 
-          {/* Payable Amount (Read-only or auto-filled) */}
+          {/* Payable Amount (Read-only, auto-filled from Income & Expense) */}
           <div>
             <Label htmlFor="payable" className="text-gray-300">
               Payable (Owner's Split)
@@ -403,12 +781,11 @@ export function AddEditPaymentModal({
               </span>
               <Input
                 id="payable"
-                type="number"
-                step="0.01"
+                type="text"
                 value={payable}
-                onChange={(e) => setPayable(e.target.value)}
+                readOnly
                 disabled={isPending || isLoadingIncomeExpense}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1 pl-8"
+                className="bg-[#0a0a0a] border-[#2a2a2a] text-white mt-1 pl-8 cursor-not-allowed"
                 placeholder="0.00"
               />
             </div>
@@ -417,9 +794,9 @@ export function AddEditPaymentModal({
                 Loading payable amount from Income & Expense...
               </p>
             )}
-            {!isEdit && !isLoadingIncomeExpense && incomeExpenseData && !incomeExpenseData.success && (
+            {!isLoadingIncomeExpense && year && month && (!incomeExpenseData || !incomeExpenseData.success) && (
               <p className="text-xs text-yellow-400 mt-1">
-                Income & Expense not found for this month. Please enter manually.
+                Income & Expense not found for {year}-{String(month).padStart(2, "0")}. Payable set to $0.00.
               </p>
             )}
           </div>
