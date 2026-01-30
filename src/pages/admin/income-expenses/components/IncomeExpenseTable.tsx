@@ -21,11 +21,13 @@ import { useLocation } from "wouter";
 
 interface IncomeExpenseTableProps {
   year: string;
+  isFromRoute?: boolean; // True when accessed from individual car page (View Car → Income and Expense)
+  showParkingAirportQB?: boolean; // True to show PARKING AIRPORT AVERAGE PER TRIP - QB section
 }
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
+export default function IncomeExpenseTable({ year, isFromRoute = false, showParkingAirportQB = false }: IncomeExpenseTableProps) {
   const [location] = useLocation();
   const isReadOnly = location.startsWith("/admin/income-expenses");
   
@@ -1785,37 +1787,39 @@ export default function IncomeExpenseTable({ year }: IncomeExpenseTableProps) {
               />
             </CategorySection>
 
-            {/* PARKING AIRPORT AVERAGE PER TRIP - QB */}
-            <CategorySection
-              title="PARKING AIRPORT AVERAGE PER TRIP - QB"
-              isExpanded={expandedSections.parkingAverageQB}
-              onToggle={() => toggleSection("parkingAverageQB")}
-              hasActions={false}
-            >
-              <CategoryRow
-                label="Total Trips Taken"
-                values={MONTHS.map((_, i) => getMonthValue(data.history, i + 1, "tripsTaken"))}
-                isEditable={false}
-                isInteger
-              />
-              <CategoryRow
-                label="Total Parking Airport"
-                values={MONTHS.map((_, i) => getMonthValue(data.parkingAirportQB || [], i + 1, "totalParkingAirport"))}
-                category="parkingAirportQB"
-                field="totalParkingAirport"
-                isEditable={true}
-              />
-              <CategoryRow
-                label="Average per trip"
-                values={MONTHS.map((_, i) => {
-                  const monthNum = i + 1;
-                  const parking = getMonthValue(data.parkingAirportQB || [], monthNum, "totalParkingAirport");
-                  const trips = getMonthValue(data.history, monthNum, "tripsTaken");
-                  return trips > 0 ? parking / trips : 0;
-                })}
-                isEditable={false}
-              />
-            </CategorySection>
+            {/* PARKING AIRPORT AVERAGE PER TRIP - QB - Only show when "All Cars" is selected */}
+            {showParkingAirportQB && (
+              <CategorySection
+                title="PARKING AIRPORT AVERAGE PER TRIP - QB"
+                isExpanded={expandedSections.parkingAverageQB}
+                onToggle={() => toggleSection("parkingAverageQB")}
+                hasActions={false}
+              >
+                <CategoryRow
+                  label="Total Trips Taken"
+                  values={MONTHS.map((_, i) => getMonthValue(data.history, i + 1, "tripsTaken"))}
+                  isEditable={false}
+                  isInteger
+                />
+                <CategoryRow
+                  label="Total Parking Airport"
+                  values={MONTHS.map((_, i) => getMonthValue(data.parkingAirportQB || [], i + 1, "totalParkingAirport"))}
+                  category="parkingAirportQB"
+                  field="totalParkingAirport"
+                  isEditable={true}
+                />
+                <CategoryRow
+                  label="Average per trip"
+                  values={MONTHS.map((_, i) => {
+                    const monthNum = i + 1;
+                    const parking = getMonthValue(data.parkingAirportQB || [], monthNum, "totalParkingAirport");
+                    const trips = getMonthValue(data.history, monthNum, "tripsTaken");
+                    return trips > 0 ? parking / trips : 0;
+                  })}
+                  isEditable={false}
+                />
+              </CategorySection>
+            )}
           </tbody>
         </table>
       </div>

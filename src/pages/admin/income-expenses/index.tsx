@@ -183,11 +183,13 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   }
 
   // Determine which carId to use for data fetching
-  const activeCarId = selectedCar !== "all" ? parseInt(selectedCar) : null;
+  // "all" = show aggregate data, "allcars" = show "All Cars" aggregate view, specific ID = individual car
+  const activeCarId = selectedCar !== "all" && selectedCar !== "allcars" ? parseInt(selectedCar) : null;
+  const isAllCarsView = selectedCar === "allcars";
 
   // Show different UI based on whether this is per-car view or all-cars admin view
-  if (!activeCarId) {
-    // Admin "Income and Expenses" (plural) - All cars view with car selector
+  if (!activeCarId && !isAllCarsView) {
+    // Admin "Income and Expenses" (plural) - Initial view with car selector
     return (
       <AdminLayout>
         <div className="flex flex-col w-full h-full overflow-hidden">
@@ -218,6 +220,8 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                     <span className="truncate text-left flex-1 min-w-0">
                     {selectedCar === "all"
                       ? "-- Select a Car --"
+                      : selectedCar === "allcars"
+                      ? "All Cars"
                       : (() => {
                           const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
                           return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
@@ -251,6 +255,21 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                             }`}
                           />
                           -- Select a Car --
+                        </CommandItem>
+                        <CommandItem
+                          value="All Cars"
+                          onSelect={() => {
+                            setSelectedCar("allcars");
+                            setCarComboboxOpen(false);
+                          }}
+                          className="text-white hover:bg-[#2a2a2a] cursor-pointer font-semibold"
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              selectedCar === "allcars" ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          All Cars
                         </CommandItem>
                         {cars.map((carItem: any) => {
                           const carDisplayName = formatCarDisplayName(carItem);
@@ -307,6 +326,128 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           </div>
         </div>
       </AdminLayout>
+    );
+  }
+
+  // Handle "All Cars" aggregate view
+  if (isAllCarsView) {
+    // Use a special carId (e.g., first car or aggregate) for the provider
+    // For now, we'll use the first car's ID as a placeholder since the backend needs to support aggregate queries
+    const firstCarId = cars && cars.length > 0 ? cars[0].id : 1;
+    
+    return (
+      <IncomeExpenseProvider carId={firstCarId} year={selectedYear}>
+        <AdminLayout>
+          <div className="flex flex-col w-full h-full overflow-hidden">
+            {/* Header */}
+            <div className="mb-2 flex-shrink-0">
+              <button
+                onClick={() => setLocation("/cars")}
+                className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Cars</span>
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold text-white">Income and Expenses</h1>
+                <p className="text-sm text-gray-400 mt-1">All Cars - Aggregate View</p>
+              </div>
+            </div>
+
+            {/* Page Title and Actions */}
+            <div className="flex items-center justify-between mb-2 flex-shrink-0">
+              <h1 className="text-xl font-semibold text-white">INCOME AND EXPENSES - ALL CARS</h1>
+              <div className="flex items-center gap-2">
+                <div className="w-[300px]">
+                  <Popover open={carComboboxOpenPerCar} onOpenChange={setCarComboboxOpenPerCar}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={carComboboxOpenPerCar}
+                        className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] text-sm overflow-hidden"
+                      >
+                        <span className="truncate text-left flex-1 min-w-0">All Cars</span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0 bg-[#1a1a1a] border-[#2a2a2a]">
+                      <Command className="bg-[#1a1a1a]">
+                        <CommandInput 
+                          placeholder="Search car by make, model, plate, or VIN..." 
+                          className="text-white placeholder:text-gray-500"
+                        />
+                        <CommandList>
+                          <CommandEmpty className="text-gray-400 py-6 text-center text-sm">
+                            No car found.
+                          </CommandEmpty>
+                          <CommandGroup>
+                            <CommandItem
+                              value="All Cars"
+                              onSelect={() => {
+                                setSelectedCar("allcars");
+                                setCarComboboxOpenPerCar(false);
+                              }}
+                              className="text-white hover:bg-[#2a2a2a] cursor-pointer font-semibold"
+                            >
+                              <Check className="mr-2 h-4 w-4 opacity-100" />
+                              All Cars
+                            </CommandItem>
+                            {cars.map((carItem: any) => {
+                              const carDisplayName = formatCarDisplayName(carItem);
+                              const isSelected = selectedCar === carItem.id.toString();
+                              return (
+                                <CommandItem
+                                  key={carItem.id}
+                                  value={carDisplayName}
+                                  onSelect={() => {
+                                    setSelectedCar(carItem.id.toString());
+                                    setCarComboboxOpenPerCar(false);
+                                  }}
+                                  className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                                >
+                                  <Check
+                                    className={`mr-2 h-4 w-4 ${
+                                      isSelected ? "opacity-100" : "opacity-0"
+                                    }`}
+                                  />
+                                  {carDisplayName}
+                                </CommandItem>
+                              );
+                            })}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <TableActions
+                  selectedYear={selectedYear}
+                  setSelectedYear={setSelectedYear}
+                  carId={firstCarId}
+                  car={null}
+                />
+              </div>
+            </div>
+
+            {/* Main Content Area - No scroll on page, only table scrolls */}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <IncomeExpenseTable year={selectedYear} isFromRoute={false} showParkingAirportQB={true} />
+            </div>
+
+            {/* Category-specific Edit Modals */}
+            <ModalEditManagementSplit />
+            <ModalEditIncomeExpense />
+            <ModalEditDirectDelivery />
+            <ModalEditCOGS />
+            <ModalEditParkingFeeLabor />
+            <ModalEditReimbursedBills />
+            <ModalEditHistory />
+            <ModalEditParkingAirportQB />
+            <ModalEditDynamicSubcategory />
+          </div>
+        </AdminLayout>
+      </IncomeExpenseProvider>
     );
   }
 
@@ -373,6 +514,8 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         <span className="truncate text-left flex-1 min-w-0">
                         {selectedCar === "all"
                           ? "-- Select a Car --"
+                          : selectedCar === "allcars"
+                          ? "All Cars"
                           : (() => {
                               const selectedCarObj = cars.find((car: any) => car.id.toString() === selectedCar);
                               return selectedCarObj ? formatCarDisplayName(selectedCarObj) : "-- Select a Car --";
@@ -392,6 +535,21 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                             No car found.
                           </CommandEmpty>
                           <CommandGroup>
+                            <CommandItem
+                              value="All Cars"
+                              onSelect={() => {
+                                setSelectedCar("allcars");
+                                setCarComboboxOpenPerCar(false);
+                              }}
+                              className="text-white hover:bg-[#2a2a2a] cursor-pointer font-semibold"
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  selectedCar === "allcars" ? "opacity-100" : "opacity-0"
+                                }`}
+                              />
+                              All Cars
+                            </CommandItem>
                             {cars.map((carItem: any) => {
                               const carDisplayName = formatCarDisplayName(carItem);
                               const isSelected = selectedCar === carItem.id.toString();
@@ -432,7 +590,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
 
           {/* Main Content Area - No scroll on page, only table scrolls */}
           <div className="flex-1 min-h-0 overflow-hidden">
-            <IncomeExpenseTable year={selectedYear} />
+            <IncomeExpenseTable year={selectedYear} isFromRoute={isFromRoute} showParkingAirportQB={false} />
           </div>
 
           {/* Category-specific Edit Modals */}

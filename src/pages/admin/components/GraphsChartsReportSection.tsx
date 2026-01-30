@@ -51,8 +51,9 @@ export function GraphsChartsReportSection({
       const carOwnerTotalExpenses = calculateCarOwnerTotalExpenses(monthNum);
       const daysRented = getMonthValue(incomeExpenseData.history || [], monthNum, "daysRented");
       const tripsTaken = getMonthValue(incomeExpenseData.history || [], monthNum, "tripsTaken");
-      const carManagementProfit = carManagementSplit - carManagementTotalExpenses;
-      const carOwnerProfit = carOwnerSplit - carOwnerTotalExpenses;
+      // Profit should equal the split values (not split minus expenses)
+      const carManagementProfit = carManagementSplit;
+      const carOwnerProfit = carOwnerSplit;
       const avePerRental = tripsTaken > 0 ? rentalIncome / tripsTaken : 0;
 
       return {
@@ -161,9 +162,9 @@ export function GraphsChartsReportSection({
         </ResponsiveContainer>
       </div>
 
-      {/* Car Owner Management Profit Chart */}
+      {/* Car Owner Profit Chart */}
       <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-300 mb-4">Car Owner Management Profit</h2>
+        <h2 className="text-lg font-semibold text-gray-300 mb-4">Car Owner Profit</h2>
         <div className="mb-4 text-sm text-gray-400">
           <div>Yearly Total: {formatCurrency(yearlyTotals["Car Owner Profit"])}</div>
         </div>
