@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { 
@@ -20,7 +20,8 @@ import {
   LogOut,
   Menu,
   X,
-  User
+  User,
+  ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -35,6 +36,7 @@ interface SidebarItem {
   label: string;
   icon: any;
   roles?: ("admin" | "client" | "employee")[];
+  children?: SidebarItem[];
 }
 
 const allSidebarItems: SidebarItem[] = [
@@ -52,7 +54,15 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/view-client", label: "View as a Client", icon: Eye, roles: ["admin"] },
   { href: "/admin/view-employee", label: "View as an Employee", icon: Eye, roles: ["admin"] },
   { href: "/admin/car-rental", label: "Car Rental", icon: Key, roles: ["admin"] },
-  { href: "/admin/hr", label: "Human Resources", icon: Briefcase, roles: ["admin"] },
+  {
+    href: "/admin/hr",
+    label: "Human Resources",
+    icon: Briefcase,
+    roles: ["admin"],
+    children: [
+      { href: "/admin/hr/employees", label: "Employees", icon: Users, roles: ["admin"] }
+    ],
+  },
   { href: "/admin/payroll", label: "Payroll", icon: DollarSign, roles: ["admin"] },
   { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/admin/turo-guide", label: "Turo Guide", icon: BookOpen },
@@ -64,6 +74,34 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location, setLocation] = useLocation();
+
+  const [expandedParents, setExpandedParents] = useState<Record<string, boolean>>(() => {
+    const obj: Record<string, boolean> = {};
+    allSidebarItems.forEach((it) => {
+      if (it.children && it.children.length > 0) {
+        obj[it.href] = it.children.some((c) => location === c.href || location.startsWith(c.href));
+      }
+    });
+    return obj;
+  });
+
+  const toggleExpand = (href: string) => setExpandedParents((prev) => ({ ...prev, [href]: !prev[href] }));
+
+  useEffect(() => {
+    // Auto-expand parent when a child matches the current location
+    let changed = false;
+    const newState = { ...expandedParents };
+    allSidebarItems.forEach((it) => {
+      if (it.children && it.children.length > 0) {
+        const childActive = it.children.some((c) => location === c.href || location.startsWith(c.href));
+        if (childActive && !newState[it.href]) {
+          newState[it.href] = true;
+          changed = true;
+        }
+      }
+    });
+    if (changed) setExpandedParents(newState);
+  }, [location]);
 
   const { data } = useQuery<{ user?: any }>({
     queryKey: ["/api/auth/me"],
@@ -97,15 +135,20 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
     const userRole = user.isAdmin ? "admin" : user.isClient ? "client" : user.isEmployee ? "employee" : null;
     
-    return allSidebarItems.filter((item) => {
-      // If no roles specified, show to all
-      if (!item.roles || item.roles.length === 0) {
-        return true;
-      }
-      
-      // If roles specified, check if user's role is included
-      return userRole && item.roles.includes(userRole);
-    });
+    // Filter parent's visibility based on role and also filter children by role
+    return allSidebarItems
+      .map((item) => {
+        const visible = !item.roles || item.roles.length === 0 || (userRole && item.roles.includes(userRole));
+        if (!visible) return null;
+
+        if (item.children && item.children.length > 0) {
+          const filteredChildren = item.children.filter((c) => !c.roles || c.roles.length === 0 || (userRole && c.roles.includes(userRole)));
+          return { ...item, children: filteredChildren };
+        }
+
+        return item;
+      })
+      .filter(Boolean) as SidebarItem[];
   }, [user]);
 
   const handleLogout = async () => {
@@ -158,6 +201,58 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
             const Icon = item.icon;
             const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));
             
+                      if (item.children && item.children.length > 0) {
+              // Parent with children - render expandable menu
+              const isParentActive = item.children.some((c) => location === c.href || location.startsWith(c.href));
+              const isActiveParent = isActive || isParentActive;
+              const expanded = expandedParents[item.href] ?? isParentActive;
+
+              return (
+                <div key={item.href} className="mx-2">
+                  <div
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded transition-colors relative cursor-pointer",
+                      isActiveParent ? "bg-[#EAEB80]/10 text-[#EAEB80]" : "text-gray-400 hover:bg-[#1a1a1a] hover:text-white"
+                    )}
+                    onClick={() => toggleExpand(item.href)}
+                    data-testid={`link-admin-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    {sidebarOpen && (
+                      <>
+                        <span className="text-sm flex-1">{item.label}</span>
+                        <ChevronDown className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+                      </>
+                    )}
+                  </div>
+
+                  {expanded && sidebarOpen && (
+                    <div className="mt-1 ml-6">
+                      {item.children.map((child) => {
+                        const ChildIcon = child.icon;
+                        const childActive = location === child.href || (child.href !== '/dashboard' && location.startsWith(child.href));
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className={cn(
+                              "flex items-center gap-3 px-3 py-2 rounded text-sm",
+                              childActive ? "bg-[#EAEB80]/10 text-[#EAEB80]" : "text-gray-400 hover:bg-[#1a1a1a] hover:text-white"
+                            )}
+                            onClick={() => setMobileMenuOpen(false)}
+                            data-testid={`link-admin-${child.label.toLowerCase().replace(/\s+/g, '-')}`}
+                          >
+                            <ChildIcon className="w-3 h-3 shrink-0" />
+                            <span className="text-sm">{child.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={item.href}
