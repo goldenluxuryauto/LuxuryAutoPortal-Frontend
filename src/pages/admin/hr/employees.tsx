@@ -103,21 +103,20 @@ interface Employee {
 
 const employeeSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
   middleName: z.string().optional(),
-  personalEmail: z.string().email("Invalid email address"),
-  workEmail: z.string().email("Invalid email address").optional().or(z.literal("")),
-  mobileNumber: z.string().optional(),
-  telephone: z.string().optional(),
-  ssnEin: z.string().optional(),
+  lastName: z.string().min(1, "Last name is required"),
+  workEmail: z.string().email("Invalid email address").min(1, "Work email is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  street: z.string().min(1, "Street is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State is required"),
+  zipCode: z.string().min(1, "ZIP Code is required"),
+  country: z.string().min(1, "Country is required"),
+  emergencyContactName: z.string().min(1, "Emergency contact name is required"),
+  emergencyContactPhoneNumber: z.string().min(1, "Emergency contact phone number is required"),
+  ssnEin: z.string().min(1, "Social Security Number or EIN is required"),
   shirtSize: z.string().optional(),
-  street: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  country: z.string().optional(),
-  zipCode: z.string().optional(),
-  departmentName: z.string().optional(),
-  jobTitleName: z.string().optional(),
+  hearAboutGla: z.string().optional(),
 });
 
 type EmployeeFormData = z.infer<typeof employeeSchema>;
@@ -166,6 +165,10 @@ export default function EmployeesPage() {
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importErrors, setImportErrors] = useState<Array<{ row: number; error: string }>>([]);
   const [showImportErrors, setShowImportErrors] = useState(false);
+  
+  // File upload states for employee form
+  const [carInsurancePhotos, setCarInsurancePhotos] = useState<File[]>([]);
+  const [driverLicensePhoto, setDriverLicensePhoto] = useState<File | null>(null);
 
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [employeeToApprove, setEmployeeToApprove] = useState<Employee | null>(null);
@@ -174,6 +177,7 @@ export default function EmployeesPage() {
   const formLink = useMemo(() => `${window.location.origin}/employee-form`, []);
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
   const qrRef = useRef<HTMLDivElement | null>(null);
+  // Load employees from database (employees + employee_job_pay tables) via GET /api/employees
   const { data, isLoading, error, refetch } = useQuery<{
     success: boolean;
     data: Employee[];
@@ -216,26 +220,27 @@ export default function EmployeesPage() {
     resolver: zodResolver(employeeSchema),
     defaultValues: {
       firstName: "",
-      lastName: "",
       middleName: "",
-      personalEmail: "",
+      lastName: "",
       workEmail: "",
-      mobileNumber: "",
-      telephone: "",
-      ssnEin: "",
-      shirtSize: "",
+      phoneNumber: "",
       street: "",
       city: "",
       state: "",
-      country: "",
       zipCode: "",
-      departmentName: "",
-      jobTitleName: "",
+      country: "",
+      emergencyContactName: "",
+      emergencyContactPhoneNumber: "",
+      ssnEin: "",
+      shirtSize: "",
+      hearAboutGla: "",
     },
   });
 
   const createMutation = useMutation({
     mutationFn: async (payload: EmployeeFormData) => {
+      // Note: Files are stored in state but backend currently expects JSON
+      // Files can be uploaded separately or backend can be updated to accept FormData
       const response = await fetch(buildApiUrl("/api/employees"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -244,32 +249,43 @@ export default function EmployeesPage() {
           firstName: payload.firstName,
           lastName: payload.lastName,
           middleName: payload.middleName || "",
-          personalEmail: payload.personalEmail,
-          workEmail: payload.workEmail || payload.personalEmail,
-          mobileNumber: payload.mobileNumber || "",
-          telephone: payload.telephone || "",
-          ssnEin: payload.ssnEin || "",
+          // Map to adminCreateSchema fields
+          personalEmail: payload.workEmail,
+          workEmail: payload.workEmail,
+          mobileNumber: payload.phoneNumber,
+          street: payload.street,
+          city: payload.city,
+          state: payload.state,
+          country: payload.country,
+          zipCode: payload.zipCode,
+          emergencyContactPerson: payload.emergencyContactName,
+          emergencyNumber: payload.emergencyContactPhoneNumber,
+          ssnEin: payload.ssnEin,
           shirtSize: payload.shirtSize || "",
-          street: payload.street || "",
-          city: payload.city || "",
-          state: payload.state || "",
-          country: payload.country || "",
-          zipCode: payload.zipCode || "",
-          departmentName: payload.departmentName || "",
-          jobTitleName: payload.jobTitleName || "",
+          hearAboutGla: payload.hearAboutGla || "",
         }),
       });
+      
       if (!response.ok) {
         const err = await response.json().catch(() => ({ error: "Failed to create employee" }));
         throw new Error(err.error || err.message || "Failed to create employee");
       }
-      return response.json();
+      
+      const result = await response.json();
+      
+      // TODO: Upload files separately if backend supports file uploads
+      // For now, files are stored in state (carInsurancePhotos, driverLicensePhoto)
+      // and can be uploaded via a separate endpoint if needed
+      
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
       toast({ title: "Success", description: "Employee created successfully." });
       setIsAddModalOpen(false);
       addForm.reset();
+      setCarInsurancePhotos([]);
+      setDriverLicensePhoto(null);
     },
     onError: (e: any) => {
       toast({ title: "Error", description: e.message || "Failed to create employee", variant: "destructive" });
@@ -988,20 +1004,6 @@ export default function EmployeesPage() {
 
                   <FormField
                     control={addForm.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">Last Name *</FormLabel>
-                        <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={addForm.control}
                     name="middleName"
                     render={({ field }) => (
                       <FormItem>
@@ -1016,12 +1018,12 @@ export default function EmployeesPage() {
 
                   <FormField
                     control={addForm.control}
-                    name="personalEmail"
+                    name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Personal Email *</FormLabel>
+                        <FormLabel className="text-gray-400">Last Name *</FormLabel>
                         <FormControl>
-                          <Input {...field} type="email" className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1033,7 +1035,7 @@ export default function EmployeesPage() {
                     name="workEmail"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Work Email</FormLabel>
+                        <FormLabel className="text-gray-400">Work Email *</FormLabel>
                         <FormControl>
                           <Input {...field} type="email" className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
                         </FormControl>
@@ -1044,10 +1046,25 @@ export default function EmployeesPage() {
 
                   <FormField
                     control={addForm.control}
-                    name="mobileNumber"
+                    name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Mobile #</FormLabel>
+                        <FormLabel className="text-gray-400">Phone Number *</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Address */}
+                  <FormField
+                    control={addForm.control}
+                    name="street"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel className="text-gray-400">Street</FormLabel>
                         <FormControl>
                           <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
                         </FormControl>
@@ -1058,10 +1075,10 @@ export default function EmployeesPage() {
 
                   <FormField
                     control={addForm.control}
-                    name="departmentName"
+                    name="city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Department</FormLabel>
+                        <FormLabel className="text-gray-400">City</FormLabel>
                         <FormControl>
                           <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
                         </FormControl>
@@ -1072,10 +1089,10 @@ export default function EmployeesPage() {
 
                   <FormField
                     control={addForm.control}
-                    name="jobTitleName"
+                    name="state"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Job Title</FormLabel>
+                        <FormLabel className="text-gray-400">State</FormLabel>
                         <FormControl>
                           <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
                         </FormControl>
@@ -1083,6 +1100,240 @@ export default function EmployeesPage() {
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={addForm.control}
+                    name="country"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Country</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={addForm.control}
+                    name="zipCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">ZIP</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Emergency */}
+                  <FormField
+                    control={addForm.control}
+                    name="emergencyContactName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Emergency Contact Name *</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={addForm.control}
+                    name="emergencyContactPhoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Emergency Contact Phone Number *</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Other */}
+                  <FormField
+                    control={addForm.control}
+                    name="ssnEin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Social Security Number or EIN *</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={addForm.control}
+                    name="shirtSize"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">Shirt Size</FormLabel>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              <SelectValue placeholder="Select shirt size" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectItem value="Small">Small</SelectItem>
+                            <SelectItem value="Medium">Medium</SelectItem>
+                            <SelectItem value="Large">Large</SelectItem>
+                            <SelectItem value="XLarge">XLarge</SelectItem>
+                            <SelectItem value="XXLarge">XXLarge</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={addForm.control}
+                    name="hearAboutGla"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-400">How did you hear about Golden Luxury Auto?</FormLabel>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              <SelectValue placeholder="Select an option" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectItem value="Friend/Refferal">Friend/Refferal</SelectItem>
+                            <SelectItem value="KSL Ad">KSL Ad</SelectItem>
+                            <SelectItem value="Facebook Ad">Facebook Ad</SelectItem>
+                            <SelectItem value="Indeed Ad">Indeed Ad</SelectItem>
+                            <SelectItem value="Google Ad">Google Ad</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* File Uploads */}
+                  <FormItem className="md:col-span-2">
+                    <FormLabel className="text-gray-400">Photo of car insurance</FormLabel>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="car-insurance-upload"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#EAEB80]/40 rounded-xl bg-[#0a0a0a]/50 hover:border-[#EAEB80]/60 hover:bg-[#EAEB80]/5 transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col items-center justify-center pt-4 pb-4">
+                          <Upload className="w-8 h-8 text-[#EAEB80] mb-2 group-hover:scale-110 transition-transform" />
+                          <p className="text-xs text-gray-400 group-hover:text-[#EAEB80] transition-colors">
+                            Click to upload or drag and drop
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Multiple files allowed</p>
+                        </div>
+                        <input
+                          id="car-insurance-upload"
+                          type="file"
+                          multiple
+                          accept="image/*,.pdf"
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files || []);
+                            setCarInsurancePhotos((prev) => [...prev, ...files]);
+                            e.target.value = ""; // Reset input
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                      {carInsurancePhotos.length > 0 && (
+                        <div className="space-y-2">
+                          {carInsurancePhotos.map((file, index) => (
+                            <div key={index} className="flex items-center justify-between p-2 bg-[#0a0a0a] rounded-lg border border-[#2a2a2a]">
+                              <div className="flex items-center gap-2">
+                                <FileSpreadsheet className="w-4 h-4 text-[#EAEB80]" />
+                                <span className="text-sm text-gray-300">{file.name}</span>
+                                <span className="text-xs text-gray-500">
+                                  ({(file.size / 1024).toFixed(2)} KB)
+                                </span>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setCarInsurancePhotos((prev) => prev.filter((_, i) => i !== index));
+                                }}
+                                className="text-gray-400 hover:text-white h-6 w-6 p-0"
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </FormItem>
+
+                  <FormItem className="md:col-span-2">
+                    <FormLabel className="text-gray-400">Driver license photo</FormLabel>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="driver-license-upload"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#EAEB80]/40 rounded-xl bg-[#0a0a0a]/50 hover:border-[#EAEB80]/60 hover:bg-[#EAEB80]/5 transition-all cursor-pointer group"
+                      >
+                        <div className="flex flex-col items-center justify-center pt-4 pb-4">
+                          <Upload className="w-8 h-8 text-[#EAEB80] mb-2 group-hover:scale-110 transition-transform" />
+                          <p className="text-xs text-gray-400 group-hover:text-[#EAEB80] transition-colors">
+                            Click to upload or drag and drop
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Single file</p>
+                        </div>
+                        <input
+                          id="driver-license-upload"
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) setDriverLicensePhoto(file);
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                      {driverLicensePhoto && (
+                        <div className="flex items-center justify-between p-2 bg-[#0a0a0a] rounded-lg border border-[#2a2a2a]">
+                          <div className="flex items-center gap-2">
+                            <FileSpreadsheet className="w-4 h-4 text-[#EAEB80]" />
+                            <span className="text-sm text-gray-300">{driverLicensePhoto.name}</span>
+                            <span className="text-xs text-gray-500">
+                              ({(driverLicensePhoto.size / 1024).toFixed(2)} KB)
+                            </span>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDriverLicensePhoto(null)}
+                            className="text-gray-400 hover:text-white h-6 w-6 p-0"
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </FormItem>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">
@@ -1092,6 +1343,8 @@ export default function EmployeesPage() {
                     onClick={() => {
                       setIsAddModalOpen(false);
                       addForm.reset();
+                      setCarInsurancePhotos([]);
+                      setDriverLicensePhoto(null);
                     }}
                     className="text-gray-400 hover:text-white"
                     disabled={createMutation.isPending}

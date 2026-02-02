@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, Wand2 } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
 
 const schema = z.object({
@@ -41,6 +41,32 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+
+const sampleFormData: FormData = {
+  firstName: "Jane",
+  lastName: "Smith",
+  middleName: "Marie",
+  email: "jane.smith@example.com",
+  birthday: "1995-03-15",
+  maritalStatus: "single",
+  street: "100 Sample Lane",
+  city: "Denver",
+  state: "CO",
+  country: "USA",
+  zipCode: "80202",
+  telephone: "555-0102",
+  mobileNumber: "555-0101",
+  motherName: "Mary Smith",
+  fatherName: "Robert Smith",
+  homeContact: "555-0103",
+  homeAddress: "100 Sample Lane, Denver, CO 80202",
+  emergencyContactPerson: "Robert Smith",
+  emergencyRelationship: "Father",
+  emergencyAddress: "100 Sample Lane, Denver, CO 80202",
+  emergencyNumber: "555-0103",
+  ssnEin: "XXX-XX-1234",
+  shirtSize: "Medium",
+};
 
 export default function EmployeeFormPage() {
   const { toast } = useToast();
@@ -145,7 +171,20 @@ export default function EmployeeFormPage() {
         <Card className="bg-[#111111] border-[#2a2a2a]">
           <CardContent className="p-6 space-y-8">
             <form
-              onSubmit={handleSubmit((values) => mutation.mutate(values))}
+              onSubmit={handleSubmit((values) => {
+                if (shouldShowRecaptcha) {
+                  const token = recaptchaRef.current?.getValue()?.trim();
+                  if (!token) {
+                    toast({
+                      title: "Verification required",
+                      description: "Please complete the reCAPTCHA before submitting.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                }
+                mutation.mutate(values);
+              })}
               className="space-y-8"
             >
               <section className="space-y-4">
@@ -172,7 +211,11 @@ export default function EmployeeFormPage() {
                   </div>
                   <div className="space-y-1">
                     <Label className="text-gray-400">Birthday *</Label>
-                    <Input {...register("birthday")} type="date" className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
+                    <Input 
+                      {...register("birthday")} 
+                      type="date" 
+                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert" 
+                    />
                     {errors.birthday && <p className="text-red-400 text-xs">{errors.birthday.message}</p>}
                   </div>
                   <div className="space-y-1">
@@ -321,12 +364,29 @@ export default function EmployeeFormPage() {
               </section>
 
               {shouldShowRecaptcha && (
-                <div className="pt-2">
+                <div className="pt-2 space-y-1">
                   <ReCAPTCHA ref={recaptchaRef} sitekey={siteKey!} />
+                  <p className="text-gray-400 text-xs">
+                    Please complete the verification above before submitting.
+                  </p>
                 </div>
               )}
+              {!shouldShowRecaptcha && (
+                <p className="text-gray-500 text-xs italic">
+                  reCAPTCHA is not configured. For production, set VITE_RECAPTCHA_SITE_KEY (frontend) and RECAPTCHA_SECRET_KEY (backend).
+                </p>
+              )}
 
-              <div className="flex justify-end">
+              <div className="flex flex-row justify-between gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="border-[#2a2a2a] text-[#EAEB80] hover:bg-[#1a1a1a] hover:text-[#EAEB80]"
+                  onClick={() => form.reset(sampleFormData)}
+                >
+                  <Wand2 className="w-4 h-4 mr-2" />
+                  Auto-fill
+                </Button>
                 <Button
                   type="submit"
                   className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
