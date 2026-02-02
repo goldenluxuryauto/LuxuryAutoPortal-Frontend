@@ -92,6 +92,54 @@ export default function GraphsChartsPage() {
   const tireSize = onboarding?.tireSize || car.tireSize || "N/A";
   const oilType = onboarding?.oilType || car.oilType || "N/A";
 
+  // === Income/Expense data for charts (per-car) ===
+  const selectedYear = new Date().getFullYear().toString();
+
+  const { data: incomeExpenseResp } = useQuery<{ success: boolean; data: any }>(
+    {
+      queryKey: ["/api/income-expense", carId, selectedYear],
+      queryFn: async () => {
+        if (!carId) throw new Error("Invalid car ID");
+        const url = buildApiUrl(`/api/income-expense/${carId}/${selectedYear}`);
+        const resp = await fetch(url, { credentials: "include" });
+        if (!resp.ok) return { success: true, data: null };
+        return resp.json();
+      },
+      enabled: !!carId,
+      retry: false,
+    }
+  );
+
+  const incomeExpenseData = incomeExpenseResp?.data || null;
+
+  const getMonthValue = (arr: any[] = [], month: number, field: string) => {
+    if (!arr || arr.length === 0) return 0;
+    const m = arr.find((x: any) => Number(x.month) === Number(month));
+    return m ? Number(m[field] || 0) : 0;
+  };
+
+  const calculateCarManagementSplit = (month: number): number => {
+    const percent = incomeExpenseData?.formulaSetting?.carManagementSplitPercent || 0;
+    const mgmtPct = percent / 100;
+    const rentalIncome = getMonthValue(incomeExpenseData?.incomeExpenses || [], month, "rentalIncome");
+    return rentalIncome * mgmtPct;
+  };
+
+  const calculateCarOwnerSplit = (month: number): number => {
+    const rentalIncome = getMonthValue(incomeExpenseData?.incomeExpenses || [], month, "rentalIncome");
+    return rentalIncome - calculateCarManagementSplit(month);
+  };
+
+  const calculateCarManagementTotalExpenses = (month: number): number => {
+    return getMonthValue(incomeExpenseData?.incomeExpenses || [], month, "carManagementTotalExpenses");
+  };
+
+  const calculateCarOwnerTotalExpenses = (month: number): number => {
+    return getMonthValue(incomeExpenseData?.incomeExpenses || [], month, "carOwnerTotalExpenses");
+  };
+
+  const getMonthValueWrapper = (arr: any[], month: number, field: string) => getMonthValue(arr, month, field);
+
   return (
     <AdminLayout>
       <div className="flex flex-col w-full overflow-x-hidden">
@@ -210,7 +258,16 @@ export default function GraphsChartsPage() {
           </div>
         </div>
 
-        <GraphsChartsReportSection className="mb-6" />
+        <GraphsChartsReportSection
+          className="mb-6"
+          incomeExpenseData={incomeExpenseData}
+          selectedYear={selectedYear}
+          calculateCarManagementSplit={calculateCarManagementSplit}
+          calculateCarOwnerSplit={calculateCarOwnerSplit}
+          calculateCarManagementTotalExpenses={calculateCarManagementTotalExpenses}
+          calculateCarOwnerTotalExpenses={calculateCarOwnerTotalExpenses}
+          getMonthValue={getMonthValueWrapper}
+        />
       </div>
     </AdminLayout>
   );

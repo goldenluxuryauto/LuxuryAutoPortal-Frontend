@@ -88,10 +88,6 @@ const clientSchema = z.object({
   bankAccountNumber: z.string().optional(),
   businessName: z.string().optional(),
   ein: z.string().optional(),
-  vehicleRecall: z.string().optional(),
-  numberOfSeats: z.string().optional(),
-  numberOfDoors: z.string().optional(),
-  skiRacks: z.string().optional(),
 });
 
 type ClientFormData = z.infer<typeof clientSchema>;
@@ -258,10 +254,6 @@ export default function ClientsPage() {
       bankAccountNumber: "",
       businessName: "",
       ein: "",
-      vehicleRecall: "",
-      numberOfSeats: "",
-      numberOfDoors: "",
-      skiRacks: "",
     },
   });
 
@@ -1313,109 +1305,10 @@ export default function ClientsPage() {
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="vehicleRecall"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-400">Vehicle Recall</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                                <SelectValue placeholder="Select" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                              <SelectItem value="Yes">Yes</SelectItem>
-                              <SelectItem value="No">No</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
 
-                    <FormField
-                      control={form.control}
-                      name="skiRacks"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-400">Ski Racks</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                                <SelectValue placeholder="Select" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                              <SelectItem value="Yes">Yes</SelectItem>
-                              <SelectItem value="No">No</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="numberOfDoors"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-400">Number of Doors</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                                <SelectValue placeholder="Select" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                              <SelectItem value="2">2</SelectItem>
-                              <SelectItem value="4">4</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="numberOfSeats"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-400">Number of Seats</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
-                                <SelectValue placeholder="Select" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
-                              {[2, 4, 5, 6, 7, 8].map((n) => (
-                                <SelectItem key={n} value={String(n)}>
-                                  {n}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+
                   </div>
                 </div>
 
