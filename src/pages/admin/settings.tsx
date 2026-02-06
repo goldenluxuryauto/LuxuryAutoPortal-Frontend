@@ -13,7 +13,7 @@ import { checkPasswordStrength, getPasswordStrengthColor, getPasswordStrengthLab
 
 interface SlackChannelConfig {
   id: number;
-  formType: "lyc" | "car_onboarding" | "car_offboarding";
+  formType: "lyc" | "car_onboarding" | "car_offboarding" | "employee_onboarding" | "expense_receipt";
   channelId: string;
   channelName: string | null;
   updatedAt: string;
@@ -23,6 +23,8 @@ const formTypeLabels: Record<string, string> = {
   lyc: "Client Onboarding Form (LYC)",
   car_onboarding: "Car On-boarding",
   car_offboarding: "Car Off-boarding",
+  employee_onboarding: "Employee Onboarding",
+  expense_receipt: "Expense Receipt Forms",
 };
 
 export default function SettingsPage() {

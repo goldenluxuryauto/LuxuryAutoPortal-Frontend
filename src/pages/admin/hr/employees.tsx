@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -137,6 +138,9 @@ function statusBadge(employee: Employee) {
   if (employee.employee_status === "pending") {
     return { text: "Pending", className: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30" };
   }
+  if (employee.employee_status === "offboarded" || employee.employee_status === "separated") {
+    return { text: "Offboarded", className: "bg-gray-500/20 text-gray-300 border-gray-500/30" };
+  }
   if (employee.employee_is_active === 1) {
     return { text: "Active", className: "bg-green-500/20 text-green-300 border-green-500/30" };
   }
@@ -170,9 +174,15 @@ export default function EmployeesPage() {
   const [carInsurancePhotos, setCarInsurancePhotos] = useState<File[]>([]);
   const [driverLicensePhoto, setDriverLicensePhoto] = useState<File | null>(null);
 
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [employeeToApprove, setEmployeeToApprove] = useState<Employee | null>(null);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+
+  const [location] = useLocation();
+  const employeeIdFromUrl = useMemo(() => {
+    const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+    const id = params.get("employeeId");
+    return id ? parseInt(id, 10) : null;
+  }, [location]);
 
   const formLink = useMemo(() => `${window.location.origin}/employee-form`, []);
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
@@ -205,6 +215,14 @@ export default function EmployeesPage() {
     },
     refetchOnWindowFocus: true,
   });
+
+  // When employeeId in URL (e.g. from Slack), navigate to full view page (v1 style)
+  const [, setLocation] = useLocation();
+  useEffect(() => {
+    if (employeeIdFromUrl) {
+      setLocation(`/admin/hr/employees/view?employeeId=${employeeIdFromUrl}`);
+    }
+  }, [employeeIdFromUrl, setLocation]);
 
   const employees = data?.data || [];
   const pagination = data?.pagination;
@@ -787,6 +805,7 @@ export default function EmployeesPage() {
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="offboarded">Offboarded</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -830,6 +849,9 @@ export default function EmployeesPage() {
                     <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[240px] text-[10px] sm:text-xs hidden lg:table-cell">
                       Work Email
                     </TableHead>
+                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden lg:table-cell">
+                      Mobile
+                    </TableHead>
                     <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
                       Department
                     </TableHead>
@@ -851,7 +873,7 @@ export default function EmployeesPage() {
                     <TableRow>
                       <TableCell colSpan={9} className="text-center py-8">
                         <div className="flex flex-col items-center gap-3">
-                          <p className="text-red-400">
+                          <p className="text-red-400 text-sm break-words max-w-2xl">
                             {error instanceof Error ? error.message : "Failed to fetch employees"}
                           </p>
                           <Button
@@ -867,7 +889,7 @@ export default function EmployeesPage() {
                     </TableRow>
                   ) : employees.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8 text-gray-400">
+                      <TableCell colSpan={10} className="text-center py-8 text-gray-400">
                         No employees found. Try adjusting your search or filters.
                       </TableCell>
                     </TableRow>
@@ -900,6 +922,11 @@ export default function EmployeesPage() {
                               <span className="text-gray-600">N/A</span>
                             )}
                           </TableCell>
+                          <TableCell className="text-left text-gray-300 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
+                            {emp.employee_mobile_number || emp.employee_telephone || (
+                              <span className="text-gray-600">—</span>
+                            )}
+                          </TableCell>
                           <TableCell className="text-left text-gray-400 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
                             {emp.employee_job_pay_department_name || <span className="text-gray-600">—</span>}
                           </TableCell>
@@ -915,8 +942,8 @@ export default function EmployeesPage() {
                                 variant="ghost"
                                 size="sm"
                                 className="h-9 w-9 p-0 text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 rounded-full"
-                                onClick={() => setSelectedEmployee(emp)}
-                                title="View Details"
+                                title="View"
+                                onClick={() => setLocation(`/admin/hr/employees/view?employeeId=${emp.employee_aid}`)}
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
@@ -1603,77 +1630,6 @@ export default function EmployeesPage() {
                 )}
               </Button>
             </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* View Details modal */}
-        <Dialog open={selectedEmployee !== null} onOpenChange={(open) => !open && setSelectedEmployee(null)}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-[#EAEB80]">Employee Details</DialogTitle>
-              <DialogDescription className="text-gray-400">
-                {selectedEmployee ? `${selectedEmployee.employee_last_name}, ${selectedEmployee.employee_first_name}` : ""}
-              </DialogDescription>
-            </DialogHeader>
-
-            {selectedEmployee && (
-              <div className="space-y-6 mt-2 text-sm">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
-                    <h3 className="text-[#EAEB80] font-semibold mb-3">Basic</h3>
-                    <div className="space-y-1 text-gray-300">
-                      <div><span className="text-gray-500">Employee #:</span> {selectedEmployee.employee_number || "—"}</div>
-                      <div><span className="text-gray-500">Personal Email:</span> {selectedEmployee.employee_email || "—"}</div>
-                      <div><span className="text-gray-500">Work Email:</span> {selectedEmployee.employee_job_pay_work_email || "—"}</div>
-                      <div><span className="text-gray-500">Mobile:</span> {selectedEmployee.employee_mobile_number || "—"}</div>
-                      <div><span className="text-gray-500">SSN/EIN:</span> {selectedEmployee.employee_ssn_ein || "—"}</div>
-                      <div><span className="text-gray-500">Shirt Size:</span> {selectedEmployee.employee_shirt_size || "—"}</div>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
-                    <h3 className="text-[#EAEB80] font-semibold mb-3">Job</h3>
-                    <div className="space-y-1 text-gray-300">
-                      <div><span className="text-gray-500">Department:</span> {selectedEmployee.employee_job_pay_department_name || "—"}</div>
-                      <div><span className="text-gray-500">Job Title:</span> {selectedEmployee.employee_job_pay_job_title_name || "—"}</div>
-                      <div><span className="text-gray-500">Status:</span> {selectedEmployee.employee_status || "Approved"}</div>
-                      <div><span className="text-gray-500">Created:</span> {formatDate(selectedEmployee.employee_created)}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
-                  <h3 className="text-[#EAEB80] font-semibold mb-3">Address</h3>
-                  <div className="text-gray-300">
-                    {[selectedEmployee.employee_street, selectedEmployee.employee_city, selectedEmployee.employee_state, selectedEmployee.employee_zip_code, selectedEmployee.employee_country]
-                      .filter(Boolean)
-                      .join(", ") || "—"}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
-                    <h3 className="text-[#EAEB80] font-semibold mb-3">Family</h3>
-                    <div className="space-y-1 text-gray-300">
-                      <div><span className="text-gray-500">Mother:</span> {selectedEmployee.employee_mother_name || "—"}</div>
-                      <div><span className="text-gray-500">Father:</span> {selectedEmployee.employee_father_name || "—"}</div>
-                      <div><span className="text-gray-500">Home Contact:</span> {selectedEmployee.employee_home_contact || "—"}</div>
-                      <div><span className="text-gray-500">Home Address:</span> {selectedEmployee.employee_home_address || "—"}</div>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4">
-                    <h3 className="text-[#EAEB80] font-semibold mb-3">Emergency</h3>
-                    <div className="space-y-1 text-gray-300">
-                      <div><span className="text-gray-500">Contact:</span> {selectedEmployee.employee_emergency_contact_person || "—"}</div>
-                      <div><span className="text-gray-500">Relationship:</span> {selectedEmployee.employee_emergency_relationship || "—"}</div>
-                      <div><span className="text-gray-500">Number:</span> {selectedEmployee.employee_emergency_number || "—"}</div>
-                      <div><span className="text-gray-500">Address:</span> {selectedEmployee.employee_emergency_address || "—"}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </DialogContent>
         </Dialog>
       </div>

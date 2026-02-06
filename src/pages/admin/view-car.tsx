@@ -23,6 +23,7 @@ interface CarDetail {
   } | null;
   turoLink?: string | null;
   adminTuroLink?: string | null;
+  turoVehicleIds?: string[] | null;
   fuelType?: string | null;
   tireSize?: string | null;
   oilType?: string | null;
@@ -283,7 +284,13 @@ export default function ViewCarPage() {
                     </a>
                   </div>
                 )}
-                {!car.turoLink && !car.adminTuroLink && (
+                {car.turoVehicleIds && car.turoVehicleIds.length > 0 && (
+                  <div>
+                    <span className="text-gray-400 text-xs">Turo Vehicle IDs: </span>
+                    <span className="text-white text-sm font-mono">{car.turoVehicleIds.join(", ")}</span>
+                  </div>
+                )}
+                {!car.turoLink && !car.adminTuroLink && (!car.turoVehicleIds || car.turoVehicleIds.length === 0) && (
                   <span className="text-gray-500 text-sm">No Turo links available</span>
                 )}
               </div>

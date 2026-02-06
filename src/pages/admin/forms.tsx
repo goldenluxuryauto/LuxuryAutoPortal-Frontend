@@ -14,6 +14,9 @@ import CarOnboarding from "./CarOnboarding";
 import CarOffboarding from "./CarOffboarding";
 import CarOnboardingForm from "@/components/forms/CarOnboardingForm";
 import CarOffboardingForm from "@/components/forms/CarOffboardingForm";
+import ExpenseFormSubmission from "./forms/ExpenseFormSubmission";
+import ExpenseFormMySubmissions from "./forms/ExpenseFormMySubmissions";
+import ExpenseFormApprovalDashboard from "./forms/ExpenseFormApprovalDashboard";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +44,7 @@ import {
   XCircle,
   X,
   Upload,
+  DollarSign,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
@@ -293,6 +297,7 @@ function QRCodeSection() {
 export default function FormsPage() {
   const [expandedSections, setExpandedSections] = useState<string[]>([
     "client-onboarding",
+    "employee-forms",
   ]);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -354,6 +359,15 @@ export default function FormsPage() {
     retry: false,
   });
 
+  // Auto-expand Approval Dashboard for admins so data is visible immediately
+  useEffect(() => {
+    if (formVisibilityData?.isAdmin) {
+      setExpandedItems((prev) =>
+        prev.includes("approval-dashboard") ? prev : [...prev, "approval-dashboard"]
+      );
+    }
+  }, [formVisibilityData?.isAdmin]);
+
   const toggleSection = (sectionId: string) => {
     setExpandedSections((prev) =>
       prev.includes(sectionId)
@@ -367,7 +381,9 @@ export default function FormsPage() {
       itemId === "lyc" ||
       itemId === "contract" ||
       itemId === "car-on" ||
-      itemId === "car-off"
+      itemId === "car-off" ||
+      itemId === "expense-receipt" ||
+      itemId === "approval-dashboard"
     ) {
       setExpandedItems((prev) =>
         prev.includes(itemId)
@@ -796,7 +812,18 @@ export default function FormsPage() {
       { id: "car-off", title: "Car Off-boarding", icon: LogOut },
     ];
 
-    // If admin, show all forms
+    const expenseReceiptItem: FormItem = {
+      id: "expense-receipt",
+      title: "Income & Expense Receipt Submission",
+      icon: DollarSign,
+    };
+    const approvalDashboardItem: FormItem = {
+      id: "approval-dashboard",
+      title: "Approval Dashboard",
+      icon: FileCheck,
+    };
+
+    // Admin: Client Onboarding + Employee Forms (only Approval Dashboard, no submission form)
     if (formVisibilityData?.isAdmin) {
       return [
         {
@@ -805,34 +832,68 @@ export default function FormsPage() {
           icon: ClipboardList,
           items: allItems,
         },
+        {
+          id: "employee-forms",
+          title: "Employee Forms",
+          icon: DollarSign,
+          items: [approvalDashboardItem],
+        },
       ];
     }
 
-    // For non-admin roles, filter based on form visibility
+    // Employee (non-admin): show only Employee Forms section (expense receipt + my submissions, no Approval Dashboard)
+    if (formVisibilityData?.isEmployee) {
+      return [
+        {
+          id: "employee-forms",
+          title: "Employee Forms",
+          icon: DollarSign,
+          items: [expenseReceiptItem],
+        },
+      ];
+    }
+
+    // Client: show only Client Onboarding Form section (no Employee Forms)
+    if (formVisibilityData?.isClient) {
+      const visibleItems: FormItem[] = allItems
+        .map((item) => {
+          const formNameMap: Record<string, string> = {
+            lyc: "Client Onboarding Form LYC",
+            contract: "Contract / Agreement",
+            "car-on": "Car On-boarding",
+            "car-off": "Car Off-boarding",
+          };
+          const formName = formNameMap[item.id];
+          if (!formName) return null;
+          const visibility = formVisibilityData?.formVisibility?.[formName];
+          if (!visibility || !visibility.isVisible) return null;
+          return { ...item, externalUrl: visibility.externalUrl ?? null } as FormItem;
+        })
+        .filter((item): item is FormItem => item !== null);
+      return [
+        {
+          id: "client-onboarding",
+          title: "Client Onboarding Form",
+          icon: ClipboardList,
+          items: visibleItems,
+        },
+      ];
+    }
+
+    // Other non-admin roles (e.g. no role flags set), filter based on form visibility
     const visibleItems: FormItem[] = allItems
       .map((item) => {
-        // Map form IDs to form names in database
         const formNameMap: Record<string, string> = {
           lyc: "Client Onboarding Form LYC",
           contract: "Contract / Agreement",
           "car-on": "Car On-boarding",
           "car-off": "Car Off-boarding",
         };
-
         const formName = formNameMap[item.id];
         if (!formName) return null;
-
-        // Check visibility
         const visibility = formVisibilityData?.formVisibility?.[formName];
-        if (!visibility || !visibility.isVisible) {
-          return null; // Hide form
-        }
-
-        // Add external URL if available
-        return {
-          ...item,
-          externalUrl: visibility.externalUrl ?? null,
-        } as FormItem;
+        if (!visibility || !visibility.isVisible) return null;
+        return { ...item, externalUrl: visibility.externalUrl ?? null } as FormItem;
       })
       .filter((item): item is FormItem => item !== null);
 
@@ -842,6 +903,12 @@ export default function FormsPage() {
         title: "Client Onboarding Form",
         icon: ClipboardList,
         items: visibleItems,
+      },
+      {
+        id: "employee-forms",
+        title: "Employee Forms",
+        icon: DollarSign,
+        items: [expenseReceiptItem],
       },
     ];
   };
@@ -886,7 +953,9 @@ export default function FormsPage() {
                           (item.id === "lyc" ||
                             item.id === "contract" ||
                             item.id === "car-on" ||
-                            item.id === "car-off") &&
+                            item.id === "car-off" ||
+                            item.id === "expense-receipt" ||
+                            item.id === "approval-dashboard") &&
                           !item.comingSoon;
 
                         return (
@@ -1002,6 +1071,21 @@ export default function FormsPage() {
                                 ) : (
                                   <CarOffboardingForm />
                                 )}
+                              </div>
+                            )}
+
+                            {/* Expanded content for Income & Expense Receipt Submission (employees only) */}
+                            {isItemExpanded && item.id === "expense-receipt" && (
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                                <ExpenseFormSubmission />
+                                <ExpenseFormMySubmissions />
+                              </div>
+                            )}
+
+                            {/* Expanded content for Approval Dashboard (admins only) */}
+                            {isItemExpanded && item.id === "approval-dashboard" && (
+                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                                <ExpenseFormApprovalDashboard isAdmin={true} />
                               </div>
                             )}
 
