@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { 
-  LayoutDashboard, 
-  Users, 
-  Car, 
-  DollarSign, 
+import {
+  LayoutDashboard,
+  Users,
+  Car,
+  DollarSign,
   Calculator,
   Wrench,
   ClipboardList,
@@ -23,6 +23,7 @@ import {
   User,
   ChevronDown
 } from "lucide-react";
+import { NotificationBell } from "./NotificationBell";
 import { cn } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { AuthGuard } from "./auth-guard";
@@ -180,7 +181,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         <div className="flex items-center justify-between h-16 px-4 border-b border-[#1a1a1a]">
           <Link href="/dashboard" className="flex items-center gap-2">
             <img 
-              src="/logo.svg" 
+              src="/logo.png" 
               alt="Golden Luxury Auto" 
               className={cn(
                 "object-contain transition-all duration-300 drop-shadow-[0_0_8px_rgba(234,235,128,0.3)]",
@@ -307,6 +308,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2 sm:gap-4">
+            <NotificationBell />
             {user && (
               <span className="text-xs sm:text-sm text-gray-400 truncate max-w-[120px] sm:max-w-none">
                 {user.firstName} {user.lastName} <span className="hidden sm:inline">({user.roleName})</span>

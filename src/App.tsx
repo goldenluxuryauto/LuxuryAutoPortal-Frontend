@@ -36,6 +36,7 @@ import IncomeExpenseLogPage from "@/pages/admin/income-expense-log";
 import SettingsPage from "@/pages/admin/settings";
 import HumanResourcesPage from "@/pages/admin/hr";
 import EmployeesPage from "@/pages/admin/hr/employees";
+import EmployeeViewPage from "@/pages/admin/hr/employee-view";
 import EmployeeFormPage from "@/pages/employee-form";
 
 // Wrapper component for IncomeExpensesPage to handle Wouter route props
@@ -83,6 +84,7 @@ function Router() {
       <Route path="/admin/income-expenses" component={IncomeExpensesPageWrapper} />
       <Route path="/admin/settings" component={SettingsPage} />
       <Route path="/admin/hr" component={HumanResourcesPage} />
+      <Route path="/admin/hr/employees/view" component={EmployeeViewPage} />
       <Route path="/admin/hr/employees" component={EmployeesPage} />
       <Route path="/employee-form" component={EmployeeFormPage} />
       <Route path="/profile" component={ClientProfilePage} />
