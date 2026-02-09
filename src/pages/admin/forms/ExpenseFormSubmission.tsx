@@ -59,6 +59,14 @@ export default function ExpenseFormSubmission() {
   const employees = options.employees || [];
   const cars = options.cars || [];
   const currentEmployeeId = options.currentEmployeeId ?? null;
+  const currentUser = options.currentUser || null;
+  const isAdmin = options.isAdmin === true;
+  const isEmployee = options.isEmployee === true;
+  const isEmployeeOnly = isEmployee && !isAdmin && !!currentEmployeeId;
+  const currentEmployeeName =
+    isEmployeeOnly && currentEmployeeId
+      ? (employees.find((e: { id: number }) => e.id === currentEmployeeId)?.name ?? currentUser?.displayName ?? "")
+      : "";
   const categoryFields: Record<string, { value: string; label: string }[]> =
     options.categoryFields || {};
   const fieldOptions = categoryFields[formData.category] || [];
@@ -67,12 +75,15 @@ export default function ExpenseFormSubmission() {
     setFormData((prev) => ({ ...prev, field: "" }));
   }, [formData.category]);
 
-  const hasAutoSelectedEmployee = useRef(false);
+  // Default Employee Name to current user/account owner (client requirement)
+  // Use optionsData as dep only (avoid employees - new [] ref each render when loading)
   useEffect(() => {
-    if (currentEmployeeId && !hasAutoSelectedEmployee.current && optionsData) {
-      hasAutoSelectedEmployee.current = true;
-      setFormData((prev) => ({ ...prev, employeeId: String(currentEmployeeId) }));
-    }
+    if (!currentEmployeeId || !optionsData?.data) return;
+    const list = optionsData.data.employees || [];
+    const id = String(currentEmployeeId);
+    const exists = list.some((e: { id: number }) => String(e.id) === id);
+    if (!exists) return;
+    setFormData((prev) => (prev.employeeId === id ? prev : { ...prev, employeeId: id }));
   }, [currentEmployeeId, optionsData]);
 
   const submitMutation = useMutation({
@@ -126,7 +137,7 @@ export default function ExpenseFormSubmission() {
       });
       setFormData({
         submissionDate: new Date().toISOString().slice(0, 10),
-        employeeId: "",
+        employeeId: isEmployeeOnly && currentEmployeeId ? String(currentEmployeeId) : "",
         carId: "",
         year: new Date().getFullYear().toString(),
         month: (new Date().getMonth() + 1).toString(),
@@ -207,21 +218,36 @@ export default function ExpenseFormSubmission() {
             </div>
             <div>
               <Label className="text-gray-400">Employee Name *</Label>
-              <Select
-                value={formData.employeeId}
-                onValueChange={(v) => setFormData((prev) => ({ ...prev, employeeId: v }))}
-              >
-                <SelectTrigger className="bg-[#111111] border-[#2a2a2a] text-white mt-1">
-                  <SelectValue placeholder="Select employee" />
-                </SelectTrigger>
-                <SelectContent>
-                  {employees.map((emp: { id: number; name: string }) => (
-                    <SelectItem key={emp.id} value={String(emp.id)}>
-                      {emp.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {isEmployeeOnly ? (
+                <Input
+                  readOnly
+                  value={currentEmployeeName}
+                  className="bg-[#111111] border-[#2a2a2a] text-white mt-1 cursor-default"
+                  title="Your name (pre-filled for employee accounts)"
+                />
+              ) : (
+                <Select
+                  value={formData.employeeId}
+                  onValueChange={(v) => setFormData((prev) => ({ ...prev, employeeId: v }))}
+                >
+                  <SelectTrigger className="bg-[#111111] border-[#2a2a2a] text-white mt-1">
+                    <SelectValue
+                      placeholder={
+                        currentUser?.displayName
+                          ? `Select employee (defaults to ${currentUser.displayName})`
+                          : "Select employee"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employees.map((emp: { id: number; name: string }) => (
+                      <SelectItem key={emp.id} value={String(emp.id)}>
+                        {emp.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
 
@@ -235,9 +261,9 @@ export default function ExpenseFormSubmission() {
                 <SelectValue placeholder="Select car (Make Model Year - Plate - VIN)" />
               </SelectTrigger>
               <SelectContent>
-                {cars.map((car: { id: number; displayName: string }) => (
+                {cars.map((car: { id: number; name: string; displayName?: string }) => (
                   <SelectItem key={car.id} value={String(car.id)}>
-                    {car.displayName}
+                    {car.displayName ?? car.name}
                   </SelectItem>
                 ))}
               </SelectContent>

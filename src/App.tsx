@@ -29,6 +29,8 @@ import MaintenancePage from "@/pages/admin/maintenance";
 import RecordsPage from "@/pages/admin/records";
 import ViewRecordFilesPage from "@/pages/admin/view-record-files";
 import PaymentsPage from "@/pages/admin/payments";
+import PaymentsMainPage from "@/pages/admin/payments-main";
+import PaymentStatusPage from "@/pages/admin/payment-status";
 import TotalsPage from "@/pages/admin/totals";
 import IncomeExpensesPage from "@/pages/admin/income-expenses/index";
 import CarIncomeExpensePage from "@/pages/admin/car-income-expense";
@@ -77,6 +79,8 @@ function Router() {
       <Route path="/admin/totals/all" component={TotalsPage} />
       <Route path="/admin/cars/:id/records" component={RecordsPage} />
       <Route path="/admin/cars/:carId/records/:recordId/files" component={ViewRecordFilesPage} />
+      <Route path="/admin/payments" component={PaymentsMainPage} />
+      <Route path="/admin/payment-status" component={PaymentStatusPage} />
       <Route path="/admin/cars/:id/payments" component={PaymentsPage} />
       <Route path="/admin/cars/:id/income-expense/log" component={IncomeExpenseLogPage} />
       <Route path="/admin/cars/:id/income-expense" component={CarIncomeExpensePage} />

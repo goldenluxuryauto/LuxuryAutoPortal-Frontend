@@ -48,7 +48,16 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/clients", label: "Clients", icon: Users, roles: ["admin"] },
   { href: "/cars", label: "Cars", icon: Car },
   { href: "/admin/income-expenses", label: "Income and Expenses", icon: DollarSign, roles: ["admin"] },
-  { href: "/admin/payments", label: "Client Payments", icon: CreditCard, roles: ["admin"] },
+  {
+    href: "/admin/payments",
+    label: "Client Payments",
+    icon: CreditCard,
+    roles: ["admin"],
+    children: [
+      { href: "/admin/payments", label: "Payments", icon: CreditCard, roles: ["admin"] },
+      { href: "/admin/payment-status", label: "Status", icon: ClipboardList, roles: ["admin"] },
+    ],
+  },
   { href: "/admin/totals", label: "Totals", icon: Calculator, roles: ["admin"] },
   { href: "/admin/maintenance", label: "Car Maintenance", icon: Wrench, roles: ["admin"] },
   { href: "/admin/forms", label: "Forms", icon: ClipboardList },
