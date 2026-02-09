@@ -2542,13 +2542,14 @@ export default function CarDetailPage() {
                     disabled={uploadingPhotos}
                     className="hidden"
                     id="photo-upload"
+                    title="Select one or more images (JPEG, PNG, GIF, WebP - max 10MB each)"
                   />
                   <Button
                     asChild
                     className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
                     disabled={uploadingPhotos}
                   >
-                    <label htmlFor="photo-upload" className="cursor-pointer">
+                    <label htmlFor="photo-upload" className="cursor-pointer" title="Select multiple images to upload at once">
                       {uploadingPhotos ? (
                         <>
                           Uploading...
@@ -2732,8 +2733,8 @@ export default function CarDetailPage() {
             ) : (
               <div className="flex items-center justify-center py-16">
                 <p className="text-gray-400 text-center">
-                  No photos uploaded. {isAdmin && "Upload photos to get started."}
-              </p>
+                  No photos uploaded. {isAdmin && "Upload one or multiple photos (up to 20) to get started."}
+                </p>
               </div>
             )}
           </CardContent>
