@@ -327,6 +327,21 @@ export const getQueryFn = <T,>({ on401: unauthorizedBehavior }: {
       }
     };
 
+/**
+ * Retry failed queries only for transient network errors (e.g. ERR_NETWORK_CHANGED).
+ * Do not retry on 4xx/5xx or other application errors.
+ */
+function shouldRetryOnError(failureCount: number, error: unknown): boolean {
+  if (failureCount >= 3) return false;
+  // Retry on network errors: Failed to fetch, ERR_NETWORK_CHANGED, connection reset, etc.
+  if (error instanceof TypeError && error.message === "Failed to fetch") return true;
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase();
+    if (msg.includes("network") || msg.includes("connection") || msg.includes("load failed")) return true;
+  }
+  return false;
+}
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -334,7 +349,8 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
-      retry: false,
+      retry: shouldRetryOnError,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
       // Don't throw errors by default - let components handle them
       throwOnError: false,
       // Add timeout to prevent queries from hanging indefinitely
