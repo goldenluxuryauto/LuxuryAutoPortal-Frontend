@@ -26,6 +26,63 @@ export function FileViewerModal({
 }: FileViewerModalProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [imageObjectUrl, setImageObjectUrl] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(false);
+
+  const fileContentUrl = file
+    ? buildApiUrl(`/api/record-file-views/${file.recordsFileViewAid}/content`)
+    : "";
+
+  // Load image via fetch with credentials so auth cookies are sent; display via blob URL
+  useEffect(() => {
+    if (!file || !isOpen) {
+      setImageObjectUrl(null);
+      setImageError(false);
+      return;
+    }
+
+    const fileExtension = file.recordsFileViewName.split(".").pop()?.toLowerCase() ?? "";
+    const isImage = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(fileExtension);
+    if (!isImage) {
+      setImageObjectUrl(null);
+      return;
+    }
+
+    let revoked = false;
+    setImageError(false);
+    setImageLoading(true);
+
+    const loadImage = async () => {
+      try {
+        const response = await fetch(fileContentUrl, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to load image: ${response.status}`);
+        }
+        const blob = await response.blob();
+        if (revoked) return;
+        const objectUrl = URL.createObjectURL(blob);
+        setImageObjectUrl(objectUrl);
+      } catch (err) {
+        if (!revoked) setImageError(true);
+        console.error("FileViewerModal: failed to load image", err);
+      } finally {
+        if (!revoked) setImageLoading(false);
+      }
+    };
+
+    loadImage();
+
+    return () => {
+      revoked = true;
+      setImageObjectUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+    };
+  }, [file?.recordsFileViewAid, isOpen, fileContentUrl]);
 
   // Sync fullscreen state with browser events
   useEffect(() => {
@@ -33,25 +90,24 @@ export function FileViewerModal({
       setIsFullscreen(!!document.fullscreenElement);
     };
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("MSFullscreenChange", handleFullscreenChange);
 
     return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("mozfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
     };
   }, []);
 
   if (!file) return null;
 
-  const fileContentUrl = buildApiUrl(`/api/record-file-views/${file.recordsFileViewAid}/content`);
-  const fileExtension = file.recordsFileViewName.split('.').pop()?.toLowerCase() || '';
-  const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(fileExtension);
-  const isPdf = fileExtension === 'pdf';
+  const fileExtension = file.recordsFileViewName.split(".").pop()?.toLowerCase() ?? "";
+  const isImage = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(fileExtension);
+  const isPdf = fileExtension === "pdf";
 
   const handleDownload = () => {
     const link = document.createElement('a');
@@ -145,26 +201,33 @@ export function FileViewerModal({
                     variant="outline"
                     onClick={() => {
                       setImageError(false);
-                      // Force reload by adding timestamp
-                      const img = document.getElementById('file-viewer-image') as HTMLImageElement;
-                      if (img) {
-                        img.src = `${fileContentUrl}?t=${Date.now()}`;
-                      }
+                      setImageObjectUrl(null);
+                      setImageLoading(true);
+                      fetch(fileContentUrl, { method: "GET", credentials: "include" })
+                        .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+                        .then((blob) => {
+                          const objectUrl = URL.createObjectURL(blob);
+                          setImageObjectUrl(objectUrl);
+                        })
+                        .catch(() => setImageError(true))
+                        .finally(() => setImageLoading(false));
                     }}
                     className="border-[#2a2a2a] text-gray-300 hover:bg-[#2a2a2a]"
                   >
                     Retry
                   </Button>
                 </div>
-              ) : (
+              ) : imageLoading ? (
+                <div className="text-gray-400">Loading image...</div>
+              ) : imageObjectUrl ? (
                 <img
                   id="file-viewer-image"
-                  src={fileContentUrl}
+                  src={imageObjectUrl}
                   alt={file.recordsFileViewName}
                   className="max-w-full max-h-full object-contain"
                   onError={() => setImageError(true)}
                 />
-              )}
+              ) : null}
             </div>
           ) : isPdf ? (
             <div className="w-full h-full">
