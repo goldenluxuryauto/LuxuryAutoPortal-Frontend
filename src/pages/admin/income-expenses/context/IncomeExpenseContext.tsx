@@ -21,6 +21,7 @@ interface IncomeExpenseContextType {
   isSavingSkiRacksOwner: boolean;
   year: string;
   carId: number;
+  isAllCars: boolean;
   // Dynamic subcategories
   dynamicSubcategories: {
     directDelivery: any[];
@@ -171,10 +172,12 @@ export function IncomeExpenseProvider({
   children,
   carId,
   year,
+  isAllCars = false,
 }: {
   children: ReactNode;
   carId: number;
   year: string;
+  isAllCars?: boolean;
 }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -212,21 +215,25 @@ export function IncomeExpenseProvider({
     reimbursedBills: [] as any[],
   });
 
-  // Fetch income/expense data
+  // Fetch income/expense data (aggregated for all cars, or per car)
   const { data: incomeExpenseData, isLoading } = useQuery<{
     success: boolean;
     data: IncomeExpenseData;
   }>({
-    queryKey: ["/api/income-expense", carId, year],
+    queryKey: isAllCars ? ["/api/income-expense/all-cars", year] : ["/api/income-expense", carId, year],
     queryFn: async () => {
-      const response = await fetch(
-        buildApiUrl(`/api/income-expense/${carId}/${year}`),
-        { credentials: "include" }
-      );
+      const url = isAllCars 
+        ? buildApiUrl(`/api/income-expense/all-cars/${year}`)
+        : buildApiUrl(`/api/income-expense/${carId}/${year}`);
+      const response = await fetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch income/expense data");
       return response.json();
     },
     retry: false,
+    // For "All Cars" view, always fetch fresh data (no caching)
+    staleTime: isAllCars ? 0 : 1000 * 60 * 5, // 0 for all cars, 5 minutes for individual cars
+    refetchOnMount: isAllCars ? "always" : true,
+    refetchOnWindowFocus: isAllCars,
   });
 
   const data = incomeExpenseData?.data || getEmptyData();
@@ -242,10 +249,10 @@ export function IncomeExpenseProvider({
     
     const promises = categories.map(async (categoryType) => {
       try {
-        const response = await fetch(
-          buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${year}/${categoryType}`),
-          { credentials: "include" }
-        );
+        const url = isAllCars
+          ? buildApiUrl(`/api/income-expense/dynamic-subcategories/all-cars/${year}/${categoryType}`)
+          : buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${year}/${categoryType}`);
+        const response = await fetch(url, { credentials: "include" });
         if (response.ok) {
           const result = await response.json();
           return { categoryType, data: result.data || [] };
@@ -272,12 +279,12 @@ export function IncomeExpenseProvider({
     setDynamicSubcategories(newSubcategories);
   };
 
-  // Fetch dynamic subcategories when carId or year changes
+  // Fetch dynamic subcategories when carId or year changes (including "All Cars" mode)
   React.useEffect(() => {
-    if (carId && year) {
+    if (year && (isAllCars || carId)) {
       fetchDynamicSubcategories();
     }
-  }, [carId, year]);
+  }, [carId, year, isAllCars]);
 
   const refreshDynamicSubcategories = async () => {
     await fetchDynamicSubcategories();
@@ -798,6 +805,7 @@ export function IncomeExpenseProvider({
         isSavingSkiRacksOwner,
         year,
         carId,
+        isAllCars,
         dynamicSubcategories,
         refreshDynamicSubcategories,
         addDynamicSubcategory,

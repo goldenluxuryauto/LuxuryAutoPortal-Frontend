@@ -23,11 +23,12 @@ interface IncomeExpenseTableProps {
   year: string;
   isFromRoute?: boolean; // True when accessed from individual car page (View Car → Income and Expense)
   showParkingAirportQB?: boolean; // True to show PARKING AIRPORT AVERAGE PER TRIP - QB section
+  isAllCarsView?: boolean; // True when "All Cars" is selected
 }
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export default function IncomeExpenseTable({ year, isFromRoute = false, showParkingAirportQB = false }: IncomeExpenseTableProps) {
+export default function IncomeExpenseTable({ year, isFromRoute = false, showParkingAirportQB = false, isAllCarsView = false }: IncomeExpenseTableProps) {
   const [location] = useLocation();
   const isReadOnly = location.startsWith("/admin/income-expenses");
   
@@ -45,6 +46,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
     deleteDynamicSubcategory,
     updateDynamicSubcategoryValue,
     carId,
+    isAllCars,
   } = useIncomeExpense();
 
   // Fetch previous year December data for January calculation
@@ -53,12 +55,12 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
     success: boolean;
     data: IncomeExpenseData;
   }>({
-    queryKey: ["/api/income-expense", carId, previousYear],
+    queryKey: isAllCars ? ["/api/income-expense/all-cars", previousYear] : ["/api/income-expense", carId, previousYear],
     queryFn: async () => {
-      const response = await fetch(
-        buildApiUrl(`/api/income-expense/${carId}/${previousYear}`),
-        { credentials: "include" }
-      );
+      const url = isAllCars
+        ? buildApiUrl(`/api/income-expense/all-cars/${previousYear}`)
+        : buildApiUrl(`/api/income-expense/${carId}/${previousYear}`);
+      const response = await fetch(url, { credentials: "include" });
       if (!response.ok) {
         // If previous year data doesn't exist, return empty data
         return { success: true, data: null as any };
@@ -66,7 +68,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
       return response.json();
     },
     retry: false,
-    enabled: !!carId && !!year, // Only fetch if we have carId and year
+    enabled: (isAllCars || !!carId) && !!year, // Fetch if we have carId (or isAllCars) and year
   });
 
   const prevYearDecData = previousYearData?.data;
@@ -78,9 +80,11 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
     parkingFeeLabor: any[];
     reimbursedBills: any[];
   }>({
-    queryKey: ["/api/income-expense/dynamic-subcategories", carId, previousYear],
+    queryKey: isAllCars 
+      ? ["/api/income-expense/dynamic-subcategories/all-cars", previousYear]
+      : ["/api/income-expense/dynamic-subcategories", carId, previousYear],
     queryFn: async () => {
-      if (!carId || !previousYear) return { directDelivery: [], cogs: [], parkingFeeLabor: [], reimbursedBills: [] };
+      if ((!isAllCars && !carId) || !previousYear) return { directDelivery: [], cogs: [], parkingFeeLabor: [], reimbursedBills: [] };
       
       const categories: Array<'directDelivery' | 'cogs' | 'parkingFeeLabor' | 'reimbursedBills'> = [
         'directDelivery',
@@ -91,10 +95,10 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
       
       const promises = categories.map(async (categoryType) => {
         try {
-          const response = await fetch(
-            buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${previousYear}/${categoryType}`),
-            { credentials: "include" }
-          );
+          const url = isAllCars
+            ? buildApiUrl(`/api/income-expense/dynamic-subcategories/all-cars/${previousYear}/${categoryType}`)
+            : buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${previousYear}/${categoryType}`);
+          const response = await fetch(url, { credentials: "include" });
           if (response.ok) {
             const result = await response.json();
             return { categoryType, data: result.data || [] };
@@ -121,7 +125,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
       return subcategories;
     },
     retry: false,
-    enabled: !!carId && !!year && !!previousYearData?.data, // Only fetch if we have previous year data
+    enabled: (isAllCars || !!carId) && !!year && !!previousYearData?.data, // Only fetch if we have previous year data
   });
   
   const [addSubcategoryModal, setAddSubcategoryModal] = useState<{
@@ -145,6 +149,9 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
     cogs: true,
     parkingFeeLabor: true,
     reimbursedBills: true,
+    officeSupport: false,
+    incomeExpenseSummary: false,
+    ebitda: false,
     history: true,
     rentalValue: true,
     parkingAverageGLA: false,
@@ -270,6 +277,46 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
       return sum + (monthValue?.value || 0);
     }, 0);
     return fixedTotal + dynamicTotal;
+  };
+
+  // Helper function to calculate total office support expenses for a month
+  const getTotalOfficeSupportForMonth = (month: number): number => {
+    if (!data.officeSupport || !Array.isArray(data.officeSupport)) return 0;
+    return (
+      getMonthValue(data.officeSupport, month, "accountingProfessionalFees") +
+      getMonthValue(data.officeSupport, month, "advertizing") +
+      getMonthValue(data.officeSupport, month, "bankCharges") +
+      getMonthValue(data.officeSupport, month, "detailMobile") +
+      getMonthValue(data.officeSupport, month, "charitableContributions") +
+      getMonthValue(data.officeSupport, month, "computerInternet") +
+      getMonthValue(data.officeSupport, month, "deliveryPostageFreight") +
+      getMonthValue(data.officeSupport, month, "detailShopEquipment") +
+      getMonthValue(data.officeSupport, month, "duesSubscription") +
+      getMonthValue(data.officeSupport, month, "generalAdministrative") +
+      getMonthValue(data.officeSupport, month, "healthWellness") +
+      getMonthValue(data.officeSupport, month, "laborSales") +
+      getMonthValue(data.officeSupport, month, "laborSoftware") +
+      getMonthValue(data.officeSupport, month, "legalProfessional") +
+      getMonthValue(data.officeSupport, month, "marketing") +
+      getMonthValue(data.officeSupport, month, "mealsEntertainment") +
+      getMonthValue(data.officeSupport, month, "officeExpense") +
+      getMonthValue(data.officeSupport, month, "officeRent") +
+      getMonthValue(data.officeSupport, month, "outsideStaffContractors") +
+      getMonthValue(data.officeSupport, month, "parkNJetBooth") +
+      getMonthValue(data.officeSupport, month, "printing") +
+      getMonthValue(data.officeSupport, month, "referral") +
+      getMonthValue(data.officeSupport, month, "repairsMaintenance") +
+      getMonthValue(data.officeSupport, month, "salesTax") +
+      getMonthValue(data.officeSupport, month, "securityCameras") +
+      getMonthValue(data.officeSupport, month, "shippingFreightDelivery") +
+      getMonthValue(data.officeSupport, month, "suppliesMaterials") +
+      getMonthValue(data.officeSupport, month, "taxesLicense") +
+      getMonthValue(data.officeSupport, month, "telephone") +
+      getMonthValue(data.officeSupport, month, "travel") +
+      getMonthValue(data.officeSupport, month, "depreciationExpense") +
+      getMonthValue(data.officeSupport, month, "vehicleDepreciationExpense") +
+      getMonthValue(data.officeSupport, month, "vehicleLoanInterestExpense")
+    );
   };
 
   // Helper to get value from previous year data by month
@@ -1020,6 +1067,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               title="CAR MANAGEMENT OWNER SPLIT"
               isExpanded={expandedSections.managementOwner}
               onToggle={() => toggleSection("managementOwner")}
+              isAllCarsView={isAllCarsView}
             >
               {/* Car Management Split - Shows calculated amount + percentage */}
               <CategoryRow
@@ -1066,6 +1114,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               title="INCOME & EXPENSES"
               isExpanded={expandedSections.incomeExpenses}
               onToggle={() => toggleSection("incomeExpenses")}
+              isAllCarsView={isAllCarsView}
             >
               <CategoryRow
                 label="Rental Income"
@@ -1191,6 +1240,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               title="OPERATING EXPENSE (Direct Delivery)"
               isExpanded={expandedSections.directDelivery}
               onToggle={() => toggleSection("directDelivery")}
+              isAllCarsView={isAllCarsView}
             >
               <CategoryRow
                 label="Labor - Cleaning"
@@ -1285,6 +1335,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               title="OPERATING EXPENSE (COGS - Per Vehicle)"
               isExpanded={expandedSections.cogs}
               onToggle={() => toggleSection("cogs")}
+              isAllCarsView={isAllCarsView}
             >
               <CategoryRow
                 label="Auto Body Shop / Wreck"
@@ -1512,6 +1563,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               title="Parking Fee & Labor Cleaning"
               isExpanded={expandedSections.parkingFeeLabor}
               onToggle={() => toggleSection("parkingFeeLabor")}
+              isAllCarsView={isAllCarsView}
             >
               <CategoryRow
                 label="GLA Parking Fee"
@@ -1585,6 +1637,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               title="REIMBURSE AND NON-REIMBURSE BILLS"
               isExpanded={expandedSections.reimbursedBills}
               onToggle={() => toggleSection("reimbursedBills")}
+              isAllCarsView={isAllCarsView}
             >
               <CategoryRow
                 label="Electric - Reimbursed"
@@ -1695,11 +1748,400 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               />
             </CategorySection>
 
+            {/* OPERATING EXPENSES (OFFICE SUPPORT) - Only show when "All Cars" is selected */}
+            {isAllCarsView && (
+              <CategorySection
+                title="OPERATING EXPENSES (OFFICE SUPPORT)"
+                isExpanded={expandedSections.officeSupport}
+                onToggle={() => toggleSection("officeSupport")}
+                isAllCarsView={isAllCarsView}
+              >
+                <CategoryRow
+                  label="Accounting & Professional Fees"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "accountingProfessionalFees"))}
+                  category="officeSupport"
+                  field="accountingProfessionalFees"
+                />
+                <CategoryRow
+                  label="Advertizing"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "advertizing"))}
+                  category="officeSupport"
+                  field="advertizing"
+                />
+                <CategoryRow
+                  label="Bank Charges"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "bankCharges"))}
+                  category="officeSupport"
+                  field="bankCharges"
+                />
+                <CategoryRow
+                  label="Detail Mobile"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "detailMobile"))}
+                  category="officeSupport"
+                  field="detailMobile"
+                />
+                <CategoryRow
+                  label="Charitable Contributions"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "charitableContributions"))}
+                  category="officeSupport"
+                  field="charitableContributions"
+                />
+                <CategoryRow
+                  label="Computer & Internet"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "computerInternet"))}
+                  category="officeSupport"
+                  field="computerInternet"
+                />
+                <CategoryRow
+                  label="Delivery, Postage & Freight"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "deliveryPostageFreight"))}
+                  category="officeSupport"
+                  field="deliveryPostageFreight"
+                />
+                <CategoryRow
+                  label="Detail Shop Equipment"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "detailShopEquipment"))}
+                  category="officeSupport"
+                  field="detailShopEquipment"
+                />
+                <CategoryRow
+                  label="Dues & Subscription"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "duesSubscription"))}
+                  category="officeSupport"
+                  field="duesSubscription"
+                />
+                <CategoryRow
+                  label="General and administrative (G&A)"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "generalAdministrative"))}
+                  category="officeSupport"
+                  field="generalAdministrative"
+                />
+                <CategoryRow
+                  label="Health & Wellness"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "healthWellness"))}
+                  category="officeSupport"
+                  field="healthWellness"
+                />
+                <CategoryRow
+                  label="Labor - Human Resources"
+                  values={MONTHS.map(() => 0)}
+                  isEditable={false}
+                />
+                <CategoryRow
+                  label="Labor - Marketing"
+                  values={MONTHS.map(() => 0)}
+                  isEditable={false}
+                />
+                <CategoryRow
+                  label="Office Rent"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "officeRent"))}
+                  category="officeSupport"
+                  field="officeRent"
+                />
+                <CategoryRow
+                  label="Outside & Staff Contractors"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "outsideStaffContractors"))}
+                  category="officeSupport"
+                  field="outsideStaffContractors"
+                />
+                <CategoryRow
+                  label="Park n Jet Booth"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "parkNJetBooth"))}
+                  category="officeSupport"
+                  field="parkNJetBooth"
+                />
+                <CategoryRow
+                  label="Printing"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "printing"))}
+                  category="officeSupport"
+                  field="printing"
+                />
+                <CategoryRow
+                  label="Referral"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "referral"))}
+                  category="officeSupport"
+                  field="referral"
+                />
+                <CategoryRow
+                  label="Repairs & Maintenance"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "repairsMaintenance"))}
+                  category="officeSupport"
+                  field="repairsMaintenance"
+                />
+                <CategoryRow
+                  label="Sales Tax"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "salesTax"))}
+                  category="officeSupport"
+                  field="salesTax"
+                />
+                <CategoryRow
+                  label="Security Cameras"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "securityCameras"))}
+                  category="officeSupport"
+                  field="securityCameras"
+                />
+                <CategoryRow
+                  label="Supplies & Materials"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "suppliesMaterials"))}
+                  category="officeSupport"
+                  field="suppliesMaterials"
+                />
+                <CategoryRow
+                  label="Taxes and License"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "taxesLicense"))}
+                  category="officeSupport"
+                  field="taxesLicense"
+                />
+                <CategoryRow
+                  label="Telephone"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "telephone"))}
+                  category="officeSupport"
+                  field="telephone"
+                />
+                <CategoryRow
+                  label="Travel"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "travel"))}
+                  category="officeSupport"
+                  field="travel"
+                />
+                <CategoryRow
+                  label="Labor Software"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "laborSoftware"))}
+                  category="officeSupport"
+                  field="laborSoftware"
+                />
+                <CategoryRow
+                  label="Legal & Professional"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "legalProfessional"))}
+                  category="officeSupport"
+                  field="legalProfessional"
+                />
+                <CategoryRow
+                  label="Marketing"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "marketing"))}
+                  category="officeSupport"
+                  field="marketing"
+                />
+                <CategoryRow
+                  label="Meals & Entertainment"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "mealsEntertainment"))}
+                  category="officeSupport"
+                  field="mealsEntertainment"
+                />
+                <CategoryRow
+                  label="Office Expense"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "officeExpense"))}
+                  category="officeSupport"
+                  field="officeExpense"
+                />
+                <CategoryRow
+                  label="Labor Sales"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "laborSales"))}
+                  category="officeSupport"
+                  field="laborSales"
+                />
+                <CategoryRow
+                  label="Totals OPERATING EXPENSE (Office Support)"
+                  values={MONTHS.map((_, i) => getTotalOfficeSupportForMonth(i + 1))}
+                  isEditable={false}
+                  isTotal
+                />
+              </CategorySection>
+            )}
+
+            {/* INCOME & EXPENSES SUMMARY - Always shown */}
+            <CategorySection
+              title="INCOME & EXPENSES SUMMARY"
+              isExpanded={expandedSections.incomeExpenseSummary}
+              onToggle={() => toggleSection("incomeExpenseSummary")}
+              isAllCarsView={isAllCarsView}
+            >
+              <CategoryRow
+                label="Total Rental Income"
+                values={MONTHS.map((_, i) => getMonthValue(data.incomeExpenses, i + 1, "rentalIncome"))}
+                isEditable={false}
+              />
+              <CategoryRow
+                label="Total Car Management Income"
+                values={MONTHS.map((_, i) => {
+                  const monthNum = i + 1;
+                  // Car Management Split - Office Support (only subtract office support when all cars)
+                  const carManagementSplit = calculateCarManagementSplit(monthNum);
+                  const officeSupportTotal = isAllCarsView ? getTotalOfficeSupportForMonth(monthNum) : 0;
+                  return carManagementSplit - officeSupportTotal;
+                })}
+                isEditable={false}
+              />
+              <CategoryRow
+                label="Total Car Owner Income"
+                values={MONTHS.map((_, i) => {
+                  const monthNum = i + 1;
+                  // Car Owner Split
+                  return calculateCarOwnerSplit(monthNum);
+                })}
+                isEditable={false}
+              />
+              <CategoryRow
+                label="Total Car Management Car Expenses"
+                values={MONTHS.map((_, i) => {
+                  const monthNum = i + 1;
+                  return getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses");
+                })}
+                isEditable={false}
+              />
+              <CategoryRow
+                label="Total Car Owner Car Expenses"
+                values={MONTHS.map((_, i) => {
+                  const monthNum = i + 1;
+                  return getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses");
+                })}
+                isEditable={false}
+              />
+              {isAllCarsView && (
+                <CategoryRow
+                  label="Total Car Management Office Support Expenses"
+                  values={MONTHS.map((_, i) => getTotalOfficeSupportForMonth(i + 1))}
+                  isEditable={false}
+                />
+              )}
+              <CategoryRow
+                label="Total Expenses"
+                values={MONTHS.map((_, i) => {
+                  const monthNum = i + 1;
+                  // Total Expenses = Car Management Total Expenses + Car Owner Total Expenses + Office Support (when all cars)
+                  const carManagementExpenses = getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses");
+                  const carOwnerExpenses = getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses");
+                  const officeSupportTotal = isAllCarsView ? getTotalOfficeSupportForMonth(monthNum) : 0;
+                  return carManagementExpenses + carOwnerExpenses + officeSupportTotal;
+                })}
+                isEditable={false}
+                isTotal
+              />
+            </CategorySection>
+
+            {/* EBITDA - Only show when "All Cars" is selected */}
+            {isAllCarsView && (
+              <CategorySection
+                title="EBITDA"
+                isExpanded={expandedSections.ebitda}
+                onToggle={() => toggleSection("ebitda")}
+                isAllCarsView={isAllCarsView}
+              >
+                <CategoryRow
+                  label="Total Rental Income"
+                  values={MONTHS.map((_, i) => getMonthValue(data.incomeExpenses, i + 1, "rentalIncome"))}
+                  isEditable={false}
+                />
+                <CategoryRow
+                  label="Total Expenses"
+                  values={MONTHS.map((_, i) => {
+                    const monthNum = i + 1;
+                    // Total Expenses = Car Management Total Expenses + Car Owner Total Expenses + Office Support
+                    const carManagementExpenses = getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses");
+                    const carOwnerExpenses = getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses");
+                    const officeSupportTotal = getTotalOfficeSupportForMonth(monthNum);
+                    return carManagementExpenses + carOwnerExpenses + officeSupportTotal;
+                  })}
+                  isEditable={false}
+                />
+                <CategoryRow
+                  label="Interest"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "vehicleLoanInterestExpense"))}
+                  category="officeSupport"
+                  field="vehicleLoanInterestExpense"
+                  isEditable={true}
+                />
+                <CategoryRow
+                  label="Taxes"
+                  values={MONTHS.map((_, i) => getMonthValue(data.officeSupport, i + 1, "taxesLicense"))}
+                  category="officeSupport"
+                  field="taxesLicense"
+                  isEditable={true}
+                />
+                <CategoryRow
+                  label="Depreciation"
+                  values={MONTHS.map((_, i) => {
+                    const monthNum = i + 1;
+                    return getMonthValue(data.officeSupport, monthNum, "depreciationExpense") + 
+                           getMonthValue(data.officeSupport, monthNum, "vehicleDepreciationExpense");
+                  })}
+                  isEditable={false}
+                />
+                <CategoryRow
+                  label="Amortization"
+                  values={MONTHS.map(() => 0)}
+                  isEditable={false}
+                />
+                <CategoryRow
+                  label="Net Income"
+                  values={MONTHS.map((_, i) => {
+                    const monthNum = i + 1;
+                    // Net Income = Total Rental Income - Total Expenses
+                    const rentalIncome = getMonthValue(data.incomeExpenses, monthNum, "rentalIncome");
+                    const carManagementExpenses = getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses");
+                    const carOwnerExpenses = getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses");
+                    const officeSupportTotal = getTotalOfficeSupportForMonth(monthNum);
+                    const totalExpenses = carManagementExpenses + carOwnerExpenses + officeSupportTotal;
+                    return rentalIncome - totalExpenses;
+                  })}
+                  isEditable={false}
+                />
+                <CategoryRow
+                  label="EBITDA"
+                  values={MONTHS.map((_, i) => {
+                    const monthNum = i + 1;
+                    // EBITDA = Net Income + Interest + Taxes + Depreciation + Amortization
+                    const rentalIncome = getMonthValue(data.incomeExpenses, monthNum, "rentalIncome");
+                    const carManagementExpenses = getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses");
+                    const carOwnerExpenses = getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses");
+                    const officeSupportTotal = getTotalOfficeSupportForMonth(monthNum);
+                    const totalExpenses = carManagementExpenses + carOwnerExpenses + officeSupportTotal;
+                    const netIncome = rentalIncome - totalExpenses;
+                    
+                    const interest = getMonthValue(data.officeSupport, monthNum, "vehicleLoanInterestExpense");
+                    const taxes = getMonthValue(data.officeSupport, monthNum, "taxesLicense");
+                    const depreciation = getMonthValue(data.officeSupport, monthNum, "depreciationExpense") + 
+                                        getMonthValue(data.officeSupport, monthNum, "vehicleDepreciationExpense");
+                    const amortization = 0; // Placeholder for amortization
+                    
+                    return netIncome + interest + taxes + depreciation + amortization;
+                  })}
+                  isEditable={false}
+                />
+                <CategoryRow
+                  label="EBITDA Margin"
+                  values={MONTHS.map((_, i) => {
+                    const monthNum = i + 1;
+                    // EBITDA Margin = (EBITDA / Total Rental Income) * 100
+                    const rentalIncome = getMonthValue(data.incomeExpenses, monthNum, "rentalIncome");
+                    if (rentalIncome === 0) return 0;
+                    
+                    const carManagementExpenses = getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses");
+                    const carOwnerExpenses = getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses");
+                    const officeSupportTotal = getTotalOfficeSupportForMonth(monthNum);
+                    const totalExpenses = carManagementExpenses + carOwnerExpenses + officeSupportTotal;
+                    const netIncome = rentalIncome - totalExpenses;
+                    
+                    const interest = getMonthValue(data.officeSupport, monthNum, "vehicleLoanInterestExpense");
+                    const taxes = getMonthValue(data.officeSupport, monthNum, "taxesLicense");
+                    const depreciation = getMonthValue(data.officeSupport, monthNum, "depreciationExpense") + 
+                                        getMonthValue(data.officeSupport, monthNum, "vehicleDepreciationExpense");
+                    const amortization = 0;
+                    
+                    const ebitda = netIncome + interest + taxes + depreciation + amortization;
+                    return (ebitda / rentalIncome) * 100;
+                  })}
+                  isEditable={false}
+                />
+              </CategorySection>
+            )}
+
             {/* HISTORY */}
             <CategorySection
               title="HISTORY"
               isExpanded={expandedSections.history}
               onToggle={() => toggleSection("history")}
+              isAllCarsView={isAllCarsView}
             >
               <CategoryRow
                 label="Days Rented"
@@ -1733,6 +2175,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               isExpanded={expandedSections.rentalValue}
               onToggle={() => toggleSection("rentalValue")}
               hasActions={false}
+              isAllCarsView={isAllCarsView}
             >
               <CategoryRow
                 label="Total Car Rental Income"
@@ -1763,6 +2206,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               isExpanded={expandedSections.parkingAverageGLA}
               onToggle={() => toggleSection("parkingAverageGLA")}
               hasActions={false}
+              isAllCarsView={isAllCarsView}
             >
               <CategoryRow
                 label="Total Trips Taken"
@@ -1794,6 +2238,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                 isExpanded={expandedSections.parkingAverageQB}
                 onToggle={() => toggleSection("parkingAverageQB")}
                 hasActions={false}
+                isAllCarsView={isAllCarsView}
               >
                 <CategoryRow
                   label="Total Trips Taken"
@@ -2012,20 +2457,28 @@ interface CategorySectionProps {
   onToggle: () => void;
   children: React.ReactNode;
   hasActions?: boolean;
+  isAllCarsView?: boolean;
 }
 
-function CategorySection({ title, isExpanded, onToggle, children, hasActions = true }: CategorySectionProps) {
+function CategorySection({ title, isExpanded, onToggle, children, hasActions = true, isAllCarsView = false }: CategorySectionProps) {
+  // In "All Cars" view, always show children and hide toggle button
+  const shouldShowToggle = !isAllCarsView;
+  const shouldShowChildren = isAllCarsView || isExpanded;
+  
   return (
     <>
       <tr className="bg-[#1a1a1a] hover:bg-[#222]">
         <td colSpan={14} className="sticky left-0 z-30 bg-[#1a1a1a] hover:bg-[#222] px-3 py-2 border-b border-[#2a2a2a]">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={onToggle}>
-            {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          <div 
+            className={`flex items-center gap-2 ${shouldShowToggle ? 'cursor-pointer' : ''}`} 
+            onClick={shouldShowToggle ? onToggle : undefined}
+          >
+            {shouldShowToggle && (isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />)}
             <span className="text-xs font-semibold text-white">{title}</span>
           </div>
         </td>
       </tr>
-      {isExpanded && children}
+      {shouldShowChildren && children}
     </>
   );
 }

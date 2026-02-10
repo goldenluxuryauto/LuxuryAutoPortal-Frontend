@@ -331,12 +331,11 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
 
   // Handle "All Cars" aggregate view
   if (isAllCarsView) {
-    // Use a special carId (e.g., first car or aggregate) for the provider
-    // For now, we'll use the first car's ID as a placeholder since the backend needs to support aggregate queries
-    const firstCarId = cars && cars.length > 0 ? cars[0].id : 1;
+    // Use a placeholder carId (0) for the provider - the aggregated API doesn't need a specific carId
+    const placeholderCarId = 0;
     
     return (
-      <IncomeExpenseProvider carId={firstCarId} year={selectedYear}>
+      <IncomeExpenseProvider carId={placeholderCarId} year={selectedYear} isAllCars={true}>
         <AdminLayout>
           <div className="flex flex-col w-full h-full overflow-hidden">
             {/* Header */}
@@ -424,7 +423,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                 <TableActions
                   selectedYear={selectedYear}
                   setSelectedYear={setSelectedYear}
-                  carId={firstCarId}
+                  carId={placeholderCarId}
                   car={null}
                 />
               </div>
@@ -432,7 +431,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
 
             {/* Main Content Area - No scroll on page, only table scrolls */}
             <div className="flex-1 min-h-0 overflow-hidden">
-              <IncomeExpenseTable year={selectedYear} isFromRoute={false} showParkingAirportQB={true} />
+              <IncomeExpenseTable year={selectedYear} isFromRoute={false} showParkingAirportQB={true} isAllCarsView={true} />
             </div>
 
             {/* Category-specific Edit Modals */}
