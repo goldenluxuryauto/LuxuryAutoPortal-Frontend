@@ -74,9 +74,9 @@ export function EmployeeDocumentImage({ value, alt, className }: EmployeeDocumen
   if (error || !src) {
     return (
       <div
-        className={`flex items-center justify-center bg-[#0a0a0a] border border-[#2a2a2a] rounded-md ${className || ""}`}
+        className={`flex items-center justify-center bg-background border border-border rounded-md ${className || ""}`}
       >
-        <Image className="h-12 w-12 text-gray-500" />
+        <Image className="h-12 w-12 text-foreground0" />
       </div>
     );
   }

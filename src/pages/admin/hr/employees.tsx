@@ -136,15 +136,15 @@ function formatDate(dateString: string) {
 
 function statusBadge(employee: Employee) {
   if (employee.employee_status === "pending") {
-    return { text: "Pending", className: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30" };
+    return { text: "Pending", className: "bg-yellow-500/20 text-yellow-700 border-yellow-500/30" };
   }
   if (employee.employee_status === "offboarded" || employee.employee_status === "separated") {
-    return { text: "Offboarded", className: "bg-gray-500/20 text-gray-300 border-gray-500/30" };
+    return { text: "Offboarded", className: "bg-gray-500/20 text-muted-foreground border-gray-500/30" };
   }
   if (employee.employee_is_active === 1) {
-    return { text: "Active", className: "bg-green-500/20 text-green-300 border-green-500/30" };
+    return { text: "Active", className: "bg-green-500/20 text-green-700 border-green-500/30" };
   }
-  return { text: "Inactive", className: "bg-gray-500/20 text-gray-300 border-gray-500/30" };
+  return { text: "Inactive", className: "bg-gray-500/20 text-muted-foreground border-gray-500/30" };
 }
 
 export default function EmployeesPage() {
@@ -678,10 +678,10 @@ export default function EmployeesPage() {
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#EAEB80] italic mb-1 sm:mb-2">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-primary italic mb-1 sm:mb-2">
               Employees
             </h1>
-            <p className="text-gray-400 text-xs sm:text-sm">
+            <p className="text-muted-foreground text-xs sm:text-sm">
               Manage employees and employee onboarding submissions
             </p>
           </div>
@@ -689,7 +689,7 @@ export default function EmployeesPage() {
           <div className="flex flex-col sm:flex-row gap-2">
             <Button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] w-full sm:w-auto"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
             >
               <Plus className="w-4 h-4 sm:mr-2" />
               Add
@@ -698,7 +698,7 @@ export default function EmployeesPage() {
             <Button
               onClick={openQRDialog}
               variant="outline"
-              className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10 w-full sm:w-auto"
+              className="border-primary/30 text-primary hover:bg-primary/10 w-full sm:w-auto"
             >
               <Copy className="w-4 h-4 sm:mr-2" />
               Form Link
@@ -707,7 +707,7 @@ export default function EmployeesPage() {
             <Button
               onClick={() => setIsImportModalOpen(true)}
               variant="outline"
-              className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10 w-full sm:w-auto"
+              className="border-primary/30 text-primary hover:bg-primary/10 w-full sm:w-auto"
             >
               <Upload className="w-4 h-4 sm:mr-2" />
               Import
@@ -717,13 +717,13 @@ export default function EmployeesPage() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10 w-full sm:w-auto"
+                  className="border-primary/30 text-primary hover:bg-primary/10 w-full sm:w-auto"
                 >
                   <Download className="w-4 h-4 sm:mr-2" />
                   Export
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-[#111111] border-[#2a2a2a] text-white">
+              <DropdownMenuContent className="bg-card border-border text-foreground">
                 <DropdownMenuItem onClick={() => downloadExport("xlsx", "template")}>
                   Template (Excel)
                 </DropdownMenuItem>
@@ -740,7 +740,7 @@ export default function EmployeesPage() {
 
             {/* QR Code Dialog */}
             <Dialog open={isQRDialogOpen} onOpenChange={(open) => !open && setIsQRDialogOpen(false)}>
-              <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-md">
+              <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Employee Onboarding Form</DialogTitle>
                 </DialogHeader>
@@ -751,17 +751,17 @@ export default function EmployeesPage() {
                   </div>
 
                   <div className="mb-4">
-                    <p className="text-sm text-gray-400 break-words">{formLink}</p>
+                    <p className="text-sm text-muted-foreground break-words">{formLink}</p>
                   </div>
 
                   <div className="flex gap-3 justify-center">
-                    <Button onClick={handlePrintQR} className="bg-[#EAEB80] text-black hover:bg-[#d4d570]">
+                    <Button onClick={handlePrintQR} className="bg-primary text-primary-foreground hover:bg-primary/80">
                       Print
                     </Button>
-                    <Button onClick={handleViewForm} variant="outline" className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10">
+                    <Button onClick={handleViewForm} variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
                       View
                     </Button>
-                    <Button onClick={handleCopyFormLink} variant="ghost" className="text-gray-400 hover:text-white">
+                    <Button onClick={handleCopyFormLink} variant="ghost" className="text-muted-foreground hover:text-foreground">
                       Copy Link
                     </Button>
                   </div>
@@ -773,11 +773,11 @@ export default function EmployeesPage() {
         </div>
 
         {/* Search and Filter */}
-        <Card className="bg-[#111111] border-[#2a2a2a]">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
                 <Input
                   type="text"
                   placeholder="Search by name, email, employee #..."
@@ -786,7 +786,7 @@ export default function EmployeesPage() {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600"
+                  className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600"
                 />
               </div>
 
@@ -797,10 +797,10 @@ export default function EmployeesPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-full md:w-[220px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectTrigger className="w-full md:w-[220px] bg-card border-border text-foreground">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectContent className="bg-card border-border text-foreground">
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
@@ -818,7 +818,7 @@ export default function EmployeesPage() {
                     setStatusFilter("all");
                     setPage(1);
                   }}
-                  className="text-gray-400 hover:text-white"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -828,40 +828,40 @@ export default function EmployeesPage() {
         </Card>
 
         {/* Employees Table */}
-        <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
+        <Card className="bg-card border-border">
           <CardContent className="p-0">
             <div className="overflow-x-auto -mx-3 sm:mx-0">
               <Table className="min-w-[1000px]">
                 <TableHeader>
-                  <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                    <TableHead className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-16 text-[10px] sm:text-xs">
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-16 text-[10px] sm:text-xs">
                       No
                     </TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
                       Status
                     </TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
                       Employee #
                     </TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[220px] text-[10px] sm:text-xs">
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[220px] text-[10px] sm:text-xs">
                       Employee Name
                     </TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[240px] text-[10px] sm:text-xs hidden lg:table-cell">
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[240px] text-[10px] sm:text-xs hidden lg:table-cell">
                       Work Email
                     </TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden lg:table-cell">
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden lg:table-cell">
                       Mobile
                     </TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
                       Department
                     </TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
                       Job Title
                     </TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden md:table-cell">
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden md:table-cell">
                       Created
                     </TableHead>
-                    <TableHead className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-28 text-[10px] sm:text-xs">
+                    <TableHead className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-28 text-[10px] sm:text-xs">
                       Actions
                     </TableHead>
                   </TableRow>
@@ -873,14 +873,14 @@ export default function EmployeesPage() {
                     <TableRow>
                       <TableCell colSpan={9} className="text-center py-8">
                         <div className="flex flex-col items-center gap-3">
-                          <p className="text-red-400 text-sm break-words max-w-2xl">
+                          <p className="text-red-700 text-sm break-words max-w-2xl">
                             {error instanceof Error ? error.message : "Failed to fetch employees"}
                           </p>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => refetch()}
-                            className="border-[#EAEB80] text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                            className="border-primary text-primary hover:bg-primary/10"
                           >
                             Retry
                           </Button>
@@ -889,7 +889,7 @@ export default function EmployeesPage() {
                     </TableRow>
                   ) : employees.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8 text-gray-400">
+                      <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                         No employees found. Try adjusting your search or filters.
                       </TableCell>
                     </TableRow>
@@ -899,8 +899,8 @@ export default function EmployeesPage() {
                         (pagination ? (pagination.page - 1) * pagination.limit : 0) + index + 1;
                       const badge = statusBadge(emp);
                       return (
-                        <TableRow key={emp.employee_aid} className="border-[#2a2a2a] group">
-                          <TableCell className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
+                        <TableRow key={emp.employee_aid} className="border-border group">
+                          <TableCell className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
                             {rowNumber}
                           </TableCell>
                           <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
@@ -911,29 +911,29 @@ export default function EmployeesPage() {
                               {badge.text}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-left text-gray-200 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
+                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
                             {emp.employee_number || <span className="text-gray-600">N/A</span>}
                           </TableCell>
-                          <TableCell className="text-left text-white font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
+                          <TableCell className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
                             {emp.employee_last_name}, {emp.employee_first_name}
                           </TableCell>
-                          <TableCell className="text-left text-gray-300 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
                             {emp.employee_job_pay_work_email || emp.employee_email || (
                               <span className="text-gray-600">N/A</span>
                             )}
                           </TableCell>
-                          <TableCell className="text-left text-gray-300 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
                             {emp.employee_mobile_number || emp.employee_telephone || (
                               <span className="text-gray-600">—</span>
                             )}
                           </TableCell>
-                          <TableCell className="text-left text-gray-400 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
                             {emp.employee_job_pay_department_name || <span className="text-gray-600">—</span>}
                           </TableCell>
-                          <TableCell className="text-left text-gray-400 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
                             {emp.employee_job_pay_job_title_name || <span className="text-gray-600">—</span>}
                           </TableCell>
-                          <TableCell className="text-left text-gray-400 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden md:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden md:table-cell">
                             {formatDate(emp.employee_created)}
                           </TableCell>
                           <TableCell className="text-center px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
@@ -941,7 +941,7 @@ export default function EmployeesPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-9 w-9 p-0 text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 rounded-full"
+                                className="h-9 w-9 p-0 text-primary hover:text-primary hover:bg-primary/10 rounded-full"
                                 title="View"
                                 onClick={() => setLocation(`/admin/hr/employees/view?employeeId=${emp.employee_aid}`)}
                               >
@@ -952,7 +952,7 @@ export default function EmployeesPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-green-400 hover:text-green-300 hover:bg-green-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-green-700 hover:text-green-700 hover:bg-green-500/10 rounded-full"
                                   onClick={() => setEmployeeToApprove(emp)}
                                   title="Approve"
                                 >
@@ -963,7 +963,7 @@ export default function EmployeesPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-9 w-9 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-full"
+                                className="h-9 w-9 p-0 text-red-700 hover:text-red-700 hover:bg-red-500/10 rounded-full"
                                 onClick={() => setEmployeeToDelete(emp)}
                                 title="Delete"
                               >
@@ -1001,10 +1001,10 @@ export default function EmployeesPage() {
 
         {/* Add Employee Modal */}
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-[#EAEB80]">Add New Employee</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-primary">Add New Employee</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
                 Create an employee record (this does not submit the public onboarding form)
               </DialogDescription>
             </DialogHeader>
@@ -1020,9 +1020,9 @@ export default function EmployeesPage() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">First Name *</FormLabel>
+                        <FormLabel className="text-muted-foreground">First Name *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1034,9 +1034,9 @@ export default function EmployeesPage() {
                     name="middleName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Middle Name</FormLabel>
+                        <FormLabel className="text-muted-foreground">Middle Name</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1048,9 +1048,9 @@ export default function EmployeesPage() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Last Name *</FormLabel>
+                        <FormLabel className="text-muted-foreground">Last Name *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1062,9 +1062,9 @@ export default function EmployeesPage() {
                     name="workEmail"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Work Email *</FormLabel>
+                        <FormLabel className="text-muted-foreground">Work Email *</FormLabel>
                         <FormControl>
-                          <Input {...field} type="email" className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} type="email" className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1076,9 +1076,9 @@ export default function EmployeesPage() {
                     name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Phone Number *</FormLabel>
+                        <FormLabel className="text-muted-foreground">Phone Number *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1091,9 +1091,9 @@ export default function EmployeesPage() {
                     name="street"
                     render={({ field }) => (
                       <FormItem className="md:col-span-2">
-                        <FormLabel className="text-gray-400">Street</FormLabel>
+                        <FormLabel className="text-muted-foreground">Street</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1105,9 +1105,9 @@ export default function EmployeesPage() {
                     name="city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">City</FormLabel>
+                        <FormLabel className="text-muted-foreground">City</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1119,9 +1119,9 @@ export default function EmployeesPage() {
                     name="state"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">State</FormLabel>
+                        <FormLabel className="text-muted-foreground">State</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1133,9 +1133,9 @@ export default function EmployeesPage() {
                     name="country"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Country</FormLabel>
+                        <FormLabel className="text-muted-foreground">Country</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1147,9 +1147,9 @@ export default function EmployeesPage() {
                     name="zipCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">ZIP</FormLabel>
+                        <FormLabel className="text-muted-foreground">ZIP</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1162,9 +1162,9 @@ export default function EmployeesPage() {
                     name="emergencyContactName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Emergency Contact Name *</FormLabel>
+                        <FormLabel className="text-muted-foreground">Emergency Contact Name *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1176,9 +1176,9 @@ export default function EmployeesPage() {
                     name="emergencyContactPhoneNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Emergency Contact Phone Number *</FormLabel>
+                        <FormLabel className="text-muted-foreground">Emergency Contact Phone Number *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1191,9 +1191,9 @@ export default function EmployeesPage() {
                     name="ssnEin"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Social Security Number or EIN *</FormLabel>
+                        <FormLabel className="text-muted-foreground">Social Security Number or EIN *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1205,17 +1205,17 @@ export default function EmployeesPage() {
                     name="shirtSize"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Shirt Size</FormLabel>
+                        <FormLabel className="text-muted-foreground">Shirt Size</FormLabel>
                         <Select
                           value={field.value}
                           onValueChange={field.onChange}
                         >
                           <FormControl>
-                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectTrigger className="bg-card border-border text-foreground">
                               <SelectValue placeholder="Select shirt size" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                          <SelectContent className="bg-card border-border text-foreground">
                             <SelectItem value="Small">Small</SelectItem>
                             <SelectItem value="Medium">Medium</SelectItem>
                             <SelectItem value="Large">Large</SelectItem>
@@ -1233,17 +1233,17 @@ export default function EmployeesPage() {
                     name="hearAboutGla"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">How did you hear about Golden Luxury Auto?</FormLabel>
+                        <FormLabel className="text-muted-foreground">How did you hear about Golden Luxury Auto?</FormLabel>
                         <Select
                           value={field.value}
                           onValueChange={field.onChange}
                         >
                           <FormControl>
-                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectTrigger className="bg-card border-border text-foreground">
                               <SelectValue placeholder="Select an option" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                          <SelectContent className="bg-card border-border text-foreground">
                             <SelectItem value="Friend/Refferal">Friend/Refferal</SelectItem>
                             <SelectItem value="KSL Ad">KSL Ad</SelectItem>
                             <SelectItem value="Facebook Ad">Facebook Ad</SelectItem>
@@ -1259,18 +1259,18 @@ export default function EmployeesPage() {
 
                   {/* File Uploads */}
                   <FormItem className="md:col-span-2">
-                    <FormLabel className="text-gray-400">Photo of car insurance</FormLabel>
+                    <FormLabel className="text-muted-foreground">Photo of car insurance</FormLabel>
                     <div className="space-y-2">
                       <label
                         htmlFor="car-insurance-upload"
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#EAEB80]/40 rounded-xl bg-[#0a0a0a]/50 hover:border-[#EAEB80]/60 hover:bg-[#EAEB80]/5 transition-all cursor-pointer group"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
                       >
                         <div className="flex flex-col items-center justify-center pt-4 pb-4">
-                          <Upload className="w-8 h-8 text-[#EAEB80] mb-2 group-hover:scale-110 transition-transform" />
-                          <p className="text-xs text-gray-400 group-hover:text-[#EAEB80] transition-colors">
+                          <Upload className="w-8 h-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                          <p className="text-xs text-muted-foreground group-hover:text-primary transition-colors">
                             Click to upload or drag and drop
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">Multiple files allowed</p>
+                          <p className="text-xs text-foreground0 mt-1">Multiple files allowed</p>
                         </div>
                         <input
                           id="car-insurance-upload"
@@ -1288,11 +1288,11 @@ export default function EmployeesPage() {
                       {carInsurancePhotos.length > 0 && (
                         <div className="space-y-2">
                           {carInsurancePhotos.map((file, index) => (
-                            <div key={index} className="flex items-center justify-between p-2 bg-[#0a0a0a] rounded-lg border border-[#2a2a2a]">
+                            <div key={index} className="flex items-center justify-between p-2 bg-background rounded-lg border border-border">
                               <div className="flex items-center gap-2">
-                                <FileSpreadsheet className="w-4 h-4 text-[#EAEB80]" />
-                                <span className="text-sm text-gray-300">{file.name}</span>
-                                <span className="text-xs text-gray-500">
+                                <FileSpreadsheet className="w-4 h-4 text-primary" />
+                                <span className="text-sm text-muted-foreground">{file.name}</span>
+                                <span className="text-xs text-foreground0">
                                   ({(file.size / 1024).toFixed(2)} KB)
                                 </span>
                               </div>
@@ -1303,7 +1303,7 @@ export default function EmployeesPage() {
                                 onClick={() => {
                                   setCarInsurancePhotos((prev) => prev.filter((_, i) => i !== index));
                                 }}
-                                className="text-gray-400 hover:text-white h-6 w-6 p-0"
+                                className="text-muted-foreground hover:text-foreground h-6 w-6 p-0"
                               >
                                 <X className="w-3 h-3" />
                               </Button>
@@ -1315,18 +1315,18 @@ export default function EmployeesPage() {
                   </FormItem>
 
                   <FormItem className="md:col-span-2">
-                    <FormLabel className="text-gray-400">Driver license photo</FormLabel>
+                    <FormLabel className="text-muted-foreground">Driver license photo</FormLabel>
                     <div className="space-y-2">
                       <label
                         htmlFor="driver-license-upload"
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#EAEB80]/40 rounded-xl bg-[#0a0a0a]/50 hover:border-[#EAEB80]/60 hover:bg-[#EAEB80]/5 transition-all cursor-pointer group"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
                       >
                         <div className="flex flex-col items-center justify-center pt-4 pb-4">
-                          <Upload className="w-8 h-8 text-[#EAEB80] mb-2 group-hover:scale-110 transition-transform" />
-                          <p className="text-xs text-gray-400 group-hover:text-[#EAEB80] transition-colors">
+                          <Upload className="w-8 h-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                          <p className="text-xs text-muted-foreground group-hover:text-primary transition-colors">
                             Click to upload or drag and drop
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">Single file</p>
+                          <p className="text-xs text-foreground0 mt-1">Single file</p>
                         </div>
                         <input
                           id="driver-license-upload"
@@ -1340,11 +1340,11 @@ export default function EmployeesPage() {
                         />
                       </label>
                       {driverLicensePhoto && (
-                        <div className="flex items-center justify-between p-2 bg-[#0a0a0a] rounded-lg border border-[#2a2a2a]">
+                        <div className="flex items-center justify-between p-2 bg-background rounded-lg border border-border">
                           <div className="flex items-center gap-2">
-                            <FileSpreadsheet className="w-4 h-4 text-[#EAEB80]" />
-                            <span className="text-sm text-gray-300">{driverLicensePhoto.name}</span>
-                            <span className="text-xs text-gray-500">
+                            <FileSpreadsheet className="w-4 h-4 text-primary" />
+                            <span className="text-sm text-muted-foreground">{driverLicensePhoto.name}</span>
+                            <span className="text-xs text-foreground0">
                               ({(driverLicensePhoto.size / 1024).toFixed(2)} KB)
                             </span>
                           </div>
@@ -1353,7 +1353,7 @@ export default function EmployeesPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => setDriverLicensePhoto(null)}
-                            className="text-gray-400 hover:text-white h-6 w-6 p-0"
+                            className="text-muted-foreground hover:text-foreground h-6 w-6 p-0"
                           >
                             <X className="w-3 h-3" />
                           </Button>
@@ -1373,14 +1373,14 @@ export default function EmployeesPage() {
                       setCarInsurancePhotos([]);
                       setDriverLicensePhoto(null);
                     }}
-                    className="text-gray-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                     disabled={createMutation.isPending}
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                     disabled={createMutation.isPending}
                   >
                     {createMutation.isPending ? (
@@ -1400,13 +1400,13 @@ export default function EmployeesPage() {
 
         {/* Import Modal */}
         <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-2xl">
+          <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-[#EAEB80] flex items-center gap-2">
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-primary flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5" />
                 Import Employees
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 Upload an Excel (.xlsx, .xls) or CSV file. Use Export → Template to download the correct format.
               </DialogDescription>
             </DialogHeader>
@@ -1415,14 +1415,14 @@ export default function EmployeesPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="import-file"
-                  className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-[#EAEB80]/40 rounded-xl bg-[#0a0a0a]/50 hover:border-[#EAEB80]/60 hover:bg-[#EAEB80]/5 transition-all cursor-pointer group"
+                  className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
                 >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="w-10 h-10 text-[#EAEB80] mb-3 group-hover:scale-110 transition-transform" />
-                    <p className="mb-2 text-sm font-semibold text-gray-300 group-hover:text-[#EAEB80] transition-colors">
+                    <Upload className="w-10 h-10 text-primary mb-3 group-hover:scale-110 transition-transform" />
+                    <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors">
                       {importFile ? importFile.name : "Click to Upload or Drag and Drop"}
                     </p>
-                    <p className="text-xs text-gray-500">Excel (.xlsx, .xls) or CSV file (Max 100MB)</p>
+                    <p className="text-xs text-foreground0">Excel (.xlsx, .xls) or CSV file (Max 100MB)</p>
                   </div>
                   <input
                     id="import-file"
@@ -1437,11 +1437,11 @@ export default function EmployeesPage() {
                 </label>
 
                 {importFile && (
-                  <div className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-lg border border-[#2a2a2a]">
+                  <div className="flex items-center justify-between p-3 bg-background rounded-lg border border-border">
                     <div className="flex items-center gap-2">
-                      <FileSpreadsheet className="w-5 h-5 text-[#EAEB80]" />
-                      <span className="text-sm text-gray-300">{importFile.name}</span>
-                      <span className="text-xs text-gray-500">
+                      <FileSpreadsheet className="w-5 h-5 text-primary" />
+                      <span className="text-sm text-muted-foreground">{importFile.name}</span>
+                      <span className="text-xs text-foreground0">
                         ({(importFile.size / 1024 / 1024).toFixed(2)} MB)
                       </span>
                     </div>
@@ -1450,7 +1450,7 @@ export default function EmployeesPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setImportFile(null)}
-                      className="text-gray-400 hover:text-white h-8 w-8 p-0"
+                      className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -1458,7 +1458,7 @@ export default function EmployeesPage() {
                 )}
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <Button
                   type="button"
                   variant="ghost"
@@ -1467,7 +1467,7 @@ export default function EmployeesPage() {
                     setImportFile(null);
                     setImportErrors([]);
                   }}
-                  className="text-gray-400 hover:text-white"
+                  className="text-muted-foreground hover:text-foreground"
                   disabled={importMutation.isPending}
                 >
                   Cancel
@@ -1485,7 +1485,7 @@ export default function EmployeesPage() {
                     }
                     importMutation.mutate(importFile);
                   }}
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                   disabled={!importFile || importMutation.isPending}
                 >
                   {importMutation.isPending ? (
@@ -1507,32 +1507,32 @@ export default function EmployeesPage() {
 
         {/* Import Errors */}
         <Dialog open={showImportErrors} onOpenChange={setShowImportErrors}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-3xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-yellow-400">
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-yellow-700">
                 Import Warning ({importErrors.length})
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 The following rows failed to import. Please review and fix the issues.
               </DialogDescription>
             </DialogHeader>
             <div className="mt-4 space-y-2 max-h-[60vh] overflow-y-auto">
               {importErrors.map((err, idx) => (
-                <div key={idx} className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4">
+                <div key={idx} className="bg-card border border-border rounded-lg p-4">
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 font-semibold text-sm">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-700 font-semibold text-sm">
                       {err.row}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-gray-300 break-words">
-                        <span className="font-medium text-white">Row {err.row}:</span> {err.error}
+                      <p className="text-sm text-muted-foreground break-words">
+                        <span className="font-medium text-foreground">Row {err.row}:</span> {err.error}
                       </p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-[#2a2a2a]">
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-border">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -1541,7 +1541,7 @@ export default function EmployeesPage() {
                   setImportFile(null);
                   setImportErrors([]);
                 }}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+                className="bg-card border-border text-foreground hover:bg-muted"
               >
                 Close
               </Button>
@@ -1551,13 +1551,13 @@ export default function EmployeesPage() {
 
         {/* Approve confirmation */}
         <Dialog open={employeeToApprove !== null} onOpenChange={(open) => !open && setEmployeeToApprove(null)}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+          <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-green-400">Approve Employee</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-green-700">Approve Employee</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
                 {employeeToApprove ? (
                   <>
-                    Approve <strong className="text-white">{employeeToApprove.employee_last_name}, {employeeToApprove.employee_first_name}</strong>?
+                    Approve <strong className="text-foreground">{employeeToApprove.employee_last_name}, {employeeToApprove.employee_first_name}</strong>?
                     <br />
                     This will change the employee status from Pending to Approved.
                   </>
@@ -1568,14 +1568,14 @@ export default function EmployeesPage() {
               <Button
                 variant="outline"
                 onClick={() => setEmployeeToApprove(null)}
-                className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                className="border-border text-muted-foreground hover:bg-muted/50"
                 disabled={approveMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={() => employeeToApprove && approveMutation.mutate(employeeToApprove.employee_aid)}
-                className="bg-green-600 text-white hover:bg-green-700"
+                className="bg-green-600 text-foreground hover:bg-green-700"
                 disabled={approveMutation.isPending}
               >
                 {approveMutation.isPending ? (
@@ -1593,13 +1593,13 @@ export default function EmployeesPage() {
 
         {/* Delete confirmation */}
         <Dialog open={employeeToDelete !== null} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+          <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-red-400">Delete Employee</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-red-700">Delete Employee</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
                 {employeeToDelete ? (
                   <>
-                    Are you sure you want to delete <strong className="text-white">{employeeToDelete.employee_last_name}, {employeeToDelete.employee_first_name}</strong>?
+                    Are you sure you want to delete <strong className="text-foreground">{employeeToDelete.employee_last_name}, {employeeToDelete.employee_first_name}</strong>?
                     <br />
                     This action cannot be undone.
                   </>
@@ -1610,14 +1610,14 @@ export default function EmployeesPage() {
               <Button
                 variant="outline"
                 onClick={() => setEmployeeToDelete(null)}
-                className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                className="border-border text-muted-foreground hover:bg-muted/50"
                 disabled={deleteMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={() => employeeToDelete && deleteMutation.mutate(employeeToDelete.employee_aid)}
-                className="bg-red-600 text-white hover:bg-red-700"
+                className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground hover:bg-red-500/30 text-red-700"
                 disabled={deleteMutation.isPending}
               >
                 {deleteMutation.isPending ? (

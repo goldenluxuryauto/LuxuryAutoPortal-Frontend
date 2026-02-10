@@ -11,7 +11,7 @@ export function CTASection() {
           backgroundImage: `url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=2574&q=80')`,
         }}
       >
-        <div className="absolute inset-0 bg-[#0a0a0a]/85 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

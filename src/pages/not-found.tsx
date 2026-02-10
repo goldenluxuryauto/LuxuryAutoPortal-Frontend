@@ -56,24 +56,24 @@ export default function NotFound() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="text-center">
         <div className="w-20 h-20 rounded-full bg-[#EAEB80]/10 flex items-center justify-center mx-auto mb-8">
-          <Construction className="w-10 h-10 text-[#EAEB80]" />
+          <Construction className="w-10 h-10 text-primary" />
         </div>
-        <h1 className="font-serif text-4xl lg:text-6xl font-light text-white mb-4">
+        <h1 className="font-serif text-4xl lg:text-6xl font-light text-foreground mb-4">
           Under Development
         </h1>
-        <p className="text-xl text-gray-400 mb-2">
+        <p className="text-xl text-muted-foreground mb-2">
           This page is currently under development
         </p>
-        <p className="text-gray-500 mb-8 max-w-md mx-auto">
+        <p className="text-foreground0 mb-8 max-w-md mx-auto">
           We're working hard to bring you this feature. Please check back soon!
         </p>
         <Button 
           onClick={handleBack}
           size="lg" 
-          className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+          className="bg-primary text-primary-foreground hover:bg-primary/80"
           data-testid="button-back"
         >
           <ArrowLeft className="mr-2 w-4 h-4" />

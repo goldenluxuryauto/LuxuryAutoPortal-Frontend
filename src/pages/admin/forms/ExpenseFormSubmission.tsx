@@ -185,19 +185,19 @@ export default function ExpenseFormSubmission() {
   if (optionsLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <Card className="bg-[#0d0d0d] border-[#2a2a2a]">
+    <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="text-[#EAEB80] flex items-center gap-2">
+        <CardTitle className="text-primary flex items-center gap-2">
           <DollarSign className="w-5 h-5" />
           Income & Expense Receipt Submission
         </CardTitle>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-muted-foreground">
           Submit expense receipts for Operating Expenses (Direct Delivery), COGS, or Reimbursed Bills.
         </p>
       </CardHeader>
@@ -205,24 +205,24 @@ export default function ExpenseFormSubmission() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="text-gray-400">Date *</Label>
+              <Label className="text-muted-foreground">Date *</Label>
               <Input
                 type="date"
                 value={formData.submissionDate}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, submissionDate: e.target.value }))
                 }
-                className="bg-[#111111] border-[#2a2a2a] text-white mt-1"
+                className="bg-card border-border text-foreground mt-1"
                 required
               />
             </div>
             <div>
-              <Label className="text-gray-400">Employee Name *</Label>
+              <Label className="text-muted-foreground">Employee Name *</Label>
               {isEmployeeOnly ? (
                 <Input
                   readOnly
                   value={currentEmployeeName}
-                  className="bg-[#111111] border-[#2a2a2a] text-white mt-1 cursor-default"
+                  className="bg-card border-border text-foreground mt-1 cursor-default"
                   title="Your name (pre-filled for employee accounts)"
                 />
               ) : (
@@ -230,7 +230,7 @@ export default function ExpenseFormSubmission() {
                   value={formData.employeeId}
                   onValueChange={(v) => setFormData((prev) => ({ ...prev, employeeId: v }))}
                 >
-                  <SelectTrigger className="bg-[#111111] border-[#2a2a2a] text-white mt-1">
+                  <SelectTrigger className="bg-card border-border text-foreground mt-1">
                     <SelectValue
                       placeholder={
                         currentUser?.displayName
@@ -252,12 +252,12 @@ export default function ExpenseFormSubmission() {
           </div>
 
           <div>
-            <Label className="text-gray-400">Car *</Label>
+            <Label className="text-muted-foreground">Car *</Label>
             <Select
               value={formData.carId}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, carId: v }))}
             >
-              <SelectTrigger className="bg-[#111111] border-[#2a2a2a] text-white mt-1">
+              <SelectTrigger className="bg-card border-border text-foreground mt-1">
                 <SelectValue placeholder="Select car (Make Model Year - Plate - VIN)" />
               </SelectTrigger>
               <SelectContent>
@@ -272,21 +272,21 @@ export default function ExpenseFormSubmission() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label className="text-gray-400">Year</Label>
+              <Label className="text-muted-foreground">Year</Label>
               <Input
                 type="number"
                 value={formData.year}
                 onChange={(e) => setFormData((prev) => ({ ...prev, year: e.target.value }))}
-                className="bg-[#111111] border-[#2a2a2a] text-white mt-1"
+                className="bg-card border-border text-foreground mt-1"
               />
             </div>
             <div>
-              <Label className="text-gray-400">Month</Label>
+              <Label className="text-muted-foreground">Month</Label>
               <Select
                 value={formData.month}
                 onValueChange={(v) => setFormData((prev) => ({ ...prev, month: v }))}
               >
-                <SelectTrigger className="bg-[#111111] border-[#2a2a2a] text-white mt-1">
+                <SelectTrigger className="bg-card border-border text-foreground mt-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -299,14 +299,14 @@ export default function ExpenseFormSubmission() {
               </Select>
             </div>
             <div>
-              <Label className="text-gray-400">Amount ($) *</Label>
+              <Label className="text-muted-foreground">Amount ($) *</Label>
               <Input
                 type="number"
                 step="0.01"
                 min="0"
                 value={formData.amount}
                 onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
-                className="bg-[#111111] border-[#2a2a2a] text-white mt-1"
+                className="bg-card border-border text-foreground mt-1"
                 placeholder="0.00"
                 required
               />
@@ -314,14 +314,14 @@ export default function ExpenseFormSubmission() {
           </div>
 
           <div>
-            <Label className="text-gray-400">Expense Category *</Label>
+            <Label className="text-muted-foreground">Expense Category *</Label>
             <Select
               value={formData.category}
               onValueChange={(v) =>
                 setFormData((prev) => ({ ...prev, category: v, field: "" }))
               }
             >
-              <SelectTrigger className="bg-[#111111] border-[#2a2a2a] text-white mt-1">
+              <SelectTrigger className="bg-card border-border text-foreground mt-1">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -337,12 +337,12 @@ export default function ExpenseFormSubmission() {
           </div>
 
           <div>
-            <Label className="text-gray-400">Expense Type *</Label>
+            <Label className="text-muted-foreground">Expense Type *</Label>
             <Select
               value={formData.field}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, field: v }))}
             >
-              <SelectTrigger className="bg-[#111111] border-[#2a2a2a] text-white mt-1">
+              <SelectTrigger className="bg-card border-border text-foreground mt-1">
                 <SelectValue placeholder="Select expense type" />
               </SelectTrigger>
               <SelectContent>
@@ -356,7 +356,7 @@ export default function ExpenseFormSubmission() {
           </div>
 
           <div>
-            <Label className="text-gray-400">Upload Receipts</Label>
+            <Label className="text-muted-foreground">Upload Receipts</Label>
             <div className="flex items-center gap-2 mt-1">
               <Input
                 type="file"
@@ -366,30 +366,30 @@ export default function ExpenseFormSubmission() {
                   const files = e.target.files ? Array.from(e.target.files) : [];
                   setReceiptFiles((prev) => [...prev, ...files]);
                 }}
-                className="bg-[#111111] border-[#2a2a2a] text-white"
+                className="bg-card border-border text-foreground"
               />
-              <Upload className="w-4 h-4 text-gray-500" />
+              <Upload className="w-4 h-4 text-foreground0" />
             </div>
             {receiptFiles.length > 0 && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-foreground0 mt-1">
                 {receiptFiles.length} file(s) selected
               </p>
             )}
           </div>
 
           <div>
-            <Label className="text-gray-400">Remarks</Label>
+            <Label className="text-muted-foreground">Remarks</Label>
             <Textarea
               value={formData.remarks}
               onChange={(e) => setFormData((prev) => ({ ...prev, remarks: e.target.value }))}
-              className="bg-[#111111] border-[#2a2a2a] text-white mt-1 min-h-[80px]"
+              className="bg-card border-border text-foreground mt-1 min-h-[80px]"
               placeholder="Optional notes..."
             />
           </div>
 
           <Button
             type="submit"
-            className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={submitMutation.isPending}
           >
             {submitMutation.isPending ? (

@@ -150,10 +150,10 @@ export default function TotalsPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-400">Failed to load car details</p>
+          <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
-            className="mt-4 text-[#EAEB80] hover:underline"
+            className="mt-4 text-primary hover:underline"
           >
             ← Back to Cars
           </button>
@@ -193,18 +193,18 @@ export default function TotalsPage() {
           {!isAllCarsReport && (
             <button
               onClick={() => setLocation(`/admin/view-car/${carId}`)}
-              className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+              className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to View Car</span>
             </button>
           )}
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-foreground">
               {isAllCarsReport ? "ALL CARS REPORT - TOTALS" : "INDIVIDUAL CAR REPORT - TOTALS"}
             </h1>
             {!isAllCarsReport && car && (
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Car: {car.makeModel || "Unknown Car"}
               </p>
             )}
@@ -213,14 +213,14 @@ export default function TotalsPage() {
 
         {/* Car and Owner Information Header */}
         {!isAllCarsReport && car && (
-          <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+          <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
               <div className="flex-1">
-                <h1 className="text-xl sm:text-2xl font-semibold text-white mb-2">Totals</h1>
+                <h1 className="text-xl sm:text-2xl font-semibold text-foreground mb-2">Totals</h1>
               </div>
               <Button
                 variant="outline"
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2 w-full sm:w-auto"
+                className="bg-card border-border text-foreground hover:bg-muted flex items-center gap-2 w-full sm:w-auto"
               >
                 <Download className="w-4 h-4" />
                 Export
@@ -229,73 +229,73 @@ export default function TotalsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Information</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Information</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Car Name: </span>
-                  <span className="text-white text-xs sm:text-sm break-words">{carName}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Car Name: </span>
+                  <span className="text-foreground text-xs sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">VIN #: </span>
-                  <span className="text-white font-mono text-xs sm:text-sm break-all">{car.vin}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">VIN #: </span>
+                  <span className="text-foreground font-mono text-xs sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">License: </span>
-                  <span className="text-white text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">License: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Owner Information</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Owner Information</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Name: </span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Name: </span>
                   {car.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
+                      className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                    <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
+                    <span className="text-foreground text-xs sm:text-sm break-words">{ownerName}</span>
                   )}
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Contact #: </span>
-                  <span className="text-white text-xs sm:text-sm">{ownerContact}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Contact #: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Email: </span>
-                  <span className="text-white text-xs sm:text-sm break-all">{ownerEmail}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Email: </span>
+                  <span className="text-foreground text-xs sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Specifications</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Specifications</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Fuel/Gas: </span>
-                  <span className="text-white text-xs sm:text-sm">{fuelType}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Fuel/Gas: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{fuelType}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Tire Size: </span>
-                  <span className="text-white text-xs sm:text-sm">{tireSize}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Tire Size: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{tireSize}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Oil Type: </span>
-                  <span className="text-white text-xs sm:text-sm">{oilType}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Oil Type: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{oilType}</span>
                 </div>
               </div>
             </div>
 
             {/* Turo Links */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Turo Links</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Turo Links</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 {car.turoLink && (
                   <div>
@@ -303,7 +303,7 @@ export default function TotalsPage() {
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                      className="text-primary hover:underline text-sm flex items-center gap-1"
                     >
                       Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -316,7 +316,7 @@ export default function TotalsPage() {
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                      className="text-primary hover:underline text-sm flex items-center gap-1"
                     >
                       Admin Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -324,7 +324,7 @@ export default function TotalsPage() {
                   </div>
                 )}
                 {!car.turoLink && !car.adminTuroLink && (
-                  <span className="text-gray-500 text-sm">No Turo links available</span>
+                  <span className="text-foreground0 text-sm">No Turo links available</span>
                 )}
               </div>
             </div>
@@ -333,13 +333,13 @@ export default function TotalsPage() {
         )}
 
         {/* Filters Section */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 mb-6">
+        <div className="bg-card border border-border rounded-lg p-4 mb-6">
           <div className="flex flex-wrap items-center gap-4">
             <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[150px]">
+              <SelectTrigger className="bg-card border-border text-foreground w-[150px]">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-card border-border text-foreground">
                 <SelectItem value="Year">Year</SelectItem>
                 <SelectItem value="Month">Month</SelectItem>
                 <SelectItem value="Quarter">Quarter</SelectItem>
@@ -349,10 +349,10 @@ export default function TotalsPage() {
             {(filterType === "Month" || filterType === "Quarter") && (
               <>
                 <Select value={fromMonth} onValueChange={setFromMonth}>
-                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[120px]">
+                  <SelectTrigger className="bg-card border-border text-foreground w-[120px]">
                     <SelectValue placeholder="From Month" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                  <SelectContent className="bg-card border-border text-foreground">
                     {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                       <SelectItem key={month} value={month.toString()}>
                         {new Date(2000, month - 1).toLocaleString('default', { month: 'short' })}
@@ -362,10 +362,10 @@ export default function TotalsPage() {
                 </Select>
 
                 <Select value={toMonth} onValueChange={setToMonth}>
-                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[120px]">
+                  <SelectTrigger className="bg-card border-border text-foreground w-[120px]">
                     <SelectValue placeholder="To Month" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                  <SelectContent className="bg-card border-border text-foreground">
                     {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                       <SelectItem key={month} value={month.toString()}>
                         {new Date(2000, month - 1).toLocaleString('default', { month: 'short' })}
@@ -377,10 +377,10 @@ export default function TotalsPage() {
             )}
 
             <Select value={fromYear} onValueChange={setFromYear}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[120px]">
+              <SelectTrigger className="bg-card border-border text-foreground w-[120px]">
                 <SelectValue placeholder="From Year" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-card border-border text-foreground">
                 {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
                   <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                 ))}
@@ -388,10 +388,10 @@ export default function TotalsPage() {
             </Select>
 
             <Select value={toYear} onValueChange={setToYear}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[120px]">
+              <SelectTrigger className="bg-card border-border text-foreground w-[120px]">
                 <SelectValue placeholder="To Year" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-card border-border text-foreground">
                 {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
                   <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                 ))}
@@ -401,7 +401,7 @@ export default function TotalsPage() {
         </div>
 
         {/* Totals Categories */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden" style={{ overflowY: 'auto' }}>
+        <div className="bg-card border border-border rounded-lg overflow-hidden" style={{ overflowY: 'auto' }}>
           <Accordion type="multiple" className="w-full">
             {categories.map((category) => {
               // Special handling for EXPENSES category
@@ -410,34 +410,34 @@ export default function TotalsPage() {
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
-                          <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                          <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                          <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                          <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                          <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Category Header */}
-                        <div className="flex justify-between text-gray-300 text-sm font-bold mb-2">
+                        <div className="flex justify-between text-muted-foreground text-sm font-bold mb-2">
                           <span>Car Management and Car Owner Split</span>
                         </div>
                         {/* Child Items */}
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Car Management Split</span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {formatCurrency(totals?.carManagementSplit || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Car Owner Split</span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {formatCurrency(totals?.carOwnerSplit || 0)}
                           </span>
                         </div>
@@ -453,48 +453,48 @@ export default function TotalsPage() {
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
-                          <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                          <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                          <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                          <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                          <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Labor - Car Cleaning</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesDirect?.laborCarCleaning || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Labor - Driver</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesDirect?.laborDriver || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Parking - Airport</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesDirect?.parkingAirport || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Taxi/Uber/Lyft/Lime</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesDirect?.taxiUberLyftLime || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                        <div className="flex justify-between text-muted-foreground text-sm font-bold pt-2 border-t border-border">
                           <span>Total OPERATING EXPENSES (Direct Delivery)</span>
-                          <span className="text-white font-bold">
+                          <span className="text-foreground font-bold">
                             {formatCurrency(totals?.operatingExpensesDirect?.total || 0)}
                           </span>
                         </div>
@@ -510,216 +510,216 @@ export default function TotalsPage() {
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
-                          <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                          <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                          <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                          <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                          <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Auto Body Shop / Wreck</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.autoBodyShop || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Alignment</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.alignment || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Battery</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.battery || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Brakes</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.brakes || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Car Payment</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.carPayment || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Car Insurance</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.carInsurance || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Car Seats</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.carSeats || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Cleaning Supplies / Tools</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.cleaningSupplies || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Emissions</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.emissions || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>GPS System</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.gpsSystem || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Keys & Fob</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.keysFob || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Labor - Cleaning</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.laborDetailing || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Parking Airport (Reimbursed - GLA - Client Owner Rentals)</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.parkingAirport || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Uber/Lyft/Lime - Not Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.uberNotReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Uber/Lyft/Lime - Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.uberReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Gas - Service Run</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.gasServiceRun || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Gas Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.gasReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Gas - Not Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.gasNotReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Electric Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.electricReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Electric - Not Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.electricNotReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Windshield</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.windshield || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Wipers</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.wipers || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Uber/Lyft/Lime</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.uberLyftLime || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Towing / Impound Fees</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.towingImpoundFees || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Tired Air Station</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.tiredAirStation || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Tires</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.tires || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Oil/Lube</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.oilLube || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Parts</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.parts || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Ski Racks</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.skiRacks || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Tickets & Tolls</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.ticketsTolls || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Mechanic</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.mechanic || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>License & Registration</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.licenseRegistration || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                        <div className="flex justify-between text-muted-foreground text-sm font-bold pt-2 border-t border-border">
                           <span className="font-bold">Total OPERATING EXPENSES (COGS - Per Vehicle)</span>
-                          <span className="text-white font-bold">
+                          <span className="text-foreground font-bold">
                             {formatCurrency(totals?.expenses?.totalOperatingExpenses || 0)}
                           </span>
                         </div>
@@ -743,120 +743,120 @@ export default function TotalsPage() {
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
-                          <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                          <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                          <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                          <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                          <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Income Items */}
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Rental Income</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.rentalIncome || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Delivery Income</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.deliveryIncome || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Electric Prepaid Income</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.electricPrepaidIncome || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Smoking Fines</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.smokingFines || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Gas Prepaid Income</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.gasPrepaidIncome || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Miles Income</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.milesIncome || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Ski Racks Income</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.skiRacksIncome || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Child Seat Income</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.childSeatIncome || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Coolers Income</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.coolersIncome || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Income Insurance and Client Wrecks</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.incomeInsurance || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Other Income</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.income?.otherIncome || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Negative Balance Carry Over</span>
-                          <span className={negativeBalance < 0 ? "text-[#EAEB80]" : "text-white"}>
+                          <span className={negativeBalance < 0 ? "text-primary" : "text-foreground"}>
                             {formatNegativeCurrency(negativeBalance)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm pt-2 border-t border-[#2a2a2a]">
+                        <div className="flex justify-between text-muted-foreground text-sm pt-2 border-t border-border">
                           <span className="font-medium">Car Management Total Expenses</span>
-                          <span className="text-white font-semibold">
+                          <span className="text-foreground font-semibold">
                             {formatCurrency(totals?.income?.carManagementTotalExpenses || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span className="font-medium">Car Owner Total Expenses</span>
-                          <span className="text-white font-semibold">
+                          <span className="text-foreground font-semibold">
                             {formatCurrency(totals?.income?.carOwnerTotalExpenses || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                        <div className="flex justify-between text-muted-foreground text-sm font-bold pt-2 border-t border-border">
                           <span>Total Expenses</span>
-                          <span className="text-white font-bold">
+                          <span className="text-foreground font-bold">
                             {formatCurrency(totals?.income?.totalExpenses || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm font-bold">
+                        <div className="flex justify-between text-muted-foreground text-sm font-bold">
                           <span>Car Payment</span>
-                          <span className="text-white font-bold">
+                          <span className="text-foreground font-bold">
                             {formatCurrency(totals?.income?.carPayment || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm font-bold">
+                        <div className="flex justify-between text-muted-foreground text-sm font-bold">
                           <span>Total Profit</span>
-                          <span className="text-white font-bold">
+                          <span className="text-foreground font-bold">
                             {formatCurrency(totals?.income?.totalProfit || 0)}
                           </span>
                         </div>
@@ -872,36 +872,36 @@ export default function TotalsPage() {
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
-                          <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                          <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                          <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                          <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                          <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>GLA Labor - Cleaning</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.gla?.laborCleaning || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>GLA Parking Fee</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.gla?.parkingFee || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                        <div className="flex justify-between text-muted-foreground text-sm font-bold pt-2 border-t border-border">
                           <span className="font-bold">Total GLA PARKING FEE & LABOR CLEANING</span>
-                          <span className="text-white font-bold">
+                          <span className="text-foreground font-bold">
                             {formatCurrency(totals?.gla?.total || 0)}
                           </span>
                         </div>
@@ -917,65 +917,65 @@ export default function TotalsPage() {
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
-                          <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                          <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                          <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                          <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                          <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Electric - Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.reimbursedBills?.electricReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Electric - Not Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.reimbursedBills?.electricNotReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Gas - Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.reimbursedBills?.gasReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Gas - Not Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.reimbursedBills?.gasNotReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Gas - Service Run</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.reimbursedBills?.gasServiceRun || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Parking Airport</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.reimbursedBills?.parkingAirport || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Uber/Lyft/Lime - Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.reimbursedBills?.uberLyftLimeReimbursed || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Uber/Lyft/Lime - Not Reimbursed</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.reimbursedBills?.uberLyftLimeNotReimbursed || 0)}
                           </span>
                         </div>
@@ -991,216 +991,216 @@ export default function TotalsPage() {
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
-                          <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                          <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                          <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                          <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                          <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Accounting & Professional Fees</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.accountingProfessionalFees || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Advertizing</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.advertizing || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Bank Charges</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.bankCharges || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Detail Mobile</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.detailMobile || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Charitable Contributions</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.charitableContributions || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Computer & Internet</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.computerInternet || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Delivery, Postage & Freight</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.deliveryPostageFreight || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Detail Shop Equipment</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.detailShopEquipment || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Dues & Subscription</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.duesSubscription || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>General and administrative (G&A)</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.generalAdministrative || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Health & Wellness</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.healthWellness || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Labor - Human Resources</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.laborHumanResources || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Labor - Marketing</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.laborMarketing || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Office Rent</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.officeRent || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Outside & Staff Contractors</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.outsideStaffContractors || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Park n Jet Booth</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.parknJetBooth || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Printing</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.printing || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Referral</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.referral || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Repairs & Maintenance</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.repairsMaintenance || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Sales Tax</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.salesTax || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Security Cameras</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.securityCameras || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Supplies & Materials</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.suppliesMaterials || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Taxes and License</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.taxesLicense || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Telephone</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.telephone || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Travel</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.travel || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Labor Software</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.laborSoftware || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Legal & Professional</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.legalProfessional || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Marketing</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.marketing || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Meals & Entertainment</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.mealsEntertainment || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Office Expense</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.officeExpense || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Labor Sales</span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.laborSales || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                        <div className="flex justify-between text-muted-foreground text-sm font-bold pt-2 border-t border-border">
                           <span className="font-bold">Total OPERATING EXPENSES (Office Support)</span>
-                          <span className="text-white font-bold">
+                          <span className="text-foreground font-bold">
                             {formatCurrency(totals?.operatingExpensesOffice?.total || 0)}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-base font-extrabold">
+                        <div className="flex justify-between text-muted-foreground text-base font-extrabold">
                           <span className="font-extrabold">Total Expenses</span>
-                          <span className="text-white font-extrabold">
+                          <span className="text-foreground font-extrabold">
                             {formatCurrency(totals?.operatingExpensesOffice?.totalExpenses || 0)}
                           </span>
                         </div>
@@ -1216,36 +1216,36 @@ export default function TotalsPage() {
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
-                          <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                          <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                          <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                          <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                          <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Days Rented</span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {totals?.history?.daysRented || 0}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Cars Available For Rent</span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {totals?.history?.carsAvailableForRent || 0}
                           </span>
                         </div>
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Trips Taken</span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {totals?.history?.tripsTaken || 0}
                           </span>
                         </div>
@@ -1261,24 +1261,24 @@ export default function TotalsPage() {
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
-                          <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                          <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                          <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                          <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                          <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
-                        <div className="flex justify-between text-gray-300 text-sm">
+                        <div className="flex justify-between text-muted-foreground text-sm">
                           <span>{fromYear} - {toYear}</span>
-                          <span className="text-white font-semibold">
+                          <span className="text-foreground font-semibold">
                             {formatCurrency(totals?.payments?.total || 0)}
                           </span>
                         </div>
@@ -1293,24 +1293,24 @@ export default function TotalsPage() {
                 <AccordionItem
                   key={category.id}
                   value={category.id}
-                  className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a] mb-2 last:mb-0"
+                  className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
                 >
-                  <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                  <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
                     <div className="flex items-center justify-between w-full pr-4">
                       <div className="flex items-center gap-2">
-                        <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                        <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                        <span className="text-white font-medium text-sm sm:text-base">{category.label}</span>
+                        <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                        <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                        <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
                       </div>
-                      <span className="text-white font-semibold text-sm sm:text-base">TOTALS</span>
+                      <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="px-4 sm:px-6 pb-4 bg-[#0a0a0a]">
+                  <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
                     <div className="space-y-2 pt-2">
                       {/* Placeholder content - will be replaced with actual data from API */}
-                      <div className="flex justify-between text-gray-300 text-sm">
+                      <div className="flex justify-between text-muted-foreground text-sm">
                         <span>No data available</span>
-                        <span className="text-white">{formatCurrency(category.total)}</span>
+                        <span className="text-foreground">{formatCurrency(category.total)}</span>
                       </div>
                     </div>
                   </AccordionContent>

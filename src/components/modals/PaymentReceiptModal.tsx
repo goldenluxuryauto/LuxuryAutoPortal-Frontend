@@ -280,37 +280,37 @@ export function PaymentReceiptModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white max-w-4xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="bg-card border-border text-foreground max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
-          <DialogTitle className="text-white text-xl flex items-center justify-between">
+          <DialogTitle className="text-foreground text-xl flex items-center justify-between">
             <span>Payment Receipt</span>
             {hasAttachments && fileUrls.length > 1 && (
-              <span className="text-sm text-gray-400 font-normal">
+              <span className="text-sm text-muted-foreground font-normal">
                 {currentIndex + 1} / {fileUrls.length}
               </span>
             )}
           </DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogDescription className="text-muted-foreground">
             Receipt for {formatYearMonth(payment.payments_year_month)}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col h-full">
           {isLoadingFiles ? (
-            <div className="flex items-center justify-center p-12 bg-[#1a1a1a] rounded-lg min-h-[400px]">
+            <div className="flex items-center justify-center p-12 bg-card rounded-lg min-h-[400px]">
               <div className="text-center">
                 <Loader2 className="w-8 h-8 mx-auto mb-4 text-[#EAEB80] animate-spin" />
-                <p className="text-gray-400">Loading receipt files...</p>
+                <p className="text-muted-foreground">Loading receipt files...</p>
               </div>
             </div>
           ) : !hasAttachments ? (
-            <div className="flex items-center justify-center p-12 bg-[#1a1a1a] rounded-lg">
+            <div className="flex items-center justify-center p-12 bg-card rounded-lg">
               <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#2a2a2a] flex items-center justify-center">
-                  <X className="w-8 h-8 text-gray-500" />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                  <X className="w-8 h-8 text-foreground0" />
                 </div>
-                <p className="text-gray-400 text-lg">No receipt attached</p>
-                <p className="text-gray-500 text-sm mt-2">
+                <p className="text-muted-foreground text-lg">No receipt attached</p>
+                <p className="text-foreground0 text-sm mt-2">
                   Upload a receipt to view it here
                 </p>
               </div>
@@ -318,21 +318,21 @@ export function PaymentReceiptModal({
           ) : (
             <>
               {/* Receipt Display Area */}
-              <div className="flex-1 bg-[#1a1a1a] rounded-lg overflow-auto p-4 min-h-[400px] max-h-[600px]">
+              <div className="flex-1 bg-card rounded-lg overflow-auto p-4 min-h-[400px] max-h-[600px]">
                 {currentFile && currentFile.error ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
                       <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-900/20 flex items-center justify-center">
-                        <X className="w-8 h-8 text-red-400" />
+                        <X className="w-8 h-8 text-red-700" />
                       </div>
-                      <p className="text-red-400 text-lg mb-2">Error Loading Receipt</p>
-                      <p className="text-gray-400 text-sm max-w-md">
+                      <p className="text-red-700 text-lg mb-2">Error Loading Receipt</p>
+                      <p className="text-muted-foreground text-sm max-w-md">
                         {currentFile.error}
                       </p>
-                      <p className="text-gray-500 text-xs mt-4">
+                      <p className="text-foreground0 text-xs mt-4">
                         File ID: {currentFile.fileId}
                       </p>
-                      <p className="text-gray-500 text-xs mt-2">
+                      <p className="text-foreground0 text-xs mt-2">
                         If this error persists, the receipt may need to be re-uploaded.
                       </p>
                     </div>
@@ -384,13 +384,13 @@ export function PaymentReceiptModal({
                     ) : (
                       <div className="flex items-center justify-center h-full">
                         <div className="text-center">
-                          <p className="text-gray-400">
+                          <p className="text-muted-foreground">
                             Unsupported file type
                           </p>
                           <Button
                             variant="outline"
                             onClick={handleDownload}
-                            className="mt-4 bg-[#2a2a2a] text-white hover:bg-[#3a3a3a] border-[#2a2a2a]"
+                            className="mt-4 bg-muted text-foreground hover:bg-muted/503a3a3a] border-border"
                           >
                             <Download className="w-4 h-4 mr-2" />
                             Download File
@@ -402,7 +402,7 @@ export function PaymentReceiptModal({
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
-                      <p className="text-gray-400">No file to display</p>
+                      <p className="text-muted-foreground">No file to display</p>
                     </div>
                   </div>
                 )}
@@ -410,10 +410,10 @@ export function PaymentReceiptModal({
 
               {/* File ID Information */}
               {currentFile && currentFile.fileId && currentFile.fileId !== 'error' && (
-                <div className="mt-4 p-3 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a]">
+                <div className="mt-4 p-3 bg-card rounded-lg border border-border">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-gray-400 mb-1">File ID:</p>
+                      <p className="text-xs text-muted-foreground mb-1">File ID:</p>
                       <div className="flex items-center gap-2">
                         {/* Only show file ID if it's not a folder (mimeType check) */}
                         {currentFile.mimeType !== 'application/vnd.google-apps.folder' ? (
@@ -445,7 +445,7 @@ export function PaymentReceiptModal({
                                   });
                                 }
                               }}
-                              className="h-6 w-6 p-0 text-gray-400 hover:text-white"
+                              className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
                               title="Copy File ID"
                             >
                               <Copy className="w-3 h-3" />
@@ -456,16 +456,16 @@ export function PaymentReceiptModal({
                               onClick={() => {
                                 window.open(`https://drive.google.com/file/d/${currentFile.fileId}/view`, "_blank");
                               }}
-                              className="h-6 w-6 p-0 text-gray-400 hover:text-white"
+                              className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
                               title="Open in Google Drive"
                             >
                               <ExternalLink className="w-3 h-3" />
                             </Button>
                           </>
                         ) : (
-                          <div className="text-sm text-yellow-400">
+                          <div className="text-sm text-yellow-700">
                             <p>Folder ID detected. Please re-upload the receipt file.</p>
-                            <p className="text-xs text-gray-500 mt-1">Folder ID: {currentFile.fileId}</p>
+                            <p className="text-xs text-foreground0 mt-1">Folder ID: {currentFile.fileId}</p>
                           </div>
                         )}
                       </div>
@@ -475,7 +475,7 @@ export function PaymentReceiptModal({
               )}
 
               {/* Navigation & Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-[#2a2a2a] mt-4">
+              <div className="flex items-center justify-between pt-4 border-t border-border mt-4">
                 <div className="flex items-center gap-2">
                   {fileUrls.length > 1 && (
                     <>
@@ -483,7 +483,7 @@ export function PaymentReceiptModal({
                         variant="outline"
                         size="sm"
                         onClick={handlePrevious}
-                        className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border-[#2a2a2a]"
+                        className="bg-card text-foreground hover:bg-muted border-border"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </Button>
@@ -491,7 +491,7 @@ export function PaymentReceiptModal({
                         variant="outline"
                         size="sm"
                         onClick={handleNext}
-                        className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border-[#2a2a2a]"
+                        className="bg-card text-foreground hover:bg-muted border-border"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </Button>
@@ -503,7 +503,7 @@ export function PaymentReceiptModal({
                     variant="outline"
                     size="sm"
                     onClick={handleDownload}
-                    className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border-[#2a2a2a]"
+                    className="bg-card text-foreground hover:bg-muted border-border"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Download
@@ -518,7 +518,7 @@ export function PaymentReceiptModal({
             <Button
               variant="outline"
               onClick={onClose}
-              className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border-[#2a2a2a]"
+              className="bg-card text-foreground hover:bg-muted border-border"
             >
               Close
             </Button>

@@ -144,14 +144,14 @@ export function RecordFileModal({
   // Validate carId before allowing submission
   if (!carId || carId <= 0) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg w-full max-w-2xl p-6 relative">
-          <div className="text-red-400 text-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50 p-4">
+        <div className="bg-card border border-border rounded-lg w-full max-w-2xl p-6 relative">
+          <div className="text-red-700 text-sm">
             Invalid car ID. Please go back and try again.
           </div>
           <Button
             onClick={onClose}
-            className="mt-4 bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            className="mt-4 bg-primary text-black hover:bg-primary/80"
           >
             Close
           </Button>
@@ -184,23 +184,23 @@ export function RecordFileModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50 p-4">
+      <div className="bg-card border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
           disabled={mutation.isPending}
         >
           <X className="w-5 h-5" />
         </button>
 
-        <h3 className="text-lg font-semibold text-white mb-6">
+        <h3 className="text-lg font-semibold text-foreground mb-6">
           Add Record File
         </h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="doc_name" className="text-gray-300">
+            <Label htmlFor="doc_name" className="text-muted-foreground">
               Document Name *
             </Label>
             <Input
@@ -214,13 +214,13 @@ export function RecordFileModal({
                 }))
               }
               disabled={mutation.isPending}
-              className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1"
+              className="bg-card border-border text-foreground mt-1"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="date" className="text-gray-300">
+            <Label htmlFor="date" className="text-muted-foreground">
               Date *
             </Label>
             <Input
@@ -234,13 +234,13 @@ export function RecordFileModal({
                 }))
               }
               disabled={mutation.isPending}
-              className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:contrast-100"
+              className="bg-card border-border text-foreground mt-1 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:contrast-100"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="remarks" className="text-gray-300">
+            <Label htmlFor="remarks" className="text-muted-foreground">
               Remarks
             </Label>
             <Textarea
@@ -253,7 +253,7 @@ export function RecordFileModal({
                 }))
               }
               disabled={mutation.isPending}
-              className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1"
+              className="bg-card border-border text-foreground mt-1"
               rows={3}
               placeholder="Enter any additional notes or remarks about this record..."
             />
@@ -261,10 +261,10 @@ export function RecordFileModal({
 
           <div className="p-3 bg-blue-900/20 border border-blue-800/50 rounded">
             <div className="flex items-start gap-2">
-              <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-300">
+              <Info className="w-4 h-4 text-blue-700 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-blue-700">
                 <p className="font-medium mb-1">New Record File</p>
-                <p className="text-xs text-blue-400/80">
+                <p className="text-xs text-blue-700/80">
                   After creating this record, you can add individual files to it. The record will be created as Active by default.
                 </p>
               </div>
@@ -273,7 +273,7 @@ export function RecordFileModal({
 
           {mutation.isError && (
             <div className="p-3 bg-red-900/20 border border-red-800/50 rounded">
-              <div className="text-red-400 text-sm font-medium">
+              <div className="text-red-700 text-sm font-medium">
                 {mutation.error instanceof Error
                   ? mutation.error.message
                   : "An error occurred while creating the record file"}
@@ -287,14 +287,14 @@ export function RecordFileModal({
               variant="outline"
               onClick={onClose}
               disabled={mutation.isPending}
-              className="border-[#2a2a2a] text-gray-300 hover:bg-[#2a2a2a]"
+              className="border-border text-muted-foreground hover:bg-muted"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={mutation.isPending || !formData.record_files_doc_name || !formData.record_files_date}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              className="bg-primary text-black hover:bg-primary/80"
             >
               {mutation.isPending ? "Saving..." : "Add"}
             </Button>

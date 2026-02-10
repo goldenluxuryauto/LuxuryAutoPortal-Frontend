@@ -142,7 +142,7 @@ export default function ContractManagement() {
       return (
         <Badge
           variant="outline"
-          className="border-yellow-500/50 text-yellow-500 bg-yellow-500/10 text-xs"
+          className="border-primary/50 text-primary-foreground bg-primary/20 text-xs"
         >
           Pending
         </Badge>
@@ -152,9 +152,9 @@ export default function ContractManagement() {
       return (
         <Badge
           variant="outline"
-          className="border-yellow-500/50 text-yellow-400 bg-yellow-500/10 text-xs"
+          className="border-blue-500/50 text-blue-700 bg-blue-500/10 text-xs"
         >
-          Opened
+          Sent
         </Badge>
       );
     }
@@ -162,7 +162,7 @@ export default function ContractManagement() {
       return (
         <Badge
           variant="outline"
-          className="border-green-500/50 text-green-400 bg-green-500/10 text-xs"
+          className="border-green-500/50 text-green-700 bg-green-500/10 text-xs"
         >
           Signed
         </Badge>
@@ -172,7 +172,7 @@ export default function ContractManagement() {
       return (
         <Badge
           variant="outline"
-          className="border-red-500/50 text-red-400 bg-red-500/10 text-xs"
+          className="border-red-500/50 text-red-700 bg-red-500/10 text-xs"
         >
           Expired
         </Badge>
@@ -181,7 +181,7 @@ export default function ContractManagement() {
     return (
       <Badge
         variant="outline"
-        className="border-yellow-500/50 text-yellow-500 bg-yellow-500/10 text-xs"
+        className="border-primary/50 text-primary-foreground bg-primary/20 text-xs"
       >
         Pending
       </Badge>
@@ -192,8 +192,8 @@ export default function ContractManagement() {
     <div className="space-y-6">
       {/* Header with Title and Description */}
         <div>
-        <h2 className="text-xl font-semibold text-white">LYC Contract / Agreement</h2>
-        <p className="text-sm text-gray-400 mt-1">
+        <h2 className="text-xl font-semibold text-foreground">LYC Contract / Agreement</h2>
+        <p className="text-sm text-muted-foreground mt-1">
           Manage LYC contracts and agreements
         </p>
       </div>
@@ -201,28 +201,28 @@ export default function ContractManagement() {
       {/* Search Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
             type="text"
             placeholder="Search by name, email, phone, or vehicle..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500"
+            className="pl-10 bg-card border-border text-foreground placeholder:text-foreground0"
           />
         </div>
       </div>
 
       {/* Table Card */}
-      <Card className="bg-[#111111] border-[#EAEB80]/20">
+      <Card className="bg-card border-primary/20">
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-[#EAEB80] animate-spin" />
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
             </div>
           ) : error ? (
-            <div className="text-center py-12 text-red-400">
+            <div className="text-center py-12 text-red-700">
               <p className="mb-2">Error loading contracts</p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-foreground0">
                 {error instanceof Error ? error.message : "Unknown error"}
               </p>
             </div>
@@ -232,41 +232,41 @@ export default function ContractManagement() {
                 <div className="overflow-x-auto">
             <Table className="w-full table-auto">
               <TableHeader>
-                    <TableRow className="border-b border-[#1a1a1a]">
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                    <TableRow className="border-b border-border">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Name
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
                         Email
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
                         Phone
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Vehicle
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
                         VIN#
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
                         Plate #
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
                         Submitted
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Status
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
                         Contract
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
                         Car Onboarding Date
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
                         Offboarding
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -276,33 +276,33 @@ export default function ContractManagement() {
                   <TableRow
                     key={contract.id}
                         className={cn(
-                          "border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
+                          "border-b border-border hover:bg-card transition-colors"
                         )}
                   >
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-white text-xs sm:text-sm max-w-[120px] truncate" title={`${contract.firstNameOwner} ${contract.lastNameOwner}`}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-foreground text-xs sm:text-sm max-w-[120px] truncate" title={`${contract.firstNameOwner} ${contract.lastNameOwner}`}>
                           {contract.firstNameOwner} {contract.lastNameOwner}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={contract.emailOwner}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={contract.emailOwner}>
                           {contract.emailOwner}
                     </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={contract.phoneOwner}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={contract.phoneOwner}>
                           {contract.phoneOwner}
                     </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm max-w-[150px] truncate" title={`${contract.vehicleMake} ${contract.vehicleModel} ${contract.vehicleYear}`}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm max-w-[150px] truncate" title={`${contract.vehicleMake} ${contract.vehicleModel} ${contract.vehicleYear}`}>
                           {contract.vehicleMake} {contract.vehicleModel}{" "}
                           {contract.vehicleYear}
                     </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={contract.vinNumber || "—"}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={contract.vinNumber || "—"}>
                           {contract.vinNumber || (
-                            <span className="text-gray-500">—</span>
+                            <span className="text-foreground0">—</span>
                         )}
                     </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={contract.licensePlate || "—"}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={contract.licensePlate || "—"}>
                           {contract.licensePlate || (
-                            <span className="text-gray-500">—</span>
+                            <span className="text-foreground0">—</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                           {new Date(contract.createdAt).toLocaleDateString("en-US", {
                             month: "2-digit",
                             day: "2-digit",
@@ -321,7 +321,7 @@ export default function ContractManagement() {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20"
+                                  className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-700 hover:bg-green-500/20"
                                   onClick={() => {
                                     window.open(
                                       buildApiUrl(`/api/contracts/${contract.id}/view`),
@@ -332,7 +332,7 @@ export default function ContractManagement() {
                                   View PDF
                                 </Button>
                               ) : (
-                                <span className="text-gray-500 text-xs">
+                                <span className="text-foreground0 text-xs">
                                   {contract.contractStatus === "sent" ||
                                   contract.contractStatus === "opened"
                                     ? "Contract sent"
@@ -341,7 +341,7 @@ export default function ContractManagement() {
                         )}
                       </div>
                     </TableCell>
-                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
+                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
                           {contract.contractSignedAt ? (
                             new Date(
                               contract.contractSignedAt
@@ -351,7 +351,7 @@ export default function ContractManagement() {
                               year: "numeric",
                             })
                           ) : (
-                            <span className="text-gray-500">Not signed</span>
+                            <span className="text-foreground0">Not signed</span>
                           )}
                         </TableCell>
                         <TableCell className="px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
@@ -359,12 +359,12 @@ export default function ContractManagement() {
                             <div className="flex flex-col gap-1">
                               <Badge
                                 variant="outline"
-                                className="border-red-500/50 text-red-400 bg-red-500/10 text-xs"
+                                className="border-red-500/50 text-red-700 bg-red-500/10 text-xs"
                               >
                                 Offboarded
                               </Badge>
                               {contract.carOffboardAt && (
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-foreground0">
                                   {new Date(
                                     contract.carOffboardAt
                                   ).toLocaleDateString("en-US", {
@@ -375,7 +375,7 @@ export default function ContractManagement() {
                                 </span>
                               )}
                               {contract.carOffboardReason && (
-                                <span className="text-xs text-gray-500 capitalize">
+                                <span className="text-xs text-foreground0 capitalize">
                                   {contract.carOffboardReason.replace("_", " ")}
                                 </span>
                               )}
@@ -383,7 +383,7 @@ export default function ContractManagement() {
           ) : (
                             <Badge
                               variant="outline"
-                              className="border-green-500/50 text-green-400 bg-green-500/10 text-xs"
+                              className="border-green-500/50 text-green-700 bg-green-500/10 text-xs"
                             >
                               Active
                             </Badge>
@@ -393,7 +393,7 @@ export default function ContractManagement() {
                       <Button
                         size="sm"
                             variant="outline"
-                            className="h-8 px-3 bg-[#EAEB80]/10 border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/20"
+                            className="h-8 px-3 bg-primary/10 border-primary/30 text-primary hover:bg-primary/20"
                             onClick={() => {
                               resendMutation.mutate(contract.id);
                             }}
@@ -438,7 +438,7 @@ export default function ContractManagement() {
               )}
             </>
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-foreground0">
               <p className="text-lg">No records found</p>
               <p className="text-sm mt-2">
                 {searchQuery

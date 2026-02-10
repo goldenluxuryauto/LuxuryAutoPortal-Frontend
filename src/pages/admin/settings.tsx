@@ -207,7 +207,7 @@ export default function SettingsPage() {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       </AdminLayout>
     );
@@ -219,25 +219,25 @@ export default function SettingsPage() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-          <p className="text-gray-400">Manage your account settings and preferences</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
+          <p className="text-muted-foreground">Manage your account settings and preferences</p>
         </div>
 
         {/* Account Security - Password Change */}
-        <Card className="bg-[#111111] border-[#EAEB80]/20">
+        <Card className="bg-card border-primary/20">
           <CardHeader>
-            <CardTitle className="text-[#EAEB80] flex items-center gap-2">
+            <CardTitle className="text-primary flex items-center gap-2">
               <Lock className="w-5 h-5" />
               Account Security
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-muted-foreground">
               Update your password to keep your account secure
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="old-password" className="text-gray-300">
+                <Label htmlFor="old-password" className="text-muted-foreground">
                   Current Password *
                 </Label>
                 <div className="relative">
@@ -246,13 +246,13 @@ export default function SettingsPage() {
                     type={showOldPassword ? "text" : "password"}
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
-                    className="bg-[#0a0a0a] border-[#2a2a2a] text-white focus:border-[#EAEB80] pr-10"
+                    className="bg-background border-border text-foreground focus:border-primary pr-10"
                     placeholder="Enter your current password"
                     required
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setShowOldPassword(!showOldPassword)}
                   >
                     {showOldPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -261,7 +261,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="new-password" className="text-gray-300">
+                <Label htmlFor="new-password" className="text-muted-foreground">
                   New Password *
                 </Label>
                 <div className="relative">
@@ -270,14 +270,14 @@ export default function SettingsPage() {
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="bg-[#0a0a0a] border-[#2a2a2a] text-white focus:border-[#EAEB80] pr-10"
+                    className="bg-background border-border text-foreground focus:border-primary pr-10"
                     placeholder="Enter your new password (min 8 characters)"
                     required
                     minLength={8}
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                   >
                     {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -286,7 +286,7 @@ export default function SettingsPage() {
                 {newPassword.length > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-[#2a2a2a] rounded-full h-2">
+                      <div className="flex-1 bg-muted rounded-full h-2">
                         <div
                           className={`h-2 rounded-full transition-all ${getPasswordStrengthColor(
                             passwordStrength.score
@@ -294,7 +294,7 @@ export default function SettingsPage() {
                           style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
                         />
                       </div>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-muted-foreground">
                         {getPasswordStrengthLabel(passwordStrength.score)}
                       </span>
                     </div>
@@ -304,7 +304,7 @@ export default function SettingsPage() {
                           <div
                             key={idx}
                             className={`flex items-center gap-1 ${
-                              passwordStrength.isValid ? "text-green-400" : "text-yellow-400"
+                              passwordStrength.isValid ? "text-green-700" : "text-yellow-700"
                             }`}
                           >
                             <AlertCircle className="w-3 h-3" />
@@ -318,7 +318,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirm-password" className="text-gray-300">
+                <Label htmlFor="confirm-password" className="text-muted-foreground">
                   Confirm New Password *
                 </Label>
                 <div className="relative">
@@ -327,13 +327,13 @@ export default function SettingsPage() {
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="bg-[#0a0a0a] border-[#2a2a2a] text-white focus:border-[#EAEB80] pr-10"
+                    className="bg-background border-border text-foreground focus:border-primary pr-10"
                     placeholder="Confirm your new password"
                     required
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -342,9 +342,9 @@ export default function SettingsPage() {
                 {confirmPassword.length > 0 && (
                   <div className="text-xs flex items-center gap-1">
                     {passwordsMatch ? (
-                      <span className="text-green-400">✓ Passwords match</span>
+                      <span className="text-green-700">✓ Passwords match</span>
                     ) : (
-                      <span className="text-red-400">✗ Passwords do not match</span>
+                      <span className="text-red-700">✗ Passwords do not match</span>
                     )}
                   </div>
                 )}
@@ -354,7 +354,7 @@ export default function SettingsPage() {
                 <Button
                   type="submit"
                   disabled={!canSubmitPassword}
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {passwordUpdateMutation.isPending ? (
                     <>
@@ -370,7 +370,7 @@ export default function SettingsPage() {
                 </Button>
                 <a
                   href="/reset-password"
-                  className="text-sm text-[#EAEB80] hover:underline"
+                  className="text-sm text-primary hover:underline"
                 >
                   Forgot your password?
                 </a>
@@ -382,13 +382,13 @@ export default function SettingsPage() {
         {/* Slack Channel Configuration - Admin Only */}
         {isAdmin && (
           <>
-            <Card className="bg-[#111111] border-[#EAEB80]/20">
+            <Card className="bg-card border-primary/20">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80] flex items-center gap-2">
+              <CardTitle className="text-primary flex items-center gap-2">
                 <Slack className="w-5 h-5" />
                 Slack Channel Configuration
               </CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardDescription className="text-muted-foreground">
                 Configure which Slack channels receive notifications for each form type. Each form type can have its own dedicated channel.
               </CardDescription>
             </CardHeader>
@@ -400,22 +400,22 @@ export default function SettingsPage() {
               return (
                 <div
                   key={config.formType}
-                  className="p-4 border border-[#2a2a2a] rounded-lg bg-[#1a1a1a]"
+                  className="p-4 border border-border rounded-lg bg-card"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <Label className="text-white font-medium text-lg">
+                      <Label className="text-foreground font-medium text-lg">
                         {formTypeLabels[config.formType] || config.formType}
                       </Label>
                       {config.channelName && (
-                        <p className="text-sm text-gray-400 mt-1">{config.channelName}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{config.channelName}</p>
                       )}
                     </div>
                   </div>
 
                   <div className="space-y-3">
                     <div>
-                      <Label htmlFor={`channel-${config.formType}`} className="text-gray-300 text-sm">
+                      <Label htmlFor={`channel-${config.formType}`} className="text-muted-foreground text-sm">
                         Slack Channel ID
                       </Label>
                       {isEditing ? (
@@ -429,13 +429,13 @@ export default function SettingsPage() {
                                 [config.formType]: e.target.value,
                               }))
                             }
-                            className="bg-[#0a0a0a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-background border-border text-foreground focus:border-primary"
                             placeholder="C1234567890"
                           />
                           <Button
                             onClick={() => handleSave(config)}
                             disabled={updateMutation.isPending}
-                            className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                            className="bg-primary text-primary-foreground hover:bg-primary/80"
                             size="sm"
                           >
                             {updateMutation.isPending ? (
@@ -448,7 +448,7 @@ export default function SettingsPage() {
                             onClick={() => handleCancel(config.formType)}
                             variant="outline"
                             size="sm"
-                            className="border-[#2a2a2a] text-gray-300 hover:bg-[#2a2a2a]"
+                            className="border-border text-muted-foreground hover:bg-muted"
                           >
                             Cancel
                           </Button>
@@ -458,20 +458,20 @@ export default function SettingsPage() {
                           <Input
                             value={config.channelId}
                             readOnly
-                            className="bg-[#0a0a0a] border-[#2a2a2a] text-gray-400"
+                            className="bg-background border-border text-muted-foreground"
                           />
                           <Button
                             onClick={() => handleEdit(config.formType, config.channelId)}
                             variant="outline"
                             size="sm"
-                            className="border-[#2a2a2a] text-gray-300 hover:bg-[#2a2a2a]"
+                            className="border-border text-muted-foreground hover:bg-muted"
                           >
                             Edit
                           </Button>
                         </div>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-foreground0">
                       Last updated: {new Date(config.updatedAt).toLocaleString()}
                     </p>
                   </div>
@@ -480,7 +480,7 @@ export default function SettingsPage() {
             })}
 
             {channels.length === 0 && (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-muted-foreground">
                 <p>No Slack channel configurations found.</p>
                 <p className="text-sm mt-2">Channels will be initialized on first use.</p>
               </div>
@@ -488,18 +488,18 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#111111] border-[#EAEB80]/20">
+          <Card className="bg-card border-primary/20">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80]">How to Get Slack Channel ID</CardTitle>
+              <CardTitle className="text-primary">How to Get Slack Channel ID</CardTitle>
             </CardHeader>
-            <CardContent className="text-gray-300 space-y-2">
+            <CardContent className="text-muted-foreground space-y-2">
               <ol className="list-decimal list-inside space-y-2">
                 <li>Open Slack and navigate to the channel you want to use</li>
                 <li>Click on the channel name at the top</li>
                 <li>Scroll down to find the "Channel ID" (starts with "C")</li>
                 <li>Copy the Channel ID and paste it in the field above</li>
               </ol>
-              <p className="text-sm text-gray-400 mt-4">
+              <p className="text-sm text-muted-foreground mt-4">
                 Note: Make sure your Slack bot has been invited to the channel before notifications can be sent.
               </p>
             </CardContent>

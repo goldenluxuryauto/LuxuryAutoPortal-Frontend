@@ -94,9 +94,9 @@ export function EditEmergencyModal({ open, onOpenChange, employee }: EditEmergen
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg bg-[#111111] border-[#2a2a2a] text-gray-200">
+      <DialogContent className="max-w-lg bg-card border-border text-muted-foreground">
         <DialogHeader>
-          <DialogTitle className="text-[#EAEB80]">Update Emergency Contact</DialogTitle>
+          <DialogTitle className="text-primary">Update Emergency Contact</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -105,9 +105,9 @@ export function EditEmergencyModal({ open, onOpenChange, employee }: EditEmergen
               name="employee_emergency_contact_person"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-400">Name</FormLabel>
+                  <FormLabel className="text-muted-foreground">Name</FormLabel>
                   <FormControl>
-                    <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                    <Input {...field} className="bg-card border-border" />
                   </FormControl>
                 </FormItem>
               )}
@@ -117,9 +117,9 @@ export function EditEmergencyModal({ open, onOpenChange, employee }: EditEmergen
               name="employee_emergency_relationship"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-400">Relationship</FormLabel>
+                  <FormLabel className="text-muted-foreground">Relationship</FormLabel>
                   <FormControl>
-                    <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                    <Input {...field} className="bg-card border-border" />
                   </FormControl>
                 </FormItem>
               )}
@@ -129,9 +129,9 @@ export function EditEmergencyModal({ open, onOpenChange, employee }: EditEmergen
               name="employee_emergency_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-400">Number</FormLabel>
+                  <FormLabel className="text-muted-foreground">Number</FormLabel>
                   <FormControl>
-                    <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                    <Input {...field} className="bg-card border-border" />
                   </FormControl>
                 </FormItem>
               )}
@@ -141,9 +141,9 @@ export function EditEmergencyModal({ open, onOpenChange, employee }: EditEmergen
               name="employee_emergency_address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-400">Address</FormLabel>
+                  <FormLabel className="text-muted-foreground">Address</FormLabel>
                   <FormControl>
-                    <Textarea {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" rows={3} />
+                    <Textarea {...field} className="bg-card border-border" rows={3} />
                   </FormControl>
                 </FormItem>
               )}
@@ -154,14 +154,14 @@ export function EditEmergencyModal({ open, onOpenChange, employee }: EditEmergen
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={mutation.isPending}
-                className="border-[#2a2a2a]"
+                className="border-border"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={mutation.isPending}
-                className="bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
               </Button>

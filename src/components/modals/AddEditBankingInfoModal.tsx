@@ -236,7 +236,7 @@ export function AddEditBankingInfoModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#0a0a0a] border-[#2a2a2a] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-background border-border text-foreground max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-[#EAEB80]">
             {isEdit ? "Edit Banking Information" : "Add Banking Information"}
@@ -246,14 +246,14 @@ export function AddEditBankingInfoModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Car Selection */}
           <div>
-            <Label htmlFor="car" className="text-gray-300">
+            <Label htmlFor="car" className="text-muted-foreground">
               Associated Car (Optional)
             </Label>
             <Select value={carId} onValueChange={setCarId}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectTrigger className="bg-card border-border text-foreground">
                 <SelectValue placeholder="Default (No specific car)" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-card border-border text-foreground">
                 <SelectItem value="none">Default (No specific car)</SelectItem>
                 {cars.map((car) => (
                   <SelectItem key={car.id} value={String(car.id)}>
@@ -268,14 +268,14 @@ export function AddEditBankingInfoModal({
 
           {/* Bank Name */}
           <div>
-            <Label htmlFor="bankName" className="text-gray-300">
+            <Label htmlFor="bankName" className="text-muted-foreground">
               Bank Name <span className="text-red-500">*</span>
             </Label>
             <Input
               id="bankName"
               value={bankName}
               onChange={(e) => setBankName(e.target.value)}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+              className="bg-card border-border text-foreground"
               placeholder="Enter bank name"
               required
             />
@@ -283,14 +283,14 @@ export function AddEditBankingInfoModal({
 
           {/* Routing Number */}
           <div>
-            <Label htmlFor="routingNumber" className="text-gray-300">
+            <Label htmlFor="routingNumber" className="text-muted-foreground">
               Routing Number <span className="text-red-500">*</span>
             </Label>
             <Input
               id="routingNumber"
               value={routingNumber}
               onChange={(e) => setRoutingNumber(e.target.value)}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+              className="bg-card border-border text-foreground font-mono"
               placeholder="Enter routing number"
               required
             />
@@ -298,14 +298,14 @@ export function AddEditBankingInfoModal({
 
           {/* Account Number */}
           <div>
-            <Label htmlFor="accountNumber" className="text-gray-300">
+            <Label htmlFor="accountNumber" className="text-muted-foreground">
               Account Number <span className="text-red-500">*</span>
             </Label>
             <Input
               id="accountNumber"
               value={accountNumber}
               onChange={(e) => setAccountNumber(e.target.value)}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+              className="bg-card border-border text-foreground font-mono"
               placeholder="Enter account number"
               required
             />
@@ -313,56 +313,56 @@ export function AddEditBankingInfoModal({
 
           {/* Tax Classification */}
           <div>
-            <Label htmlFor="taxClassification" className="text-gray-300">
+            <Label htmlFor="taxClassification" className="text-muted-foreground">
               Tax Classification
             </Label>
             <Input
               id="taxClassification"
               value={taxClassification}
               onChange={(e) => setTaxClassification(e.target.value)}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+              className="bg-card border-border text-foreground"
               placeholder="e.g., Individual, LLC, Corporation"
             />
           </div>
 
           {/* SSN */}
           <div>
-            <Label htmlFor="ssn" className="text-gray-300">
+            <Label htmlFor="ssn" className="text-muted-foreground">
               SSN
             </Label>
             <Input
               id="ssn"
               value={ssn}
               onChange={(e) => setSsn(e.target.value)}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+              className="bg-card border-border text-foreground font-mono"
               placeholder="XXX-XX-XXXX"
             />
           </div>
 
           {/* EIN */}
           <div>
-            <Label htmlFor="ein" className="text-gray-300">
+            <Label htmlFor="ein" className="text-muted-foreground">
               EIN
             </Label>
             <Input
               id="ein"
               value={ein}
               onChange={(e) => setEin(e.target.value)}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+              className="bg-card border-border text-foreground font-mono"
               placeholder="XX-XXXXXXX"
             />
           </div>
 
           {/* Business Name */}
           <div>
-            <Label htmlFor="businessName" className="text-gray-300">
+            <Label htmlFor="businessName" className="text-muted-foreground">
               Business Name
             </Label>
             <Input
               id="businessName"
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+              className="bg-card border-border text-foreground"
               placeholder="Enter business name (if applicable)"
             />
           </div>
@@ -373,9 +373,9 @@ export function AddEditBankingInfoModal({
               id="isDefault"
               checked={isDefault}
               onCheckedChange={(checked) => setIsDefault(checked as boolean)}
-              className="border-[#2a2a2a]"
+              className="border-border"
             />
-            <Label htmlFor="isDefault" className="text-gray-300 cursor-pointer">
+            <Label htmlFor="isDefault" className="text-muted-foreground cursor-pointer">
               Set as default banking information
             </Label>
           </div>
@@ -386,13 +386,13 @@ export function AddEditBankingInfoModal({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-[#2a2a2a] text-gray-300 hover:bg-[#1a1a1a]"
+              className="border-border text-muted-foreground hover:bg-card"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              className="bg-primary text-primary-foreground hover:bg-primary/80"
               disabled={createMutation.isPending || updateMutation.isPending}
             >
               {createMutation.isPending || updateMutation.isPending

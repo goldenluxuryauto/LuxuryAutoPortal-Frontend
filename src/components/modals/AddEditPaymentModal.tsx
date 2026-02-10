@@ -240,7 +240,7 @@ export function AddEditPaymentModal({
       getMonthValue(incomeExpenseDataValue.directDelivery || [], monthNum, "parkingLot") +
       getMonthValue(incomeExpenseDataValue.directDelivery || [], monthNum, "uberLyftLime")
     );
-    const dynamicTotal = (dynamicSubcategories.directDelivery || []).reduce((sum, subcat) => {
+    const dynamicTotal = dynamicSubcategories.directDelivery.reduce((sum, subcat) => {
       const monthValue = subcat.values?.find((v: any) => v.month === monthNum);
       return sum + (monthValue?.value || 0);
     }, 0);
@@ -276,7 +276,7 @@ export function AddEditPaymentModal({
       getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "windshield") +
       getMonthValue(incomeExpenseDataValue.cogs || [], monthNum, "wipers")
     );
-    const dynamicTotal = (dynamicSubcategories.cogs || []).reduce((sum, subcat) => {
+    const dynamicTotal = dynamicSubcategories.cogs.reduce((sum, subcat) => {
       const monthValue = subcat.values?.find((v: any) => v.month === monthNum);
       return sum + (monthValue?.value || 0);
     }, 0);
@@ -290,7 +290,7 @@ export function AddEditPaymentModal({
       getMonthValue(incomeExpenseDataValue.parkingFeeLabor || [], monthNum, "glaParkingFee") +
       getMonthValue(incomeExpenseDataValue.parkingFeeLabor || [], monthNum, "laborCleaning")
     );
-    const dynamicTotal = (dynamicSubcategories.parkingFeeLabor || []).reduce((sum, subcat) => {
+    const dynamicTotal = dynamicSubcategories.parkingFeeLabor.reduce((sum, subcat) => {
       const monthValue = subcat.values?.find((v: any) => v.month === monthNum);
       return sum + (monthValue?.value || 0);
     }, 0);
@@ -300,8 +300,6 @@ export function AddEditPaymentModal({
   // Calculate Negative Balance Carry Over (simplified version for modal)
   const calculateNegativeBalanceCarryOver = (monthNum: number): number => {
     if (!incomeExpenseDataValue || !year) return 0;
-    // Guard: prevent infinite recursion - monthNum must be 1-12 (valid month)
-    if (typeof monthNum !== "number" || isNaN(monthNum) || monthNum < 1 || monthNum > 12) return 0;
     const currentYear = parseInt(String(year), 10);
     
     if (currentYear === 2019) return 0;
@@ -325,22 +323,20 @@ export function AddEditPaymentModal({
     let prevTotalParkingFeeLabor: number;
     let prevCarOwnerSplitPercent: number;
     
-    // January: use previous year Dec or 0 for carry over (never recurse - prevents stack overflow)
-    if (monthNum === 1) {
+    if (monthNum === 1 && currentYear > 2019 && prevYearDecData) {
       const prevDec = 12;
-      const prevYearIncomeExpenses = prevYearDecData?.incomeExpenses || [];
-      prevRentalIncome = getPrevYearValue(prevYearIncomeExpenses, prevDec, "rentalIncome");
-      prevDeliveryIncome = getPrevYearValue(prevYearIncomeExpenses, prevDec, "deliveryIncome");
-      prevElectricPrepaidIncome = getPrevYearValue(prevYearIncomeExpenses, prevDec, "electricPrepaidIncome");
-      prevSmokingFines = getPrevYearValue(prevYearIncomeExpenses, prevDec, "smokingFines");
-      prevGasPrepaidIncome = getPrevYearValue(prevYearIncomeExpenses, prevDec, "gasPrepaidIncome");
-      prevSkiRacksIncome = getPrevYearValue(prevYearIncomeExpenses, prevDec, "skiRacksIncome");
-      prevMilesIncome = getPrevYearValue(prevYearIncomeExpenses, prevDec, "milesIncome");
-      prevChildSeatIncome = getPrevYearValue(prevYearIncomeExpenses, prevDec, "childSeatIncome");
-      prevCoolersIncome = getPrevYearValue(prevYearIncomeExpenses, prevDec, "coolersIncome");
-      prevInsuranceWreckIncome = getPrevYearValue(prevYearIncomeExpenses, prevDec, "insuranceWreckIncome");
-      prevOtherIncome = getPrevYearValue(prevYearIncomeExpenses, prevDec, "otherIncome");
-      prevCarOwnerSplitPercent = getPrevYearValue(prevYearIncomeExpenses, prevDec, "carOwnerSplit") || 0;
+      prevRentalIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "rentalIncome");
+      prevDeliveryIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "deliveryIncome");
+      prevElectricPrepaidIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "electricPrepaidIncome");
+      prevSmokingFines = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "smokingFines");
+      prevGasPrepaidIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "gasPrepaidIncome");
+      prevSkiRacksIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "skiRacksIncome");
+      prevMilesIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "milesIncome");
+      prevChildSeatIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "childSeatIncome");
+      prevCoolersIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "coolersIncome");
+      prevInsuranceWreckIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "insuranceWreckIncome");
+      prevOtherIncome = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "otherIncome");
+      prevCarOwnerSplitPercent = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevDec, "carOwnerSplit") || 0;
       
       // For January, we'll use 0 for negative balance carry over from previous year December
       // (full calculation would require recursive calculation of previous year)
@@ -541,27 +537,19 @@ export function AddEditPaymentModal({
     setBalance(balanceNum.toFixed(2));
   }, [payout, payable]);
 
-  // Update payable when income/expense data is fetched and year/month changes (add mode only)
-  // Use stable primitive deps; object refs (incomeExpenseData?.data) can change identity and cause loops
+  // Update payable when income/expense data is fetched and year/month changes
+  // Always calculate from income/expense data (both add and edit modes)
   useEffect(() => {
-    if (payment) return; // Edit mode: use payment amount, don't overwrite
     if (year && month && incomeExpenseData?.success && incomeExpenseData?.data) {
+      // Calculate car owner split for the selected month
       const ownerSplit = calculateCarOwnerSplit(month);
-      setPayable((prev) => {
-        const next = ownerSplit.toFixed(2);
-        return prev === next ? prev : next; // Avoid redundant updates
-      });
+      setPayable(ownerSplit.toFixed(2));
     } else if (year && month && incomeExpenseData && !incomeExpenseData.success) {
+      // If income/expense data not found, set to 0
       setPayable("0.00");
     }
-  }, [
-    !!payment,
-    incomeExpenseData?.success,
-    incomeExpenseData?.dataUpdatedAt ?? 0,
-    year,
-    month,
-    previousYearData?.dataUpdatedAt ?? 0,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [incomeExpenseData?.success, incomeExpenseData?.data, year, month, dynamicSubcategories, previousYearData, monthModes, skiRacksOwner]);
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -619,7 +607,6 @@ export function AddEditPaymentModal({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/payments/car", carId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/payments/search"] });
       toast({
         title: "Success",
         description: "Payment created successfully",
@@ -674,7 +661,6 @@ export function AddEditPaymentModal({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/payments/car", carId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/payments/search"] });
       toast({
         title: "Success",
         description: "Payment updated successfully",
@@ -755,12 +741,12 @@ export function AddEditPaymentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border2a2a2a] text-foreground max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-white text-xl">
+          <DialogTitle className="text-foreground text-xl">
             {isEdit ? "Update" : "Add"} Payment
           </DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogDescription className="text-muted-foreground">
             {isEdit
               ? "Update payment information"
               : "Create a new payment record"}
@@ -770,8 +756,8 @@ export function AddEditPaymentModal({
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           {/* Year/Month */}
           <div>
-            <Label htmlFor="yearMonth" className="text-gray-300">
-              Year/Month <span className="text-red-400">*</span>
+            <Label htmlFor="yearMonth" className="text-muted-foreground">
+              Year/Month <span className="text-red-700">*</span>
             </Label>
             <Input
               id="yearMonth"
@@ -779,18 +765,18 @@ export function AddEditPaymentModal({
               value={yearMonth}
               onChange={(e) => setYearMonth(e.target.value)}
               disabled={isPending || isEdit}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1"
+              className="bg-muted border-border2a2a2a] text-foreground mt-1"
               required
             />
           </div>
 
           {/* Payable Amount (Read-only, auto-filled from Income & Expense) */}
           <div>
-            <Label htmlFor="payable" className="text-gray-300">
+            <Label htmlFor="payable" className="text-muted-foreground">
               Payable (Owner's Split)
             </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                 $
               </span>
               <Input
@@ -799,17 +785,17 @@ export function AddEditPaymentModal({
                 value={payable}
                 readOnly
                 disabled={isPending || isLoadingIncomeExpense}
-                className="bg-[#0a0a0a] border-[#2a2a2a] text-white mt-1 pl-8 cursor-not-allowed"
+                className="bg-background border-border2a2a2a] text-foreground mt-1 pl-8 cursor-not-allowed"
                 placeholder="0.00"
               />
             </div>
             {isLoadingIncomeExpense && (
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Loading payable amount from Income & Expense...
               </p>
             )}
             {!isLoadingIncomeExpense && year && month && (!incomeExpenseData || !incomeExpenseData.success) && (
-              <p className="text-xs text-yellow-400 mt-1">
+              <p className="text-xs text-yellow-700 mt-1">
                 Income & Expense not found for {year}-{String(month).padStart(2, "0")}. Payable set to $0.00.
               </p>
             )}
@@ -817,11 +803,11 @@ export function AddEditPaymentModal({
 
           {/* Payout Amount */}
           <div>
-            <Label htmlFor="payout" className="text-gray-300">
-              Payout <span className="text-red-400">*</span>
+            <Label htmlFor="payout" className="text-muted-foreground">
+              Payout <span className="text-red-700">*</span>
             </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                 $
               </span>
               <Input
@@ -831,7 +817,7 @@ export function AddEditPaymentModal({
                 value={payout}
                 onChange={(e) => setPayout(e.target.value)}
                 disabled={isPending}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1 pl-8"
+                className="bg-muted border-border2a2a2a] text-foreground mt-1 pl-8"
                 placeholder="0.00"
                 required
               />
@@ -840,11 +826,11 @@ export function AddEditPaymentModal({
 
           {/* Balance (Read-only, auto-calculated) */}
           <div>
-            <Label htmlFor="balance" className="text-gray-300">
+            <Label htmlFor="balance" className="text-muted-foreground">
               Balance (Payout - Payable)
             </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                 $
               </span>
               <Input
@@ -852,21 +838,21 @@ export function AddEditPaymentModal({
                 type="text"
                 value={balance}
                 disabled
-                className="bg-[#0a0a0a] border-[#2a2a2a] text-[#EAEB80] font-bold mt-1 pl-8"
+                className="bg-background border-border2a2a2a] text-[#EAEB80] font-bold mt-1 pl-8"
               />
             </div>
           </div>
 
           {/* Status */}
           <div>
-            <Label htmlFor="status" className="text-gray-300">
-              Payment Status <span className="text-red-400">*</span>
+            <Label htmlFor="status" className="text-muted-foreground">
+              Payment Status <span className="text-red-700">*</span>
             </Label>
             <Select value={statusId} onValueChange={setStatusId} disabled={isPending}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1">
+              <SelectTrigger className="bg-muted border-border2a2a2a] text-foreground mt-1">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-muted border-border2a2a2a] text-foreground">
                 {statuses.map((status) => (
                   <SelectItem
                     key={status.payment_status_aid}
@@ -881,7 +867,7 @@ export function AddEditPaymentModal({
 
           {/* Reference Number */}
           <div>
-            <Label htmlFor="referenceNumber" className="text-gray-300">
+            <Label htmlFor="referenceNumber" className="text-muted-foreground">
               Reference Number
             </Label>
             <Input
@@ -890,14 +876,14 @@ export function AddEditPaymentModal({
               value={referenceNumber}
               onChange={(e) => setReferenceNumber(e.target.value)}
               disabled={isPending}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1"
+              className="bg-muted border-border2a2a2a] text-foreground mt-1"
               placeholder="Enter reference number"
             />
           </div>
 
           {/* Payment Date */}
           <div>
-            <Label htmlFor="paymentDate" className="text-gray-300">
+            <Label htmlFor="paymentDate" className="text-muted-foreground">
               Payment Date
             </Label>
             <Input
@@ -906,13 +892,13 @@ export function AddEditPaymentModal({
               value={paymentDate}
               onChange={(e) => setPaymentDate(e.target.value)}
               disabled={isPending}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1"
+              className="bg-muted border-border2a2a2a] text-foreground mt-1"
             />
           </div>
 
           {/* Receipt Upload */}
           <div>
-            <Label className="text-gray-300">Receipt Upload</Label>
+            <Label className="text-muted-foreground">Receipt Upload</Label>
             <div className="mt-2 space-y-2">
               <input
                 ref={fileInputRef}
@@ -928,7 +914,7 @@ export function AddEditPaymentModal({
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isPending}
-                className="w-full bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+                className="w-full bg-muted border-border2a2a2a] text-foreground hover:bg-muted"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 {receiptFiles.length > 0 ? "Add More Files" : "Upload Receipt"}
@@ -936,13 +922,13 @@ export function AddEditPaymentModal({
               
               {receiptFiles.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     {receiptFiles.length} file(s) selected
                   </p>
                   {receiptFiles.map((file, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between bg-[#0a0a0a] border border-[#2a2a2a] rounded p-2"
+                      className="flex items-center justify-between bg-background border border-border2a2a2a] rounded p-2"
                     >
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         {file.type.startsWith("image/") ? (
@@ -950,10 +936,10 @@ export function AddEditPaymentModal({
                         ) : (
                           <FileText className="w-4 h-4 text-[#EAEB80] flex-shrink-0" />
                         )}
-                        <span className="text-sm text-white truncate">
+                        <span className="text-sm text-foreground truncate">
                           {file.name}
                         </span>
-                        <span className="text-xs text-gray-400 flex-shrink-0">
+                        <span className="text-xs text-muted-foreground flex-shrink-0">
                           ({(file.size / 1024).toFixed(1)} KB)
                         </span>
                       </div>
@@ -963,7 +949,7 @@ export function AddEditPaymentModal({
                         size="sm"
                         onClick={() => handleRemoveFile(index)}
                         disabled={isPending}
-                        className="text-red-400 hover:text-red-300 hover:bg-red-400/10 ml-2"
+                        className="text-red-700 hover:text-red-700 hover:bg-red-400/10 ml-2"
                       >
                         <X className="w-4 h-4" />
                       </Button>
@@ -976,7 +962,7 @@ export function AddEditPaymentModal({
 
           {/* Remarks */}
           <div>
-            <Label htmlFor="remarks" className="text-gray-300">
+            <Label htmlFor="remarks" className="text-muted-foreground">
               Remarks
             </Label>
             <Textarea
@@ -984,27 +970,27 @@ export function AddEditPaymentModal({
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               disabled={isPending}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1"
+              className="bg-muted border-border2a2a2a] text-foreground mt-1"
               placeholder="Enter any additional notes"
               rows={3}
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-2 pt-4 border-t border-[#2a2a2a]">
+          <div className="flex justify-end gap-2 pt-4 border-t border-border2a2a2a]">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
               disabled={isPending}
-              className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border-[#2a2a2a]"
+              className="bg-muted text-foreground hover:bg-muted border-border2a2a2a]"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isPending}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              className="bg-primary text-primary-foreground hover:bg-primary/80"
             >
               {isPending ? "Saving..." : isEdit ? "Update Payment" : "Create Payment"}
             </Button>

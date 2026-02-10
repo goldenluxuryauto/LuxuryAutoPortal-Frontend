@@ -166,27 +166,27 @@ export function EditRecordFileModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50 p-4">
+      <div className="bg-card border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
           disabled={mutation.isPending}
         >
           <X className="w-5 h-5" />
         </button>
 
-        <h3 className="text-lg font-semibold text-white mb-6">
+        <h3 className="text-lg font-semibold text-foreground mb-6">
           Edit Record File
         </h3>
 
         {!isDataLoaded && (
-          <div className="text-gray-400 text-sm mb-4">Loading record data...</div>
+          <div className="text-muted-foreground text-sm mb-4">Loading record data...</div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="doc_name" className="text-gray-300">
+            <Label htmlFor="doc_name" className="text-muted-foreground">
               Document Name *
             </Label>
             <Input
@@ -200,13 +200,13 @@ export function EditRecordFileModal({
                 }))
               }
               disabled={mutation.isPending}
-              className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1"
+              className="bg-card border-border text-foreground mt-1"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="date" className="text-gray-300">
+            <Label htmlFor="date" className="text-muted-foreground">
               Date *
             </Label>
             <Input
@@ -220,13 +220,13 @@ export function EditRecordFileModal({
                 }))
               }
               disabled={mutation.isPending}
-              className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:contrast-100"
+              className="bg-card border-border text-foreground mt-1 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:contrast-100"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="remarks" className="text-gray-300">
+            <Label htmlFor="remarks" className="text-muted-foreground">
               Remarks
             </Label>
             <Textarea
@@ -239,14 +239,14 @@ export function EditRecordFileModal({
                 }))
               }
               disabled={mutation.isPending}
-              className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1"
+              className="bg-card border-border text-foreground mt-1"
               rows={3}
               placeholder="Enter any additional notes or remarks about this record..."
             />
           </div>
 
           {mutation.isError && (
-            <div className="text-red-400 text-sm">
+            <div className="text-red-700 text-sm">
               {mutation.error instanceof Error
                 ? mutation.error.message
                 : "An error occurred"}
@@ -259,14 +259,14 @@ export function EditRecordFileModal({
               variant="outline"
               onClick={onClose}
               disabled={mutation.isPending}
-              className="border-[#2a2a2a] text-gray-300 hover:bg-[#2a2a2a]"
+              className="border-border text-muted-foreground hover:bg-muted"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={mutation.isPending || !formData.record_files_doc_name || !formData.record_files_date}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              className="bg-primary text-black hover:bg-primary/80"
             >
               {mutation.isPending ? "Saving..." : "Save"}
             </Button>

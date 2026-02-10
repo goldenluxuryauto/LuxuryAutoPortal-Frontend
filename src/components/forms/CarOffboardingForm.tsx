@@ -188,13 +188,13 @@ export default function CarOffboardingForm() {
   };
 
   return (
-    <Card className="bg-[#111111] border-[#EAEB80]/20">
+    <Card className="bg-card border-primary/20">
       <CardHeader>
         <CardTitle className="text-[#EAEB80] flex items-center gap-2">
           <LogOut className="w-5 h-5" />
           Car Off-boarding Form
         </CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardDescription className="text-muted-foreground">
           Submit this form when requesting your car back from GLA (end of rental or off-boarding from the fleet).
         </CardDescription>
       </CardHeader>
@@ -208,12 +208,12 @@ export default function CarOffboardingForm() {
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Date *</FormLabel>
+                    <FormLabel className="text-muted-foreground">Date *</FormLabel>
                     <FormControl>
                       <Input
                         type="date"
                         {...field}
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        className="bg-card border-border text-foreground focus:border-primary"
                       />
                     </FormControl>
                     <FormMessage />
@@ -226,12 +226,12 @@ export default function CarOffboardingForm() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Name *</FormLabel>
+                    <FormLabel className="text-muted-foreground">Name *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Your full name"
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        className="bg-card border-border text-foreground focus:border-primary"
                         readOnly
                       />
                     </FormControl>
@@ -247,7 +247,7 @@ export default function CarOffboardingForm() {
               name="carId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-300">Select Car to Pick Up *</FormLabel>
+                  <FormLabel className="text-muted-foreground">Select Car to Pick Up *</FormLabel>
                   <Select
                     onValueChange={(value) => {
                       field.onChange(value);
@@ -256,11 +256,11 @@ export default function CarOffboardingForm() {
                     value={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                      <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                         <SelectValue placeholder="Select a car to pick up" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       {isLoadingCars ? (
                         <SelectItem value="loading" disabled>
                           Loading cars...
@@ -286,7 +286,7 @@ export default function CarOffboardingForm() {
                     </SelectContent>
                   </Select>
                   <FormMessage />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-foreground0 mt-1">
                     Only showing cars currently with GLA (on-boarded status)
                   </p>
                 </FormItem>
@@ -300,12 +300,12 @@ export default function CarOffboardingForm() {
                 name="carMakeModelYear"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Car Make/Model/Year *</FormLabel>
+                    <FormLabel className="text-muted-foreground">Car Make/Model/Year *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Select a car above to auto-fill"
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        className="bg-card border-border text-foreground focus:border-primary"
                         readOnly
                       />
                     </FormControl>
@@ -319,12 +319,12 @@ export default function CarOffboardingForm() {
                 name="plateNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Plate Number *</FormLabel>
+                    <FormLabel className="text-muted-foreground">Plate Number *</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Enter plate number or auto-filled from car"
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] uppercase"
+                        className="bg-card border-border text-foreground focus:border-primary uppercase"
                         style={{ textTransform: "uppercase" }}
                       />
                     </FormControl>
@@ -338,12 +338,12 @@ export default function CarOffboardingForm() {
                 name="dealershipAddress"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Address of Dealership</FormLabel>
+                    <FormLabel className="text-muted-foreground">Address of Dealership</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="Enter dealership address (if applicable)"
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        className="bg-card border-border text-foreground focus:border-primary"
                       />
                     </FormControl>
                     <FormMessage />
@@ -359,12 +359,12 @@ export default function CarOffboardingForm() {
                 name="pickUpDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Pick-up Date *</FormLabel>
+                    <FormLabel className="text-muted-foreground">Pick-up Date *</FormLabel>
                     <FormControl>
                       <Input
                         type="date"
                         {...field}
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        className="bg-card border-border text-foreground focus:border-primary"
                       />
                     </FormControl>
                     <FormMessage />
@@ -377,12 +377,12 @@ export default function CarOffboardingForm() {
                 name="pickUpTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Pick-up Time *</FormLabel>
+                    <FormLabel className="text-muted-foreground">Pick-up Time *</FormLabel>
                     <FormControl>
                       <Input
                         type="time"
                         {...field}
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        className="bg-card border-border text-foreground focus:border-primary"
                       />
                     </FormControl>
                     <FormMessage />
@@ -394,7 +394,7 @@ export default function CarOffboardingForm() {
             <Button
               type="submit"
               disabled={isSubmitting || isLoadingCars || activeCars.length === 0}
-              className="w-full bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
             >
               {isSubmitting ? (
                 <>

@@ -198,10 +198,10 @@ export default function AdminDashboard() {
             alt="Golden Luxury Auto" 
             className="h-[47px] md:h-[60px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
           />
-          <h1 className="text-2xl font-semibold text-[#EAEB80] mb-2">
+          <h1 className="text-2xl font-semibold text-primary mb-2">
             {welcome.title}
           </h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-foreground0 text-sm">
             {welcome.description}
           </p>
           {user && (
@@ -216,49 +216,49 @@ export default function AdminDashboard() {
           {/* Show all stats for admins */}
           {isAdmin && (
             <>
-              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <Car className="w-4 h-4 text-[#EAEB80]" />
-                    <span className="text-sm text-gray-400">Active Vehicles</span>
+                    <Car className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-muted-foreground">Active Vehicles</span>
                   </div>
-                  <p className="text-3xl font-bold text-white" data-testid="stat-vehicles">
+                  <p className="text-3xl font-bold text-foreground" data-testid="stat-vehicles">
                     {isLoading ? "..." : stats?.activeVehicles || 24}
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <Users className="w-4 h-4 text-[#EAEB80]" />
-                    <span className="text-sm text-gray-400">Total Clients</span>
+                    <Users className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-muted-foreground">Total Clients</span>
                   </div>
-                  <p className="text-3xl font-bold text-white" data-testid="stat-clients">
+                  <p className="text-3xl font-bold text-foreground" data-testid="stat-clients">
                     {isLoading ? "..." : stats?.totalClients || 18}
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <DollarSign className="w-4 h-4 text-[#EAEB80]" />
-                    <span className="text-sm text-gray-400">Monthly Revenue</span>
+                    <DollarSign className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-muted-foreground">Monthly Revenue</span>
                   </div>
-                  <p className="text-3xl font-bold text-white" data-testid="stat-revenue">
+                  <p className="text-3xl font-bold text-foreground" data-testid="stat-revenue">
                     ${isLoading ? "..." : ((stats?.monthlyRevenue || 42500) / 1000).toFixed(1)}K
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <TrendingUp className="w-4 h-4 text-[#EAEB80]" />
-                    <span className="text-sm text-gray-400">Growth Rate</span>
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-muted-foreground">Growth Rate</span>
                   </div>
-                  <p className="text-3xl font-bold text-[#EAEB80]" data-testid="stat-growth">
+                  <p className="text-3xl font-bold text-primary" data-testid="stat-growth">
                     +{isLoading ? "..." : stats?.growthRate || 23}%
                   </p>
                 </CardContent>
@@ -269,25 +269,25 @@ export default function AdminDashboard() {
           {/* Show limited stats for clients */}
           {isClient && (
             <>
-              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <Car className="w-4 h-4 text-[#EAEB80]" />
-                    <span className="text-sm text-gray-400">My Vehicles</span>
+                    <Car className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-muted-foreground">My Vehicles</span>
                   </div>
-                  <p className="text-3xl font-bold text-white" data-testid="stat-vehicles">
+                  <p className="text-3xl font-bold text-foreground" data-testid="stat-vehicles">
                     {isClientStatsLoading ? "..." : clientStats?.data?.totalVehicles || 0}
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <DollarSign className="w-4 h-4 text-[#EAEB80]" />
-                    <span className="text-sm text-gray-400">My Earnings</span>
+                    <DollarSign className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-muted-foreground">My Earnings</span>
                   </div>
-                  <p className="text-3xl font-bold text-white" data-testid="stat-revenue">
+                  <p className="text-3xl font-bold text-foreground" data-testid="stat-revenue">
                     ${isLoading ? "..." : ((stats?.monthlyRevenue || 0) / 1000).toFixed(1)}K
                   </p>
                 </CardContent>
@@ -298,13 +298,13 @@ export default function AdminDashboard() {
           {/* Show limited stats for employees */}
           {isEmployee && !isAdmin && !isClient && (
             <>
-              <Card className="bg-[#111111] border-[#EAEB80]/20 hover:border-[#EAEB80]/40 transition-colors">
+              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <Car className="w-4 h-4 text-[#EAEB80]" />
-                    <span className="text-sm text-gray-400">Assigned Vehicles</span>
+                    <Car className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-muted-foreground">Assigned Vehicles</span>
                   </div>
-                  <p className="text-3xl font-bold text-white" data-testid="stat-vehicles">
+                  <p className="text-3xl font-bold text-foreground" data-testid="stat-vehicles">
                     {isLoading ? "..." : stats?.activeVehicles || 0}
                   </p>
                 </CardContent>
@@ -316,13 +316,13 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Show Quick Start only for admins */}
           {isAdmin && (
-            <Card className="bg-[#111111] border-[#EAEB80]/20">
+            <Card className="bg-card border-primary/20">
               <CardContent className="p-5">
-                <h3 className="text-base font-semibold text-white mb-4">Quick Start</h3>
+                <h3 className="text-base font-semibold text-foreground mb-4">Quick Start</h3>
                 <ol className="space-y-3">
                   {quickStartSteps.map((step, index) => (
-                    <li key={index} className="flex items-start gap-3 text-sm text-gray-400">
-                      <span className="text-[#EAEB80] font-medium">{index + 1}.</span>
+                    <li key={index} className="flex items-start gap-3 text-sm text-muted-foreground">
+                      <span className="text-primary font-medium">{index + 1}.</span>
                       <span>{step}</span>
                     </li>
                   ))}
@@ -333,24 +333,24 @@ export default function AdminDashboard() {
 
           {/* Show Quick Start for clients with different steps */}
           {isClient && (
-            <Card className="bg-[#111111] border-[#EAEB80]/20">
+            <Card className="bg-card border-primary/20">
               <CardContent className="p-5">
-                <h3 className="text-base font-semibold text-white mb-4">Quick Start</h3>
+                <h3 className="text-base font-semibold text-foreground mb-4">Quick Start</h3>
                 <ol className="space-y-3">
-                  <li className="flex items-start gap-3 text-sm text-gray-400">
-                    <span className="text-[#EAEB80] font-medium">1.</span>
+                  <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                    <span className="text-primary font-medium">1.</span>
                     <span>View your vehicles in the Cars section</span>
                   </li>
-                  <li className="flex items-start gap-3 text-sm text-gray-400">
-                    <span className="text-[#EAEB80] font-medium">2.</span>
+                  <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                    <span className="text-primary font-medium">2.</span>
                     <span>Check your earnings and totals</span>
                   </li>
-                  <li className="flex items-start gap-3 text-sm text-gray-400">
-                    <span className="text-[#EAEB80] font-medium">3.</span>
+                  <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                    <span className="text-primary font-medium">3.</span>
                     <span>Access forms and resources</span>
                   </li>
-                  <li className="flex items-start gap-3 text-sm text-gray-400">
-                    <span className="text-[#EAEB80] font-medium">4.</span>
+                  <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                    <span className="text-primary font-medium">4.</span>
                     <span>Update your profile information</span>
                   </li>
                 </ol>
@@ -358,13 +358,13 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          <Card className="bg-[#111111] border-[#EAEB80]/20">
+          <Card className="bg-card border-primary/20">
             <CardContent className="p-5">
-              <h3 className="text-base font-semibold text-white mb-4">Features</h3>
+              <h3 className="text-base font-semibold text-foreground mb-4">Features</h3>
               <ul className="space-y-3">
                 {features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-3 text-sm text-gray-400">
-                    <CheckCircle className="w-4 h-4 text-[#EAEB80]" />
+                  <li key={index} className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <CheckCircle className="w-4 h-4 text-primary" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -372,24 +372,24 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#111111] border-[#EAEB80]/20">
+          <Card className="bg-card border-primary/20">
             <CardContent className="p-5">
-              <h3 className="text-base font-semibold text-white mb-4">Support</h3>
+              <h3 className="text-base font-semibold text-foreground mb-4">Support</h3>
               <ul className="space-y-3">
-                <li className="flex items-center gap-3 text-sm text-gray-400">
-                  <Mail className="w-4 h-4 text-[#EAEB80]" />
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <Mail className="w-4 h-4 text-primary" />
                   <span>{supportInfo.email}</span>
                 </li>
-                <li className="flex items-center gap-3 text-sm text-gray-400">
-                  <Phone className="w-4 h-4 text-[#EAEB80]" />
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <Phone className="w-4 h-4 text-primary" />
                   <span>{supportInfo.phone}</span>
                 </li>
-                <li className="flex items-center gap-3 text-sm text-gray-400">
-                  <Clock className="w-4 h-4 text-[#EAEB80]" />
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <Clock className="w-4 h-4 text-primary" />
                   <span>{supportInfo.hours}</span>
                 </li>
-                <li className="flex items-center gap-3 text-sm text-gray-400">
-                  <MessageCircle className="w-4 h-4 text-[#EAEB80]" />
+                <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <MessageCircle className="w-4 h-4 text-primary" />
                   <span>{supportInfo.chat}</span>
                 </li>
               </ul>
@@ -399,7 +399,7 @@ export default function AdminDashboard() {
 
         {/* Quick Links */}
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-white">Quick Links</h2>
+          <h2 className="text-xl font-semibold text-foreground">Quick Links</h2>
           <QuickLinks />
         </div>
 

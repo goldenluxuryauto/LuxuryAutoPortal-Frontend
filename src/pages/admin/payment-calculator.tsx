@@ -96,10 +96,10 @@ export default function PaymentCalculatorPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-400">Failed to load car details</p>
+          <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-[#EAEB80] hover:underline"
+            className="mt-4 text-primary hover:underline"
           >
             ← Back to View Car
           </button>
@@ -130,15 +130,15 @@ export default function PaymentCalculatorPage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">Payment Calculator</h1>
+            <h1 className="text-2xl font-bold text-foreground">Payment Calculator</h1>
             {car && (
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Car: {car.makeModel || "Unknown Car"}
               </p>
             )}
@@ -146,65 +146,65 @@ export default function PaymentCalculatorPage() {
         </div>
 
         {/* Header Section */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <div className="bg-card border border-border rounded-lg p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Car Information</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">Car Name:</span>
-                  <p className="text-sm text-gray-300">{carName}</p>
+                  <span className="text-xs text-foreground0">Car Name:</span>
+                  <p className="text-sm text-muted-foreground">{carName}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">VIN#:</span>
-                  <p className="text-sm text-gray-300">{car.vin || "N/A"}</p>
+                  <span className="text-xs text-foreground0">VIN#:</span>
+                  <p className="text-sm text-muted-foreground">{car.vin || "N/A"}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">License:</span>
-                  <p className="text-sm text-gray-300">{car.licensePlate || "N/A"}</p>
+                  <span className="text-xs text-foreground0">License:</span>
+                  <p className="text-sm text-muted-foreground">{car.licensePlate || "N/A"}</p>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Contact Information</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Contact Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">Name:</span>
-                  <p className="text-sm text-gray-300">{ownerName}</p>
+                  <span className="text-xs text-foreground0">Name:</span>
+                  <p className="text-sm text-muted-foreground">{ownerName}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Contact #:</span>
-                  <p className="text-sm text-gray-300">{ownerContact}</p>
+                  <span className="text-xs text-foreground0">Contact #:</span>
+                  <p className="text-sm text-muted-foreground">{ownerContact}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Email:</span>
-                  <p className="text-sm text-gray-300">{ownerEmail}</p>
+                  <span className="text-xs text-foreground0">Email:</span>
+                  <p className="text-sm text-muted-foreground">{ownerEmail}</p>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications & Turo Links */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Car Specifications</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Specifications</h3>
               <div className="space-y-2 mb-4">
                 <div>
-                  <span className="text-xs text-gray-500">Fuel/Gas:</span>
-                  <p className="text-sm text-gray-300">{fuelType}</p>
+                  <span className="text-xs text-foreground0">Fuel/Gas:</span>
+                  <p className="text-sm text-muted-foreground">{fuelType}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Tire Size:</span>
-                  <p className="text-sm text-gray-300">{tireSize}</p>
+                  <span className="text-xs text-foreground0">Tire Size:</span>
+                  <p className="text-sm text-muted-foreground">{tireSize}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Oil Type:</span>
-                  <p className="text-sm text-gray-300">{oilType}</p>
+                  <span className="text-xs text-foreground0">Oil Type:</span>
+                  <p className="text-sm text-muted-foreground">{oilType}</p>
                 </div>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-3">Turo Links</h3>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Turo Links</h3>
                 <div className="space-y-2">
                   {car.turoLink && (
                     <div>
@@ -212,7 +212,7 @@ export default function PaymentCalculatorPage() {
                         href={car.turoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                        className="text-primary hover:underline text-sm flex items-center gap-1"
                       >
                         Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -225,7 +225,7 @@ export default function PaymentCalculatorPage() {
                         href={car.adminTuroLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                        className="text-primary hover:underline text-sm flex items-center gap-1"
                       >
                         Admin Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -233,7 +233,7 @@ export default function PaymentCalculatorPage() {
                     </div>
                   )}
                   {!car.turoLink && !car.adminTuroLink && (
-                    <span className="text-gray-500 text-sm">No Turo links available</span>
+                    <span className="text-foreground0 text-sm">No Turo links available</span>
                   )}
                 </div>
               </div>
@@ -243,7 +243,7 @@ export default function PaymentCalculatorPage() {
 
         {/* Payment Calculator Section */}
         <div className="mb-6">
-          <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-6">Payment Calculator</h1>
+          <h1 className="text-3xl font-serif text-primary italic mb-6">Payment Calculator</h1>
           
           {/* Warning Banner */}
           {!firstPaymentDate && (
@@ -260,56 +260,56 @@ export default function PaymentCalculatorPage() {
             {/* Left Column: Inputs and Summary */}
             <div className="lg:col-span-2 space-y-6">
               {/* Inputs Section */}
-              <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6">
-                <h2 className="text-lg font-semibold text-gray-300 mb-4">Inputs</h2>
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h2 className="text-lg font-semibold text-muted-foreground mb-4">Inputs</h2>
                 <div className="space-y-4">
                   <div>
-                    <Label className="text-sm text-gray-400 mb-2 block">Auto Loan Amount</Label>
+                    <Label className="text-sm text-muted-foreground mb-2 block">Auto Loan Amount</Label>
                     <Input
                       type="number"
                       value={autoLoanAmount}
                       onChange={(e) => setAutoLoanAmount(parseFloat(e.target.value) || 0)}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                      className="bg-card border-border text-foreground"
                       placeholder="0.00"
                     />
                   </div>
                   <div>
-                    <Label className="text-sm text-gray-400 mb-2 block">Annual Interest Rate</Label>
+                    <Label className="text-sm text-muted-foreground mb-2 block">Annual Interest Rate</Label>
                     <Input
                       type="number"
                       step="0.01"
                       value={annualInterestRate}
                       onChange={(e) => setAnnualInterestRate(parseFloat(e.target.value) || 0)}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                      className="bg-card border-border text-foreground"
                       placeholder="0.00"
                     />
                   </div>
                   <div>
-                    <Label className="text-sm text-gray-400 mb-2 block">Term of Loan in Years</Label>
+                    <Label className="text-sm text-muted-foreground mb-2 block">Term of Loan in Years</Label>
                     <Input
                       type="number"
                       value={termOfLoan}
                       onChange={(e) => setTermOfLoan(parseInt(e.target.value) || 0)}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                      className="bg-card border-border text-foreground"
                       placeholder="0"
                     />
                   </div>
                   <div>
-                    <Label className="text-sm text-gray-400 mb-2 block">First Payment Date</Label>
+                    <Label className="text-sm text-muted-foreground mb-2 block">First Payment Date</Label>
                     <Input
                       type="date"
                       value={firstPaymentDate}
                       onChange={(e) => setFirstPaymentDate(e.target.value)}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                      className="bg-card border-border text-foreground"
                     />
                   </div>
                   <div>
-                    <Label className="text-sm text-gray-400 mb-2 block">Frequency of Payment</Label>
+                    <Label className="text-sm text-muted-foreground mb-2 block">Frequency of Payment</Label>
                     <Select value={frequencyOfPayment} onValueChange={setFrequencyOfPayment}>
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="--" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectContent className="bg-card border-border text-foreground">
                         <SelectItem value="monthly">Monthly</SelectItem>
                         <SelectItem value="biweekly">Bi-weekly</SelectItem>
                         <SelectItem value="weekly">Weekly</SelectItem>
@@ -320,55 +320,55 @@ export default function PaymentCalculatorPage() {
               </div>
 
               {/* Effect of Extra Payments Section */}
-              <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6">
-                <h2 className="text-lg font-semibold text-gray-300 mb-4">Effect of Extra Payments</h2>
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h2 className="text-lg font-semibold text-muted-foreground mb-4">Effect of Extra Payments</h2>
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                    <span className="text-sm text-gray-300">Total Payments</span>
-                    <span className="text-sm text-gray-300 font-medium">{formatCurrency(0)}</span>
+                  <div className="flex justify-between items-center py-2 border-b border-border">
+                    <span className="text-sm text-muted-foreground">Total Payments</span>
+                    <span className="text-sm text-muted-foreground font-medium">{formatCurrency(0)}</span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                    <span className="text-sm text-gray-300">Total Interest</span>
-                    <span className="text-sm text-gray-300 font-medium">{formatCurrency(0)}</span>
+                  <div className="flex justify-between items-center py-2 border-b border-border">
+                    <span className="text-sm text-muted-foreground">Total Interest</span>
+                    <span className="text-sm text-muted-foreground font-medium">{formatCurrency(0)}</span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                    <span className="text-sm text-gray-300">Reduced Interest</span>
-                    <span className="text-sm text-gray-300 font-medium">{formatCurrency(0)}</span>
+                  <div className="flex justify-between items-center py-2 border-b border-border">
+                    <span className="text-sm text-muted-foreground">Reduced Interest</span>
+                    <span className="text-sm text-muted-foreground font-medium">{formatCurrency(0)}</span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                    <span className="text-sm text-gray-300">Number of Payments</span>
-                    <span className="text-sm text-gray-300 font-medium">0</span>
+                  <div className="flex justify-between items-center py-2 border-b border-border">
+                    <span className="text-sm text-muted-foreground">Number of Payments</span>
+                    <span className="text-sm text-muted-foreground font-medium">0</span>
                   </div>
                   <div className="flex justify-between items-center py-2">
-                    <span className="text-sm text-gray-300">Last Payment Date</span>
-                    <span className="text-sm text-gray-500 font-medium">--</span>
+                    <span className="text-sm text-muted-foreground">Last Payment Date</span>
+                    <span className="text-sm text-foreground0 font-medium">--</span>
                   </div>
                 </div>
               </div>
 
               {/* Summary (with no extra payments) Section */}
-              <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6">
-                <h2 className="text-lg font-semibold text-gray-300 mb-4">Summary (with no extra payments)</h2>
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h2 className="text-lg font-semibold text-muted-foreground mb-4">Summary (with no extra payments)</h2>
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                    <span className="text-sm text-gray-300">Number of Payments</span>
-                    <span className="text-sm text-gray-300 font-medium">0</span>
+                  <div className="flex justify-between items-center py-2 border-b border-border">
+                    <span className="text-sm text-muted-foreground">Number of Payments</span>
+                    <span className="text-sm text-muted-foreground font-medium">0</span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                    <span className="text-sm text-gray-300">Rate (per period)</span>
-                    <span className="text-sm text-gray-300 font-medium">{formatPercentage(0)}</span>
+                  <div className="flex justify-between items-center py-2 border-b border-border">
+                    <span className="text-sm text-muted-foreground">Rate (per period)</span>
+                    <span className="text-sm text-muted-foreground font-medium">{formatPercentage(0)}</span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                    <span className="text-sm text-gray-300">Payment (per period)</span>
-                    <span className="text-sm text-gray-300 font-medium">{formatCurrency(0)}</span>
+                  <div className="flex justify-between items-center py-2 border-b border-border">
+                    <span className="text-sm text-muted-foreground">Payment (per period)</span>
+                    <span className="text-sm text-muted-foreground font-medium">{formatCurrency(0)}</span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                    <span className="text-sm text-gray-300">Total Interest</span>
-                    <span className="text-sm text-gray-300 font-medium">{formatCurrency(0)}</span>
+                  <div className="flex justify-between items-center py-2 border-b border-border">
+                    <span className="text-sm text-muted-foreground">Total Interest</span>
+                    <span className="text-sm text-muted-foreground font-medium">{formatCurrency(0)}</span>
                   </div>
                   <div className="flex justify-between items-center py-2">
-                    <span className="text-sm text-gray-300">Total Payments</span>
-                    <span className="text-sm text-gray-300 font-medium">{formatCurrency(0)}</span>
+                    <span className="text-sm text-muted-foreground">Total Payments</span>
+                    <span className="text-sm text-muted-foreground font-medium">{formatCurrency(0)}</span>
                   </div>
                 </div>
               </div>
@@ -377,7 +377,7 @@ export default function PaymentCalculatorPage() {
             {/* Right Column: Graph and Instructions */}
             <div className="space-y-6">
               {/* Graph */}
-              <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6">
+              <div className="bg-card border border-border rounded-lg p-6">
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
@@ -409,9 +409,9 @@ export default function PaymentCalculatorPage() {
               </div>
 
               {/* Using the Payment Calculator Text */}
-              <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6">
-                <h3 className="text-sm font-semibold text-gray-300 mb-3">Using the Payment Calculator</h3>
-                <p className="text-sm text-gray-400 leading-relaxed">
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Using the Payment Calculator</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   This Payment Calculator creates a payment schedule for a fixed-rate auto loan, with optional extra payments. Use the Payment Calculator to compare different terms, rates, and loan amounts. The Payment Calculator allows complete flexibility in how you make additional payments. The payment is rounded to the nearest cent. The last payment is adjusted to bring the balance to zero.
                 </p>
               </div>
@@ -419,20 +419,20 @@ export default function PaymentCalculatorPage() {
           </div>
 
           {/* Payment Schedule Table */}
-          <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden">
+          <div className="bg-card border border-border rounded-lg overflow-hidden">
             <div className="p-6">
-              <h2 className="text-lg font-semibold text-gray-300 mb-4">Payment Schedule</h2>
+              <h2 className="text-lg font-semibold text-muted-foreground mb-4">Payment Schedule</h2>
               <div className="w-full overflow-x-auto">
                 <table className="border-collapse w-full" style={{ minWidth: '800px' }}>
-                  <thead className="bg-[#1a1a1a]">
-                    <tr className="border-b border-[#2a2a2a]">
-                      <th className="text-left px-4 py-3 text-sm font-medium text-gray-300">No.</th>
-                      <th className="text-left px-4 py-3 text-sm font-medium text-gray-300">Due Date</th>
-                      <th className="text-right px-4 py-3 text-sm font-medium text-gray-300">Payment Due</th>
-                      <th className="text-right px-4 py-3 text-sm font-medium text-gray-300">Additional Payment</th>
-                      <th className="text-right px-4 py-3 text-sm font-medium text-gray-300">Interest</th>
-                      <th className="text-right px-4 py-3 text-sm font-medium text-gray-300">Principal</th>
-                      <th className="text-right px-4 py-3 text-sm font-medium text-gray-300">Balance</th>
+                  <thead className="bg-card">
+                    <tr className="border-b border-border">
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">No.</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Due Date</th>
+                      <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Payment Due</th>
+                      <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Additional Payment</th>
+                      <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Interest</th>
+                      <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Principal</th>
+                      <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Balance</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -440,7 +440,7 @@ export default function PaymentCalculatorPage() {
                       <td colSpan={7} className="py-12 text-center">
                         <div className="flex flex-col items-center justify-center gap-3">
                           <Folder className="w-12 h-12 text-gray-600" />
-                          <span className="text-gray-500 text-sm">No data</span>
+                          <span className="text-foreground0 text-sm">No data</span>
                         </div>
                       </td>
                     </tr>
@@ -449,10 +449,10 @@ export default function PaymentCalculatorPage() {
               </div>
               
               {/* Ending Balance */}
-              <div className="mt-6 pt-4 border-t border-[#2a2a2a] flex justify-end">
+              <div className="mt-6 pt-4 border-t border-border flex justify-end">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-300">Ending Balance</span>
-                  <span className="text-sm font-semibold text-[#EAEB80]">{formatCurrency(0)}</span>
+                  <span className="text-sm font-semibold text-muted-foreground">Ending Balance</span>
+                  <span className="text-sm font-semibold text-primary">{formatCurrency(0)}</span>
                 </div>
               </div>
             </div>

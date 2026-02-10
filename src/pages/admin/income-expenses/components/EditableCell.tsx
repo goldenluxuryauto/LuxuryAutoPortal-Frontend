@@ -51,9 +51,9 @@ export default function EditableCell({
     <span
       onClick={handleClick}
       className={cn(
-        "cursor-pointer hover:bg-[#2a2a2a] px-2 py-1 rounded block text-xs text-right transition-colors",
+        "cursor-pointer hover:bg-muted px-2 py-1 rounded block text-xs text-right transition-colors",
         value === 0 && "text-gray-600",
-        isCurrentlyEditing && "bg-[#2a2a2a] ring-1 ring-[#EAEB80]"
+        isCurrentlyEditing && "bg-muted ring-1 ring-[#EAEB80]"
       )}
     >
       {displayValue}

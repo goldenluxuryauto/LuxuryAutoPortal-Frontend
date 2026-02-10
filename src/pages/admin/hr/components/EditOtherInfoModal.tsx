@@ -224,9 +224,9 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg bg-[#111111] border-[#2a2a2a] text-gray-200">
+      <DialogContent className="max-w-lg bg-card border-border text-muted-foreground">
         <DialogHeader>
-          <DialogTitle className="text-[#EAEB80]">Update Other Information</DialogTitle>
+          <DialogTitle className="text-primary">Update Other Information</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -235,12 +235,12 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
               name="employee_hear_about_gla"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-400">
+                  <FormLabel className="text-muted-foreground">
                     How did you hear about Golden Luxury Auto?
                   </FormLabel>
                   <Select onValueChange={field.onChange} value={field.value || ""}>
                     <FormControl>
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a]">
+                      <SelectTrigger className="bg-card border-border">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                     </FormControl>
@@ -261,9 +261,9 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                 name="employee_hear_about_gla_other"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">Other (please specify)</FormLabel>
+                    <FormLabel className="text-muted-foreground">Other (please specify)</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -271,9 +271,9 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
             )}
             <div className="space-y-4">
               <div>
-                <FormLabel className="text-gray-400">Driver's License <span className="text-gray-500 font-normal">(Optional)</span></FormLabel>
+                <FormLabel className="text-muted-foreground">Driver's License <span className="text-foreground0 font-normal">(Optional)</span></FormLabel>
                 <div className="flex items-center gap-4 mt-2">
-                  <div className="w-32 h-24 border border-[#2a2a2a] rounded-md overflow-hidden bg-[#0a0a0a] shrink-0">
+                  <div className="w-32 h-24 border border-border rounded-md overflow-hidden bg-background shrink-0">
                     {licenseFile ? (
                       <img
                         src={URL.createObjectURL(licenseFile)}
@@ -288,7 +288,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Image className="h-8 w-8 text-gray-500" />
+                        <Image className="h-8 w-8 text-foreground0" />
                       </div>
                     )}
                   </div>
@@ -305,7 +305,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="border-[#2a2a2a]"
+                        className="border-border"
                         onClick={() => licenseInputRef.current?.click()}
                       >
                         <Upload className="h-4 w-4 mr-2" />
@@ -315,7 +315,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="border-[#EAEB80]/50 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                        className="border-primary/50 text-primary hover:bg-primary/10"
                         onClick={handleArchiveLicense}
                         disabled={!licenseFile || archiveLicenseMutation.isPending}
                       >
@@ -328,15 +328,15 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       </Button>
                     </div>
                     {licenseFile && (
-                      <span className="text-xs text-gray-500 truncate max-w-[12rem]">{licenseFile.name}</span>
+                      <span className="text-xs text-foreground0 truncate max-w-[12rem]">{licenseFile.name}</span>
                     )}
                   </div>
                 </div>
               </div>
               <div>
-                <FormLabel className="text-gray-400">Car Insurance <span className="text-gray-500 font-normal">(Optional)</span></FormLabel>
+                <FormLabel className="text-muted-foreground">Car Insurance <span className="text-foreground0 font-normal">(Optional)</span></FormLabel>
                 <div className="flex items-center gap-4 mt-2">
-                  <div className="w-32 h-24 border border-[#2a2a2a] rounded-md overflow-hidden bg-[#0a0a0a] shrink-0">
+                  <div className="w-32 h-24 border border-border rounded-md overflow-hidden bg-background shrink-0">
                     {insuranceFile ? (
                       <img
                         src={URL.createObjectURL(insuranceFile)}
@@ -351,7 +351,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Image className="h-8 w-8 text-gray-500" />
+                        <Image className="h-8 w-8 text-foreground0" />
                       </div>
                     )}
                   </div>
@@ -368,7 +368,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="border-[#2a2a2a]"
+                        className="border-border"
                         onClick={() => insuranceInputRef.current?.click()}
                       >
                         <Upload className="h-4 w-4 mr-2" />
@@ -378,7 +378,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="border-[#EAEB80]/50 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                        className="border-primary/50 text-primary hover:bg-primary/10"
                         onClick={handleArchiveInsurance}
                         disabled={!insuranceFile || archiveInsuranceMutation.isPending}
                       >
@@ -391,7 +391,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       </Button>
                     </div>
                     {insuranceFile && (
-                      <span className="text-xs text-gray-500 truncate max-w-[12rem]">{insuranceFile.name}</span>
+                      <span className="text-xs text-foreground0 truncate max-w-[12rem]">{insuranceFile.name}</span>
                     )}
                   </div>
                 </div>
@@ -403,14 +403,14 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={mutation.isPending || isAnyUploading}
-                className="border-[#2a2a2a]"
+                className="border-border"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={mutation.isPending || isAnyUploading}
-                className="bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
               </Button>

@@ -107,9 +107,9 @@ export function EditJobInfoModal({ open, onOpenChange, employee }: EditJobInfoMo
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="bg-[#111111] border-[#2a2a2a] text-gray-200 max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border text-muted-foreground max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-[#EAEB80]">Update Job Information</DialogTitle>
+          <DialogTitle className="text-primary">Update Job Information</DialogTitle>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -119,83 +119,83 @@ export function EditJobInfoModal({ open, onOpenChange, employee }: EditJobInfoMo
           className="space-y-4"
         >
           <div>
-            <Label className="text-gray-400">Employee Number</Label>
+            <Label className="text-muted-foreground">Employee Number</Label>
             <Input
               value={form.employee_number}
               onChange={(e) => setForm((p) => ({ ...p, employee_number: e.target.value }))}
-              className="bg-[#0a0a0a] border-[#2a2a2a]"
+              className="bg-background border-border"
               disabled
             />
           </div>
           <div>
-            <Label className="text-gray-400">Department</Label>
+            <Label className="text-muted-foreground">Department</Label>
             <Input
               value={form.employee_job_pay_department_name}
               onChange={(e) => setForm((p) => ({ ...p, employee_job_pay_department_name: e.target.value }))}
-              className="bg-[#0a0a0a] border-[#2a2a2a]"
+              className="bg-background border-border"
               placeholder="e.g. Sales"
             />
           </div>
           <div>
-            <Label className="text-gray-400">Job Title</Label>
+            <Label className="text-muted-foreground">Job Title</Label>
             <Input
               value={form.employee_job_pay_job_title_name}
               onChange={(e) => setForm((p) => ({ ...p, employee_job_pay_job_title_name: e.target.value }))}
-              className="bg-[#0a0a0a] border-[#2a2a2a]"
+              className="bg-background border-border"
               placeholder="e.g. Sales Associate"
             />
           </div>
           <div>
-            <Label className="text-gray-400">Work Email</Label>
+            <Label className="text-muted-foreground">Work Email</Label>
             <Input
               type="email"
               value={form.employee_job_pay_work_email}
               onChange={(e) => setForm((p) => ({ ...p, employee_job_pay_work_email: e.target.value }))}
-              className="bg-[#0a0a0a] border-[#2a2a2a]"
+              className="bg-background border-border"
               placeholder="work@example.com"
             />
           </div>
           <div>
-            <Label className="text-gray-400">Date Hired</Label>
+            <Label className="text-muted-foreground">Date Hired</Label>
             <Input
               type="date"
               value={form.employee_job_pay_hired}
               onChange={(e) => setForm((p) => ({ ...p, employee_job_pay_hired: e.target.value }))}
-              className="bg-[#0a0a0a] border-[#2a2a2a]"
+              className="bg-background border-border"
             />
           </div>
           <div>
-            <Label className="text-gray-400">Regularized On</Label>
+            <Label className="text-muted-foreground">Regularized On</Label>
             <Input
               type="date"
               value={form.employee_job_pay_regular_on}
               onChange={(e) => setForm((p) => ({ ...p, employee_job_pay_regular_on: e.target.value }))}
-              className="bg-[#0a0a0a] border-[#2a2a2a]"
+              className="bg-background border-border"
             />
           </div>
           <div>
-            <Label className="text-gray-400">Date Separated</Label>
+            <Label className="text-muted-foreground">Date Separated</Label>
             <Input
               type="date"
               value={form.employee_job_pay_separated}
               onChange={(e) => setForm((p) => ({ ...p, employee_job_pay_separated: e.target.value }))}
-              className="bg-[#0a0a0a] border-[#2a2a2a]"
+              className="bg-background border-border"
             />
           </div>
           <div>
-            <Label className="text-gray-400">Comment</Label>
+            <Label className="text-muted-foreground">Comment</Label>
             <Textarea
               value={form.employee_job_pay_comment}
               onChange={(e) => setForm((p) => ({ ...p, employee_job_pay_comment: e.target.value }))}
-              className="bg-[#0a0a0a] border-[#2a2a2a] min-h-[80px]"
+              className="bg-background border-border min-h-[80px]"
               placeholder="Optional notes"
             />
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-[#2a2a2a]">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-border">
               Cancel
             </Button>
-            <Button type="submit" disabled={mutation.isPending} className="bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90">
+            <Button type="submit" disabled={mutation.isPending} className="bg-primary text-primary-foreground hover:bg-primary/90">
               {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
             </Button>
           </DialogFooter>

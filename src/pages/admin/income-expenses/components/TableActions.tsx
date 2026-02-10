@@ -291,10 +291,10 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
       <div className="flex items-center gap-2">
         {/* Year Selector */}
         <Select value={selectedYear} onValueChange={setSelectedYear}>
-          <SelectTrigger className="w-[120px] bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm">
+          <SelectTrigger className="w-[120px] bg-card border-border text-foreground text-sm">
             <SelectValue placeholder="Year" />
           </SelectTrigger>
-          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+          <SelectContent className="bg-card border-border text-foreground">
             {yearOptions.map((yr) => (
               <SelectItem key={yr} value={String(yr)}>
                 {yr}
@@ -309,7 +309,7 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
             onClick={() => setIsImportModalOpen(true)}
             variant="outline"
             size="sm"
-            className="border-[#2a2a2a] text-gray-300 hover:text-white hover:bg-[#2a2a2a]"
+            className="border-border text-muted-foreground hover:text-foreground hover:bg-muted"
           >
             <Upload className="w-4 h-4 mr-2" />
             Import
@@ -322,7 +322,7 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
             onClick={handleDownloadTemplate}
             variant="outline"
             size="sm"
-            className="border-[#2a2a2a] text-gray-300 hover:text-white hover:bg-[#2a2a2a]"
+            className="border-border text-muted-foreground hover:text-foreground hover:bg-muted"
           >
             <FileText className="w-4 h-4 mr-2" />
             Download Template
@@ -334,7 +334,7 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
           onClick={handleExportCSV}
           variant="outline"
           size="sm"
-          className="border-[#2a2a2a] text-gray-300 hover:text-white hover:bg-[#2a2a2a]"
+          className="border-border text-muted-foreground hover:text-foreground hover:bg-muted"
         >
           <Download className="w-4 h-4 mr-2" />
           Export CSV
@@ -345,7 +345,7 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
           onClick={handleViewLog}
           variant="outline"
           size="sm"
-          className="border-[#2a2a2a] text-gray-300 hover:text-white hover:bg-[#2a2a2a]"
+          className="border-border text-muted-foreground hover:text-foreground hover:bg-muted"
         >
           <History className="w-4 h-4 mr-2" />
           Log
@@ -354,39 +354,39 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
 
       {/* Import Modal */}
       <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
-        <DialogContent className="bg-[#0f0f0f] border-[#1a1a1a] text-white">
+        <DialogContent className="bg-card border-border text-foreground">
           <DialogHeader>
-            <DialogTitle className="text-white text-xl">
+            <DialogTitle className="text-foreground text-xl">
               Import Income and Expense Data
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-muted-foreground">
               Upload a CSV file to import all income and expense data for {car?.makeModel || 'this car'} ({selectedYear})
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            <div className="border-2 border-dashed border-[#2a2a2a] rounded-lg p-6">
+            <div className="border-2 border-dashed border-border rounded-lg p-6">
               <input
                 type="file"
                 accept=".csv"
                 onChange={(e) => setImportFile(e.target.files?.[0] || null)}
-                className="w-full text-sm text-gray-400
+                className="w-full text-sm text-muted-foreground
                   file:mr-4 file:py-2 file:px-4
                   file:rounded-md file:border-0
                   file:text-sm file:font-semibold
-                  file:bg-[#EAEB80] file:text-black
-                  hover:file:bg-[#d4d570] file:cursor-pointer"
+                  file:bg-primary file:text-primary-foreground
+                  hover:file:bg-primary/90 file:cursor-pointer"
               />
               {importFile && (
-                <p className="text-sm text-gray-400 mt-2">
+                <p className="text-sm text-muted-foreground mt-2">
                   Selected: {importFile.name}
                 </p>
               )}
             </div>
 
-            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4">
-              <h4 className="text-white font-medium mb-2">What will be imported:</h4>
-              <ul className="text-sm text-gray-400 space-y-1 list-disc list-inside">
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h4 className="text-foreground font-medium mb-2">What will be imported:</h4>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                 <li>Car Management Owner Split (with mode settings)</li>
                 <li>Income & Expenses (all income categories)</li>
                 <li>Operating Expense (Direct Delivery)</li>
@@ -395,7 +395,7 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
                 <li>Reimburse and Non-Reimburse Bills</li>
                 <li>History (days rented, trips, etc.)</li>
               </ul>
-              <p className="text-yellow-400 text-xs mt-3">
+              <p className="text-yellow-700 text-xs mt-3">
                 ⚠️ This will update all data for the selected year. Existing data will be overwritten.
               </p>
             </div>
@@ -408,14 +408,14 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
                 setImportFile(null);
               }}
               variant="outline"
-              className="flex-1 border-[#2a2a2a] text-gray-400 hover:text-white hover:bg-[#2a2a2a]"
+              className="flex-1 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
               disabled={isImporting}
             >
               Cancel
             </Button>
             <Button
               onClick={handleImportFile}
-              className="flex-1 bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/80"
               disabled={!importFile || isImporting}
             >
               {isImporting ? "Importing..." : "Import Data"}

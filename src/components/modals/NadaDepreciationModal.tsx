@@ -267,23 +267,23 @@ export function NadaDepreciationModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg w-full max-w-md p-6 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50">
+      <div className="bg-card border border-border rounded-lg w-full max-w-md p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
           disabled={mutation.isPending}
         >
           <X className="w-5 h-5" />
         </button>
 
-        <h3 className="text-lg font-semibold text-white mb-6">
+        <h3 className="text-lg font-semibold text-foreground mb-6">
           {itemEdit ? "Update" : "Add"} Current Cost {isWithAdd ? "with Add" : ""}
         </h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="date" className="text-gray-300">
+            <Label htmlFor="date" className="text-muted-foreground">
               Date
             </Label>
             <Input
@@ -301,13 +301,13 @@ export function NadaDepreciationModal({
                 }
               }}
               disabled={mutation.isPending || !!itemEdit}
-              className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:contrast-100"
+              className="bg-card border-border text-foreground mt-1 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:contrast-100"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="category" className="text-gray-300">
+            <Label htmlFor="category" className="text-muted-foreground">
               Category
             </Label>
             <Select
@@ -327,10 +327,10 @@ export function NadaDepreciationModal({
               }}
               disabled={mutation.isPending || !!itemEdit}
             >
-              <SelectTrigger className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1">
+              <SelectTrigger className="bg-card border-border text-foreground mt-1">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-card border-border text-foreground">
                 {isLoadingCategories ? (
                   <SelectItem value="loading" disabled>
                     Loading categories...
@@ -384,7 +384,7 @@ export function NadaDepreciationModal({
           </div>
 
           <div>
-            <Label htmlFor="amount" className="text-gray-300">
+            <Label htmlFor="amount" className="text-muted-foreground">
               Value
             </Label>
             <Input
@@ -396,13 +396,13 @@ export function NadaDepreciationModal({
                 setFormData((prev) => ({ ...prev, amount: e.target.value }))
               }
               disabled={mutation.isPending}
-              className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1"
+              className="bg-card border-border text-foreground mt-1"
               required
             />
           </div>
 
           {mutation.isError && (
-            <div className="text-red-400 text-sm">
+            <div className="text-red-700 text-sm">
               {mutation.error instanceof Error
                 ? mutation.error.message
                 : "An error occurred"}
@@ -415,14 +415,14 @@ export function NadaDepreciationModal({
               variant="outline"
               onClick={onClose}
               disabled={mutation.isPending}
-              className="border-[#2a2a2a] text-gray-300 hover:bg-[#2a2a2a]"
+              className="border-border text-muted-foreground hover:bg-muted"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={mutation.isPending || !formData.date || !formData.categoryId || !formData.amount}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              className="bg-primary text-black hover:bg-primary/80"
             >
               {mutation.isPending
                 ? "Saving..."

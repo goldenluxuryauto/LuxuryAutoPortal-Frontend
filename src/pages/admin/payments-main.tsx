@@ -294,8 +294,8 @@ export default function PaymentsMainPage() {
     <AdminLayout>
       <div className="flex flex-col h-full overflow-x-hidden">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-white">Payments</h1>
-          <p className="text-sm text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Payments</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Manage client payments across all cars
           </p>
         </div>
@@ -303,7 +303,7 @@ export default function PaymentsMainPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
           <div className="flex flex-wrap items-center gap-2">
             <div>
-              <label className="text-gray-400 text-sm block mb-1">Status</label>
+              <label className="text-muted-foreground text-sm block mb-1">Status</label>
               <Select
                 value={filterStatus || "__all__"}
                 onValueChange={(v) => {
@@ -311,10 +311,10 @@ export default function PaymentsMainPage() {
                   setIsFilter(true);
                 }}
               >
-                <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[140px]">
+                <SelectTrigger className="bg-card border-border text-foreground w-[140px]">
                   <SelectValue placeholder="All" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectContent className="bg-card border-border text-foreground">
                   <SelectItem value="__all__">All</SelectItem>
                   {statuses.map((s) => (
                     <SelectItem key={s.payment_status_aid} value={s.payment_status_name}>
@@ -325,7 +325,7 @@ export default function PaymentsMainPage() {
               </Select>
             </div>
             <div>
-              <label className="text-gray-400 text-sm block mb-1">Month</label>
+              <label className="text-muted-foreground text-sm block mb-1">Month</label>
               <Input
                 type="month"
                 value={monthFilter}
@@ -333,36 +333,36 @@ export default function PaymentsMainPage() {
                   setMonthFilter(e.target.value);
                   setIsFilter(true);
                 }}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[180px] [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert"
+                className="bg-card border-border text-foreground w-[180px] [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert"
               />
             </div>
             <div>
-              <label className="text-gray-400 text-sm block mb-1">Client Search</label>
+              <label className="text-muted-foreground text-sm block mb-1">Client Search</label>
               <Input
                 type="search"
                 placeholder="Search client..."
                 value={clientInputVal}
                 onChange={(e) => handleClientSearchChange(e.target.value)}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[180px]"
+                className="bg-card border-border text-foreground w-[180px]"
               />
             </div>
             {hasFilters && (
               <Button
                 variant="ghost"
                 onClick={handleClearFilters}
-                className="text-red-400 hover:text-red-300 hover:bg-red-900/20 mt-6"
+                className="text-red-700 hover:text-red-700 hover:bg-red-900/20 mt-6"
               >
                 Clear
               </Button>
             )}
           </div>
           <div className="flex items-center gap-2 ml-auto">
-            <span className="text-gray-400 text-sm">
+            <span className="text-muted-foreground text-sm">
               Total: {paymentsData?.total ?? payments.length}
             </span>
             <Button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              className="bg-primary text-primary-foreground hover:bg-primary/80"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add
@@ -370,7 +370,7 @@ export default function PaymentsMainPage() {
             <Button
               variant="outline"
               onClick={() => setIsDeleteByMonthModalOpen(true)}
-              className="border-[#2a2a2a] text-gray-400 hover:bg-[#1a1a1a]"
+              className="border-border text-muted-foreground hover:bg-card"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete
@@ -378,31 +378,31 @@ export default function PaymentsMainPage() {
           </div>
         </div>
 
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-auto flex-1">
+        <div className="bg-card border border-border rounded-lg overflow-auto flex-1">
           <div className="overflow-x-auto">
             <Table className="table-fixed w-full">
               <TableHeader>
-                <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-12">#</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-24">Status</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-36">Client</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-28 whitespace-nowrap">Date</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium min-w-[180px]">Car</TableHead>
-                  <TableHead className="text-right text-[#EAEB80] font-medium w-24 tabular-nums">Payable</TableHead>
-                  <TableHead className="text-right text-[#EAEB80] font-medium w-24 tabular-nums">Payout</TableHead>
-                  <TableHead className="text-right text-[#EAEB80] font-medium w-24 tabular-nums">Balance</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-24">Ref #</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-24">Invoice #</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-28 whitespace-nowrap">Payment Date</TableHead>
-                  <TableHead className="text-center text-[#EAEB80] font-medium w-16">Receipt</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium min-w-[100px]">Remarks</TableHead>
-                  <TableHead className="text-center text-[#EAEB80] font-medium w-24">Actions</TableHead>
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-left text-primary font-medium w-12">#</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-24">Status</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-36">Client</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-28 whitespace-nowrap">Date</TableHead>
+                  <TableHead className="text-left text-primary font-medium min-w-[180px]">Car</TableHead>
+                  <TableHead className="text-right text-primary font-medium w-24 tabular-nums">Payable</TableHead>
+                  <TableHead className="text-right text-primary font-medium w-24 tabular-nums">Payout</TableHead>
+                  <TableHead className="text-right text-primary font-medium w-24 tabular-nums">Balance</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-24">Ref #</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-24">Invoice #</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-28 whitespace-nowrap">Payment Date</TableHead>
+                  <TableHead className="text-center text-primary font-medium w-16">Receipt</TableHead>
+                  <TableHead className="text-left text-primary font-medium min-w-[100px]">Remarks</TableHead>
+                  <TableHead className="text-center text-primary font-medium w-24">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoadingPayments ? (
                   <TableRow>
-                    <TableCell colSpan={14} className="text-center py-12 text-gray-500">
+                    <TableCell colSpan={14} className="text-center py-12 text-foreground0">
                       <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                     </TableCell>
                   </TableRow>
@@ -415,9 +415,9 @@ export default function PaymentsMainPage() {
                       return (
                         <TableRow
                           key={payment.payments_aid}
-                          className="border-[#2a2a2a] hover:bg-[#1a1a1a]"
+                          className="border-border hover:bg-card"
                         >
-                          <TableCell className="text-gray-300 w-12">{index + 1}.</TableCell>
+                          <TableCell className="text-muted-foreground w-12">{index + 1}.</TableCell>
                           <TableCell className="w-24">
                             <Badge
                               style={{
@@ -429,23 +429,23 @@ export default function PaymentsMainPage() {
                               {payment.payment_status_name}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-white w-36">{payment.fullname}</TableCell>
-                          <TableCell className="w-28 whitespace-nowrap text-gray-400">{formatYearMonth(payment.payments_year_month)}</TableCell>
-                          <TableCell className="text-gray-400 text-sm min-w-[180px]">
+                          <TableCell className="text-foreground w-36">{payment.fullname}</TableCell>
+                          <TableCell className="w-28 whitespace-nowrap text-muted-foreground">{formatYearMonth(payment.payments_year_month)}</TableCell>
+                          <TableCell className="text-muted-foreground text-sm min-w-[180px]">
                             {formatVehicleInfo(payment)}
                           </TableCell>
-                          <TableCell className="text-right text-[#EAEB80] font-medium w-24 tabular-nums">
+                          <TableCell className="text-right text-primary font-medium w-24 tabular-nums">
                             {formatCurrency(Number(payment.payments_amount || 0))}
                           </TableCell>
-                          <TableCell className="text-right w-24 tabular-nums text-gray-300">
+                          <TableCell className="text-right w-24 tabular-nums text-muted-foreground">
                             {formatCurrency(Number(payment.payments_amount_payout || 0))}
                           </TableCell>
-                          <TableCell className="text-right w-24 tabular-nums text-gray-300">
+                          <TableCell className="text-right w-24 tabular-nums text-muted-foreground">
                             {formatCurrency(balance)}
                           </TableCell>
-                          <TableCell className="text-gray-400 w-24">{payment.payments_reference_number || "--"}</TableCell>
-                          <TableCell className="text-gray-400 w-24">{payment.payments_invoice_id || "--"}</TableCell>
-                          <TableCell className="text-gray-400 w-28 whitespace-nowrap">{formatDate(payment.payments_invoice_date)}</TableCell>
+                          <TableCell className="text-muted-foreground w-24">{payment.payments_reference_number || "--"}</TableCell>
+                          <TableCell className="text-muted-foreground w-24">{payment.payments_invoice_id || "--"}</TableCell>
+                          <TableCell className="text-muted-foreground w-28 whitespace-nowrap">{formatDate(payment.payments_invoice_date)}</TableCell>
                           <TableCell className="text-center w-16">
                             <Button
                               variant="ghost"
@@ -454,12 +454,12 @@ export default function PaymentsMainPage() {
                                 setSelectedPayment(payment);
                                 setIsReceiptModalOpen(true);
                               }}
-                              className="text-gray-400 hover:text-[#EAEB80]"
+                              className="text-muted-foreground hover:text-primary"
                             >
                               <FileText className="w-4 h-4" />
                             </Button>
                           </TableCell>
-                          <TableCell className="min-w-[100px] max-w-[150px] truncate text-gray-400">
+                          <TableCell className="min-w-[100px] max-w-[150px] truncate text-muted-foreground">
                             {payment.payments_remarks || "--"}
                           </TableCell>
                           <TableCell className="text-center w-24">
@@ -471,7 +471,7 @@ export default function PaymentsMainPage() {
                                   setSelectedPayment(payment);
                                   setIsEditModalOpen(true);
                                 }}
-                                className="text-gray-400 hover:text-[#EAEB80]"
+                                className="text-muted-foreground hover:text-primary"
                                 title="Edit"
                               >
                                 <HandCoins className="w-4 h-4" />
@@ -483,7 +483,7 @@ export default function PaymentsMainPage() {
                                   setSelectedPayment(payment);
                                   setIsDeleteSingleModalOpen(true);
                                 }}
-                                className="text-gray-400 hover:text-red-400"
+                                className="text-muted-foreground hover:text-red-700"
                                 title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -493,17 +493,17 @@ export default function PaymentsMainPage() {
                         </TableRow>
                       );
                     })}
-                    <TableRow className="border-t-2 border-[#2a2a2a] bg-[#1a1a1a]/50">
-                      <TableCell colSpan={5} className="text-right font-bold text-white pr-4">
+                    <TableRow className="border-t-2 border-border bg-card/50">
+                      <TableCell colSpan={5} className="text-right font-bold text-foreground pr-4">
                         Total:
                       </TableCell>
-                      <TableCell className="text-right font-bold text-[#EAEB80] w-24 tabular-nums">
+                      <TableCell className="text-right font-bold text-primary w-24 tabular-nums">
                         {formatCurrency(totals.payable)}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-[#EAEB80] w-24 tabular-nums">
+                      <TableCell className="text-right font-bold text-primary w-24 tabular-nums">
                         {formatCurrency(totals.payout)}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-[#EAEB80] w-24 tabular-nums">
+                      <TableCell className="text-right font-bold text-primary w-24 tabular-nums">
                         {formatCurrency(totals.balance)}
                       </TableCell>
                       <TableCell colSpan={6}></TableCell>
@@ -511,7 +511,7 @@ export default function PaymentsMainPage() {
                   </>
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={14} className="text-center py-12 text-gray-500">
+                    <TableCell colSpan={14} className="text-center py-12 text-foreground0">
                       No payment records found
                     </TableCell>
                   </TableRow>
@@ -523,26 +523,26 @@ export default function PaymentsMainPage() {
 
         {isAddModalOpen && (
           <Dialog open={true} onOpenChange={() => setIsAddModalOpen(false)}>
-            <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white">
+            <DialogContent className="bg-card border-border text-foreground">
               <DialogHeader>
                 <DialogTitle>Add Payments</DialogTitle>
-                <DialogDescription className="text-gray-400">
+                <DialogDescription className="text-muted-foreground">
                   Select a month to create payments for all active client-car pairs. This
                   pulls car owner split from income/expense data.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm text-gray-400 block mb-2">Month</label>
+                  <label className="text-sm text-muted-foreground block mb-2">Month</label>
                   <Input
                     type="month"
                     value={addYearMonth}
                     onChange={(e) => setAddYearMonth(e.target.value)}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert"
+                    className="bg-card border-border text-foreground [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert"
                   />
                 </div>
                 {toPayStatus.length === 0 && (
-                  <p className="text-red-400 text-sm">
+                  <p className="text-red-700 text-sm">
                     Warning: Payment status &quot;To Pay&quot; is required. Please configure
                     it in Payment Status settings.
                   </p>
@@ -552,7 +552,7 @@ export default function PaymentsMainPage() {
                 <Button
                   variant="outline"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  className="bg-card border-border text-foreground"
                 >
                   Cancel
                 </Button>
@@ -566,7 +566,7 @@ export default function PaymentsMainPage() {
                     }
                   }}
                   disabled={createByMonthMutation.isPending || toPayStatus.length === 0}
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80"
                 >
                   {createByMonthMutation.isPending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -597,22 +597,22 @@ export default function PaymentsMainPage() {
             open={isDeleteByMonthModalOpen}
             onOpenChange={setIsDeleteByMonthModalOpen}
           >
-            <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white">
+            <DialogContent className="bg-card border-border text-foreground">
               <DialogHeader>
                 <DialogTitle>Delete Payments by Month</DialogTitle>
-                <DialogDescription className="text-gray-400">
+                <DialogDescription className="text-muted-foreground">
                   This will delete all payments for the selected month. This action
                   cannot be undone.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm text-gray-400 block mb-2">Month</label>
+                  <label className="text-sm text-muted-foreground block mb-2">Month</label>
                   <Input
                     type="month"
                     value={deleteYearMonth}
                     onChange={(e) => setDeleteYearMonth(e.target.value)}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert"
+                    className="bg-card border-border text-foreground [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert"
                   />
                 </div>
               </div>
@@ -620,7 +620,7 @@ export default function PaymentsMainPage() {
                 <Button
                   variant="outline"
                   onClick={() => setIsDeleteByMonthModalOpen(false)}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  className="bg-card border-border text-foreground"
                 >
                   Cancel
                 </Button>
@@ -629,7 +629,7 @@ export default function PaymentsMainPage() {
                     deleteYearMonth && deleteByMonthMutation.mutate(deleteYearMonth)
                   }
                   disabled={!deleteYearMonth || deleteByMonthMutation.isPending}
-                  className="bg-red-600 hover:bg-red-700"
+                  className="bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30"
                 >
                   {deleteByMonthMutation.isPending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -647,18 +647,18 @@ export default function PaymentsMainPage() {
             open={isDeleteSingleModalOpen}
             onOpenChange={setIsDeleteSingleModalOpen}
           >
-            <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white">
+            <DialogContent className="bg-card border-border text-foreground">
               <DialogHeader>
                 <DialogTitle>Delete Payment</DialogTitle>
-                <DialogDescription className="text-gray-400">
+                <DialogDescription className="text-muted-foreground">
                   Are you sure you want to delete this payment?
-                  <div className="mt-4 p-4 bg-[#1a1a1a] rounded-md">
+                  <div className="mt-4 p-4 bg-card rounded-md">
                     <p>
-                      <span className="text-gray-400">Date:</span>{" "}
+                      <span className="text-muted-foreground">Date:</span>{" "}
                       {formatYearMonth(selectedPayment.payments_year_month)}
                     </p>
                     <p>
-                      <span className="text-gray-400">Amount:</span>{" "}
+                      <span className="text-muted-foreground">Amount:</span>{" "}
                       {formatCurrency(selectedPayment.payments_amount)}
                     </p>
                   </div>
@@ -668,14 +668,14 @@ export default function PaymentsMainPage() {
                 <Button
                   variant="outline"
                   onClick={() => setIsDeleteSingleModalOpen(false)}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  className="bg-card border-border text-foreground"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={() => deleteSingleMutation.mutate(selectedPayment.payments_aid)}
                   disabled={deleteSingleMutation.isPending}
-                  className="bg-red-600 hover:bg-red-700"
+                  className="bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30"
                 >
                   {deleteSingleMutation.isPending ? "Deleting..." : "Delete"}
                 </Button>

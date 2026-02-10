@@ -149,10 +149,10 @@ export function FileViewerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl w-[95vw] h-[95vh] p-0 bg-[#0f0f0f] border-[#2a2a2a] flex flex-col">
-        <DialogHeader className="px-6 py-4 border-b border-[#2a2a2a] flex-shrink-0">
+      <DialogContent className="max-w-7xl w-[95vw] h-[95vh] p-0 bg-card border-border flex flex-col">
+        <DialogHeader className="px-6 py-4 border-b border-border flex-shrink-0">
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-white text-lg font-semibold">
+            <DialogTitle className="text-foreground text-lg font-semibold">
               {file.recordsFileViewName}
             </DialogTitle>
             <div className="flex items-center gap-2">
@@ -160,7 +160,7 @@ export function FileViewerModal({
                 variant="ghost"
                 size="sm"
                 onClick={toggleFullscreen}
-                className="text-gray-400 hover:text-white hover:bg-[#2a2a2a]"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted"
                 title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
               >
                 {isFullscreen ? (
@@ -173,7 +173,7 @@ export function FileViewerModal({
                 variant="ghost"
                 size="sm"
                 onClick={handleDownload}
-                className="text-gray-400 hover:text-white hover:bg-[#2a2a2a]"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted"
                 title="Download"
               >
                 <Download className="w-4 h-4" />
@@ -182,7 +182,7 @@ export function FileViewerModal({
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="text-gray-400 hover:text-white hover:bg-[#2a2a2a]"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted"
                 title="Close"
               >
                 <X className="w-4 h-4" />
@@ -191,11 +191,11 @@ export function FileViewerModal({
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-auto bg-[#1a1a1a] p-4 flex items-center justify-center">
+        <div className="flex-1 overflow-auto bg-card p-4 flex items-center justify-center">
           {isImage ? (
             <div className="w-full h-full flex items-center justify-center">
               {imageError ? (
-                <div className="text-center text-gray-400">
+                <div className="text-center text-muted-foreground">
                   <p className="mb-2">Failed to load image</p>
                   <Button
                     variant="outline"
@@ -212,13 +212,13 @@ export function FileViewerModal({
                         .catch(() => setImageError(true))
                         .finally(() => setImageLoading(false));
                     }}
-                    className="border-[#2a2a2a] text-gray-300 hover:bg-[#2a2a2a]"
+                    className="border-border text-muted-foreground hover:bg-muted"
                   >
                     Retry
                   </Button>
                 </div>
               ) : imageLoading ? (
-                <div className="text-gray-400">Loading image...</div>
+                <div className="text-muted-foreground">Loading image...</div>
               ) : imageObjectUrl ? (
                 <img
                   id="file-viewer-image"
@@ -239,12 +239,12 @@ export function FileViewerModal({
             </div>
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <div className="text-center text-gray-400">
+              <div className="text-center text-muted-foreground">
                 <p className="mb-4">Preview not available for this file type</p>
                 <Button
                   variant="outline"
                   onClick={handleDownload}
-                  className="border-[#2a2a2a] text-gray-300 hover:bg-[#2a2a2a]"
+                  className="border-border text-muted-foreground hover:bg-muted"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Download to View

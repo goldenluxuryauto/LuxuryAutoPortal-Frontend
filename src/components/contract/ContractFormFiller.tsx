@@ -894,13 +894,13 @@ export function ContractFormFiller({
 
       <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-200px)]">
         {/* Left 2/3: Full-Size PDF Preview */}
-        <div className="flex-[2] flex flex-col bg-gradient-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-lg border-2 border-[#EAEB80]/30 shadow-2xl overflow-hidden">
-          <div className="p-4 border-b border-[#EAEB80]/20 flex items-center justify-between bg-[#1a1a1a]">
+        <div className="flex-[2] flex flex-col bg-gradient-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-lg border-2 border-primary/30 shadow-2xl overflow-hidden">
+          <div className="p-4 border-b border-primary/20 flex items-center justify-between bg-card">
             <div>
               <h3 className="text-[#EAEB80] font-semibold text-lg">Contract Preview</h3>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-gray-300 text-sm">
+              <span className="text-muted-foreground text-sm">
                 {numPages} {numPages === 1 ? "page" : "pages"}
               </span>
             </div>
@@ -912,14 +912,14 @@ export function ContractFormFiller({
               {isPdfLoading && (
                 <div className="flex items-center justify-center h-[600px]">
                   <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
-                  <p className="ml-3 text-gray-300">Loading contract document...</p>
+                  <p className="ml-3 text-muted-foreground">Loading contract document...</p>
                 </div>
               )}
               {pdfLoadError && (
                 <div className="flex flex-col items-center justify-center h-[600px] p-8">
                   <X className="w-12 h-12 text-red-500 mb-4" />
                   <p className="text-red-500 font-semibold mb-2">Failed to load contract document</p>
-                  <p className="text-gray-400 text-sm text-center max-w-md">{pdfLoadError}</p>
+                  <p className="text-muted-foreground text-sm text-center max-w-md">{pdfLoadError}</p>
                   <Button
                     onClick={() => {
                       setPdfLoadError(null);
@@ -942,7 +942,7 @@ export function ContractFormFiller({
                       };
                       loadPdf();
                     }}
-                    className="mt-4 bg-[#EAEB80] text-[#1a1a1a] hover:bg-[#f4d03f]"
+                    className="mt-4 bg-primary text-[#1a1a1a] hover:bg-muted/50f4d03f]"
                   >
                     Retry
                   </Button>
@@ -1173,7 +1173,7 @@ export function ContractFormFiller({
           </div>
 
           {/* Zoom Controls */}
-          <div className="p-4 border-t border-[#EAEB80]/20 flex items-center justify-center bg-[#1a1a1a]">
+          <div className="p-4 border-t border-primary/20 flex items-center justify-center bg-card">
             <div className="flex items-center gap-2">
               <Button
                 onClick={() => setScale((s) => Math.max(0.5, s - 0.2))}
@@ -1203,10 +1203,10 @@ export function ContractFormFiller({
         {/* Right 1/3: Form Fields & Signature */}
         <div className="flex-1 flex flex-col gap-4 overflow-y-auto">
           {/* Your Information Card */}
-          <Card className="bg-[#1a1a1a] border-[#EAEB80]/20 flex-shrink-0">
+          <Card className="bg-card border-primary/20 flex-shrink-0">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">Your Information</CardTitle>
-              <CardDescription className="text-gray-400 text-sm">
+              <CardDescription className="text-muted-foreground text-sm">
                 Fill in all required fields. The contract preview updates in real-time.
               </CardDescription>
             </CardHeader>
@@ -1219,7 +1219,7 @@ export function ContractFormFiller({
                 if (field.type === "date" && field.name === "expectedStartDate") {
                   return (
                     <div key={field.name} className="space-y-1">
-                      <Label htmlFor={field.name} className="text-gray-300 text-sm">
+                      <Label htmlFor={field.name} className="text-muted-foreground text-sm">
                         {field.label}
                         {field.required && <span className="text-[#EAEB80] ml-1">*</span>}
                       </Label>
@@ -1230,12 +1230,12 @@ export function ContractFormFiller({
                         onChange={(e) => handleDateChange(field.name, e.target.value)}
                         onBlur={(e) => handleFieldBlur(field.name, e.target.value)}
                         required={field.required}
-                        className={`bg-[#2a2a2a] border text-white focus:border-[#EAEB80] transition-colors ${
-                          hasError || isEmpty ? "border-red-500 focus:border-red-500" : "border-[#EAEB80]/30"
+                        className={`bg-muted border text-foreground focus:border-primary transition-colors ${
+                          hasError || isEmpty ? "border-red-500 focus:border-red-500" : "border-primary/30"
                         }`}
                       />
                       {field.value && (
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           Will appear as: {formatDateMMDDYYYY(field.value)}
                         </p>
                       )}
@@ -1248,11 +1248,11 @@ export function ContractFormFiller({
                 
                 return (
                   <div key={field.name} className="space-y-1">
-                    <Label htmlFor={field.name} className="text-gray-300 text-sm">
+                    <Label htmlFor={field.name} className="text-muted-foreground text-sm">
                       {field.label}
                       {field.required && <span className="text-[#EAEB80] ml-1">*</span>}
                       {field.name === "owner" && (
-                        <span className="text-xs text-gray-400 ml-2">(Max 20 chars)</span>
+                        <span className="text-xs text-muted-foreground ml-2">(Max 20 chars)</span>
                       )}
                     </Label>
                     <Input
@@ -1263,8 +1263,8 @@ export function ContractFormFiller({
                       onBlur={(e) => handleFieldBlur(field.name, e.target.value)}
                       required={field.required}
                       maxLength={field.name === "owner" ? 20 : 100}
-                      className={`bg-[#2a2a2a] border text-white focus:border-[#EAEB80] transition-colors ${
-                        hasError || isEmpty ? "border-red-500 focus:border-red-500" : "border-[#EAEB80]/30"
+                      className={`bg-muted border text-foreground focus:border-primary transition-colors ${
+                        hasError || isEmpty ? "border-red-500 focus:border-red-500" : "border-primary/30"
                       }`}
                     />
                     {field.error && (
@@ -1282,16 +1282,16 @@ export function ContractFormFiller({
             </CardContent>
           </Card>
 
-          <Card className="bg-[#1a1a1a] border-[#EAEB80]/20 flex-shrink-0">
+          <Card className="bg-card border-primary/20 flex-shrink-0">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">Additional Notes</CardTitle>
-              <CardDescription className="text-gray-400 text-sm">
+              <CardDescription className="text-muted-foreground text-sm">
                 Add any additional notes to the contract here.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Mandatory Agreements */}
-              <div className="mt-4 pt-4 border-t border-[#EAEB80]/20 space-y-3">
+              <div className="mt-4 pt-4 border-t border-primary/20 space-y-3">
                 <p className="text-sm font-semibold text-[#EAEB80]">
                   Mandatory Agreements (all required)
                 </p>
@@ -1314,7 +1314,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-maintain-insurance"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       I agree to maintain full coverage insurance.
                     </Label>
@@ -1338,7 +1338,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-split-730"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       I agree to the 70% ~ 30% split.
                     </Label>
@@ -1362,7 +1362,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-parking-fee"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       I agree to a monthly parking fee of $100.
                     </Label>
@@ -1386,7 +1386,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-cleaning-fee"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       I agree to a monthly regular cleaning fee of $25.
                     </Label>
@@ -1410,7 +1410,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-carwash-fee"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       I agree to an annual car wash service fee of $499.
                     </Label>
@@ -1434,14 +1434,14 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-owner-expenses"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       I agree that the owner will reimburse all vehicle-related expenses.
                     </Label>
                   </div>
 
                   {showAgreementsError && (
-                    <p className="text-xs text-red-400 mt-1">
+                    <p className="text-xs text-red-700 mt-1">
                       Please check all mandatory agreement boxes.
                     </p>
                   )}
@@ -1449,7 +1449,7 @@ export function ContractFormFiller({
               </div>
 
               {/* Payment Options (radio, required) */}
-              <div className="mt-4 pt-4 border-t border-[#EAEB80]/20 space-y-2">
+              <div className="mt-4 pt-4 border-t border-primary/20 space-y-2">
                 <p className="text-sm font-semibold text-[#EAEB80]">
                   Payment Options (choose one – required)
                 </p>
@@ -1465,32 +1465,32 @@ export function ContractFormFiller({
                 >
                   <div className="flex items-center space-x-3">
                     <RadioGroupItem value="735" id="payment-735" />
-                    <Label htmlFor="payment-735" className="text-sm text-gray-300">
+                    <Label htmlFor="payment-735" className="text-sm text-muted-foreground">
                       Pay $735. No early exit fee if removed before two years.
                     </Label>
                   </div>
                   <div className="flex items-center space-x-3">
                     <RadioGroupItem value="357" id="payment-357" />
-                    <Label htmlFor="payment-357" className="text-sm text-gray-300">
+                    <Label htmlFor="payment-357" className="text-sm text-muted-foreground">
                       Pay $357. No early exit fee if removed before two years.
                     </Label>
                   </div>
                   <div className="flex items-center space-x-3">
                     <RadioGroupItem value="exit-fee" id="payment-exit-fee" />
-                    <Label htmlFor="payment-exit-fee" className="text-sm text-gray-300">
+                    <Label htmlFor="payment-exit-fee" className="text-sm text-muted-foreground">
                       No setup fee. Pay $1,000 early exit fee if removed before two years.
                     </Label>
                   </div>
                 </RadioGroup>
                 {showPaymentError && (
-                  <p className="text-xs text-red-400 mt-1">
+                  <p className="text-xs text-red-700 mt-1">
                     Please select one payment option.
                   </p>
                 )}
               </div>
 
               {/* Optional Services */}
-              <div className="mt-4 pt-4 border-t border-[#EAEB80]/20 space-y-2">
+              <div className="mt-4 pt-4 border-t border-primary/20 space-y-2">
                 <p className="text-sm font-semibold text-[#EAEB80]">
                   Optional Services (choose any)
                 </p>
@@ -1506,7 +1506,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="optional-rome-insurance"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       Enroll in Tint or Roamy Insurance at $97/month.
                     </Label>
@@ -1522,7 +1522,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="optional-gps"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       Activate GPS tracking at $9.99/month.
                     </Label>
@@ -1538,7 +1538,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="optional-gps-install"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       One-time GPS purchase and installation fee of $199.
                     </Label>
@@ -1554,7 +1554,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="optional-airport"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       Airport delivery and pick-up at $25 per use.
                     </Label>
@@ -1570,7 +1570,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="optional-home-pickup"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       Home or dealership pickup for $100, $75, or $50 based on distance.
                     </Label>
@@ -1579,7 +1579,7 @@ export function ContractFormFiller({
               </div>
 
               {/* Additional Earnings Options */}
-              <div className="mt-4 pt-4 border-t border-[#EAEB80]/20 space-y-2">
+              <div className="mt-4 pt-4 border-t border-primary/20 space-y-2">
                 <p className="text-sm font-semibold text-[#EAEB80]">
                   Additional Earnings Options (optional)
                 </p>
@@ -1595,7 +1595,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="optional-relocation"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       Authorize relocation within the U.S. for rentals; up to $50 per move.
                     </Label>
@@ -1611,7 +1611,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="optional-other-platforms"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       Authorize listing and renting on other websites and apps.
                     </Label>
@@ -1627,7 +1627,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="optional-chauffeur"
-                      className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
                     >
                       Authorize use for transportation and chauffeur services, including airport pickups.
                     </Label>
@@ -1638,21 +1638,21 @@ export function ContractFormFiller({
           </Card>
 
           {/* Sign Here Card */}
-          <Card className="bg-[#1a1a1a] border-[#EAEB80]/20 flex-shrink-0">
+          <Card className="bg-card border-primary/20 flex-shrink-0">
             <CardHeader>
               <CardTitle className="text-[#EAEB80] text-lg">Sign Here</CardTitle>
-              <CardDescription className="text-gray-400 text-sm">
+              <CardDescription className="text-muted-foreground text-sm">
                 Type your name or draw your signature below
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
             <Tabs value={signatureType} onValueChange={(v) => setSignatureType(v as "typed" | "drawn")}>
-              <TabsList className="grid w-full grid-cols-2 bg-[#2a2a2a]">
-                <TabsTrigger value="typed" className="data-[state=active]:bg-[#EAEB80] data-[state=active]:text-black">
+              <TabsList className="grid w-full grid-cols-2 bg-muted">
+                <TabsTrigger value="typed" className="data-[state=active]:bg-primary data-[state=active]:text-black">
                   <Type className="w-4 h-4 mr-2" />
                   Type Name
                 </TabsTrigger>
-                <TabsTrigger value="drawn" className="data-[state=active]:bg-[#EAEB80] data-[state=active]:text-black">
+                <TabsTrigger value="drawn" className="data-[state=active]:bg-primary data-[state=active]:text-black">
                   <PenTool className="w-4 h-4 mr-2" />
                   Draw
                 </TabsTrigger>
@@ -1664,10 +1664,10 @@ export function ContractFormFiller({
                   placeholder="Type your full name"
                   value={typedName}
                   onChange={(e) => setTypedName(e.target.value)}
-                  className="bg-[#2a2a2a] border-[#EAEB80]/30 text-white focus:border-[#EAEB80]"
+                  className="bg-muted border-primary/30 text-foreground focus:border-primary"
                 />
                 {typedName && (
-                  <div className="bg-white p-3 rounded-md border-2 border-[#EAEB80]/30">
+                  <div className="bg-white p-3 rounded-md border-2 border-primary/30">
                     <p
                       className="text-2xl text-black italic text-center"
                       style={{ fontFamily: "'Dancing Script', cursive" }}
@@ -1679,12 +1679,12 @@ export function ContractFormFiller({
               </TabsContent>
 
               <TabsContent value="drawn" className="mt-4">
-                <div className="border-2 border-[#EAEB80]/30 rounded-md bg-white overflow-hidden">
+                <div className="border-2 border-primary/30 rounded-md bg-white overflow-hidden">
                   <SignatureCanvas
                     ref={signatureCanvasRef}
                     onEnd={handleSignatureEnd}
                     canvasProps={{
-                      className: "w-full h-32 border border-[#EAEB80]/30 rounded-md bg-white",
+                      className: "w-full h-32 border border-primary/30 rounded-md bg-white",
                     }}
                   />
                 </div>
@@ -1695,7 +1695,7 @@ export function ContractFormFiller({
                   }}
                   variant="outline"
                   size="sm"
-                  className="mt-2 w-full border-[#EAEB80]/30 text-gray-300"
+                  className="mt-2 w-full border-primary/30 text-muted-foreground"
                 >
                   Clear
                 </Button>
@@ -1708,7 +1708,7 @@ export function ContractFormFiller({
                 <Button
                   onClick={handleSubmit}
                   disabled={isProcessing}
-                  className="flex-1 h-12 bg-[#EAEB80] text-black text-lg font-bold hover:bg-[#d4d570] disabled:opacity-50"
+                  className="flex-1 h-12 bg-primary text-black text-lg font-bold hover:bg-primary/80 disabled:opacity-50"
                 >
                   {isProcessing ? (
                     <>
@@ -1726,7 +1726,7 @@ export function ContractFormFiller({
                   <Button
                     onClick={onDecline}
                     disabled={isProcessing}
-                    className="flex-1 h-12 bg-[#ef4444] text-white text-lg font-bold hover:bg-[#dc2626] disabled:opacity-50"
+                    className="flex-1 h-12 bg-[#ef4444] text-foreground text-lg font-bold hover:bg-muted/50dc2626] disabled:opacity-50"
                   >
                     <X className="w-5 h-5 mr-2" />
                     Decline Contract

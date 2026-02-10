@@ -1115,10 +1115,10 @@ export default function EarningsPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-400">Failed to load car details</p>
+          <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-[#EAEB80] hover:underline"
+            className="mt-4 text-primary hover:underline"
           >
             ← Back to View Car
           </button>
@@ -1144,15 +1144,15 @@ export default function EarningsPage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">Earnings</h1>
+            <h1 className="text-2xl font-bold text-foreground">Earnings</h1>
             {car && (
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Car: {car.makeModel || "Unknown Car"}
               </p>
             )}
@@ -1160,77 +1160,77 @@ export default function EarningsPage() {
         </div>
 
         {/* Car and Owner Information Header */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+        <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Information</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Information</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Car Name: </span>
-                  <span className="text-white text-xs sm:text-sm break-words">{carName}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Car Name: </span>
+                  <span className="text-foreground text-xs sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">VIN #: </span>
-                  <span className="text-white font-mono text-xs sm:text-sm break-all">{car.vin}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">VIN #: </span>
+                  <span className="text-foreground font-mono text-xs sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">License: </span>
-                  <span className="text-white text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">License: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Owner Information</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Owner Information</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Name: </span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Name: </span>
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
+                      className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                  <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
+                  <span className="text-foreground text-xs sm:text-sm break-words">{ownerName}</span>
                   )}
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Contact #: </span>
-                  <span className="text-white text-xs sm:text-sm">{ownerContact}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Contact #: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Email: </span>
-                  <span className="text-white text-xs sm:text-sm break-all">{ownerEmail}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Email: </span>
+                  <span className="text-foreground text-xs sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Specifications</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Specifications</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Fuel/Gas: </span>
-                  <span className="text-white text-xs sm:text-sm">{fuelType}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Fuel/Gas: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{fuelType}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Tire Size: </span>
-                  <span className="text-white text-xs sm:text-sm">{tireSize}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Tire Size: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{tireSize}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Oil Type: </span>
-                  <span className="text-white text-xs sm:text-sm">{oilType}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Oil Type: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{oilType}</span>
                 </div>
               </div>
             </div>
 
             {/* Turo Links */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Turo Links</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Turo Links</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 {car.turoLink && (
                   <div>
@@ -1238,7 +1238,7 @@ export default function EarningsPage() {
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                      className="text-primary hover:underline text-sm flex items-center gap-1"
                     >
                       Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -1251,7 +1251,7 @@ export default function EarningsPage() {
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                      className="text-primary hover:underline text-sm flex items-center gap-1"
                     >
                       Admin Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -1259,7 +1259,7 @@ export default function EarningsPage() {
                   </div>
                 )}
                 {!car.turoLink && !car.adminTuroLink && (
-                  <span className="text-gray-500 text-sm">No Turo links available</span>
+                  <span className="text-foreground0 text-sm">No Turo links available</span>
                 )}
               </div>
             </div>
@@ -1268,13 +1268,13 @@ export default function EarningsPage() {
 
         {/* Earnings Header with Year Filter */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-serif text-[#EAEB80] italic">Earnings</h1>
+          <h1 className="text-3xl font-serif text-primary italic">Earnings</h1>
           <div className="w-[150px]">
             <Select value={selectedYear} onValueChange={setSelectedYear}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                 <SelectValue placeholder="Select year" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-card border-border text-foreground">
                 <SelectItem value="2026">2026</SelectItem>
                 <SelectItem value="2025">2025</SelectItem>
                 <SelectItem value="2024">2024</SelectItem>
@@ -1287,7 +1287,7 @@ export default function EarningsPage() {
         </div>
 
         {/* Earnings Table */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden mb-6">
+        <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">
           <div className="w-full h-[600px] overflow-y-auto overflow-x-auto">
             <table className="border-collapse w-full table-fixed" style={{ minWidth: '1200px' }}>
               <colgroup>
@@ -1295,9 +1295,9 @@ export default function EarningsPage() {
                 {months.map((_, idx) => <col key={idx} style={{ width: '5.5%' }} />)}
                 <col style={{ width: '7%' }} />
               </colgroup>
-              <thead className="bg-[#1a1a1a]">
-                <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-2 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[5] border-r border-[#2a2a2a] align-middle">
+              <thead className="bg-card">
+                <tr className="bg-card border-b border-border">
+                  <th className="text-left px-3 py-2 text-sm font-medium text-muted-foreground sticky top-0 left-0 bg-card z-[5] border-r border-border align-middle">
                     Category / Expense
                   </th>
                   {months.map((month, index) => {
@@ -1311,18 +1311,18 @@ export default function EarningsPage() {
                     return (
                     <th
                       key={month}
-                        className="border-l border-[#2a2a2a] px-2 py-2 text-center min-w-[100px] sticky top-0 bg-[#1a1a1a] z-[5] align-middle"
+                        className="border-l border-border px-2 py-2 text-center min-w-[100px] sticky top-0 bg-card z-[5] align-middle"
                       >
                         <div className="flex flex-col items-center gap-1 justify-center">
-                          <span className="text-white text-xs">{month}</span>
+                          <span className="text-foreground text-xs">{month}</span>
                           <div className="flex items-center justify-center gap-1 h-[24px]">
                             {/* Mode Toggle (Read-only) - Shows 50:50 or 30:70 split mode */}
                             <div
                               className={cn(
                                 "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-default",
                                 currentMode === 50 
-                                  ? "bg-green-600 text-white" 
-                                  : "bg-blue-600 text-white"
+                                  ? "bg-green-600 text-foreground" 
+                                  : "bg-blue-600 text-foreground"
                               )}
                               title={`Rate mode: ${currentMode === 50 ? "50:50 (green)" : "30:70 (blue)"} (Read-only)`}
                             >
@@ -1334,8 +1334,8 @@ export default function EarningsPage() {
                                 className={cn(
                                   "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px] cursor-default",
                                   currentSkiRacksOwner === "GLA"
-                                    ? "bg-purple-600 text-white"
-                                    : "bg-orange-600 text-white"
+                                    ? "bg-purple-600 text-foreground"
+                                    : "bg-orange-600 text-foreground"
                                 )}
                                 title={`Ski racks owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"} (Read-only)`}
                               >
@@ -1347,7 +1347,7 @@ export default function EarningsPage() {
                     </th>
                     );
                   })}
-                  <th className="text-right px-2 py-2 text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-[5] border-l border-[#2a2a2a] whitespace-nowrap align-middle">
+                  <th className="text-right px-2 py-2 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-[5] border-l border-border whitespace-nowrap align-middle">
                     Total
                   </th>
                 </tr>
@@ -1713,11 +1713,11 @@ export default function EarningsPage() {
         </div>
 
         {/* Turo Earnings Chart Section */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden mb-6">
+        <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">
           <div className="p-6">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-300">
+              <h2 className="text-xl font-semibold text-muted-foreground">
                 Turo Earnings, Upcoming Earnings, Reimbursements, Missed Earnings Chart
               </h2>
             </div>
@@ -1766,13 +1766,13 @@ export default function EarningsPage() {
                 return (
                 <div key={index} className="flex flex-col">
                     {/* Month Label with Rental Income */}
-                  <div className="bg-[#EAEB80] text-black px-3 py-2 text-sm font-medium rounded-t flex justify-between items-center">
+                  <div className="bg-primary text-primary-foreground px-3 py-2 text-sm font-medium rounded-t flex justify-between items-center">
                       <span>{monthLabel}</span>
                       <span className="font-semibold">{formatCurrency(rentalIncome)}</span>
                   </div>
                     
                     {/* Chart Image Area */}
-                    <div className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-b relative group min-h-[200px] flex items-center justify-center">
+                    <div className="bg-card border border-border rounded-b relative group min-h-[200px] flex items-center justify-center">
                       {chartImageUrl ? (
                         <>
                           {/* Manual Upload Override - Show uploaded image */}
@@ -1785,7 +1785,7 @@ export default function EarningsPage() {
                           {isAdmin && (
                             <button
                               onClick={() => handleChartDelete(monthNum)}
-                              className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                              className="absolute top-2 right-2 bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30 text-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
                               title="Delete chart (will show auto-generated chart)"
                             >
                               <X className="w-4 h-4" />
@@ -1793,7 +1793,7 @@ export default function EarningsPage() {
                           )}
                           {/* Upload overlay for replacing manual upload */}
                           {chartImageUrl && isAdmin && (
-                            <label className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all cursor-pointer flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-b">
+                            <label className="absolute inset-0 bg-background bg-opacity-0 hover:bg-opacity-50 transition-all cursor-pointer flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-b">
                               <input
                                 type="file"
                                 accept="image/*"
@@ -1807,7 +1807,7 @@ export default function EarningsPage() {
                                 }}
                                 disabled={isUploading}
                               />
-                              <div className="flex items-center gap-2 px-4 py-2 bg-[#EAEB80] text-black rounded hover:bg-[#d4d570] transition-colors">
+                              <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/80 transition-colors">
                                 {isUploading ? (
                                   <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -1866,7 +1866,7 @@ export default function EarningsPage() {
                           
                           {/* Upload button overlay for auto-generated chart */}
                           {isAdmin && (
-                            <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-b">
+                            <div className="absolute inset-0 bg-background bg-opacity-0 hover:bg-opacity-30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-b">
                               <label className="cursor-pointer">
                                 <input
                                   type="file"
@@ -1881,7 +1881,7 @@ export default function EarningsPage() {
                                   }}
                                   disabled={isUploading}
                                 />
-                                <div className="flex items-center gap-2 px-4 py-2 bg-[#EAEB80] text-black rounded hover:bg-[#d4d570] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                                   {isUploading ? (
                                     <>
                                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -1934,11 +1934,11 @@ interface CategorySectionProps {
 function CategorySection({ title, isExpanded, onToggle, children }: CategorySectionProps) {
   return (
     <>
-      <tr className="bg-[#1a1a1a] hover:bg-[#222]">
-        <td colSpan={14} className="sticky left-0 z-[3] bg-[#1a1a1a] hover:bg-[#222] px-3 py-2 border-b border-[#2a2a2a]">
+      <tr className="bg-card hover:bg-muted">
+        <td colSpan={14} className="sticky left-0 z-[3] bg-card hover:bg-muted px-3 py-2 border-b border-border">
           <div className="flex items-center gap-2 cursor-pointer" onClick={onToggle}>
-            {isExpanded ? <ChevronDown className="w-4 h-4 text-[#EAEB80]" /> : <ChevronRight className="w-4 h-4 text-[#EAEB80]" />}
-            <span className="text-sm font-semibold text-[#EAEB80]">{title}</span>
+            {isExpanded ? <ChevronDown className="w-4 h-4 text-primary" /> : <ChevronRight className="w-4 h-4 text-primary" />}
+            <span className="text-sm font-semibold text-primary">{title}</span>
           </div>
         </td>
       </tr>
@@ -1961,12 +1961,12 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
   
   return (
     <tr className={cn(
-      "border-b border-[#2a2a2a] hover:bg-[#151515] transition-colors",
-      isTotal && "bg-[#0a0a0a] font-semibold"
+      "border-b border-border hover:bg-muted/50151515] transition-colors",
+      isTotal && "bg-background font-semibold"
     )}>
       <td className={cn(
-        "px-3 py-2 text-sm sticky left-0 z-[3] border-r border-[#2a2a2a]",
-        isTotal ? "text-[#EAEB80] bg-[#0a0a0a]" : "text-gray-300 bg-[#0f0f0f]"
+        "px-3 py-2 text-sm sticky left-0 z-[3] border-r border-border",
+        isTotal ? "text-primary bg-background" : "text-muted-foreground bg-card"
       )}>
         <span className="whitespace-nowrap">{label}</span>
       </td>
@@ -1986,10 +1986,10 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
           <td
             key={i}
             className={cn(
-              "text-right px-2 py-2 text-sm border-l border-[#2a2a2a]",
+              "text-right px-2 py-2 text-sm border-l border-border",
               cellValue !== 0
-                ? isTotal ? "text-[#EAEB80] font-semibold" : "text-gray-300 font-medium"
-                : "text-gray-500"
+                ? isTotal ? "text-primary font-semibold" : "text-muted-foreground font-medium"
+                : "text-foreground0"
             )}
           >
             {displayText}
@@ -1997,8 +1997,8 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
         );
       })}
       <td className={cn(
-        "text-right px-2 py-2 text-sm font-semibold border-l border-[#2a2a2a] bg-[#1f1f1f] sticky right-0 z-[3]",
-        isTotal ? "text-[#EAEB80]" : total !== 0 ? "text-gray-300" : "text-gray-400"
+        "text-right px-2 py-2 text-sm font-semibold border-l border-border bg-card sticky right-0 z-[3]",
+        isTotal ? "text-primary" : total !== 0 ? "text-muted-foreground" : "text-muted-foreground"
       )}>
         {isNegativeBalance && total < 0 
           ? `(${Math.abs(total).toFixed(2)})`

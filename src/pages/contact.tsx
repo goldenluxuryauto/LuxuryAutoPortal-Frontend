@@ -94,7 +94,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-20 lg:pt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -116,7 +116,7 @@ export default function Contact() {
               {contactInfo.map((item, index) => {
                 const Icon = item.icon;
                 return (
-                  <Card key={index} className="bg-card border-white/10">
+                  <Card key={index} className="bg-card border-border">
                     <CardContent className="p-6 flex items-start gap-4">
                       <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
                         <Icon className="w-5 h-5 text-primary" />
@@ -137,7 +137,7 @@ export default function Contact() {
               })}
             </div>
 
-            <Card className="lg:col-span-2 bg-card border-white/10">
+            <Card className="lg:col-span-2 bg-card border-border">
               <CardContent className="p-6 lg:p-8">
                 <h2 className="text-xl font-semibold text-foreground mb-6">
                   Send Us a Message

@@ -313,7 +313,7 @@ const TextAnnotationBox = memo(
         {/* Resize Handle - only visible when editing */}
         {isEditing && (
           <div
-            className="absolute bottom-0 right-0 w-4 h-4 bg-black cursor-se-resize rounded-tl hover:bg-gray-700 transition-colors"
+            className="absolute bottom-0 right-0 w-4 h-4 bg-background cursor-se-resize rounded-tl hover:bg-gray-700 transition-colors"
             onPointerDown={handleResizePointerDown}
             onClick={(e) => e.stopPropagation()}
           />
@@ -332,7 +332,7 @@ const TextAnnotationBox = memo(
               e.stopPropagation();
               e.preventDefault();
             }}
-            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 transition-colors cursor-pointer"
+            className="absolute -top-2 -right-2 bg-red-500 text-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-500/20 text-red-700 border-red-500/50 transition-colors cursor-pointer"
             style={{
               zIndex: 1001,
               pointerEvents: "auto",
@@ -519,7 +519,7 @@ const SignatureAnnotationBox = memo(
               e.preventDefault();
               onRemove();
             }}
-            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 transition-colors z-10"
+            className="absolute -top-2 -right-2 bg-red-500 text-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-500/20 text-red-700 border-red-500/50 transition-colors z-10"
             title="Remove signature"
           >
             <X className="w-3 h-3" />
@@ -529,7 +529,7 @@ const SignatureAnnotationBox = memo(
         {/* Resize Handle - only visible when selected */}
         {isSelected && (
           <div
-            className="absolute bottom-0 right-0 w-4 h-4 bg-black cursor-se-resize rounded-tl hover:bg-gray-700 transition-colors"
+            className="absolute bottom-0 right-0 w-4 h-4 bg-background cursor-se-resize rounded-tl hover:bg-gray-700 transition-colors"
             onPointerDown={handleResizePointerDown}
             onClick={(e) => e.stopPropagation()}
           />
@@ -921,7 +921,7 @@ export function PDFEditor({
           title: "✅ Signature added",
           description: "Your signature has been placed on the document.",
           duration: 2000,
-          className: "bg-[#EAEB80] text-[#1a1a1a] border-[#EAEB80]",
+          className: "bg-primary text-[#1a1a1a] border-primary",
         });
 
         console.log("✅ Signature placed successfully - no selection border!");
@@ -1261,7 +1261,7 @@ export function PDFEditor({
       <div className="fixed top-4 right-4 z-[60] flex flex-col items-end gap-2">
         {/* Placement mode indicator */}
         {tool === "text" && (
-          <div className="bg-[#EAEB80] text-[#1a1a1a] px-4 py-2 rounded-lg shadow-xl flex items-center gap-2 animate-pulse">
+          <div className="bg-primary text-[#1a1a1a] px-4 py-2 rounded-lg shadow-xl flex items-center gap-2 animate-pulse">
             <Type className="w-4 h-4" />
             <span className="text-sm font-semibold">
               Click on PDF to add text box
@@ -1272,7 +1272,7 @@ export function PDFEditor({
               onClick={() => {
                 setTool("select");
               }}
-              className="ml-2 h-6 w-6 p-0 hover:bg-[#1a1a1a]/10"
+              className="ml-2 h-6 w-6 p-0 hover:bg-card/10"
             >
               <X className="w-3 h-3" />
             </Button>
@@ -1280,7 +1280,7 @@ export function PDFEditor({
         )}
 
         {signaturePlacementMode && (
-          <div className="bg-[#EAEB80] text-[#1a1a1a] px-4 py-2 rounded-lg shadow-xl flex items-center gap-2 animate-pulse">
+          <div className="bg-primary text-[#1a1a1a] px-4 py-2 rounded-lg shadow-xl flex items-center gap-2 animate-pulse">
             <PenTool className="w-4 h-4" />
             <span className="text-sm font-semibold">
               Click anywhere on the PDF to place your signature
@@ -1294,7 +1294,7 @@ export function PDFEditor({
                 setTool("select");
                 document.body.style.cursor = "default";
               }}
-              className="ml-2 h-6 w-6 p-0 hover:bg-[#1a1a1a]/10"
+              className="ml-2 h-6 w-6 p-0 hover:bg-card/10"
             >
               <X className="w-3 h-3" />
             </Button>
@@ -1302,7 +1302,7 @@ export function PDFEditor({
         )}
 
         {/* Toolbar */}
-        <div className="flex items-center gap-2 bg-[#1a1a1a] border border-[#EAEB80]/30 rounded-lg p-2 shadow-2xl">
+        <div className="flex items-center gap-2 bg-card border border-primary/30 rounded-lg p-2 shadow-2xl">
           {/* Tools */}
           <Button
             variant={tool === "text" ? "default" : "ghost"}
@@ -1312,8 +1312,8 @@ export function PDFEditor({
             }}
             className={cn(
               tool === "text"
-                ? "bg-[#EAEB80] text-[#1a1a1a]"
-                : "text-[#EAEB80] hover:bg-[#EAEB80]/20"
+                ? "bg-primary text-[#1a1a1a]"
+                : "text-[#EAEB80] hover:bg-primary/20"
             )}
             title="Add Text (Click to activate, then click on PDF)"
           >
@@ -1327,7 +1327,7 @@ export function PDFEditor({
               setSignatureModalOpen(true);
               setTool("select");
             }}
-            className="text-[#EAEB80] hover:bg-[#EAEB80]/20"
+            className="text-[#EAEB80] hover:bg-primary/20"
             title="Add Signature"
           >
             <PenTool className="w-4 h-4" />
@@ -1337,7 +1337,7 @@ export function PDFEditor({
             variant="ghost"
             size="sm"
             onClick={handleDownload}
-            className="text-[#EAEB80] hover:bg-[#EAEB80]/20"
+            className="text-[#EAEB80] hover:bg-primary/20"
             title="Download"
           >
             <Download className="w-4 h-4" />
@@ -1457,7 +1457,7 @@ export function PDFEditor({
         }}
       >
         <DialogContent
-          className="bg-[#1a1a1a] border-2 border-[#EAEB80]/30 text-white 
+          className="bg-card border-2 border-primary/30 text-foreground 
              max-w-md w-[90vw] sm:max-w-lg shadow-2xl 
              z-50 
              sm:z-[100] 
@@ -1467,7 +1467,7 @@ export function PDFEditor({
             <DialogTitle className="text-[#EAEB80] text-xl font-semibold">
               Add Signature
             </DialogTitle>
-            <DialogDescription className="text-gray-400 text-sm">
+            <DialogDescription className="text-muted-foreground text-sm">
               Choose how you want to add your signature
             </DialogDescription>
           </DialogHeader>
@@ -1476,22 +1476,22 @@ export function PDFEditor({
             value={signatureType}
             onValueChange={(v) => setSignatureType(v as any)}
           >
-            <TabsList className="bg-[#2d2d2d] border-[#EAEB80]/30">
+            <TabsList className="bg-[#2d2d2d] border-primary/30">
               <TabsTrigger
                 value="type"
-                className="text-gray-300 data-[state=active]:text-[#EAEB80]"
+                className="text-muted-foreground data-[state=active]:text-[#EAEB80]"
               >
                 Type
               </TabsTrigger>
               <TabsTrigger
                 value="draw"
-                className="text-gray-300 data-[state=active]:text-[#EAEB80]"
+                className="text-muted-foreground data-[state=active]:text-[#EAEB80]"
               >
                 Draw
               </TabsTrigger>
               <TabsTrigger
                 value="upload"
-                className="text-gray-300 data-[state=active]:text-[#EAEB80]"
+                className="text-muted-foreground data-[state=active]:text-[#EAEB80]"
               >
                 Upload
               </TabsTrigger>
@@ -1503,10 +1503,10 @@ export function PDFEditor({
                   placeholder="Type your name"
                   value={typedSignature}
                   onChange={(e) => setTypedSignature(e.target.value)}
-                  className="bg-[#2d2d2d] border-[#EAEB80]/30 text-white"
+                  className="bg-[#2d2d2d] border-primary/30 text-foreground"
                 />
                 {typedSignature && (
-                  <div className="relative bg-white p-3 rounded-lg border-2 border-[#EAEB80] shadow-md w-fit mx-auto">
+                  <div className="relative bg-white p-3 rounded-lg border-2 border-primary shadow-md w-fit mx-auto">
                     {/* Checkered pattern to show transparency */}
                     <div
                       className="absolute inset-0 rounded-lg"
@@ -1535,11 +1535,11 @@ export function PDFEditor({
                 <Button
                   onClick={handleTypeSignature}
                   disabled={!typedSignature.trim()}
-                  className="w-full bg-[#EAEB80] text-[#1a1a1a] hover:bg-[#f4d03f] font-semibold"
+                  className="w-full bg-primary text-[#1a1a1a] hover:bg-muted/50f4d03f] font-semibold"
                 >
                   Confirm Signature
                 </Button>
-                <p className="text-xs text-gray-400 text-center">
+                <p className="text-xs text-muted-foreground text-center">
                   After clicking "Confirm", click anywhere on the PDF to place
                   your signature.
                 </p>
@@ -1548,7 +1548,7 @@ export function PDFEditor({
 
             <TabsContent value="draw" className="mt-4">
               <div className="space-y-3">
-                <div className="bg-white rounded-lg p-3 border-2 border-[#EAEB80] shadow-md relative">
+                <div className="bg-white rounded-lg p-3 border-2 border-primary shadow-md relative">
                   {/* Checkered pattern background to show transparency */}
                   <div
                     className="absolute inset-3 rounded"
@@ -1584,19 +1584,19 @@ export function PDFEditor({
                       setSignaturePlacementMode(false);
                       document.body.style.cursor = "default";
                     }}
-                    className="flex-1 border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                    className="flex-1 border-primary/30 text-[#EAEB80] hover:bg-primary/10"
                   >
                     Clear
                   </Button>
                   <Button
                     onClick={handleDrawSignature}
                     disabled={signatureCanvasRef.current?.isEmpty()}
-                    className="flex-1 bg-[#EAEB80] text-[#1a1a1a] hover:bg-[#f4d03f] font-semibold"
+                    className="flex-1 bg-primary text-[#1a1a1a] hover:bg-muted/50f4d03f] font-semibold"
                   >
                     Confirm Signature
                   </Button>
                 </div>
-                <p className="text-xs text-gray-400 text-center">
+                <p className="text-xs text-muted-foreground text-center">
                   Draw your signature above. After clicking "Confirm", click on
                   the PDF to place it.
                 </p>
@@ -1613,7 +1613,7 @@ export function PDFEditor({
                   className="hidden"
                 />
                 {signatureImage && (
-                  <div className="relative bg-white p-3 rounded-lg border-2 border-[#EAEB80] shadow-md w-fit mx-auto max-w-full">
+                  <div className="relative bg-white p-3 rounded-lg border-2 border-primary shadow-md w-fit mx-auto max-w-full">
                     {/* Checkered pattern to show transparency */}
                     <div
                       className="absolute inset-3 rounded-lg"
@@ -1637,14 +1637,14 @@ export function PDFEditor({
                 )}
                 <Button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full bg-[#EAEB80] text-[#1a1a1a] hover:bg-[#f4d03f] font-semibold"
+                  className="w-full bg-primary text-[#1a1a1a] hover:bg-muted/50f4d03f] font-semibold"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   {signatureImage
                     ? "Choose Different Image"
                     : "Upload Signature Image"}
                 </Button>
-                <p className="text-xs text-gray-400 text-center">
+                <p className="text-xs text-muted-foreground text-center">
                   Upload a transparent PNG for best results. After upload, click
                   on the PDF to place it.
                 </p>

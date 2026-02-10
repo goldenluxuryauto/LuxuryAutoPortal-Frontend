@@ -142,12 +142,12 @@ export default function EmployeeFormPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-4">
-        <Card className="bg-[#111111] border-[#2a2a2a] max-w-md w-full">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
+        <Card className="bg-card border-border max-w-md w-full">
           <CardContent className="p-6 text-center space-y-3">
             <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto" />
-            <h1 className="text-xl font-semibold text-[#EAEB80]">Success!</h1>
-            <p className="text-gray-400 text-sm">
+            <h1 className="text-xl font-semibold text-primary">Success!</h1>
+            <p className="text-muted-foreground text-sm">
               Your employee onboarding form has been submitted.
             </p>
           </CardContent>
@@ -160,15 +160,15 @@ export default function EmployeeFormPage() {
   const { errors } = formState;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex items-start justify-center p-4">
+    <div className="min-h-screen bg-background text-foreground flex items-start justify-center p-4">
       <div className="w-full max-w-3xl space-y-6">
         <div className="text-center">
           <img src="/logo.svg" alt="Golden Luxury Auto" className="h-10 mx-auto mb-3" />
-          <h1 className="text-2xl sm:text-3xl font-serif text-[#EAEB80] italic">Employee Onboarding</h1>
-          <p className="text-gray-400 text-sm mt-1">Please complete your personal information.</p>
+          <h1 className="text-2xl sm:text-3xl font-serif text-primary italic">Employee Onboarding</h1>
+          <p className="text-muted-foreground text-sm mt-1">Please complete your personal information.</p>
         </div>
 
-        <Card className="bg-[#111111] border-[#2a2a2a]">
+        <Card className="bg-card border-border">
           <CardContent className="p-6 space-y-8">
             <form
               onSubmit={handleSubmit((values) => {
@@ -188,46 +188,46 @@ export default function EmployeeFormPage() {
               className="space-y-8"
             >
               <section className="space-y-4">
-                <h2 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">Basic Information</h2>
+                <h2 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">Basic Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <Label className="text-gray-400">First Name *</Label>
-                    <Input {...register("firstName")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.firstName && <p className="text-red-400 text-xs">{errors.firstName.message}</p>}
+                    <Label className="text-muted-foreground">First Name *</Label>
+                    <Input {...register("firstName")} className="bg-card border-border text-foreground" />
+                    {errors.firstName && <p className="text-red-700 text-xs">{errors.firstName.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Last Name *</Label>
-                    <Input {...register("lastName")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.lastName && <p className="text-red-400 text-xs">{errors.lastName.message}</p>}
+                    <Label className="text-muted-foreground">Last Name *</Label>
+                    <Input {...register("lastName")} className="bg-card border-border text-foreground" />
+                    {errors.lastName && <p className="text-red-700 text-xs">{errors.lastName.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Middle Name</Label>
-                    <Input {...register("middleName")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
+                    <Label className="text-muted-foreground">Middle Name</Label>
+                    <Input {...register("middleName")} className="bg-card border-border text-foreground" />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Email *</Label>
-                    <Input {...register("email")} type="email" className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.email && <p className="text-red-400 text-xs">{errors.email.message}</p>}
+                    <Label className="text-muted-foreground">Email *</Label>
+                    <Input {...register("email")} type="email" className="bg-card border-border text-foreground" />
+                    {errors.email && <p className="text-red-700 text-xs">{errors.email.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Birthday *</Label>
+                    <Label className="text-muted-foreground">Birthday *</Label>
                     <Input 
                       {...register("birthday")} 
                       type="date" 
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert" 
+                      className="bg-card border-border text-foreground [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert" 
                     />
-                    {errors.birthday && <p className="text-red-400 text-xs">{errors.birthday.message}</p>}
+                    {errors.birthday && <p className="text-red-700 text-xs">{errors.birthday.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Marital Status *</Label>
+                    <Label className="text-muted-foreground">Marital Status *</Label>
                     <Select
                       value={watch("maritalStatus")}
                       onValueChange={(v) => setValue("maritalStatus", v, { shouldValidate: true })}
                     >
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectContent className="bg-card border-border text-foreground">
                         <SelectItem value="single">Single</SelectItem>
                         <SelectItem value="married">Married</SelectItem>
                         <SelectItem value="divorced">Divorced</SelectItem>
@@ -236,121 +236,121 @@ export default function EmployeeFormPage() {
                         <SelectItem value="widowed">Widowed</SelectItem>
                       </SelectContent>
                     </Select>
-                    {errors.maritalStatus && <p className="text-red-400 text-xs">{errors.maritalStatus.message}</p>}
+                    {errors.maritalStatus && <p className="text-red-700 text-xs">{errors.maritalStatus.message}</p>}
                   </div>
                 </div>
               </section>
 
               <section className="space-y-4">
-                <h2 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">Address & Contact</h2>
+                <h2 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">Address & Contact</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1 md:col-span-2">
-                    <Label className="text-gray-400">Street *</Label>
-                    <Input {...register("street")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.street && <p className="text-red-400 text-xs">{errors.street.message}</p>}
+                    <Label className="text-muted-foreground">Street *</Label>
+                    <Input {...register("street")} className="bg-card border-border text-foreground" />
+                    {errors.street && <p className="text-red-700 text-xs">{errors.street.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">City *</Label>
-                    <Input {...register("city")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.city && <p className="text-red-400 text-xs">{errors.city.message}</p>}
+                    <Label className="text-muted-foreground">City *</Label>
+                    <Input {...register("city")} className="bg-card border-border text-foreground" />
+                    {errors.city && <p className="text-red-700 text-xs">{errors.city.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">State *</Label>
-                    <Input {...register("state")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.state && <p className="text-red-400 text-xs">{errors.state.message}</p>}
+                    <Label className="text-muted-foreground">State *</Label>
+                    <Input {...register("state")} className="bg-card border-border text-foreground" />
+                    {errors.state && <p className="text-red-700 text-xs">{errors.state.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Country *</Label>
-                    <Input {...register("country")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.country && <p className="text-red-400 text-xs">{errors.country.message}</p>}
+                    <Label className="text-muted-foreground">Country *</Label>
+                    <Input {...register("country")} className="bg-card border-border text-foreground" />
+                    {errors.country && <p className="text-red-700 text-xs">{errors.country.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">ZIP *</Label>
-                    <Input {...register("zipCode")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.zipCode && <p className="text-red-400 text-xs">{errors.zipCode.message}</p>}
+                    <Label className="text-muted-foreground">ZIP *</Label>
+                    <Input {...register("zipCode")} className="bg-card border-border text-foreground" />
+                    {errors.zipCode && <p className="text-red-700 text-xs">{errors.zipCode.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Mobile # *</Label>
-                    <Input {...register("mobileNumber")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.mobileNumber && <p className="text-red-400 text-xs">{errors.mobileNumber.message}</p>}
+                    <Label className="text-muted-foreground">Mobile # *</Label>
+                    <Input {...register("mobileNumber")} className="bg-card border-border text-foreground" />
+                    {errors.mobileNumber && <p className="text-red-700 text-xs">{errors.mobileNumber.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Telephone #</Label>
-                    <Input {...register("telephone")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
+                    <Label className="text-muted-foreground">Telephone #</Label>
+                    <Input {...register("telephone")} className="bg-card border-border text-foreground" />
                   </div>
                 </div>
               </section>
 
               <section className="space-y-4">
-                <h2 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">Family Information</h2>
+                <h2 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">Family Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Mother's Name *</Label>
-                    <Input {...register("motherName")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.motherName && <p className="text-red-400 text-xs">{errors.motherName.message}</p>}
+                    <Label className="text-muted-foreground">Mother's Name *</Label>
+                    <Input {...register("motherName")} className="bg-card border-border text-foreground" />
+                    {errors.motherName && <p className="text-red-700 text-xs">{errors.motherName.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Father's Name *</Label>
-                    <Input {...register("fatherName")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.fatherName && <p className="text-red-400 text-xs">{errors.fatherName.message}</p>}
+                    <Label className="text-muted-foreground">Father's Name *</Label>
+                    <Input {...register("fatherName")} className="bg-card border-border text-foreground" />
+                    {errors.fatherName && <p className="text-red-700 text-xs">{errors.fatherName.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Home Contact # *</Label>
-                    <Input {...register("homeContact")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.homeContact && <p className="text-red-400 text-xs">{errors.homeContact.message}</p>}
+                    <Label className="text-muted-foreground">Home Contact # *</Label>
+                    <Input {...register("homeContact")} className="bg-card border-border text-foreground" />
+                    {errors.homeContact && <p className="text-red-700 text-xs">{errors.homeContact.message}</p>}
                   </div>
                   <div className="space-y-1 md:col-span-2">
-                    <Label className="text-gray-400">Home Address *</Label>
-                    <Textarea {...register("homeAddress")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white min-h-[80px]" />
-                    {errors.homeAddress && <p className="text-red-400 text-xs">{errors.homeAddress.message}</p>}
+                    <Label className="text-muted-foreground">Home Address *</Label>
+                    <Textarea {...register("homeAddress")} className="bg-card border-border text-foreground min-h-[80px]" />
+                    {errors.homeAddress && <p className="text-red-700 text-xs">{errors.homeAddress.message}</p>}
                   </div>
                 </div>
               </section>
 
               <section className="space-y-4">
-                <h2 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">Emergency Contact</h2>
+                <h2 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">Emergency Contact</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Emergency Contact Person *</Label>
-                    <Input {...register("emergencyContactPerson")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.emergencyContactPerson && <p className="text-red-400 text-xs">{errors.emergencyContactPerson.message}</p>}
+                    <Label className="text-muted-foreground">Emergency Contact Person *</Label>
+                    <Input {...register("emergencyContactPerson")} className="bg-card border-border text-foreground" />
+                    {errors.emergencyContactPerson && <p className="text-red-700 text-xs">{errors.emergencyContactPerson.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Relationship *</Label>
-                    <Input {...register("emergencyRelationship")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.emergencyRelationship && <p className="text-red-400 text-xs">{errors.emergencyRelationship.message}</p>}
+                    <Label className="text-muted-foreground">Relationship *</Label>
+                    <Input {...register("emergencyRelationship")} className="bg-card border-border text-foreground" />
+                    {errors.emergencyRelationship && <p className="text-red-700 text-xs">{errors.emergencyRelationship.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Contact # *</Label>
-                    <Input {...register("emergencyNumber")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.emergencyNumber && <p className="text-red-400 text-xs">{errors.emergencyNumber.message}</p>}
+                    <Label className="text-muted-foreground">Contact # *</Label>
+                    <Input {...register("emergencyNumber")} className="bg-card border-border text-foreground" />
+                    {errors.emergencyNumber && <p className="text-red-700 text-xs">{errors.emergencyNumber.message}</p>}
                   </div>
                   <div className="space-y-1 md:col-span-2">
-                    <Label className="text-gray-400">Address *</Label>
-                    <Textarea {...register("emergencyAddress")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white min-h-[80px]" />
-                    {errors.emergencyAddress && <p className="text-red-400 text-xs">{errors.emergencyAddress.message}</p>}
+                    <Label className="text-muted-foreground">Address *</Label>
+                    <Textarea {...register("emergencyAddress")} className="bg-card border-border text-foreground min-h-[80px]" />
+                    {errors.emergencyAddress && <p className="text-red-700 text-xs">{errors.emergencyAddress.message}</p>}
                   </div>
                 </div>
               </section>
 
               <section className="space-y-4">
-                <h2 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">Other</h2>
+                <h2 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">Other</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <Label className="text-gray-400">SSN / EIN *</Label>
-                    <Input {...register("ssnEin")} className="bg-[#1a1a1a] border-[#2a2a2a] text-white" />
-                    {errors.ssnEin && <p className="text-red-400 text-xs">{errors.ssnEin.message}</p>}
+                    <Label className="text-muted-foreground">SSN / EIN *</Label>
+                    <Input {...register("ssnEin")} className="bg-card border-border text-foreground" />
+                    {errors.ssnEin && <p className="text-red-700 text-xs">{errors.ssnEin.message}</p>}
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-gray-400">Shirt Size *</Label>
+                    <Label className="text-muted-foreground">Shirt Size *</Label>
                     <Select
                       value={watch("shirtSize")}
                       onValueChange={(v) => setValue("shirtSize", v, { shouldValidate: true })}
                     >
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="Select size" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectContent className="bg-card border-border text-foreground">
                         {["Small", "Medium", "Large", "XLarge", "XXLarge"].map((s) => (
                           <SelectItem key={s} value={s}>
                             {s}
@@ -358,7 +358,7 @@ export default function EmployeeFormPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                    {errors.shirtSize && <p className="text-red-400 text-xs">{errors.shirtSize.message}</p>}
+                    {errors.shirtSize && <p className="text-red-700 text-xs">{errors.shirtSize.message}</p>}
                   </div>
                 </div>
               </section>
@@ -366,13 +366,13 @@ export default function EmployeeFormPage() {
               {shouldShowRecaptcha && (
                 <div className="pt-2 space-y-1">
                   <ReCAPTCHA ref={recaptchaRef} sitekey={siteKey!} />
-                  <p className="text-gray-400 text-xs">
+                  <p className="text-muted-foreground text-xs">
                     Please complete the verification above before submitting.
                   </p>
                 </div>
               )}
               {!shouldShowRecaptcha && (
-                <p className="text-gray-500 text-xs italic">
+                <p className="text-foreground0 text-xs italic">
                   reCAPTCHA is not configured. For production, set VITE_RECAPTCHA_SITE_KEY (frontend) and RECAPTCHA_SECRET_KEY (backend).
                 </p>
               )}
@@ -381,7 +381,7 @@ export default function EmployeeFormPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="border-[#2a2a2a] text-[#EAEB80] hover:bg-[#1a1a1a] hover:text-[#EAEB80]"
+                  className="border-border text-primary hover:bg-card hover:text-primary"
                   onClick={() => form.reset(sampleFormData)}
                 >
                   <Wand2 className="w-4 h-4 mr-2" />
@@ -389,7 +389,7 @@ export default function EmployeeFormPage() {
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                   disabled={mutation.isPending}
                 >
                   {mutation.isPending ? (

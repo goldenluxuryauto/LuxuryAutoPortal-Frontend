@@ -296,17 +296,17 @@ export function RecordFileViewModal({
   const hasValidFolderId = folderId && folderId.trim() !== "" && folderId !== recordId.toString();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50 p-4">
+      <div className="bg-card border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
           disabled={mutation.isPending}
         >
           <X className="w-5 h-5" />
         </button>
 
-        <h3 className="text-lg font-semibold text-white mb-6">
+        <h3 className="text-lg font-semibold text-foreground mb-6">
           {itemEdit ? "Edit File" : "Add File"}
         </h3>
 
@@ -314,10 +314,10 @@ export function RecordFileViewModal({
         {!hasValidFolderId && !itemEdit && (
           <div className="mb-4 p-3 bg-blue-900/20 border border-blue-800/50 rounded">
             <div className="flex items-start gap-2">
-              <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-300">
+              <Info className="w-4 h-4 text-blue-700 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-blue-700">
                 <p className="font-medium mb-1">Google Drive Folder Will Be Created</p>
-                <p className="text-xs text-blue-400/80">
+                <p className="text-xs text-blue-700/80">
                   This record does not have a Google Drive folder ID. A folder will be automatically created when you upload your first file.
                 </p>
               </div>
@@ -328,7 +328,7 @@ export function RecordFileViewModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {!itemEdit && (
             <div>
-              <Label className="text-gray-300">File *</Label>
+              <Label className="text-muted-foreground">File *</Label>
               {/* Drag & Drop Zone */}
               <div
                 ref={dropZoneRef}
@@ -338,8 +338,8 @@ export function RecordFileViewModal({
                 onClick={handleBrowseClick}
                 className={`mt-1 relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                   isDragging
-                    ? "border-[#EAEB80] bg-[#EAEB80]/10 cursor-pointer"
-                    : "border-[#2a2a2a] hover:border-[#EAEB80]/50 bg-[#0f0f0f] cursor-pointer"
+                    ? "border-primary bg-primary/10 cursor-pointer"
+                    : "border-border hover:border-primary/50 bg-card cursor-pointer"
                 }`}
               >
                 <input
@@ -352,13 +352,13 @@ export function RecordFileViewModal({
                   accept="*"
                 />
                 <div className="flex flex-col items-center justify-center gap-2">
-                  <Upload className={`w-8 h-8 ${isDragging ? "text-[#EAEB80]" : "text-gray-400"}`} />
+                  <Upload className={`w-8 h-8 ${isDragging ? "text-[#EAEB80]" : "text-muted-foreground"}`} />
                   <div className="text-sm">
                     <span className="text-[#EAEB80]">Drag & Drop</span>{" "}
-                    <span className="text-gray-400">multiple files here or</span>{" "}
+                    <span className="text-muted-foreground">multiple files here or</span>{" "}
                     <span className="text-[#EAEB80]">Browse</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-foreground0 mt-1">
                     Supported formats: PDF, Images, Documents. Maximum 20 files.
                   </p>
                 </div>
@@ -366,22 +366,22 @@ export function RecordFileViewModal({
 
               {/* File List */}
               {fileList.length > 0 && (
-                <div className="mt-4 p-3 bg-[#0f0f0f] border border-[#2a2a2a] rounded">
-                  <Label className="text-gray-300 text-sm mb-2 block">
+                <div className="mt-4 p-3 bg-card border border-border rounded">
+                  <Label className="text-muted-foreground text-sm mb-2 block">
                     Selected Files ({fileList.length})
                   </Label>
                   <ol className="flex flex-col gap-1.5 max-h-40 overflow-y-auto">
                     {fileList.map((file, index) => (
                       <li
                         key={index}
-                        className="flex items-center justify-between text-sm text-gray-300 p-2 bg-[#1a1a1a] rounded hover:bg-[#2a2a2a] transition-colors"
+                        className="flex items-center justify-between text-sm text-muted-foreground p-2 bg-card rounded hover:bg-muted transition-colors"
                       >
                         <span className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="text-gray-500">{index + 1}.</span>
+                          <span className="text-foreground0">{index + 1}.</span>
                           <span className="truncate" title={file.name}>
                             {file.name}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-foreground0">
                             ({(file.size / 1024 / 1024).toFixed(2)} MB)
                           </span>
                         </span>
@@ -392,7 +392,7 @@ export function RecordFileViewModal({
                             handleRemoveFile(index);
                           }}
                           disabled={mutation.isPending}
-                          className="ml-2 text-red-400 hover:text-red-300 transition-colors"
+                          className="ml-2 text-red-700 hover:text-red-700 transition-colors"
                           title="Remove file"
                         >
                           <XCircle className="w-4 h-4" />
@@ -407,7 +407,7 @@ export function RecordFileViewModal({
 
           {itemEdit && (
             <div>
-              <Label htmlFor="file_name" className="text-gray-300">
+              <Label htmlFor="file_name" className="text-muted-foreground">
                 File Name *
               </Label>
               <Input
@@ -421,17 +421,17 @@ export function RecordFileViewModal({
                   }))
                 }
                 disabled={mutation.isPending}
-                className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1"
+                className="bg-card border-border text-foreground mt-1"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-foreground0 mt-1">
                 Update the file name as it appears in the system
               </p>
             </div>
           )}
 
           <div>
-            <Label htmlFor="remarks" className="text-gray-300">
+            <Label htmlFor="remarks" className="text-muted-foreground">
               Remarks
             </Label>
             <Textarea
@@ -444,7 +444,7 @@ export function RecordFileViewModal({
                 }))
               }
               disabled={mutation.isPending}
-              className="bg-[#0f0f0f] border-[#2a2a2a] text-white mt-1"
+              className="bg-card border-border text-foreground mt-1"
               rows={3}
               placeholder="Enter any additional notes or remarks about this file..."
             />
@@ -452,10 +452,10 @@ export function RecordFileViewModal({
 
           {itemEdit && itemEdit.recordsFileViewGoogleId && (
             <div>
-              <Label className="text-gray-300 flex items-center gap-2">
+              <Label className="text-muted-foreground flex items-center gap-2">
                 <span>Google Drive File</span>
                 <span title="The Google Drive file ID for this file">
-                  <Info className="w-4 h-4 text-gray-500" />
+                  <Info className="w-4 h-4 text-foreground0" />
                 </span>
               </Label>
               <div className="flex items-center gap-2 mt-1">
@@ -463,13 +463,13 @@ export function RecordFileViewModal({
                   type="text"
                   value={itemEdit.recordsFileViewGoogleId}
                   disabled
-                  className="bg-[#0f0f0f] border-[#2a2a2a] text-gray-500 flex-1"
+                  className="bg-card border-border text-foreground0 flex-1"
                 />
                 <a
                   href={`https://drive.google.com/file/d/${itemEdit.recordsFileViewGoogleId}/view`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 bg-[#0f0f0f] border border-[#2a2a2a] rounded hover:bg-[#2a2a2a] transition-colors"
+                  className="p-2 bg-card border border-border rounded hover:bg-muted transition-colors"
                   title="Open in Google Drive"
                 >
                   <ExternalLink className="w-4 h-4 text-[#EAEB80]" />
@@ -481,10 +481,10 @@ export function RecordFileViewModal({
           {!itemEdit && (
             <div className="p-3 bg-blue-900/20 border border-blue-800/50 rounded">
               <div className="flex items-start gap-2">
-                <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                <div className="text-sm text-blue-300">
+                <Info className="w-4 h-4 text-blue-700 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-blue-700">
                   <p className="font-medium mb-1">New File Upload</p>
-                  <p className="text-xs text-blue-400/80">
+                  <p className="text-xs text-blue-700/80">
                     The file will be uploaded to Google Drive and linked to this record. The file will be created as Active by default.
                   </p>
                 </div>
@@ -493,7 +493,7 @@ export function RecordFileViewModal({
           )}
 
           {mutation.isError && (
-            <div className="text-red-400 text-sm">
+            <div className="text-red-700 text-sm">
               {mutation.error instanceof Error
                 ? mutation.error.message
                 : "An error occurred"}
@@ -506,7 +506,7 @@ export function RecordFileViewModal({
               variant="outline"
               onClick={onClose}
               disabled={mutation.isPending}
-              className="border-[#2a2a2a] text-gray-300 hover:bg-[#2a2a2a]"
+              className="border-border text-muted-foreground hover:bg-muted"
             >
               Cancel
             </Button>
@@ -517,7 +517,7 @@ export function RecordFileViewModal({
                 (itemEdit && !formData.records_file_view_name) ||
                 (!itemEdit && fileList.length === 0 && !formData.file)
               }
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-primary text-black hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {mutation.isPending
                 ? itemEdit

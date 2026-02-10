@@ -206,19 +206,19 @@ export default function SignContract() {
   if (validationError || !contractData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#1a1a1a] via-[#2d2d2d] to-[#1a1a1a] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-[#2d2d2d] border-2 border-[#d4af37] rounded-lg p-8 text-center">
+        <div className="max-w-md w-full bg-[#2d2d2d] border-2 border-borderd4af37] rounded-lg p-8 text-center">
           <X className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-[#d4af37] mb-4">
             Link Expired or Invalid
           </h1>
-          <p className="text-gray-300 mb-6">
+          <p className="text-muted-foreground mb-6">
             {validationError instanceof Error
               ? validationError.message
               : "The contract link you're trying to access is no longer valid."}
           </p>
           <Button
             onClick={() => setLocation("/")}
-            className="bg-[#d4af37] text-[#1a1a1a] hover:bg-[#f4d03f] font-semibold"
+            className="bg-[#d4af37] text-[#1a1a1a] hover:bg-muted/50f4d03f] font-semibold"
           >
             Return to Home
           </Button>
@@ -238,7 +238,7 @@ export default function SignContract() {
             alt="Golden Luxury Auto" 
             className="h-20 md:h-24 w-auto mx-auto object-contain mb-3 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
           />
-          <p className="text-gray-300 text-lg">
+          <p className="text-muted-foreground text-lg">
             Contract Agreement - {contractData.firstNameOwner} {contractData.lastNameOwner}
           </p>
         </div>

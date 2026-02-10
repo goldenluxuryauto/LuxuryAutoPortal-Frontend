@@ -176,13 +176,13 @@ export default function PaymentsPage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-gray-400 hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">Payment History</h1>
+            <h1 className="text-2xl font-bold text-foreground">Payment History</h1>
             {car && (
               <p className="text-sm text-gray-400 mt-1">
                 Car: {car.makeModel || "Unknown Car"}
@@ -200,15 +200,15 @@ export default function PaymentsPage() {
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Car Name: </span>
-                  <span className="text-white text-xs sm:text-sm break-words">{carName}</span>
+                  <span className="text-foreground text-xs sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">VIN #: </span>
-                  <span className="text-white font-mono text-xs sm:text-sm break-all">{car.vin}</span>
+                  <span className="text-foreground font-mono text-xs sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">License: </span>
-                  <span className="text-white text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
+                  <span className="text-foreground text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
@@ -219,15 +219,15 @@ export default function PaymentsPage() {
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Name: </span>
-                  <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
+                  <span className="text-foreground text-xs sm:text-sm break-words">{ownerName}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Contact #: </span>
-                  <span className="text-white text-xs sm:text-sm">{ownerContact}</span>
+                  <span className="text-foreground text-xs sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Email: </span>
-                  <span className="text-white text-xs sm:text-sm break-all">{ownerEmail}</span>
+                  <span className="text-foreground text-xs sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
@@ -238,15 +238,15 @@ export default function PaymentsPage() {
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Fuel/Gas: </span>
-                  <span className="text-white text-xs sm:text-sm">{fuelType}</span>
+                  <span className="text-foreground text-xs sm:text-sm">{fuelType}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Tire Size: </span>
-                  <span className="text-white text-xs sm:text-sm">{tireSize}</span>
+                  <span className="text-foreground text-xs sm:text-sm">{tireSize}</span>
                 </div>
                 <div>
                   <span className="text-gray-400 text-xs sm:text-sm">Oil Type: </span>
-                  <span className="text-white text-xs sm:text-sm">{oilType}</span>
+                  <span className="text-foreground text-xs sm:text-sm">{oilType}</span>
                 </div>
                 {car.turoLink && (
                   <div>
@@ -284,15 +284,15 @@ export default function PaymentsPage() {
         {/* Payment History Section */}
         <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-auto">
           <div className="p-4 sm:p-6">
-            <h2 className="text-xl font-semibold text-white mb-4 sm:mb-6">Payment History</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4 sm:mb-6">Payment History</h2>
             
             {/* Filter Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4 sm:mb-6">
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[120px]">
+                <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-foreground w-[120px]">
                   <SelectValue placeholder="Filter" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-foreground">
                   <SelectItem value="All">All</SelectItem>
                   <SelectItem value="To Pay">To Pay</SelectItem>
                   <SelectItem value="Paid">Paid</SelectItem>
@@ -307,7 +307,7 @@ export default function PaymentsPage() {
                   placeholder="--- ---"
                   value={monthFilter}
                   onChange={(e) => setMonthFilter(e.target.value)}
-                  className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600"
+                  className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-foreground placeholder:text-gray-600"
                 />
               </div>
 
@@ -343,7 +343,7 @@ export default function PaymentsPage() {
                         <TableCell className="text-center text-gray-300">
                           {index + 1}
                         </TableCell>
-                        <TableCell className="text-center text-white">{payment.date}</TableCell>
+                        <TableCell className="text-center text-foreground">{payment.date}</TableCell>
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center">
                             <Badge
@@ -360,13 +360,13 @@ export default function PaymentsPage() {
                             </Badge>
                           </div>
                         </TableCell>
-                        <TableCell className="text-center text-white">
+                        <TableCell className="text-center text-foreground">
                           {formatCurrency(payment.payable)}
                         </TableCell>
-                        <TableCell className="text-center text-white">
+                        <TableCell className="text-center text-foreground">
                           {formatCurrency(payment.payout)}
                         </TableCell>
-                        <TableCell className="text-center text-white">
+                        <TableCell className="text-center text-foreground">
                           {formatBalance(payment.balance)}
                         </TableCell>
                         <TableCell className="text-center text-gray-400">

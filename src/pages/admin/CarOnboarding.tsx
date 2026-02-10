@@ -243,8 +243,8 @@ function CarOnboarding() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-semibold text-white">Car On-boarding</h2>
-        <p className="text-sm text-gray-400 mt-1">
+        <h2 className="text-xl font-semibold text-foreground">Car On-boarding</h2>
+        <p className="text-sm text-muted-foreground mt-1">
           Manage vehicles added to the fleet
         </p>
       </div>
@@ -252,18 +252,18 @@ function CarOnboarding() {
       {/* Search and Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
             type="text"
             placeholder="Search by name, email, phone, VIN, plate, or make/model..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500"
+            className="pl-10 bg-card border-border text-foreground placeholder:text-foreground0"
           />
         </div>
         <div className="w-full sm:w-48">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+            <SelectTrigger className="bg-card border-border text-foreground">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -276,11 +276,11 @@ function CarOnboarding() {
       </div>
 
       {/* Table Card */}
-      <Card className="bg-[#111111] border-[#EAEB80]/20">
+      <Card className="bg-card border-primary/20">
         <CardContent className="p-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-[#EAEB80] animate-spin" />
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
             </div>
           ) : cars.length > 0 ? (
             <>
@@ -288,35 +288,35 @@ function CarOnboarding() {
                 <div className="overflow-x-auto">
                 <Table className="w-full table-auto">
                   <TableHeader>
-                    <TableRow className="border-b border-[#1a1a1a]">
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                    <TableRow className="border-b border-border">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Name
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
                         Email
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
                         Phone
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Vehicle
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
                         VIN#
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
                         Plate #
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
                         Submitted
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Status
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
                         Contract
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
                         Car Onboarding Date
                       </TableHead>
                     </TableRow>
@@ -326,34 +326,34 @@ function CarOnboarding() {
                       <TableRow
                         key={car.id}
                         className={cn(
-                          "border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
+                          "border-b border-border hover:bg-card transition-colors"
                         )}
                       >
                         <TableCell
-                          className="text-center px-2 sm:px-3 py-3 sm:py-4 text-white text-xs sm:text-sm cursor-pointer max-w-[120px] truncate"
+                          className="text-center px-2 sm:px-3 py-3 sm:py-4 text-foreground text-xs sm:text-sm cursor-pointer max-w-[120px] truncate"
                           onClick={() => handleRowClick(car)}
                           title={car.clientName}
                         >
                           {car.clientName}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={car.clientEmail || "—"}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={car.clientEmail || "—"}>
                           {car.clientEmail || "—"}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={car.clientPhone || "—"}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={car.clientPhone || "—"}>
                           {car.clientPhone || "—"}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm max-w-[150px] truncate" title={car.carMakeModel}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm max-w-[150px] truncate" title={car.carMakeModel}>
                           {car.carMakeModel}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={car.vin || "—"}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={car.vin || "—"}>
                           {car.vin || "—"}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={car.licensePlate ? car.licensePlate.toUpperCase() : "—"}>
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={car.licensePlate ? car.licensePlate.toUpperCase() : "—"}>
                           {car.licensePlate
                             ? car.licensePlate.toUpperCase()
                             : "—"}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                           {new Date(car.createdAt).toLocaleDateString("en-US", {
                             month: "2-digit",
                             day: "2-digit",
@@ -367,8 +367,8 @@ function CarOnboarding() {
                               className={cn(
                                 "text-xs",
                                 (car.status === "available" || car.status === "in_use") 
-                                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                                  ? "bg-green-500/20 text-green-700 border-green-500/30"
+                                : "bg-gray-500/20 text-muted-foreground border-gray-500/30"
                             )}
                           >
                             {(car.status === "available" || car.status === "in_use") ? "ACTIVE" : "INACTIVE"}
@@ -382,21 +382,21 @@ function CarOnboarding() {
                               className={cn(
                                 "text-xs",
                                 car.contractStatus === "signed"
-                                  ? "border-green-500/50 text-green-400 bg-green-500/10"
+                                  ? "border-green-500/50 text-green-700 bg-green-500/10"
                                   : car.contractStatus === "pending"
-                                  ? "border-yellow-500/50 text-yellow-400 bg-yellow-500/10"
+                                  ? "border-primary/50 text-primary-foreground bg-primary/20"
                                   : car.contractStatus === "sent" || car.contractStatus === "opened"
-                                  ? "border-blue-500/50 text-blue-400 bg-blue-500/10"
+                                  ? "border-blue-500/50 text-blue-700 bg-blue-500/10"
                                   : car.contractStatus === "declined"
-                                  ? "border-red-500/50 text-red-400 bg-red-500/10"
-                                  : "bg-gray-800/50 text-gray-400 border-gray-700"
+                                  ? "border-red-500/50 text-red-700 bg-red-500/10"
+                                  : "bg-muted/30 text-muted-foreground border-border"
                               )}
                             >
                               {car.contractStatus ? car.contractStatus.charAt(0).toUpperCase() + car.contractStatus.slice(1) : "N/A"}
                             </Badge>
                           </div>
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-gray-300 text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
+                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
                           {car.onboardingDate
                             ? new Date(car.onboardingDate).toLocaleDateString("en-US", {
                                 month: "2-digit",
@@ -437,7 +437,7 @@ function CarOnboarding() {
               )}
             </>
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-foreground0">
               <p className="text-lg">No records found</p>
               <p className="text-sm mt-2">
                 {searchQuery || statusFilter !== "all"
@@ -451,12 +451,12 @@ function CarOnboarding() {
 
       {/* Add New Car Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="bg-[#111111] border-[#EAEB80]/30 border-2 text-white max-w-2xl">
+        <DialogContent className="bg-card border-primary/30 border-2 text-foreground max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-semibold text-[#EAEB80]">
+            <DialogTitle className="text-2xl font-semibold text-primary">
               Add New Car
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-muted-foreground">
               Add a new vehicle to the onboarding queue
             </DialogDescription>
           </DialogHeader>
@@ -472,14 +472,14 @@ function CarOnboarding() {
                   name="date"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-300">
-                        Date <span className="text-[#EAEB80]">*</span>
+                      <FormLabel className="text-muted-foreground">
+                        Date <span className="text-primary">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="date"
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -492,14 +492,14 @@ function CarOnboarding() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-300">
-                        Name <span className="text-[#EAEB80]">*</span>
+                      <FormLabel className="text-muted-foreground">
+                        Name <span className="text-primary">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           placeholder="Client full name"
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -513,15 +513,15 @@ function CarOnboarding() {
                 name="carMakeModelYear"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">
+                    <FormLabel className="text-muted-foreground">
                       Car Make/Model (Year){" "}
-                      <span className="text-[#EAEB80]">*</span>
+                      <span className="text-primary">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="e.g., 2024 Lamborghini Urus"
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        className="bg-card border-border text-foreground focus:border-primary"
                       />
                     </FormControl>
                     <FormMessage />
@@ -535,12 +535,12 @@ function CarOnboarding() {
                   name="plateNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-300">Plate #</FormLabel>
+                      <FormLabel className="text-muted-foreground">Plate #</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           placeholder="License plate number"
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] uppercase"
+                          className="bg-card border-border text-foreground focus:border-primary uppercase"
                           style={{ textTransform: "uppercase" }}
                         />
                       </FormControl>
@@ -554,15 +554,15 @@ function CarOnboarding() {
                   name="dropOffDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-300">
+                      <FormLabel className="text-muted-foreground">
                         Date of Car Drop Off{" "}
-                        <span className="text-[#EAEB80]">*</span>
+                        <span className="text-primary">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="date"
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -579,7 +579,7 @@ function CarOnboarding() {
                     setIsAddDialogOpen(false);
                     addCarForm.reset();
                   }}
-                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                  className="border-border text-muted-foreground hover:bg-muted/50"
                 >
                   Cancel
                 </Button>
@@ -588,7 +588,7 @@ function CarOnboarding() {
                   disabled={
                     addCarMutation.isPending || !addCarForm.formState.isValid
                   }
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {addCarMutation.isPending ? (
                     <>

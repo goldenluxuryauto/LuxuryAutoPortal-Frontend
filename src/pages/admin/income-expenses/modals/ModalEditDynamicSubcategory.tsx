@@ -69,47 +69,47 @@ export default function ModalEditDynamicSubcategory() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="bg-[#0f0f0f] border-[#1a1a1a] text-white max-w-md">
+      <DialogContent className="bg-card border-border text-foreground max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-white text-lg">
+          <DialogTitle className="text-foreground text-lg">
             Update {subcategory.name}
           </DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogDescription className="text-muted-foreground">
             Enter the amount for {subcategory.name} for {monthName} {year}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div>
-            <Label className="text-gray-400 text-xs">Type:</Label>
-            <div className="text-white text-sm font-medium mt-1">{subcategory.name}</div>
+            <Label className="text-muted-foreground text-xs">Type:</Label>
+            <div className="text-foreground text-sm font-medium mt-1">{subcategory.name}</div>
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Date:</Label>
-            <div className="text-white text-sm font-medium mt-1">
+            <Label className="text-muted-foreground text-xs">Date:</Label>
+            <div className="text-foreground text-sm font-medium mt-1">
               {monthName} {year}
             </div>
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Amount</Label>
+            <Label className="text-muted-foreground text-xs">Amount</Label>
             <Input
               type="number"
               value={value}
               onChange={(e) => setValue(parseFloat(e.target.value) || 0)}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm mt-1"
+              className="bg-card border-border text-foreground text-sm mt-1"
               step="0.01"
               autoFocus
             />
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Inputted Amount:</Label>
+            <Label className="text-muted-foreground text-xs">Inputted Amount:</Label>
             <Input
               value={`$${value.toFixed(2)}`}
               disabled
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-gray-400 text-sm mt-1"
+              className="bg-card border-border text-muted-foreground text-sm mt-1"
             />
           </div>
         </div>
@@ -118,13 +118,13 @@ export default function ModalEditDynamicSubcategory() {
           <Button
             onClick={handleClose}
             variant="outline"
-            className="flex-1 border-[#2a2a2a] text-gray-400 hover:text-white hover:bg-[#2a2a2a]"
+            className="flex-1 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
-            className="flex-1 bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/80"
           >
             Save
           </Button>

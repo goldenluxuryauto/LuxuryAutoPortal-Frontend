@@ -65,7 +65,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         {/* Back to Home Button */}
         <div className="mb-6">
@@ -73,7 +73,7 @@ export default function AdminLogin() {
             type="button"
             variant="ghost"
             onClick={() => setLocation("/")}
-            className="text-gray-400 hover:text-[#EAEB80] hover:bg-[#1a1a1a] flex items-center gap-2"
+            className="text-muted-foreground hover:text-primary hover:bg-card flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <Home className="w-4 h-4" />
@@ -87,18 +87,18 @@ export default function AdminLogin() {
             alt="Golden Luxury Auto" 
             className="h-[240px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_15px_rgba(234,235,128,0.5)]"
           />
-          <p className="text-gray-400 mt-6 text-sm">Admin Portal Login</p>
+          <p className="text-muted-foreground mt-6 text-sm">Admin Portal Login</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-gray-400 text-sm">Email</Label>
+            <Label htmlFor="email" className="text-muted-foreground text-sm">Email</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-[#111111] border-[#222222] text-white focus:border-[#EAEB80] focus:ring-[#EAEB80] h-11"
+              className="bg-card border-border222222] text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
               placeholder="admin@goldenluxuryauto.com"
               required
               data-testid="input-email"
@@ -107,10 +107,10 @@ export default function AdminLogin() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-gray-400 text-sm">Password</Label>
+              <Label htmlFor="password" className="text-muted-foreground text-sm">Password</Label>
               <a
                 href="/reset-password"
-                className="text-xs text-[#EAEB80] hover:underline"
+                className="text-xs text-primary hover:underline"
               >
                 Forgot password?
               </a>
@@ -120,7 +120,7 @@ export default function AdminLogin() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-[#111111] border-[#222222] text-white focus:border-[#EAEB80] focus:ring-[#EAEB80] h-11"
+              className="bg-card border-border222222] text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
               placeholder="••••••••"
               required
               data-testid="input-password"
@@ -129,7 +129,7 @@ export default function AdminLogin() {
 
           <Button
             type="submit"
-            className="w-full bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium h-11"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium h-11"
             disabled={loginMutation.isPending}
             data-testid="button-login"
           >

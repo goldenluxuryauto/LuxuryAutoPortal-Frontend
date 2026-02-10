@@ -21,8 +21,8 @@ const categoryIcons: Record<string, any> = {
 };
 
 const categoryColors: Record<string, string> = {
-  "Reports Center": "text-blue-400",
-  "Support Center": "text-green-400",
+  "Reports Center": "text-blue-700",
+  "Support Center": "text-green-700",
   "Forms Center": "text-purple-400",
 };
 
@@ -78,9 +78,9 @@ export default function QuickLinks() {
         const iconColor = categoryColors[category] || "text-[#EAEB80]";
 
         return (
-          <Card key={category} className="bg-[#111111] border-[#2a2a2a] hover:border-[#EAEB80]/40 transition-colors">
+          <Card key={category} className="bg-card border-border hover:border-primary/40 transition-colors">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-white text-base">
+              <CardTitle className="flex items-center gap-2 text-foreground text-base">
                 <Icon className={`w-5 h-5 ${iconColor}`} />
                 {category}
               </CardTitle>
@@ -93,7 +93,7 @@ export default function QuickLinks() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#EAEB80] transition-colors group"
+                      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-[#EAEB80] transition-colors group"
                     >
                       <span className="flex-1 truncate">{link.title}</span>
                       <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />

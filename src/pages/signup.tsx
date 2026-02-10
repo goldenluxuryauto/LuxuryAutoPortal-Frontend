@@ -95,7 +95,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <img
@@ -103,12 +103,12 @@ export default function Signup() {
             alt="Golden Luxury Auto"
             className="h-[200px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_15px_rgba(234,235,128,0.5)]"
           />
-          <h1 className="text-2xl font-semibold text-white mb-2">Create Your Account</h1>
-          <p className="text-gray-400 text-sm">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">Create Your Account</h1>
+          <p className="text-muted-foreground text-sm">
             {emailFromUrl ? "Welcome! Set your password to complete your registration" : "Sign up to access your account"}
           </p>
           {emailFromUrl && (
-            <p className="text-[#EAEB80] text-sm mt-2">
+            <p className="text-primary text-sm mt-2">
               ✓ Your information has been pre-filled from your onboarding
             </p>
           )}
@@ -120,70 +120,70 @@ export default function Signup() {
           <input type="hidden" {...register("lastName")} />
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-gray-400 text-sm">
-              Email {emailFromUrl && <span className="text-[#EAEB80] text-xs">(pre-filled)</span>}
+            <Label htmlFor="email" className="text-muted-foreground text-sm">
+              Email {emailFromUrl && <span className="text-primary text-xs">(pre-filled)</span>}
             </Label>
             <Input
               id="email"
               type="email"
               {...register("email")}
-              className={`bg-[#111111] border-[#222222] text-white focus:border-[#EAEB80] focus:ring-[#EAEB80] h-11 ${
+              className={`bg-card border-border222222] text-foreground focus:border-primary focus:ring-[#EAEB80] h-11 ${
                 emailFromUrl ? 'cursor-not-allowed opacity-75' : ''
               }`}
               placeholder="john.doe@example.com"
               readOnly={!!emailFromUrl}
             />
             {errors.email && (
-              <p className="text-red-400 text-xs">{errors.email.message}</p>
+              <p className="text-red-700 text-xs">{errors.email.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-gray-400 text-sm">
+            <Label htmlFor="password" className="text-muted-foreground text-sm">
               Password
             </Label>
             <Input
               id="password"
               type="password"
               {...register("password")}
-              className="bg-[#111111] border-[#222222] text-white focus:border-[#EAEB80] focus:ring-[#EAEB80] h-11"
+              className="bg-card border-border222222] text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
               placeholder="••••••••"
             />
             {errors.password && (
-              <p className="text-red-400 text-xs">{errors.password.message}</p>
+              <p className="text-red-700 text-xs">{errors.password.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="text-gray-400 text-sm">
+            <Label htmlFor="confirmPassword" className="text-muted-foreground text-sm">
               Confirm Password
             </Label>
             <Input
               id="confirmPassword"
               type="password"
               {...register("confirmPassword")}
-              className="bg-[#111111] border-[#222222] text-white focus:border-[#EAEB80] focus:ring-[#EAEB80] h-11"
+              className="bg-card border-border222222] text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
               placeholder="••••••••"
             />
             {errors.confirmPassword && (
-              <p className="text-red-400 text-xs">{errors.confirmPassword.message}</p>
+              <p className="text-red-700 text-xs">{errors.confirmPassword.message}</p>
             )}
           </div>
 
           <Button
             type="submit"
-            className="w-full bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium h-11"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium h-11"
             disabled={signupMutation.isPending}
           >
             {signupMutation.isPending ? "Creating account..." : "Sign Up"}
           </Button>
         </form>
 
-        <p className="text-center text-gray-500 text-sm mt-6">
+        <p className="text-center text-foreground0 text-sm mt-6">
           Already have an account?{" "}
           <button
             onClick={() => setLocation("/admin/login")}
-            className="text-[#EAEB80] hover:underline"
+            className="text-primary hover:underline"
           >
             Sign in
           </button>

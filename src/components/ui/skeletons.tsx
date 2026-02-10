@@ -8,10 +8,10 @@ export function TableSkeleton({ rows = 5, cols = 5 }: { rows?: number; cols?: nu
   return (
     <>
       {[...Array(rows)].map((_, i) => (
-        <tr key={`skeleton-row-${i}`} className="border-b border-[#2a2a2a]">
+        <tr key={`skeleton-row-${i}`} className="border-b border-border">
           {[...Array(cols)].map((_, j) => (
             <td key={`skeleton-cell-${i}-${j}`} className="px-4 py-3">
-              <Skeleton className="h-4 w-full bg-[#252525]" />
+              <Skeleton className="h-4 w-full bg-muted/50" />
             </td>
           ))}
         </tr>
@@ -25,12 +25,12 @@ export function TableSkeleton({ rows = 5, cols = 5 }: { rows?: number; cols?: nu
  */
 export function CardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn("bg-[#1a1a1a] p-6 rounded-lg border border-[#2a2a2a]", className)}>
-      <Skeleton className="h-6 w-1/3 mb-4 bg-[#252525]" />
+    <div className={cn("bg-card p-6 rounded-lg border border-border", className)}>
+      <Skeleton className="h-6 w-1/3 mb-4 bg-muted/50" />
       <div className="space-y-3">
-        <Skeleton className="h-4 w-full bg-[#252525]" />
-        <Skeleton className="h-4 w-5/6 bg-[#252525]" />
-        <Skeleton className="h-4 w-4/6 bg-[#252525]" />
+        <Skeleton className="h-4 w-full bg-muted/50" />
+        <Skeleton className="h-4 w-5/6 bg-muted/50" />
+        <Skeleton className="h-4 w-4/6 bg-muted/50" />
       </div>
     </div>
   );
@@ -44,8 +44,8 @@ export function ProfileSkeleton() {
     <div className="space-y-6">
       {/* Header Skeleton */}
       <div className="space-y-4">
-        <Skeleton className="h-10 w-64 bg-[#252525]" />
-        <Skeleton className="h-4 w-48 bg-[#252525]" />
+        <Skeleton className="h-10 w-64 bg-muted/50" />
+        <Skeleton className="h-4 w-48 bg-muted/50" />
       </div>
 
       {/* Cards Skeleton */}
@@ -56,13 +56,13 @@ export function ProfileSkeleton() {
       </div>
 
       {/* Vehicle Information Skeleton */}
-      <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-        <Skeleton className="h-6 w-48 mb-4 bg-[#252525]" />
+      <div className="bg-card p-4 rounded-lg border border-primary/20">
+        <Skeleton className="h-6 w-48 mb-4 bg-muted/50" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[...Array(10)].map((_, i) => (
             <div key={`field-skeleton-${i}`} className="space-y-2">
-              <Skeleton className="h-3 w-24 bg-[#252525]" />
-              <Skeleton className="h-4 w-32 bg-[#252525]" />
+              <Skeleton className="h-3 w-24 bg-muted/50" />
+              <Skeleton className="h-4 w-32 bg-muted/50" />
             </div>
           ))}
         </div>
@@ -79,13 +79,13 @@ export function FormSkeleton({ fields = 6 }: { fields?: number }) {
     <div className="space-y-4">
       {[...Array(fields)].map((_, i) => (
         <div key={`form-field-${i}`} className="space-y-2">
-          <Skeleton className="h-4 w-24 bg-[#252525]" />
-          <Skeleton className="h-10 w-full bg-[#252525]" />
+          <Skeleton className="h-4 w-24 bg-muted/50" />
+          <Skeleton className="h-10 w-full bg-muted/50" />
         </div>
       ))}
       <div className="flex gap-3 pt-4">
-        <Skeleton className="h-10 w-24 bg-[#252525]" />
-        <Skeleton className="h-10 w-24 bg-[#252525]" />
+        <Skeleton className="h-10 w-24 bg-muted/50" />
+        <Skeleton className="h-10 w-24 bg-muted/50" />
       </div>
     </div>
   );
@@ -98,11 +98,11 @@ export function TableRowSkeleton({ colSpan, rows = 5 }: { colSpan: number; rows?
   return (
     <>
       {[...Array(rows)].map((_, i) => (
-        <tr key={`skeleton-row-${i}`} className="border-b border-[#2a2a2a]">
+        <tr key={`skeleton-row-${i}`} className="border-b border-border">
           <td colSpan={colSpan} className="px-4 py-3">
             <div className="grid grid-cols-1 gap-2">
-              <Skeleton className="h-4 w-full bg-[#252525]" />
-              <Skeleton className="h-4 w-3/4 bg-[#252525]" />
+              <Skeleton className="h-4 w-full bg-muted/50" />
+              <Skeleton className="h-4 w-3/4 bg-muted/50" />
             </div>
           </td>
         </tr>
@@ -118,12 +118,12 @@ export function ClientDetailSkeleton() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Skeleton className="h-10 w-64 bg-[#252525]" />
+      <Skeleton className="h-10 w-64 bg-muted/50" />
 
       {/* Tabs Skeleton */}
-      <div className="flex gap-4 border-b border-[#2a2a2a]">
+      <div className="flex gap-4 border-b border-border">
         {[...Array(4)].map((_, i) => (
-          <Skeleton key={`tab-${i}`} className="h-10 w-24 bg-[#252525]" />
+          <Skeleton key={`tab-${i}`} className="h-10 w-24 bg-muted/50" />
         ))}
       </div>
 
@@ -145,19 +145,19 @@ export function CarDetailSkeleton() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Skeleton className="h-10 w-10 bg-[#252525]" />
-        <Skeleton className="h-8 w-64 bg-[#252525]" />
+        <Skeleton className="h-10 w-10 bg-muted/50" />
+        <Skeleton className="h-8 w-64 bg-muted/50" />
       </div>
 
       {/* Car Info Card */}
       <CardSkeleton />
 
       {/* Photos Grid Skeleton */}
-      <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#2a2a2a]">
-        <Skeleton className="h-6 w-32 mb-4 bg-[#252525]" />
+      <div className="bg-card p-4 rounded-lg border border-border">
+        <Skeleton className="h-6 w-32 mb-4 bg-muted/50" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
-            <Skeleton key={`photo-${i}`} className="h-32 w-full bg-[#252525] rounded" />
+            <Skeleton key={`photo-${i}`} className="h-32 w-full bg-muted/50 rounded" />
           ))}
         </div>
       </div>

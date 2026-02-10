@@ -625,26 +625,26 @@ export default function TrainingManualPage() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-2">System Tutorial</h1>
-          <p className="text-gray-400 text-sm">Learn how to use the GLA portal with our guided tutorial</p>
+          <h1 className="text-3xl font-serif text-primary italic mb-2">System Tutorial</h1>
+          <p className="text-muted-foreground text-sm">Learn how to use the GLA portal with our guided tutorial</p>
         </div>
 
         {/* Help & Tutorials Section */}
-        <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
+        <Card className="bg-background border-border">
           <CardHeader>
-            <CardTitle className="text-[#EAEB80] text-xl">Help & Tutorials</CardTitle>
+            <CardTitle className="text-primary text-xl">Help & Tutorials</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white font-medium">System Tutorial</p>
-                <p className="text-gray-400 text-sm">
+                <p className="text-foreground font-medium">System Tutorial</p>
+                <p className="text-muted-foreground text-sm">
                   Learn how to use the GLA portal with our guided tutorial
                 </p>
               </div>
               <Button
                 onClick={handleStartTutorial}
-                className="bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <PlayCircle className="w-4 h-4 mr-2" />
                 Start Tutorial
@@ -655,19 +655,19 @@ export default function TrainingManualPage() {
 
         {/* Admin Tutorial Management Section */}
         {isAdmin && (
-          <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
+          <Card className="bg-background border-border">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-[#EAEB80] text-xl">Tutorial Configuration</CardTitle>
+                <CardTitle className="text-primary text-xl">Tutorial Configuration</CardTitle>
                 <div className="flex gap-2">
                   <Select value={selectedRole} onValueChange={(value: 'admin' | 'client' | 'employee') => {
                     setSelectedRole(value);
                     setExpandedModules(new Set()); // Reset expanded modules when role changes
                   }}>
-                    <SelectTrigger className="w-[150px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="w-[150px] bg-card border-border text-foreground">
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="client">Client</SelectItem>
                       <SelectItem value="employee">Employee</SelectItem>
@@ -675,14 +675,14 @@ export default function TrainingManualPage() {
                   </Select>
                   <Button
                     onClick={handleAddModuleClick}
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Module
                   </Button>
                   <Button
                     onClick={() => handleAddStepClick()}
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Step
@@ -693,15 +693,15 @@ export default function TrainingManualPage() {
             <CardContent>
               {isLoading || modulesLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 </div>
               ) : isError ? (
                 <div className="text-center py-8">
-                  <p className="text-red-400 mb-4">Error loading tutorial data. Please try refreshing the page.</p>
+                  <p className="text-red-700 mb-4">Error loading tutorial data. Please try refreshing the page.</p>
                 </div>
               ) : (tutorialDataWithModules.modules.length === 0 && allSteps.length === 0 && !isFetching && !isLoading) ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-400 mb-4">No modules or steps found. Click "Add Module" or "Add Step" to get started.</p>
+                  <p className="text-muted-foreground mb-4">No modules or steps found. Click "Add Module" or "Add Step" to get started.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -710,7 +710,7 @@ export default function TrainingManualPage() {
                     const isExpanded = expandedModules.has(module.id);
                     const moduleSteps = module.steps || [];
                     return (
-                      <Card key={module.id} className="bg-[#1a1a1a] border-[#2a2a2a]">
+                      <Card key={module.id} className="bg-card border-border">
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3 flex-1">
@@ -718,7 +718,7 @@ export default function TrainingManualPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => toggleModule(module.id)}
-                                className="text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                                className="text-primary hover:bg-primary/10"
                               >
                                 {isExpanded ? (
                                   <X className="w-4 h-4" />
@@ -726,15 +726,15 @@ export default function TrainingManualPage() {
                                   <Plus className="w-4 h-4" />
                                 )}
                               </Button>
-                              <Badge variant="outline" className="bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/30">
+                              <Badge variant="outline" className="bg-[#EAEB80]/20 text-primary border-primary/30">
                                 Module {module.moduleOrder}
                               </Badge>
                               <div className="flex-1">
-                                <h3 className="text-lg font-semibold text-white">{module.title}</h3>
+                                <h3 className="text-lg font-semibold text-foreground">{module.title}</h3>
                                 {module.description && (
-                                  <p className="text-sm text-gray-400 mt-1">{module.description}</p>
+                                  <p className="text-sm text-muted-foreground mt-1">{module.description}</p>
                                 )}
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-foreground0 mt-1">
                                   {moduleSteps.length} {moduleSteps.length !== 1 ? 'steps' : 'step'}
                                 </p>
                               </div>
@@ -744,7 +744,7 @@ export default function TrainingManualPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleEditModuleClick(module)}
-                                className="text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                                className="text-primary hover:bg-primary/10"
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -753,7 +753,7 @@ export default function TrainingManualPage() {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="text-red-400 hover:bg-red-500/10"
+                                    className="text-red-700 hover:bg-red-500/10"
                                     disabled={deleteModuleMutation.isPending && deletingModuleId === module.id}
                                   >
                                     {deleteModuleMutation.isPending && deletingModuleId === module.id ? (
@@ -777,7 +777,7 @@ export default function TrainingManualPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleAddStepClick(module.id)}
-                                className="text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                                className="text-primary hover:bg-primary/10"
                                 title="Add step to this module"
                               >
                                 <Plus className="w-4 h-4" />
@@ -789,35 +789,35 @@ export default function TrainingManualPage() {
                           <CardContent className="pt-0">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                               {moduleSteps.length === 0 ? (
-                                <div className="col-span-2 text-center py-4 text-gray-400 text-sm">
+                                <div className="col-span-2 text-center py-4 text-muted-foreground text-sm">
                                   No steps in this module. Click the + button to add a step.
                                 </div>
                               ) : (
                                 moduleSteps.map((step: TutorialStep) => (
-                                  <Card key={step.id} className="bg-[#0f0f0f] border-[#2a2a2a] hover:border-[#EAEB80]/30 transition-colors">
+                                  <Card key={step.id} className="bg-card border-border hover:border-primary/30 transition-colors">
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 space-y-4">
                             {/* Step Header */}
                             <div className="flex items-center gap-3">
-                              <Badge variant="outline" className="bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/30 text-sm font-semibold px-3 py-1">
+                              <Badge variant="outline" className="bg-[#EAEB80]/20 text-primary border-primary/30 text-sm font-semibold px-3 py-1">
                                 Step {step.id}
                               </Badge>
-                              <h3 className="text-xl font-semibold text-white">{step.title}</h3>
+                              <h3 className="text-xl font-semibold text-foreground">{step.title}</h3>
                             </div>
 
                             {/* Description */}
                             <div>
-                              <p className="text-sm font-medium text-gray-300 mb-1">Description:</p>
-                              <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
+                              <p className="text-sm font-medium text-muted-foreground mb-1">Description:</p>
+                              <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
                             </div>
 
                                           {/* Video Display */}
                             {(step.videoUrl || step.videoPlaceholder) && (
                               <div className="space-y-3">
                                 <div className="flex items-center gap-2">
-                                  <Video className="w-4 h-4 text-[#EAEB80]" />
-                                                <p className="text-sm font-medium text-gray-300">Video:</p>
+                                  <Video className="w-4 h-4 text-primary" />
+                                                <p className="text-sm font-medium text-muted-foreground">Video:</p>
                                 </div>
                                               
                                               {/* Video Player */}
@@ -826,16 +826,16 @@ export default function TrainingManualPage() {
                                                   {stepVideoStates[step.id]?.loading && (
                                                     <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
                                                       <div className="text-center space-y-2">
-                                                        <div className="w-8 h-8 border-2 border-[#EAEB80] border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                                        <p className="text-sm text-gray-400">Loading video...</p>
+                                                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                                        <p className="text-sm text-muted-foreground">Loading video...</p>
                                                       </div>
                                                     </div>
                                                   )}
                                                   {stepVideoStates[step.id]?.error ? (
                                                     <div className="w-full h-full flex items-center justify-center p-8">
                                                       <div className="text-center space-y-2">
-                                                        <AlertCircle className="w-8 h-8 text-gray-500 mx-auto" />
-                                                        <div className="text-gray-500 text-sm">
+                                                        <AlertCircle className="w-8 h-8 text-foreground0 mx-auto" />
+                                                        <div className="text-foreground0 text-sm">
                                                           {step.videoPlaceholder || "Video failed to load"}
                                                         </div>
                                                         <div className="text-xs text-gray-600 mt-2 break-all">
@@ -848,7 +848,7 @@ export default function TrainingManualPage() {
                                                           onClick={() => {
                                                             window.open(step.videoUrl, "_blank");
                                                           }}
-                                                          className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 mt-2"
+                                                          className="text-primary hover:text-primary hover:bg-primary/10 mt-2"
                                                           title="Open video in new tab"
                                                         >
                                                           <PlayCircle className="w-4 h-4 mr-2" />
@@ -898,7 +898,7 @@ export default function TrainingManualPage() {
                                                 <div className="w-full aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex items-center justify-center p-8">
                                                   <div className="text-center space-y-2">
                                                     <Video className="w-12 h-12 text-gray-600 mx-auto" />
-                                                    <p className="text-gray-500 text-sm">{step.videoPlaceholder}</p>
+                                                    <p className="text-foreground0 text-sm">{step.videoPlaceholder}</p>
                                                   </div>
                                                 </div>
                                               ) : null}
@@ -907,9 +907,9 @@ export default function TrainingManualPage() {
                                               {step.videoUrl && !stepVideoStates[step.id]?.error && (
                                   <div className="space-y-2">
                                     <div>
-                                      <p className="text-xs text-gray-500 mb-1">Video URL:</p>
+                                      <p className="text-xs text-foreground0 mb-1">Video URL:</p>
                                       <div className="flex items-center gap-2">
-                                        <p className="text-xs text-gray-400 break-all bg-[#0a0a0a] p-2 rounded border border-[#2a2a2a] flex-1">
+                                        <p className="text-xs text-muted-foreground break-all bg-background p-2 rounded border border-border flex-1">
                                           {step.videoUrl}
                                         </p>
                                         <Button
@@ -919,7 +919,7 @@ export default function TrainingManualPage() {
                                           onClick={() => {
                                             window.open(step.videoUrl, "_blank");
                                           }}
-                                          className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                                          className="text-primary hover:text-primary hover:bg-primary/10"
                                           title="Open video in new tab"
                                         >
                                           <PlayCircle className="w-4 h-4" />
@@ -934,10 +934,10 @@ export default function TrainingManualPage() {
                             {/* Instructions */}
                             {step.instructions && step.instructions.length > 0 && (
                               <div>
-                                <p className="text-sm font-medium text-gray-300 mb-2">
+                                <p className="text-sm font-medium text-muted-foreground mb-2">
                                   Instructions ({step.instructions.length}):
                                 </p>
-                                <ul className="list-disc list-inside text-sm text-gray-400 space-y-1.5 bg-[#0a0a0a] p-3 rounded border border-[#2a2a2a]">
+                                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1.5 bg-background p-3 rounded border border-border">
                                   {step.instructions.map((instruction, idx) => (
                                     <li key={idx} className="leading-relaxed">{instruction}</li>
                                   ))}
@@ -948,13 +948,13 @@ export default function TrainingManualPage() {
                             {/* Action Button */}
                             {step.actionButton && (
                               <div>
-                                <p className="text-sm font-medium text-gray-300 mb-1">Action Button:</p>
-                                <div className="flex items-center gap-2 bg-[#0a0a0a] p-2 rounded border border-[#2a2a2a]">
-                                  <Badge variant="outline" className="bg-[#EAEB80]/10 text-[#EAEB80] border-[#EAEB80]/30">
+                                <p className="text-sm font-medium text-muted-foreground mb-1">Action Button:</p>
+                                <div className="flex items-center gap-2 bg-background p-2 rounded border border-border">
+                                  <Badge variant="outline" className="bg-[#EAEB80]/10 text-primary border-primary/30">
                                     {step.actionButton.label}
                                   </Badge>
                                   {step.actionButton.href && (
-                                    <span className="text-xs text-gray-400">
+                                    <span className="text-xs text-muted-foreground">
                                       → {step.actionButton.href}
                                     </span>
                                   )}
@@ -969,7 +969,7 @@ export default function TrainingManualPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditClick(step)}
-                              className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 border border-[#EAEB80]/20"
+                              className="text-primary hover:text-primary hover:bg-primary/10 border border-primary/20"
                               title="Edit Step"
                             >
                               <Edit className="w-4 h-4 mr-2" />
@@ -980,7 +980,7 @@ export default function TrainingManualPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="text-red-400 hover:text-red-500 hover:bg-red-500/10 border border-red-500/20"
+                                  className="text-red-700 hover:text-red-500 hover:bg-red-500/10 border border-red-500/20"
                                   title="Delete Step"
                                                 disabled={deleteMutation.isPending && deletingStepId === step.id}
                                               >
@@ -1019,12 +1019,12 @@ export default function TrainingManualPage() {
                   {(() => {
                     const stepsWithoutModule = allSteps.filter((step: any) => !step.moduleId);
                     return stepsWithoutModule.length > 0 && (
-                      <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
+                      <Card className="bg-card border-border">
                         <CardHeader>
                           <div className="flex items-center justify-between">
                             <div>
-                              <h3 className="text-lg font-semibold text-white">Steps without Module</h3>
-                              <p className="text-xs text-gray-500 mt-1">
+                              <h3 className="text-lg font-semibold text-foreground">Steps without Module</h3>
+                              <p className="text-xs text-foreground0 mt-1">
                                 {stepsWithoutModule.length} {stepsWithoutModule.length !== 1 ? 'steps' : 'step'}
                               </p>
                             </div>
@@ -1033,27 +1033,27 @@ export default function TrainingManualPage() {
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {stepsWithoutModule.map((step: TutorialStep) => (
-                            <Card key={step.id} className="bg-[#0f0f0f] border-[#2a2a2a] hover:border-[#EAEB80]/30 transition-colors">
+                            <Card key={step.id} className="bg-card border-border hover:border-primary/30 transition-colors">
                               <CardContent className="p-6">
                                 <div className="flex items-start justify-between gap-4">
                                   <div className="flex-1 space-y-4">
                                     <div className="flex items-center gap-3">
-                                      <Badge variant="outline" className="bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/30 text-sm font-semibold px-3 py-1">
+                                      <Badge variant="outline" className="bg-[#EAEB80]/20 text-primary border-primary/30 text-sm font-semibold px-3 py-1">
                                         Step {step.id}
                                       </Badge>
-                                      <h3 className="text-xl font-semibold text-white">{step.title}</h3>
+                                      <h3 className="text-xl font-semibold text-foreground">{step.title}</h3>
                                     </div>
                                     <div>
-                                      <p className="text-sm font-medium text-gray-300 mb-1">Description:</p>
-                                      <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
+                                      <p className="text-sm font-medium text-muted-foreground mb-1">Description:</p>
+                                      <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
                                     </div>
 
                                     {/* Video Display */}
                                     {(step.videoUrl || step.videoPlaceholder) && (
                                       <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                          <Video className="w-4 h-4 text-[#EAEB80]" />
-                                          <p className="text-sm font-medium text-gray-300">Video:</p>
+                                          <Video className="w-4 h-4 text-primary" />
+                                          <p className="text-sm font-medium text-muted-foreground">Video:</p>
                                         </div>
                                         
                                         {/* Video Player */}
@@ -1062,16 +1062,16 @@ export default function TrainingManualPage() {
                                             {stepVideoStates[step.id]?.loading && (
                                               <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
                                                 <div className="text-center space-y-2">
-                                                  <div className="w-8 h-8 border-2 border-[#EAEB80] border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                                  <p className="text-sm text-gray-400">Loading video...</p>
+                                                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                                  <p className="text-sm text-muted-foreground">Loading video...</p>
                                                 </div>
                                               </div>
                                             )}
                                             {stepVideoStates[step.id]?.error ? (
                                               <div className="w-full h-full flex items-center justify-center p-8">
                                                 <div className="text-center space-y-2">
-                                                  <AlertCircle className="w-8 h-8 text-gray-500 mx-auto" />
-                                                  <div className="text-gray-500 text-sm">
+                                                  <AlertCircle className="w-8 h-8 text-foreground0 mx-auto" />
+                                                  <div className="text-foreground0 text-sm">
                                                     {step.videoPlaceholder || "Video failed to load"}
                                                   </div>
                                                   <div className="text-xs text-gray-600 mt-2 break-all">
@@ -1084,7 +1084,7 @@ export default function TrainingManualPage() {
                                                     onClick={() => {
                                                       window.open(step.videoUrl, "_blank");
                                                     }}
-                                                    className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 mt-2"
+                                                    className="text-primary hover:text-primary hover:bg-primary/10 mt-2"
                                                     title="Open video in new tab"
                                                   >
                                                     <PlayCircle className="w-4 h-4 mr-2" />
@@ -1134,7 +1134,7 @@ export default function TrainingManualPage() {
                                           <div className="w-full aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex items-center justify-center p-8">
                                             <div className="text-center space-y-2">
                                               <Video className="w-12 h-12 text-gray-600 mx-auto" />
-                                              <p className="text-gray-500 text-sm">{step.videoPlaceholder}</p>
+                                              <p className="text-foreground0 text-sm">{step.videoPlaceholder}</p>
                                             </div>
                                           </div>
                                         ) : null}
@@ -1143,9 +1143,9 @@ export default function TrainingManualPage() {
                                         {step.videoUrl && !stepVideoStates[step.id]?.error && (
                                           <div className="space-y-2">
                                             <div>
-                                              <p className="text-xs text-gray-500 mb-1">Video URL:</p>
+                                              <p className="text-xs text-foreground0 mb-1">Video URL:</p>
                                               <div className="flex items-center gap-2">
-                                                <p className="text-xs text-gray-400 break-all bg-[#0a0a0a] p-2 rounded border border-[#2a2a2a] flex-1">
+                                                <p className="text-xs text-muted-foreground break-all bg-background p-2 rounded border border-border flex-1">
                                                   {step.videoUrl}
                                                 </p>
                                                 <Button
@@ -1155,7 +1155,7 @@ export default function TrainingManualPage() {
                                                   onClick={() => {
                                                     window.open(step.videoUrl, "_blank");
                                                   }}
-                                                  className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                                                  className="text-primary hover:text-primary hover:bg-primary/10"
                                                   title="Open video in new tab"
                                                 >
                                                   <PlayCircle className="w-4 h-4" />
@@ -1172,7 +1172,7 @@ export default function TrainingManualPage() {
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => handleEditClick(step)}
-                                      className="text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 border border-[#EAEB80]/20"
+                                      className="text-primary hover:text-primary hover:bg-primary/10 border border-primary/20"
                                     >
                                       <Edit className="w-4 h-4 mr-2" />
                                       Edit
@@ -1182,7 +1182,7 @@ export default function TrainingManualPage() {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="text-red-400 hover:text-red-500 hover:bg-red-500/10 border border-red-500/20"
+                                          className="text-red-700 hover:text-red-500 hover:bg-red-500/10 border border-red-500/20"
                                   disabled={deleteMutation.isPending && deletingStepId === step.id}
                                 >
                                   {deleteMutation.isPending && deletingStepId === step.id ? (
@@ -1233,12 +1233,12 @@ export default function TrainingManualPage() {
             });
           }
         }}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-2xl">
+          <DialogContent className="bg-card border-border text-foreground max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-[#EAEB80]">
+              <DialogTitle className="text-xl font-semibold text-primary">
                 {isAddingModule ? "Add New Module" : `Edit Module ${editingModule?.id}`}
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 {isAddingModule 
                   ? "Create a new tutorial module to organize tutorial steps"
                   : "Update the module information"}
@@ -1252,7 +1252,7 @@ export default function TrainingManualPage() {
                   name="role"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Role *</FormLabel>
+                      <FormLabel className="text-muted-foreground">Role *</FormLabel>
                       <Select 
                         value={field.value} 
                         onValueChange={(value) => {
@@ -1266,11 +1266,11 @@ export default function TrainingManualPage() {
                         }}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                          <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectContent className="bg-card border-border text-foreground">
                           <SelectItem value="admin">Admin</SelectItem>
                           <SelectItem value="client">Client</SelectItem>
                           <SelectItem value="employee">Employee</SelectItem>
@@ -1286,13 +1286,13 @@ export default function TrainingManualPage() {
                   name="moduleOrder"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Module Order *</FormLabel>
+                      <FormLabel className="text-muted-foreground">Module Order *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           min="1"
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
                         />
                       </FormControl>
@@ -1306,11 +1306,11 @@ export default function TrainingManualPage() {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Title *</FormLabel>
+                      <FormLabel className="text-muted-foreground">Title *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="Module title"
                         />
                       </FormControl>
@@ -1324,11 +1324,11 @@ export default function TrainingManualPage() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Description</FormLabel>
+                      <FormLabel className="text-muted-foreground">Description</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="Module description"
                           rows={3}
                         />
@@ -1348,13 +1348,13 @@ export default function TrainingManualPage() {
                       setEditingModule(null);
                       moduleForm.reset();
                     }}
-                    className="text-gray-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                     disabled={createModuleMutation.isPending || updateModuleMutation.isPending}
                   >
                     {(createModuleMutation.isPending || updateModuleMutation.isPending) && (
@@ -1392,12 +1392,12 @@ export default function TrainingManualPage() {
             });
           }
         }}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-card border-border text-foreground max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-[#EAEB80]">
+              <DialogTitle className="text-xl font-semibold text-primary">
                 {isAddingStep ? "Add New Tutorial Step" : `Edit Tutorial Step ${editingStep?.id}`}
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 {isAddingStep 
                   ? "Create a new tutorial step with content, video URL, and instructions"
                   : "Update the tutorial step content, video URL, and instructions"}
@@ -1411,17 +1411,17 @@ export default function TrainingManualPage() {
                   name="role"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Role *</FormLabel>
+                      <FormLabel className="text-muted-foreground">Role *</FormLabel>
                       <Select
                         value={field.value}
                         onValueChange={field.onChange}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                          <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectContent className="bg-card border-border text-foreground">
                           <SelectItem value="admin">Admin</SelectItem>
                           <SelectItem value="client">Client</SelectItem>
                           <SelectItem value="employee">Employee</SelectItem>
@@ -1437,17 +1437,17 @@ export default function TrainingManualPage() {
                   name="moduleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Module (Optional)</FormLabel>
+                      <FormLabel className="text-muted-foreground">Module (Optional)</FormLabel>
                       <Select
                         value={field.value?.toString() || "none"}
                         onValueChange={(value) => field.onChange(value === "none" ? undefined : parseInt(value))}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                          <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                             <SelectValue placeholder="Select module (optional)" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectContent className="bg-card border-border text-foreground">
                           <SelectItem value="none">No Module</SelectItem>
                           {tutorialModules
                             .filter(m => m.role === form.watch("role"))
@@ -1468,11 +1468,11 @@ export default function TrainingManualPage() {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Title *</FormLabel>
+                      <FormLabel className="text-muted-foreground">Title *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="Step title"
                         />
                       </FormControl>
@@ -1486,11 +1486,11 @@ export default function TrainingManualPage() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Description *</FormLabel>
+                      <FormLabel className="text-muted-foreground">Description *</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="Step description"
                           rows={3}
                         />
@@ -1501,10 +1501,10 @@ export default function TrainingManualPage() {
                 />
 
                 {/* Video Management Section */}
-                <div className="space-y-4 p-4 bg-[#0a0a0a] rounded-lg border border-[#2a2a2a]">
+                <div className="space-y-4 p-4 bg-background rounded-lg border border-border">
                   <div className="flex items-center gap-2 mb-2">
-                    <Video className="w-5 h-5 text-[#EAEB80]" />
-                    <Label className="text-[#EAEB80] font-semibold">Video Management</Label>
+                    <Video className="w-5 h-5 text-primary" />
+                    <Label className="text-primary font-semibold">Video Management</Label>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -1513,13 +1513,13 @@ export default function TrainingManualPage() {
                       name="videoUrl"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400 flex items-center gap-2">
+                          <FormLabel className="text-muted-foreground flex items-center gap-2">
                             Video URL
                             {videoValid === true && (
-                              <CheckCircle2 className="w-4 h-4 text-green-400" />
+                              <CheckCircle2 className="w-4 h-4 text-green-700" />
                             )}
                             {videoValid === false && (
-                              <AlertCircle className="w-4 h-4 text-red-400" />
+                              <AlertCircle className="w-4 h-4 text-red-700" />
                             )}
                           </FormLabel>
                           <FormControl>
@@ -1527,7 +1527,7 @@ export default function TrainingManualPage() {
                               <Input
                                 {...field}
                                 type="url"
-                                className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                                className="bg-card border-border text-foreground focus:border-primary"
                                 placeholder="https://example.com/video.mp4"
                                 onChange={(e) => {
                                   field.onChange(e);
@@ -1546,13 +1546,13 @@ export default function TrainingManualPage() {
                                 }}
                               />
                               {videoError && (
-                                <p className="text-xs text-red-400 flex items-center gap-1">
+                                <p className="text-xs text-red-700 flex items-center gap-1">
                                   <AlertCircle className="w-3 h-3" />
                                   {videoError}
                                 </p>
                               )}
                               {videoValid === true && (
-                                <p className="text-xs text-green-400 flex items-center gap-1">
+                                <p className="text-xs text-green-700 flex items-center gap-1">
                                   <CheckCircle2 className="w-3 h-3" />
                                   Video URL is valid and accessible
                                 </p>
@@ -1569,11 +1569,11 @@ export default function TrainingManualPage() {
                       name="videoPlaceholder"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Video Placeholder</FormLabel>
+                          <FormLabel className="text-muted-foreground">Video Placeholder</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                               placeholder="Placeholder text when video is unavailable"
                             />
                           </FormControl>
@@ -1586,22 +1586,22 @@ export default function TrainingManualPage() {
                   {/* Video Preview */}
                   {videoPreviewUrl && (
                     <div className="mt-4 space-y-2">
-                      <Label className="text-gray-400 text-sm">Video Preview</Label>
+                      <Label className="text-muted-foreground text-sm">Video Preview</Label>
                       <div className="relative h-64 bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
                         {videoLoading && (
                           <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
                             <div className="text-center space-y-2">
-                              <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80] mx-auto" />
-                              <p className="text-sm text-gray-400">Loading video preview...</p>
+                              <Loader2 className="w-6 h-6 animate-spin text-primary mx-auto" />
+                              <p className="text-sm text-muted-foreground">Loading video preview...</p>
                             </div>
                           </div>
                         )}
                         {videoError ? (
                           <div className="w-full h-full flex items-center justify-center p-4">
                             <div className="text-center space-y-2">
-                              <AlertCircle className="w-8 h-8 text-red-400 mx-auto" />
-                              <p className="text-sm text-gray-400">{videoError}</p>
-                              <p className="text-xs text-gray-500 break-all">{videoPreviewUrl}</p>
+                              <AlertCircle className="w-8 h-8 text-red-700 mx-auto" />
+                              <p className="text-sm text-muted-foreground">{videoError}</p>
+                              <p className="text-xs text-foreground0 break-all">{videoPreviewUrl}</p>
                             </div>
                           </div>
                         ) : (
@@ -1637,7 +1637,7 @@ export default function TrainingManualPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-gray-400">Instructions *</Label>
+                  <Label className="text-muted-foreground">Instructions *</Label>
                   <div className="space-y-2">
                     {form.watch("instructions").map((instruction, index) => (
                       <div key={index} className="flex items-center gap-2">
@@ -1648,7 +1648,7 @@ export default function TrainingManualPage() {
                             instructions[index] = e.target.value;
                             form.setValue("instructions", instructions);
                           }}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder={`Instruction ${index + 1}`}
                         />
                         <Button
@@ -1656,7 +1656,7 @@ export default function TrainingManualPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemoveInstruction(index)}
-                          className="text-red-400 hover:text-red-500"
+                          className="text-red-700 hover:text-red-500"
                         >
                           <X className="w-4 h-4" />
                         </Button>
@@ -1672,21 +1672,21 @@ export default function TrainingManualPage() {
                             handleAddInstruction();
                           }
                         }}
-                        className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                        className="bg-card border-border text-foreground focus:border-primary"
                         placeholder="Add new instruction"
                       />
                       <Button
                         type="button"
                         variant="outline"
                         onClick={handleAddInstruction}
-                        className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                        className="border-primary/30 text-primary hover:bg-primary/10"
                       >
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
                   {form.formState.errors.instructions && (
-                    <p className="text-sm text-red-400">{form.formState.errors.instructions.message}</p>
+                    <p className="text-sm text-red-700">{form.formState.errors.instructions.message}</p>
                   )}
                 </div>
 
@@ -1696,11 +1696,11 @@ export default function TrainingManualPage() {
                     name="actionButtonLabel"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Action Button Label</FormLabel>
+                        <FormLabel className="text-muted-foreground">Action Button Label</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="Button label"
                           />
                         </FormControl>
@@ -1714,11 +1714,11 @@ export default function TrainingManualPage() {
                     name="actionButtonHref"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Action Button Link</FormLabel>
+                        <FormLabel className="text-muted-foreground">Action Button Link</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="/admin/forms"
                           />
                         </FormControl>
@@ -1738,13 +1738,13 @@ export default function TrainingManualPage() {
                       setEditingStep(null);
                       form.reset();
                     }}
-                    className="text-gray-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                     disabled={createMutation.isPending || updateMutation.isPending}
                   >
                     {(createMutation.isPending || updateMutation.isPending) && (

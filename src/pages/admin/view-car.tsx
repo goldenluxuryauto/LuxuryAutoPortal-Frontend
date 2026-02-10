@@ -141,10 +141,10 @@ export default function ViewCarPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-400">Failed to load car details</p>
+          <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
-            className="mt-4 text-[#EAEB80] hover:underline"
+            className="mt-4 text-primary hover:underline"
           >
             ← Back to Cars
           </button>
@@ -170,15 +170,15 @@ export default function ViewCarPage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation("/cars")}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Cars</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">View Car</h1>
+            <h1 className="text-2xl font-bold text-foreground">View Car</h1>
             {car && (
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Car: {car.makeModel || "Unknown Car"}
               </p>
             )}
@@ -186,77 +186,77 @@ export default function ViewCarPage() {
         </div>
 
         {/* Car and Owner Information Header */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+        <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Information</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Information</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Car Name: </span>
-                  <span className="text-white text-xs sm:text-sm break-words">{carName}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Car Name: </span>
+                  <span className="text-foreground text-xs sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">VIN #: </span>
-                  <span className="text-white font-mono text-xs sm:text-sm break-all">{car.vin}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">VIN #: </span>
+                  <span className="text-foreground font-mono text-xs sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">License: </span>
-                  <span className="text-white text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">License: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Owner Information</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Owner Information</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Name: </span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Name: </span>
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
+                      className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                    <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
+                    <span className="text-foreground text-xs sm:text-sm break-words">{ownerName}</span>
                   )}
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Contact #: </span>
-                  <span className="text-white text-xs sm:text-sm">{ownerContact}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Contact #: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Email: </span>
-                  <span className="text-white text-xs sm:text-sm break-all">{ownerEmail}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Email: </span>
+                  <span className="text-foreground text-xs sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Specifications</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Specifications</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Fuel/Gas: </span>
-                  <span className="text-white text-xs sm:text-sm">{fuelType}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Fuel/Gas: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{fuelType}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Tire Size: </span>
-                  <span className="text-white text-xs sm:text-sm">{tireSize}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Tire Size: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{tireSize}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Oil Type: </span>
-                  <span className="text-white text-xs sm:text-sm">{oilType}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Oil Type: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{oilType}</span>
                 </div>
               </div>
             </div>
 
             {/* Turo Links */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Turo Links</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Turo Links</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 {car.turoLink && (
                   <div>
@@ -264,7 +264,7 @@ export default function ViewCarPage() {
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                      className="text-primary hover:underline text-sm flex items-center gap-1"
                     >
                       Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -277,7 +277,7 @@ export default function ViewCarPage() {
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                      className="text-primary hover:underline text-sm flex items-center gap-1"
                     >
                       Admin Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -286,12 +286,12 @@ export default function ViewCarPage() {
                 )}
                 {car.turoVehicleIds && car.turoVehicleIds.length > 0 && (
                   <div>
-                    <span className="text-gray-400 text-xs">Turo Vehicle IDs: </span>
-                    <span className="text-white text-sm font-mono">{car.turoVehicleIds.join(", ")}</span>
+                    <span className="text-muted-foreground text-xs">Turo Vehicle IDs: </span>
+                    <span className="text-foreground text-sm font-mono">{car.turoVehicleIds.join(", ")}</span>
                   </div>
                 )}
                 {!car.turoLink && !car.adminTuroLink && (!car.turoVehicleIds || car.turoVehicleIds.length === 0) && (
-                  <span className="text-gray-500 text-sm">No Turo links available</span>
+                  <span className="text-foreground0 text-sm">No Turo links available</span>
                 )}
               </div>
             </div>
@@ -299,20 +299,20 @@ export default function ViewCarPage() {
         </div>
 
         {/* Menu Items List */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-auto">
-          <div className="divide-y divide-[#1a1a1a]">
+        <div className="bg-card border border-border rounded-lg overflow-auto">
+          <div className="divide-y divide-border1a1a1a]">
             {menuItems.map((item, index) => (
               <button
                 key={index}
                 onClick={() => handleMenuItemClick(item)}
                 className={cn(
                   "w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex items-center justify-between",
-                  "hover:bg-[#1a1a1a] transition-colors",
-                  "text-white group"
+                  "hover:bg-card transition-colors",
+                  "text-foreground group"
                 )}
               >
                 <span className="text-xs sm:text-sm break-words pr-2">{item.label}</span>
-                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#EAEB80] transition-colors flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
               </button>
             ))}
           </div>

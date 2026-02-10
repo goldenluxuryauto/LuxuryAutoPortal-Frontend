@@ -536,11 +536,11 @@ export default function CarsPage() {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "ACTIVE":
-        return "bg-green-500/20 text-green-400 border-green-500/30";
+        return "bg-green-500/20 text-green-700 border-green-500/30";
       case "INACTIVE":
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
     }
   };
 
@@ -588,9 +588,9 @@ export default function CarsPage() {
       return (
         <div 
           ref={imgRef}
-          className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-black/30 border border-[#2a2a2a] flex items-center justify-center shrink-0"
+          className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-background/30 border border-border flex items-center justify-center shrink-0"
         >
-          <CarIcon className="h-4 w-4 text-gray-500" />
+          <CarIcon className="h-4 w-4 text-foreground0" />
         </div>
       );
     }
@@ -613,7 +613,7 @@ export default function CarsPage() {
     return (
       <div 
         ref={imgRef}
-        className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-black/30 border border-[#2a2a2a] shrink-0 relative overflow-hidden"
+        className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-background/30 border border-border shrink-0 relative overflow-hidden"
       >
         {isVisible ? (
           <img
@@ -650,17 +650,17 @@ export default function CarsPage() {
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-white">Cars</h1>
-            <p className="text-gray-400 text-xs sm:text-sm">{isAdmin ? "Manage your vehicle fleet" : "View your vehicles"}</p>
+            <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Cars</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm">{isAdmin ? "Manage your vehicle fleet" : "View your vehicles"}</p>
           </div>
         </div>
 
         {/* Search and Filter */}
-        <Card className="bg-[#111111] border-[#2a2a2a]">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
                 <Input
                   type="text"
                   placeholder="Search by VIN, Plate, Owner, Make/Model/Year..."
@@ -669,7 +669,7 @@ export default function CarsPage() {
                     setSearchQuery(e.target.value);
                     setPage(1); // Reset to first page on search
                   }}
-                  className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600"
+                  className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600"
                 />
               </div>
               <Select
@@ -679,10 +679,10 @@ export default function CarsPage() {
                   setPage(1); // Reset to first page on filter change
                 }}
               >
-                <SelectTrigger className="w-full md:w-[200px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectTrigger className="w-full md:w-[200px] bg-card border-border text-foreground">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectContent className="bg-card border-border text-foreground">
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="ACTIVE">ACTIVE</SelectItem>
                   <SelectItem value="INACTIVE">INACTIVE</SelectItem>
@@ -693,7 +693,7 @@ export default function CarsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setSearchQuery("")}
-                  className="text-gray-400 hover:text-white"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -703,65 +703,65 @@ export default function CarsPage() {
         </Card>
 
         {/* Cars Table */}
-        <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
+        <Card className="bg-card border-border">
           <CardContent className="p-0">
             <div className="overflow-x-auto -mx-3 sm:mx-0">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[#2a2a2a]">
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 w-8 sm:w-10">
+                  <tr className="border-b border-border">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 w-8 sm:w-10">
                       #
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Status
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Stats
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden md:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden md:table-cell">
                       Management
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Owner
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Make
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Year
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Model/Specs
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Contact
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       VIN #
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Plate #
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Gas
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                       Tire Size
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                       Oil Type
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                       Turo Link
                     </th>
                     {isAdmin && (
-                      <th className="text-center text-[10px] sm:text-xs font-medium text-[#EAEB80] uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                      <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                         Admin Turo Link
                       </th>
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2a2a2a]">
+                <tbody className="divide-y divide-border">
                   {isLoading ? (
                     <TableRowSkeleton colSpan={isAdmin ? 13 : 12} rows={5} />
                   ) : cars.length > 0 ? (
@@ -816,9 +816,9 @@ export default function CarsPage() {
                       return (
                         <tr
                           key={uniqueKey}
-                          className="hover:bg-[#252525] transition-colors group border-b border-[#2a2a2a]"
+                          className="hover:bg-muted/50 transition-colors group border-b border-border"
                         >
-                          <td className="text-center text-[#EAEB80] text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
+                          <td className="text-center text-primary text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
                             {globalRowNumber}
                           </td>
                           <td className="text-center px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
@@ -843,7 +843,7 @@ export default function CarsPage() {
                                 e.preventDefault();
                                 setLocation(`/admin/view-car/${car.id}`);
                               }}
-                              className="text-[#EAEB80] hover:underline text-xs sm:text-sm"
+                              className="text-primary hover:underline text-xs sm:text-sm"
                             >
                               View Stats
                             </a>
@@ -854,10 +854,10 @@ export default function CarsPage() {
                               className={cn(
                                 "text-xs",
                                 derivedManagementStatus === "management"
-                                  ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                                  ? "bg-blue-500/20 text-blue-700 border-blue-500/30"
                                   : derivedManagementStatus === "off_ride"
-                                    ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-                                    : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                                    ? "bg-yellow-500/20 text-yellow-700 border-yellow-500/30"
+                                    : "bg-gray-500/20 text-muted-foreground border-gray-500/30"
                               )}
                             >
                             {managementValue}
@@ -874,7 +874,7 @@ export default function CarsPage() {
                                         e.preventDefault();
                                         setLocation(`/admin/clients/${car.clientId}`);
                                       }}
-                                      className="text-[#EAEB80] hover:underline text-xs sm:text-sm font-medium cursor-pointer block"
+                                      className="text-primary hover:underline text-xs sm:text-sm font-medium cursor-pointer block"
                                     >
                                       {car.owner.firstName} {car.owner.lastName}
                                     </a>
@@ -885,7 +885,7 @@ export default function CarsPage() {
                                           e.preventDefault();
                                           setLocation(`/admin/clients/${car.clientId}`);
                                         }}
-                                        className="text-[#EAEB80] hover:underline text-[10px] sm:text-xs cursor-pointer block mt-0.5"
+                                        className="text-primary hover:underline text-[10px] sm:text-xs cursor-pointer block mt-0.5"
                                       >
                                         {car.owner.email}
                                       </a>
@@ -893,11 +893,11 @@ export default function CarsPage() {
                                   </>
                                 ) : (
                                   <>
-                                    <div className="text-white text-xs sm:text-sm">
+                                    <div className="text-foreground text-xs sm:text-sm">
                                       {car.owner.firstName} {car.owner.lastName}
                                     </div>
                                     {car.owner.email && (
-                                      <div className="text-gray-500 text-[10px] sm:text-xs">
+                                      <div className="text-foreground0 text-[10px] sm:text-xs">
                                         {car.owner.email}
                                       </div>
                                     )}
@@ -910,31 +910,31 @@ export default function CarsPage() {
                               </span>
                             )}
                           </td>
-                          <td className="text-center text-white text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
+                          <td className="text-center text-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
                             {car.make || "N/A"}
                           </td>
-                          <td className="text-center text-white text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-center text-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.year || "N/A"}
                           </td>
-                          <td className="text-center text-white text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
+                          <td className="text-center text-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
                             {car.model || "N/A"}
                           </td>
-                          <td className="text-center text-gray-400 text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-center text-muted-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.contactPhone || car.owner?.phone || "N/A"}
                           </td>
-                          <td className="text-center text-white font-mono text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-center text-foreground font-mono text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.vin || "N/A"}
                           </td>
-                          <td className="text-center text-gray-400 text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-center text-muted-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.licensePlate || "N/A"}
                           </td>
-                          <td className="text-center text-gray-400 text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-center text-muted-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
                             {car.fuelType || "N/A"}
                           </td>
-                          <td className="text-center text-gray-400 text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
+                          <td className="text-center text-muted-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
                             {car.tireSize || "N/A"}
                           </td>
-                          <td className="text-center text-gray-400 text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
+                          <td className="text-center text-muted-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
                             {car.oilType || "N/A"}
                           </td>
                           <td className="text-center px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
@@ -944,7 +944,7 @@ export default function CarsPage() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="text-[#EAEB80] hover:underline inline-flex items-center justify-center"
+                                className="text-primary hover:underline inline-flex items-center justify-center"
                               >
                                 <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                               </a>
@@ -960,7 +960,7 @@ export default function CarsPage() {
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="text-[#EAEB80] hover:underline inline-flex items-center justify-center"
+                                  className="text-primary hover:underline inline-flex items-center justify-center"
                                 >
                                   <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </a>
@@ -976,8 +976,8 @@ export default function CarsPage() {
                     <tr>
                       <td colSpan={isAdmin ? 13 : 12} className="px-4 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
-                          <p className="text-gray-400 text-lg">No cars found</p>
-                          <p className="text-gray-500 text-sm">
+                          <p className="text-muted-foreground text-lg">No cars found</p>
+                          <p className="text-foreground0 text-sm">
                             Try adjusting your search or filters
                           </p>
                         </div>
@@ -1020,12 +1020,12 @@ export default function CarsPage() {
             }
           }}
         >
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-card border-border text-foreground max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold">
                 {selectedCar ? "Edit Car" : "Add New Car"}
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 {selectedCar
                   ? "Update car information"
                   : "Add a new vehicle to the fleet"}
@@ -1042,11 +1042,11 @@ export default function CarsPage() {
                   name="vin"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">VIN *</FormLabel>
+                      <FormLabel className="text-muted-foreground">VIN *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="1HGBH41JXMN109186"
                           maxLength={17}
                         />
@@ -1061,13 +1061,13 @@ export default function CarsPage() {
                   name="makeModel"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">
+                      <FormLabel className="text-muted-foreground">
                         Make & Model *
                       </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="2024 Mercedes S580"
                         />
                       </FormControl>
@@ -1082,11 +1082,11 @@ export default function CarsPage() {
                     name="make"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Make</FormLabel>
+                        <FormLabel className="text-muted-foreground">Make</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="Mercedes"
                           />
                         </FormControl>
@@ -1100,11 +1100,11 @@ export default function CarsPage() {
                     name="model"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Model</FormLabel>
+                        <FormLabel className="text-muted-foreground">Model</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="S580"
                           />
                         </FormControl>
@@ -1120,13 +1120,13 @@ export default function CarsPage() {
                     name="licensePlate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">
+                        <FormLabel className="text-muted-foreground">
                           License Plate
                         </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="ABC-1234"
                           />
                         </FormControl>
@@ -1140,12 +1140,12 @@ export default function CarsPage() {
                     name="year"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Year</FormLabel>
+                        <FormLabel className="text-muted-foreground">Year</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="number"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="2024"
                           />
                         </FormControl>
@@ -1161,11 +1161,11 @@ export default function CarsPage() {
                     name="color"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Exterior Color</FormLabel>
+                        <FormLabel className="text-muted-foreground">Exterior Color</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="Black"
                           />
                         </FormControl>
@@ -1179,11 +1179,11 @@ export default function CarsPage() {
                     name="interiorColor"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Interior Color</FormLabel>
+                        <FormLabel className="text-muted-foreground">Interior Color</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="Black"
                           />
                         </FormControl>
@@ -1199,14 +1199,14 @@ export default function CarsPage() {
                     name="mileage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">
+                        <FormLabel className="text-muted-foreground">
                           Current Mileage
                         </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="number"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="0"
                           />
                         </FormControl>
@@ -1220,7 +1220,7 @@ export default function CarsPage() {
                     name="status"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Status *</FormLabel>
+                        <FormLabel className="text-muted-foreground">Status *</FormLabel>
                         <Select
                           onValueChange={async (value) => {
                             console.log(`📝 [FRONTEND] Status changed to: ${value}`);
@@ -1250,11 +1250,11 @@ export default function CarsPage() {
                           value={field.value || "ACTIVE"}
                         >
                           <FormControl>
-                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                            <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                          <SelectContent className="bg-card border-border text-foreground">
                             <SelectItem value="ACTIVE">ACTIVE</SelectItem>
                             <SelectItem value="INACTIVE">INACTIVE</SelectItem>
                           </SelectContent>
@@ -1271,11 +1271,11 @@ export default function CarsPage() {
                     name="tireSize"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Tire Size</FormLabel>
+                        <FormLabel className="text-muted-foreground">Tire Size</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="225/50R17"
                           />
                         </FormControl>
@@ -1289,11 +1289,11 @@ export default function CarsPage() {
                     name="oilType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Oil Type</FormLabel>
+                        <FormLabel className="text-muted-foreground">Oil Type</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="5W-30"
                           />
                         </FormControl>
@@ -1309,12 +1309,12 @@ export default function CarsPage() {
                     name="lastOilChange"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Last Oil Change</FormLabel>
+                        <FormLabel className="text-muted-foreground">Last Oil Change</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="date"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -1327,13 +1327,13 @@ export default function CarsPage() {
                     name="fuelType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Fuel Type</FormLabel>
+                        <FormLabel className="text-muted-foreground">Fuel Type</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                            <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                               <SelectValue placeholder="Select fuel type" />
                             </SelectTrigger>
                           </FormControl>
@@ -1360,11 +1360,11 @@ export default function CarsPage() {
                   name="titleType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Title Type</FormLabel>
+                      <FormLabel className="text-muted-foreground">Title Type</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="Enter title type"
                         />
                       </FormControl>
@@ -1379,12 +1379,12 @@ export default function CarsPage() {
                     name="turoLink"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Turo Link</FormLabel>
+                        <FormLabel className="text-muted-foreground">Turo Link</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="url"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="https://turo.com/us/en/car/..."
                           />
                         </FormControl>
@@ -1398,12 +1398,12 @@ export default function CarsPage() {
                     name="adminTuroLink"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Admin Turo Link</FormLabel>
+                        <FormLabel className="text-muted-foreground">Admin Turo Link</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="url"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="https://turo.com/us/en/car/..."
                           />
                         </FormControl>
@@ -1423,13 +1423,13 @@ export default function CarsPage() {
                       setSelectedCar(null);
                       form.reset();
                     }}
-                    className="text-gray-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                     disabled={
                       createMutation.isPending || updateMutation.isPending
                     }
@@ -1444,12 +1444,12 @@ export default function CarsPage() {
 
         {/* Confirmation Dialog for Last Active Car */}
         <AlertDialog open={isLastActiveCarDialogOpen} onOpenChange={setIsLastActiveCarDialogOpen}>
-          <AlertDialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+          <AlertDialogContent className="bg-card border-border text-foreground">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-xl font-semibold text-[#EAEB80]">
+              <AlertDialogTitle className="text-xl font-semibold text-primary">
                 Last Active Car Warning
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-gray-400">
+              <AlertDialogDescription className="text-muted-foreground">
                 This is the client's last active car. Changing the status to INACTIVE will leave the client with no active vehicles. You may want to consider deactivating the client account as well.
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -1463,7 +1463,7 @@ export default function CarsPage() {
                     form.setValue("status", selectedCar.status);
                   }
                 }}
-                className="text-gray-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
                 Cancel
               </AlertDialogCancel>
@@ -1475,7 +1475,7 @@ export default function CarsPage() {
                     setPendingStatusChange(null);
                   }
                 }}
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
               >
                 Continue
               </AlertDialogAction>

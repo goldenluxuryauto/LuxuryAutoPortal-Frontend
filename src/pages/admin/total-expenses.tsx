@@ -114,10 +114,10 @@ export default function TotalExpensesPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-400">Failed to load car details</p>
+          <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-[#EAEB80] hover:underline"
+            className="mt-4 text-primary hover:underline"
           >
             ← Back to View Car
           </button>
@@ -155,15 +155,15 @@ export default function TotalExpensesPage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">Total Expenses</h1>
+            <h1 className="text-2xl font-bold text-foreground">Total Expenses</h1>
             {car && (
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Car: {car.makeModel || "Unknown Car"}
               </p>
             )}
@@ -171,68 +171,68 @@ export default function TotalExpensesPage() {
         </div>
 
         {/* Header Section */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <div className="bg-card border border-border rounded-lg p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Car Information</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">Car Name:</span>
-                  <p className="text-sm text-gray-300">{carName}</p>
+                  <span className="text-xs text-foreground0">Car Name:</span>
+                  <p className="text-sm text-muted-foreground">{carName}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">VIN #:</span>
-                  <p className="text-sm text-gray-300">{car.vin || "N/A"}</p>
+                  <span className="text-xs text-foreground0">VIN #:</span>
+                  <p className="text-sm text-muted-foreground">{car.vin || "N/A"}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">License:</span>
-                  <p className="text-sm text-gray-300">{car.licensePlate || "N/A"}</p>
+                  <span className="text-xs text-foreground0">License:</span>
+                  <p className="text-sm text-muted-foreground">{car.licensePlate || "N/A"}</p>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Owner Information</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Owner Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">Name:</span>
-                  <p className="text-sm text-gray-300">{ownerName}</p>
+                  <span className="text-xs text-foreground0">Name:</span>
+                  <p className="text-sm text-muted-foreground">{ownerName}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Contact #:</span>
-                  <p className="text-sm text-gray-300">{ownerContact}</p>
+                  <span className="text-xs text-foreground0">Contact #:</span>
+                  <p className="text-sm text-muted-foreground">{ownerContact}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Email:</span>
-                  <p className="text-sm text-gray-300">{ownerEmail}</p>
+                  <span className="text-xs text-foreground0">Email:</span>
+                  <p className="text-sm text-muted-foreground">{ownerEmail}</p>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Car Specifications</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Specifications</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">Fuel/Gas:</span>
-                  <p className="text-sm text-gray-300">{fuelType}</p>
+                  <span className="text-xs text-foreground0">Fuel/Gas:</span>
+                  <p className="text-sm text-muted-foreground">{fuelType}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Tire Size:</span>
-                  <p className="text-sm text-gray-300">{tireSize}</p>
+                  <span className="text-xs text-foreground0">Tire Size:</span>
+                  <p className="text-sm text-muted-foreground">{tireSize}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Oil Type:</span>
-                  <p className="text-sm text-gray-300">{oilType}</p>
+                  <span className="text-xs text-foreground0">Oil Type:</span>
+                  <p className="text-sm text-muted-foreground">{oilType}</p>
                 </div>
               </div>
             </div>
 
             {/* Turo Links */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Turo Links</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Turo Links</h3>
               <div className="space-y-2">
                 {car.turoLink && (
                   <div>
@@ -240,7 +240,7 @@ export default function TotalExpensesPage() {
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                      className="text-primary hover:underline text-sm flex items-center gap-1"
                     >
                       Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -253,7 +253,7 @@ export default function TotalExpensesPage() {
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                      className="text-primary hover:underline text-sm flex items-center gap-1"
                     >
                       Admin Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -261,7 +261,7 @@ export default function TotalExpensesPage() {
                   </div>
                 )}
                 {!car.turoLink && !car.adminTuroLink && (
-                  <span className="text-gray-500 text-sm">No Turo links available</span>
+                  <span className="text-foreground0 text-sm">No Turo links available</span>
                 )}
               </div>
             </div>
@@ -270,13 +270,13 @@ export default function TotalExpensesPage() {
 
         {/* Total Expenses Header with Year Filter */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-serif text-[#EAEB80] italic">Total Expenses</h1>
+          <h1 className="text-3xl font-serif text-primary italic">Total Expenses</h1>
           <div className="w-[150px]">
             <Select value={selectedYear} onValueChange={setSelectedYear}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                 <SelectValue placeholder="Select year" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-card border-border text-foreground">
                 <SelectItem value="2026">2026</SelectItem>
                 <SelectItem value="2025">2025</SelectItem>
                 <SelectItem value="2024">2024</SelectItem>
@@ -289,7 +289,7 @@ export default function TotalExpensesPage() {
         </div>
 
         {/* Total Expenses Table */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden mb-6">
+        <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">
           <div className="w-full overflow-x-auto">
             <table className="border-collapse w-full table-fixed" style={{ minWidth: '1200px' }}>
               <colgroup>
@@ -297,15 +297,15 @@ export default function TotalExpensesPage() {
                 {months.map((_, idx) => <col key={idx} style={{ width: '5%' }} />)}
                 {additionalColumns.map((_, idx) => <col key={idx} style={{ width: '6%' }} />)}
               </colgroup>
-              <thead className="bg-[#1a1a1a]">
-                <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-[60] border-r border-[#2a2a2a]">
+              <thead className="bg-card">
+                <tr className="bg-card border-b border-border">
+                  <th className="text-left px-3 py-3 text-sm font-medium text-muted-foreground sticky top-0 left-0 bg-card z-[60] border-r border-border">
                     Expenses
                   </th>
                   {months.map((month) => (
                     <th
                       key={month}
-                      className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
+                      className="text-right px-2 py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-30 border-l border-border whitespace-nowrap"
                     >
                       {month}
                     </th>
@@ -313,7 +313,7 @@ export default function TotalExpensesPage() {
                   {additionalColumns.map((col) => (
                     <th
                       key={col}
-                      className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1f1f1f] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
+                      className="text-right px-2 py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-30 border-l border-border whitespace-nowrap"
                     >
                       {col}
                     </th>
@@ -324,47 +324,47 @@ export default function TotalExpensesPage() {
                 {expenseRows.map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
-                    className="border-b border-[#2a2a2a] hover:bg-[#151515] transition-colors"
+                    className="border-b border-border hover:bg-muted/50151515] transition-colors"
                   >
-                    <td className="px-3 py-2 text-sm text-gray-300 sticky left-0 bg-[#0f0f0f] z-[50] border-r border-[#2a2a2a]">
+                    <td className="px-3 py-2 text-sm text-muted-foreground sticky left-0 bg-card z-[50] border-r border-border">
                       <span className="whitespace-nowrap">{row.label}</span>
                     </td>
                     {row.values.map((value, monthIndex) => (
                       <td
                         key={monthIndex}
                         className={cn(
-                          "text-right px-2 py-2 text-sm border-l border-[#2a2a2a]",
+                          "text-right px-2 py-2 text-sm border-l border-border",
                           value !== 0
-                            ? "text-gray-300 font-medium"
-                            : "text-gray-500"
+                            ? "text-muted-foreground font-medium"
+                            : "text-foreground0"
                         )}
                       >
                         {formatCurrency(value)}
                       </td>
                     ))}
-                    <td className="text-right px-2 py-2 text-sm border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                    <td className="text-right px-2 py-2 text-sm border-l border-border bg-card">
                       <span className={cn(
                         calculateYearEndRecon(row.values) !== 0
-                          ? "text-gray-300 font-medium"
-                          : "text-gray-500"
+                          ? "text-muted-foreground font-medium"
+                          : "text-foreground0"
                       )}>
                         {formatCurrency(calculateYearEndRecon(row.values))}
                       </span>
                     </td>
-                    <td className="text-right px-2 py-2 text-sm border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                    <td className="text-right px-2 py-2 text-sm border-l border-border bg-card">
                       <span className={cn(
                         calculateYearEndReconSplit(row.values) !== 0
-                          ? "text-gray-300 font-medium"
-                          : "text-gray-500"
+                          ? "text-muted-foreground font-medium"
+                          : "text-foreground0"
                       )}>
                         {formatCurrency(calculateYearEndReconSplit(row.values))}
                       </span>
                     </td>
-                    <td className="text-right px-2 py-2 text-sm font-semibold border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                    <td className="text-right px-2 py-2 text-sm font-semibold border-l border-border bg-card">
                       <span className={cn(
                         calculateGrandTotal(row.values) !== 0
-                          ? "text-gray-300"
-                          : "text-gray-400"
+                          ? "text-muted-foreground"
+                          : "text-muted-foreground"
                       )}>
                         {formatCurrency(calculateGrandTotal(row.values))}
                       </span>
@@ -372,46 +372,46 @@ export default function TotalExpensesPage() {
                   </tr>
                 ))}
                 {/* Total Expenses Row */}
-                <tr className="border-b border-[#2a2a2a] hover:bg-[#151515] transition-colors bg-[#151515]">
-                  <td className="px-3 py-2 text-sm font-semibold text-[#EAEB80] sticky left-0 bg-[#151515] z-[50] border-r border-[#2a2a2a]">
+                <tr className="border-b border-border hover:bg-muted/50 transition-colors bg-muted/30">
+                  <td className="px-3 py-2 text-sm font-semibold text-primary sticky left-0 bg-muted/30 z-[50] border-r border-border">
                     <span className="whitespace-nowrap">Total Expenses</span>
                   </td>
                   {totalExpenses.map((value, monthIndex) => (
                     <td
                       key={monthIndex}
                       className={cn(
-                        "text-right px-2 py-2 text-sm font-semibold border-l border-[#2a2a2a]",
+                        "text-right px-2 py-2 text-sm font-semibold border-l border-border",
                         value !== 0
-                          ? "text-[#EAEB80]"
-                          : "text-gray-400"
+                          ? "text-primary"
+                          : "text-muted-foreground"
                       )}
                     >
                       {formatCurrency(value)}
                     </td>
                   ))}
-                  <td className="text-right px-2 py-2 text-sm font-semibold border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                  <td className="text-right px-2 py-2 text-sm font-semibold border-l border-border bg-card">
                     <span className={cn(
                       calculateYearEndRecon(totalExpenses) !== 0
-                        ? "text-[#EAEB80]"
-                        : "text-gray-400"
+                        ? "text-primary"
+                        : "text-muted-foreground"
                     )}>
                       {formatCurrency(calculateYearEndRecon(totalExpenses))}
                     </span>
                   </td>
-                  <td className="text-right px-2 py-2 text-sm font-semibold border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                  <td className="text-right px-2 py-2 text-sm font-semibold border-l border-border bg-card">
                     <span className={cn(
                       calculateYearEndReconSplit(totalExpenses) !== 0
-                        ? "text-[#EAEB80]"
-                        : "text-gray-400"
+                        ? "text-primary"
+                        : "text-muted-foreground"
                     )}>
                       {formatCurrency(calculateYearEndReconSplit(totalExpenses))}
                     </span>
                   </td>
-                  <td className="text-right px-2 py-2 text-sm font-semibold border-l border-[#2a2a2a] bg-[#1f1f1f]">
+                  <td className="text-right px-2 py-2 text-sm font-semibold border-l border-border bg-card">
                     <span className={cn(
                       calculateGrandTotal(totalExpenses) !== 0
-                        ? "text-[#EAEB80]"
-                        : "text-gray-400"
+                        ? "text-primary"
+                        : "text-muted-foreground"
                     )}>
                       {formatCurrency(calculateGrandTotal(totalExpenses))}
                     </span>

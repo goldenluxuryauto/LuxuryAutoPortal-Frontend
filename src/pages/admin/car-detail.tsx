@@ -142,14 +142,14 @@ function DocumentImageWithAuth({
   const { src, loading, error } = useDocumentBlobUrl(url);
   if (loading) {
     return (
-      <div className={cn("w-full h-full flex items-center justify-center text-gray-500 text-sm", className)}>
+      <div className={cn("w-full h-full flex items-center justify-center text-foreground0 text-sm", className)}>
         Loading...
       </div>
     );
   }
   if (error || !src) {
     return (
-      <div className={cn("w-full h-full flex items-center justify-center text-gray-500 text-sm", className)}>
+      <div className={cn("w-full h-full flex items-center justify-center text-foreground0 text-sm", className)}>
         Failed to load document
       </div>
     );
@@ -1406,19 +1406,19 @@ export default function CarDetailPage() {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "ACTIVE":
-        return "bg-green-500/20 text-green-400 border-green-500/30";
+        return "bg-green-500/20 text-green-700 border-green-500/30";
       case "INACTIVE":
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
       // Legacy support for database values (if any still exist)
       case "available":
       case "in_use":
-        return "bg-green-500/20 text-green-400 border-green-500/30";
+        return "bg-green-500/20 text-green-700 border-green-500/30";
       case "maintenance":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+        return "bg-yellow-500/20 text-yellow-700 border-yellow-500/30";
       case "off_fleet":
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
     }
   };
 
@@ -1448,7 +1448,7 @@ export default function CarDetailPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <p className="text-red-400 mb-4">Failed to load car details</p>
+          <p className="text-red-700 mb-4">Failed to load car details</p>
           <Button
             onClick={() => {
               if (carId) {
@@ -1457,7 +1457,7 @@ export default function CarDetailPage() {
                 setLocation("/cars");
               }
             }}
-            className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -1475,22 +1475,22 @@ export default function CarDetailPage() {
             <Button
               variant="ghost"
               onClick={() => setLocation(`/admin/view-car/${carId}`)}
-              className="text-gray-400 hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Back</span>
             </Button>
             <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#EAEB80] italic">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-primary italic">
                 {car.makeModel}
               </h1>
-              <p className="text-gray-400 text-xs sm:text-sm">Car Details</p>
+              <p className="text-muted-foreground text-xs sm:text-sm">Car Details</p>
             </div>
           </div>
           {isAdmin && (
             <Button
               onClick={handleEditClick}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] w-full sm:w-auto"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
             >
               <Edit className="w-4 h-4 mr-2" />
               Edit
@@ -1501,9 +1501,9 @@ export default function CarDetailPage() {
         {/* Row 1: Vehicle Information, Car Photos, and Car Links */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           {/* Vehicle Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-6 flex flex-col">
+          <Card className="bg-card border-border lg:col-span-6 flex flex-col">
             <CardHeader className="pb-2">
-              <CardTitle className="text-[#EAEB80] text-base sm:text-lg flex items-center gap-2">
+              <CardTitle className="text-primary text-base sm:text-lg flex items-center gap-2">
                 <Car className="w-4 h-4 sm:w-5 sm:h-5" />
                 Vehicle Information
               </CardTitle>
@@ -1513,122 +1513,122 @@ export default function CarDetailPage() {
                 {/* Column 1: Basic Vehicle Information */}
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Make & Model</p>
-                    <p className="text-white text-base font-medium">{car.makeModel}</p>
+                    <p className="text-xs text-foreground0 mb-1">Make & Model</p>
+                    <p className="text-foreground text-base font-medium">{car.makeModel}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Year</p>
-                    <p className="text-white text-base">{car.year || "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Year</p>
+                    <p className="text-foreground text-base">{car.year || "N/A"}</p>
                   </div>
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">VIN</p>
-                    <p className="text-white text-base font-mono">{car.vin}</p>
+                  <p className="text-xs text-foreground0 mb-1">VIN</p>
+                    <p className="text-foreground text-base font-mono">{car.vin}</p>
                 </div>
                 <div>
-                    <p className="text-xs text-gray-500 mb-1">License Plate</p>
-                    <p className="text-white text-base">{car.licensePlate || "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">License Plate</p>
+                    <p className="text-foreground text-base">{car.licensePlate || "N/A"}</p>
                 </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Title Type</p>
-                    <p className="text-white text-base">{onboarding?.titleType ? formatValue(onboarding.titleType) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Title Type</p>
+                    <p className="text-foreground text-base">{onboarding?.titleType ? formatValue(onboarding.titleType) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Trim</p>
-                    <p className="text-white text-base">{car.vehicleTrim ? formatValue(car.vehicleTrim) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Trim</p>
+                    <p className="text-foreground text-base">{car.vehicleTrim ? formatValue(car.vehicleTrim) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Mileage</p>
-                    <p className="text-white text-base">{car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Mileage</p>
+                    <p className="text-foreground text-base">{car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A"}</p>
                   </div>
                 </div>
 
                 {/* Column 2: Specifications & Colors */}
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Exterior Color</p>
-                    <p className="text-white text-base">{car.color ? formatValue(car.color) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Exterior Color</p>
+                    <p className="text-foreground text-base">{car.color ? formatValue(car.color) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Interior Color</p>
-                    <p className="text-white text-base">{car.interiorColor ? formatValue(car.interiorColor) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Interior Color</p>
+                    <p className="text-foreground text-base">{car.interiorColor ? formatValue(car.interiorColor) : "N/A"}</p>
                   </div>
                 <div>
-                    <p className="text-xs text-gray-500 mb-1">Fuel Type</p>
-                    <p className="text-white text-base">{car.fuelType ? formatValue(car.fuelType) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Fuel Type</p>
+                    <p className="text-foreground text-base">{car.fuelType ? formatValue(car.fuelType) : "N/A"}</p>
                 </div>
                 <div>
-                    <p className="text-xs text-gray-500 mb-1">Tire Size</p>
-                    <p className="text-white text-base">{car.tireSize ? formatValue(car.tireSize) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Tire Size</p>
+                    <p className="text-foreground text-base">{car.tireSize ? formatValue(car.tireSize) : "N/A"}</p>
                 </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Number of Doors</p>
-                    <p className="text-white text-base">{car.numberOfDoors ? formatValue(car.numberOfDoors) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Number of Doors</p>
+                    <p className="text-foreground text-base">{car.numberOfDoors ? formatValue(car.numberOfDoors) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Number of Seats</p>
-                    <p className="text-white text-base">{car.numberOfSeats ? formatValue(car.numberOfSeats) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Number of Seats</p>
+                    <p className="text-foreground text-base">{car.numberOfSeats ? formatValue(car.numberOfSeats) : "N/A"}</p>
                   </div>
                   </div>
 
                 {/* Column 3: Maintenance & Accessories */}
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Oil Type</p>
-                    <p className="text-white text-base">{car.oilType ? formatValue(car.oilType) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Oil Type</p>
+                    <p className="text-foreground text-base">{car.oilType ? formatValue(car.oilType) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Last Oil Change</p>
-                    <p className="text-white text-base">{car.lastOilChange ? formatValue(car.lastOilChange) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Last Oil Change</p>
+                    <p className="text-foreground text-base">{car.lastOilChange ? formatValue(car.lastOilChange) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Does Your Vehicle Have Free Dealership Oil Changes?</p>
-                    <p className="text-white text-base">{car.freeDealershipOilChanges ? formatValue(car.freeDealershipOilChanges) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Does Your Vehicle Have Free Dealership Oil Changes?</p>
+                    <p className="text-foreground text-base">{car.freeDealershipOilChanges ? formatValue(car.freeDealershipOilChanges) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">If Yes, For How Many Years of Oil Changes, or What Oil Package</p>
-                    <p className="text-white text-base">
+                    <p className="text-xs text-foreground0 mb-1">If Yes, For How Many Years of Oil Changes, or What Oil Package</p>
+                    <p className="text-foreground text-base">
                       {car.oilPackageDetails ? formatValue(car.oilPackageDetails) : "N/A"}
                     </p>
                   </div>
                   {car.dealershipAddress && (
                 <div>
-                      <p className="text-xs text-gray-500 mb-1">Dealership Address</p>
-                      <p className="text-white text-base">{formatValue(car.dealershipAddress)}</p>
+                      <p className="text-xs text-foreground0 mb-1">Dealership Address</p>
+                      <p className="text-foreground text-base">{formatValue(car.dealershipAddress)}</p>
                 </div>
                   )}
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Registration Expiration</p>
-                    <p className="text-white text-base">{car.registrationExpiration ? formatValue(car.registrationExpiration) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Registration Expiration</p>
+                    <p className="text-foreground text-base">{car.registrationExpiration ? formatValue(car.registrationExpiration) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Vehicle Recall</p>
-                    <p className="text-white text-base">{car.vehicleRecall ? formatValue(car.vehicleRecall) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Vehicle Recall</p>
+                    <p className="text-foreground text-base">{car.vehicleRecall ? formatValue(car.vehicleRecall) : "N/A"}</p>
                   </div>
                 </div>
               </div>
               
               {/* Accessories Section - Full width */}
-              <div className="pt-4 border-t border-[#2a2a2a]">
+              <div className="pt-4 border-t border-border">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Roof Rails</p>
-                    <p className="text-white text-base">{car.roofRails ? formatValue(car.roofRails) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Roof Rails</p>
+                    <p className="text-foreground text-base">{car.roofRails ? formatValue(car.roofRails) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Ski Crossbars</p>
-                    <p className="text-white text-base">{car.skiCrossBars ? formatValue(car.skiCrossBars) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Ski Crossbars</p>
+                    <p className="text-foreground text-base">{car.skiCrossBars ? formatValue(car.skiCrossBars) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Ski Rack</p>
-                    <p className="text-white text-base">{car.skiRacks ? formatValue(car.skiRacks) : "N/A"}</p>
+                    <p className="text-xs text-foreground0 mb-1">Ski Rack</p>
+                    <p className="text-foreground text-base">{car.skiRacks ? formatValue(car.skiRacks) : "N/A"}</p>
                   </div>
               </div>
               </div>
               
               {/* Features - Full width */}
-              <div className="pt-4 border-t border-[#2a2a2a]">
-                <p className="text-xs text-gray-500 mb-1">Features</p>
-                <p className="text-white text-base">
+              <div className="pt-4 border-t border-border">
+                <p className="text-xs text-foreground0 mb-1">Features</p>
+                <p className="text-foreground text-base">
                   {car.vehicleFeatures && Array.isArray(car.vehicleFeatures) && car.vehicleFeatures.length > 0
                     ? car.vehicleFeatures.join(", ")
                     : (car.vehicleFeatures && typeof car.vehicleFeatures === 'string'
@@ -1638,27 +1638,27 @@ export default function CarDetailPage() {
               </div>
               
               {/* Assigned To Section */}
-                <div className="pt-1.5 border-t border-[#2a2a2a]">
+                <div className="pt-1.5 border-t border-border">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8">
                     {/* Left: Assigned To */}
                     <div className="flex-shrink-0 text-center lg:text-left">
-                      <p className="text-xs text-gray-500 mb-1.5">Assigned To</p>
+                      <p className="text-xs text-foreground0 mb-1.5">Assigned To</p>
                     {/* Display maintenance status if car is in maintenance */}
                     {car.rawStatus === "maintenance" ? (
                       <div>
                         <Badge
                           variant="outline"
-                            className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 mb-2"
+                            className="bg-yellow-500/20 text-yellow-700 border-yellow-500/30 mb-2"
                         >
                           Maintenance
                         </Badge>
                         {car.owner && (
                           <div className="mt-2">
-                              <p className="text-white text-sm sm:text-base font-semibold">
+                              <p className="text-foreground text-sm sm:text-base font-semibold">
                               {car.owner.firstName} {car.owner.lastName}
                             </p>
                             {car.owner.email && (
-                                <p className="text-white text-xs mt-0.5 break-all">
+                                <p className="text-foreground text-xs mt-0.5 break-all">
                                 {car.owner.email}
                               </p>
                             )}
@@ -1669,31 +1669,31 @@ export default function CarDetailPage() {
                       car.clientId ? (
                         <button
                           onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                            className="hover:text-[#EAEB80] transition-colors"
+                            className="hover:text-primary transition-colors"
                         >
-                            <p className="text-white text-sm sm:text-base font-semibold hover:underline">
+                            <p className="text-foreground text-sm sm:text-base font-semibold hover:underline">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
-                              <p className="text-white text-xs mt-0.5 hover:text-[#EAEB80] break-all">
+                              <p className="text-foreground text-xs mt-0.5 hover:text-primary break-all">
                               {car.owner.email}
                             </p>
                           )}
                         </button>
                       ) : (
                         <>
-                            <p className="text-white text-sm sm:text-base font-semibold">
+                            <p className="text-foreground text-sm sm:text-base font-semibold">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
-                              <p className="text-white text-xs mt-0.5 break-all">
+                              <p className="text-foreground text-xs mt-0.5 break-all">
                               {car.owner.email}
                             </p>
                           )}
                         </>
                       )
                     ) : (
-                      <p className="text-gray-500 text-xs sm:text-sm">Unassigned</p>
+                      <p className="text-foreground0 text-xs sm:text-sm">Unassigned</p>
                       )}
                     </div>
 
@@ -1701,7 +1701,7 @@ export default function CarDetailPage() {
                     <div className="grid grid-cols-2 lg:flex lg:items-start lg:gap-8 lg:flex-1 lg:justify-end gap-4">
                       {/* Car Status */}
                       <div className="text-center lg:min-w-[100px]">
-                        <p className="text-xs text-gray-500 mb-1.5">Car Status</p>
+                        <p className="text-xs text-foreground0 mb-1.5">Car Status</p>
                         <div className="flex justify-center">
                           <Badge
                             variant="outline"
@@ -1718,8 +1718,8 @@ export default function CarDetailPage() {
 
                       {/* Management */}
                       <div className="text-center lg:min-w-[100px]">
-                        <p className="text-xs text-gray-500 mb-1.5">Management</p>
-                        <p className="text-white text-xs sm:text-sm font-medium">
+                        <p className="text-xs text-foreground0 mb-1.5">Management</p>
+                        <p className="text-foreground text-xs sm:text-sm font-medium">
                           {car.managementStatus === "management"
                             ? "Management"
                             : car.managementStatus === "own"
@@ -1732,9 +1732,9 @@ export default function CarDetailPage() {
 
                       {/* Online Status */}
                       <div className="text-center lg:min-w-[120px]">
-                        <p className="text-xs text-gray-500 mb-1.5">Online Status</p>
+                        <p className="text-xs text-foreground0 mb-1.5">Online Status</p>
                         {!car.owner ? (
-                          <p className="text-gray-500 text-xs sm:text-sm">N/A</p>
+                          <p className="text-foreground0 text-xs sm:text-sm">N/A</p>
                         ) : onlineStatusBadge ? (
                           <div className="flex justify-center">
                             <Badge
@@ -1745,14 +1745,14 @@ export default function CarDetailPage() {
                             </Badge>
                           </div>
                         ) : (
-                          <p className="text-gray-500 text-xs sm:text-sm">N/A</p>
+                          <p className="text-foreground0 text-xs sm:text-sm">N/A</p>
                         )}
                       </div>
 
                       {/* Last Login */}
                       <div className="text-center lg:min-w-[140px] col-span-2 lg:col-span-1">
-                        <p className="text-xs text-gray-500 mb-1.5">Last Login</p>
-                        <p className="text-white text-xs sm:text-sm font-medium whitespace-normal break-words">
+                        <p className="text-xs text-foreground0 mb-1.5">Last Login</p>
+                        <p className="text-foreground text-xs sm:text-sm font-medium whitespace-normal break-words">
                           {car.owner
                             ? formatLastLogin(car.owner.lastLoginAt)
                             : "N/A"}
@@ -1762,18 +1762,18 @@ export default function CarDetailPage() {
                 </div>
               </div>
               {car.offboardAt && (
-                  <div className="pt-1.5 border-t border-[#2a2a2a]">
-                    <p className="text-xs text-gray-500 mb-0.5">Off-boarded</p>
-                    <p className="text-white text-base">
+                  <div className="pt-1.5 border-t border-border">
+                    <p className="text-xs text-foreground0 mb-0.5">Off-boarded</p>
+                    <p className="text-foreground text-base">
                     {formatDate(car.offboardAt)}
                   </p>
                   {car.offboardReason && (
-                      <p className="text-gray-400 text-xs mt-0.5">
+                      <p className="text-muted-foreground text-xs mt-0.5">
                       Reason: {car.offboardReason.replace("_", " ")}
                     </p>
                   )}
                   {car.offboardNote && (
-                      <p className="text-gray-400 text-xs mt-0.5">
+                      <p className="text-muted-foreground text-xs mt-0.5">
                       Note: {car.offboardNote}
                     </p>
                   )}
@@ -1785,9 +1785,9 @@ export default function CarDetailPage() {
           {/* Column 2: Car Photos and Car Links stacked vertically */}
           <div className="lg:col-span-6 flex flex-col gap-6">
             {/* Car Photos Carousel Card */}
-            <Card className="bg-[#0f0f0f] border-[#1a1a1a] flex flex-col flex-1">
+            <Card className="bg-card border-border flex flex-col flex-1">
               <CardHeader className="pb-2">
-                <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
+                <CardTitle className="text-primary text-lg flex items-center gap-2">
                   <Car className="w-5 h-5" />
                   Car Photos
               </CardTitle>
@@ -1796,7 +1796,7 @@ export default function CarDetailPage() {
                 {car.photos && car.photos.length > 0 ? (
                   <div className="space-y-2 flex-1 flex flex-col">
                       {/* Main Carousel Display - Flexible height to match Vehicle Information card */}
-                      <div className="relative w-full flex-1 bg-black rounded-lg overflow-hidden border border-[#2a2a2a]">
+                      <div className="relative w-full flex-1 bg-background rounded-lg overflow-hidden border border-border">
                       {car.photos.map((photo, index) => {
                         // Use getProxiedImageUrl to handle both GCS URLs and local paths
                         // This ensures CORS issues are avoided by proxying GCS URLs through the backend
@@ -1861,15 +1861,15 @@ export default function CarDetailPage() {
                             variant="ghost"
                             size="icon"
                             onClick={handleCarouselPrev}
-                            className="h-9 w-9 bg-black/70 hover:bg-black/90 text-white border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                            className="h-9 w-9 bg-background/70 hover:bg-background/90 text-foreground border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
                             aria-label="Previous image"
                           >
                             <ChevronLeft className="w-5 h-5" />
                           </Button>
                           
                           {/* Image Counter */}
-                          <div className="bg-black/70 px-4 py-2 rounded-full border border-white/30 shadow-lg backdrop-blur-sm">
-                            <span className="text-white text-sm font-medium">
+                          <div className="bg-background/70 px-4 py-2 rounded-full border border-white/30 shadow-lg backdrop-blur-sm">
+                            <span className="text-foreground text-sm font-medium">
                               {carouselIndex + 1} / {car.photos.length}
                             </span>
                   </div>
@@ -1879,7 +1879,7 @@ export default function CarDetailPage() {
                             variant="ghost"
                             size="icon"
                             onClick={handleCarouselNext}
-                            className="h-9 w-9 bg-black/70 hover:bg-black/90 text-white border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                            className="h-9 w-9 bg-background/70 hover:bg-background/90 text-foreground border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
                             aria-label="Next image"
                           >
                             <ChevronRight className="w-5 h-5" />
@@ -1908,8 +1908,8 @@ export default function CarDetailPage() {
                     )}
                 </div>
               ) : (
-                    <div className="flex items-center justify-center flex-1 bg-black/20 rounded-lg border border-[#2a2a2a]">
-                      <p className="text-gray-400 text-center">
+                    <div className="flex items-center justify-center flex-1 bg-background/20 rounded-lg border border-border">
+                      <p className="text-muted-foreground text-center">
                         No photos available
                       </p>
                 </div>
@@ -1918,9 +1918,9 @@ export default function CarDetailPage() {
           </Card>
 
             {/* Car Links Card */}
-            <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
+            <Card className="bg-card border-border">
             <CardHeader>
-                <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
+                <CardTitle className="text-primary text-lg flex items-center gap-2">
                   <Car className="w-5 h-5" />
                   Car Links
               </CardTitle>
@@ -1928,44 +1928,44 @@ export default function CarDetailPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Turo Link</p>
+                    <p className="text-xs text-foreground0 mb-1">Turo Link</p>
                     {car.turoLink ? (
-                      <p className="text-white text-base break-all">
+                      <p className="text-foreground text-base break-all">
                         <a
                           href={car.turoLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#EAEB80] hover:underline"
+                          className="text-primary hover:underline"
                         >
                           {formatValue(car.turoLink)}
                         </a>
                       </p>
                     ) : (
-                      <p className="text-gray-500 text-base">Not provided</p>
+                      <p className="text-foreground0 text-base">Not provided</p>
                     )}
                   </div>
                   {isAdmin && (
                   <div>
-                      <p className="text-xs text-gray-500 mb-1">Admin Turo Link</p>
+                      <p className="text-xs text-foreground0 mb-1">Admin Turo Link</p>
                       {car.adminTuroLink ? (
-                        <p className="text-white text-base break-all">
+                        <p className="text-foreground text-base break-all">
                           <a
                             href={car.adminTuroLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#EAEB80] hover:underline"
+                            className="text-primary hover:underline"
                           >
                             {formatValue(car.adminTuroLink)}
                           </a>
                         </p>
               ) : (
-                        <p className="text-gray-500 text-base">Not provided</p>
+                        <p className="text-foreground0 text-base">Not provided</p>
                       )}
                 </div>
               )}
                   {isAdmin && (
                   <div>
-                      <p className="text-xs text-gray-500 mb-1">Turo Vehicle IDs</p>
+                      <p className="text-xs text-foreground0 mb-1">Turo Vehicle IDs</p>
                       {(() => {
                         const dbIds = (car.turoVehicleIds || []).filter((id): id is string => typeof id === "string" && id.trim().length > 0);
                         const fromTuroLink = extractTuroVehicleIdFromUrl(car.turoLink);
@@ -1974,12 +1974,12 @@ export default function CarDetailPage() {
                         return allIds.length > 0 ? (
                           <div className="space-y-1">
                             {allIds.map((id, idx) => (
-                              <p key={idx} className="text-white text-sm font-mono">{id}</p>
+                              <p key={idx} className="text-foreground text-sm font-mono">{id}</p>
                             ))}
-                            <p className="text-xs text-gray-500">({allIds.length} of 10 max — for automation{fromTuroLink || fromAdminLink ? ", includes IDs from links" : ""})</p>
+                            <p className="text-xs text-foreground0">({allIds.length} of 10 max — for automation{fromTuroLink || fromAdminLink ? ", includes IDs from links" : ""})</p>
                           </div>
                         ) : (
-                          <p className="text-gray-500 text-base">Not provided</p>
+                          <p className="text-foreground0 text-base">Not provided</p>
                         );
                       })()}
                 </div>
@@ -1993,22 +1993,22 @@ export default function CarDetailPage() {
         {/* Row 2: Documents, Vehicle Purchase Information, Car Login Information, Insurance Information */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Documents Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
+          <Card className="bg-card border-border lg:col-span-3">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80] text-lg">
+              <CardTitle className="text-primary text-lg">
                 Documents
               </CardTitle>
             </CardHeader>
             <CardContent>
               {isLoadingOnboarding ? (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-muted-foreground">
                   <p className="text-sm">Loading documents...</p>
                 </div>
               ) : onboarding ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {/* Insurance Card */}
                   <div>
-                    <h4 className="text-base font-semibold text-gray-200 mb-4">Insurance Card</h4>
+                    <h4 className="text-base font-semibold text-muted-foreground mb-4">Insurance Card</h4>
                     {onboarding.insuranceCardUrl && String(onboarding.insuranceCardUrl).trim() ? (() => {
                       const trimmedUrl = String(onboarding.insuranceCardUrl).trim();
                       
@@ -2059,16 +2059,16 @@ export default function CarDetailPage() {
                             setFullScreenDocument({ url: documentUrl, type: 'insurance', isPdf });
                           }}
                         >
-                          <div className={`relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
+                          <div className={`relative w-full aspect-[4/3] bg-background rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
                             isPdf 
-                              ? 'border-[#EAEB80]/50 hover:border-[#EAEB80] shadow-[#EAEB80]/20' 
-                              : 'border-[#EAEB80]/30 hover:border-[#EAEB80] shadow-[#EAEB80]/20'
+                              ? 'border-primary/50 hover:border-primary shadow-[#EAEB80]/20' 
+                              : 'border-primary/30 hover:border-primary shadow-[#EAEB80]/20'
                           }`}>
                             {isPdf ? (
                               <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                                <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
-                                <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
-                                <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
+                                <FileText className="w-16 h-16 text-primary mb-2" />
+                                <p className="text-primary text-sm font-semibold">PDF Document</p>
+                                <p className="text-muted-foreground text-xs mt-1">Click to open in PDF viewer</p>
                               </div>
                             ) : isGoogleDriveId ? (
                               // For Google Drive: use credentialled fetch so documents display in published (cross-origin) project
@@ -2088,7 +2088,7 @@ export default function CarDetailPage() {
                                     parent.appendChild(iframe);
                                   } else if (parent && !parent.querySelector(".error-message")) {
                                     const errorDiv = document.createElement("div");
-                                    errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                    errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
                                     errorDiv.textContent = "Failed to load document";
                                     parent.appendChild(errorDiv);
                                   }
@@ -2114,20 +2114,20 @@ export default function CarDetailPage() {
                                   const parent = target.parentElement?.parentElement;
                                   if (parent && !parent.querySelector(".error-message")) {
                                     const errorDiv = document.createElement("div");
-                                    errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                    errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
                                     errorDiv.textContent = "Failed to load image";
                                     parent.appendChild(errorDiv);
                                   }
                                 }}
                               />
                             )}
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                              <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                            <div className="absolute inset-0 bg-background/0 group-hover:bg-background/10 transition-colors flex items-center justify-center">
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/70 text-foreground px-4 py-2 rounded-lg text-sm font-medium">
                                 {isPdf ? 'Click to open PDF' : 'Click to view full screen'}
                               </div>
                             </div>
                             {isPdf && (
-                              <div className="absolute top-2 right-2 bg-[#EAEB80]/90 text-black text-xs px-2 py-1 rounded font-semibold">
+                              <div className="absolute top-2 right-2 bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded font-semibold">
                                 PDF
                               </div>
                             )}
@@ -2135,15 +2135,15 @@ export default function CarDetailPage() {
                         </div>
                       );
                     })() : (
-                      <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
-                        <p className="text-sm text-gray-500">No insurance card uploaded</p>
+                      <div className="w-full aspect-[4/3] bg-background rounded-lg border border-border flex items-center justify-center">
+                        <p className="text-sm text-foreground0">No insurance card uploaded</p>
                       </div>
                     )}
                   </div>
 
                   {/* Drivers License */}
                   <div>
-                    <h4 className="text-base font-semibold text-gray-200 mb-4">Drivers License</h4>
+                    <h4 className="text-base font-semibold text-muted-foreground mb-4">Drivers License</h4>
                     {validDriversLicenseUrls.length > 0 ? (
                       <div className="space-y-4">
                         {validDriversLicenseUrls.map((url: string, index: number) => {
@@ -2196,20 +2196,20 @@ export default function CarDetailPage() {
                               className="relative group cursor-pointer"
                               onClick={() => setFullScreenDocument({ url: documentUrl, type: 'license', index, isPdf })}
                             >
-                              <div className={`relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
+                              <div className={`relative w-full aspect-[4/3] bg-background rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
                                 isPdf 
-                                  ? 'border-[#EAEB80]/50 hover:border-[#EAEB80] shadow-[#EAEB80]/20' 
-                                  : 'border-[#EAEB80]/30 hover:border-[#EAEB80] shadow-[#EAEB80]/20'
+                                  ? 'border-primary/50 hover:border-primary shadow-[#EAEB80]/20' 
+                                  : 'border-primary/30 hover:border-primary shadow-[#EAEB80]/20'
                               }`}>
                                 {isPdf ? (
                                   <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                                    <div className="text-[#EAEB80] mb-2">
+                                    <div className="text-primary mb-2">
                                       <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                       </svg>
                                     </div>
-                                    <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
-                                    <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
+                                    <p className="text-primary text-sm font-semibold">PDF Document</p>
+                                    <p className="text-muted-foreground text-xs mt-1">Click to open in PDF viewer</p>
                                   </div>
                                 ) : isGoogleDriveId ? (
                                   // For Google Drive: use credentialled fetch so documents display in published (cross-origin) project
@@ -2229,7 +2229,7 @@ export default function CarDetailPage() {
                                         parent.appendChild(iframe);
                                       } else if (parent && !parent.querySelector(".error-message")) {
                                         const errorDiv = document.createElement("div");
-                                        errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                        errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
                                         errorDiv.textContent = "Failed to load document";
                                         parent.appendChild(errorDiv);
                                       }
@@ -2255,15 +2255,15 @@ export default function CarDetailPage() {
                                       const parent = target.parentElement?.parentElement;
                                       if (parent && !parent.querySelector(".error-message")) {
                                         const errorDiv = document.createElement("div");
-                                        errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                        errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
                                         errorDiv.textContent = "Failed to load image";
                                         parent.appendChild(errorDiv);
                                       }
                                     }}
                                   />
                                 )}
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                <div className="absolute inset-0 bg-background/0 group-hover:bg-background/10 transition-colors flex items-center justify-center">
+                                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/70 text-foreground px-4 py-2 rounded-lg text-sm font-medium">
                                     {isPdf ? 'Click to open PDF' : 'Click to view full screen'}
                                   </div>
                                 </div>
@@ -2273,7 +2273,7 @@ export default function CarDetailPage() {
                                   </div>
                                 )}
                                 {validDriversLicenseUrls.length > 1 && (
-                                  <div className="absolute top-2 left-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                                  <div className="absolute top-2 left-2 bg-background/80 text-foreground text-xs px-2 py-1 rounded">
                                     {index + 1} / {validDriversLicenseUrls.length}
                                   </div>
                                 )}
@@ -2283,14 +2283,14 @@ export default function CarDetailPage() {
                         })}
                       </div>
                     ) : (
-                      <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
-                        <p className="text-sm text-gray-500">No drivers license uploaded</p>
+                      <div className="w-full aspect-[4/3] bg-background rounded-lg border border-border flex items-center justify-center">
+                        <p className="text-sm text-foreground0">No drivers license uploaded</p>
                       </div>
                     )}
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-muted-foreground">
                   <p className="text-sm">No documents available</p>
                 </div>
               )}
@@ -2298,15 +2298,15 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Vehicle Purchase Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
+          <Card className="bg-card border-border lg:col-span-3">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80] text-lg">
+              <CardTitle className="text-primary text-lg">
               Purchase Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {isLoadingOnboarding ? (
-                <div className="text-center py-4 text-gray-400">
+                <div className="text-center py-4 text-muted-foreground">
                   <p className="text-sm">Loading...</p>
                 </div>
               ) : onboarding ? (
@@ -2314,37 +2314,37 @@ export default function CarDetailPage() {
                   {/* Financial Details - 2 columns */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Purchase Price</p>
-                      <p className="text-white text-base font-medium">{formatCurrency(onboarding.purchasePrice)}</p>
+                    <p className="text-xs text-foreground0 mb-1">Purchase Price</p>
+                      <p className="text-foreground text-base font-medium">{formatCurrency(onboarding.purchasePrice)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Down Payment</p>
-                      <p className="text-white text-base font-medium">{formatCurrency(onboarding.downPayment)}</p>
+                    <p className="text-xs text-foreground0 mb-1">Down Payment</p>
+                      <p className="text-foreground text-base font-medium">{formatCurrency(onboarding.downPayment)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Monthly Payment</p>
-                      <p className="text-white text-base font-medium">{formatCurrency(onboarding.monthlyPayment)}</p>
+                    <p className="text-xs text-foreground0 mb-1">Monthly Payment</p>
+                      <p className="text-foreground text-base font-medium">{formatCurrency(onboarding.monthlyPayment)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Interest Rate</p>
-                      <p className="text-white text-base font-medium">{formatValue(onboarding.interestRate)}%</p>
+                    <p className="text-xs text-foreground0 mb-1">Interest Rate</p>
+                      <p className="text-foreground text-base font-medium">{formatValue(onboarding.interestRate)}%</p>
                   </div>
                   </div>
                   
                   {/* Additional Information - Full width with separator */}
-                  <div className="pt-4 border-t border-[#2a2a2a] space-y-4">
+                  <div className="pt-4 border-t border-border space-y-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Transport City to City</p>
-                    <p className="text-white text-base">{formatValue(onboarding.transportCityToCity)}</p>
+                    <p className="text-xs text-foreground0 mb-1">Transport City to City</p>
+                    <p className="text-foreground text-base">{formatValue(onboarding.transportCityToCity)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Ultimate Goal</p>
-                    <p className="text-white text-base">{formatValue(onboarding.ultimateGoal)}</p>
+                    <p className="text-xs text-foreground0 mb-1">Ultimate Goal</p>
+                    <p className="text-foreground text-base">{formatValue(onboarding.ultimateGoal)}</p>
                   </div>
                 </div>
                 </>
               ) : (
-                <div className="text-center py-4 text-gray-400">
+                <div className="text-center py-4 text-muted-foreground">
                   <p className="text-sm">No financial information available</p>
                 </div>
               )}
@@ -2352,28 +2352,28 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Car Login Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
+          <Card className="bg-card border-border lg:col-span-3">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80] text-lg">
+              <CardTitle className="text-primary text-lg">
                 Car Login Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {isLoadingOnboarding ? (
-                <div className="text-center py-4 text-gray-400">
+                <div className="text-center py-4 text-muted-foreground">
                   <p className="text-sm">Loading...</p>
                 </div>
               ) : onboarding ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                   {onboarding.carManufacturerWebsite && (
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Car Manufacturer Website</p>
-                      <p className="text-white text-base break-all">
+                      <p className="text-xs text-foreground0 mb-1">Car Manufacturer Website</p>
+                      <p className="text-foreground text-base break-all">
                         <a
                           href={onboarding.carManufacturerWebsite}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#EAEB80] hover:underline"
+                          className="text-primary hover:underline"
                         >
                           {formatValue(onboarding.carManufacturerWebsite)}
                         </a>
@@ -2382,33 +2382,33 @@ export default function CarDetailPage() {
                   )}
                   {onboarding.carManufacturerUsername && (
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Manufacturer Username</p>
-                      <p className="text-white text-base">{formatValue(onboarding.carManufacturerUsername)}</p>
+                      <p className="text-xs text-foreground0 mb-1">Manufacturer Username</p>
+                      <p className="text-foreground text-base">{formatValue(onboarding.carManufacturerUsername)}</p>
                     </div>
                   )}
                   {onboarding.password && (
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Password</p>
-                      <p className="text-white text-base font-mono">{formatValue(onboarding.password)}</p>
+                      <p className="text-xs text-foreground0 mb-1">Password</p>
+                      <p className="text-foreground text-base font-mono">{formatValue(onboarding.password)}</p>
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="text-center py-4 text-gray-400">
+                <div className="text-center py-4 text-muted-foreground">
                   <p className="text-sm">No additional information available</p>
                 </div>
               )}
               {/* Timestamps */}
-              <div className="pt-3 border-t border-[#2a2a2a] space-y-2">
+              <div className="pt-3 border-t border-border space-y-2">
               <div>
-                <p className="text-xs text-gray-500 mb-1">Created</p>
-                  <p className="text-white text-base">
+                <p className="text-xs text-foreground0 mb-1">Created</p>
+                  <p className="text-foreground text-base">
                   {formatDate(car.createdAt)}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">Last Updated</p>
-                  <p className="text-white text-base">
+                <p className="text-xs text-foreground0 mb-1">Last Updated</p>
+                  <p className="text-foreground text-base">
                   {formatDate(car.updatedAt)}
                 </p>
                 </div>
@@ -2417,40 +2417,40 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Insurance Information Card */}
-          <Card className="bg-[#0f0f0f] border-[#1a1a1a] lg:col-span-3">
+          <Card className="bg-card border-border lg:col-span-3">
             <CardHeader>
-              <CardTitle className="text-[#EAEB80] text-lg">
+              <CardTitle className="text-primary text-lg">
                 Insurance Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {isLoadingOnboarding ? (
-                <div className="text-center py-4 text-gray-400">
+                <div className="text-center py-4 text-muted-foreground">
                   <p className="text-sm">Loading...</p>
         </div>
               ) : onboarding ? (
                 <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Provider</p>
-                    <p className="text-white text-base">{formatValue(onboarding.insuranceProvider)}</p>
+                    <p className="text-xs text-foreground0 mb-1">Provider</p>
+                    <p className="text-foreground text-base">{formatValue(onboarding.insuranceProvider)}</p>
                         </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Phone</p>
-                    <p className="text-white text-base">{formatValue(onboarding.insurancePhone)}</p>
+                    <p className="text-xs text-foreground0 mb-1">Phone</p>
+                    <p className="text-foreground text-base">{formatValue(onboarding.insurancePhone)}</p>
                       </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Policy Number</p>
-                    <p className="text-white text-base font-mono">{formatValue(onboarding.policyNumber)}</p>
+                    <p className="text-xs text-foreground0 mb-1">Policy Number</p>
+                    <p className="text-foreground text-base font-mono">{formatValue(onboarding.policyNumber)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Expiration</p>
-                    <p className="text-white text-base">{formatValue(onboarding.insuranceExpiration)}</p>
+                    <p className="text-xs text-foreground0 mb-1">Expiration</p>
+                    <p className="text-foreground text-base">{formatValue(onboarding.insuranceExpiration)}</p>
                     </div>
                   </div>
                 </>
                 ) : (
-                <div className="text-center py-4 text-gray-400">
+                <div className="text-center py-4 text-muted-foreground">
                   <p className="text-sm">No insurance information available</p>
                   </div>
                 )}
@@ -2461,10 +2461,10 @@ export default function CarDetailPage() {
 
         {/* Photos Grid - 8 columns per row (up to 20 images) - Hidden for client accounts */}
         {isAdmin && (
-        <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-[#EAEB80] text-lg flex items-center gap-2">
+              <CardTitle className="text-primary text-lg flex items-center gap-2">
                 <Upload className="w-5 h-5" />
                 Photos ({car.photos?.length || 0} / 20)
               </CardTitle>
@@ -2477,7 +2477,7 @@ export default function CarDetailPage() {
                           <Button
                             variant="outline"
                             disabled={deleteMultiplePhotosMutation.isPending}
-                            className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-500"
+                            className="border-red-500/50 text-red-700 hover:bg-red-500/10 hover:border-red-500"
                           >
                             {deleteMultiplePhotosMutation.isPending ? (
                               <>
@@ -2501,7 +2501,7 @@ export default function CarDetailPage() {
                       <Button
                         variant="ghost"
                         onClick={() => setSelectedPhotos(new Set())}
-                        className="text-gray-400 hover:text-white"
+                        className="text-muted-foreground hover:text-foreground"
                       >
                         Clear Selection
                       </Button>
@@ -2511,7 +2511,7 @@ export default function CarDetailPage() {
                     <Button
                       variant="outline"
                       onClick={handleSelectAll}
-                      className="border-[#EAEB80]/50 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                      className="border-primary/50 text-primary hover:bg-primary/10"
                     >
                       {(() => {
                         // Check if all photos are selected
@@ -2546,7 +2546,7 @@ export default function CarDetailPage() {
                   />
                   <Button
                     asChild
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80"
                     disabled={uploadingPhotos}
                   >
                     <label htmlFor="photo-upload" className="cursor-pointer" title="Select multiple images to upload at once">
@@ -2613,8 +2613,8 @@ export default function CarDetailPage() {
                           className={cn(
                             "w-full h-full object-cover rounded-lg border transition-all",
                             isSelected
-                              ? "border-[#EAEB80] opacity-80"
-                              : "border-[#2a2a2a] group-hover:border-[#EAEB80]/50"
+                              ? "border-primary opacity-80"
+                              : "border-border group-hover:border-primary/50"
                           )}
                       onError={(e) => {
                        // Don't hide the image - keep it visible but show error state
@@ -2625,7 +2625,7 @@ export default function CarDetailPage() {
                     />
                         {/* Main Photo Badge */}
                         {isMain && (
-                          <div className="absolute bottom-2 left-2 bg-black/70 text-[#EAEB80] text-[10px] px-2 py-1 rounded border border-[#EAEB80]/30">
+                          <div className="absolute bottom-2 left-2 bg-background/70 text-primary text-[10px] px-2 py-1 rounded border border-primary/30">
                             Main
                           </div>
                         )}
@@ -2644,8 +2644,8 @@ export default function CarDetailPage() {
                               className={cn(
                                 "w-6 h-6 rounded border-2 flex items-center justify-center transition-all cursor-pointer",
                                 isSelected
-                                  ? "bg-[#EAEB80] border-[#EAEB80] hover:bg-[#d4d570]"
-                                  : "bg-black/50 border-white/50 hover:border-white hover:bg-black/70"
+                                  ? "bg-[#EAEB80] border-primary hover:bg-primary/80"
+                                  : "bg-background/50 border-white/50 hover:border-white hover:bg-background/70"
                               )}
                             >
                               {isSelected && (
@@ -2665,7 +2665,7 @@ export default function CarDetailPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                                  className="bg-red-500/80 hover:bg-red-500 text-white"
+                                  className="bg-red-500/80 hover:bg-red-500 text-foreground"
                           >
                             <X className="w-4 h-4" />
                           </Button>
@@ -2714,7 +2714,7 @@ export default function CarDetailPage() {
                                 e.stopPropagation();
                                 setMainPhotoMutation.mutate(photo);
                               }}
-                              className="bg-black/70 hover:bg-black/90 text-[#EAEB80] border border-[#EAEB80]/30 h-7 w-7 p-0"
+                              className="bg-background/70 hover:bg-background/90 text-primary border border-primary/30 h-7 w-7 p-0"
                               title="Set as main photo"
                             >
                               <Star className="w-4 h-4" />
@@ -2722,7 +2722,7 @@ export default function CarDetailPage() {
                           </div>
                         )}
                         {/* Image Number Badge */}
-                        <div className="absolute bottom-2 right-2 bg-black/70 px-2 py-1 rounded text-xs text-white">
+                        <div className="absolute bottom-2 right-2 bg-background/70 px-2 py-1 rounded text-xs text-foreground">
                           {index + 1}
                         </div>
                       </div>
@@ -2732,7 +2732,7 @@ export default function CarDetailPage() {
               </div>
             ) : (
               <div className="flex items-center justify-center py-16">
-                <p className="text-gray-400 text-center">
+                <p className="text-muted-foreground text-center">
                   No photos uploaded. {isAdmin && "Upload one or multiple photos (up to 20) to get started."}
                 </p>
               </div>
@@ -2742,12 +2742,12 @@ export default function CarDetailPage() {
         )}
 
         {/* Rental History - Placeholder */}
-        <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-[#EAEB80] text-lg">Rental History</CardTitle>
+            <CardTitle className="text-primary text-lg">Rental History</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-400 text-center py-8">
+            <p className="text-muted-foreground text-center py-8">
               Rental history tracking coming soon
             </p>
           </CardContent>
@@ -2765,12 +2765,12 @@ export default function CarDetailPage() {
               setDriversLicensePreviews([]);
             }
           }}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl font-semibold">
                 Edit Car Information
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 Update vehicle information, documents, vehicle purchase information, vehicle login information, and insurance information
               </DialogDescription>
             </DialogHeader>
@@ -2782,7 +2782,7 @@ export default function CarDetailPage() {
               >
                 {/* Vehicle Information Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                  <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                     Vehicle Information
                   </h3>
                 <FormField
@@ -2790,11 +2790,11 @@ export default function CarDetailPage() {
                   name="vin"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">VIN *</FormLabel>
+                      <FormLabel className="text-muted-foreground">VIN *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           maxLength={17}
                         />
                       </FormControl>
@@ -2808,13 +2808,13 @@ export default function CarDetailPage() {
                   name="makeModel"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">
+                      <FormLabel className="text-muted-foreground">
                         Make & Model *
                       </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -2828,13 +2828,13 @@ export default function CarDetailPage() {
                     name="licensePlate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">
+                        <FormLabel className="text-muted-foreground">
                           License Plate
                         </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2847,12 +2847,12 @@ export default function CarDetailPage() {
                     name="year"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Year</FormLabel>
+                        <FormLabel className="text-muted-foreground">Year</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="number"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2867,11 +2867,11 @@ export default function CarDetailPage() {
                     name="color"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Exterior Color</FormLabel>
+                        <FormLabel className="text-muted-foreground">Exterior Color</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2884,12 +2884,12 @@ export default function CarDetailPage() {
                       name="mileage"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Mileage</FormLabel>
+                          <FormLabel className="text-muted-foreground">Mileage</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="number"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2902,11 +2902,11 @@ export default function CarDetailPage() {
                     name="titleType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Title Type</FormLabel>
+                        <FormLabel className="text-muted-foreground">Title Type</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2919,11 +2919,11 @@ export default function CarDetailPage() {
                     name="vehicleTrim"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Trim</FormLabel>
+                        <FormLabel className="text-muted-foreground">Trim</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2936,11 +2936,11 @@ export default function CarDetailPage() {
                     name="interiorColor"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Interior Color</FormLabel>
+                        <FormLabel className="text-muted-foreground">Interior Color</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2953,12 +2953,12 @@ export default function CarDetailPage() {
                     name="registrationExpiration"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Registration Expiration</FormLabel>
+                        <FormLabel className="text-muted-foreground">Registration Expiration</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="date"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2971,11 +2971,11 @@ export default function CarDetailPage() {
                     name="vehicleRecall"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Vehicle Recall</FormLabel>
+                        <FormLabel className="text-muted-foreground">Vehicle Recall</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2988,12 +2988,12 @@ export default function CarDetailPage() {
                     name="numberOfSeats"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Number of Seats</FormLabel>
+                        <FormLabel className="text-muted-foreground">Number of Seats</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="number"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3006,12 +3006,12 @@ export default function CarDetailPage() {
                     name="numberOfDoors"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Number of Doors</FormLabel>
+                        <FormLabel className="text-muted-foreground">Number of Doors</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="number"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3024,11 +3024,11 @@ export default function CarDetailPage() {
                     name="skiRacks"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Ski Rack</FormLabel>
+                        <FormLabel className="text-muted-foreground">Ski Rack</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3041,11 +3041,11 @@ export default function CarDetailPage() {
                     name="skiCrossBars"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Ski Crossbars</FormLabel>
+                        <FormLabel className="text-muted-foreground">Ski Crossbars</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3058,11 +3058,11 @@ export default function CarDetailPage() {
                     name="roofRails"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Roof Rails</FormLabel>
+                        <FormLabel className="text-muted-foreground">Roof Rails</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3075,11 +3075,11 @@ export default function CarDetailPage() {
                     name="oilType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Oil Type</FormLabel>
+                        <FormLabel className="text-muted-foreground">Oil Type</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3092,12 +3092,12 @@ export default function CarDetailPage() {
                     name="lastOilChange"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Last Oil Change Date</FormLabel>
+                        <FormLabel className="text-muted-foreground">Last Oil Change Date</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="date"
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3110,17 +3110,17 @@ export default function CarDetailPage() {
                     name="freeDealershipOilChanges"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Does Your Vehicle Have Free Dealership Oil Changes?</FormLabel>
+                        <FormLabel className="text-muted-foreground">Does Your Vehicle Have Free Dealership Oil Changes?</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
                         >
                         <FormControl>
-                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                            <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                               <SelectValue placeholder="Select" />
                             </SelectTrigger>
                         </FormControl>
-                          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                          <SelectContent className="bg-card border-border text-foreground">
                             <SelectItem value="Yes">Yes</SelectItem>
                             <SelectItem value="No">No</SelectItem>
                           </SelectContent>
@@ -3135,11 +3135,11 @@ export default function CarDetailPage() {
                     name="oilPackageDetails"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">If Yes, For How Many Years of Oil Changes, or What Oil Package</FormLabel>
+                        <FormLabel className="text-muted-foreground">If Yes, For How Many Years of Oil Changes, or What Oil Package</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="e.g., 3 years or Premium Package"
                           />
                         </FormControl>
@@ -3153,11 +3153,11 @@ export default function CarDetailPage() {
                     name="dealershipAddress"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Dealership Address</FormLabel>
+                        <FormLabel className="text-muted-foreground">Dealership Address</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3170,13 +3170,13 @@ export default function CarDetailPage() {
                     name="fuelType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Fuel Type</FormLabel>
+                        <FormLabel className="text-muted-foreground">Fuel Type</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                            <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                               <SelectValue placeholder="Select fuel type" />
                             </SelectTrigger>
                           </FormControl>
@@ -3202,11 +3202,11 @@ export default function CarDetailPage() {
                     name="tireSize"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Tire Size</FormLabel>
+                        <FormLabel className="text-muted-foreground">Tire Size</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3220,11 +3220,11 @@ export default function CarDetailPage() {
                     render={() => (
                       <FormItem className="col-span-2">
                         <div className="mb-4">
-                          <FormLabel className="text-gray-400 text-base font-semibold">
+                          <FormLabel className="text-muted-foreground text-base font-semibold">
                             Features (check all that apply)
                           </FormLabel>
                         </div>
-                        <div className="border border-[#2a2a2a] rounded-lg p-4 bg-[#1a1a1a]">
+                        <div className="border border-border rounded-lg p-4 bg-card">
                           <div className="grid grid-cols-2 gap-3">
                             {[
                               "All-wheel drive",
@@ -3269,10 +3269,10 @@ export default function CarDetailPage() {
                                                   )
                                                 );
                                           }}
-                                          className="border-[#2a2a2a] data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-[#EAEB80]"
+                                          className="border-border data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-primary"
                           />
                         </FormControl>
-                                      <FormLabel className="text-gray-300 text-sm font-normal cursor-pointer">
+                                      <FormLabel className="text-muted-foreground text-sm font-normal cursor-pointer">
                                         {feature}
                                       </FormLabel>
                                     </FormItem>
@@ -3291,7 +3291,7 @@ export default function CarDetailPage() {
 
                 {/* Financial Information Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                  <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                     Purchase Information
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
@@ -3300,14 +3300,14 @@ export default function CarDetailPage() {
                       name="purchasePrice"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Purchase Price</FormLabel>
+                          <FormLabel className="text-muted-foreground">Purchase Price</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="number"
                               step="0.01"
                               placeholder="0.00"
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3320,14 +3320,14 @@ export default function CarDetailPage() {
                       name="downPayment"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Down Payment</FormLabel>
+                          <FormLabel className="text-muted-foreground">Down Payment</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="number"
                               step="0.01"
                               placeholder="0.00"
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3340,14 +3340,14 @@ export default function CarDetailPage() {
                       name="monthlyPayment"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Monthly Payment</FormLabel>
+                          <FormLabel className="text-muted-foreground">Monthly Payment</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="number"
                               step="0.01"
                               placeholder="0.00"
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3360,14 +3360,14 @@ export default function CarDetailPage() {
                       name="interestRate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Interest Rate (%)</FormLabel>
+                          <FormLabel className="text-muted-foreground">Interest Rate (%)</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="number"
                               step="0.01"
                               placeholder="0.00"
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3380,11 +3380,11 @@ export default function CarDetailPage() {
                       name="transportCityToCity"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Transport City to City</FormLabel>
+                          <FormLabel className="text-muted-foreground">Transport City to City</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3397,11 +3397,11 @@ export default function CarDetailPage() {
                       name="ultimateGoal"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Ultimate Goal</FormLabel>
+                          <FormLabel className="text-muted-foreground">Ultimate Goal</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3413,7 +3413,7 @@ export default function CarDetailPage() {
 
                 {/* Insurance Information Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                  <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                     Insurance Information
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
@@ -3422,11 +3422,11 @@ export default function CarDetailPage() {
                       name="insuranceProvider"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Provider</FormLabel>
+                          <FormLabel className="text-muted-foreground">Provider</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3439,12 +3439,12 @@ export default function CarDetailPage() {
                       name="insurancePhone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Phone</FormLabel>
+                          <FormLabel className="text-muted-foreground">Phone</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="tel"
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3457,11 +3457,11 @@ export default function CarDetailPage() {
                       name="policyNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Policy Number</FormLabel>
+                          <FormLabel className="text-muted-foreground">Policy Number</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] font-mono"
+                              className="bg-card border-border text-foreground focus:border-primary font-mono"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3474,12 +3474,12 @@ export default function CarDetailPage() {
                       name="insuranceExpiration"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Expiration</FormLabel>
+                          <FormLabel className="text-muted-foreground">Expiration</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="date"
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3491,7 +3491,7 @@ export default function CarDetailPage() {
 
                 {/* Car Login Information Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                  <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                     Car Login Information
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
@@ -3500,13 +3500,13 @@ export default function CarDetailPage() {
                       name="carManufacturerWebsite"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Car Manufacturer Website</FormLabel>
+                          <FormLabel className="text-muted-foreground">Car Manufacturer Website</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="url"
                               placeholder="https://example.com"
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3519,11 +3519,11 @@ export default function CarDetailPage() {
                       name="carManufacturerUsername"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Manufacturer Username</FormLabel>
+                          <FormLabel className="text-muted-foreground">Manufacturer Username</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3536,12 +3536,12 @@ export default function CarDetailPage() {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Password</FormLabel>
+                          <FormLabel className="text-muted-foreground">Password</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="password"
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] font-mono"
+                              className="bg-card border-border text-foreground focus:border-primary font-mono"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3553,7 +3553,7 @@ export default function CarDetailPage() {
 
                 {/* Car Links Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                  <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                     Car Links
                   </h3>
                   <div className="grid grid-cols-1 gap-4">
@@ -3562,13 +3562,13 @@ export default function CarDetailPage() {
                       name="turoLink"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Turo Link</FormLabel>
+                          <FormLabel className="text-muted-foreground">Turo Link</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="url"
                               placeholder="https://turo.com/..."
-                              className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                              className="bg-card border-border text-foreground focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3582,13 +3582,13 @@ export default function CarDetailPage() {
                         name="adminTuroLink"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-400">Admin Turo Link</FormLabel>
+                            <FormLabel className="text-muted-foreground">Admin Turo Link</FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
                                 type="url"
                                 placeholder="https://turo.com/..."
-                                className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                                className="bg-card border-border text-foreground focus:border-primary"
                               />
                             </FormControl>
                             <FormMessage />
@@ -3598,13 +3598,13 @@ export default function CarDetailPage() {
                     )}
                     {isAdmin && (
                       <div className="space-y-2">
-                        <FormLabel className="text-gray-400">Turo Vehicle IDs (5–10 for automation)</FormLabel>
-                        <p className="text-xs text-gray-500">Add up to 10 Turo Vehicle IDs for the automation process.</p>
+                        <FormLabel className="text-muted-foreground">Turo Vehicle IDs (5–10 for automation)</FormLabel>
+                        <p className="text-xs text-foreground0">Add up to 10 Turo Vehicle IDs for the automation process.</p>
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="border-[#2a2a2a] text-gray-400 hover:text-[#EAEB80] hover:border-[#EAEB80] mb-2"
+                          className="border-border text-muted-foreground hover:text-primary hover:border-primary mb-2"
                           onClick={() => {
                             const turoLink = form.getValues("turoLink");
                             const adminTuroLink = form.getValues("adminTuroLink");
@@ -3630,7 +3630,7 @@ export default function CarDetailPage() {
                                     <Input
                                       {...field}
                                       placeholder={`Vehicle ID ${index + 1}`}
-                                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] font-mono"
+                                      className="bg-card border-border text-foreground focus:border-primary font-mono"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -3641,7 +3641,7 @@ export default function CarDetailPage() {
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="text-gray-400 hover:text-red-400 shrink-0"
+                              className="text-muted-foreground hover:text-red-700 shrink-0"
                               onClick={() => {
                                 const current = form.getValues("turoVehicleIds") || [];
                                 form.setValue("turoVehicleIds", current.filter((_, i) => i !== index));
@@ -3656,7 +3656,7 @@ export default function CarDetailPage() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="border-[#2a2a2a] text-gray-400 hover:text-[#EAEB80] hover:border-[#EAEB80]"
+                            className="border-border text-muted-foreground hover:text-primary hover:border-primary"
                             onClick={() => {
                               const current = form.getValues("turoVehicleIds") || [];
                               form.setValue("turoVehicleIds", [...current, ""]);
@@ -3674,7 +3674,7 @@ export default function CarDetailPage() {
                 {/* Car Status Section (Admin Only) */}
                 {isAdmin && (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                    <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                       Car Status
                     </h3>
                     <FormField
@@ -3682,7 +3682,7 @@ export default function CarDetailPage() {
                       name="status"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Car Status</FormLabel>
+                          <FormLabel className="text-muted-foreground">Car Status</FormLabel>
                           <FormControl>
                             <Select
                               value={field.value || "ACTIVE"}
@@ -3706,17 +3706,17 @@ export default function CarDetailPage() {
                               }}
                               disabled={!isAdmin}
                             >
-                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                                 <SelectValue placeholder="Select car status" />
                               </SelectTrigger>
-                              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              <SelectContent className="bg-card border-border text-foreground">
                                 <SelectItem value="ACTIVE">Active</SelectItem>
                                 <SelectItem value="INACTIVE">Inactive</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormControl>
                           <FormMessage />
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-foreground0">
                             Only admins can change car status. When set to Inactive, offboarding status will be automatically updated to Offboarded. When set to Active, offboarding status will be automatically updated to Active.
                           </p>
                         </FormItem>
@@ -3728,7 +3728,7 @@ export default function CarDetailPage() {
                 {/* Management Status Section (Admin Only) */}
                 {isAdmin && (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                    <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                       Management Status
                     </h3>
                     <FormField
@@ -3736,17 +3736,17 @@ export default function CarDetailPage() {
                       name="managementStatus"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Management Status</FormLabel>
+                          <FormLabel className="text-muted-foreground">Management Status</FormLabel>
                           <FormControl>
                             <Select
                               value={field.value || "own"}
                               onValueChange={field.onChange}
                               disabled={!isAdmin}
                             >
-                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                                 <SelectValue placeholder="Select management status" />
                               </SelectTrigger>
-                              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                              <SelectContent className="bg-card border-border text-foreground">
                                 <SelectItem value="management">Management</SelectItem>
                                 <SelectItem value="own">Own</SelectItem>
                                 <SelectItem value="off_ride">Off Ride</SelectItem>
@@ -3754,7 +3754,7 @@ export default function CarDetailPage() {
                             </Select>
                           </FormControl>
                           <FormMessage />
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-foreground0">
                             Only admins can change management status. Automatic updates occur on onboarding approval, offboarding, and maintenance events.
                           </p>
                         </FormItem>
@@ -3765,7 +3765,7 @@ export default function CarDetailPage() {
 
                 {/* Documents Section */}
                 <div className="space-y-6">
-                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+                  <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                     Documents
                   </h3>
                   
@@ -3775,14 +3775,14 @@ export default function CarDetailPage() {
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <div className="h-1 w-1 rounded-full bg-[#EAEB80]"></div>
-                        <Label className="text-gray-300 text-base font-semibold">Insurance Card</Label>
+                        <Label className="text-muted-foreground text-base font-semibold">Insurance Card</Label>
                       </div>
                       
                       {/* Current Insurance Card Preview */}
                       {onboarding?.insuranceCardUrl && !insuranceCardFile && (
                         <div className="space-y-2">
-                          <p className="text-xs text-gray-500 font-medium">Current Document</p>
-                          <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-[#2a2a2a] overflow-hidden shadow-lg hover:border-[#EAEB80]/30 transition-all">
+                          <p className="text-xs text-foreground0 font-medium">Current Document</p>
+                          <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg hover:border-primary/30 transition-all">
                             {(() => {
                               const trimmedUrl = String(onboarding.insuranceCardUrl).trim();
                               // Check if it's a Google Drive file ID
@@ -3804,13 +3804,13 @@ export default function CarDetailPage() {
                               return isPdf ? (
                                 <div className="w-full h-full flex flex-col items-center justify-center p-4">
                                   <div className="relative">
-                                    <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
-                                    <div className="absolute -top-1 -right-1 bg-[#EAEB80]/20 text-[#EAEB80] text-xs px-2 py-0.5 rounded-full font-bold">
+                                    <FileText className="w-16 h-16 text-primary mb-2" />
+                                    <div className="absolute -top-1 -right-1 bg-[#EAEB80]/20 text-primary text-xs px-2 py-0.5 rounded-full font-bold">
                                       PDF
                                     </div>
                                   </div>
-                                  <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
-                                  <p className="text-gray-400 text-xs mt-1 truncate max-w-full px-2">{isGoogleDriveId ? 'Google Drive File' : onboarding.insuranceCardUrl.split("/").pop()}</p>
+                                  <p className="text-primary text-sm font-semibold">PDF Document</p>
+                                  <p className="text-muted-foreground text-xs mt-1 truncate max-w-full px-2">{isGoogleDriveId ? 'Google Drive File' : onboarding.insuranceCardUrl.split("/").pop()}</p>
                                 </div>
                               ) : (
                                 <img
@@ -3827,18 +3827,18 @@ export default function CarDetailPage() {
                       {/* New Insurance Card Preview */}
                       {insuranceCardFile && (
                         <div className="space-y-2">
-                          <p className="text-xs text-[#EAEB80] font-semibold">New Document Selected</p>
-                          <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#EAEB80]/10 to-[#EAEB80]/5 rounded-xl border-2 border-[#EAEB80]/60 overflow-hidden shadow-lg ring-2 ring-[#EAEB80]/20">
+                          <p className="text-xs text-primary font-semibold">New Document Selected</p>
+                          <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#EAEB80]/10 to-[#EAEB80]/5 rounded-xl border-2 border-primary/60 overflow-hidden shadow-lg ring-2 ring-[#EAEB80]/20">
                             {insuranceCardFile.type === 'application/pdf' ? (
                               <div className="w-full h-full flex flex-col items-center justify-center p-4">
                                 <div className="relative">
-                                  <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
-                                  <div className="absolute -top-1 -right-1 bg-[#EAEB80] text-black text-xs px-2 py-0.5 rounded-full font-bold">
+                                  <FileText className="w-16 h-16 text-primary mb-2" />
+                                  <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full font-bold">
                                     PDF
                                   </div>
                                 </div>
-                                <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
-                                <p className="text-gray-300 text-xs mt-1 truncate max-w-full px-2">{insuranceCardFile.name}</p>
+                                <p className="text-primary text-sm font-semibold">PDF Document</p>
+                                <p className="text-muted-foreground text-xs mt-1 truncate max-w-full px-2">{insuranceCardFile.name}</p>
                               </div>
                             ) : insuranceCardPreview ? (
                               <div className="relative w-full h-full">
@@ -3852,7 +3852,7 @@ export default function CarDetailPage() {
                                   variant="ghost"
                                   size="icon"
                                   onClick={handleRemoveInsuranceCard}
-                                  className="absolute top-2 right-2 h-8 w-8 bg-red-600/90 hover:bg-red-600 text-white rounded-full shadow-lg hover:scale-110 transition-transform"
+                                  className="absolute top-2 right-2 h-8 w-8 bg-red-500/20 text-red-700 border-red-500/50/90 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground rounded-full shadow-lg hover:scale-110 transition-transform"
                                 >
                                   <X className="w-4 h-4" />
                                 </Button>
@@ -3866,14 +3866,14 @@ export default function CarDetailPage() {
                       <div className="relative">
                         <label
                           htmlFor="insurance-card-input"
-                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#EAEB80]/40 rounded-xl bg-[#0a0a0a]/50 hover:border-[#EAEB80]/60 hover:bg-[#EAEB80]/5 transition-all cursor-pointer group"
+                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
                         >
                           <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <Upload className="w-8 h-8 text-[#EAEB80] mb-2 group-hover:scale-110 transition-transform" />
-                            <p className="mb-2 text-sm font-semibold text-gray-300 group-hover:text-[#EAEB80] transition-colors">
+                            <Upload className="w-8 h-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                            <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors">
                               {insuranceCardFile ? "Change File" : "Click to Upload"}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-foreground0">
                               Image or PDF (Max 10MB)
                             </p>
                           </div>
@@ -3886,7 +3886,7 @@ export default function CarDetailPage() {
                           />
                         </label>
                         {insuranceCardFile && (
-                          <p className="text-xs text-[#EAEB80] mt-2 text-center font-medium">
+                          <p className="text-xs text-primary mt-2 text-center font-medium">
                             ✓ Ready to update
                           </p>
                         )}
@@ -3897,16 +3897,16 @@ export default function CarDetailPage() {
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <div className="h-1 w-1 rounded-full bg-[#EAEB80]"></div>
-                        <Label className="text-gray-300 text-base font-semibold">Drivers License</Label>
+                        <Label className="text-muted-foreground text-base font-semibold">Drivers License</Label>
                       </div>
                       
                       {/* Current Drivers License Previews */}
                       {onboarding?.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 && driversLicenseFiles.length === 0 && (
                         <div className="space-y-2">
-                          <p className="text-xs text-gray-500 font-medium">Current Documents ({onboarding.driversLicenseUrls.length})</p>
+                          <p className="text-xs text-foreground0 font-medium">Current Documents ({onboarding.driversLicenseUrls.length})</p>
                           {onboarding.driversLicenseUrls.length === 1 ? (
                             // Single document - full width to match Insurance Card
-                            <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-[#2a2a2a] overflow-hidden shadow-lg hover:border-[#EAEB80]/30 transition-all">
+                            <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg hover:border-primary/30 transition-all">
                               {(() => {
                                 const url = onboarding.driversLicenseUrls[0];
                                 // Check if it's a Google Drive file ID
@@ -3926,13 +3926,13 @@ export default function CarDetailPage() {
                                 return isPdf ? (
                                   <div className="w-full h-full flex flex-col items-center justify-center p-4">
                                     <div className="relative">
-                                      <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
-                                      <div className="absolute -top-1 -right-1 bg-[#EAEB80]/20 text-[#EAEB80] text-xs px-2 py-0.5 rounded-full font-bold">
+                                      <FileText className="w-16 h-16 text-primary mb-2" />
+                                      <div className="absolute -top-1 -right-1 bg-[#EAEB80]/20 text-primary text-xs px-2 py-0.5 rounded-full font-bold">
                                         PDF
                                       </div>
                                     </div>
-                                    <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
-                                    <p className="text-gray-400 text-xs mt-1 truncate max-w-full px-2">{isGoogleDriveId ? 'Google Drive File' : url.split("/").pop()}</p>
+                                    <p className="text-primary text-sm font-semibold">PDF Document</p>
+                                    <p className="text-muted-foreground text-xs mt-1 truncate max-w-full px-2">{isGoogleDriveId ? 'Google Drive File' : url.split("/").pop()}</p>
                                   </div>
                                 ) : (
                                   <img
@@ -3962,16 +3962,16 @@ export default function CarDetailPage() {
                                   : isPdfDocument(url);
                                 
                                 return (
-                                <div key={index} className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-[#2a2a2a] overflow-hidden shadow-lg hover:border-[#EAEB80]/30 transition-all">
+                                <div key={index} className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg hover:border-primary/30 transition-all">
                                   {isPdf ? (
                                     <div className="w-full h-full flex flex-col items-center justify-center p-2">
                                       <div className="relative">
-                                        <FileText className="w-12 h-12 text-[#EAEB80] mb-1" />
-                                        <div className="absolute -top-1 -right-1 bg-[#EAEB80]/20 text-[#EAEB80] text-xs px-1.5 py-0.5 rounded-full font-bold">
+                                        <FileText className="w-12 h-12 text-primary mb-1" />
+                                        <div className="absolute -top-1 -right-1 bg-[#EAEB80]/20 text-primary text-xs px-1.5 py-0.5 rounded-full font-bold">
                                           PDF
                                         </div>
                                       </div>
-                                      <p className="text-[#EAEB80] text-xs font-semibold">PDF</p>
+                                      <p className="text-primary text-xs font-semibold">PDF</p>
                                     </div>
                                   ) : (
                                       <img
@@ -3980,7 +3980,7 @@ export default function CarDetailPage() {
                                         className="w-full h-full object-contain p-1"
                                       />
                                     )}
-                                    <div className="absolute top-1 left-1 bg-black/90 text-[#EAEB80] text-xs px-1.5 py-0.5 rounded font-semibold shadow-lg">
+                                    <div className="absolute top-1 left-1 bg-background/90 text-primary text-xs px-1.5 py-0.5 rounded font-semibold shadow-lg">
                                       {index + 1}
                                     </div>
                                   </div>
@@ -3994,20 +3994,20 @@ export default function CarDetailPage() {
                       {/* New Drivers License Previews */}
                       {driversLicenseFiles.length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-xs text-[#EAEB80] font-semibold">New Documents Selected ({driversLicenseFiles.length})</p>
+                          <p className="text-xs text-primary font-semibold">New Documents Selected ({driversLicenseFiles.length})</p>
                           {driversLicenseFiles.length === 1 ? (
                             // Single file - full width to match Insurance Card
-                            <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#EAEB80]/10 to-[#EAEB80]/5 rounded-xl border-2 border-[#EAEB80]/60 overflow-hidden shadow-lg ring-2 ring-[#EAEB80]/20">
+                            <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#EAEB80]/10 to-[#EAEB80]/5 rounded-xl border-2 border-primary/60 overflow-hidden shadow-lg ring-2 ring-[#EAEB80]/20">
                               {driversLicenseFiles[0].type === 'application/pdf' ? (
                                 <div className="w-full h-full flex flex-col items-center justify-center p-4">
                                   <div className="relative">
-                                    <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
-                                    <div className="absolute -top-1 -right-1 bg-[#EAEB80] text-black text-xs px-2 py-0.5 rounded-full font-bold">
+                                    <FileText className="w-16 h-16 text-primary mb-2" />
+                                    <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full font-bold">
                                       PDF
                                     </div>
                                   </div>
-                                  <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
-                                  <p className="text-gray-300 text-xs mt-1 truncate max-w-full px-2">{driversLicenseFiles[0].name}</p>
+                                  <p className="text-primary text-sm font-semibold">PDF Document</p>
+                                  <p className="text-muted-foreground text-xs mt-1 truncate max-w-full px-2">{driversLicenseFiles[0].name}</p>
                                 </div>
                               ) : driversLicensePreviews[0] && driversLicensePreviews[0] !== 'pdf' ? (
                                 <div className="relative w-full h-full">
@@ -4021,14 +4021,14 @@ export default function CarDetailPage() {
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => handleRemoveDriversLicense(0)}
-                                    className="absolute top-2 right-2 h-8 w-8 bg-red-600/90 hover:bg-red-600 text-white rounded-full shadow-lg hover:scale-110 transition-transform"
+                                    className="absolute top-2 right-2 h-8 w-8 bg-red-500/20 text-red-700 border-red-500/50/90 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground rounded-full shadow-lg hover:scale-110 transition-transform"
                                   >
                                     <X className="w-4 h-4" />
                                   </Button>
                                 </div>
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">
-                                  <p className="text-xs text-gray-500">Loading...</p>
+                                  <p className="text-xs text-foreground0">Loading...</p>
                                 </div>
                               )}
                             </div>
@@ -4036,17 +4036,17 @@ export default function CarDetailPage() {
                             // Multiple files - grid layout
                             <div className="grid grid-cols-2 gap-3">
                               {driversLicenseFiles.map((file, index) => (
-                              <div key={index} className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#EAEB80]/10 to-[#EAEB80]/5 rounded-xl border-2 border-[#EAEB80]/60 overflow-hidden shadow-lg ring-2 ring-[#EAEB80]/20">
+                              <div key={index} className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#EAEB80]/10 to-[#EAEB80]/5 rounded-xl border-2 border-primary/60 overflow-hidden shadow-lg ring-2 ring-[#EAEB80]/20">
                                 {file.type === 'application/pdf' ? (
                                   <div className="w-full h-full flex flex-col items-center justify-center p-2">
                                     <div className="relative">
-                                      <FileText className="w-12 h-12 text-[#EAEB80] mb-1" />
-                                      <div className="absolute -top-1 -right-1 bg-[#EAEB80] text-black text-xs px-1.5 py-0.5 rounded-full font-bold">
+                                      <FileText className="w-12 h-12 text-primary mb-1" />
+                                      <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full font-bold">
                                         PDF
                                       </div>
                                     </div>
-                                    <p className="text-[#EAEB80] text-xs font-semibold">PDF</p>
-                                    <p className="text-gray-300 text-xs truncate w-full px-1">{file.name}</p>
+                                    <p className="text-primary text-xs font-semibold">PDF</p>
+                                    <p className="text-muted-foreground text-xs truncate w-full px-1">{file.name}</p>
                                   </div>
                                 ) : driversLicensePreviews[index] && driversLicensePreviews[index] !== 'pdf' ? (
                                     <div className="relative w-full h-full">
@@ -4060,17 +4060,17 @@ export default function CarDetailPage() {
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => handleRemoveDriversLicense(index)}
-                                        className="absolute top-1 right-1 h-6 w-6 bg-red-600/90 hover:bg-red-600 text-white rounded-full shadow-lg hover:scale-110 transition-transform"
+                                        className="absolute top-1 right-1 h-6 w-6 bg-red-500/20 text-red-700 border-red-500/50/90 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground rounded-full shadow-lg hover:scale-110 transition-transform"
                                       >
                                         <X className="w-3 h-3" />
                                       </Button>
                                     </div>
                                   ) : (
                                     <div className="w-full h-full flex items-center justify-center">
-                                      <p className="text-xs text-gray-500">Loading...</p>
+                                      <p className="text-xs text-foreground0">Loading...</p>
                                     </div>
                                   )}
-                                  <div className="absolute top-1 left-1 bg-[#EAEB80] text-black text-xs px-1.5 py-0.5 rounded font-bold shadow-lg">
+                                  <div className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded font-bold shadow-lg">
                                     {index + 1}
                                   </div>
                                 </div>
@@ -4084,14 +4084,14 @@ export default function CarDetailPage() {
                       <div className="relative">
                         <label
                           htmlFor="drivers-license-input"
-                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#EAEB80]/40 rounded-xl bg-[#0a0a0a]/50 hover:border-[#EAEB80]/60 hover:bg-[#EAEB80]/5 transition-all cursor-pointer group"
+                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
                         >
                           <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <Upload className="w-8 h-8 text-[#EAEB80] mb-2 group-hover:scale-110 transition-transform" />
-                            <p className="mb-2 text-sm font-semibold text-gray-300 group-hover:text-[#EAEB80] transition-colors">
+                            <Upload className="w-8 h-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                            <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors">
                               {driversLicenseFiles.length > 0 ? `Change Files (${driversLicenseFiles.length} selected)` : "Click to Upload"}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-foreground0">
                               Multiple files allowed (Max 10MB each)
                             </p>
                           </div>
@@ -4105,7 +4105,7 @@ export default function CarDetailPage() {
                           />
                         </label>
                         {driversLicenseFiles.length > 0 && (
-                          <p className="text-xs text-[#EAEB80] mt-2 text-center font-medium">
+                          <p className="text-xs text-primary mt-2 text-center font-medium">
                             ✓ {driversLicenseFiles.length} file(s) ready to update
                           </p>
                         )}
@@ -4114,18 +4114,18 @@ export default function CarDetailPage() {
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
+                <div className="flex justify-end gap-3 pt-4 border-t border-border">
                   <Button
                     type="button"
                     variant="ghost"
                     onClick={() => setIsEditModalOpen(false)}
-                    className="text-gray-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                     disabled={updateMutation.isPending}
                   >
                     {updateMutation.isPending ? "Updating..." : "Update"}
@@ -4140,7 +4140,7 @@ export default function CarDetailPage() {
         {/* Full Screen Image Viewer */}
         {fullScreenImageIndex !== null && car?.photos && car.photos[fullScreenImageIndex] && (
           <div 
-            className="fixed inset-0 z-[100] bg-black/98 flex items-center justify-center"
+            className="fixed inset-0 z-[100] bg-background/98 flex items-center justify-center"
             onClick={() => setFullScreenImageIndex(null)}
           >
             {/* Close Button - Top Right */}
@@ -4151,7 +4151,7 @@ export default function CarDetailPage() {
                 e.stopPropagation();
                 setFullScreenImageIndex(null);
               }}
-              className="fixed top-6 right-6 z-[200] h-12 w-12 bg-black/90 hover:bg-red-600/90 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+              className="fixed top-6 right-6 z-[200] h-12 w-12 bg-background/90 hover:bg-red-500/20 text-red-700 border-red-500/50/90 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
               aria-label="Close full screen view"
             >
               <X className="w-7 h-7" />
@@ -4161,8 +4161,8 @@ export default function CarDetailPage() {
 
               {/* Image Counter - Bottom Center */}
               {car.photos.length > 1 && (
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
-                  <span className="text-white text-base font-semibold tracking-wide">
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-background/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
+                  <span className="text-foreground text-base font-semibold tracking-wide">
                     {fullScreenImageIndex + 1} / {car.photos.length}
                   </span>
                 </div>
@@ -4192,7 +4192,7 @@ export default function CarDetailPage() {
         {/* Full Screen Document Viewer Dialog */}
         {fullScreenDocument && (
           <div 
-            className="fixed inset-0 z-[100] bg-black/98 flex items-center justify-center"
+            className="fixed inset-0 z-[100] bg-background/98 flex items-center justify-center"
             onClick={() => setFullScreenDocument(null)}
           >
             {/* Close Button - Top Right Corner */}
@@ -4203,7 +4203,7 @@ export default function CarDetailPage() {
                 e.stopPropagation();
                 setFullScreenDocument(null);
               }}
-              className="fixed top-4 right-4 z-[9999] h-14 w-14 bg-red-600/90 hover:bg-red-600 text-white border-2 border-white rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110 flex items-center justify-center"
+              className="fixed top-4 right-4 z-[9999] h-14 w-14 bg-red-500/20 text-red-700 border-red-500/50/90 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground border-2 border-white rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110 flex items-center justify-center"
               aria-label="Close full screen view"
               style={{
                 position: 'fixed',
@@ -4220,8 +4220,8 @@ export default function CarDetailPage() {
               {fullScreenDocument.type === 'license' && 
                validDriversLicenseUrls.length > 1 && 
                fullScreenDocument.index !== undefined && (
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
-                  <span className="text-white text-base font-semibold tracking-wide">
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-background/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
+                  <span className="text-foreground text-base font-semibold tracking-wide">
                     {fullScreenDocument.index + 1} / {validDriversLicenseUrls.length}
                   </span>
                 </div>
@@ -4260,7 +4260,7 @@ export default function CarDetailPage() {
                             : isPdfDocument(prevUrl)
                         });
                       }}
-                      className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+                      className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90 hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
                       aria-label="Previous image"
                     >
                       <ChevronLeft className="w-6 h-6" />
@@ -4295,7 +4295,7 @@ export default function CarDetailPage() {
                             : isPdfDocument(nextUrl)
                         });
                       }}
-                      className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+                      className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90 hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
                       aria-label="Next image"
                     >
                       <ChevronRight className="w-6 h-6" />

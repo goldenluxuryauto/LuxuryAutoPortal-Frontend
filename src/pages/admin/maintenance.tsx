@@ -100,10 +100,10 @@ export default function MaintenancePage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-400">Failed to load car details</p>
+          <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-[#EAEB80] hover:underline"
+            className="mt-4 text-primary hover:underline"
           >
             ← Back to View Car
           </button>
@@ -132,22 +132,22 @@ export default function MaintenancePage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
           </button>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white">Car Maintenance</h1>
+              <h1 className="text-2xl font-bold text-foreground">Car Maintenance</h1>
               {car && (
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Car: {car.makeModel || "Unknown Car"}
                 </p>
               )}
             </div>
             {!isClient && (
-              <Button className="bg-[#EAEB80] text-black hover:bg-[#d4d570]">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/80">
                 <Plus className="w-4 h-4 mr-2" />
                 Add
               </Button>
@@ -156,74 +156,74 @@ export default function MaintenancePage() {
         </div>
 
         {/* Header Section */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <div className="bg-card border border-border rounded-lg p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Car Information</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">Car Name:</span>
-                  <p className="text-sm text-gray-300">{carName}</p>
+                  <span className="text-xs text-foreground0">Car Name:</span>
+                  <p className="text-sm text-muted-foreground">{carName}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">VIN #:</span>
-                  <p className="text-sm text-gray-300">{car.vin || "N/A"}</p>
+                  <span className="text-xs text-foreground0">VIN #:</span>
+                  <p className="text-sm text-muted-foreground">{car.vin || "N/A"}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">License:</span>
-                  <p className="text-sm text-gray-300">{car.licensePlate || "N/A"}</p>
+                  <span className="text-xs text-foreground0">License:</span>
+                  <p className="text-sm text-muted-foreground">{car.licensePlate || "N/A"}</p>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Owner Information</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Owner Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">Name:</span>
+                  <span className="text-xs text-foreground0">Name:</span>
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-sm cursor-pointer"
+                      className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-sm cursor-pointer"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                    <p className="text-sm text-gray-300">{ownerName}</p>
+                    <p className="text-sm text-muted-foreground">{ownerName}</p>
                   )}
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Contact #:</span>
-                  <p className="text-sm text-gray-300">{ownerContact}</p>
+                  <span className="text-xs text-foreground0">Contact #:</span>
+                  <p className="text-sm text-muted-foreground">{ownerContact}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Email:</span>
-                  <p className="text-sm text-gray-300">{ownerEmail}</p>
+                  <span className="text-xs text-foreground0">Email:</span>
+                  <p className="text-sm text-muted-foreground">{ownerEmail}</p>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications & Turo Links */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Car Specifications</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Specifications</h3>
               <div className="space-y-2 mb-4">
                 <div>
-                  <span className="text-xs text-gray-500">Fuel/Gas:</span>
-                  <p className="text-sm text-gray-300">{fuelType}</p>
+                  <span className="text-xs text-foreground0">Fuel/Gas:</span>
+                  <p className="text-sm text-muted-foreground">{fuelType}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Tire Size:</span>
-                  <p className="text-sm text-gray-300">{tireSize}</p>
+                  <span className="text-xs text-foreground0">Tire Size:</span>
+                  <p className="text-sm text-muted-foreground">{tireSize}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Oil Type:</span>
-                  <p className="text-sm text-gray-300">{oilType}</p>
+                  <span className="text-xs text-foreground0">Oil Type:</span>
+                  <p className="text-sm text-muted-foreground">{oilType}</p>
                 </div>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-3">Turo Links</h3>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Turo Links</h3>
                 <div className="space-y-2">
                   {car.turoLink && (
                     <div>
@@ -231,7 +231,7 @@ export default function MaintenancePage() {
                         href={car.turoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                        className="text-primary hover:underline text-sm flex items-center gap-1"
                       >
                         Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -244,7 +244,7 @@ export default function MaintenancePage() {
                         href={car.adminTuroLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                        className="text-primary hover:underline text-sm flex items-center gap-1"
                       >
                         Admin Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -252,7 +252,7 @@ export default function MaintenancePage() {
                     </div>
                   )}
                   {!car.turoLink && !car.adminTuroLink && (
-                    <span className="text-gray-500 text-sm">No Turo links available</span>
+                    <span className="text-foreground0 text-sm">No Turo links available</span>
                   )}
                 </div>
               </div>
@@ -262,18 +262,18 @@ export default function MaintenancePage() {
 
         {/* Maintenance Section */}
         <div className="mb-6">
-          <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-6">Maintenance</h1>
+          <h1 className="text-3xl font-serif text-primary italic mb-6">Maintenance</h1>
           
           {/* Filtering and Search Section */}
-          <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+          <div className="bg-card border border-border rounded-lg p-6 mb-6">
             <div className="flex flex-col md:flex-row gap-4 items-start md:items-end">
               <div className="flex-1">
-                <Label className="text-sm text-gray-400 mb-2 block">Select a Type</Label>
+                <Label className="text-sm text-muted-foreground mb-2 block">Select a Type</Label>
                 <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                  <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                  <SelectContent className="bg-card border-border text-foreground">
                     <SelectItem value="all">All</SelectItem>
                     <SelectItem value="oil-change">Oil Change</SelectItem>
                     <SelectItem value="tire-rotation">Tire Rotation</SelectItem>
@@ -284,12 +284,12 @@ export default function MaintenancePage() {
               </div>
               
               <div className="flex-1">
-                <Label className="text-sm text-gray-400 mb-2 block">Status</Label>
+                <Label className="text-sm text-muted-foreground mb-2 block">Status</Label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                  <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                  <SelectContent className="bg-card border-border text-foreground">
                     <SelectItem value="all">All</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
@@ -299,13 +299,13 @@ export default function MaintenancePage() {
               </div>
               
               <div className="flex-1">
-                <Label className="text-sm text-gray-400 mb-2 block">Date to Filter</Label>
+                <Label className="text-sm text-muted-foreground mb-2 block">Date to Filter</Label>
                 <div className="flex items-center gap-2">
                   <Select value={dateFilter} onValueChange={setDateFilter}>
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                    <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="none">None</SelectItem>
                       <SelectItem value="this-month">This Month</SelectItem>
                       <SelectItem value="last-month">Last Month</SelectItem>
@@ -313,20 +313,20 @@ export default function MaintenancePage() {
                       <SelectItem value="last-year">Last Year</SelectItem>
                     </SelectContent>
                   </Select>
-                  <span className="text-sm text-gray-400">≡ {maintenanceRecords.length}</span>
+                  <span className="text-sm text-muted-foreground">≡ {maintenanceRecords.length}</span>
                 </div>
               </div>
               
               <div className="flex-1">
-                <Label className="text-sm text-gray-400 mb-2 block">Search</Label>
+                <Label className="text-sm text-muted-foreground mb-2 block">Search</Label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Q Search here.."
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white pl-10 focus:border-[#EAEB80]"
+                    className="bg-card border-border text-foreground pl-10 focus:border-primary"
                   />
                 </div>
               </div>
@@ -334,19 +334,19 @@ export default function MaintenancePage() {
           </div>
 
           {/* Maintenance Records Table */}
-          <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden">
+          <div className="bg-card border border-border rounded-lg overflow-hidden">
             <div className="w-full overflow-x-auto">
               <table className="border-collapse w-full" style={{ minWidth: '1000px' }}>
-                <thead className="bg-[#1a1a1a]">
-                  <tr className="border-b border-[#2a2a2a]">
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-300">#</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-300">Maintenance Type</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-300">Status</th>
-                    <th className="text-right px-4 py-3 text-sm font-medium text-gray-300">Oil Miles</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-300">Schedule Date</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-300">Date Completed</th>
-                    <th className="text-right px-4 py-3 text-sm font-medium text-gray-300">Price</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-300">Remarks</th>
+                <thead className="bg-card">
+                  <tr className="border-b border-border">
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">#</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Maintenance Type</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Status</th>
+                    <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Oil Miles</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Schedule Date</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Date Completed</th>
+                    <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Price</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Remarks</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -355,7 +355,7 @@ export default function MaintenancePage() {
                       <td colSpan={8} className="py-12 text-center">
                         <div className="flex flex-col items-center justify-center gap-3">
                           <Folder className="w-12 h-12 text-gray-600" />
-                          <span className="text-gray-500 text-sm">No data</span>
+                          <span className="text-foreground0 text-sm">No data</span>
                         </div>
                       </td>
                     </tr>
@@ -363,16 +363,16 @@ export default function MaintenancePage() {
                     maintenanceRecords.map((record, index) => (
                       <tr
                         key={index}
-                        className="border-b border-[#2a2a2a] hover:bg-[#151515] transition-colors"
+                        className="border-b border-border hover:bg-muted/50151515] transition-colors"
                       >
-                        <td className="px-4 py-3 text-sm text-gray-300">{index + 1}</td>
-                        <td className="px-4 py-3 text-sm text-gray-300">{record.type}</td>
-                        <td className="px-4 py-3 text-sm text-gray-300">{record.status}</td>
-                        <td className="px-4 py-3 text-sm text-gray-300 text-right">{record.oilMiles?.toLocaleString() || "N/A"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-300">{record.scheduleDate || "N/A"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-300">{record.dateCompleted || "N/A"}</td>
-                        <td className="px-4 py-3 text-sm text-gray-300 text-right">{formatCurrency(record.price || 0)}</td>
-                        <td className="px-4 py-3 text-sm text-gray-300">{record.remarks || "N/A"}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">{index + 1}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">{record.type}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">{record.status}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground text-right">{record.oilMiles?.toLocaleString() || "N/A"}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">{record.scheduleDate || "N/A"}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">{record.dateCompleted || "N/A"}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground text-right">{formatCurrency(record.price || 0)}</td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">{record.remarks || "N/A"}</td>
                       </tr>
                     ))
                   )}

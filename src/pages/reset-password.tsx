@@ -140,21 +140,21 @@ export default function ResetPasswordPage() {
   // If we have a token, show reset form; otherwise show request form
   if (token) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-[#111111] border-[#EAEB80]/20">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-card border-primary/20">
           <CardHeader>
-            <CardTitle className="text-[#EAEB80] flex items-center gap-2">
+            <CardTitle className="text-primary flex items-center gap-2">
               <Lock className="w-5 h-5" />
               Reset Your Password
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-muted-foreground">
               Enter your new password below
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="new-password" className="text-gray-300">
+                <Label htmlFor="new-password" className="text-muted-foreground">
                   New Password *
                 </Label>
                 <div className="relative">
@@ -163,14 +163,14 @@ export default function ResetPasswordPage() {
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="bg-[#0a0a0a] border-[#2a2a2a] text-white focus:border-[#EAEB80] pr-10"
+                    className="bg-background border-border text-foreground focus:border-primary pr-10"
                     placeholder="Enter your new password (min 8 characters)"
                     required
                     minLength={8}
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                   >
                     {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -179,7 +179,7 @@ export default function ResetPasswordPage() {
                 {newPassword.length > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-[#2a2a2a] rounded-full h-2">
+                      <div className="flex-1 bg-muted rounded-full h-2">
                         <div
                           className={`h-2 rounded-full transition-all ${getPasswordStrengthColor(
                             passwordStrength.score
@@ -187,7 +187,7 @@ export default function ResetPasswordPage() {
                           style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
                         />
                       </div>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-muted-foreground">
                         {getPasswordStrengthLabel(passwordStrength.score)}
                       </span>
                     </div>
@@ -197,7 +197,7 @@ export default function ResetPasswordPage() {
                           <div
                             key={idx}
                             className={`${
-                              passwordStrength.isValid ? "text-green-400" : "text-yellow-400"
+                              passwordStrength.isValid ? "text-green-700" : "text-yellow-700"
                             }`}
                           >
                             {feedback}
@@ -210,7 +210,7 @@ export default function ResetPasswordPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirm-password" className="text-gray-300">
+                <Label htmlFor="confirm-password" className="text-muted-foreground">
                   Confirm New Password *
                 </Label>
                 <div className="relative">
@@ -219,13 +219,13 @@ export default function ResetPasswordPage() {
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="bg-[#0a0a0a] border-[#2a2a2a] text-white focus:border-[#EAEB80] pr-10"
+                    className="bg-background border-border text-foreground focus:border-primary pr-10"
                     placeholder="Confirm your new password"
                     required
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -234,9 +234,9 @@ export default function ResetPasswordPage() {
                 {confirmPassword.length > 0 && (
                   <div className="text-xs">
                     {passwordsMatch ? (
-                      <span className="text-green-400">✓ Passwords match</span>
+                      <span className="text-green-700">✓ Passwords match</span>
                     ) : (
-                      <span className="text-red-400">✗ Passwords do not match</span>
+                      <span className="text-red-700">✗ Passwords do not match</span>
                     )}
                   </div>
                 )}
@@ -245,7 +245,7 @@ export default function ResetPasswordPage() {
               <Button
                 type="submit"
                 disabled={!canResetPassword}
-                className="w-full bg-[#EAEB80] text-black hover:bg-[#d4d570] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {resetPasswordMutation.isPending ? (
                   <>
@@ -263,7 +263,7 @@ export default function ResetPasswordPage() {
               <div className="text-center">
                 <a
                   href="/admin/login"
-                  className="text-sm text-[#EAEB80] hover:underline"
+                  className="text-sm text-primary hover:underline"
                 >
                   Back to Login
                 </a>
@@ -277,27 +277,27 @@ export default function ResetPasswordPage() {
 
   // Request password reset form
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-[#111111] border-[#EAEB80]/20">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-card border-primary/20">
         <CardHeader>
-          <CardTitle className="text-[#EAEB80] flex items-center gap-2">
+          <CardTitle className="text-primary flex items-center gap-2">
             <Mail className="w-5 h-5" />
             Reset Password
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-muted-foreground">
             Enter your email address and we'll send you a link to reset your password
           </CardDescription>
         </CardHeader>
         <CardContent>
           {resetRequestSent ? (
             <div className="space-y-4 text-center">
-              <CheckCircle className="w-16 h-16 text-green-400 mx-auto" />
+              <CheckCircle className="w-16 h-16 text-green-700 mx-auto" />
               <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Check Your Email</h3>
-                <p className="text-gray-400">
+                <h3 className="text-lg font-semibold text-foreground">Check Your Email</h3>
+                <p className="text-muted-foreground">
                   If an account exists with <strong>{email}</strong>, we've sent a password reset link.
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-foreground0">
                   The link will expire in 1 hour.
                 </p>
               </div>
@@ -307,14 +307,14 @@ export default function ResetPasswordPage() {
                   setEmail("");
                 }}
                 variant="outline"
-                className="w-full border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                className="w-full border-primary/30 text-primary hover:bg-primary/10"
               >
                 Send Another Email
               </Button>
               <div className="text-center">
                 <a
                   href="/admin/login"
-                  className="text-sm text-[#EAEB80] hover:underline"
+                  className="text-sm text-primary hover:underline"
                 >
                   Back to Login
                 </a>
@@ -323,7 +323,7 @@ export default function ResetPasswordPage() {
           ) : (
             <form onSubmit={handleResetRequest} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-300">
+                <Label htmlFor="email" className="text-muted-foreground">
                   Email Address *
                 </Label>
                 <Input
@@ -331,7 +331,7 @@ export default function ResetPasswordPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-[#0a0a0a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                  className="bg-background border-border text-foreground focus:border-primary"
                   placeholder="Enter your email address"
                   required
                 />
@@ -340,7 +340,7 @@ export default function ResetPasswordPage() {
               <Button
                 type="submit"
                 disabled={!email.trim() || resetRequestMutation.isPending}
-                className="w-full bg-[#EAEB80] text-black hover:bg-[#d4d570] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {resetRequestMutation.isPending ? (
                   <>
@@ -358,7 +358,7 @@ export default function ResetPasswordPage() {
               <div className="text-center">
                 <a
                   href="/admin/login"
-                  className="text-sm text-[#EAEB80] hover:underline"
+                  className="text-sm text-primary hover:underline"
                 >
                   Back to Login
                 </a>

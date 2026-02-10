@@ -259,7 +259,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground0" />
           <Input
             placeholder="Search employee, car, VIN..."
             value={searchQuery}
@@ -267,11 +267,11 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
               setSearchQuery(e.target.value);
               setPage(1);
             }}
-            className="pl-10 bg-[#111111] border-[#1a1a1a] text-white"
+            className="pl-10 bg-card border-border text-foreground"
           />
         </div>
         <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
-          <SelectTrigger className="w-[180px] bg-[#111111] border-[#1a1a1a] text-white">
+          <SelectTrigger className="w-[180px] bg-card border-border text-foreground">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -285,56 +285,56 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
 
       {isLoading ? (
         <div className="flex justify-center py-8">
-          <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       ) : isError ? (
-        <div className="text-center py-8 text-red-400">
+        <div className="text-center py-8 text-red-700">
           {error instanceof Error ? error.message : "Failed to load submissions."}
         </div>
       ) : submissions.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-foreground0">
           No expense submissions found.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-[#2a2a2a]">
+        <div className="overflow-x-auto rounded-lg border border-border">
           <Table>
             <TableHeader>
-              <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                <TableHead className="text-gray-400">Date</TableHead>
-                <TableHead className="text-gray-400">Employee</TableHead>
-                <TableHead className="text-gray-400">Car</TableHead>
-                <TableHead className="text-gray-400">Year/Month</TableHead>
-                <TableHead className="text-gray-400">Category</TableHead>
-                <TableHead className="text-gray-400">Type</TableHead>
-                <TableHead className="text-gray-400">Amount</TableHead>
-                <TableHead className="text-gray-400">Status</TableHead>
-                <TableHead className="text-gray-400">Remarks</TableHead>
-                <TableHead className="text-gray-400">Decline Reason</TableHead>
-                {isAdmin && <TableHead className="text-gray-400 text-right">Actions</TableHead>}
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-primary font-medium">Date</TableHead>
+                <TableHead className="text-primary font-medium">Employee</TableHead>
+                <TableHead className="text-primary font-medium">Car</TableHead>
+                <TableHead className="text-primary font-medium">Year/Month</TableHead>
+                <TableHead className="text-primary font-medium">Category</TableHead>
+                <TableHead className="text-primary font-medium">Type</TableHead>
+                <TableHead className="text-primary font-medium">Amount</TableHead>
+                <TableHead className="text-primary font-medium">Status</TableHead>
+                <TableHead className="text-primary font-medium">Remarks</TableHead>
+                <TableHead className="text-primary font-medium">Decline Reason</TableHead>
+                {isAdmin && <TableHead className="text-primary font-medium text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {submissions.map((sub) => (
-                <TableRow key={sub.id} className="border-[#2a2a2a]">
-                  <TableCell className="text-white text-sm">
+                <TableRow key={sub.id} className="border-border">
+                  <TableCell className="text-foreground text-sm">
                     {new Date(sub.submissionDate).toLocaleDateString()}
                   </TableCell>
-                  <TableCell className="text-white text-sm">
+                  <TableCell className="text-foreground text-sm">
                     {sub.employeeName || "-"}
                   </TableCell>
-                  <TableCell className="text-white text-sm max-w-[200px] truncate" title={sub.carDisplayName}>
+                  <TableCell className="text-foreground text-sm max-w-[200px] truncate" title={sub.carDisplayName}>
                     {sub.carDisplayName || "-"}
                   </TableCell>
-                  <TableCell className="text-white text-sm">
+                  <TableCell className="text-foreground text-sm">
                     {sub.year} / {MONTHS[sub.month - 1]}
                   </TableCell>
-                  <TableCell className="text-white text-sm">
+                  <TableCell className="text-foreground text-sm">
                     {CATEGORY_LABELS[sub.category] || sub.category}
                   </TableCell>
-                  <TableCell className="text-gray-400 text-sm">
+                  <TableCell className="text-muted-foreground text-sm">
                     {formatFieldLabel(sub.field)}
                   </TableCell>
-                  <TableCell className="text-[#EAEB80] font-medium">
+                  <TableCell className="text-primary font-medium">
                     ${Number(sub.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </TableCell>
                   <TableCell>
@@ -342,19 +342,19 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                       variant="outline"
                       className={
                         sub.status === "approved"
-                          ? "border-green-600 text-green-400"
+                          ? "border-green-600 text-green-700"
                           : sub.status === "declined"
-                          ? "border-red-600 text-red-400"
-                          : "border-[#EAEB80]/50 text-[#EAEB80]"
+                          ? "border-red-600 text-red-700"
+                          : "border-primary/50 text-primary"
                       }
                     >
                       {sub.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-gray-400 text-sm max-w-[120px] truncate" title={sub.remarks || undefined}>
+                  <TableCell className="text-muted-foreground text-sm max-w-[120px] truncate" title={sub.remarks || undefined}>
                     {sub.remarks || "—"}
                   </TableCell>
-                  <TableCell className="text-red-400/80 text-sm max-w-[150px] truncate" title={sub.declineReason || undefined}>
+                  <TableCell className="text-red-700/80 text-sm max-w-[150px] truncate" title={sub.declineReason || undefined}>
                     {sub.status === "declined" && sub.declineReason ? sub.declineReason : "—"}
                   </TableCell>
                   {isAdmin && (
@@ -364,7 +364,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-[#EAEB80]"
+                            className="h-8 w-8 text-muted-foreground hover:text-primary"
                             onClick={() => {
                               setSelectedSubmission(sub);
                               setViewReceiptsOpen(true);
@@ -379,7 +379,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-green-500 hover:text-green-400"
+                              className="h-8 w-8 text-green-500 hover:text-green-700"
                               onClick={() => approveMutation.mutate(sub.id)}
                               disabled={approveMutation.isPending}
                               title="Approve"
@@ -389,7 +389,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-red-500 hover:text-red-400"
+                              className="h-8 w-8 text-red-500 hover:text-red-700"
                               onClick={() => handleDecline(sub)}
                               title="Decline"
                             >
@@ -398,7 +398,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-gray-400 hover:text-[#EAEB80]"
+                              className="h-8 w-8 text-muted-foreground hover:text-primary"
                               onClick={() => handleEdit(sub)}
                               title="Edit"
                             >
@@ -407,7 +407,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-red-500 hover:text-red-400"
+                              className="h-8 w-8 text-red-500 hover:text-red-700"
                               onClick={() => {
                                 if (window.confirm("Delete this submission?")) {
                                   deleteMutation.mutate(sub.id);
@@ -432,7 +432,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
 
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-foreground0">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
           </p>
           <div className="flex gap-2">
@@ -441,7 +441,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
               size="sm"
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="border-[#2a2a2a] text-[#EAEB80]"
+              className="border-border text-primary"
             >
               Previous
             </Button>
@@ -450,7 +450,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
               size="sm"
               disabled={page >= pagination.totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="border-[#2a2a2a] text-[#EAEB80]"
+              className="border-border text-primary"
             >
               Next
             </Button>
@@ -460,16 +460,16 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
 
       {/* View Receipts Dialog */}
       <Dialog open={viewReceiptsOpen} onOpenChange={setViewReceiptsOpen}>
-        <DialogContent className="bg-[#111111] border-[#2a2a2a] max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-[#EAEB80]">Receipts</DialogTitle>
+            <DialogTitle className="text-primary">Receipts</DialogTitle>
             <DialogDescription>
               {selectedSubmission?.employeeName} - ${selectedSubmission?.amount?.toLocaleString()}
               {selectedSubmission?.remarks && ` • Remarks: ${selectedSubmission.remarks}`}
             </DialogDescription>
           </DialogHeader>
           {selectedSubmission?.status === "declined" && selectedSubmission?.declineReason && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+            <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-700">
               <strong>Decline reason:</strong> {selectedSubmission.declineReason}
             </div>
           )}
@@ -489,18 +489,18 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                   className="block"
                 >
                   {isPdf ? (
-                    <span className="flex items-center gap-2 text-[#EAEB80] hover:underline">
+                    <span className="flex items-center gap-2 text-primary hover:underline">
                       <ExternalLink className="w-4 h-4" /> Receipt {i + 1} (PDF)
                     </span>
                   ) : isDriveFileId ? (
-                    <span className="flex items-center gap-2 text-[#EAEB80] hover:underline">
+                    <span className="flex items-center gap-2 text-primary hover:underline">
                       <ExternalLink className="w-4 h-4" /> View Receipt {i + 1}
                     </span>
                   ) : (
                     <img
                       src={displayUrl}
                       alt={`Receipt ${i + 1}`}
-                      className="max-h-48 rounded border border-[#2a2a2a] object-contain"
+                      className="max-h-48 rounded border border-border object-contain"
                     />
                   )}
                 </a>
@@ -512,9 +512,9 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
 
       {/* Decline Modal */}
       <Dialog open={declineModalOpen} onOpenChange={setDeclineModalOpen}>
-        <DialogContent className="bg-[#111111] border-[#2a2a2a]">
+        <DialogContent className="bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-[#EAEB80]">Decline Submission</DialogTitle>
+            <DialogTitle className="text-primary">Decline Submission</DialogTitle>
             <DialogDescription>
               Please provide a reason for declining. This will be stored with the submission.
             </DialogDescription>
@@ -523,14 +523,14 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
             placeholder="Decline reason (required)"
             value={declineReason}
             onChange={(e) => setDeclineReason(e.target.value)}
-            className="bg-[#0d0d0d] border-[#2a2a2a] text-white"
+            className="bg-card border-border text-foreground"
           />
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeclineModalOpen(false)} className="border-[#2a2a2a]">
+            <Button variant="outline" onClick={() => setDeclineModalOpen(false)} className="border-border">
               Cancel
             </Button>
             <Button
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30"
               onClick={confirmDecline}
               disabled={!declineReason.trim() || declineMutation.isPending}
             >
@@ -543,50 +543,50 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
 
       {/* Edit Modal */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="bg-[#111111] border-[#2a2a2a]">
+        <DialogContent className="bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-[#EAEB80]">Edit Submission</DialogTitle>
+            <DialogTitle className="text-primary">Edit Submission</DialogTitle>
             <DialogDescription>
               Edit date, amount, or remarks. Other fields cannot be changed.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm text-gray-400">Date</label>
+              <label className="text-sm text-muted-foreground">Date</label>
               <Input
                 type="date"
                 value={editForm.submissionDate || ""}
                 onChange={(e) => setEditForm((p) => ({ ...p, submissionDate: e.target.value }))}
-                className="bg-[#0d0d0d] border-[#2a2a2a] text-white mt-1"
+                className="bg-card border-border text-foreground mt-1"
               />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Amount ($)</label>
+              <label className="text-sm text-muted-foreground">Amount ($)</label>
               <Input
                 type="number"
                 step="0.01"
                 min="0"
                 value={editForm.amount ?? ""}
                 onChange={(e) => setEditForm((p) => ({ ...p, amount: parseFloat(e.target.value) || 0 }))}
-                className="bg-[#0d0d0d] border-[#2a2a2a] text-white mt-1"
+                className="bg-card border-border text-foreground mt-1"
               />
             </div>
             <div>
-              <label className="text-sm text-gray-400">Remarks</label>
+              <label className="text-sm text-muted-foreground">Remarks</label>
               <Input
                 value={editForm.remarks ?? ""}
                 onChange={(e) => setEditForm((p) => ({ ...p, remarks: e.target.value }))}
-                className="bg-[#0d0d0d] border-[#2a2a2a] text-white mt-1"
+                className="bg-card border-border text-foreground mt-1"
                 placeholder="Optional"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditModalOpen(false)} className="border-[#2a2a2a]">
+            <Button variant="outline" onClick={() => setEditModalOpen(false)} className="border-border">
               Cancel
             </Button>
             <Button
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+              className="bg-primary text-primary-foreground hover:bg-primary/80"
               onClick={confirmEdit}
               disabled={updateMutation.isPending}
             >

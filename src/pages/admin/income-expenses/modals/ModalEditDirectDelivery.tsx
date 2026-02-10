@@ -124,31 +124,31 @@ export default function ModalEditDirectDelivery() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="bg-[#0f0f0f] border-[#1a1a1a] text-white max-w-md">
+      <DialogContent className="bg-card border-border text-foreground max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-white text-lg">
+          <DialogTitle className="text-foreground text-lg">
             Update Direct Delivery Expense
           </DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogDescription className="text-muted-foreground">
             Enter direct delivery expenses for {monthName} {year}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div>
-            <Label className="text-gray-400 text-xs">Type:</Label>
-            <div className="text-white text-sm font-medium mt-1">{fieldName}</div>
+            <Label className="text-muted-foreground text-xs">Type:</Label>
+            <div className="text-foreground text-sm font-medium mt-1">{fieldName}</div>
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Date:</Label>
-            <div className="text-white text-sm font-medium mt-1">
+            <Label className="text-muted-foreground text-xs">Date:</Label>
+            <div className="text-foreground text-sm font-medium mt-1">
               {monthName} {year}
             </div>
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Amount</Label>
+            <Label className="text-muted-foreground text-xs">Amount</Label>
             <Input
               type="number"
               value={editingCell.value}
@@ -158,33 +158,33 @@ export default function ModalEditDirectDelivery() {
                   value: parseFloat(e.target.value) || 0,
                 })
               }
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm mt-1"
+              className="bg-card border-border text-foreground text-sm mt-1"
               step="0.01"
               autoFocus
             />
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Inputted Amount:</Label>
+            <Label className="text-muted-foreground text-xs">Inputted Amount:</Label>
             <Input
               value={`$${editingCell.value.toFixed(2)}`}
               disabled
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-gray-400 text-sm mt-1"
+              className="bg-card border-border text-muted-foreground text-sm mt-1"
             />
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Remarks</Label>
+            <Label className="text-muted-foreground text-xs">Remarks</Label>
             <Textarea
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="Add any notes..."
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm min-h-[80px] mt-1"
+              className="bg-card border-border text-foreground text-sm min-h-[80px] mt-1"
             />
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs mb-2 block">Receipt Images</Label>
+            <Label className="text-muted-foreground text-xs mb-2 block">Receipt Images</Label>
             
             {/* Beautiful Upload Button */}
             <div className="relative">
@@ -199,20 +199,20 @@ export default function ModalEditDirectDelivery() {
               />
               <label
                 htmlFor="receipt-upload"
-                className="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-[#EAEB80]/50 rounded-lg bg-[#1a1a1a]/50 hover:border-[#EAEB80] hover:bg-[#1a1a1a] transition-all cursor-pointer group"
+                className="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-primary/50 rounded-lg bg-card/50 hover:border-primary hover:bg-card transition-all cursor-pointer group"
               >
-                <Upload className="w-5 h-5 text-[#EAEB80] group-hover:scale-110 transition-transform" />
-                <span className="text-[#EAEB80] font-medium text-sm">
+                <Upload className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                <span className="text-primary font-medium text-sm">
                   {imageFiles.length > 0 
                     ? `Add More Images (${imageFiles.length} selected)`
                     : "Choose Images to Upload"
                   }
                 </span>
-                <ImageIcon className="w-5 h-5 text-[#EAEB80]/70" />
+                <ImageIcon className="w-5 h-5 text-primary/70" />
               </label>
             </div>
             
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-foreground0 mt-2">
               Supported formats: JPEG, PNG, GIF, WebP (Max 10MB per image)
             </p>
             
@@ -220,7 +220,7 @@ export default function ModalEditDirectDelivery() {
             {(imageFiles.length > 0 || existingImages.length > 0 || isLoadingImages) && (
               <div className="mt-4">
                 {isLoadingImages ? (
-                  <div className="text-center py-4 text-gray-400 text-sm">Loading images...</div>
+                  <div className="text-center py-4 text-muted-foreground text-sm">Loading images...</div>
                   ) : (
                   <ImagePreview
                     newImages={imageFiles}
@@ -238,14 +238,14 @@ export default function ModalEditDirectDelivery() {
           <Button
             onClick={handleClose}
             variant="outline"
-            className="flex-1 border-[#2a2a2a] text-gray-400 hover:text-white hover:bg-[#2a2a2a]"
+            className="flex-1 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={isSaving || isUploading}
-            className="flex-1 bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/80"
           >
             {isSaving || isUploading ? "Saving..." : `Save${imageFiles.length > 0 ? ` & Upload ${imageFiles.length} Image${imageFiles.length > 1 ? 's' : ''}` : ''}`}
           </Button>

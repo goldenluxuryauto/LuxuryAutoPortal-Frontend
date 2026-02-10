@@ -170,7 +170,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-400">Failed to load car details</p>
+          <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
             className="mt-4 text-[#EAEB80] hover:underline"
@@ -198,7 +198,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
             <h1 className="text-2xl font-serif text-[#EAEB80] italic mb-2">
               Income and Expenses
             </h1>
-            <p className="text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               Financial tracking and expense management - All Cars
             </p>
           </div>
@@ -206,7 +206,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           {/* Car Selector and Year Filter */}
           <div className="flex items-center gap-4 mb-6">
             <div className="w-[400px]">
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Select a car
               </label>
               <Popover open={carComboboxOpen} onOpenChange={setCarComboboxOpen}>
@@ -215,7 +215,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                     variant="outline"
                     role="combobox"
                     aria-expanded={carComboboxOpen}
-                    className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] overflow-hidden"
+                    className="w-full justify-between bg-muted border-border2a2a2a] text-foreground hover:bg-muted overflow-hidden"
                   >
                     <span className="truncate text-left flex-1 min-w-0">
                     {selectedCar === "all"
@@ -230,14 +230,14 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[400px] p-0 bg-[#1a1a1a] border-[#2a2a2a]">
-                  <Command className="bg-[#1a1a1a]">
+                <PopoverContent className="w-[400px] p-0 bg-muted border-border2a2a2a]">
+                  <Command className="bg-muted">
                     <CommandInput 
                       placeholder="Search car by make, model, plate, or VIN..." 
-                      className="text-white placeholder:text-gray-500"
+                      className="text-foreground placeholder:text-foreground0"
                     />
                     <CommandList>
-                      <CommandEmpty className="text-gray-400 py-6 text-center text-sm">
+                      <CommandEmpty className="text-muted-foreground py-6 text-center text-sm">
                         No car found.
                       </CommandEmpty>
                       <CommandGroup>
@@ -247,7 +247,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                             setSelectedCar("all");
                             setCarComboboxOpen(false);
                           }}
-                          className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                          className="text-foreground hover:bg-muted cursor-pointer"
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
@@ -262,7 +262,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                             setSelectedCar("allcars");
                             setCarComboboxOpen(false);
                           }}
-                          className="text-white hover:bg-[#2a2a2a] cursor-pointer font-semibold"
+                          className="text-foreground hover:bg-muted cursor-pointer font-semibold"
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
@@ -282,7 +282,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                                 setSelectedCar(carItem.id.toString());
                                 setCarComboboxOpen(false);
                               }}
-                              className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                              className="text-foreground hover:bg-muted cursor-pointer"
                             >
                               <Check
                                 className={`mr-2 h-4 w-4 ${
@@ -301,12 +301,12 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
             </div>
 
             <div className="w-[150px]">
-              <label className="block text-sm font-medium text-gray-400 mb-2">Year</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Year</label>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectTrigger className="bg-muted border-border2a2a2a] text-foreground">
                   <SelectValue placeholder="Year" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectContent className="bg-muted border-border2a2a2a] text-foreground">
                   {yearOptions.map((yr) => (
                     <SelectItem key={yr} value={String(yr)}>
                       {yr}
@@ -318,9 +318,9 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           </div>
 
           {/* Message to select a car */}
-          <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-12 text-center">
-            <p className="text-gray-400 text-lg mb-2">Please select a car to view income and expenses</p>
-            <p className="text-gray-500 text-sm">
+          <div className="bg-card border border-border1a1a1a] rounded-lg p-12 text-center">
+            <p className="text-muted-foreground text-lg mb-2">Please select a car to view income and expenses</p>
+            <p className="text-foreground0 text-sm">
               Choose a car from the dropdown above to see detailed financial data
             </p>
           </div>
@@ -342,20 +342,20 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
             <div className="mb-2 flex-shrink-0">
               <button
                 onClick={() => setLocation("/cars")}
-                className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+                className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Cars</span>
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-white">Income and Expenses</h1>
-                <p className="text-sm text-gray-400 mt-1">All Cars - Aggregate View</p>
+                <h1 className="text-2xl font-bold text-foreground">Income and Expenses</h1>
+                <p className="text-sm text-muted-foreground mt-1">All Cars - Aggregate View</p>
               </div>
             </div>
 
             {/* Page Title and Actions */}
             <div className="flex items-center justify-between mb-2 flex-shrink-0">
-              <h1 className="text-xl font-semibold text-white">INCOME AND EXPENSES - ALL CARS</h1>
+              <h1 className="text-xl font-semibold text-foreground">INCOME AND EXPENSES - ALL CARS</h1>
               <div className="flex items-center gap-2">
                 <div className="w-[300px]">
                   <Popover open={carComboboxOpenPerCar} onOpenChange={setCarComboboxOpenPerCar}>
@@ -364,20 +364,20 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         variant="outline"
                         role="combobox"
                         aria-expanded={carComboboxOpenPerCar}
-                        className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] text-sm overflow-hidden"
+                        className="w-full justify-between bg-muted border-border2a2a2a] text-foreground hover:bg-muted text-sm overflow-hidden"
                       >
                         <span className="truncate text-left flex-1 min-w-0">All Cars</span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 bg-[#1a1a1a] border-[#2a2a2a]">
-                      <Command className="bg-[#1a1a1a]">
+                    <PopoverContent className="w-[300px] p-0 bg-muted border-border2a2a2a]">
+                      <Command className="bg-muted">
                         <CommandInput 
                           placeholder="Search car by make, model, plate, or VIN..." 
-                          className="text-white placeholder:text-gray-500"
+                          className="text-foreground placeholder:text-foreground0"
                         />
                         <CommandList>
-                          <CommandEmpty className="text-gray-400 py-6 text-center text-sm">
+                          <CommandEmpty className="text-muted-foreground py-6 text-center text-sm">
                             No car found.
                           </CommandEmpty>
                           <CommandGroup>
@@ -387,7 +387,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                                 setSelectedCar("allcars");
                                 setCarComboboxOpenPerCar(false);
                               }}
-                              className="text-white hover:bg-[#2a2a2a] cursor-pointer font-semibold"
+                              className="text-foreground hover:bg-muted cursor-pointer font-semibold"
                             >
                               <Check className="mr-2 h-4 w-4 opacity-100" />
                               All Cars
@@ -403,7 +403,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                                     setSelectedCar(carItem.id.toString());
                                     setCarComboboxOpenPerCar(false);
                                   }}
-                                  className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                                  className="text-foreground hover:bg-muted cursor-pointer"
                                 >
                                   <Check
                                     className={`mr-2 h-4 w-4 ${
@@ -461,7 +461,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               // From View Car menu
               <button
                 onClick={() => setLocation(`/admin/view-car/${activeCarId}`)}
-                className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+                className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to View Car</span>
@@ -470,16 +470,16 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               // From admin Income and Expenses menu
               <button
                 onClick={() => setLocation("/cars")}
-                className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+                className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Cars</span>
               </button>
             )}
             <div>
-              <h1 className="text-2xl font-bold text-white">Income and Expenses</h1>
+              <h1 className="text-2xl font-bold text-foreground">Income and Expenses</h1>
               {car && (
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Car: {car.makeModel || "Unknown Car"}
                 </p>
               )}
@@ -497,7 +497,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
 
           {/* Page Title and Actions */}
           <div className="flex items-center justify-between mb-2 flex-shrink-0">
-            <h1 className="text-xl font-semibold text-white">INCOME AND EXPENSES</h1>
+            <h1 className="text-xl font-semibold text-foreground">INCOME AND EXPENSES</h1>
             <div className="flex items-center gap-2">
               {/* Show car selector only in admin all-cars view */}
               {!isFromRoute && (
@@ -508,7 +508,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         variant="outline"
                         role="combobox"
                         aria-expanded={carComboboxOpenPerCar}
-                        className="w-full justify-between bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] text-sm overflow-hidden"
+                        className="w-full justify-between bg-muted border-border2a2a2a] text-foreground hover:bg-muted text-sm overflow-hidden"
                       >
                         <span className="truncate text-left flex-1 min-w-0">
                         {selectedCar === "all"
@@ -523,14 +523,14 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 bg-[#1a1a1a] border-[#2a2a2a]">
-                      <Command className="bg-[#1a1a1a]">
+                    <PopoverContent className="w-[300px] p-0 bg-muted border-border2a2a2a]">
+                      <Command className="bg-muted">
                         <CommandInput 
                           placeholder="Search car by make, model, plate, or VIN..." 
-                          className="text-white placeholder:text-gray-500"
+                          className="text-foreground placeholder:text-foreground0"
                         />
                         <CommandList>
-                          <CommandEmpty className="text-gray-400 py-6 text-center text-sm">
+                          <CommandEmpty className="text-muted-foreground py-6 text-center text-sm">
                             No car found.
                           </CommandEmpty>
                           <CommandGroup>
@@ -540,7 +540,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                                 setSelectedCar("allcars");
                                 setCarComboboxOpenPerCar(false);
                               }}
-                              className="text-white hover:bg-[#2a2a2a] cursor-pointer font-semibold"
+                              className="text-foreground hover:bg-muted cursor-pointer font-semibold"
                             >
                               <Check
                                 className={`mr-2 h-4 w-4 ${
@@ -560,7 +560,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                                     setSelectedCar(carItem.id.toString());
                                     setCarComboboxOpenPerCar(false);
                                   }}
-                                  className="text-white hover:bg-[#2a2a2a] cursor-pointer"
+                                  className="text-foreground hover:bg-muted cursor-pointer"
                                 >
                                   <Check
                                     className={`mr-2 h-4 w-4 ${

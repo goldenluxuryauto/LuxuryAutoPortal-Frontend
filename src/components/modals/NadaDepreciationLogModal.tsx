@@ -218,46 +218,46 @@ export function NadaDepreciationLogModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg w-full max-w-6xl max-h-[90vh] p-6 relative flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50">
+      <div className="bg-card border border-border rounded-lg w-full max-w-6xl max-h-[90vh] p-6 relative flex flex-col">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-white">
+          <h3 className="text-lg font-semibold text-foreground">
             NADA Depreciation Schedule Edit History
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Filters and Search */}
-        <div className="flex flex-col md:flex-row justify-between gap-3 pb-4 mb-4 border-b border-[#2a2a2a]">
+        <div className="flex flex-col md:flex-row justify-between gap-3 pb-4 mb-4 border-b border-border">
           <div className="flex items-end gap-2 flex-wrap">
             <div className="flex flex-col">
-              <label className="text-xs text-gray-400 mb-1 capitalize">From</label>
+              <label className="text-xs text-muted-foreground mb-1 capitalize">From</label>
               <Input
                 type="date"
                 value={dateFrom}
                 onChange={handleDateFrom}
-                className="bg-[#0f0f0f] border-[#2a2a2a] text-white w-40"
+                className="bg-card border-border text-foreground w-40"
               />
             </div>
             <div className="flex flex-col">
-              <label className="text-xs text-gray-400 mb-1 capitalize">To</label>
+              <label className="text-xs text-muted-foreground mb-1 capitalize">To</label>
               <Input
                 type="date"
                 value={dateTo}
                 onChange={handleDateTo}
-                className="bg-[#0f0f0f] border-[#2a2a2a] text-white w-40"
+                className="bg-card border-border text-foreground w-40"
               />
             </div>
             {(isFilter || onSearch) && (
               <Button
                 onClick={handleClear}
                 variant="ghost"
-                className="text-gray-400 hover:text-white underline h-9"
+                className="text-muted-foreground hover:text-foreground underline h-9"
               >
                 Clear
               </Button>
@@ -275,11 +275,11 @@ export function NadaDepreciationLogModal({
                   handleSearch();
                 }
               }}
-              className="bg-[#0f0f0f] border-[#2a2a2a] text-white h-9"
+              className="bg-card border-border text-foreground h-9"
             />
             <Button
               onClick={handleSearch}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] h-9"
+              className="bg-primary text-black hover:bg-primary/80 h-9"
             >
               <Search className="w-4 h-4" />
             </Button>
@@ -289,14 +289,14 @@ export function NadaDepreciationLogModal({
         {/* Table */}
         <div className="flex-1 overflow-auto">
           {error && (
-            <div className="text-center text-red-400 py-8">
+            <div className="text-center text-red-700 py-8">
               <div className="mb-2">Error loading data.</div>
-              <div className="text-sm text-gray-400 mb-4">
+              <div className="text-sm text-muted-foreground mb-4">
                 {error instanceof Error ? error.message : "Please try again."}
                     </div>
               <Button
                 onClick={() => refetch()}
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                className="bg-primary text-black hover:bg-primary/80"
               >
                 Retry
               </Button>
@@ -304,38 +304,38 @@ export function NadaDepreciationLogModal({
           )}
 
           {!error && (status === "pending" || (isFetching && !isFetchingNextPage)) ? (
-            <div className="text-center text-gray-400 py-8">Loading...</div>
+            <div className="text-center text-muted-foreground py-8">Loading...</div>
           ) : !error && logs.length === 0 ? (
-            <div className="text-center text-gray-400 py-8">
+            <div className="text-center text-muted-foreground py-8">
               No edit history found
                     </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
-                <thead className="bg-[#0f0f0f] sticky top-0 z-10">
-                  <tr className="border-b border-[#2a2a2a]">
-                    <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 w-12">
+                <thead className="bg-card sticky top-0 z-10">
+                  <tr className="border-b border-border">
+                    <th className="text-left px-3 py-3 text-sm font-medium text-muted-foreground w-12">
                       #
                     </th>
-                    <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 min-w-[10rem]">
+                    <th className="text-left px-3 py-3 text-sm font-medium text-muted-foreground min-w-[10rem]">
                       Edit by
                     </th>
-                    <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 min-w-[10rem]">
+                    <th className="text-left px-3 py-3 text-sm font-medium text-muted-foreground min-w-[10rem]">
                       Date Time
                     </th>
-                    <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 min-w-[8rem]">
+                    <th className="text-left px-3 py-3 text-sm font-medium text-muted-foreground min-w-[8rem]">
                       Item
                     </th>
-                    <th className="text-left px-3 py-3 text-sm font-medium text-gray-300">
+                    <th className="text-left px-3 py-3 text-sm font-medium text-muted-foreground">
                       Category
                     </th>
-                    <th className="text-left px-3 py-3 text-sm font-medium text-gray-300">
+                    <th className="text-left px-3 py-3 text-sm font-medium text-muted-foreground">
                       Month Year
                     </th>
-                    <th className="text-right px-3 py-3 text-sm font-medium text-gray-300">
+                    <th className="text-right px-3 py-3 text-sm font-medium text-muted-foreground">
                       Old Values
                     </th>
-                    <th className="text-right px-3 py-3 text-sm font-medium text-gray-300">
+                    <th className="text-right px-3 py-3 text-sm font-medium text-muted-foreground">
                       New Values
                     </th>
                   </tr>
@@ -346,15 +346,15 @@ export function NadaDepreciationLogModal({
                     return (
                       <tr
                         key={log.carBacklogAid || index}
-                        className="border-b border-[#2a2a2a] hover:bg-[#0f0f0f] transition-colors"
+                        className="border-b border-border hover:bg-card transition-colors"
                       >
-                        <td className="px-3 py-2 text-sm text-gray-300 text-center">
+                        <td className="px-3 py-2 text-sm text-muted-foreground text-center">
                           {rowNumber}.
                         </td>
-                        <td className="px-3 py-2 text-sm text-gray-300">
+                        <td className="px-3 py-2 text-sm text-muted-foreground">
                           {log.fullname || "N/A"}
                         </td>
-                        <td className="px-3 py-2 text-sm text-gray-300">
+                        <td className="px-3 py-2 text-sm text-muted-foreground">
                         {log.carBacklogCreated
                           ? format(
                               new Date(log.carBacklogCreated),
@@ -362,18 +362,18 @@ export function NadaDepreciationLogModal({
                             )
                           : "N/A"}
                         </td>
-                        <td className="px-3 py-2 text-sm text-gray-300 capitalize">
+                        <td className="px-3 py-2 text-sm text-muted-foreground capitalize">
                           {log.carBacklogItem
                             ? log.carBacklogItem.replaceAll("-", " ")
                             : "N/A"}
                         </td>
-                        <td className="px-3 py-2 text-sm text-gray-300">
+                        <td className="px-3 py-2 text-sm text-muted-foreground">
                           {log.carBacklogCategoryName || "N/A"}
                         </td>
-                        <td className="px-3 py-2 text-sm text-gray-300">
+                        <td className="px-3 py-2 text-sm text-muted-foreground">
                           {formatMonthYear(log.carBacklogDate)}
                         </td>
-                        <td className="px-3 py-2 text-sm text-gray-300 text-right">
+                        <td className="px-3 py-2 text-sm text-muted-foreground text-right">
                           {formatCurrency(
                             log.carBacklogOldAmount || log.carBacklogOldValues || "0"
                           )}
@@ -393,7 +393,7 @@ export function NadaDepreciationLogModal({
               {hasNextPage && (
                 <div ref={loadMoreRef} className="text-center py-4">
                   {isFetchingNextPage ? (
-                    <div className="text-gray-400">Loading more...</div>
+                    <div className="text-muted-foreground">Loading more...</div>
                   ) : (
                     <Button
                       onClick={() => fetchNextPage()}
@@ -409,10 +409,10 @@ export function NadaDepreciationLogModal({
           )}
         </div>
 
-        <div className="flex justify-end pt-4 border-t border-[#2a2a2a] mt-4">
+        <div className="flex justify-end pt-4 border-t border-border mt-4">
           <Button
             onClick={onClose}
-            className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            className="bg-primary text-black hover:bg-primary/80"
           >
             Close
           </Button>

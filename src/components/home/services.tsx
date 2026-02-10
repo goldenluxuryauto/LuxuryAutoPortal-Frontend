@@ -57,7 +57,7 @@ export function Services() {
             return (
               <Card
                 key={index}
-                className="bg-white/[0.02] border-white/10 hover-elevate group"
+                className="bg-white/[0.02] border-border hover-elevate group"
               >
                 <CardContent className="p-6 lg:p-8">
                   <div className="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">

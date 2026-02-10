@@ -64,7 +64,7 @@ function formatPrice(price: string) {
 
 function CarCard({ car }: { car: Partial<Car> }) {
   return (
-    <Card className="group overflow-hidden bg-card border-white/10 hover-elevate">
+    <Card className="group overflow-hidden bg-card border-border hover-elevate">
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
           src={car.images?.[0] || "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"}
@@ -93,7 +93,7 @@ function CarCard({ car }: { car: Partial<Car> }) {
 
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="w-4 h-4 text-white" />
+            <Calendar className="w-4 h-4 text-foreground" />
             <span>{car.year}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -119,7 +119,7 @@ function CarCard({ car }: { car: Partial<Car> }) {
 
 export function FeaturedCars() {
   return (
-    <section id="featured-fleet" className="py-20 lg:py-28 bg-[#0a0a0a]">
+    <section id="featured-fleet" className="py-20 lg:py-28 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 lg:mb-16">
           <p className="text-sm font-medium text-primary tracking-widest uppercase mb-3">

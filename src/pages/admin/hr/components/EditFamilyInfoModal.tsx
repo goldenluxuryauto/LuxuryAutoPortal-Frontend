@@ -93,9 +93,9 @@ export function EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamily
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg bg-[#111111] border-[#2a2a2a] text-gray-200">
+      <DialogContent className="max-w-lg bg-card border-border text-muted-foreground">
         <DialogHeader>
-          <DialogTitle className="text-[#EAEB80]">Update Family Information</DialogTitle>
+          <DialogTitle className="text-primary">Update Family Information</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -104,9 +104,9 @@ export function EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamily
               name="employee_mother_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-400">Mother's First Name</FormLabel>
+                  <FormLabel className="text-muted-foreground">Mother's First Name</FormLabel>
                   <FormControl>
-                    <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                    <Input {...field} className="bg-card border-border" />
                   </FormControl>
                 </FormItem>
               )}
@@ -116,9 +116,9 @@ export function EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamily
               name="employee_father_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-400">Father's First Name</FormLabel>
+                  <FormLabel className="text-muted-foreground">Father's First Name</FormLabel>
                   <FormControl>
-                    <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                    <Input {...field} className="bg-card border-border" />
                   </FormControl>
                 </FormItem>
               )}
@@ -128,9 +128,9 @@ export function EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamily
               name="employee_home_contact"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-400">Home Contact</FormLabel>
+                  <FormLabel className="text-muted-foreground">Home Contact</FormLabel>
                   <FormControl>
-                    <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                    <Input {...field} className="bg-card border-border" />
                   </FormControl>
                 </FormItem>
               )}
@@ -140,9 +140,9 @@ export function EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamily
               name="employee_home_address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-400">Family Home Address</FormLabel>
+                  <FormLabel className="text-muted-foreground">Family Home Address</FormLabel>
                   <FormControl>
-                    <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                    <Input {...field} className="bg-card border-border" />
                   </FormControl>
                 </FormItem>
               )}
@@ -153,14 +153,14 @@ export function EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamily
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={mutation.isPending}
-                className="border-[#2a2a2a]"
+                className="border-border"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={mutation.isPending}
-                className="bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
               </Button>

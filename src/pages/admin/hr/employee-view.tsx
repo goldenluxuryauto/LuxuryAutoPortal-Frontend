@@ -180,14 +180,14 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
   });
   return (
     <>
-      <Button size="sm" onClick={() => setOpen(true)} className="bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90">
+      <Button size="sm" onClick={() => setOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
         <Plus className="w-4 h-4 mr-2" />
         Add New Rate
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-[#111111] border-[#2a2a2a] text-gray-200 max-w-md">
+        <DialogContent className="bg-card border-border2a2a2a] text-muted-foreground max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-[#EAEB80]">Add New Rate</DialogTitle>
+            <DialogTitle className="text-primary">Add New Rate</DialogTitle>
           </DialogHeader>
           <form
             onSubmit={(e) => {
@@ -197,45 +197,45 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
             className="space-y-4"
           >
             <div>
-              <Label className="text-gray-400">Pay Type</Label>
+              <Label className="text-muted-foreground">Pay Type</Label>
               <Select value={payType} onValueChange={setPayType}>
-                <SelectTrigger className="bg-[#0a0a0a] border-[#2a2a2a] mt-1">
+                <SelectTrigger className="bg-background border-border2a2a2a] mt-1">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a]">
+                <SelectContent className="bg-card border-border2a2a2a]">
                   <SelectItem value="hourly">Hourly</SelectItem>
                   <SelectItem value="salary">Salary</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label className="text-gray-400">Effective Start Date</Label>
+              <Label className="text-muted-foreground">Effective Start Date</Label>
               <Input
                 type="date"
                 value={effectiveStart}
                 onChange={(e) => setEffectiveStart(e.target.value)}
-                className="bg-[#0a0a0a] border-[#2a2a2a] mt-1"
+                className="bg-background border-border2a2a2a] mt-1"
               />
             </div>
             <div>
-              <Label className="text-gray-400">Rate Amount ($)</Label>
+              <Label className="text-muted-foreground">Rate Amount ($)</Label>
               <Input
                 type="number"
                 step="0.01"
                 min="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="bg-[#0a0a0a] border-[#2a2a2a] mt-1"
+                className="bg-background border-border2a2a2a] mt-1"
                 placeholder="0.00"
                 required
               />
             </div>
-            <p className="text-xs text-gray-500">The previous rate will be auto-closed (effective end = day before this start date).</p>
+            <p className="text-xs text-foreground0">The previous rate will be auto-closed (effective end = day before this start date).</p>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-[#2a2a2a]">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-border2a2a2a]">
                 Cancel
               </Button>
-              <Button type="submit" disabled={mutation.isPending || !amount} className="bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90">
+              <Button type="submit" disabled={mutation.isPending || !amount} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add Rate"}
               </Button>
             </DialogFooter>
@@ -397,10 +397,10 @@ export default function EmployeeViewPage() {
   if (!employeeId) {
     return (
       <AdminLayout>
-        <div className="p-6 text-center text-gray-400">
+        <div className="p-6 text-center text-muted-foreground">
           <p>Invalid employee ID.</p>
           <Link href="/admin/hr/employees">
-            <Button variant="outline" className="mt-4 border-[#EAEB80]/30 text-[#EAEB80]">
+            <Button variant="outline" className="mt-4 border-primary/30 text-primary">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Employees
             </Button>
@@ -414,7 +414,7 @@ export default function EmployeeViewPage() {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       </AdminLayout>
     );
@@ -424,9 +424,9 @@ export default function EmployeeViewPage() {
     return (
       <AdminLayout>
         <div className="p-6 text-center">
-          <p className="text-red-400">Employee not found.</p>
+          <p className="text-red-700">Employee not found.</p>
           <Link href="/admin/hr/employees">
-            <Button variant="outline" className="mt-4 border-[#EAEB80]/30 text-[#EAEB80]">
+            <Button variant="outline" className="mt-4 border-primary/30 text-primary">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Employees
             </Button>
@@ -444,21 +444,21 @@ export default function EmployeeViewPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link href="/admin/hr/employees">
-              <Button variant="ghost" size="sm" className="text-[#EAEB80] hover:bg-[#EAEB80]/10">
+              <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
             </Link>
-            <h1 className="text-xl sm:text-2xl font-serif text-[#EAEB80] italic">
+            <h1 className="text-xl sm:text-2xl font-serif text-primary italic">
               {fullName}
             </h1>
             {isPending && (
-              <span className="px-2 py-0.5 text-xs font-medium rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+              <span className="px-2 py-0.5 text-xs font-medium rounded bg-yellow-500/20 text-yellow-700 border border-yellow-500/30">
                 Pending
               </span>
             )}
             {isOffboarded && (
-              <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-500/20 text-gray-300 border border-gray-500/30">
+              <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-500/20 text-muted-foreground border border-gray-500/30">
                 Offboarded
               </span>
             )}
@@ -480,7 +480,7 @@ export default function EmployeeViewPage() {
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white"
+                className="bg-green-600 hover:bg-green-700 text-foreground"
                 onClick={handleApprove}
               >
                 <UserCheck className="w-4 h-4 mr-2" />
@@ -497,7 +497,7 @@ export default function EmployeeViewPage() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Section navigation list */}
           <div className="w-full lg:w-72 shrink-0">
-            <ul className="rounded-lg border border-[#2a2a2a] bg-[#111111] overflow-hidden">
+            <ul className="rounded-lg border border-border2a2a2a] bg-card overflow-hidden">
               {PROFILE_SECTIONS.map((section) => {
                 const isActive = activeSection === section.id;
                 return (
@@ -505,8 +505,8 @@ export default function EmployeeViewPage() {
                     <button
                       type="button"
                       onClick={() => setActiveSection(section.id)}
-                      className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-[#1a1a1a] ${
-                        isActive ? "bg-[#EAEB80]/15 text-[#EAEB80]" : "text-gray-300"
+                      className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-card ${
+                        isActive ? "bg-[#EAEB80]/15 text-primary" : "text-muted-foreground"
                       }`}
                     >
                       <span className="flex items-center gap-2">
@@ -516,7 +516,7 @@ export default function EmployeeViewPage() {
                       <ChevronRight className="h-4 w-4 shrink-0 opacity-70" />
                     </button>
                     {section.id !== "payslip" && (
-                      <div className="h-px bg-[#2a2a2a]" aria-hidden />
+                      <div className="h-px bg-muted" aria-hidden />
                     )}
                   </li>
                 );
@@ -529,17 +529,17 @@ export default function EmployeeViewPage() {
             {activeSection === "personal-information" && (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 text-sm xl:items-stretch">
                   {/* Basic Information - v1 exact structure */}
-                  <Card className="bg-[#111111] border-[#2a2a2a] xl:h-full flex flex-col order-1">
+                  <Card className="bg-card border-border2a2a2a] xl:h-full flex flex-col order-1">
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between border-b border-[#2a2a2a] pb-2 mb-3">
+                        <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
                           <div className="flex items-center gap-2">
-                            <List className="h-4 w-4 text-[#EAEB80]" />
-                            <span className="font-bold uppercase text-[13px] text-[#EAEB80]">Basic Information</span>
+                            <List className="h-4 w-4 text-primary" />
+                            <span className="font-bold uppercase text-[13px] text-primary">Basic Information</span>
                           </div>
                           <button
                             type="button"
                             onClick={() => setEditBasicOpen(true)}
-                            className="flex items-center gap-2 py-2 text-[#EAEB80] hover:underline"
+                            className="flex items-center gap-2 py-2 text-primary hover:underline"
                           >
                             <Pencil className="h-3 w-3" />
                             <span>Update</span>
@@ -547,7 +547,7 @@ export default function EmployeeViewPage() {
                         </div>
                         <div className="mt-3">
                           <div className="mb-3">
-                            <p className="font-bold text-gray-500 mb-1">Profile Photo <span className="font-normal text-gray-600">(Optional)</span></p>
+                            <p className="font-bold text-foreground0 mb-1">Profile Photo <span className="font-normal text-gray-600">(Optional)</span></p>
                             {employee.employee_photo ? (
                               <EmployeeDocumentImage
                                 value={employee.employee_photo}
@@ -555,41 +555,41 @@ export default function EmployeeViewPage() {
                                 className="h-20 w-20 rounded-full object-cover object-center"
                               />
                             ) : (
-                              <div className="h-20 w-20 rounded-full border-2 border-[#2a2a2a] flex items-center justify-center" title="No photo uploaded (optional)">
-                                <Image className="h-10 w-10 text-gray-500" />
+                              <div className="h-20 w-20 rounded-full border-2 border-border2a2a2a] flex items-center justify-center" title="No photo uploaded (optional)">
+                                <Image className="h-10 w-10 text-foreground0" />
                               </div>
                             )}
                           </div>
-                          <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-gray-300 capitalize">
-                            <li className="font-bold text-gray-500">First Name:</li>
+                          <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
+                            <li className="font-bold text-foreground0">First Name:</li>
                             <li>{unspecified(employee.employee_first_name)}</li>
-                            <li className="font-bold text-gray-500">Middle Name:</li>
+                            <li className="font-bold text-foreground0">Middle Name:</li>
                             <li>{unspecified(employee.employee_middle_name)}</li>
-                            <li className="font-bold text-gray-500">Last Name:</li>
+                            <li className="font-bold text-foreground0">Last Name:</li>
                             <li>{unspecified(employee.employee_last_name)}</li>
-                            <li className="font-bold text-gray-500">Birth Date:</li>
+                            <li className="font-bold text-foreground0">Birth Date:</li>
                             <li>{employee.employee_birthday ? formatDate(employee.employee_birthday) : "Unspecified"}</li>
-                            <li className="font-bold text-gray-500">Marital Status:</li>
+                            <li className="font-bold text-foreground0">Marital Status:</li>
                             <li>{unspecified(employee.employee_marital_status)}</li>
-                            <li className="font-bold text-gray-500">Social Security Number or EIN:</li>
+                            <li className="font-bold text-foreground0">Social Security Number or EIN:</li>
                             <li>{unspecified(employee.employee_ssn_ein)}</li>
-                            <li className="font-bold text-gray-500">Street:</li>
+                            <li className="font-bold text-foreground0">Street:</li>
                             <li>{unspecified(employee.employee_street)}</li>
-                            <li className="font-bold text-gray-500">City:</li>
+                            <li className="font-bold text-foreground0">City:</li>
                             <li>{unspecified(employee.employee_city)}</li>
-                            <li className="font-bold text-gray-500">State:</li>
+                            <li className="font-bold text-foreground0">State:</li>
                             <li>{unspecified(employee.employee_state)}</li>
-                            <li className="font-bold text-gray-500">Zip Code:</li>
+                            <li className="font-bold text-foreground0">Zip Code:</li>
                             <li>{unspecified(employee.employee_zip_code)}</li>
-                            <li className="font-bold text-gray-500">Country:</li>
+                            <li className="font-bold text-foreground0">Country:</li>
                             <li>{unspecified(employee.employee_country)}</li>
-                            <li className="font-bold text-gray-500">Mobile Number:</li>
+                            <li className="font-bold text-foreground0">Mobile Number:</li>
                             <li>{unspecified(employee.employee_mobile_number)}</li>
-                            <li className="font-bold text-gray-500">Telephone Number:</li>
+                            <li className="font-bold text-foreground0">Telephone Number:</li>
                             <li>{unspecified(employee.employee_telephone)}</li>
-                            <li className="font-bold text-gray-500">Personal Email:</li>
+                            <li className="font-bold text-foreground0">Personal Email:</li>
                             <li className="break-words">{unspecified(employee.employee_email)}</li>
-                            <li className="font-bold text-gray-500">Shirt Size:</li>
+                            <li className="font-bold text-foreground0">Shirt Size:</li>
                             <li>{unspecified(employee.employee_shirt_size)}</li>
                           </ul>
                         </div>
@@ -597,17 +597,17 @@ export default function EmployeeViewPage() {
                     </Card>
 
                   {/* Other Information - v1 (same row as Basic on xl for equal height) */}
-                  <Card className="bg-[#111111] border-[#2a2a2a] xl:h-full flex flex-col order-4 xl:order-2">
+                  <Card className="bg-card border-border2a2a2a] xl:h-full flex flex-col order-4 xl:order-2">
                     <CardContent className="p-4 flex flex-col flex-1">
-                      <div className="flex items-center justify-between border-b border-[#2a2a2a] pb-2 mb-3">
+                      <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
                         <div className="flex items-center gap-2">
-                          <List className="h-4 w-4 text-[#EAEB80]" />
-                          <span className="font-bold uppercase text-[13px] text-[#EAEB80]">Other Information</span>
+                          <List className="h-4 w-4 text-primary" />
+                          <span className="font-bold uppercase text-[13px] text-primary">Other Information</span>
                         </div>
                         <button
                           type="button"
                           onClick={() => setEditOtherOpen(true)}
-                          className="flex items-center gap-2 py-2 text-[#EAEB80] hover:underline"
+                          className="flex items-center gap-2 py-2 text-primary hover:underline"
                         >
                           <Pencil className="h-3 w-3" />
                           <span>Update</span>
@@ -615,8 +615,8 @@ export default function EmployeeViewPage() {
                       </div>
                       <div className="mt-3 space-y-4 flex-1">
                         <div>
-                          <p className="font-bold text-gray-500 mb-2">Driver's License <span className="font-normal text-gray-600">(Optional)</span></p>
-                          <div className="w-full max-w-[20rem] h-[9.7rem] border border-[#2a2a2a] rounded-md overflow-hidden bg-[#0a0a0a]">
+                          <p className="font-bold text-foreground0 mb-2">Driver's License <span className="font-normal text-gray-600">(Optional)</span></p>
+                          <div className="w-full max-w-[20rem] h-[9.7rem] border border-border2a2a2a] rounded-md overflow-hidden bg-background">
                             {employee.employee_driver_license_photo ? (
                               <EmployeeDocumentImage
                                 value={employee.employee_driver_license_photo}
@@ -625,15 +625,15 @@ export default function EmployeeViewPage() {
                               />
                             ) : (
                               <div className="w-full h-full flex flex-col items-center justify-center gap-1" title="No document uploaded">
-                                <Image className="h-12 w-12 text-gray-500" />
+                                <Image className="h-12 w-12 text-foreground0" />
                                 <span className="text-xs text-gray-600">No document uploaded</span>
                               </div>
                             )}
                           </div>
                         </div>
                         <div>
-                          <p className="font-bold text-gray-500 mb-2">Car Insurance <span className="font-normal text-gray-600">(Optional)</span></p>
-                          <div className="w-full max-w-[20rem] h-[9.7rem] border border-[#2a2a2a] rounded-md overflow-hidden bg-[#0a0a0a]">
+                          <p className="font-bold text-foreground0 mb-2">Car Insurance <span className="font-normal text-gray-600">(Optional)</span></p>
+                          <div className="w-full max-w-[20rem] h-[9.7rem] border border-border2a2a2a] rounded-md overflow-hidden bg-background">
                             {employee.employee_car_insurance ? (
                               <EmployeeDocumentImage
                                 value={employee.employee_car_insurance}
@@ -642,46 +642,46 @@ export default function EmployeeViewPage() {
                               />
                             ) : (
                               <div className="w-full h-full flex flex-col items-center justify-center gap-1" title="No document uploaded">
-                                <Image className="h-12 w-12 text-gray-500" />
+                                <Image className="h-12 w-12 text-foreground0" />
                                 <span className="text-xs text-gray-600">No document uploaded</span>
                               </div>
                             )}
                           </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-[18rem,1fr] gap-2">
-                          <p className="font-bold text-gray-500">How did you hear about Golden Luxury Auto?</p>
-                          <p className="text-gray-300">{unspecified(employee.employee_hear_about_gla)}</p>
+                          <p className="font-bold text-foreground0">How did you hear about Golden Luxury Auto?</p>
+                          <p className="text-muted-foreground">{unspecified(employee.employee_hear_about_gla)}</p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Family Information - v1 exact structure */}
-                  <Card className="bg-[#111111] border-[#2a2a2a] order-2 xl:order-3">
+                  <Card className="bg-card border-border2a2a2a] order-2 xl:order-3">
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between border-b border-[#2a2a2a] pb-2 mb-3">
+                        <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
                           <div className="flex items-center gap-2">
-                            <List className="h-4 w-4 text-[#EAEB80]" />
-                            <span className="font-bold uppercase text-[13px] text-[#EAEB80]">Family Information</span>
+                            <List className="h-4 w-4 text-primary" />
+                            <span className="font-bold uppercase text-[13px] text-primary">Family Information</span>
                           </div>
                           <button
                             type="button"
                             onClick={() => setEditFamilyOpen(true)}
-                            className="flex items-center gap-2 py-2 text-[#EAEB80] hover:underline"
+                            className="flex items-center gap-2 py-2 text-primary hover:underline"
                           >
                             <Pencil className="h-3 w-3" />
                             <span>Update</span>
                           </button>
                         </div>
                         <div className="mt-3">
-                          <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-gray-300 capitalize">
-                            <li className="font-bold text-gray-500">Mother's First Name:</li>
+                          <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
+                            <li className="font-bold text-foreground0">Mother's First Name:</li>
                             <li>{unspecified(employee.employee_mother_name)}</li>
-                            <li className="font-bold text-gray-500">Father's First Name:</li>
+                            <li className="font-bold text-foreground0">Father's First Name:</li>
                             <li>{unspecified(employee.employee_father_name)}</li>
-                            <li className="font-bold text-gray-500">Home Contact:</li>
+                            <li className="font-bold text-foreground0">Home Contact:</li>
                             <li>{unspecified(employee.employee_home_contact)}</li>
-                            <li className="font-bold text-gray-500">Family Home Address:</li>
+                            <li className="font-bold text-foreground0">Family Home Address:</li>
                             <li className="break-words">{unspecified(employee.employee_home_address)}</li>
                           </ul>
                         </div>
@@ -689,31 +689,31 @@ export default function EmployeeViewPage() {
                     </Card>
 
                   {/* Emergency Contact - v1 */}
-                  <Card className="bg-[#111111] border-[#2a2a2a] order-3 xl:order-4">
+                  <Card className="bg-card border-border2a2a2a] order-3 xl:order-4">
                     <CardContent className="p-4">
-                      <div className="flex items-center justify-between border-b border-[#2a2a2a] pb-2 mb-3">
+                      <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
                         <div className="flex items-center gap-2">
-                          <List className="h-4 w-4 text-[#EAEB80]" />
-                          <span className="font-bold uppercase text-[13px] text-[#EAEB80]">Emergency Contact</span>
+                          <List className="h-4 w-4 text-primary" />
+                          <span className="font-bold uppercase text-[13px] text-primary">Emergency Contact</span>
                         </div>
                           <button
                             type="button"
                             onClick={() => setEditEmergencyOpen(true)}
-                            className="flex items-center gap-2 py-2 text-[#EAEB80] hover:underline"
+                            className="flex items-center gap-2 py-2 text-primary hover:underline"
                           >
                             <Pencil className="h-3 w-3" />
                             <span>Update</span>
                           </button>
                         </div>
                         <div className="mt-3">
-                          <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-gray-300 capitalize">
-                            <li className="font-bold text-gray-500">Name:</li>
+                          <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
+                            <li className="font-bold text-foreground0">Name:</li>
                             <li>{unspecified(employee.employee_emergency_contact_person)}</li>
-                          <li className="font-bold text-gray-500">Relationship:</li>
+                          <li className="font-bold text-foreground0">Relationship:</li>
                           <li>{unspecified(employee.employee_emergency_relationship)}</li>
-                          <li className="font-bold text-gray-500">Number:</li>
+                          <li className="font-bold text-foreground0">Number:</li>
                           <li>{unspecified(employee.employee_emergency_number)}</li>
-                          <li className="font-bold text-gray-500">Address:</li>
+                          <li className="font-bold text-foreground0">Address:</li>
                           <li className="break-words">{unspecified(employee.employee_emergency_address)}</li>
                         </ul>
                       </div>
@@ -724,58 +724,58 @@ export default function EmployeeViewPage() {
 
             {activeSection === "job-and-pay" && (
               <div className="space-y-4 max-w-[50rem]">
-                <Card className="bg-[#111111] border-[#2a2a2a]">
+                <Card className="bg-card border-border2a2a2a]">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between border-b border-[#2a2a2a] pb-2 mb-3">
+                    <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
                       <div className="flex items-center gap-2">
-                        <List className="h-4 w-4 text-[#EAEB80]" />
-                        <span className="font-bold uppercase text-[13px] text-[#EAEB80]">Job Information</span>
+                        <List className="h-4 w-4 text-primary" />
+                        <span className="font-bold uppercase text-[13px] text-primary">Job Information</span>
                       </div>
-                      <button type="button" onClick={() => setEditJobOpen(true)} className="flex items-center gap-2 py-2 text-[#EAEB80] hover:underline">
+                      <button type="button" onClick={() => setEditJobOpen(true)} className="flex items-center gap-2 py-2 text-primary hover:underline">
                         <Pencil className="h-3 w-3" /> <span>Update</span>
                       </button>
                     </div>
-                    <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-sm text-gray-300">
-                      <li className="font-bold text-gray-500">Employee Number:</li>
+                    <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                      <li className="font-bold text-foreground0">Employee Number:</li>
                       <li>{unspecified(employee.employee_number)}</li>
-                      <li className="font-bold text-gray-500">Department:</li>
+                      <li className="font-bold text-foreground0">Department:</li>
                       <li>{unspecified(employee.employee_job_pay_department_name)}</li>
-                      <li className="font-bold text-gray-500">Job Title:</li>
+                      <li className="font-bold text-foreground0">Job Title:</li>
                       <li>{unspecified(employee.employee_job_pay_job_title_name)}</li>
-                      <li className="font-bold text-gray-500">Work Email:</li>
+                      <li className="font-bold text-foreground0">Work Email:</li>
                       <li className="break-words">{unspecified(employee.employee_job_pay_work_email ?? employee.employee_email)}</li>
-                      <li className="font-bold text-gray-500">Date Hired:</li>
+                      <li className="font-bold text-foreground0">Date Hired:</li>
                       <li>{employee.employee_job_pay_hired ? formatDate(employee.employee_job_pay_hired) : "Unspecified"}</li>
-                      <li className="font-bold text-gray-500">Regularized On:</li>
+                      <li className="font-bold text-foreground0">Regularized On:</li>
                       <li>{employee.employee_job_pay_regular_on ? formatDate(employee.employee_job_pay_regular_on) : "Unspecified"}</li>
-                      <li className="font-bold text-gray-500">Date Separated:</li>
+                      <li className="font-bold text-foreground0">Date Separated:</li>
                       <li>{employee.employee_job_pay_separated ? formatDate(employee.employee_job_pay_separated) : "Unspecified"}</li>
-                      <li className="font-bold text-gray-500">Comment:</li>
+                      <li className="font-bold text-foreground0">Comment:</li>
                       <li>{unspecified(employee.employee_job_pay_comment)}</li>
                     </ul>
                   </CardContent>
                 </Card>
-                <Card className="bg-[#111111] border-[#2a2a2a]">
+                <Card className="bg-card border-border2a2a2a]">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between border-b border-[#2a2a2a] pb-2 mb-3">
+                    <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
                       <div className="flex items-center gap-2">
-                        <List className="h-4 w-4 text-[#EAEB80]" />
-                        <span className="font-bold uppercase text-[13px] text-[#EAEB80]">Pay Information</span>
+                        <List className="h-4 w-4 text-primary" />
+                        <span className="font-bold uppercase text-[13px] text-primary">Pay Information</span>
                       </div>
                       {canEditPay ? (
-                        <button type="button" onClick={() => setEditPayOpen(true)} className="flex items-center gap-2 py-2 text-[#EAEB80] hover:underline">
+                        <button type="button" onClick={() => setEditPayOpen(true)} className="flex items-center gap-2 py-2 text-primary hover:underline">
                           <Pencil className="h-3 w-3" /> <span>Update</span>
                         </button>
                       ) : (
-                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">On-going payroll</span>
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-yellow-500/20 text-yellow-700 border border-yellow-500/30">On-going payroll</span>
                       )}
                     </div>
-                    <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-sm text-gray-300">
-                      <li className="font-bold text-gray-500">Payroll Eligibility:</li>
+                    <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                      <li className="font-bold text-foreground0">Payroll Eligibility:</li>
                       <li>{Number(employee.employee_job_pay_eligible) === 1 ? "Eligible" : "Not Eligible"}</li>
-                      <li className="font-bold text-gray-500">Employee rate per hour:</li>
+                      <li className="font-bold text-foreground0">Employee rate per hour:</li>
                       <li>{formatCurrency(employee.employee_job_pay_salary_rate)}</li>
-                      <li className="font-bold text-gray-500">Bank Account:</li>
+                      <li className="font-bold text-foreground0">Bank Account:</li>
                       <li>{unspecified(employee.employee_job_pay_bank_acc)}</li>
                     </ul>
                   </CardContent>
@@ -784,10 +784,10 @@ export default function EmployeeViewPage() {
             )}
 
             {activeSection === "rate-history" && (
-              <Card className="bg-[#111111] border-[#2a2a2a]">
+              <Card className="bg-card border-border2a2a2a]">
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-3 border-b border-[#2a2a2a] pb-2">
-                    <h3 className="text-[#EAEB80] font-semibold">
+                  <div className="flex items-center justify-between mb-3 border-b border-border2a2a2a] pb-2">
+                    <h3 className="text-primary font-semibold">
                       Rate History
                     </h3>
                     {canEditPay && employeeId && (
@@ -796,27 +796,27 @@ export default function EmployeeViewPage() {
                   </div>
                   {rateHistoryLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
                     </div>
                   ) : rateHistoryData?.data?.length ? (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-[#2a2a2a] bg-[#1a1a1a]">
-                            <th className="text-center py-3 w-12 text-gray-500 font-medium">#</th>
-                            <th className="text-left py-3 min-w-[5rem] text-gray-500 font-medium">Status</th>
-                            <th className="text-left py-3 min-w-[6rem] text-gray-500 font-medium">Pay Type</th>
-                            <th className="text-left py-3 min-w-[10rem] text-gray-500 font-medium">Effective Start</th>
-                            <th className="text-left py-3 min-w-[10rem] text-gray-500 font-medium">Effective End</th>
-                            <th className="text-right py-3 min-w-[6rem] text-gray-500 font-medium">Amount</th>
-                            <th className="text-left py-3 min-w-[12rem] text-gray-500 font-medium">Created Date</th>
-                            <th className="text-right py-3 min-w-[8rem] text-gray-500 font-medium"></th>
+                          <tr className="border-b border-border2a2a2a] bg-card">
+                            <th className="text-center py-3 w-12 text-foreground0 font-medium">#</th>
+                            <th className="text-left py-3 min-w-[5rem] text-foreground0 font-medium">Status</th>
+                            <th className="text-left py-3 min-w-[6rem] text-foreground0 font-medium">Pay Type</th>
+                            <th className="text-left py-3 min-w-[10rem] text-foreground0 font-medium">Effective Start</th>
+                            <th className="text-left py-3 min-w-[10rem] text-foreground0 font-medium">Effective End</th>
+                            <th className="text-right py-3 min-w-[6rem] text-foreground0 font-medium">Amount</th>
+                            <th className="text-left py-3 min-w-[12rem] text-foreground0 font-medium">Created Date</th>
+                            <th className="text-right py-3 min-w-[8rem] text-foreground0 font-medium"></th>
                           </tr>
                         </thead>
                         <tbody>
                           {rateHistoryData.data.map((row, i) => (
-                            <tr key={row.rate_history_aid} className="border-b border-[#2a2a2a]/50 hover:bg-[#1a1a1a]/50">
-                              <td className="py-3 text-center text-gray-300">{i + 1}.</td>
+                            <tr key={row.rate_history_aid} className="border-b border-border2a2a2a]/50 hover:bg-card/50">
+                              <td className="py-3 text-center text-muted-foreground">{i + 1}.</td>
                               <td className="py-3 pl-2">
                                 <span
                                   className={`inline-block w-5 h-5 rounded-full flex-shrink-0 ${
@@ -825,14 +825,14 @@ export default function EmployeeViewPage() {
                                   title={!row.rate_history_effective_end || row.rate_history_effective_end === "" ? "Current rate" : "Previous rate"}
                                 />
                               </td>
-                              <td className="py-3 text-gray-300 capitalize">{row.rate_history_pay_type || "Hourly"}</td>
-                              <td className="py-3 text-gray-300">{formatDate(row.rate_history_effective_start || row.rate_history_date)}</td>
-                              <td className="py-3 text-gray-300">{row.rate_history_effective_end ? formatDate(row.rate_history_effective_end) : "—"}</td>
-                              <td className="py-3 text-right text-gray-300">{formatCurrency(row.rate_history_amount)}</td>
-                              <td className="py-3 text-gray-300">{formatDateTime(row.rate_history_created)}</td>
+                              <td className="py-3 text-muted-foreground capitalize">{row.rate_history_pay_type || "Hourly"}</td>
+                              <td className="py-3 text-muted-foreground">{formatDate(row.rate_history_effective_start || row.rate_history_date)}</td>
+                              <td className="py-3 text-muted-foreground">{row.rate_history_effective_end ? formatDate(row.rate_history_effective_end) : "—"}</td>
+                              <td className="py-3 text-right text-muted-foreground">{formatCurrency(row.rate_history_amount)}</td>
+                              <td className="py-3 text-muted-foreground">{formatDateTime(row.rate_history_created)}</td>
                               <td className="py-3 text-right">
                                 {!canEditPay && i === 0 ? (
-                                  <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                                  <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-yellow-500/20 text-yellow-700 border border-yellow-500/30">
                                     On-going payroll
                                   </span>
                                 ) : null}
@@ -841,198 +841,198 @@ export default function EmployeeViewPage() {
                           ))}
                         </tbody>
                       </table>
-                      <p className="text-center text-sm text-gray-500 py-4">End of list.</p>
+                      <p className="text-center text-sm text-foreground0 py-4">End of list.</p>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">No rate history recorded yet.</p>
+                    <p className="text-sm text-foreground0">No rate history recorded yet.</p>
                   )}
                 </CardContent>
               </Card>
             )}
 
             {activeSection === "job-history" && (
-              <Card className="bg-[#111111] border-[#2a2a2a]">
+              <Card className="bg-card border-border2a2a2a]">
                 <CardContent className="p-6">
-                  <h3 className="text-[#EAEB80] font-semibold mb-3 border-b border-[#2a2a2a] pb-2">
+                  <h3 className="text-primary font-semibold mb-3 border-b border-border2a2a2a] pb-2">
                     Job History
                   </h3>
                   {jobHistoryLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
                     </div>
                   ) : jobHistoryData?.data?.length ? (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-[#2a2a2a]">
-                            <th className="text-left py-2 text-gray-500 font-medium">#</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Status</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Company Name</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Years Deployed</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">From</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">To</th>
+                          <tr className="border-b border-border2a2a2a]">
+                            <th className="text-left py-2 text-foreground0 font-medium">#</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Status</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Company Name</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Years Deployed</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">From</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">To</th>
                           </tr>
                         </thead>
                         <tbody>
                           {jobHistoryData.data.map((row, i) => (
-                            <tr key={row.employment_history_aid} className="border-b border-[#2a2a2a]/50">
-                              <td className="py-2 text-gray-300">{i + 1}.</td>
+                            <tr key={row.employment_history_aid} className="border-b border-border2a2a2a]/50">
+                              <td className="py-2 text-muted-foreground">{i + 1}.</td>
                               <td className="py-2">
-                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.employment_history_is_active === 1 ? "bg-green-500/20 text-green-300" : "bg-gray-500/20 text-gray-400"}`}>
+                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.employment_history_is_active === 1 ? "bg-green-500/20 text-green-700" : "bg-gray-500/20 text-muted-foreground"}`}>
                                   {row.employment_history_is_active === 1 ? "Active" : "Inactive"}
                                 </span>
                               </td>
-                              <td className="py-2 text-gray-300">{row.employment_history_company_name || "—"}</td>
-                              <td className="py-2 text-gray-300">{row.employment_history_years_deployed || "—"}</td>
-                              <td className="py-2 text-gray-300">{formatDate(row.employment_history_start_date)}</td>
-                              <td className="py-2 text-gray-300">{formatDate(row.employment_history_end_date)}</td>
+                              <td className="py-2 text-muted-foreground">{row.employment_history_company_name || "—"}</td>
+                              <td className="py-2 text-muted-foreground">{row.employment_history_years_deployed || "—"}</td>
+                              <td className="py-2 text-muted-foreground">{formatDate(row.employment_history_start_date)}</td>
+                              <td className="py-2 text-muted-foreground">{formatDate(row.employment_history_end_date)}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">No job history recorded yet.</p>
+                    <p className="text-sm text-foreground0">No job history recorded yet.</p>
                   )}
                 </CardContent>
               </Card>
             )}
 
             {activeSection === "earnings" && (
-              <Card className="bg-[#111111] border-[#2a2a2a]">
+              <Card className="bg-card border-border2a2a2a]">
                 <CardContent className="p-6">
-                  <h3 className="text-[#EAEB80] font-semibold mb-3 border-b border-[#2a2a2a] pb-2">
+                  <h3 className="text-primary font-semibold mb-3 border-b border-border2a2a2a] pb-2">
                     Earnings
                   </h3>
                   {earningsLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
                     </div>
                   ) : earningsData?.data?.length ? (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-[#2a2a2a]">
-                            <th className="text-left py-2 text-gray-500 font-medium">#</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Status</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Date</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Payitem</th>
-                            <th className="text-right py-2 text-gray-500 font-medium">Amount</th>
+                          <tr className="border-b border-border2a2a2a]">
+                            <th className="text-left py-2 text-foreground0 font-medium">#</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Status</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Date</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Payitem</th>
+                            <th className="text-right py-2 text-foreground0 font-medium">Amount</th>
                           </tr>
                         </thead>
                         <tbody>
                           {earningsData.data.map((row, i) => (
-                            <tr key={row.hris_earning_deduction_aid} className="border-b border-[#2a2a2a]/50">
-                              <td className="py-2 text-gray-300">{i + 1}.</td>
+                            <tr key={row.hris_earning_deduction_aid} className="border-b border-border2a2a2a]/50">
+                              <td className="py-2 text-muted-foreground">{i + 1}.</td>
                               <td className="py-2">
-                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-300" : "bg-yellow-500/20 text-yellow-300"}`}>
+                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
                                   {row.hris_earning_deduction_is_paid === 1 ? "Paid" : "Unpaid"}
                                 </span>
                               </td>
-                              <td className="py-2 text-gray-300">{formatDate(row.hris_earning_deduction_date)}</td>
-                              <td className="py-2 text-gray-300">{row.payitem_name || "—"}</td>
-                              <td className="py-2 text-right text-gray-300">{formatCurrency(row.hris_earning_deduction_amount)}</td>
+                              <td className="py-2 text-muted-foreground">{formatDate(row.hris_earning_deduction_date)}</td>
+                              <td className="py-2 text-muted-foreground">{row.payitem_name || "—"}</td>
+                              <td className="py-2 text-right text-muted-foreground">{formatCurrency(row.hris_earning_deduction_amount)}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">No earnings recorded yet.</p>
+                    <p className="text-sm text-foreground0">No earnings recorded yet.</p>
                   )}
                 </CardContent>
               </Card>
             )}
 
             {activeSection === "deduction" && (
-              <Card className="bg-[#111111] border-[#2a2a2a]">
+              <Card className="bg-card border-border2a2a2a]">
                 <CardContent className="p-6">
-                  <h3 className="text-[#EAEB80] font-semibold mb-3 border-b border-[#2a2a2a] pb-2">
+                  <h3 className="text-primary font-semibold mb-3 border-b border-border2a2a2a] pb-2">
                     Deduction
                   </h3>
                   {deductionsLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
                     </div>
                   ) : deductionsData?.data?.length ? (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-[#2a2a2a]">
-                            <th className="text-left py-2 text-gray-500 font-medium">#</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Status</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Date</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Payitem</th>
-                            <th className="text-right py-2 text-gray-500 font-medium">Amount</th>
+                          <tr className="border-b border-border2a2a2a]">
+                            <th className="text-left py-2 text-foreground0 font-medium">#</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Status</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Date</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Payitem</th>
+                            <th className="text-right py-2 text-foreground0 font-medium">Amount</th>
                           </tr>
                         </thead>
                         <tbody>
                           {deductionsData.data.map((row, i) => (
-                            <tr key={row.hris_earning_deduction_aid} className="border-b border-[#2a2a2a]/50">
-                              <td className="py-2 text-gray-300">{i + 1}.</td>
+                            <tr key={row.hris_earning_deduction_aid} className="border-b border-border2a2a2a]/50">
+                              <td className="py-2 text-muted-foreground">{i + 1}.</td>
                               <td className="py-2">
-                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-300" : "bg-yellow-500/20 text-yellow-300"}`}>
+                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
                                   {row.hris_earning_deduction_is_paid === 1 ? "Paid" : "Unpaid"}
                                 </span>
                               </td>
-                              <td className="py-2 text-gray-300">{formatDate(row.hris_earning_deduction_date)}</td>
-                              <td className="py-2 text-gray-300">{row.payitem_name || "—"}</td>
-                              <td className="py-2 text-right text-gray-300">{formatCurrency(row.hris_earning_deduction_amount)}</td>
+                              <td className="py-2 text-muted-foreground">{formatDate(row.hris_earning_deduction_date)}</td>
+                              <td className="py-2 text-muted-foreground">{row.payitem_name || "—"}</td>
+                              <td className="py-2 text-right text-muted-foreground">{formatCurrency(row.hris_earning_deduction_amount)}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">No deductions recorded yet.</p>
+                    <p className="text-sm text-foreground0">No deductions recorded yet.</p>
                   )}
                 </CardContent>
               </Card>
             )}
 
             {activeSection === "payslip" && (
-              <Card className="bg-[#111111] border-[#2a2a2a]">
+              <Card className="bg-card border-border2a2a2a]">
                 <CardContent className="p-6">
-                  <h3 className="text-[#EAEB80] font-semibold mb-3 border-b border-[#2a2a2a] pb-2">
+                  <h3 className="text-primary font-semibold mb-3 border-b border-border2a2a2a] pb-2">
                     Payslip
                   </h3>
                   {payslipsLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
                     </div>
                   ) : payslipsData?.data?.length ? (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-[#2a2a2a]">
-                            <th className="text-left py-2 text-gray-500 font-medium">#</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Status</th>
-                            <th className="text-left py-2 text-gray-500 font-medium">Payroll ID</th>
-                            <th className="text-right py-2 text-gray-500 font-medium">Gross</th>
-                            <th className="text-right py-2 text-gray-500 font-medium">Deduction</th>
-                            <th className="text-right py-2 text-gray-500 font-medium">Net Pay</th>
+                          <tr className="border-b border-border2a2a2a]">
+                            <th className="text-left py-2 text-foreground0 font-medium">#</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Status</th>
+                            <th className="text-left py-2 text-foreground0 font-medium">Payroll ID</th>
+                            <th className="text-right py-2 text-foreground0 font-medium">Gross</th>
+                            <th className="text-right py-2 text-foreground0 font-medium">Deduction</th>
+                            <th className="text-right py-2 text-foreground0 font-medium">Net Pay</th>
                           </tr>
                         </thead>
                         <tbody>
                           {payslipsData.data.map((row, i) => (
-                            <tr key={row.payrun_list_aid} className="border-b border-[#2a2a2a]/50">
-                              <td className="py-2 text-gray-300">{i + 1}.</td>
+                            <tr key={row.payrun_list_aid} className="border-b border-border2a2a2a]/50">
+                              <td className="py-2 text-muted-foreground">{i + 1}.</td>
                               <td className="py-2">
-                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.payrun_status === 1 ? "bg-green-500/20 text-green-300" : "bg-yellow-500/20 text-yellow-300"}`}>
+                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.payrun_status === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
                                   {row.payrun_status === 1 ? "Paid" : "Unpaid"}
                                 </span>
                               </td>
-                              <td className="py-2 text-gray-300">{row.payrun_number || "—"}</td>
-                              <td className="py-2 text-right text-gray-300">{formatCurrency(row.payrun_list_gross)}</td>
-                              <td className="py-2 text-right text-gray-300">{formatCurrency(row.payrun_list_deduction)}</td>
-                              <td className="py-2 text-right text-gray-300">{formatCurrency(row.payrun_list_net)}</td>
+                              <td className="py-2 text-muted-foreground">{row.payrun_number || "—"}</td>
+                              <td className="py-2 text-right text-muted-foreground">{formatCurrency(row.payrun_list_gross)}</td>
+                              <td className="py-2 text-right text-muted-foreground">{formatCurrency(row.payrun_list_deduction)}</td>
+                              <td className="py-2 text-right text-muted-foreground">{formatCurrency(row.payrun_list_net)}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">No payslips available yet.</p>
+                    <p className="text-sm text-foreground0">No payslips available yet.</p>
                   )}
                 </CardContent>
               </Card>

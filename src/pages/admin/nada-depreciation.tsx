@@ -632,10 +632,10 @@ export default function NADADepreciationPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-400">Failed to load car details</p>
+          <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-[#EAEB80] hover:underline"
+            className="mt-4 text-primary hover:underline"
           >
             ← Back to View Car
           </button>
@@ -683,15 +683,15 @@ export default function NADADepreciationPage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">NADA Depreciation Schedule</h1>
+            <h1 className="text-2xl font-bold text-foreground">NADA Depreciation Schedule</h1>
             {car && (
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Car: {car.makeModel || "Unknown Car"}
               </p>
             )}
@@ -699,26 +699,26 @@ export default function NADADepreciationPage() {
         </div>
 
         {/* Header Section */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <div className="bg-card border border-border rounded-lg p-6 mb-6">
           <div className="flex justify-between items-start mb-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 flex-1">
               {/* Car Information */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-3">
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">
                   Car Information
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-xs text-gray-500">Car Name:</span>
-                    <p className="text-sm text-gray-300">{carName}</p>
+                    <span className="text-xs text-foreground0">Car Name:</span>
+                    <p className="text-sm text-muted-foreground">{carName}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">VIN #:</span>
-                    <p className="text-sm text-gray-300">{car.vin || "N/A"}</p>
+                    <span className="text-xs text-foreground0">VIN #:</span>
+                    <p className="text-sm text-muted-foreground">{car.vin || "N/A"}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">License:</span>
-                    <p className="text-sm text-gray-300">
+                    <span className="text-xs text-foreground0">License:</span>
+                    <p className="text-sm text-muted-foreground">
                       {car.licensePlate || "N/A"}
                     </p>
                   </div>
@@ -727,58 +727,58 @@ export default function NADADepreciationPage() {
 
               {/* Owner Information */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-3">
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">
                   Owner Information
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-xs text-gray-500">Name:</span>
+                    <span className="text-xs text-foreground0">Name:</span>
                     {car?.clientId ? (
                       <button
                         onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                        className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-sm cursor-pointer"
+                        className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-sm cursor-pointer"
                       >
                         {ownerName}
                       </button>
                     ) : (
-                      <p className="text-sm text-gray-300">{ownerName}</p>
+                      <p className="text-sm text-muted-foreground">{ownerName}</p>
                     )}
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">Contact #:</span>
-                    <p className="text-sm text-gray-300">{ownerContact}</p>
+                    <span className="text-xs text-foreground0">Contact #:</span>
+                    <p className="text-sm text-muted-foreground">{ownerContact}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">Email:</span>
-                    <p className="text-sm text-gray-300">{ownerEmail}</p>
+                    <span className="text-xs text-foreground0">Email:</span>
+                    <p className="text-sm text-muted-foreground">{ownerEmail}</p>
                   </div>
                 </div>
               </div>
 
               {/* Car Specifications */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-3">
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">
                   Car Specifications
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-xs text-gray-500">Fuel/Gas:</span>
-                    <p className="text-sm text-gray-300">{fuelType}</p>
+                    <span className="text-xs text-foreground0">Fuel/Gas:</span>
+                    <p className="text-sm text-muted-foreground">{fuelType}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">Tire Size:</span>
-                    <p className="text-sm text-gray-300">{tireSize}</p>
+                    <span className="text-xs text-foreground0">Tire Size:</span>
+                    <p className="text-sm text-muted-foreground">{tireSize}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">Oil Type:</span>
-                    <p className="text-sm text-gray-300">{oilType}</p>
+                    <span className="text-xs text-foreground0">Oil Type:</span>
+                    <p className="text-sm text-muted-foreground">{oilType}</p>
                   </div>
                 </div>
               </div>
 
               {/* Turo Links */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-3">
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">
                   Turo Links
                 </h3>
                 <div className="space-y-2">
@@ -788,7 +788,7 @@ export default function NADADepreciationPage() {
                         href={car.turoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                        className="text-primary hover:underline text-sm flex items-center gap-1"
                       >
                         Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -801,7 +801,7 @@ export default function NADADepreciationPage() {
                         href={car.adminTuroLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                        className="text-primary hover:underline text-sm flex items-center gap-1"
                       >
                         Admin Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -809,7 +809,7 @@ export default function NADADepreciationPage() {
                     </div>
                   )}
                   {!car.turoLink && !car.adminTuroLink && (
-                    <span className="text-gray-500 text-sm">
+                    <span className="text-foreground0 text-sm">
                       No Turo links available
                     </span>
                   )}
@@ -819,7 +819,7 @@ export default function NADADepreciationPage() {
             {/* Action Buttons */}
             <div className="flex gap-2 ml-4">
               <Button
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                className="bg-primary text-primary-foreground hover:bg-primary/80"
                 onClick={handleExport}
                 disabled={
                   !car ||
@@ -832,7 +832,7 @@ export default function NADADepreciationPage() {
               </Button>
               {!isClient && (
                 <Button
-                  className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border border-[#2a2a2a]"
+                  className="bg-card text-foreground hover:bg-muted border border-border"
                   onClick={() => setIsImportModalOpen(true)}
                   disabled={!car}
                 >
@@ -842,7 +842,7 @@ export default function NADADepreciationPage() {
               )}
               {!isClient && (
                 <Button
-                  className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border border-[#2a2a2a]"
+                  className="bg-card text-foreground hover:bg-muted border border-border"
                   onClick={() => setIsLogModalOpen(true)}
                 >
                   <FileText className="w-4 h-4 mr-2" />
@@ -855,15 +855,15 @@ export default function NADADepreciationPage() {
 
         {/* NADA Depreciation Schedule Header with Year Filter */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-serif text-[#EAEB80] italic">
+          <h1 className="text-3xl font-serif text-primary italic">
             NADA Depreciation Schedule
           </h1>
           <div className="w-[150px]">
             <Select value={selectedYear} onValueChange={setSelectedYear}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                 <SelectValue placeholder="Select year" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-card border-border text-foreground">
                 {availableYears.map((year) => (
                   <SelectItem key={year} value={year}>
                     {year}
@@ -875,14 +875,14 @@ export default function NADADepreciationPage() {
         </div>
 
         {/* NADA Depreciation Schedule Previous Year Table */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden mb-6">
-          <div className="flex justify-between items-center p-4 border-b border-[#2a2a2a]">
-            <h2 className="text-lg font-semibold text-gray-300">
+        <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">
+          <div className="flex justify-between items-center p-4 border-b border-border">
+            <h2 className="text-lg font-semibold text-muted-foreground">
               NADA Depreciation Schedule {parseInt(selectedYear) - 1}
             </h2>
             {!isClient && (
               <Button
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                className="bg-primary text-primary-foreground hover:bg-primary/80"
                 onClick={() => handleAdd(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -892,20 +892,20 @@ export default function NADADepreciationPage() {
           </div>
           <div className="w-full overflow-x-auto">
             <table className="border-collapse w-full table-auto">
-              <thead className="bg-[#1a1a1a]">
-                <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-index-[auto] border-r border-[#2a2a2a] whitespace-nowrap">
+              <thead className="bg-card">
+                <tr className="bg-card border-b border-border">
+                  <th className="text-left px-3 py-3 text-sm font-medium text-muted-foreground sticky top-0 left-0 bg-card z-index-[auto] border-r border-border whitespace-nowrap">
                     Current Cost of Vehicle
                   </th>
                   {monthsPreviousYear.map((month) => (
                     <th
                       key={month}
-                      className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
+                      className="text-right px-2 py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-30 border-l border-border whitespace-nowrap"
                     >
                       {month}
                     </th>
                   ))}
-                  <th className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap">
+                  <th className="text-right px-2 py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-30 border-l border-border whitespace-nowrap">
                     Current
                   </th>
                 </tr>
@@ -913,19 +913,19 @@ export default function NADADepreciationPage() {
               <tbody>
                 {isLoadingNadaWithAdd ? (
                   <tr>
-                    <td colSpan={14} className="p-10 text-center text-gray-400">
+                    <td colSpan={14} className="p-10 text-center text-muted-foreground">
                       Loading previous year data...
                     </td>
                   </tr>
                 ) : nadaDepreciationWithAddError ? (
                   <tr>
                     <td colSpan={14} className="p-10 text-center">
-                      <div className="text-red-400 mb-2">
+                      <div className="text-red-700 mb-2">
                         Error loading data: {nadaDepreciationWithAddError instanceof Error ? nadaDepreciationWithAddError.message : "Unknown error"}
                       </div>
                       <Button
                         onClick={() => refetchNadaDepreciationWithAdd()}
-                        className="bg-[#EAEB80] text-black hover:bg-[#d4d570] text-sm"
+                        className="bg-primary text-primary-foreground hover:bg-primary/80 text-sm"
                       >
                         Retry
                       </Button>
@@ -933,7 +933,7 @@ export default function NADADepreciationPage() {
                   </tr>
                 ) : nadaPreviousRows.length === 0 ? (
                   <tr>
-                    <td colSpan={14} className="p-10 text-center text-gray-400">
+                    <td colSpan={14} className="p-10 text-center text-muted-foreground">
                       No data available for {previousYear}. Click "Add" to create entries.
                     </td>
                   </tr>
@@ -947,9 +947,9 @@ export default function NADADepreciationPage() {
                     return (
                   <tr
                     key={rowIndex}
-                    className="border-b border-[#2a2a2a] hover:bg-[#151515] transition-colors"
+                    className="border-b border-border hover:bg-muted/50151515] transition-colors"
                   >
-                    <td className="px-3 py-2 text-sm text-gray-300 sticky left-0 bg-[#0f0f0f] z-[50] border-r border-[#2a2a2a]">
+                    <td className="px-3 py-2 text-sm text-muted-foreground sticky left-0 bg-card z-[50] border-r border-border">
                       <span className="whitespace-nowrap">{row.label}</span>
                     </td>
                         {row.values.map((value, monthIndex) => {
@@ -970,12 +970,12 @@ export default function NADADepreciationPage() {
                                 }
                               }}
                         className={cn(
-                          "text-right px-2 py-2 text-sm border-l border-[#2a2a2a] whitespace-nowrap",
+                          "text-right px-2 py-2 text-sm border-l border-border whitespace-nowrap",
                                 hasData && !row.isMiles
-                                  ? "text-[#EAEB80] underline cursor-pointer hover:bg-[#1a1a1a]"
+                                  ? "text-primary underline cursor-pointer hover:bg-card"
                                   : value !== 0
-                            ? "text-gray-300 font-medium"
-                            : "text-gray-500"
+                            ? "text-muted-foreground font-medium"
+                            : "text-foreground0"
                         )}
                       >
                               {row.isMiles
@@ -984,12 +984,12 @@ export default function NADADepreciationPage() {
                       </td>
                           );
                         })}
-                    <td className="text-right px-2 py-2 text-sm border-l border-[#2a2a2a] bg-[#1f1f1f] whitespace-nowrap">
+                    <td className="text-right px-2 py-2 text-sm border-l border-border bg-card whitespace-nowrap">
                           <span
                             className={cn(
                               row.current !== 0
-                                ? "text-[#EAEB80] font-medium"
-                          : "text-gray-500"
+                                ? "text-primary font-medium"
+                          : "text-foreground0"
                             )}
                           >
                         {row.isMiles 
@@ -1007,31 +1007,31 @@ export default function NADADepreciationPage() {
         </div>
 
         {/* NADA Change % Table */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden mb-6">
-          <div className="p-4 border-b border-[#2a2a2a]">
-             <h2 className="text-lg font-semibold text-gray-300">
+        <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">
+          <div className="p-4 border-b border-border">
+             <h2 className="text-lg font-semibold text-muted-foreground">
                NADA Change % {previousYear} - {selectedYear}
              </h2>
           </div>
           <div className="w-full overflow-x-auto">
             <table className="border-collapse w-full table-auto">
-              <thead className="bg-[#1a1a1a]">
-                <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-index-[auto] border-r border-[#2a2a2a] whitespace-nowrap">
+              <thead className="bg-card">
+                <tr className="bg-card border-b border-border">
+                  <th className="text-left px-3 py-3 text-sm font-medium text-muted-foreground sticky top-0 left-0 bg-card z-index-[auto] border-r border-border whitespace-nowrap">
                     Category
                   </th>
                   {months.map((month) => (
                     <th
                       key={month}
-                      className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
+                      className="text-right px-2 py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-30 border-l border-border whitespace-nowrap"
                     >
                       {month}
                     </th>
                   ))}
-                  <th className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap">
+                  <th className="text-right px-2 py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-30 border-l border-border whitespace-nowrap">
                     Average
                   </th>
-                  <th className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap">
+                  <th className="text-right px-2 py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-30 border-l border-border whitespace-nowrap">
                     Current
                   </th>
                 </tr>
@@ -1040,41 +1040,41 @@ export default function NADADepreciationPage() {
                 {nadaChangeRows.map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
-                    className="border-b border-[#2a2a2a] hover:bg-[#151515] transition-colors"
+                    className="border-b border-border hover:bg-muted/50151515] transition-colors"
                   >
-                    <td className="px-3 py-2 text-sm text-gray-300 sticky left-0 bg-[#0f0f0f] z-[50] border-r border-[#2a2a2a]">
+                    <td className="px-3 py-2 text-sm text-muted-foreground sticky left-0 bg-card z-[50] border-r border-border">
                       <span className="whitespace-nowrap">{row.label}</span>
                     </td>
                     {row.values.map((value, monthIndex) => (
                       <td
                         key={monthIndex}
                         className={cn(
-                          "text-right px-2 py-2 text-sm border-l border-[#2a2a2a] whitespace-nowrap",
+                          "text-right px-2 py-2 text-sm border-l border-border whitespace-nowrap",
                           value !== 0
-                            ? "text-[#EAEB80] font-medium"
-                            : "text-gray-500"
+                            ? "text-primary font-medium"
+                            : "text-foreground0"
                         )}
                       >
                         {formatPercentage(value)}
                       </td>
                     ))}
-                    <td className="text-right px-2 py-2 text-sm border-l border-[#2a2a2a] bg-[#1f1f1f] whitespace-nowrap">
+                    <td className="text-right px-2 py-2 text-sm border-l border-border bg-card whitespace-nowrap">
                       <span
                         className={cn(
                           row.average !== 0
-                            ? "text-[#EAEB80] font-medium"
-                            : "text-gray-500"
+                            ? "text-primary font-medium"
+                            : "text-foreground0"
                         )}
                       >
                         {formatPercentage(row.average)}
                       </span>
                     </td>
-                    <td className="text-right px-2 py-2 text-sm border-l border-[#2a2a2a] bg-[#1f1f1f] whitespace-nowrap">
+                    <td className="text-right px-2 py-2 text-sm border-l border-border bg-card whitespace-nowrap">
                       <span
                         className={cn(
                           row.current !== 0
-                            ? "text-[#EAEB80] font-medium"
-                            : "text-gray-500"
+                            ? "text-primary font-medium"
+                            : "text-foreground0"
                         )}
                       >
                         {formatPercentage(row.current)}
@@ -1088,14 +1088,14 @@ export default function NADADepreciationPage() {
         </div>
 
         {/* NADA Depreciation Schedule Current Year Table */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden mb-6">
-          <div className="flex justify-between items-center p-4 border-b border-[#2a2a2a]">
-             <h2 className="text-lg font-semibold text-[#EAEB80]">
+        <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">
+          <div className="flex justify-between items-center p-4 border-b border-border">
+             <h2 className="text-lg font-semibold text-primary">
                NADA Depreciation Schedule {selectedYear}
              </h2>
             {!isClient && (
               <Button
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                className="bg-primary text-primary-foreground hover:bg-primary/80"
                 onClick={() => handleAdd(false)}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -1105,20 +1105,20 @@ export default function NADADepreciationPage() {
           </div>
           <div className="w-full overflow-x-auto">
             <table className="border-collapse w-full table-auto">
-              <thead className="bg-[#1a1a1a]">
-                <tr className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
-                  <th className="text-left px-3 py-3 text-sm font-medium text-gray-300 sticky top-0 left-0 bg-[#1a1a1a] z-index-[auto] border-r border-[#2a2a2a] whitespace-nowrap">
+              <thead className="bg-card">
+                <tr className="bg-card border-b border-border">
+                  <th className="text-left px-3 py-3 text-sm font-medium text-muted-foreground sticky top-0 left-0 bg-card z-index-[auto] border-r border-border whitespace-nowrap">
                     Current Cost of Vehicle
                   </th>
                   {months.map((month) => (
                     <th
                       key={month}
-                      className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap"
+                      className="text-right px-2 py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-30 border-l border-border whitespace-nowrap"
                     >
                       {month}
                     </th>
                   ))}
-                  <th className="text-right px-2 py-3 text-sm font-medium text-gray-300 sticky top-0 bg-[#1a1a1a] z-30 border-l border-[#2a2a2a] whitespace-nowrap">
+                  <th className="text-right px-2 py-3 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-30 border-l border-border whitespace-nowrap">
                     Current
                   </th>
                 </tr>
@@ -1126,19 +1126,19 @@ export default function NADADepreciationPage() {
               <tbody>
                 {isLoadingNada ? (
                   <tr>
-                    <td colSpan={14} className="p-10 text-center text-gray-400">
+                    <td colSpan={14} className="p-10 text-center text-muted-foreground">
                       Loading NADA depreciation data...
                     </td>
                   </tr>
                 ) : nadaDepreciationError ? (
                   <tr>
                     <td colSpan={14} className="p-10 text-center">
-                      <div className="text-red-400 mb-2">
+                      <div className="text-red-700 mb-2">
                         Error loading data: {nadaDepreciationError instanceof Error ? nadaDepreciationError.message : "Unknown error"}
                       </div>
                       <Button
                         onClick={() => refetchNadaDepreciation()}
-                        className="bg-[#EAEB80] text-black hover:bg-[#d4d570] text-sm"
+                        className="bg-primary text-primary-foreground hover:bg-primary/80 text-sm"
                       >
                         Retry
                       </Button>
@@ -1146,7 +1146,7 @@ export default function NADADepreciationPage() {
                   </tr>
                 ) : nadaCurrentRows.length === 0 ? (
                   <tr>
-                    <td colSpan={14} className="p-10 text-center text-gray-400">
+                    <td colSpan={14} className="p-10 text-center text-muted-foreground">
                       No data available for {selectedYear}. Click "Add" to create entries.
                     </td>
                   </tr>
@@ -1161,9 +1161,9 @@ export default function NADADepreciationPage() {
                   return (
                     <tr
                       key={rowIndex}
-                      className="border-b border-[#2a2a2a] hover:bg-[#151515] transition-colors"
+                      className="border-b border-border hover:bg-muted/50151515] transition-colors"
                     >
-                      <td className="px-3 py-2 text-sm text-gray-300 sticky left-0 bg-[#0f0f0f] z-[50] border-r border-[#2a2a2a]">
+                      <td className="px-3 py-2 text-sm text-muted-foreground sticky left-0 bg-card z-[50] border-r border-border">
                             <span className="whitespace-nowrap">
                               {row.label}
                             </span>
@@ -1185,12 +1185,12 @@ export default function NADADepreciationPage() {
                                   }
                                 }}
                           className={cn(
-                            "text-right px-2 py-2 text-sm border-l border-[#2a2a2a] whitespace-nowrap",
+                            "text-right px-2 py-2 text-sm border-l border-border whitespace-nowrap",
                                   hasData
-                                    ? "text-[#EAEB80] underline cursor-pointer hover:bg-[#1a1a1a]"
+                                    ? "text-primary underline cursor-pointer hover:bg-card"
                                     : value !== 0
-                              ? "text-gray-300 font-medium"
-                              : "text-gray-500"
+                              ? "text-muted-foreground font-medium"
+                              : "text-foreground0"
                           )}
                         >
                                 {row.isMiles
@@ -1199,12 +1199,12 @@ export default function NADADepreciationPage() {
                         </td>
                             );
                           })}
-                      <td className="text-right px-2 py-2 text-sm border-l border-[#2a2a2a] bg-[#1f1f1f] whitespace-nowrap">
+                      <td className="text-right px-2 py-2 text-sm border-l border-border bg-card whitespace-nowrap">
                             <span
                               className={cn(
                                 row.current !== 0
-                                  ? "text-[#EAEB80] font-medium"
-                            : "text-gray-500"
+                                  ? "text-primary font-medium"
+                            : "text-foreground0"
                               )}
                             >
                               {row.isMiles
@@ -1216,8 +1216,8 @@ export default function NADADepreciationPage() {
                   );
                 })}
                     {/* Total Equity Row */}
-                    <tr className="border-b border-[#2a2a2a] font-semibold">
-                      <td className="px-3 py-2 text-sm text-[#EAEB80] sticky left-0 bg-[#151515] z-[50] border-r border-[#2a2a2a]">
+                    <tr className="border-b border-border font-semibold">
+                      <td className="px-3 py-2 text-sm text-primary sticky left-0 bg-muted/30 z-[50] border-r border-border">
                         <span className="whitespace-nowrap">
                           Total Equity in Car
                         </span>
@@ -1226,19 +1226,19 @@ export default function NADADepreciationPage() {
                         <td
                           key={monthIndex}
                           className={cn(
-                            "text-right px-2 py-2 text-sm border-l border-[#2a2a2a] whitespace-nowrap",
-                            value !== 0 ? "text-[#EAEB80]" : "text-gray-400"
+                            "text-right px-2 py-2 text-sm border-l border-border whitespace-nowrap",
+                            value !== 0 ? "text-primary" : "text-muted-foreground"
                           )}
                         >
                           {formatCurrency(value)}
                         </td>
                       ))}
-                      <td className="text-right px-2 py-2 text-sm border-l border-[#2a2a2a] bg-[#1f1f1f] whitespace-nowrap">
+                      <td className="text-right px-2 py-2 text-sm border-l border-border bg-card whitespace-nowrap">
                         <span
                           className={cn(
                             totalEquityRow.values[totalEquityRow.values.length - 1] !== 0
-                              ? "text-[#EAEB80]"
-                              : "text-gray-400"
+                              ? "text-primary"
+                              : "text-muted-foreground"
                           )}
                         >
                           {formatCurrency(
@@ -1255,12 +1255,12 @@ export default function NADADepreciationPage() {
         </div>
 
         {/* NADA Depreciation Schedule Graphs */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden mb-6">
-          <div className="p-4 border-b border-[#2a2a2a]">
-            <h2 className="text-lg font-semibold text-gray-300 mb-4">
+        <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">
+          <div className="p-4 border-b border-border">
+            <h2 className="text-lg font-semibold text-muted-foreground mb-4">
               NADA Depreciation Schedule Graphs
             </h2>
-            <h3 className="text-md font-medium text-[#EAEB80]">
+            <h3 className="text-md font-medium text-primary">
               NADA Depreciation Schedule {previousYear}
             </h3>
           </div>
@@ -1331,9 +1331,9 @@ export default function NADADepreciationPage() {
         </div>
 
         {/* NADA Change % Chart */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden mb-6">
-          <div className="p-4 border-b border-[#2a2a2a]">
-             <h3 className="text-md font-medium text-[#EAEB80]">
+        <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">
+          <div className="p-4 border-b border-border">
+             <h3 className="text-md font-medium text-primary">
                NADA Change % {previousYear} - {selectedYear}
              </h3>
           </div>
@@ -1404,9 +1404,9 @@ export default function NADADepreciationPage() {
         </div>
 
         {/* NADA Depreciation Schedule Current Year Chart */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden mb-6">
-          <div className="p-4 border-b border-[#2a2a2a]">
-             <h3 className="text-md font-medium text-[#EAEB80]">
+        <div className="bg-card border border-border rounded-lg overflow-hidden mb-6">
+          <div className="p-4 border-b border-border">
+             <h3 className="text-md font-medium text-primary">
                NADA Depreciation Schedule {selectedYear}
              </h3>
           </div>
@@ -1521,16 +1521,16 @@ export default function NADADepreciationPage() {
 
       {/* Import Modal */}
       <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
-        <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white">
+        <DialogContent className="bg-card border-border text-foreground">
           <DialogHeader>
-            <DialogTitle className="text-white">Import NADA Depreciation Schedule</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-foreground">Import NADA Depreciation Schedule</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Upload a CSV or Excel file with the NADA Depreciation Schedule template format.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Select File (CSV or Excel)
               </label>
               <input
@@ -1542,10 +1542,10 @@ export default function NADADepreciationPage() {
                     setImportFile(file);
                   }
                 }}
-                className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#EAEB80] file:text-black hover:file:bg-[#d4d570] file:cursor-pointer"
+                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 file:cursor-pointer"
               />
               {importFile && (
-                <p className="mt-2 text-sm text-gray-400">
+                <p className="mt-2 text-sm text-muted-foreground">
                   Selected: {importFile.name}
                 </p>
               )}
@@ -1557,14 +1557,14 @@ export default function NADADepreciationPage() {
                   setIsImportModalOpen(false);
                   setImportFile(null);
                 }}
-                className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] border-[#2a2a2a]"
+                className="bg-card text-foreground hover:bg-muted border-border"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleImport}
                 disabled={!importFile || isImporting}
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                className="bg-primary text-primary-foreground hover:bg-primary/80"
               >
                 {isImporting ? "Importing..." : "Import"}
               </Button>

@@ -65,27 +65,27 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-[#1a1a1a] border-2 border-red-500/50 rounded-lg p-8 text-center">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full bg-card border-2 border-red-500/50 rounded-lg p-8 text-center">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white mb-4">
+            <h1 className="text-2xl font-bold text-foreground mb-4">
               Something went wrong
             </h1>
-            <p className="text-gray-300 mb-6">
+            <p className="text-muted-foreground mb-6">
               The application encountered an error. Please try refreshing the page.
             </p>
             
             {this.state.error && (
-              <div className="bg-[#0a0a0a] border border-red-500/30 rounded p-4 mb-6 text-left">
-                <p className="text-red-400 text-sm font-mono break-all">
+              <div className="bg-background border border-red-500/30 rounded p-4 mb-6 text-left">
+                <p className="text-red-700 text-sm font-mono break-all">
                   {this.state.error.message || "Unknown error"}
                 </p>
                 {this.state.errorInfo && (
                   <details className="mt-2">
-                    <summary className="text-gray-400 text-xs cursor-pointer">
+                    <summary className="text-muted-foreground text-xs cursor-pointer">
                       Stack trace
                     </summary>
-                    <pre className="text-gray-500 text-xs mt-2 overflow-auto max-h-40">
+                    <pre className="text-foreground0 text-xs mt-2 overflow-auto max-h-40">
                       {this.state.errorInfo.componentStack}
                     </pre>
                   </details>
@@ -96,7 +96,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="flex gap-4 justify-center">
               <Button
                 onClick={this.handleReload}
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                className="bg-primary text-primary-foreground hover:bg-primary/80"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Reload Page
@@ -104,14 +104,14 @@ export class ErrorBoundary extends Component<Props, State> {
               <Button
                 onClick={this.handleGoHome}
                 variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                className="border-border text-muted-foreground hover:bg-muted/50"
               >
                 <Home className="w-4 h-4 mr-2" />
                 Go Home
               </Button>
             </div>
 
-            <div className="mt-6 text-xs text-gray-500">
+            <div className="mt-6 text-xs text-foreground0">
               <p>If this problem persists, please contact support.</p>
               <p className="mt-2">
                 User Agent: {typeof window !== 'undefined' ? navigator.userAgent : 'Unknown'}

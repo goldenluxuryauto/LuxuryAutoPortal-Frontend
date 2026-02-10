@@ -232,40 +232,40 @@ export default function PaymentStatusPage() {
     <AdminLayout>
       <div className="flex flex-col h-full overflow-x-hidden">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-white">Payment Status</h1>
-          <p className="text-sm text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Payment Status</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Manage payment statuses for client payments
           </p>
         </div>
 
         <div className="flex items-center justify-between mb-4">
-          <span className="text-gray-400 text-sm">Total: {statuses.length}</span>
+          <span className="text-muted-foreground text-sm">Total: {statuses.length}</span>
           <Button
             onClick={handleAdd}
-            className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add
           </Button>
         </div>
 
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-auto flex-1">
+        <div className="bg-card border border-border rounded-lg overflow-auto flex-1">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-12">#</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-24">Status</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium">Name</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-24">Color</TableHead>
-                  <TableHead className="text-left text-[#EAEB80] font-medium w-36">Computed TOTALS</TableHead>
-                  <TableHead className="text-center text-[#EAEB80] font-medium w-28">Actions</TableHead>
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-left text-primary font-medium w-12">#</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-24">Status</TableHead>
+                  <TableHead className="text-left text-primary font-medium">Name</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-24">Color</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-36">Computed TOTALS</TableHead>
+                  <TableHead className="text-center text-primary font-medium w-28">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-gray-500">
+                    <TableCell colSpan={6} className="text-center py-12 text-foreground0">
                       <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                     </TableCell>
                   </TableRow>
@@ -273,25 +273,25 @@ export default function PaymentStatusPage() {
                   statuses.map((item, index) => (
                     <TableRow
                       key={item.payment_status_aid}
-                      className="border-[#2a2a2a] hover:bg-[#1a1a1a]"
+                      className="border-border hover:bg-card"
                     >
-                      <TableCell className="text-gray-300">{index + 1}.</TableCell>
+                      <TableCell className="text-muted-foreground">{index + 1}.</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {item.payment_status_is_active === 1 ? (
                             <>
                               <span className="w-3 h-3 rounded-full bg-green-600 shrink-0" />
-                              <span className="text-sm text-gray-300">Active</span>
+                              <span className="text-sm text-muted-foreground">Active</span>
                             </>
                           ) : (
                             <>
                               <span className="w-3 h-3 rounded-full bg-gray-500 shrink-0" />
-                              <span className="text-sm text-gray-500">Inactive</span>
+                              <span className="text-sm text-foreground0">Inactive</span>
                             </>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-white">{item.payment_status_name}</TableCell>
+                      <TableCell className="text-foreground">{item.payment_status_name}</TableCell>
                       <TableCell>
                         <span
                           className="inline-block px-2 py-0.5 rounded text-xs font-medium text-black"
@@ -302,7 +302,7 @@ export default function PaymentStatusPage() {
                           {item.payment_status_color || "--"}
                         </span>
                       </TableCell>
-                      <TableCell className="text-gray-400">
+                      <TableCell className="text-muted-foreground">
                         {item.payment_status_is_compute_total === 1 ? "Yes" : "No"}
                       </TableCell>
                       <TableCell>
@@ -313,7 +313,7 @@ export default function PaymentStatusPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleEdit(item)}
-                                className="text-gray-400 hover:text-[#EAEB80]"
+                                className="text-muted-foreground hover:text-primary"
                                 title="Edit"
                               >
                                 <Pencil className="w-4 h-4" />
@@ -322,7 +322,7 @@ export default function PaymentStatusPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setArchiveItem(item)}
-                                className="text-gray-400 hover:text-amber-400"
+                                className="text-muted-foreground hover:text-amber-400"
                                 title="Archive"
                               >
                                 <Archive className="w-4 h-4" />
@@ -334,7 +334,7 @@ export default function PaymentStatusPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setRestoreItem(item)}
-                                className="text-gray-400 hover:text-[#EAEB80]"
+                                className="text-muted-foreground hover:text-primary"
                                 title="Restore"
                               >
                                 <RotateCcw className="w-4 h-4" />
@@ -343,7 +343,7 @@ export default function PaymentStatusPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setDeleteItem(item)}
-                                className="text-gray-400 hover:text-red-400"
+                                className="text-muted-foreground hover:text-red-700"
                                 title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -356,7 +356,7 @@ export default function PaymentStatusPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-gray-500">
+                    <TableCell colSpan={6} className="text-center py-12 text-foreground0">
                       No payment statuses found
                     </TableCell>
                   </TableRow>
@@ -377,37 +377,37 @@ export default function PaymentStatusPage() {
               }
             }}
           >
-            <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white">
+            <DialogContent className="bg-card border-border text-foreground">
               <DialogHeader>
                 <DialogTitle>{editingItem ? "Update" : "Add"} Status</DialogTitle>
-                <DialogDescription className="text-gray-400">
+                <DialogDescription className="text-muted-foreground">
                   {editingItem ? "Edit payment status" : "Create a new payment status"}
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label className="text-gray-400">Name</Label>
+                  <Label className="text-muted-foreground">Name</Label>
                   <Input
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white mt-1"
+                    className="bg-card border-border text-foreground mt-1"
                     placeholder="e.g. To Pay, Paid"
                     required
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Color</Label>
+                  <Label className="text-muted-foreground">Color</Label>
                   <div className="flex items-center gap-2 mt-1">
                     <Input
                       type="color"
                       value={formColor}
                       onChange={(e) => setFormColor(e.target.value)}
-                      className="w-12 h-9 p-1 bg-[#1a1a1a] border-[#2a2a2a] cursor-pointer"
+                      className="w-12 h-9 p-1 bg-card border-border cursor-pointer"
                     />
                     <Input
                       value={formColor}
                       onChange={(e) => setFormColor(e.target.value)}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white flex-1"
+                      className="bg-card border-border text-foreground flex-1"
                     />
                   </div>
                 </div>
@@ -416,9 +416,9 @@ export default function PaymentStatusPage() {
                     id="computeTotal"
                     checked={formComputeTotal}
                     onCheckedChange={(v) => setFormComputeTotal(!!v)}
-                    className="border-gray-500 data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-[#EAEB80]"
+                    className="border-gray-500 data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-primary"
                   />
-                  <Label htmlFor="computeTotal" className="text-gray-400 text-sm cursor-pointer">
+                  <Label htmlFor="computeTotal" className="text-muted-foreground text-sm cursor-pointer">
                     Mark check if computed to TOTALS menu
                   </Label>
                 </div>
@@ -430,14 +430,14 @@ export default function PaymentStatusPage() {
                       setIsAddModalOpen(false);
                       resetForm();
                     }}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
                     disabled={isPending || !formName.trim()}
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80"
                   >
                     {isPending ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -456,7 +456,7 @@ export default function PaymentStatusPage() {
         {/* Archive Confirm */}
         {archiveItem && (
           <Dialog open={true} onOpenChange={() => setArchiveItem(null)}>
-            <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white">
+            <DialogContent className="bg-card border-border text-foreground">
               <DialogHeader>
                 <DialogTitle>Archive Status</DialogTitle>
                 <DialogDescription>
@@ -467,7 +467,7 @@ export default function PaymentStatusPage() {
                 <Button
                   variant="outline"
                   onClick={() => setArchiveItem(null)}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  className="bg-card border-border text-foreground"
                 >
                   Cancel
                 </Button>
@@ -486,7 +486,7 @@ export default function PaymentStatusPage() {
         {/* Restore Confirm */}
         {restoreItem && (
           <Dialog open={true} onOpenChange={() => setRestoreItem(null)}>
-            <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white">
+            <DialogContent className="bg-card border-border text-foreground">
               <DialogHeader>
                 <DialogTitle>Restore Status</DialogTitle>
                 <DialogDescription>
@@ -497,14 +497,14 @@ export default function PaymentStatusPage() {
                 <Button
                   variant="outline"
                   onClick={() => setRestoreItem(null)}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  className="bg-card border-border text-foreground"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={() => restoreMutation.mutate(restoreItem.payment_status_aid)}
                   disabled={restoreMutation.isPending}
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80"
                 >
                   {restoreMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Restore"}
                 </Button>
@@ -516,7 +516,7 @@ export default function PaymentStatusPage() {
         {/* Delete Confirm */}
         {deleteItem && (
           <Dialog open={true} onOpenChange={() => setDeleteItem(null)}>
-            <DialogContent className="bg-[#0f0f0f] border-[#2a2a2a] text-white">
+            <DialogContent className="bg-card border-border text-foreground">
               <DialogHeader>
                 <DialogTitle>Delete Status</DialogTitle>
                 <DialogDescription>
@@ -527,14 +527,14 @@ export default function PaymentStatusPage() {
                 <Button
                   variant="outline"
                   onClick={() => setDeleteItem(null)}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  className="bg-card border-border text-foreground"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={() => deleteMutation.mutate(deleteItem.payment_status_aid)}
                   disabled={deleteMutation.isPending}
-                  className="bg-red-600 hover:bg-red-700"
+                  className="bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30"
                 >
                   {deleteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
                 </Button>

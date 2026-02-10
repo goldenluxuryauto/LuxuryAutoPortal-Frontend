@@ -228,9 +228,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[#111111] border-[#2a2a2a] text-gray-200">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-card border-border text-muted-foreground">
         <DialogHeader>
-          <DialogTitle className="text-[#EAEB80]">Update Basic Information</DialogTitle>
+          <DialogTitle className="text-primary">Update Basic Information</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -240,9 +240,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_first_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">First Name</FormLabel>
+                    <FormLabel className="text-muted-foreground">First Name</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -253,9 +253,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_middle_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">Middle Name</FormLabel>
+                    <FormLabel className="text-muted-foreground">Middle Name</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -266,9 +266,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_last_name"
                 render={({ field }) => (
                   <FormItem className="col-span-2">
-                    <FormLabel className="text-gray-400">Last Name</FormLabel>
+                    <FormLabel className="text-muted-foreground">Last Name</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -279,9 +279,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_birthday"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">Birth Date</FormLabel>
+                    <FormLabel className="text-muted-foreground">Birth Date</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input type="date" {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -292,10 +292,10 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_marital_status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">Marital Status</FormLabel>
+                    <FormLabel className="text-muted-foreground">Marital Status</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
-                        <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a]">
+                        <SelectTrigger className="bg-card border-border">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                       </FormControl>
@@ -316,9 +316,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_ssn_ein"
                 render={({ field }) => (
                   <FormItem className="col-span-2">
-                    <FormLabel className="text-gray-400">Social Security Number or EIN</FormLabel>
+                    <FormLabel className="text-muted-foreground">Social Security Number or EIN</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -329,9 +329,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_street"
                 render={({ field }) => (
                   <FormItem className="col-span-2">
-                    <FormLabel className="text-gray-400">Street</FormLabel>
+                    <FormLabel className="text-muted-foreground">Street</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -342,9 +342,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">City</FormLabel>
+                    <FormLabel className="text-muted-foreground">City</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -355,9 +355,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">State</FormLabel>
+                    <FormLabel className="text-muted-foreground">State</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -368,9 +368,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_zip_code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">Zip Code</FormLabel>
+                    <FormLabel className="text-muted-foreground">Zip Code</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -381,9 +381,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_country"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">Country</FormLabel>
+                    <FormLabel className="text-muted-foreground">Country</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -394,9 +394,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_mobile_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">Mobile Number</FormLabel>
+                    <FormLabel className="text-muted-foreground">Mobile Number</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -407,9 +407,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_telephone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">Telephone Number</FormLabel>
+                    <FormLabel className="text-muted-foreground">Telephone Number</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -420,9 +420,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_email"
                 render={({ field }) => (
                   <FormItem className="col-span-2">
-                    <FormLabel className="text-gray-400">Personal Email</FormLabel>
+                    <FormLabel className="text-muted-foreground">Personal Email</FormLabel>
                     <FormControl>
-                      <Input type="email" {...field} className="bg-[#1a1a1a] border-[#2a2a2a]" />
+                      <Input type="email" {...field} className="bg-card border-border" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -433,10 +433,10 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 name="employee_shirt_size"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-400">Shirt Size</FormLabel>
+                    <FormLabel className="text-muted-foreground">Shirt Size</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
-                        <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a]">
+                        <SelectTrigger className="bg-card border-border">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                       </FormControl>
@@ -453,9 +453,9 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 )}
               />
               <div className="col-span-2 space-y-2">
-                <FormLabel className="text-gray-400">Profile Photo <span className="text-gray-500 font-normal">(Optional)</span></FormLabel>
+                <FormLabel className="text-muted-foreground">Profile Photo <span className="text-foreground0 font-normal">(Optional)</span></FormLabel>
                 <div className="flex items-center gap-4">
-                  <div className="h-20 w-20 rounded-full border-2 border-[#2a2a2a] flex items-center justify-center overflow-hidden bg-[#0a0a0a] shrink-0">
+                  <div className="h-20 w-20 rounded-full border-2 border-border flex items-center justify-center overflow-hidden bg-background shrink-0">
                     {photoFile ? (
                       <img
                         src={URL.createObjectURL(photoFile)}
@@ -469,7 +469,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                         className="h-full w-full object-cover rounded-full"
                       />
                     ) : (
-                      <Image className="h-10 w-10 text-gray-500" />
+                      <Image className="h-10 w-10 text-foreground0" />
                     )}
                   </div>
                   <div className="flex flex-col gap-2">
@@ -485,7 +485,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="border-[#2a2a2a]"
+                        className="border-border"
                         onClick={() => photoInputRef.current?.click()}
                       >
                         <Upload className="h-4 w-4 mr-2" />
@@ -495,7 +495,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="border-[#EAEB80]/50 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                        className="border-primary/50 text-primary hover:bg-primary/10"
                         onClick={handleArchive}
                         disabled={!photoFile || archiveMutation.isPending}
                       >
@@ -508,7 +508,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                       </Button>
                     </div>
                     {photoFile && (
-                      <span className="text-xs text-gray-500">{photoFile.name}</span>
+                      <span className="text-xs text-foreground0">{photoFile.name}</span>
                     )}
                   </div>
                 </div>
@@ -520,14 +520,14 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={mutation.isPending || archiveMutation.isPending}
-                className="border-[#2a2a2a]"
+                className="border-border"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={mutation.isPending || archiveMutation.isPending}
-                className="bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
               </Button>

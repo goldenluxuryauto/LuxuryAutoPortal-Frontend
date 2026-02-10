@@ -12,7 +12,7 @@ export default function CarIncomeExpensePage() {
   if (!carId) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-red-400">Invalid car ID</p>
+        <p className="text-red-700">Invalid car ID</p>
       </div>
     );
   }

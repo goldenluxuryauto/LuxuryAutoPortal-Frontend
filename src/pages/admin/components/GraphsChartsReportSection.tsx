@@ -110,12 +110,12 @@ export function GraphsChartsReportSection({
 
   return (
     <div className={className}>
-      <h1 className="text-3xl font-serif text-[#EAEB80] italic mb-6">{title}</h1>
+      <h1 className="text-3xl font-serif text-primary italic mb-6">{title}</h1>
 
       {/* Rental Income Chart */}
-      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-300 mb-4">Rental Income</h2>
-        <div className="mb-4 text-sm text-gray-400">
+      <div className="bg-card border border-border rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-muted-foreground mb-4">Rental Income</h2>
+        <div className="mb-4 text-sm text-muted-foreground">
           <div>Yearly Total: {formatCurrency(yearlyTotals["Rental Income"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
@@ -138,9 +138,9 @@ export function GraphsChartsReportSection({
       </div>
 
       {/* Car Management Profit Chart */}
-      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-300 mb-4">Car Management Profit</h2>
-        <div className="mb-4 text-sm text-gray-400">
+      <div className="bg-card border border-border rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-muted-foreground mb-4">Car Management Profit</h2>
+        <div className="mb-4 text-sm text-muted-foreground">
           <div>Yearly Total: {formatCurrency(yearlyTotals["Car Management Profit"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
@@ -163,9 +163,9 @@ export function GraphsChartsReportSection({
       </div>
 
       {/* Car Owner Profit Chart */}
-      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-300 mb-4">Car Owner Profit</h2>
-        <div className="mb-4 text-sm text-gray-400">
+      <div className="bg-card border border-border rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-muted-foreground mb-4">Car Owner Profit</h2>
+        <div className="mb-4 text-sm text-muted-foreground">
           <div>Yearly Total: {formatCurrency(yearlyTotals["Car Owner Profit"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
@@ -188,9 +188,9 @@ export function GraphsChartsReportSection({
       </div>
 
       {/* Car Owner Total Expenses Chart */}
-      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-300 mb-4">Car Owner Total Expenses</h2>
-        <div className="mb-4 text-sm text-gray-400">
+      <div className="bg-card border border-border rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-muted-foreground mb-4">Car Owner Total Expenses</h2>
+        <div className="mb-4 text-sm text-muted-foreground">
           <div>Yearly Total: {formatCurrency(yearlyTotals["Car Owner Total Expenses"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
@@ -213,9 +213,9 @@ export function GraphsChartsReportSection({
       </div>
 
       {/* Car Management Total Expenses Chart */}
-      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-300 mb-4">Car Management Total Expenses</h2>
-        <div className="mb-4 text-sm text-gray-400">
+      <div className="bg-card border border-border rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-muted-foreground mb-4">Car Management Total Expenses</h2>
+        <div className="mb-4 text-sm text-muted-foreground">
           <div>Yearly Total: {formatCurrency(yearlyTotals["Car Management Total Expenses"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
@@ -238,9 +238,9 @@ export function GraphsChartsReportSection({
       </div>
 
       {/* History Chart */}
-      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-300 mb-4">History</h2>
-        <div className="mb-4 text-sm text-gray-400">
+      <div className="bg-card border border-border rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-muted-foreground mb-4">History</h2>
+        <div className="mb-4 text-sm text-muted-foreground">
           <div>Days Rented - Yearly Total: {yearlyTotals["Days Rented"]}</div>
           <div>Trips Taken - Yearly Total: {yearlyTotals["Trips Taken"]}</div>
         </div>
@@ -264,9 +264,9 @@ export function GraphsChartsReportSection({
       </div>
 
       {/* CAR RENTAL VALUE PER MONTH Chart */}
-      <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-300 mb-4">CAR RENTAL VALUE PER MONTH</h2>
-        <div className="mb-4 text-sm text-gray-400">
+      <div className="bg-card border border-border rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-muted-foreground mb-4">CAR RENTAL VALUE PER MONTH</h2>
+        <div className="mb-4 text-sm text-muted-foreground">
           <div>Total Car Rental Income - Yearly Total: {formatCurrency(yearlyTotals["Rental Income"])}</div>
           <div>Trips Taken - Yearly Total: {yearlyTotals["Trips Taken"]}</div>
           <div>Ave Per Rental Per Trips Taken - Yearly Average: {formatCurrency(yearlyTotals["Ave Per Rental"])}</div>

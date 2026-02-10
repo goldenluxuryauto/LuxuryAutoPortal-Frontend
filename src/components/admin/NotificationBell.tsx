@@ -114,20 +114,20 @@ export function NotificationBell() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="relative p-2 text-gray-400 hover:text-[#EAEB80] transition-colors rounded-lg hover:bg-[#1a1a1a]"
+        className="relative p-2 text-muted-foreground hover:text-[#EAEB80] transition-colors rounded-lg hover:bg-card"
         aria-label="Notifications"
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-bold bg-[#EAEB80] text-black rounded-full">
+          <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-bold bg-primary text-black rounded-full">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-80 max-h-96 overflow-hidden bg-[#111111] border border-[#2a2a2a] rounded-lg shadow-xl z-50">
-          <div className="flex items-center justify-between px-4 py-2 border-b border-[#2a2a2a]">
-            <span className="text-sm font-medium text-white">Notifications</span>
+        <div className="absolute right-0 top-full mt-1 w-80 max-h-96 overflow-hidden bg-card border border-border rounded-lg shadow-xl z-50">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+            <span className="text-sm font-medium text-foreground">Notifications</span>
             {unreadCount > 0 && (
               <button
                 onClick={() => markAllReadMutation.mutate()}
@@ -145,23 +145,23 @@ export function NotificationBell() {
                 <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
               </div>
             ) : notifications.length === 0 ? (
-              <div className="py-8 text-center text-sm text-gray-500">No notifications</div>
+              <div className="py-8 text-center text-sm text-foreground0">No notifications</div>
             ) : (
               notifications.map((n) => (
                 <button
                   key={n.id}
                   onClick={() => handleNotificationClick(n)}
                   className={cn(
-                    "w-full text-left px-4 py-3 border-b border-[#1a1a1a] hover:bg-[#1a1a1a] transition-colors",
-                    !n.isRead && "bg-[#1a1a1a]/50"
+                    "w-full text-left px-4 py-3 border-b border-border hover:bg-card transition-colors",
+                    !n.isRead && "bg-card/50"
                   )}
                 >
                   <div className="flex items-start gap-2">
-                    {!n.isRead && <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#EAEB80] shrink-0" />}
+                    {!n.isRead && <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />}
                     <div className={cn("flex-1 min-w-0", !n.isRead && "ml-0")}>
-                      <p className="text-sm font-medium text-white truncate">{n.title}</p>
-                      {n.message && <p className="text-xs text-gray-400 truncate mt-0.5">{n.message}</p>}
-                      <p className="text-[10px] text-gray-500 mt-1">{formatTime(n.createdAt)}</p>
+                      <p className="text-sm font-medium text-foreground truncate">{n.title}</p>
+                      {n.message && <p className="text-xs text-muted-foreground truncate mt-0.5">{n.message}</p>}
+                      <p className="text-[10px] text-foreground0 mt-1">{formatTime(n.createdAt)}</p>
                     </div>
                   </div>
                 </button>

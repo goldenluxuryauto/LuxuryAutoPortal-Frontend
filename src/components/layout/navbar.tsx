@@ -16,7 +16,7 @@ export function Navbar() {
   const [location] = useLocation();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-[#0a0a0a]/80 border-b border-white/10">
+    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           <Link
@@ -79,7 +79,7 @@ export function Navbar() {
       </div>
 
       {isOpen && (
-        <div className="lg:hidden fixed inset-0 top-16 bg-[#0a0a0a] z-40">
+        <div className="lg:hidden fixed inset-0 top-16 bg-background z-40">
           <div className="flex flex-col p-6 gap-2">
             {navLinks.map((link) => {
               const Icon = link.icon;
@@ -91,7 +91,7 @@ export function Navbar() {
                     "flex items-center gap-3 px-4 py-3 rounded-md text-lg font-medium transition-colors",
                     location === link.href
                       ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                   onClick={() => setIsOpen(false)}
                   data-testid={`link-mobile-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -101,7 +101,7 @@ export function Navbar() {
                 </Link>
               );
             })}
-            <div className="mt-6 pt-6 border-t border-white/10 space-y-2">
+            <div className="mt-6 pt-6 border-t border-border space-y-2">
               <Link href="/admin/login" className="w-full">
                 <Button variant="ghost" className="w-full" onClick={() => setIsOpen(false)} data-testid="button-mobile-login">
                   Login

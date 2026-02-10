@@ -402,11 +402,11 @@ export default function Onboarding() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a]">
+      <div className="min-h-screen bg-background">
         <Navbar />
         <main className="pt-20 lg:pt-24">
           <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-            <Card className="bg-card border-white/10 text-center">
+            <Card className="bg-card border-border text-center">
               <CardContent className="py-16">
                 <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
                   <Check className="w-10 h-10 text-primary" />
@@ -436,7 +436,7 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-20 lg:pt-24 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -446,7 +446,7 @@ export default function Onboarding() {
               alt="Golden Luxury Auto"
               className="h-[47px] md:h-[60px] lg:h-[73px] w-auto object-contain mb-4 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
             />
-            <p className="text-gray-400 text-center">Client Onboarding Form</p>
+            <p className="text-muted-foreground text-center">Client Onboarding Form</p>
           </div>
 
           <Form {...form}>
@@ -454,25 +454,25 @@ export default function Onboarding() {
               {steps.map((step) => (
                 <Card
                   key={step.id}
-                  className="bg-[#111111] border-[#EAEB80]/20 overflow-hidden"
+                  className="bg-card border-primary/20 overflow-hidden"
                 >
                   <button
                     type="button"
                     onClick={() => toggleStep(step.id)}
-                    className="w-full flex items-center justify-between p-4 hover:bg-[#1a1a1a] transition-colors"
+                    className="w-full flex items-center justify-between p-4 hover:bg-card transition-colors"
                   >
-                    <span className="text-base font-semibold text-[#EAEB80]">
+                    <span className="text-base font-semibold text-primary">
                       {step.id}. {step.title}
                     </span>
                     {expandedSteps.includes(step.id) ? (
-                      <ChevronUp className="w-5 h-5 text-gray-400" />
+                      <ChevronUp className="w-5 h-5 text-muted-foreground" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
                     )}
                   </button>
 
                   {expandedSteps.includes(step.id) && (
-                    <CardContent className="p-4 space-y-4 border-t border-[#EAEB80]/20">
+                    <CardContent className="p-4 space-y-4 border-t border-primary/20">
                       {step.id === 1 && (
                         <>
                           <div className="grid grid-cols-2 gap-4">
@@ -481,14 +481,14 @@ export default function Onboarding() {
                               name="date"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Date *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       type="date"
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -500,7 +500,7 @@ export default function Onboarding() {
                               name="tshirtSize"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     T-Shirt Size *
                                   </FormLabel>
                                   <Select
@@ -508,7 +508,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -533,13 +533,13 @@ export default function Onboarding() {
                               name="firstNameOwner"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Vehicle Owner First Name *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -551,13 +551,13 @@ export default function Onboarding() {
                               name="lastNameOwner"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Vehicle Owner Last Name *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -571,13 +571,13 @@ export default function Onboarding() {
                               name="phoneOwner"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Vehicle Owner Phone Number *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -589,14 +589,14 @@ export default function Onboarding() {
                               name="emailOwner"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Vehicle Owner Email Address *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       type="email"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -610,7 +610,7 @@ export default function Onboarding() {
                               name="representative"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Golden Luxury Auto Representative *
                                   </FormLabel>
                                   <Select
@@ -618,7 +618,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -646,7 +646,7 @@ export default function Onboarding() {
                               name="heardAboutUs"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     How did you hear about us? *
                                   </FormLabel>
                                   <Select
@@ -654,7 +654,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -684,13 +684,13 @@ export default function Onboarding() {
                             name="streetAddress"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-gray-300">
+                                <FormLabel className="text-muted-foreground">
                                   Street Address *
                                 </FormLabel>
                                 <FormControl>
                                   <Input
                                     {...field}
-                                    className="bg-[#0a0a0a] border-gray-700"
+                                    className="bg-background border-border"
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -703,13 +703,13 @@ export default function Onboarding() {
                               name="city"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     City *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -721,13 +721,13 @@ export default function Onboarding() {
                               name="state"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     State *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -741,13 +741,13 @@ export default function Onboarding() {
                               name="zipCode"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Zip Code *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -759,14 +759,14 @@ export default function Onboarding() {
                               name="birthday"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Birthday *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       type="date"
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -780,13 +780,13 @@ export default function Onboarding() {
                               name="emergencyContactName"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Emergency Contact Name *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -798,13 +798,13 @@ export default function Onboarding() {
                               name="emergencyContactPhone"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Emergency Contact Phone *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -822,13 +822,13 @@ export default function Onboarding() {
                               name="vehicleYear"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Vehicle Year *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -840,14 +840,14 @@ export default function Onboarding() {
                               name="vehicleMake"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Vehicle Make *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="e.g., Mercedes-Benz"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -861,13 +861,13 @@ export default function Onboarding() {
                               name="vehicleModel"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Vehicle Model *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -879,13 +879,13 @@ export default function Onboarding() {
                               name="vehicleTrim"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Vehicle Trim *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -899,13 +899,13 @@ export default function Onboarding() {
                               name="vehicleMiles"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Vehicle Miles *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -917,13 +917,13 @@ export default function Onboarding() {
                               name="exteriorColor"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Exterior Color *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -937,13 +937,13 @@ export default function Onboarding() {
                               name="interiorColor"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Interior Color *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -955,7 +955,7 @@ export default function Onboarding() {
                               name="titleType"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Title Type *
                                   </FormLabel>
                                   <Select
@@ -963,7 +963,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -996,13 +996,13 @@ export default function Onboarding() {
                               name="vinNumber"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     VIN Number *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1014,13 +1014,13 @@ export default function Onboarding() {
                               name="licensePlate"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     License Plate *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1034,14 +1034,14 @@ export default function Onboarding() {
                               name="registrationExpiration"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Registration Expiration *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       type="date"
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1053,7 +1053,7 @@ export default function Onboarding() {
                               name="vehicleRecall"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Vehicle Recall *
                                   </FormLabel>
                                   <Select
@@ -1061,7 +1061,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -1077,14 +1077,14 @@ export default function Onboarding() {
                           </div>
                           {/* NHTSA Recall Check Link */}
                           <div className="mt-2 mb-2 text-center">
-                            <p className="text-sm text-gray-400 mb-1">
+                            <p className="text-sm text-muted-foreground mb-1">
                               If Your Not Sure If Your Vehicle May Have a Recall You Can Check Here:
                             </p>
                             <a
                               href="https://www.nhtsa.gov/recalls"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-[#EAEB80] hover:text-[#d4d570] underline font-medium"
+                              className="text-primary hover:text-[#d4d570] underline font-medium"
                               style={{ fontSize: '1.3em' }}
                             >
                               National Highway Traffic Safety Administration (NHTSA)
@@ -1096,7 +1096,7 @@ export default function Onboarding() {
                               name="numberOfSeats"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Number of Seats *
                                   </FormLabel>
                                   <FormControl>
@@ -1105,7 +1105,7 @@ export default function Onboarding() {
                                       type="number"
                                       min="1"
                                       placeholder="e.g., 5"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1117,7 +1117,7 @@ export default function Onboarding() {
                               name="numberOfDoors"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Number of Doors *
                                   </FormLabel>
                                   <FormControl>
@@ -1126,7 +1126,7 @@ export default function Onboarding() {
                                       type="number"
                                       min="1"
                                       placeholder="e.g., 4"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1140,7 +1140,7 @@ export default function Onboarding() {
                               name="skiRacks"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Ski Racks *
                                   </FormLabel>
                                   <Select
@@ -1148,7 +1148,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -1166,7 +1166,7 @@ export default function Onboarding() {
                               name="skiCrossBars"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Ski Cross Bars *
                                   </FormLabel>
                                   <Select
@@ -1174,7 +1174,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -1194,7 +1194,7 @@ export default function Onboarding() {
                               name="roofRails"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Roof Rails *
                                   </FormLabel>
                                   <Select
@@ -1202,7 +1202,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -1220,14 +1220,14 @@ export default function Onboarding() {
                               name="lastOilChange"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Last Oil Change *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       type="date"
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1241,14 +1241,14 @@ export default function Onboarding() {
                               name="oilType"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Oil Type *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="e.g., 5W-30"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1263,7 +1263,7 @@ export default function Onboarding() {
                               name="freeDealershipOilChanges"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                       Does Your Vehicle Have Free Dealership Oil Changes? *
                                   </FormLabel>
                                   <Select
@@ -1271,7 +1271,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -1294,7 +1294,7 @@ export default function Onboarding() {
                               name="oilPackageDetails"
                               render={({ field }) => (
                                 <FormItem className="w-full">
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     If Yes, For How Many Years of Oil Changes OR What Oil Package
                                     {freeOilChanges === "Yes" ? " *" : ""}
                                   </FormLabel>
@@ -1307,7 +1307,7 @@ export default function Onboarding() {
                                           : "Select “Yes” above to enable"
                                       }
                                       disabled={freeOilChanges !== "Yes"}
-                                      className="w-full bg-[#0a0a0a] border-gray-700 disabled:opacity-60"
+                                      className="w-full bg-background border-border disabled:opacity-60"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1322,14 +1322,14 @@ export default function Onboarding() {
                               name="dealershipAddress"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Address of Dealership (If Applicable)
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="Dealership address (optional)"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1344,7 +1344,7 @@ export default function Onboarding() {
                               name="fuelType"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Fuel Type *
                                   </FormLabel>
                                   <Select
@@ -1352,7 +1352,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -1377,14 +1377,14 @@ export default function Onboarding() {
                               name="tireSize"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Tire Size *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="e.g., 225/45R17"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1398,7 +1398,7 @@ export default function Onboarding() {
                             render={() => (
                               <FormItem>
                                 <div className="mb-4">
-                                  <FormLabel className="text-gray-300 text-base font-semibold">
+                                  <FormLabel className="text-muted-foreground text-base font-semibold">
                                     Features (check all that apply)
                                     <span className="text-red-500 ml-1">* Required</span>
                                   </FormLabel>
@@ -1450,7 +1450,7 @@ export default function Onboarding() {
                                                   }}
                                                 />
                                               </FormControl>
-                                              <FormLabel className="text-gray-300 text-sm font-normal cursor-pointer">
+                                              <FormLabel className="text-muted-foreground text-sm font-normal cursor-pointer">
                                                 {feature}
                                               </FormLabel>
                                             </FormItem>
@@ -1465,14 +1465,14 @@ export default function Onboarding() {
                             )}
                           />
                           <FormItem>
-                            <FormLabel className="text-gray-300">
+                            <FormLabel className="text-muted-foreground">
                               Drivers License Upload
                             </FormLabel>
                             <div
                               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                                 isDraggingLicense
-                                  ? "border-[#EAEB80] bg-[#EAEB80]/10"
-                                  : "border-[#EAEB80]/30"
+                                  ? "border-primary bg-[#EAEB80]/10"
+                                  : "border-primary/30"
                               }`}
                               onDragOver={(e) => {
                                 e.preventDefault();
@@ -1530,22 +1530,22 @@ export default function Onboarding() {
                                 htmlFor="drivers-license-upload"
                                 className="cursor-pointer"
                               >
-                                <p className="text-[#EAEB80] text-sm">
+                                <p className="text-primary text-sm">
                                   Drag & drop files here or click to browse
                                 </p>
-                                <p className="text-gray-500 text-xs mt-1">
+                                <p className="text-foreground0 text-xs mt-1">
                                   Supports images and PDF files
                                 </p>
                               </label>
                               {driversLicenseFile && (
-                                <div className="mt-4 p-3 bg-[#1a1a1a] rounded border border-[#EAEB80]/20">
-                                  <p className="text-white text-sm">
+                                <div className="mt-4 p-3 bg-card rounded border border-primary/20">
+                                  <p className="text-foreground text-sm">
                                     Selected: {driversLicenseFile.name}
                                   </p>
                                   <button
                                     type="button"
                                     onClick={() => setDriversLicenseFile(null)}
-                                    className="text-red-400 text-xs mt-2 hover:underline"
+                                    className="text-red-700 text-xs mt-2 hover:underline"
                                   >
                                     Remove
                                   </button>
@@ -1563,13 +1563,13 @@ export default function Onboarding() {
                               name="insuranceProvider"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Insurance Provider *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1581,13 +1581,13 @@ export default function Onboarding() {
                               name="insurancePhone"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Insurance Phone *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1601,13 +1601,13 @@ export default function Onboarding() {
                               name="policyNumber"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Policy # *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1619,14 +1619,14 @@ export default function Onboarding() {
                               name="insuranceExpiration"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Expiration *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       type="date"
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1635,14 +1635,14 @@ export default function Onboarding() {
                             />
                           </div>
                           <FormItem>
-                            <FormLabel className="text-gray-300">
+                            <FormLabel className="text-muted-foreground">
                               Insurance Card
                             </FormLabel>
                             <div
                               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                                 isDragging
-                                  ? "border-[#EAEB80] bg-[#EAEB80]/10"
-                                  : "border-[#EAEB80]/30"
+                                  ? "border-primary bg-[#EAEB80]/10"
+                                  : "border-primary/30"
                               }`}
                               onDragOver={(e) => {
                                 e.preventDefault();
@@ -1700,22 +1700,22 @@ export default function Onboarding() {
                                 htmlFor="insurance-card-upload"
                                 className="cursor-pointer"
                               >
-                                <p className="text-[#EAEB80] text-sm">
+                                <p className="text-primary text-sm">
                                   Drag & drop files here or click to browse
                                 </p>
-                                <p className="text-gray-500 text-xs mt-1">
+                                <p className="text-foreground0 text-xs mt-1">
                                   Supports images and PDF files
                                 </p>
                               </label>
                               {insuranceCardFile && (
-                                <div className="mt-4 p-3 bg-[#1a1a1a] rounded border border-[#EAEB80]/20">
-                                  <p className="text-white text-sm">
+                                <div className="mt-4 p-3 bg-card rounded border border-primary/20">
+                                  <p className="text-foreground text-sm">
                                     Selected: {insuranceCardFile.name}
                                   </p>
                                   <button
                                     type="button"
                                     onClick={() => setInsuranceCardFile(null)}
-                                    className="text-red-400 text-xs mt-2 hover:underline"
+                                    className="text-red-700 text-xs mt-2 hover:underline"
                                   >
                                     Remove
                                   </button>
@@ -1733,14 +1733,14 @@ export default function Onboarding() {
                               name="purchasePrice"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Purchase Price *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="e.g., 50000"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1752,14 +1752,14 @@ export default function Onboarding() {
                               name="interestRate"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Interest Rate *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="e.g., 3.5"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1773,14 +1773,14 @@ export default function Onboarding() {
                               name="monthlyPayment"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Monthly Payment *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="e.g., 750"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1792,14 +1792,14 @@ export default function Onboarding() {
                               name="downPayment"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Down Payment *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="e.g., 10000"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1812,7 +1812,7 @@ export default function Onboarding() {
                             name="transportCityToCity"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-gray-300">
+                                <FormLabel className="text-muted-foreground">
                                   To maximize profits, would you like us to transport the vehicle from city to city if necessary? (US only)
                                 </FormLabel>
                                 <Select
@@ -1820,7 +1820,7 @@ export default function Onboarding() {
                                   defaultValue={field.value}
                                 >
                                   <FormControl>
-                                    <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                    <SelectTrigger className="bg-background border-border">
                                       <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                   </FormControl>
@@ -1838,14 +1838,14 @@ export default function Onboarding() {
                             name="ultimateGoal"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-gray-300">
+                                <FormLabel className="text-muted-foreground">
                                   What is your ultimate goal we can help you achieve with our program *
                                 </FormLabel>
                                 <FormControl>
                                   <Textarea
                                     {...field}
                                     placeholder="Tell us about your goals..."
-                                    className="bg-[#0a0a0a] border-gray-700 resize-none"
+                                    className="bg-background border-border resize-none"
                                     rows={4}
                                   />
                                 </FormControl>
@@ -1863,13 +1863,13 @@ export default function Onboarding() {
                               name="bankName"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Bank Name *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1881,7 +1881,7 @@ export default function Onboarding() {
                               name="taxClassification"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Tax Classification *
                                   </FormLabel>
                                   <Select
@@ -1889,7 +1889,7 @@ export default function Onboarding() {
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger className="bg-[#0a0a0a] border-gray-700">
+                                      <SelectTrigger className="bg-background border-border">
                                         <SelectValue placeholder="Select" />
                                       </SelectTrigger>
                                     </FormControl>
@@ -1913,14 +1913,14 @@ export default function Onboarding() {
                               name="routingNumber"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Routing Number *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="9 digits"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1932,13 +1932,13 @@ export default function Onboarding() {
                               name="accountNumber"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Account Number *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1952,13 +1952,13 @@ export default function Onboarding() {
                               name="businessName"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Business Name
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1970,14 +1970,14 @@ export default function Onboarding() {
                               name="ein"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     EIN
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="XX-XXXXXXX"
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -1990,14 +1990,14 @@ export default function Onboarding() {
                             name="ssn"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-gray-300">
+                                <FormLabel className="text-muted-foreground">
                                   SSN *
                                 </FormLabel>
                                 <FormControl>
                                   <Input
                                     {...field}
                                     placeholder="XXX-XX-XXXX"
-                                    className="bg-[#0a0a0a] border-gray-700"
+                                    className="bg-background border-border"
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -2014,14 +2014,14 @@ export default function Onboarding() {
                               name="carManufacturerWebsite"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Car Manufacturer Website *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder="https://..."
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -2033,13 +2033,13 @@ export default function Onboarding() {
                               name="carManufacturerUsername"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300">
+                                  <FormLabel className="text-muted-foreground">
                                     Car Manufacturer Username *
                                   </FormLabel>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -2052,22 +2052,22 @@ export default function Onboarding() {
                             name="password"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-gray-300">
+                                <FormLabel className="text-muted-foreground">
                                   Password *
                                 </FormLabel>
                                 <FormControl>
                                   <Input
                                     type="password"
                                     {...field}
-                                    className="bg-[#0a0a0a] border-gray-700"
+                                    className="bg-background border-border"
                                   />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
-                          <div className="bg-[#0a0a0a] border border-gray-700 rounded p-4">
-                            <p className="text-sm text-gray-400 mb-4">
+                          <div className="bg-background border border-border rounded p-4">
+                            <p className="text-sm text-muted-foreground mb-4">
                               After you submit, we will send the contract
                               agreement to your email
                             </p>
@@ -2082,7 +2082,7 @@ export default function Onboarding() {
                                       onCheckedChange={field.onChange}
                                     />
                                   </FormControl>
-                                  <FormLabel className="text-gray-300 font-normal">
+                                  <FormLabel className="text-muted-foreground font-normal">
                                     Confirm. Send My Agreement
                                   </FormLabel>
                                 </FormItem>
@@ -2096,12 +2096,12 @@ export default function Onboarding() {
                 </Card>
               ))}
 
-              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-[#EAEB80]/20">
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-primary/20">
                 <Button
                   type="button"
                   onClick={fillWithRandomData}
                   variant="outline"
-                  className="bg-[#EAEB80]/10 border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/20"
+                  className="bg-[#EAEB80]/10 border-primary/30 text-primary hover:bg-primary/20"
                   disabled={isSubmitting}
                   data-testid="button-fill-random"
                 >
@@ -2109,7 +2109,7 @@ export default function Onboarding() {
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-bold w-full sm:w-auto sm:ml-auto"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-bold w-full sm:w-auto sm:ml-auto"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (

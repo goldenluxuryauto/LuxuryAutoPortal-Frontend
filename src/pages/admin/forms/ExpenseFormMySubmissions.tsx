@@ -99,23 +99,23 @@ export default function ExpenseFormMySubmissions() {
   const pagination = data?.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 };
 
   function statusBadge(status: string) {
-    if (status === "pending") return <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">Pending</Badge>;
-    if (status === "approved") return <Badge className="bg-green-500/20 text-green-300 border-green-500/30">Approved</Badge>;
-    return <Badge className="bg-red-500/20 text-red-300 border-red-500/30">Declined</Badge>;
+    if (status === "pending") return <Badge className="bg-primary/20 text-primary-foreground border-primary/50">Pending</Badge>;
+    if (status === "approved") return <Badge className="bg-green-500/20 text-green-700 border-green-500/30">Approved</Badge>;
+    return <Badge className="bg-red-500/20 text-red-700 border-red-500/30">Declined</Badge>;
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium text-white flex items-center gap-2">
-          <FileText className="h-5 w-5 text-[#EAEB80]" />
+        <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
+          <FileText className="h-5 w-5 text-primary" />
           My Expense Submissions
         </h3>
         <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
-          <SelectTrigger className="w-[140px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+          <SelectTrigger className="w-[140px] bg-card border-border text-foreground">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
-          <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+          <SelectContent className="bg-card border-border text-foreground">
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="approved">Approved</SelectItem>
@@ -126,47 +126,47 @@ export default function ExpenseFormMySubmissions() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-[#EAEB80]" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : isError ? (
-        <p className="text-red-400 text-sm py-6 text-center">
+        <p className="text-red-700 text-sm py-6 text-center">
           {error instanceof Error ? error.message : "Failed to load submissions."}
         </p>
       ) : submissions.length === 0 ? (
-        <p className="text-gray-500 text-sm py-6 text-center">No submissions yet.</p>
+        <p className="text-foreground0 text-sm py-6 text-center">No submissions yet.</p>
       ) : (
-        <div className="rounded-lg border border-[#2a2a2a] overflow-x-auto">
+        <div className="rounded-lg border border-border overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                <TableHead className="text-gray-400">Date</TableHead>
-                <TableHead className="text-gray-400">Car</TableHead>
-                <TableHead className="text-gray-400">Category / Type</TableHead>
-                <TableHead className="text-gray-400">Amount</TableHead>
-                <TableHead className="text-gray-400">Status</TableHead>
-                <TableHead className="text-gray-400">Remarks</TableHead>
-                <TableHead className="text-gray-400">Decline Reason</TableHead>
-                <TableHead className="text-gray-400 text-right">Actions</TableHead>
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-primary font-medium">Date</TableHead>
+                <TableHead className="text-primary font-medium">Car</TableHead>
+                <TableHead className="text-primary font-medium">Category / Type</TableHead>
+                <TableHead className="text-primary font-medium">Amount</TableHead>
+                <TableHead className="text-primary font-medium">Status</TableHead>
+                <TableHead className="text-primary font-medium">Remarks</TableHead>
+                <TableHead className="text-primary font-medium">Decline Reason</TableHead>
+                <TableHead className="text-primary font-medium text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {submissions.map((s) => (
-                <TableRow key={s.id} className="border-[#2a2a2a]">
-                  <TableCell className="text-gray-300 text-sm">
+                <TableRow key={s.id} className="border-border">
+                  <TableCell className="text-muted-foreground text-sm">
                     {s.submissionDate} ({MONTHS[s.month - 1]} {s.year})
                   </TableCell>
-                  <TableCell className="text-gray-300 text-sm">{s.carDisplayName || "—"}</TableCell>
-                  <TableCell className="text-gray-300 text-sm">
+                  <TableCell className="text-muted-foreground text-sm">{s.carDisplayName || "—"}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm">
                     {CATEGORY_LABELS[s.category] || s.category} / {formatFieldLabel(s.field)}
                   </TableCell>
-                  <TableCell className="text-[#EAEB80] font-medium">
+                  <TableCell className="text-primary font-medium">
                     ${Number(s.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </TableCell>
                   <TableCell>{statusBadge(s.status)}</TableCell>
-                  <TableCell className="text-gray-400 text-sm max-w-[120px] truncate" title={s.remarks || undefined}>
+                  <TableCell className="text-muted-foreground text-sm max-w-[120px] truncate" title={s.remarks || undefined}>
                     {s.remarks || "—"}
                   </TableCell>
-                  <TableCell className="text-red-400/80 text-sm max-w-[150px] truncate" title={s.declineReason || undefined}>
+                  <TableCell className="text-red-700/80 text-sm max-w-[150px] truncate" title={s.declineReason || undefined}>
                     {s.status === "declined" && s.declineReason ? s.declineReason : "—"}
                   </TableCell>
                   <TableCell className="text-right">
@@ -174,7 +174,7 @@ export default function ExpenseFormMySubmissions() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-gray-400 hover:text-[#EAEB80]"
+                        className="h-8 w-8 text-muted-foreground hover:text-primary"
                         onClick={() => {
                           setSelectedSubmission(s);
                           setViewReceiptsOpen(true);
@@ -193,7 +193,7 @@ export default function ExpenseFormMySubmissions() {
       )}
 
       {pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center justify-between text-sm text-foreground0">
           <span>
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
           </span>
@@ -202,7 +202,7 @@ export default function ExpenseFormMySubmissions() {
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={pagination.page <= 1}
-              className="px-3 py-1 rounded border border-[#2a2a2a] hover:bg-[#1a1a1a] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 rounded border border-border hover:bg-card disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -210,7 +210,7 @@ export default function ExpenseFormMySubmissions() {
               type="button"
               onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               disabled={pagination.page >= pagination.totalPages}
-              className="px-3 py-1 rounded border border-[#2a2a2a] hover:bg-[#1a1a1a] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 rounded border border-border hover:bg-card disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
@@ -220,9 +220,9 @@ export default function ExpenseFormMySubmissions() {
 
       {/* View Receipts Dialog */}
       <Dialog open={viewReceiptsOpen} onOpenChange={setViewReceiptsOpen}>
-        <DialogContent className="bg-[#111111] border-[#2a2a2a] max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-[#EAEB80]">Receipts</DialogTitle>
+            <DialogTitle className="text-primary">Receipts</DialogTitle>
             <DialogDescription>
               {selectedSubmission?.employeeName} - ${selectedSubmission?.amount?.toLocaleString()}
               {selectedSubmission?.remarks && ` • ${selectedSubmission.remarks}`}
@@ -244,18 +244,18 @@ export default function ExpenseFormMySubmissions() {
                   className="block"
                 >
                   {isPdf ? (
-                    <span className="flex items-center gap-2 text-[#EAEB80] hover:underline">
+                    <span className="flex items-center gap-2 text-primary hover:underline">
                       <ExternalLink className="w-4 h-4" /> Receipt {i + 1} (PDF)
                     </span>
                   ) : isDriveFileId ? (
-                    <span className="flex items-center gap-2 text-[#EAEB80] hover:underline">
+                    <span className="flex items-center gap-2 text-primary hover:underline">
                       <ExternalLink className="w-4 h-4" /> View Receipt {i + 1}
                     </span>
                   ) : (
                     <img
                       src={displayUrl}
                       alt={`Receipt ${i + 1}`}
-                      className="max-h-48 rounded border border-[#2a2a2a] object-contain"
+                      className="max-h-48 rounded border border-border object-contain"
                     />
                   )}
                 </a>

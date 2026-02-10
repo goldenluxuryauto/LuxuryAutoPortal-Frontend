@@ -686,14 +686,14 @@ export default function ClientsPage() {
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#EAEB80] italic mb-1 sm:mb-2">Clients</h1>
-            <p className="text-gray-400 text-xs sm:text-sm">Manage your client database</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-primary italic mb-1 sm:mb-2">Clients</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm">Manage your client database</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <Button
               onClick={() => setIsImportModalOpen(true)}
               variant="outline"
-              className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10 w-full sm:w-auto"
+              className="border-primary/30 text-primary hover:bg-primary/10 w-full sm:w-auto"
             >
               <Upload className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Import</span>
@@ -768,7 +768,7 @@ export default function ClientsPage() {
                 }
               }}
               variant="outline"
-              className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10 w-full sm:w-auto"
+              className="border-primary/30 text-primary hover:bg-primary/10 w-full sm:w-auto"
             >
               <Download className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Download</span>
@@ -776,7 +776,7 @@ export default function ClientsPage() {
             </Button>
             <Button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] w-full sm:w-auto"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
             >
               <Plus className="w-4 h-4 sm:mr-2" />
               Add
@@ -785,11 +785,11 @@ export default function ClientsPage() {
         </div>
 
         {/* Search and Filter */}
-        <Card className="bg-[#111111] border-[#2a2a2a]">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
                 <Input
                   type="text"
                   placeholder="Search by name, email, phone, or ID..."
@@ -798,17 +798,17 @@ export default function ClientsPage() {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600"
+                  className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600"
                 />
               </div>
               <Select value={statusFilter} onValueChange={(value) => {
                 setStatusFilter(value);
                 setPage(1); // Reset to first page when filter changes
               }}>
-                <SelectTrigger className="w-full md:w-[200px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectTrigger className="w-full md:w-[200px] bg-card border-border text-foreground">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectContent className="bg-card border-border text-foreground">
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
@@ -823,7 +823,7 @@ export default function ClientsPage() {
                     setStatusFilter("all");
                     setPage(1);
                   }}
-                  className="text-gray-400 hover:text-white"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -833,22 +833,22 @@ export default function ClientsPage() {
         </Card>
 
         {/* Clients Table */}
-        <Card className="bg-[#0f0f0f] border-[#1a1a1a]">
+        <Card className="bg-card border-border">
           <CardContent className="p-0">
             <div className="overflow-x-auto -mx-3 sm:mx-0">
               <Table className="min-w-[1000px]">
                 <TableHeader>
-                  <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                    <TableHead className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-12 sm:w-16 text-[10px] sm:text-xs">No</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[150px] sm:min-w-[200px] text-[10px] sm:text-xs">Full Name</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] sm:min-w-[180px] text-[10px] sm:text-xs hidden lg:table-cell">Email</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden xl:table-cell">Phone</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs">Role</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Status</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden md:table-cell">Joined Date</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[120px] text-[10px] sm:text-xs">Online Status</TableHead>
-                    <TableHead className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs hidden lg:table-cell">Counts of Cars</TableHead>
-                    <TableHead className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Actions</TableHead>
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-12 sm:w-16 text-[10px] sm:text-xs">No</TableHead>
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[150px] sm:min-w-[200px] text-[10px] sm:text-xs">Full Name</TableHead>
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] sm:min-w-[180px] text-[10px] sm:text-xs hidden lg:table-cell">Email</TableHead>
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden xl:table-cell">Phone</TableHead>
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs">Role</TableHead>
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Status</TableHead>
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden md:table-cell">Joined Date</TableHead>
+                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[120px] text-[10px] sm:text-xs">Online Status</TableHead>
+                    <TableHead className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs hidden lg:table-cell">Counts of Cars</TableHead>
+                    <TableHead className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -865,7 +865,7 @@ export default function ClientsPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => refetch()}
-                            className="border-[#EAEB80] text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                            className="border-primary text-primary hover:bg-primary/10"
                           >
                             <RefreshCw className="w-4 h-4 mr-2" />
                             Retry
@@ -875,7 +875,7 @@ export default function ClientsPage() {
                     </TableRow>
                   ) : clients.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8 text-gray-400">
+                      <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                         No clients found. Try adjusting your search or filters.
                       </TableCell>
                     </TableRow>
@@ -892,24 +892,24 @@ export default function ClientsPage() {
                       return (
                         <TableRow
                           key={client.id}
-                          className="border-[#2a2a2a] group"
+                          className="border-border group"
                         >
-                          <TableCell className="text-center text-[#EAEB80] font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
+                          <TableCell className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
                             {rowNumber}
                           </TableCell>
-                          <TableCell className="text-left text-white font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
+                          <TableCell className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
                             {client.firstName} {client.lastName}
                           </TableCell>
-                          <TableCell className="text-left text-gray-300 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
                             {client.email}
                           </TableCell>
-                          <TableCell className="text-left text-gray-400 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
                             {client.phone || <span className="text-gray-600">N/A</span>}
                           </TableCell>
                           <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
                             <Badge
                               variant="outline"
-                              className="bg-[#EAEB80]/10 text-[#EAEB80] border-[#EAEB80]/30 text-xs"
+                              className="bg-[#EAEB80]/10 text-primary border-primary/30 text-xs"
                             >
                               {client.roleName}
                             </Badge>
@@ -923,13 +923,13 @@ export default function ClientsPage() {
                                   ? "bg-red-500/20 text-red-400 border-red-500/30"
                                   : client.status === 0
                                   ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                  : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                                  : "bg-gray-500/20 text-muted-foreground border-gray-500/30"
                               )}
                             >
                               {client.status === 3 ? "Blocked" : client.status === 0 ? "Active" : "Inactive"}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-left text-gray-400 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden md:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden md:table-cell">
                             {formatDate(client.createdAt)}
                           </TableCell>
                           <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
@@ -940,7 +940,7 @@ export default function ClientsPage() {
                               {onlineStatusBadge.text}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-center text-gray-400 px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
+                          <TableCell className="text-center text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
                             {client.carCount}
                           </TableCell>
                           <TableCell className="text-center px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
@@ -949,7 +949,7 @@ export default function ClientsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-9 w-9 p-0 text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10 rounded-full"
+                                className="h-9 w-9 p-0 text-primary hover:text-primary hover:bg-primary/10 rounded-full"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleViewClient(client.id);
@@ -965,7 +965,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-700 hover:bg-yellow-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleRevokeAccess(client.email);
@@ -984,7 +984,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-700 hover:bg-yellow-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleRevokeAccess(client.email);
@@ -1003,7 +1003,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-green-400 hover:text-green-300 hover:bg-green-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-green-400 hover:text-green-700 hover:bg-green-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleReactivateAccess(client.email);
@@ -1022,7 +1022,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 rounded-full opacity-50 cursor-not-allowed"
+                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-700 hover:bg-yellow-500/10 rounded-full opacity-50 cursor-not-allowed"
                                   disabled={true}
                                   title="Account is blocked - Cannot suspend"
                                 >
@@ -1090,10 +1090,10 @@ export default function ClientsPage() {
 
         {/* Add Client Modal */}
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-[#EAEB80]">Add New Client</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-primary">Add New Client</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
                 Create a new client in the system
               </DialogDescription>
             </DialogHeader>
@@ -1102,7 +1102,7 @@ export default function ClientsPage() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
                 {/* Personal Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+                  <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
                     Personal Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1111,9 +1111,9 @@ export default function ClientsPage() {
                       name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">First Name *</FormLabel>
+                          <FormLabel className="text-muted-foreground">First Name *</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1125,9 +1125,9 @@ export default function ClientsPage() {
                       name="lastName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Last Name *</FormLabel>
+                          <FormLabel className="text-muted-foreground">Last Name *</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1139,9 +1139,9 @@ export default function ClientsPage() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Email *</FormLabel>
+                          <FormLabel className="text-muted-foreground">Email *</FormLabel>
                           <FormControl>
-                            <Input {...field} type="email" className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} type="email" className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1153,9 +1153,9 @@ export default function ClientsPage() {
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Phone</FormLabel>
+                          <FormLabel className="text-muted-foreground">Phone</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1167,9 +1167,9 @@ export default function ClientsPage() {
                       name="birthday"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Date of Birth</FormLabel>
+                          <FormLabel className="text-muted-foreground">Date of Birth</FormLabel>
                           <FormControl>
-                            <Input {...field} type="date" className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} type="date" className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1181,17 +1181,17 @@ export default function ClientsPage() {
                       name="tshirtSize"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">T-Shirt Size</FormLabel>
+                          <FormLabel className="text-muted-foreground">T-Shirt Size</FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                           <FormControl>
-                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                           </FormControl>
-                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectContent className="bg-card border-border text-foreground">
                               {["XS", "S", "M", "L", "XL", "XXL"].map(
                                 (s) => (
                                   <SelectItem key={s} value={s}>
@@ -1211,14 +1211,14 @@ export default function ClientsPage() {
                       name="representative"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Representative</FormLabel>
+                          <FormLabel className="text-muted-foreground">Representative</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value || undefined}>
                             <FormControl>
-                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectContent className="bg-card border-border text-foreground">
                               {["Jay Barton", "Jenn Mason", "Brynn Lunn", "Other"].map((rep) => (
                                 <SelectItem key={rep} value={rep}>
                                   {rep}
@@ -1236,17 +1236,17 @@ export default function ClientsPage() {
                       name="heardAboutUs"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">How Did You Hear About Us</FormLabel>
+                          <FormLabel className="text-muted-foreground">How Did You Hear About Us</FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                           <FormControl>
-                              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                           </FormControl>
-                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectContent className="bg-card border-border text-foreground">
                               <SelectItem value="Friend">Friend</SelectItem>
                               <SelectItem value="Google">Google</SelectItem>
                               <SelectItem value="Social Media">Social Media</SelectItem>
@@ -1262,9 +1262,9 @@ export default function ClientsPage() {
                       name="emergencyContactName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Emergency Contact Name</FormLabel>
+                          <FormLabel className="text-muted-foreground">Emergency Contact Name</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1276,9 +1276,9 @@ export default function ClientsPage() {
                       name="emergencyContactPhone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Emergency Contact Phone</FormLabel>
+                          <FormLabel className="text-muted-foreground">Emergency Contact Phone</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1290,12 +1290,12 @@ export default function ClientsPage() {
                       name="status"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Client Status</FormLabel>
+                          <FormLabel className="text-muted-foreground">Client Status</FormLabel>
                           <Select value={field.value || "INACTIVE"} onValueChange={field.onChange}>
-                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectTrigger className="bg-card border-border text-foreground">
                               <SelectValue placeholder="Select client status" />
                             </SelectTrigger>
-                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectContent className="bg-card border-border text-foreground">
                               <SelectItem value="ACTIVE">Active</SelectItem>
                               <SelectItem value="INACTIVE">Inactive</SelectItem>
                             </SelectContent>
@@ -1314,7 +1314,7 @@ export default function ClientsPage() {
 
                 {/* Address Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+                  <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
                     Address Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1323,9 +1323,9 @@ export default function ClientsPage() {
                       name="streetAddress"
                       render={({ field }) => (
                         <FormItem className="md:col-span-2">
-                          <FormLabel className="text-gray-400">Street Address</FormLabel>
+                          <FormLabel className="text-muted-foreground">Street Address</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1337,9 +1337,9 @@ export default function ClientsPage() {
                       name="city"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">City</FormLabel>
+                          <FormLabel className="text-muted-foreground">City</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1351,9 +1351,9 @@ export default function ClientsPage() {
                       name="state"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">State</FormLabel>
+                          <FormLabel className="text-muted-foreground">State</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1365,9 +1365,9 @@ export default function ClientsPage() {
                       name="zipCode"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Zip Code</FormLabel>
+                          <FormLabel className="text-muted-foreground">Zip Code</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1378,7 +1378,7 @@ export default function ClientsPage() {
 
                 {/* Banking Information (ACH) */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+                  <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
                     Banking Information (ACH)
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1387,9 +1387,9 @@ export default function ClientsPage() {
                       name="bankName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Bank Name</FormLabel>
+                          <FormLabel className="text-muted-foreground">Bank Name</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1401,12 +1401,12 @@ export default function ClientsPage() {
                       name="taxClassification"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Tax Classification</FormLabel>
+                          <FormLabel className="text-muted-foreground">Tax Classification</FormLabel>
                           <Select value={field.value || ""} onValueChange={field.onChange}>
-                            <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectTrigger className="bg-card border-border text-foreground">
                               <SelectValue placeholder="Select tax classification" />
                             </SelectTrigger>
-                            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                            <SelectContent className="bg-card border-border text-foreground">
                               <SelectItem value="individual">Individual</SelectItem>
                               <SelectItem value="business">Business</SelectItem>
                             </SelectContent>
@@ -1421,9 +1421,9 @@ export default function ClientsPage() {
                       name="bankRoutingNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Routing Number</FormLabel>
+                          <FormLabel className="text-muted-foreground">Routing Number</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground font-mono focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1435,9 +1435,9 @@ export default function ClientsPage() {
                       name="bankAccountNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Account Number</FormLabel>
+                          <FormLabel className="text-muted-foreground">Account Number</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground font-mono focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1449,9 +1449,9 @@ export default function ClientsPage() {
                       name="businessName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Business Name</FormLabel>
+                          <FormLabel className="text-muted-foreground">Business Name</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1463,9 +1463,9 @@ export default function ClientsPage() {
                       name="ssn"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">SSN</FormLabel>
+                          <FormLabel className="text-muted-foreground">SSN</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground font-mono focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1477,9 +1477,9 @@ export default function ClientsPage() {
                       name="ein"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">EIN</FormLabel>
+                          <FormLabel className="text-muted-foreground">EIN</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono focus:border-[#EAEB80]" />
+                            <Input {...field} className="bg-card border-border text-foreground font-mono focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1496,13 +1496,13 @@ export default function ClientsPage() {
                       setIsAddModalOpen(false);
                       form.reset();
                     }}
-                    className="text-gray-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                     disabled={createMutation.isPending}
                   >
                     {createMutation.isPending ? "Saving..." : "Save"}
@@ -1515,10 +1515,10 @@ export default function ClientsPage() {
 
         {/* Delete Client Only Confirmation Modal */}
         <Dialog open={deleteClientId !== null && deleteClientEmail === null} onOpenChange={(open) => !open && setDeleteClientId(null)}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+          <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl font-semibold text-red-400">Delete Client</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 {deleteClientId && clients.find(c => c.id === deleteClientId) && (
                   <>Are you sure you want to delete <strong>{clients.find(c => c.id === deleteClientId)?.firstName} {clients.find(c => c.id === deleteClientId)?.lastName}</strong>? This action cannot be undone.</>
                 )}
@@ -1528,14 +1528,14 @@ export default function ClientsPage() {
               <Button
                 variant="ghost"
                 onClick={() => setDeleteClientId(null)}
-                className="text-gray-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
                 disabled={deleteMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmDelete}
-                className="bg-red-500 text-white hover:bg-red-600"
+                className="bg-red-500 text-foreground hover:bg-red-500/20 text-red-700 border-red-500/50"
                 disabled={deleteMutation.isPending}
               >
                 {deleteMutation.isPending && (
@@ -1549,13 +1549,13 @@ export default function ClientsPage() {
 
         {/* Revoke Access Confirmation Dialog */}
         <Dialog open={revokeClientEmail !== null} onOpenChange={(open) => !open && setRevokeClientEmail(null)}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+          <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl font-semibold text-yellow-400">Suspend Client Access</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 {revokeClientEmail && clients.find(c => c.email === revokeClientEmail) && (
                   <>
-                    Are you sure you want to suspend access for <strong className="text-white">{clients.find(c => c.email === revokeClientEmail)?.firstName} {clients.find(c => c.email === revokeClientEmail)?.lastName}</strong>?
+                    Are you sure you want to suspend access for <strong className="text-foreground">{clients.find(c => c.email === revokeClientEmail)?.firstName} {clients.find(c => c.email === revokeClientEmail)?.lastName}</strong>?
                     <br /><br />
                     This will temporarily revoke their login access. The client's data will be preserved and can be reactivated later.
                   </>
@@ -1566,14 +1566,14 @@ export default function ClientsPage() {
               <Button
                 variant="outline"
                 onClick={() => setRevokeClientEmail(null)}
-                className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                className="border-border text-muted-foreground hover:bg-muted/50"
                 disabled={revokeAccessMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmRevoke}
-                className="bg-yellow-600 text-white hover:bg-yellow-700"
+                className="bg-yellow-600 text-foreground hover:bg-yellow-700"
                 disabled={revokeAccessMutation.isPending}
               >
                 {revokeAccessMutation.isPending && (
@@ -1587,15 +1587,15 @@ export default function ClientsPage() {
 
         {/* Block Account Confirmation Dialog */}
         <Dialog open={blockClientEmail !== null} onOpenChange={(open) => !open && setBlockClientEmail(null)}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+          <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl font-semibold text-red-400">Permanently Block Account</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 This will permanently block the client account. The user will not be able to register or access their account.
               </DialogDescription>
             </DialogHeader>
             <div className="mt-4">
-              <p className="text-gray-300 mb-4">
+              <p className="text-muted-foreground mb-4">
                 Are you sure you want to permanently block <strong>{blockClientEmail}</strong>?
               </p>
               <p className="text-yellow-400 text-sm mb-4">
@@ -1606,14 +1606,14 @@ export default function ClientsPage() {
               <Button
                 variant="outline"
                 onClick={() => setBlockClientEmail(null)}
-                className="border-[#2a2a2a] text-gray-400 hover:text-white"
+                className="border-border text-muted-foreground hover:text-foreground"
                 disabled={blockUserMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmBlock}
-                className="bg-red-600 text-white hover:bg-red-700"
+                className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground hover:bg-red-500/30 text-red-700"
                 disabled={blockUserMutation.isPending}
               >
                 Permanently Block
@@ -1624,13 +1624,13 @@ export default function ClientsPage() {
 
         {/* Grant/Reactivate Access Confirmation Dialog */}
         <Dialog open={reactivateClientEmail !== null} onOpenChange={(open) => !open && setReactivateClientEmail(null)}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+          <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl font-semibold text-green-400">Grant Client Access</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 {reactivateClientEmail && clients.find(c => c.email === reactivateClientEmail) && (
                   <>
-                    Are you sure you want to grant access for <strong className="text-white">{clients.find(c => c.email === reactivateClientEmail)?.firstName} {clients.find(c => c.email === reactivateClientEmail)?.lastName}</strong>?
+                    Are you sure you want to grant access for <strong className="text-foreground">{clients.find(c => c.email === reactivateClientEmail)?.firstName} {clients.find(c => c.email === reactivateClientEmail)?.lastName}</strong>?
                     <br /><br />
                     This will restore their login access. The client will be able to log in and access their account again.
                   </>
@@ -1641,14 +1641,14 @@ export default function ClientsPage() {
               <Button
                 variant="outline"
                 onClick={() => setReactivateClientEmail(null)}
-                className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                className="border-border text-muted-foreground hover:bg-muted/50"
                 disabled={reactivateAccessMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmReactivate}
-                className="bg-green-600 text-white hover:bg-green-700"
+                className="bg-green-600 text-foreground hover:bg-green-700"
                 disabled={reactivateAccessMutation.isPending}
               >
                 Grant Access
@@ -1659,13 +1659,13 @@ export default function ClientsPage() {
 
         {/* Delete User Confirmation Dialog */}
         <Dialog open={deleteClientEmail !== null && deleteClientId !== null} onOpenChange={(open) => !open && (setDeleteClientEmail(null), setDeleteClientId(null))}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white">
+          <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl font-semibold text-red-400">Permanently Delete Client</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 {deleteClientId && deleteClientEmail && clients.find(c => c.id === deleteClientId) && (
                   <>
-                    Are you sure you want to permanently delete <strong className="text-white">{clients.find(c => c.id === deleteClientId)?.firstName} {clients.find(c => c.id === deleteClientId)?.lastName}</strong>?
+                    Are you sure you want to permanently delete <strong className="text-foreground">{clients.find(c => c.id === deleteClientId)?.firstName} {clients.find(c => c.id === deleteClientId)?.lastName}</strong>?
                     <br /><br />
                     <span className="text-red-400 font-semibold">Warning:</span> This action cannot be undone. All client data, user account, cars, contracts, and related information will be permanently deleted.
                   </>
@@ -1679,14 +1679,14 @@ export default function ClientsPage() {
                   setDeleteClientEmail(null);
                   setDeleteClientId(null);
                 }}
-                className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                className="border-border text-muted-foreground hover:bg-muted/50"
                 disabled={deleteUserMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmDeleteUser}
-                className="bg-red-600 text-white hover:bg-red-700"
+                className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground hover:bg-red-500/30 text-red-700"
                 disabled={deleteUserMutation.isPending}
               >
                 Delete Permanently
@@ -1697,13 +1697,13 @@ export default function ClientsPage() {
 
         {/* Import Clients and Cars Modal */}
         <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-2xl">
+          <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-[#EAEB80] flex items-center gap-2">
+              <DialogTitle className="text-lg sm:text-xl font-semibold text-primary flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5" />
                 Import Clients and Cars
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 Upload an Excel (.xlsx, .xls) or CSV file to import existing clients and their cars.
                 The file should contain the same fields as the client onboarding form.
               </DialogDescription>
@@ -1713,14 +1713,14 @@ export default function ClientsPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="import-file"
-                  className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-[#EAEB80]/40 rounded-xl bg-[#0a0a0a]/50 hover:border-[#EAEB80]/60 hover:bg-[#EAEB80]/5 transition-all cursor-pointer group"
+                  className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
                 >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="w-10 h-10 text-[#EAEB80] mb-3 group-hover:scale-110 transition-transform" />
-                    <p className="mb-2 text-sm font-semibold text-gray-300 group-hover:text-[#EAEB80] transition-colors">
+                    <Upload className="w-10 h-10 text-primary mb-3 group-hover:scale-110 transition-transform" />
+                    <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors">
                       {importFile ? importFile.name : "Click to Upload or Drag and Drop"}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-foreground0">
                       Excel (.xlsx, .xls) or CSV file (Max 100MB)
                     </p>
                   </div>
@@ -1738,11 +1738,11 @@ export default function ClientsPage() {
                   />
                 </label>
                 {importFile && (
-                  <div className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-lg border border-[#2a2a2a]">
+                  <div className="flex items-center justify-between p-3 bg-background rounded-lg border border-border">
                     <div className="flex items-center gap-2">
-                      <FileSpreadsheet className="w-5 h-5 text-[#EAEB80]" />
-                      <span className="text-sm text-gray-300">{importFile.name}</span>
-                      <span className="text-xs text-gray-500">
+                      <FileSpreadsheet className="w-5 h-5 text-primary" />
+                      <span className="text-sm text-muted-foreground">{importFile.name}</span>
+                      <span className="text-xs text-foreground0">
                         ({(importFile.size / 1024 / 1024).toFixed(2)} MB)
                       </span>
                     </div>
@@ -1751,7 +1751,7 @@ export default function ClientsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setImportFile(null)}
-                      className="text-gray-400 hover:text-white h-8 w-8 p-0"
+                      className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -1759,11 +1759,11 @@ export default function ClientsPage() {
                 )}
               </div>
 
-              <div className="bg-[#0a0a0a] p-4 rounded-lg border border-[#2a2a2a]">
-                <p className="text-sm text-gray-400 mb-2">
-                  <strong className="text-[#EAEB80]">Note:</strong> The imported data will:
+              <div className="bg-background p-4 rounded-lg border border-border">
+                <p className="text-sm text-muted-foreground mb-2">
+                  <strong className="text-primary">Note:</strong> The imported data will:
                 </p>
-                <ul className="text-xs text-gray-500 space-y-1 list-disc list-inside">
+                <ul className="text-xs text-foreground0 space-y-1 list-disc list-inside">
                   <li>Create onboarding submissions with "pending" status</li>
                   <li>Use the same fields as the client onboarding form</li>
                   <li>Require approval before creating client accounts and cars</li>
@@ -1771,7 +1771,7 @@ export default function ClientsPage() {
                 </ul>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <Button
                   type="button"
                   variant="ghost"
@@ -1779,7 +1779,7 @@ export default function ClientsPage() {
                     setIsImportModalOpen(false);
                     setImportFile(null);
                   }}
-                  className="text-gray-400 hover:text-white"
+                  className="text-muted-foreground hover:text-foreground"
                   disabled={importMutation.isPending}
                 >
                   Cancel
@@ -1787,7 +1787,7 @@ export default function ClientsPage() {
                 <Button
                   type="button"
                   onClick={handleImport}
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                   disabled={!importFile || importMutation.isPending}
                 >
                   {importMutation.isPending ? (
@@ -1809,12 +1809,12 @@ export default function ClientsPage() {
 
         {/* Import Warning Dialog */}
         <Dialog open={showImportErrors} onOpenChange={setShowImportErrors}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-3xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl font-semibold text-yellow-400">
                 Import Warning ({importErrors.length})
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 The following rows failed to import. Please review and fix the issues.
               </DialogDescription>
             </DialogHeader>
@@ -1822,22 +1822,22 @@ export default function ClientsPage() {
               {importErrors.map((error, index) => (
                 <div
                   key={index}
-                  className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4"
+                  className="bg-card border border-border rounded-lg p-4"
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 font-semibold text-sm">
                       {error.row}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-gray-300 break-words">
-                        <span className="font-medium text-white">Row {error.row}:</span> {error.error}
+                      <p className="text-sm text-muted-foreground break-words">
+                        <span className="font-medium text-foreground">Row {error.row}:</span> {error.error}
                       </p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-[#2a2a2a]">
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-border">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -1846,7 +1846,7 @@ export default function ClientsPage() {
                   setImportFile(null);
                   setImportErrors([]);
                 }}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+                className="bg-card border-border text-foreground hover:bg-muted"
               >
                 Close
               </Button>

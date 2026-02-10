@@ -77,12 +77,12 @@ export function TablePagination({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-[#0f0f0f] border-t border-[#1a1a1a]">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-card border-t border-border1a1a1a]">
       {/* Left: Rows per page + Info */}
       <div className="flex flex-col sm:flex-row items-center gap-4">
         {/* Rows per page buttons */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-400 hidden sm:inline">Rows per page:</span>
+          <span className="text-sm text-muted-foreground hidden sm:inline">Rows per page:</span>
           <div className="flex gap-1">
             {([10, 20, 50] as ItemsPerPage[]).map((limit) => (
               <button
@@ -91,10 +91,10 @@ export function TablePagination({
                 disabled={isLoading}
                 className={cn(
                   "px-3 py-1.5 text-sm font-medium rounded transition-all duration-200",
-                  "hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed",
+                  "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
                   itemsPerPage === limit
-                    ? "bg-[#EAEB80] text-black font-bold shadow-lg"
-                    : "bg-[#1a1a1a] text-gray-300 hover:text-white border border-[#2a2a2a]"
+                    ? "bg-primary text-primary-foreground font-bold shadow-lg"
+                    : "bg-card text-muted-foreground hover:text-foreground border border-border"
                 )}
               >
                 {limit}
@@ -104,10 +104,10 @@ export function TablePagination({
         </div>
 
         {/* Info text */}
-        <span className="text-sm text-gray-400">
-          Showing <span className="text-white font-medium">{startItem}</span> to{" "}
-          <span className="text-white font-medium">{endItem}</span> of{" "}
-          <span className="text-white font-medium">{totalItems}</span>
+        <span className="text-sm text-muted-foreground">
+          Showing <span className="text-foreground font-medium">{startItem}</span> to{" "}
+          <span className="text-foreground font-medium">{endItem}</span> of{" "}
+          <span className="text-foreground font-medium">{totalItems}</span>
         </span>
       </div>
 
@@ -120,14 +120,14 @@ export function TablePagination({
             disabled={currentPage === 1 || isLoading}
             className={cn(
               "p-2 rounded transition-colors",
-              "hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-gray-400 hover:text-white"
+              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-muted-foreground hover:text-foreground"
             )}
             aria-label="Previous page"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <span className="px-3 py-1.5 text-sm font-medium text-white bg-[#1a1a1a] rounded">
+          <span className="px-3 py-1.5 text-sm font-medium text-foreground bg-card rounded">
             {currentPage} / {totalPages}
           </span>
           <button
@@ -135,8 +135,8 @@ export function TablePagination({
             disabled={currentPage === totalPages || isLoading}
             className={cn(
               "p-2 rounded transition-colors",
-              "hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-gray-400 hover:text-white"
+              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-muted-foreground hover:text-foreground"
             )}
             aria-label="Next page"
           >
@@ -152,8 +152,8 @@ export function TablePagination({
             disabled={currentPage === 1 || isLoading}
             className={cn(
               "p-2 rounded transition-colors",
-              "hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-gray-400 hover:text-white"
+              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-muted-foreground hover:text-foreground"
             )}
             aria-label="First page"
           >
@@ -166,8 +166,8 @@ export function TablePagination({
             disabled={currentPage === 1 || isLoading}
             className={cn(
               "p-2 rounded transition-colors",
-              "hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-gray-400 hover:text-white"
+              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-muted-foreground hover:text-foreground"
             )}
             aria-label="Previous page"
           >
@@ -180,7 +180,7 @@ export function TablePagination({
               return (
                 <span
                   key={`ellipsis-${index}`}
-                  className="px-2 text-gray-500"
+                  className="px-2 text-foreground0"
                 >
                   ...
                 </span>
@@ -195,10 +195,10 @@ export function TablePagination({
                 disabled={isLoading}
                 className={cn(
                   "min-w-[2.5rem] px-3 py-1.5 text-sm font-medium rounded transition-all duration-200",
-                  "hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed",
+                  "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
                   currentPage === pageNum
-                    ? "bg-[#EAEB80] text-black font-bold shadow-lg"
-                    : "bg-[#1a1a1a] text-gray-300 hover:text-white border border-[#2a2a2a]"
+                    ? "bg-primary text-primary-foreground font-bold shadow-lg"
+                    : "bg-card text-muted-foreground hover:text-foreground border border-border"
                 )}
                 aria-label={`Page ${pageNum}`}
                 aria-current={currentPage === pageNum ? "page" : undefined}
@@ -214,8 +214,8 @@ export function TablePagination({
             disabled={currentPage === totalPages || isLoading}
             className={cn(
               "p-2 rounded transition-colors",
-              "hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-gray-400 hover:text-white"
+              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-muted-foreground hover:text-foreground"
             )}
             aria-label="Next page"
           >
@@ -228,8 +228,8 @@ export function TablePagination({
             disabled={currentPage === totalPages || isLoading}
             className={cn(
               "p-2 rounded transition-colors",
-              "hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-gray-400 hover:text-white"
+              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-muted-foreground hover:text-foreground"
             )}
             aria-label="Last page"
           >

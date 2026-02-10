@@ -389,10 +389,10 @@ export default function RecordsPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-400">Failed to load car details</p>
+          <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
-            className="mt-4 text-[#EAEB80] hover:underline"
+            className="mt-4 text-primary hover:underline"
           >
             ← Back to Cars
           </button>
@@ -418,16 +418,16 @@ export default function RecordsPage() {
         <div className="mb-4 sm:mb-6">
             <button
               onClick={() => setLocation("/cars")}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
             >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Cars</span>
             </button>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white">Records and Files</h1>
+              <h1 className="text-2xl font-bold text-foreground">Records and Files</h1>
               {car && (
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Car: {car.makeModel || "Unknown Car"}
                 </p>
               )}
@@ -439,7 +439,7 @@ export default function RecordsPage() {
                 onClick={() => {
                   setIsAddModalOpen(true);
                 }}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
+                className="bg-card border-border text-foreground hover:bg-muted flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
               >
                 <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">Add</span>
@@ -447,7 +447,7 @@ export default function RecordsPage() {
               <Button
                 variant="outline"
                 onClick={() => setIsLogModalOpen(true)}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
+                className="bg-card border-border text-foreground hover:bg-muted flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
               >
                 <List className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">Log</span>
@@ -458,79 +458,79 @@ export default function RecordsPage() {
         </div>
 
         {/* Car and Owner Information Header */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+        <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Information</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Information</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Car Name: </span>
-                  <span className="text-white text-xs sm:text-sm break-words">{carName}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Car Name: </span>
+                  <span className="text-foreground text-xs sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">VIN #: </span>
-                  <span className="text-white font-mono text-xs sm:text-sm break-all">{car.vin}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">VIN #: </span>
+                  <span className="text-foreground font-mono text-xs sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">License: </span>
-                  <span className="text-white text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">License: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Owner Information</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Owner Information</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Name: </span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Name: </span>
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
+                      className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                    <span className="text-white text-xs sm:text-sm break-words">{ownerName}</span>
+                    <span className="text-foreground text-xs sm:text-sm break-words">{ownerName}</span>
                   )}
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Contact #: </span>
-                  <span className="text-white text-xs sm:text-sm">{ownerContact}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Contact #: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Email: </span>
-                  <span className="text-white text-xs sm:text-sm break-all">{ownerEmail}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Email: </span>
+                  <span className="text-foreground text-xs sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications & Links */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-gray-400 mb-2 sm:mb-3">Car Specifications & Links</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Specifications & Links</h3>
               <div className="space-y-1.5 sm:space-y-2">
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Fuel/Gas: </span>
-                  <span className="text-white text-xs sm:text-sm">{fuelType}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Fuel/Gas: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{fuelType}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Tire Size: </span>
-                  <span className="text-white text-xs sm:text-sm">{tireSize}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Tire Size: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{tireSize}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400 text-xs sm:text-sm">Oil Type: </span>
-                  <span className="text-white text-xs sm:text-sm">{oilType}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Oil Type: </span>
+                  <span className="text-foreground text-xs sm:text-sm">{oilType}</span>
                 </div>
                 {car.turoLink && (
                   <div>
-                    <span className="text-gray-400 text-xs sm:text-sm">Turo Link: </span>
+                    <span className="text-muted-foreground text-xs sm:text-sm">Turo Link: </span>
                     <a
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#EAEB80] hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
+                      className="text-primary hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
                     >
                       View Car
                       <ExternalLink className="w-3 h-3" />
@@ -539,12 +539,12 @@ export default function RecordsPage() {
                 )}
                 {car.adminTuroLink && (
                   <div>
-                    <span className="text-gray-400 text-xs sm:text-sm">Admin Turo Link: </span>
+                    <span className="text-muted-foreground text-xs sm:text-sm">Admin Turo Link: </span>
                     <a
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#EAEB80] hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
+                      className="text-primary hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
                     >
                       View Car
                       <ExternalLink className="w-3 h-3" />
@@ -557,18 +557,18 @@ export default function RecordsPage() {
         </div>
 
         {/* Records And Files Section */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg overflow-hidden" style={{ overflowY: 'auto' }}>
+        <div className="bg-card border border-border rounded-lg overflow-hidden" style={{ overflowY: 'auto' }}>
           <div className="p-4 sm:p-6">
-            <h2 className="text-xl font-semibold text-white mb-4 sm:mb-6">Records And Files</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4 sm:mb-6">Records And Files</h2>
             
             {/* Filter, Items Per Page, and Search */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 sm:mb-6">
               <div className="flex flex-wrap items-center gap-4">
                 <Select value={filterStatus} onValueChange={handleFilterChange}>
-                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[120px]">
+                  <SelectTrigger className="bg-card border-border text-foreground w-[120px]">
                     <SelectValue placeholder="Filter" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                  <SelectContent className="bg-card border-border text-foreground">
                     <SelectItem value="All">All</SelectItem>
                     <SelectItem value="Active">Active</SelectItem>
                     <SelectItem value="Inactive">Inactive</SelectItem>
@@ -576,15 +576,15 @@ export default function RecordsPage() {
                 </Select>
 
                 <div className="flex items-center gap-2">
-                  <List className="w-4 h-4 text-gray-400" />
+                  <List className="w-4 h-4 text-muted-foreground" />
                   <Select
                     value={itemsPerPage.toString()}
                     onValueChange={(value) => setItemsPerPage(parseInt(value) as 10 | 20 | 50)}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white w-[80px]">
+                    <SelectTrigger className="bg-card border-border text-foreground w-[80px]">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="10">10</SelectItem>
                       <SelectItem value="20">20</SelectItem>
                       <SelectItem value="50">50</SelectItem>
@@ -596,7 +596,7 @@ export default function RecordsPage() {
               <div className="flex-1 sm:max-w-md w-full">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
                   <Input
                     type="text"
                     placeholder="Q Search here..."
@@ -607,12 +607,12 @@ export default function RecordsPage() {
                           handleSearch();
                         }
                       }}
-                      className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600 h-9"
+                      className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600 h-9"
                   />
                   </div>
                   <Button
                     onClick={handleSearch}
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] h-9"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 h-9"
                   >
                     <Search className="w-4 h-4" />
                   </Button>
@@ -620,7 +620,7 @@ export default function RecordsPage() {
                     <Button
                       onClick={handleClear}
                       variant="ghost"
-                      className="text-gray-400 hover:text-white underline h-9"
+                      className="text-muted-foreground hover:text-foreground underline h-9"
                     >
                       Clear
                     </Button>
@@ -633,25 +633,25 @@ export default function RecordsPage() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                    <TableHead className="text-center text-[#EAEB80] font-medium w-12">#</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Document Name</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Date</TableHead>
-                    <TableHead className="text-left text-[#EAEB80] font-medium">Remarks</TableHead>
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="text-center text-primary font-medium w-12">#</TableHead>
+                    <TableHead className="text-left text-primary font-medium">Document Name</TableHead>
+                    <TableHead className="text-left text-primary font-medium">Date</TableHead>
+                    <TableHead className="text-left text-primary font-medium">Remarks</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {(status === "pending" || isFetching) ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={4} className="text-center py-12 text-foreground0">
                         Loading...
                       </TableCell>
                     </TableRow>
                   ) : recordsError ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-12 text-red-400">
+                      <TableCell colSpan={4} className="text-center py-12 text-red-700">
                         <div className="mb-2">Error loading data.</div>
-                        <div className="text-sm text-gray-400">
+                        <div className="text-sm text-muted-foreground">
                           {recordsError instanceof Error ? recordsError.message : "Please try again."}
                         </div>
                       </TableCell>
@@ -660,22 +660,22 @@ export default function RecordsPage() {
                     documents.map((doc, index) => (
                       <TableRow
                         key={doc.recordFilesAid}
-                        className="border-[#2a2a2a] hover:bg-[#1a1a1a] transition-colors"
+                        className="border-border hover:bg-card transition-colors"
                       >
-                        <TableCell className="text-center text-gray-300">
+                        <TableCell className="text-center text-muted-foreground">
                           {startIndex + index + 1}
                         </TableCell>
-                        <TableCell className="text-white">
+                        <TableCell className="text-foreground">
                           <button
                             onClick={() => {
                               setLocation(`/admin/cars/${carId}/records/${doc.recordFilesAid}/files`);
                             }}
-                            className="text-[#EAEB80] hover:text-[#d4d570] hover:underline transition-colors text-left"
+                            className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-left"
                           >
                             {doc.recordFilesDocName}
                           </button>
                         </TableCell>
-                        <TableCell className="text-gray-300">
+                        <TableCell className="text-muted-foreground">
                           {doc.recordFilesDate ? (() => {
                             // Extract date string without timezone conversion
                             const dateMatch = doc.recordFilesDate.match(/(\d{4}-\d{2}-\d{2})/);
@@ -710,7 +710,7 @@ export default function RecordsPage() {
                                       setItemEdit(doc);
                                       setIsEditModalOpen(true);
                                     }}
-                                    className="text-gray-400 hover:text-[#EAEB80] transition-colors p-1"
+                                    className="text-muted-foreground hover:text-primary transition-colors p-1"
                                     aria-label="Edit document"
                                     title="Edit"
                                   >
@@ -721,7 +721,7 @@ export default function RecordsPage() {
                                       e.stopPropagation();
                                       handleArchive(doc);
                                     }}
-                                    className="text-gray-400 hover:text-yellow-400 transition-colors p-1"
+                                    className="text-muted-foreground hover:text-yellow-700 transition-colors p-1"
                                     aria-label="Archive document"
                                     title="Archive"
                                   >
@@ -735,7 +735,7 @@ export default function RecordsPage() {
                                       e.stopPropagation();
                                       handleRestore(doc);
                                     }}
-                                    className="text-gray-400 hover:text-green-400 transition-colors p-1"
+                                    className="text-muted-foreground hover:text-green-700 transition-colors p-1"
                                     aria-label="Restore document"
                                     title="Restore"
                                   >
@@ -746,7 +746,7 @@ export default function RecordsPage() {
                                       e.stopPropagation();
                                       handleDelete(doc);
                                     }}
-                                    className="text-gray-400 hover:text-red-400 transition-colors p-1"
+                                    className="text-muted-foreground hover:text-red-700 transition-colors p-1"
                                     aria-label="Delete document"
                                     title="Delete"
                                   >
@@ -761,7 +761,7 @@ export default function RecordsPage() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-12 text-gray-500">
+                      <TableCell colSpan={4} className="text-center py-12 text-foreground0">
                         No documents found
                       </TableCell>
                     </TableRow>
@@ -772,8 +772,8 @@ export default function RecordsPage() {
 
             {/* Pagination Controls */}
             {totalDocuments > 0 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-[#2a2a2a]">
-                <div className="text-sm text-gray-400">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-border">
+                <div className="text-sm text-muted-foreground">
                   Showing {startIndex + 1} to {endIndex} of {totalDocuments} documents
                 </div>
                 
@@ -784,7 +784,7 @@ export default function RecordsPage() {
                       size="sm"
                       onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                       disabled={currentPage === 1 || isFetching}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-card border-border text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
                       <span className="hidden sm:inline">Previous</span>
@@ -802,7 +802,7 @@ export default function RecordsPage() {
                           // Show ellipsis
                           if (page === currentPage - 2 || page === currentPage + 2) {
                             return (
-                              <span key={page} className="text-gray-500 px-2">
+                              <span key={page} className="text-foreground0 px-2">
                                 ...
                               </span>
                             );
@@ -819,8 +819,8 @@ export default function RecordsPage() {
                             disabled={isFetching}
                             className={
                               currentPage === page
-                                ? "bg-[#EAEB80] text-black hover:bg-[#d4d570]"
-                                : "bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+                                ? "bg-primary text-primary-foreground hover:bg-primary/80"
+                                : "bg-card border-border text-foreground hover:bg-muted"
                             }
                           >
                             {page}
@@ -834,7 +834,7 @@ export default function RecordsPage() {
                       size="sm"
                       onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                       disabled={currentPage === totalPages || isFetching}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-card border-border text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="hidden sm:inline">Next</span>
                       <ChevronRight className="w-4 h-4" />
@@ -845,7 +845,7 @@ export default function RecordsPage() {
             )}
 
             {totalDocuments === 0 && !isFetching && status !== "pending" && (
-              <div className="text-center mt-6 text-gray-500 text-sm">
+              <div className="text-center mt-6 text-foreground0 text-sm">
                 No documents found matching your search criteria.
               </div>
             )}
@@ -891,31 +891,31 @@ export default function RecordsPage() {
 
       {/* Confirmation Dialog */}
       <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog({ open, type: null, doc: null })}>
-        <AlertDialogContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+        <AlertDialogContent className="bg-card border-border text-foreground">
           <AlertDialogHeader>
             <AlertDialogTitle>
               {confirmDialog.type === "archive" && "Archive Record"}
               {confirmDialog.type === "restore" && "Restore Record"}
               {confirmDialog.type === "delete" && "Delete Record"}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">
+            <AlertDialogDescription className="text-muted-foreground">
               {confirmDialog.type === "archive" && "Are you sure you want to archive this record?"}
               {confirmDialog.type === "restore" && "Are you sure you want to restore this record?"}
               {confirmDialog.type === "delete" && "Are you sure you want to delete this record? This action cannot be undone."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-[#0f0f0f] border-[#2a2a2a] text-gray-300 hover:bg-[#2a2a2a]">
+            <AlertDialogCancel className="bg-card border-border text-muted-foreground hover:bg-muted">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmAction}
               className={
                 confirmDialog.type === "delete"
-                  ? "bg-red-600 hover:bg-red-700 text-white"
+                  ? "bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30 text-foreground"
                   : confirmDialog.type === "restore"
-                  ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                  ? "bg-green-600 hover:bg-green-700 text-foreground"
+                  : "bg-primary text-primary-foreground hover:bg-primary/80"
               }
             >
               {confirmDialog.type === "archive" && "Archive"}

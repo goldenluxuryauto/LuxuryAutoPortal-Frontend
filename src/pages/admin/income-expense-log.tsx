@@ -99,14 +99,14 @@ export default function IncomeExpenseLogPage() {
         <div className="mb-4">
           <button
             onClick={() => setLocation(`/admin/cars/${carId}/income-expense`)}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Income & Expense</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">Edit History & Log</h1>
-            <p className="text-sm text-gray-400 mt-1">
+            <h1 className="text-2xl font-bold text-foreground">Edit History & Log</h1>
+            <p className="text-sm text-muted-foreground mt-1">
               Track all changes made to income and expense data
             </p>
           </div>
@@ -115,12 +115,12 @@ export default function IncomeExpenseLogPage() {
         {/* Filters */}
         <div className="flex items-center gap-4 mb-6">
           <div className="w-[150px]">
-            <label className="block text-sm font-medium text-gray-400 mb-2">Year</label>
+            <label className="block text-sm font-medium text-muted-foreground mb-2">Year</label>
             <Select value={selectedYear} onValueChange={setSelectedYear}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectTrigger className="bg-card border-border text-foreground">
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-card border-border text-foreground">
                 <SelectItem value="2026">2026</SelectItem>
                 <SelectItem value="2025">2025</SelectItem>
                 <SelectItem value="2024">2024</SelectItem>
@@ -130,12 +130,12 @@ export default function IncomeExpenseLogPage() {
           </div>
 
           <div className="w-[250px]">
-            <label className="block text-sm font-medium text-gray-400 mb-2">Category</label>
+            <label className="block text-sm font-medium text-muted-foreground mb-2">Category</label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectTrigger className="bg-card border-border text-foreground">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectContent className="bg-card border-border text-foreground">
                 <SelectItem value="all">All Categories</SelectItem>
                 <SelectItem value="income">Income & Expenses</SelectItem>
                 <SelectItem value="directDelivery">Direct Delivery</SelectItem>
@@ -149,73 +149,73 @@ export default function IncomeExpenseLogPage() {
           </div>
 
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-400 mb-2">Search</label>
+            <label className="block text-sm font-medium text-muted-foreground mb-2">Search</label>
             <Input
               type="text"
               placeholder="Search by field or user..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+              className="bg-card border-border text-foreground"
             />
           </div>
         </div>
 
         {/* Log Entries */}
-        <div className="flex-1 overflow-auto bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg">
+        <div className="flex-1 overflow-auto bg-card border border-border rounded-lg">
           {isLoading ? (
-            <div className="text-center py-12 text-gray-400">Loading history...</div>
+            <div className="text-center py-12 text-muted-foreground">Loading history...</div>
           ) : filteredLogs.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">
+            <div className="text-center py-12 text-muted-foreground">
               No edit history found for the selected filters
             </div>
           ) : (
             <div className="p-4 space-y-3">
               {filteredLogs.map((log) => (
-                <Card key={log.logId} className="bg-[#0f0f0f] border-[#1a1a1a] hover:bg-[#151515] transition-colors">
+                <Card key={log.logId} className="bg-card border-border hover:bg-muted/50151515] transition-colors">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-3 flex-wrap">
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-[#EAEB80] text-black">
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-primary text-primary-foreground">
                             {getCategoryLabel(log.category)}
                           </span>
-                          <span className="text-white font-medium truncate">
+                          <span className="text-foreground font-medium truncate">
                             {log.fieldLabel || log.fieldName}
                           </span>
-                          <span className="text-gray-500">•</span>
-                          <span className="text-gray-400 text-sm whitespace-nowrap">
+                          <span className="text-foreground0">•</span>
+                          <span className="text-muted-foreground text-sm whitespace-nowrap">
                             {getMonthName(log.month)} {log.year}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-4 text-sm mb-2 flex-wrap">
                           <div className="flex items-center gap-2">
-                            <span className="text-gray-400">Old:</span>
-                            <span className="text-red-400 font-mono">
+                            <span className="text-muted-foreground">Old:</span>
+                            <span className="text-red-700 font-mono">
                               ${Number(log.oldValue || 0).toFixed(2)}
                             </span>
                           </div>
-                          <span className="text-gray-500">→</span>
+                          <span className="text-foreground0">→</span>
                           <div className="flex items-center gap-2">
-                            <span className="text-gray-400">New:</span>
-                            <span className="text-green-400 font-mono">
+                            <span className="text-muted-foreground">New:</span>
+                            <span className="text-green-700 font-mono">
                               ${Number(log.newValue || 0).toFixed(2)}
                             </span>
                           </div>
-                          <span className="text-gray-500">•</span>
-                          <span className="text-yellow-400 font-mono">
+                          <span className="text-foreground0">•</span>
+                          <span className="text-yellow-700 font-mono">
                             Δ ${(Number(log.newValue || 0) - Number(log.oldValue || 0)).toFixed(2)}
                           </span>
                         </div>
 
                         {log.remarks && (
-                          <div className="text-gray-400 text-sm italic mt-2 bg-[#1a1a1a] p-2 rounded border border-[#2a2a2a]">
+                          <div className="text-muted-foreground text-sm italic mt-2 bg-card p-2 rounded border border-border">
                             "{log.remarks}"
                           </div>
                         )}
                       </div>
 
-                      <div className="flex flex-col items-end text-xs text-gray-400 ml-4 shrink-0">
+                      <div className="flex flex-col items-end text-xs text-muted-foreground ml-4 shrink-0">
                         <div className="flex items-center gap-1 mb-2">
                           <User className="w-3 h-3" />
                           <span className="whitespace-nowrap">{log.changedByName || 'Unknown'}</span>
@@ -225,7 +225,7 @@ export default function IncomeExpenseLogPage() {
                           <span className="whitespace-nowrap">{formatDate(log.changedAt)}</span>
                         </div>
                         {log.ipAddress && (
-                          <div className="text-gray-500 text-xs">
+                          <div className="text-foreground0 text-xs">
                             {log.ipAddress}
                           </div>
                         )}

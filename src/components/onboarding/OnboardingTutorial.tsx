@@ -821,7 +821,7 @@ export function OnboardingTutorial({
         }
       }}
     >
-      <DialogContent className="max-w-4xl max-h-[95vh] flex flex-col bg-[#0a0a0a] border-[#1a1a1a] text-white">
+      <DialogContent className="max-w-4xl max-h-[95vh] flex flex-col bg-background border-border text-foreground">
         <DialogHeader className="space-y-2 pb-2">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-bold text-[#EAEB80] flex items-center gap-2">
@@ -829,7 +829,7 @@ export function OnboardingTutorial({
               Welcome Tutorial
             </DialogTitle>
           </div>
-          <DialogDescription className="text-xs text-gray-400">
+          <DialogDescription className="text-xs text-muted-foreground">
             {currentModuleData ? (
               <>
                 Module: {currentModuleData.title} - Step {currentStep} of {currentModuleSteps.length}
@@ -854,8 +854,8 @@ export function OnboardingTutorial({
                 className={cn(
                   "whitespace-nowrap",
                   currentModuleData?.id === module.id
-                    ? "bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90"
-                    : "border-gray-700 text-gray-300 hover:bg-gray-800"
+                    ? "bg-primary text-black hover:bg-primary/90"
+                    : "border-border text-muted-foreground hover:bg-muted/50"
                 )}
               >
                 {module.title}
@@ -867,7 +867,7 @@ export function OnboardingTutorial({
         {/* Progress Bar */}
         <div className="space-y-1 pb-2">
           <Progress value={progress} className="h-2 bg-gray-800" />
-          <div className="flex justify-between text-xs text-gray-500">
+          <div className="flex justify-between text-xs text-foreground0">
             <span>{Math.round(progress)}% Complete</span>
             <span>
               {currentStepIndex >= 0 ? currentStepIndex + 1 : currentStep} / {stepsForProgress.length}
@@ -882,7 +882,7 @@ export function OnboardingTutorial({
              {videoError || !hasValidVideoUrl ? (
                <div className="w-full h-full flex items-center justify-center p-8">
                  <div className="text-center space-y-2">
-                   <div className="text-gray-500 text-sm">
+                   <div className="text-foreground0 text-sm">
                      {currentStepData.videoPlaceholder || "Video will be available soon"}
                    </div>
                    {hasValidVideoUrl && videoError && (
@@ -897,8 +897,8 @@ export function OnboardingTutorial({
                  {videoLoading && (
                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
                      <div className="text-center space-y-2">
-                       <div className="w-8 h-8 border-2 border-[#EAEB80] border-t-transparent rounded-full animate-spin mx-auto"></div>
-                       <p className="text-sm text-gray-400">Loading video...</p>
+                       <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                       <p className="text-sm text-muted-foreground">Loading video...</p>
                      </div>
                    </div>
                  )}
@@ -924,20 +924,20 @@ export function OnboardingTutorial({
 
           {/* Step Title and Description */}
           <div className="space-y-1 flex-shrink-0">
-            <h3 className="text-lg font-semibold text-white">{currentStepData.title}</h3>
-            <p className="text-sm text-gray-400">{currentStepData.description}</p>
+            <h3 className="text-lg font-semibold text-foreground">{currentStepData.title}</h3>
+            <p className="text-sm text-muted-foreground">{currentStepData.description}</p>
           </div>
 
           {/* Instructions List - Two Columns */}
           <div className="space-y-2 flex-1 min-h-0">
-            <h4 className="text-xs font-semibold text-gray-300 uppercase tracking-wide">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Instructions:
             </h4>
             {currentStepData.instructions && Array.isArray(currentStepData.instructions) && currentStepData.instructions.length > 0 ? (
               <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 {currentStepData.instructions.map((instruction, index) => (
-                  <li key={index} className="flex items-start gap-2 text-gray-300">
-                    <div className="mt-0.5 w-5 h-5 rounded-full bg-[#EAEB80]/20 flex items-center justify-center flex-shrink-0">
+                  <li key={index} className="flex items-start gap-2 text-muted-foreground">
+                    <div className="mt-0.5 w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                       <span className="text-[#EAEB80] text-xs font-bold">{index + 1}</span>
                     </div>
                     <span className="flex-1 leading-relaxed">{instruction}</span>
@@ -945,7 +945,7 @@ export function OnboardingTutorial({
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-500 italic">No instructions available for this step.</p>
+              <p className="text-sm text-foreground0 italic">No instructions available for this step.</p>
             )}
           </div>
         </div>
@@ -956,7 +956,7 @@ export function OnboardingTutorial({
             <Button
               variant="outline"
               onClick={handleClose}
-              className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+              className="border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground"
             >
               Skip Tutorial
             </Button>
@@ -964,7 +964,7 @@ export function OnboardingTutorial({
               <Button
                 variant="outline"
                 onClick={previousStep}
-                className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+                className="border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               >
                 <ChevronLeft className="w-4 h-4 mr-2" />
                 Previous
@@ -976,7 +976,7 @@ export function OnboardingTutorial({
               <Button
                 onClick={handleActionClick}
                 variant="outline"
-                className="border-[#EAEB80]/30 text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                className="border-primary/30 text-[#EAEB80] hover:bg-primary/10"
               >
                 <Play className="w-4 h-4 mr-2" />
                 {currentStepData.actionButton.label}
@@ -988,7 +988,7 @@ export function OnboardingTutorial({
                   markStepComplete(currentStep);
                   nextStep();
                 }}
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                className="bg-primary text-black hover:bg-primary/80"
               >
                 Next
                 <ChevronRight className="w-4 h-4 ml-2" />
@@ -999,7 +999,7 @@ export function OnboardingTutorial({
                   markStepComplete(currentStep);
                   nextStep(); // This will complete the tutorial
                 }}
-                className="bg-green-600 text-white hover:bg-green-700"
+                className="bg-green-600 text-foreground hover:bg-green-700"
               >
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Complete Tutorial

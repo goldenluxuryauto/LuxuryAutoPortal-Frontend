@@ -136,7 +136,7 @@ function formatPrice(price: string) {
 
 function CarCard({ car }: { car: Partial<Car> }) {
   return (
-    <Card className="group overflow-hidden bg-card border-white/10 hover-elevate">
+    <Card className="group overflow-hidden bg-card border-border hover-elevate">
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
           src={car.images?.[0] || "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"}
@@ -165,7 +165,7 @@ function CarCard({ car }: { car: Partial<Car> }) {
 
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="w-4 h-4 text-white" />
+            <Calendar className="w-4 h-4 text-foreground" />
             <span>{car.year}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -298,7 +298,7 @@ export default function Fleet() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-20 lg:pt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -316,7 +316,7 @@ export default function Fleet() {
 
           <div className="flex flex-col lg:flex-row gap-8">
             <aside className="hidden lg:block w-64 shrink-0">
-              <div className="sticky top-24 p-6 rounded-lg bg-card border border-white/10">
+              <div className="sticky top-24 p-6 rounded-lg bg-card border border-border">
                 <FilterSidebar
                   make={make}
                   setMake={setMake}
@@ -337,7 +337,7 @@ export default function Fleet() {
                     placeholder="Search vehicles..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10 bg-card border-white/10"
+                    className="pl-10 bg-card border-border"
                     data-testid="input-search"
                   />
                 </div>
@@ -349,7 +349,7 @@ export default function Fleet() {
                       Filters
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="left" className="bg-[#0a0a0a] border-white/10">
+                  <SheetContent side="left" className="bg-background border-border">
                     <SheetHeader>
                       <SheetTitle className="text-foreground">Filters</SheetTitle>
                     </SheetHeader>

@@ -170,39 +170,39 @@ export default function ModalEditManagementSplit() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="bg-[#0f0f0f] border-[#1a1a1a] text-white max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="bg-card border-border text-foreground max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-white text-lg">
+          <DialogTitle className="text-foreground text-lg">
             Update Car Management/Owner Split
           </DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogDescription className="text-muted-foreground">
             Enter management and owner split data for {monthName} {year}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div>
-            <Label className="text-gray-400 text-xs">Type:</Label>
-            <div className="text-white text-sm font-medium mt-1">{fieldName}</div>
+            <Label className="text-muted-foreground text-xs">Type:</Label>
+            <div className="text-foreground text-sm font-medium mt-1">{fieldName}</div>
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Date:</Label>
-            <div className="text-white text-sm font-medium mt-1">
+            <Label className="text-muted-foreground text-xs">Date:</Label>
+            <div className="text-foreground text-sm font-medium mt-1">
               {monthName} {year}
             </div>
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Current Mode:</Label>
-            <div className="text-white text-sm font-medium mt-1">
+            <Label className="text-muted-foreground text-xs">Current Mode:</Label>
+            <div className="text-foreground text-sm font-medium mt-1">
               {modeDisplay} Split
             </div>
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Split Percentage:</Label>
-            <div className="text-white text-sm font-medium mt-1">
+            <Label className="text-muted-foreground text-xs">Split Percentage:</Label>
+            <div className="text-foreground text-sm font-medium mt-1">
               {editingCell.field === "carManagementSplit" 
                 ? `${currentMode === 50 ? "50" : "30"}%`
                 : `${currentMode === 50 ? "50" : "70"}%`
@@ -211,7 +211,7 @@ export default function ModalEditManagementSplit() {
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Amount</Label>
+            <Label className="text-muted-foreground text-xs">Amount</Label>
             <Input
               type="number"
               value={editingCell.value}
@@ -221,73 +221,73 @@ export default function ModalEditManagementSplit() {
                   value: parseFloat(e.target.value) || 0,
                 })
               }
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white text-sm mt-1"
+              className="bg-card border-border text-foreground text-sm mt-1"
               step="0.01"
               autoFocus
             />
           </div>
 
           <div>
-            <Label className="text-gray-400 text-xs">Calculated Amount:</Label>
+            <Label className="text-muted-foreground text-xs">Calculated Amount:</Label>
             <Input
               value={`$${editingCell.value.toFixed(2)}`}
               disabled
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-gray-400 text-sm mt-1"
+              className="bg-card border-border text-muted-foreground text-sm mt-1"
             />
           </div>
         </div>
 
         {/* All Subcategory Values Display */}
-        <div className="border-t border-[#2a2a2a] pt-4 mt-4">
-          <Label className="text-gray-300 text-sm font-semibold mb-3 block">
+        <div className="border-t border-border pt-4 mt-4">
+          <Label className="text-muted-foreground text-sm font-semibold mb-3 block">
             All Values for {monthName} {year}
           </Label>
           <div className="max-h-[400px] overflow-y-auto space-y-4 pr-2">
             {/* INCOME */}
             <div>
-              <div className="text-[#EAEB80] text-xs font-semibold mb-2">INCOME</div>
+              <div className="text-primary text-xs font-semibold mb-2">INCOME</div>
               <div className="space-y-1 text-xs">
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Rental Income:</span>
                   <span>${incomeValues.rentalIncome.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Delivery Income:</span>
                   <span>${incomeValues.deliveryIncome.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Electric Prepaid Income:</span>
                   <span>${incomeValues.electricPrepaidIncome.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Smoking Fines:</span>
                   <span>${incomeValues.smokingFines.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Gas Prepaid Income:</span>
                   <span>${incomeValues.gasPrepaidIncome.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Ski Racks Income:</span>
                   <span>${incomeValues.skiRacksIncome.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Miles Income:</span>
                   <span>${incomeValues.milesIncome.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Child Seat Income:</span>
                   <span>${incomeValues.childSeatIncome.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Coolers Income:</span>
                   <span>${incomeValues.coolersIncome.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Insurance and Client Wrecks:</span>
                   <span>${incomeValues.insuranceWreckIncome.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Other Income:</span>
                   <span>${incomeValues.otherIncome.toFixed(2)}</span>
                 </div>
@@ -296,25 +296,25 @@ export default function ModalEditManagementSplit() {
 
             {/* OPERATING EXPENSE (Direct Delivery) */}
             <div>
-              <div className="text-[#EAEB80] text-xs font-semibold mb-2">OPERATING EXPENSE (Direct Delivery)</div>
+              <div className="text-primary text-xs font-semibold mb-2">OPERATING EXPENSE (Direct Delivery)</div>
               <div className="space-y-1 text-xs">
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Labor - Cleaning:</span>
                   <span>${directDeliveryValues.laborCarCleaning.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Labor - Delivery:</span>
                   <span>${directDeliveryValues.laborDelivery.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Parking - Airport:</span>
                   <span>${directDeliveryValues.parkingAirport.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Parking - Lot:</span>
                   <span>${directDeliveryValues.parkingLot.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Uber/Lyft/Lime:</span>
                   <span>${directDeliveryValues.uberLyftLime.toFixed(2)}</span>
                 </div>
@@ -322,13 +322,13 @@ export default function ModalEditManagementSplit() {
                   const monthValue = subcat.values.find((v: any) => v.month === month);
                   const value = monthValue?.value || 0;
                   return value > 0 ? (
-                    <div key={subcat.id} className="flex justify-between text-gray-300">
+                    <div key={subcat.id} className="flex justify-between text-muted-foreground">
                       <span>{subcat.name}:</span>
                       <span>${value.toFixed(2)}</span>
                     </div>
                   ) : null;
                 })}
-                <div className="flex justify-between text-[#EAEB80] font-semibold pt-1 border-t border-[#2a2a2a]">
+                <div className="flex justify-between text-primary font-semibold pt-1 border-t border-border">
                   <span>TOTAL OPERATING EXPENSE (Direct Delivery):</span>
                   <span>${totalDirectDelivery.toFixed(2)}</span>
                 </div>
@@ -337,101 +337,101 @@ export default function ModalEditManagementSplit() {
 
             {/* OPERATING EXPENSE (COGS - Per Vehicle) */}
             <div>
-              <div className="text-[#EAEB80] text-xs font-semibold mb-2">OPERATING EXPENSE (COGS - Per Vehicle)</div>
+              <div className="text-primary text-xs font-semibold mb-2">OPERATING EXPENSE (COGS - Per Vehicle)</div>
               <div className="space-y-1 text-xs">
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Auto Body Shop / Wreck:</span>
                   <span>${cogsValues.autoBodyShopWreck.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Alignment:</span>
                   <span>${cogsValues.alignment.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Battery:</span>
                   <span>${cogsValues.battery.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Brakes:</span>
                   <span>${cogsValues.brakes.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Car Payment:</span>
                   <span>${cogsValues.carPayment.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Car Insurance:</span>
                   <span>${cogsValues.carInsurance.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Car Seats:</span>
                   <span>${cogsValues.carSeats.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Cleaning Supplies / Tools:</span>
                   <span>${cogsValues.cleaningSuppliesTools.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Emissions:</span>
                   <span>${cogsValues.emissions.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>GPS System:</span>
                   <span>${cogsValues.gpsSystem.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Key & Fob:</span>
                   <span>${cogsValues.keyFob.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Labor - Cleaning:</span>
                   <span>${cogsValues.laborCleaning.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>License & Registration:</span>
                   <span>${cogsValues.licenseRegistration.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Mechanic:</span>
                   <span>${cogsValues.mechanic.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Oil/Lube:</span>
                   <span>${cogsValues.oilLube.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Parts:</span>
                   <span>${cogsValues.parts.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Ski Racks:</span>
                   <span>${cogsValues.skiRacks.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Tickets & Tolls:</span>
                   <span>${cogsValues.tickets.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Tired Air Station:</span>
                   <span>${cogsValues.tiredAirStation.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Tires:</span>
                   <span>${cogsValues.tires.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Towing / Impound Fees:</span>
                   <span>${cogsValues.towingImpoundFees.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Uber/Lyft/Lime:</span>
                   <span>${cogsValues.uberLyftLime.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Windshield:</span>
                   <span>${cogsValues.windshield.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Wipers:</span>
                   <span>${cogsValues.wipers.toFixed(2)}</span>
                 </div>
@@ -439,13 +439,13 @@ export default function ModalEditManagementSplit() {
                   const monthValue = subcat.values.find((v: any) => v.month === month);
                   const value = monthValue?.value || 0;
                   return value > 0 ? (
-                    <div key={subcat.id} className="flex justify-between text-gray-300">
+                    <div key={subcat.id} className="flex justify-between text-muted-foreground">
                       <span>{subcat.name}:</span>
                       <span>${value.toFixed(2)}</span>
                     </div>
                   ) : null;
                 })}
-                <div className="flex justify-between text-[#EAEB80] font-semibold pt-1 border-t border-[#2a2a2a]">
+                <div className="flex justify-between text-primary font-semibold pt-1 border-t border-border">
                   <span>TOTAL OPERATING EXPENSE (COGS - Per Vehicle):</span>
                   <span>${totalCogs.toFixed(2)}</span>
                 </div>
@@ -454,13 +454,13 @@ export default function ModalEditManagementSplit() {
 
             {/* GLA PARKING FEE & LABOR CLEANING */}
             <div>
-              <div className="text-[#EAEB80] text-xs font-semibold mb-2">GLA PARKING FEE & LABOR CLEANING</div>
+              <div className="text-primary text-xs font-semibold mb-2">GLA PARKING FEE & LABOR CLEANING</div>
               <div className="space-y-1 text-xs">
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>GLA Parking Fee:</span>
                   <span>${parkingFeeLaborValues.glaParkingFee.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Labor - Cleaning:</span>
                   <span>${parkingFeeLaborValues.laborCleaning.toFixed(2)}</span>
                 </div>
@@ -468,13 +468,13 @@ export default function ModalEditManagementSplit() {
                   const monthValue = subcat.values.find((v: any) => v.month === month);
                   const value = monthValue?.value || 0;
                   return value > 0 ? (
-                    <div key={subcat.id} className="flex justify-between text-gray-300">
+                    <div key={subcat.id} className="flex justify-between text-muted-foreground">
                       <span>{subcat.name}:</span>
                       <span>${value.toFixed(2)}</span>
                     </div>
                   ) : null;
                 })}
-                <div className="flex justify-between text-[#EAEB80] font-semibold pt-1 border-t border-[#2a2a2a]">
+                <div className="flex justify-between text-primary font-semibold pt-1 border-t border-border">
                   <span>Total Parking Fee & Labor Cleaning:</span>
                   <span>${totalParkingFeeLabor.toFixed(2)}</span>
                 </div>
@@ -483,37 +483,37 @@ export default function ModalEditManagementSplit() {
 
             {/* REIMBURSE AND NON-REIMBURSE BILLS */}
             <div>
-              <div className="text-[#EAEB80] text-xs font-semibold mb-2">REIMBURSE AND NON-REIMBURSE BILLS</div>
+              <div className="text-primary text-xs font-semibold mb-2">REIMBURSE AND NON-REIMBURSE BILLS</div>
               <div className="space-y-1 text-xs">
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Electric - Reimbursed:</span>
                   <span>${reimbursedBillsValues.electricReimbursed.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Electric - Not Reimbursed:</span>
                   <span>${reimbursedBillsValues.electricNotReimbursed.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Gas - Reimbursed:</span>
                   <span>${reimbursedBillsValues.gasReimbursed.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Gas - Not Reimbursed:</span>
                   <span>${reimbursedBillsValues.gasNotReimbursed.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Gas - Service Run:</span>
                   <span>${reimbursedBillsValues.gasServiceRun.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Parking Airport:</span>
                   <span>${reimbursedBillsValues.parkingAirport.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Uber/Lyft/Lime - Not Reimbursed:</span>
                   <span>${reimbursedBillsValues.uberLyftLimeNotReimbursed.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Uber/Lyft/Lime - Reimbursed:</span>
                   <span>${reimbursedBillsValues.uberLyftLimeReimbursed.toFixed(2)}</span>
                 </div>
@@ -521,13 +521,13 @@ export default function ModalEditManagementSplit() {
                   const monthValue = subcat.values.find((v: any) => v.month === month);
                   const value = monthValue?.value || 0;
                   return value > 0 ? (
-                    <div key={subcat.id} className="flex justify-between text-gray-300">
+                    <div key={subcat.id} className="flex justify-between text-muted-foreground">
                       <span>{subcat.name}:</span>
                       <span>${value.toFixed(2)}</span>
                     </div>
                   ) : null;
                 })}
-                <div className="flex justify-between text-[#EAEB80] font-semibold pt-1 border-t border-[#2a2a2a]">
+                <div className="flex justify-between text-primary font-semibold pt-1 border-t border-border">
                   <span>TOTAL REIMBURSE AND NON-REIMBURSE BILLS:</span>
                   <span>${totalReimbursedBills.toFixed(2)}</span>
                 </div>
@@ -536,17 +536,17 @@ export default function ModalEditManagementSplit() {
 
             {/* Total Expenses */}
             <div>
-              <div className="text-[#EAEB80] text-xs font-semibold mb-2">TOTAL EXPENSES</div>
+              <div className="text-primary text-xs font-semibold mb-2">TOTAL EXPENSES</div>
               <div className="space-y-1 text-xs">
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Car Management Total Expenses:</span>
                   <span>${carManagementTotalExpenses.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Car Owner Total Expenses:</span>
                   <span>${carOwnerTotalExpenses.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-[#EAEB80] font-semibold pt-1 border-t border-[#2a2a2a]">
+                <div className="flex justify-between text-primary font-semibold pt-1 border-t border-border">
                   <span>Total Expenses:</span>
                   <span>${totalExpenses.toFixed(2)}</span>
                 </div>
@@ -559,14 +559,14 @@ export default function ModalEditManagementSplit() {
           <Button
             onClick={handleClose}
             variant="outline"
-            className="flex-1 border-[#2a2a2a] text-gray-400 hover:text-white hover:bg-[#2a2a2a]"
+            className="flex-1 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="flex-1 bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/80"
           >
             {isSaving ? "Saving..." : "Save"}
           </Button>

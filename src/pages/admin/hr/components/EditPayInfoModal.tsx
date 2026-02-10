@@ -87,9 +87,9 @@ export function EditPayInfoModal({ open, onOpenChange, employee }: EditPayInfoMo
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="bg-[#111111] border-[#2a2a2a] text-gray-200 max-w-md">
+      <DialogContent className="bg-card border-border text-muted-foreground max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-[#EAEB80]">Update Pay Information</DialogTitle>
+          <DialogTitle className="text-primary">Update Pay Information</DialogTitle>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -103,36 +103,36 @@ export function EditPayInfoModal({ open, onOpenChange, employee }: EditPayInfoMo
               id="eligible"
               checked={form.employee_job_pay_eligible}
               onCheckedChange={(v) => setForm((p) => ({ ...p, employee_job_pay_eligible: !!v }))}
-              className="border-[#2a2a2a] data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-[#EAEB80]"
+              className="border-border data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-primary"
             />
-            <Label htmlFor="eligible" className="text-gray-400 cursor-pointer">Payroll Eligibility</Label>
+            <Label htmlFor="eligible" className="text-muted-foreground cursor-pointer">Payroll Eligibility</Label>
           </div>
           <div>
-            <Label className="text-gray-400">Employee Rate per Hour ($)</Label>
+            <Label className="text-muted-foreground">Employee Rate per Hour ($)</Label>
             <Input
               type="number"
               step="0.01"
               min="0"
               value={form.employee_job_pay_salary_rate}
               onChange={(e) => setForm((p) => ({ ...p, employee_job_pay_salary_rate: e.target.value }))}
-              className="bg-[#0a0a0a] border-[#2a2a2a]"
+              className="bg-background border-border"
               placeholder="0.00"
             />
           </div>
           <div>
-            <Label className="text-gray-400">Bank Account</Label>
+            <Label className="text-muted-foreground">Bank Account</Label>
             <Input
               value={form.employee_job_pay_bank_acc}
               onChange={(e) => setForm((p) => ({ ...p, employee_job_pay_bank_acc: e.target.value }))}
-              className="bg-[#0a0a0a] border-[#2a2a2a]"
+              className="bg-background border-border"
               placeholder="Account number"
             />
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-[#2a2a2a]">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-border">
               Cancel
             </Button>
-            <Button type="submit" disabled={mutation.isPending} className="bg-[#EAEB80] text-black hover:bg-[#EAEB80]/90">
+            <Button type="submit" disabled={mutation.isPending} className="bg-primary text-primary-foreground hover:bg-primary/90">
               {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
             </Button>
           </DialogFooter>

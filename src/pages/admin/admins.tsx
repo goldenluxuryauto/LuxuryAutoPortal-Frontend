@@ -403,12 +403,12 @@ export default function AdminsPage() {
 
   const getRoleBadgeColor = (role: string) => {
     if (role.toLowerCase().includes("admin")) {
-      return "bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/30";
+      return "bg-[#EAEB80]/20 text-primary border-primary/30";
     }
     if (role.toLowerCase().includes("employee")) {
-      return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+      return "bg-blue-500/20 text-blue-700 border-blue-500/30";
     }
-    return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+    return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
   };
 
   return (
@@ -416,14 +416,14 @@ export default function AdminsPage() {
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-white">Admins</h1>
-            <p className="text-gray-400 text-xs sm:text-sm">
+            <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Admins</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm">
               Manage portal administrators
             </p>
           </div>
           <Button
             onClick={handleAddClick}
-            className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium w-full sm:w-auto"
+            className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium w-full sm:w-auto"
             data-testid="button-add-admin"
           >
             <Plus className="w-4 h-4 sm:mr-2" />
@@ -432,38 +432,38 @@ export default function AdminsPage() {
           </Button>
         </div>
 
-        <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
+        <Card className="bg-card border-border">
           <CardContent className="p-0">
             <div className="overflow-x-auto -mx-3 sm:mx-0">
               <table className="w-full min-w-[800px]">
                 <thead>
-                  <tr className="border-b border-[#2a2a2a]">
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                  <tr className="border-b border-border">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Name
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                       Email
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Role
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Status
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
                       Created
                     </th>
-                    <th className="text-right text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-right text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2a2a2a]">
+                <tbody className="divide-y divide-border2a2a2a]">
                   {isLoading ? (
                     <tr>
                       <td
                         colSpan={6}
-                        className="px-6 py-8 text-center text-gray-400"
+                        className="px-6 py-8 text-center text-muted-foreground"
                       >
                         Loading administrators...
                       </td>
@@ -472,28 +472,28 @@ export default function AdminsPage() {
                     users.map((user) => (
                       <tr
                         key={user.id}
-                        className="hover:bg-[#252525] transition-colors"
+                        className="hover:bg-muted/50252525] transition-colors"
                         data-testid={`row-admin-${user.id}`}
                       >
                         <td className="px-3 sm:px-6 py-3 sm:py-4">
                           <div className="flex items-center gap-2 sm:gap-3">
                             <Avatar className="w-8 h-8 sm:w-10 sm:h-10 bg-[#EAEB80]/20">
-                              <AvatarFallback className="bg-[#EAEB80]/20 text-[#EAEB80] text-xs sm:text-sm font-medium">
+                              <AvatarFallback className="bg-[#EAEB80]/20 text-primary text-xs sm:text-sm font-medium">
                                 {getInitials(user.firstName, user.lastName)}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col">
-                              <span className="text-white font-medium text-xs sm:text-sm">
+                              <span className="text-foreground font-medium text-xs sm:text-sm">
                               {user.firstName} {user.lastName}
                             </span>
-                              <span className="text-gray-400 text-[10px] sm:text-xs md:hidden">
+                              <span className="text-muted-foreground text-[10px] sm:text-xs md:hidden">
                                 {user.email}
                               </span>
                             </div>
                           </div>
                         </td>
                         <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
-                          <div className="flex items-center gap-2 text-gray-400">
+                          <div className="flex items-center gap-2 text-muted-foreground">
                             <Mail className="w-4 h-4" />
                             <span className="text-xs sm:text-sm">{user.email}</span>
                           </div>
@@ -511,15 +511,15 @@ export default function AdminsPage() {
                             variant="outline"
                             className={cn(
                               user.isActive
-                                ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                : "bg-red-500/20 text-red-400 border-red-500/30",
+                                ? "bg-green-500/20 text-green-700 border-green-500/30"
+                                : "bg-red-500/20 text-red-700 border-red-500/30",
                               "text-[10px] sm:text-xs"
                             )}
                           >
                             {user.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-400 text-xs sm:text-sm hidden lg:table-cell">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell">
                           {format(new Date(user.createdAt), "MMM d, yyyy")}
                         </td>
                         <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
@@ -527,7 +527,7 @@ export default function AdminsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-gray-400 hover:text-white text-xs sm:text-sm px-2 sm:px-3"
+                            className="text-muted-foreground hover:text-foreground text-xs sm:text-sm px-2 sm:px-3"
                             onClick={() => handleEditClick(user)}
                             data-testid={`button-edit-admin-${user.id}`}
                           >
@@ -542,7 +542,7 @@ export default function AdminsPage() {
                     <tr>
                       <td
                         colSpan={6}
-                        className="px-6 py-8 text-center text-gray-400"
+                        className="px-6 py-8 text-center text-muted-foreground"
                       >
                         No administrators found
                       </td>
@@ -556,12 +556,12 @@ export default function AdminsPage() {
 
         {/* Add/Edit User Modal */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-md">
+          <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl font-semibold">
                 {editingUser ? "Edit Admin" : "Add New Admin"}
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 {editingUser
                   ? "Update admin user information"
                   : "Create a new administrator account"}
@@ -579,13 +579,13 @@ export default function AdminsPage() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">
+                        <FormLabel className="text-muted-foreground">
                           First Name
                         </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="John"
                           />
                         </FormControl>
@@ -599,13 +599,13 @@ export default function AdminsPage() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">
+                        <FormLabel className="text-muted-foreground">
                           Last Name
                         </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                            className="bg-card border-border text-foreground focus:border-primary"
                             placeholder="Doe"
                           />
                         </FormControl>
@@ -620,12 +620,12 @@ export default function AdminsPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Email</FormLabel>
+                      <FormLabel className="text-muted-foreground">Email</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="email"
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="john.doe@example.com"
                         />
                       </FormControl>
@@ -639,7 +639,7 @@ export default function AdminsPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">
+                      <FormLabel className="text-muted-foreground">
                         Password{" "}
                         {editingUser && "(leave blank to keep current)"}
                       </FormLabel>
@@ -647,7 +647,7 @@ export default function AdminsPage() {
                         <Input
                           {...field}
                           type="password"
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="••••••••"
                         />
                       </FormControl>
@@ -661,7 +661,7 @@ export default function AdminsPage() {
                   name="roleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Role</FormLabel>
+                      <FormLabel className="text-muted-foreground">Role</FormLabel>
                       <Select
                         onValueChange={(value) =>
                           field.onChange(parseInt(value, 10))
@@ -669,11 +669,11 @@ export default function AdminsPage() {
                         value={field.value?.toString() || ""}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                          <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                             <SelectValue placeholder="Select a role" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectContent className="bg-card border-border text-foreground">
                           {roles?.map((role) => (
                             <SelectItem
                               key={role.id}
@@ -698,13 +698,13 @@ export default function AdminsPage() {
                       setEditingUser(null);
                       form.reset();
                     }}
-                    className="text-gray-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                     disabled={
                       createMutation.isPending || updateMutation.isPending
                     }
@@ -724,61 +724,61 @@ export default function AdminsPage() {
         <div className="mt-12 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-white">
+              <h2 className="text-xl font-semibold text-foreground">
                 Quick Links Management
               </h2>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 Manage quick links for Reports, Support, and Forms centers
               </p>
             </div>
             <Button
               onClick={handleAddQuickLink}
-              className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Quick Link
             </Button>
           </div>
 
-          <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
+          <Card className="bg-card border-border">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-[#2a2a2a]">
-                      <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                    <tr className="border-b border-border">
+                      <th className="text-left text-xs font-medium text-foreground0 uppercase tracking-wider px-6 py-4">
                         Category
                       </th>
-                      <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-foreground0 uppercase tracking-wider px-6 py-4">
                         Title
                       </th>
-                      <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-foreground0 uppercase tracking-wider px-6 py-4">
                         URL
                       </th>
-                      <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-foreground0 uppercase tracking-wider px-6 py-4">
                         Visibility
                       </th>
-                      <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-4">
+                      <th className="text-right text-xs font-medium text-foreground0 uppercase tracking-wider px-6 py-4">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#2a2a2a]">
+                  <tbody className="divide-y divide-border2a2a2a]">
                     {quickLinks && quickLinks.length > 0 ? (
                       quickLinks.map((link) => (
                         <tr
                           key={link.id}
-                          className="hover:bg-[#252525] transition-colors"
+                          className="hover:bg-muted/50252525] transition-colors"
                         >
                           <td className="px-6 py-4">
                             <Badge
                               variant="outline"
-                              className="bg-blue-500/20 text-blue-400 border-blue-500/30"
+                              className="bg-blue-500/20 text-blue-700 border-blue-500/30"
                             >
                               {link.category}
                             </Badge>
                           </td>
-                          <td className="px-6 py-4 text-white font-medium">
+                          <td className="px-6 py-4 text-foreground font-medium">
                             {link.title}
                           </td>
                           <td className="px-6 py-4">
@@ -786,7 +786,7 @@ export default function AdminsPage() {
                               href={link.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-gray-400 hover:text-[#EAEB80] flex items-center gap-1 text-sm"
+                              className="text-muted-foreground hover:text-primary flex items-center gap-1 text-sm"
                             >
                               {link.url.length > 40
                                 ? `${link.url.substring(0, 40)}...`
@@ -799,7 +799,7 @@ export default function AdminsPage() {
                               {link.visibleToAdmins && (
                                 <Badge
                                   variant="outline"
-                                  className="bg-[#EAEB80]/20 text-[#EAEB80] border-[#EAEB80]/30 text-xs"
+                                  className="bg-[#EAEB80]/20 text-primary border-primary/30 text-xs"
                                 >
                                   Admin
                                 </Badge>
@@ -807,7 +807,7 @@ export default function AdminsPage() {
                               {link.visibleToClients && (
                                 <Badge
                                   variant="outline"
-                                  className="bg-green-500/20 text-green-400 border-green-500/30 text-xs"
+                                  className="bg-green-500/20 text-green-700 border-green-500/30 text-xs"
                                 >
                                   Client
                                 </Badge>
@@ -815,7 +815,7 @@ export default function AdminsPage() {
                               {link.visibleToEmployees && (
                                 <Badge
                                   variant="outline"
-                                  className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs"
+                                  className="bg-blue-500/20 text-blue-700 border-blue-500/30 text-xs"
                                 >
                                   Employee
                                 </Badge>
@@ -827,7 +827,7 @@ export default function AdminsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-gray-400 hover:text-white"
+                                className="text-muted-foreground hover:text-foreground"
                                 onClick={() => handleEditQuickLink(link)}
                               >
                                 <Pencil className="w-4 h-4" />
@@ -837,7 +837,7 @@ export default function AdminsPage() {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="text-gray-400 hover:text-red-400"
+                                    className="text-muted-foreground hover:text-red-700"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
@@ -857,7 +857,7 @@ export default function AdminsPage() {
                       <tr>
                         <td
                           colSpan={5}
-                          className="px-6 py-8 text-center text-gray-400"
+                          className="px-6 py-8 text-center text-muted-foreground"
                         >
                           No quick links found. Add one to get started.
                         </td>
@@ -875,12 +875,12 @@ export default function AdminsPage() {
           open={isQuickLinkModalOpen}
           onOpenChange={setIsQuickLinkModalOpen}
         >
-          <DialogContent className="bg-[#111111] border-[#2a2a2a] text-white max-w-[95vw] sm:max-w-md">
+          <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-xl font-semibold">
                 {editingQuickLink ? "Edit Quick Link" : "Add Quick Link"}
               </DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogDescription className="text-muted-foreground">
                 {editingQuickLink
                   ? "Update quick link information"
                   : "Create a new quick link for users"}
@@ -897,17 +897,17 @@ export default function AdminsPage() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Category</FormLabel>
+                      <FormLabel className="text-muted-foreground">Category</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]">
+                          <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                        <SelectContent className="bg-card border-border text-foreground">
                           <SelectItem value="Reports Center">
                             Reports Center
                           </SelectItem>
@@ -929,11 +929,11 @@ export default function AdminsPage() {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">Title</FormLabel>
+                      <FormLabel className="text-muted-foreground">Title</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="Link title"
                         />
                       </FormControl>
@@ -947,12 +947,12 @@ export default function AdminsPage() {
                   name="url"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-400">URL</FormLabel>
+                      <FormLabel className="text-muted-foreground">URL</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="url"
-                          className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80]"
+                          className="bg-card border-border text-foreground focus:border-primary"
                           placeholder="https://example.com"
                         />
                       </FormControl>
@@ -962,7 +962,7 @@ export default function AdminsPage() {
                 />
 
                 <div className="space-y-3">
-                  <FormLabel className="text-gray-400">Visibility</FormLabel>
+                  <FormLabel className="text-muted-foreground">Visibility</FormLabel>
                   <FormField
                     control={quickLinkForm.control}
                     name="visibleToAdmins"
@@ -972,10 +972,10 @@ export default function AdminsPage() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                            className="border-[#2a2a2a] data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-[#EAEB80]"
+                            className="border-border data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-primary"
                           />
                         </FormControl>
-                        <FormLabel className="text-gray-400 font-normal cursor-pointer">
+                        <FormLabel className="text-muted-foreground font-normal cursor-pointer">
                           Visible to Admins
                         </FormLabel>
                       </FormItem>
@@ -990,10 +990,10 @@ export default function AdminsPage() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                            className="border-[#2a2a2a] data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-[#EAEB80]"
+                            className="border-border data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-primary"
                           />
                         </FormControl>
-                        <FormLabel className="text-gray-400 font-normal cursor-pointer">
+                        <FormLabel className="text-muted-foreground font-normal cursor-pointer">
                           Visible to Clients
                         </FormLabel>
                       </FormItem>
@@ -1008,10 +1008,10 @@ export default function AdminsPage() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                            className="border-[#2a2a2a] data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-[#EAEB80]"
+                            className="border-border data-[state=checked]:bg-[#EAEB80] data-[state=checked]:border-primary"
                           />
                         </FormControl>
-                        <FormLabel className="text-gray-400 font-normal cursor-pointer">
+                        <FormLabel className="text-muted-foreground font-normal cursor-pointer">
                           Visible to Employees
                         </FormLabel>
                       </FormItem>
@@ -1028,13 +1028,13 @@ export default function AdminsPage() {
                       setEditingQuickLink(null);
                       quickLinkForm.reset();
                     }}
-                    className="text-gray-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium"
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                     disabled={
                       quickLinkCreateMutation.isPending ||
                       quickLinkUpdateMutation.isPending

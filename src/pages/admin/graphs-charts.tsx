@@ -70,10 +70,10 @@ export default function GraphsChartsPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-400">Failed to load car details</p>
+          <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-[#EAEB80] hover:underline"
+            className="mt-4 text-primary hover:underline"
           >
             ← Back to View Car
           </button>
@@ -147,15 +147,15 @@ export default function GraphsChartsPage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">Graphs and Charts Report</h1>
+            <h1 className="text-2xl font-bold text-foreground">Graphs and Charts Report</h1>
             {car && (
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Car: {car.makeModel || "Unknown Car"}
               </p>
             )}
@@ -163,65 +163,65 @@ export default function GraphsChartsPage() {
         </div>
 
         {/* Header Section */}
-        <div className="bg-[#0f0f0f] border border-[#1a1a1a] rounded-lg p-6 mb-6">
+        <div className="bg-card border border-border rounded-lg p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Car Information</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">Car Name:</span>
-                  <p className="text-sm text-gray-300">{carName}</p>
+                  <span className="text-xs text-foreground0">Car Name:</span>
+                  <p className="text-sm text-muted-foreground">{carName}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">VIN #:</span>
-                  <p className="text-sm text-gray-300">{car.vin || "N/A"}</p>
+                  <span className="text-xs text-foreground0">VIN #:</span>
+                  <p className="text-sm text-muted-foreground">{car.vin || "N/A"}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">License:</span>
-                  <p className="text-sm text-gray-300">{car.licensePlate || "N/A"}</p>
+                  <span className="text-xs text-foreground0">License:</span>
+                  <p className="text-sm text-muted-foreground">{car.licensePlate || "N/A"}</p>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Owner Information</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Owner Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">Name:</span>
-                  <p className="text-sm text-gray-300">{ownerName}</p>
+                  <span className="text-xs text-foreground0">Name:</span>
+                  <p className="text-sm text-muted-foreground">{ownerName}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Contact #:</span>
-                  <p className="text-sm text-gray-300">{ownerContact}</p>
+                  <span className="text-xs text-foreground0">Contact #:</span>
+                  <p className="text-sm text-muted-foreground">{ownerContact}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Email:</span>
-                  <p className="text-sm text-gray-300">{ownerEmail}</p>
+                  <span className="text-xs text-foreground0">Email:</span>
+                  <p className="text-sm text-muted-foreground">{ownerEmail}</p>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications & Turo Links */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">Car Specifications</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Specifications</h3>
               <div className="space-y-2 mb-4">
                 <div>
-                  <span className="text-xs text-gray-500">Fuel/Gas:</span>
-                  <p className="text-sm text-gray-300">{fuelType}</p>
+                  <span className="text-xs text-foreground0">Fuel/Gas:</span>
+                  <p className="text-sm text-muted-foreground">{fuelType}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Tire Size:</span>
-                  <p className="text-sm text-gray-300">{tireSize}</p>
+                  <span className="text-xs text-foreground0">Tire Size:</span>
+                  <p className="text-sm text-muted-foreground">{tireSize}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Oil Type:</span>
-                  <p className="text-sm text-gray-300">{oilType}</p>
+                  <span className="text-xs text-foreground0">Oil Type:</span>
+                  <p className="text-sm text-muted-foreground">{oilType}</p>
                 </div>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-3">Turo Links</h3>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Turo Links</h3>
                 <div className="space-y-2">
                   {car.turoLink && (
                     <div>
@@ -229,7 +229,7 @@ export default function GraphsChartsPage() {
                         href={car.turoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                        className="text-primary hover:underline text-sm flex items-center gap-1"
                       >
                         Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -242,7 +242,7 @@ export default function GraphsChartsPage() {
                         href={car.adminTuroLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#EAEB80] hover:underline text-sm flex items-center gap-1"
+                        className="text-primary hover:underline text-sm flex items-center gap-1"
                       >
                         Admin Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -250,7 +250,7 @@ export default function GraphsChartsPage() {
                     </div>
                   )}
                   {!car.turoLink && !car.adminTuroLink && (
-                    <span className="text-gray-500 text-sm">No Turo links available</span>
+                    <span className="text-foreground0 text-sm">No Turo links available</span>
                   )}
                 </div>
               </div>

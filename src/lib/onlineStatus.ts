@@ -78,7 +78,7 @@ export function getOnlineStatusBadge(
       if (logoutTime >= loginTime) {
         return {
           text: "Offline",
-          className: "border-gray-500/50 text-gray-400 bg-gray-500/10",
+          className: "border-gray-500/50 text-muted-foreground bg-gray-500/10",
           isOnline: false,
         };
       }
@@ -91,7 +91,7 @@ export function getOnlineStatusBadge(
       // Logout exists but no login time - user has logged out (show as offline)
       return {
         text: "Offline",
-        className: "border-gray-500/50 text-gray-400 bg-gray-500/10",
+        className: "border-gray-500/50 text-muted-foreground bg-gray-500/10",
         isOnline: false,
       };
         }
@@ -105,7 +105,7 @@ export function getOnlineStatusBadge(
   if (!lastLoginAt) {
     return {
       text: "Never logged in",
-      className: "border-gray-500/50 text-gray-400 bg-gray-500/10",
+      className: "border-gray-500/50 text-muted-foreground bg-gray-500/10",
       isOnline: null,
     };
   }

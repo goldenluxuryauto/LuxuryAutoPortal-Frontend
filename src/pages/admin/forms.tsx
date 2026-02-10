@@ -222,16 +222,16 @@ function QRCodeSection() {
   };
 
   return (
-    <Card className="bg-[#0a0a0a] border-[#EAEB80]/30 border-2">
+    <Card className="bg-background border-primary/30 border-2">
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           {/* Left side: Title, subtitle, and QR code */}
           <div className="flex-1 flex flex-col items-center lg:items-start">
             <div className="mb-4 text-center lg:text-left">
-              <h2 className="text-xl font-semibold text-[#EAEB80] mb-2">
+              <h2 className="text-xl font-semibold text-primary mb-2">
                 Client Onboarding Form LYC
               </h2>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 Fill out for new clients or share the QR code for them to
                 complete
               </p>
@@ -251,7 +251,7 @@ function QRCodeSection() {
             <Button
               onClick={handleDownloadQR}
               variant="outline"
-              className="w-full lg:w-auto border-[#EAEB80]/50 text-[#EAEB80] hover:bg-[#EAEB80]/10 hover:border-[#EAEB80]"
+              className="w-full lg:w-auto border-primary/50 text-primary hover:bg-primary/10 hover:border-primary"
             >
               <Download className="w-4 h-4 mr-2" />
               Download QR Code
@@ -261,10 +261,10 @@ function QRCodeSection() {
           {/* Right side: Share section */}
           <div className="flex-1 flex flex-col justify-center items-center lg:items-start">
             <div className="mb-4">
-              <h3 className="text-lg font-medium text-white mb-2">
+              <h3 className="text-lg font-medium text-foreground mb-2">
                 Share with New Clients
               </h3>
-              <p className="text-sm text-gray-400 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 Send the onboarding form link directly to your clients via
                 email, SMS, or messaging apps.
               </p>
@@ -273,7 +273,7 @@ function QRCodeSection() {
               <div className="flex flex-col sm:flex-row gap-3 w-full items-stretch">
                 <Button
                   onClick={handleShare}
-                  className="bg-[#EAEB80] text-black hover:bg-[#d4d570] font-medium w-full sm:w-auto whitespace-nowrap"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium w-full sm:w-auto whitespace-nowrap"
                 >
                   <Share2 className="w-4 h-4 mr-2" />
                   Click to Copy the Link
@@ -282,7 +282,7 @@ function QRCodeSection() {
                 <Input
                   value={onboardingUrl}
                   readOnly
-                  className="bg-[#0f0f0f] border-[#2a2a2a] text-[#EAEB80] w-full"
+                  className="bg-card border-border text-primary w-full"
                   onFocus={(e) => e.currentTarget.select()}
                 />
               </div>
@@ -918,7 +918,7 @@ export default function FormsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6 max-w-full">
-        <Card className="bg-[#111111] border-[#EAEB80]/20 max-w-full overflow-hidden">
+        <Card className="bg-card border-primary/20 max-w-full overflow-hidden">
           <CardContent className="p-0 max-w-full overflow-hidden">
             {formSections.map((section) => {
               const SectionIcon = section.icon;
@@ -928,24 +928,24 @@ export default function FormsPage() {
                 <div key={section.id}>
                   <button
                     onClick={() => toggleSection(section.id)}
-                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#1a1a1a] transition-colors"
+                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-card transition-colors"
                     data-testid={`button-section-${section.id}`}
                   >
                     <div className="flex items-center gap-3">
-                      <SectionIcon className="w-5 h-5 text-[#EAEB80]" />
-                      <span className="text-white font-medium">
+                      <SectionIcon className="w-5 h-5 text-primary" />
+                      <span className="text-foreground font-medium">
                         {section.title}
                       </span>
                     </div>
                     {isExpanded ? (
-                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
                     ) : (
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     )}
                   </button>
 
                   {isExpanded && (
-                    <div className="bg-[#0d0d0d] max-w-full">
+                    <div className="bg-card max-w-full">
                       {section.items.map((item) => {
                         const ItemIcon = item.icon;
                         const isItemExpanded = expandedItems.includes(item.id);
@@ -967,28 +967,28 @@ export default function FormsPage() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className={cn(
-                                  "w-full flex items-center justify-between px-5 py-3.5 transition-colors border-t border-[#1a1a1a]",
-                                  "hover:bg-[#1a1a1a] cursor-pointer"
+                                  "w-full flex items-center justify-between px-5 py-3.5 transition-colors border-t border-border",
+                                  "hover:bg-card cursor-pointer"
                                 )}
                                 data-testid={`button-form-${item.id}`}
                               >
                                 <div className="flex items-center gap-3 pl-6">
-                                  <ItemIcon className="w-4 h-4 text-[#EAEB80]" />
-                                  <span className="text-sm text-[#EAEB80]">
+                                  <ItemIcon className="w-4 h-4 text-primary" />
+                                  <span className="text-sm text-primary">
                                     {item.title}
                                   </span>
-                                  <ExternalLink className="w-3 h-3 text-gray-500 ml-1" />
+                                  <ExternalLink className="w-3 h-3 text-foreground0 ml-1" />
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-gray-500" />
+                                <ChevronRight className="w-4 h-4 text-foreground0" />
                               </a>
                             ) : (
                               // Internal form - expandable
                               <button
                                 className={cn(
-                                  "w-full flex items-center justify-between px-5 py-3.5 transition-colors border-t border-[#1a1a1a]",
+                                  "w-full flex items-center justify-between px-5 py-3.5 transition-colors border-t border-border",
                                   item.comingSoon
                                     ? "cursor-default"
-                                    : "hover:bg-[#1a1a1a] cursor-pointer"
+                                    : "hover:bg-card cursor-pointer"
                                 )}
                                 disabled={item.comingSoon}
                                 onClick={() => canExpand && toggleItem(item.id)}
@@ -1000,7 +1000,7 @@ export default function FormsPage() {
                                       "w-4 h-4",
                                       item.comingSoon
                                         ? "text-gray-600"
-                                        : "text-[#EAEB80]"
+                                        : "text-primary"
                                     )}
                                   />
                                   <span
@@ -1008,7 +1008,7 @@ export default function FormsPage() {
                                       "text-sm",
                                       item.comingSoon
                                         ? "text-gray-600"
-                                        : "text-[#EAEB80]"
+                                        : "text-primary"
                                     )}
                                   >
                                     {item.title}
@@ -1016,7 +1016,7 @@ export default function FormsPage() {
                                   {item.comingSoon && (
                                     <Badge
                                       variant="outline"
-                                      className="bg-gray-800/50 text-gray-500 border-gray-700 text-xs ml-2"
+                                      className="bg-muted/30 text-foreground0 border-border text-xs ml-2"
                                     >
                                       Coming soon
                                     </Badge>
@@ -1024,9 +1024,9 @@ export default function FormsPage() {
                                 </div>
                                 {canExpand ? (
                                   isItemExpanded ? (
-                                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                                    <ChevronDown className="w-4 h-4 text-foreground0" />
                                   ) : (
-                                    <ChevronRight className="w-4 h-4 text-gray-500" />
+                                    <ChevronRight className="w-4 h-4 text-foreground0" />
                                   )
                                 ) : (
                                   <ChevronRight
@@ -1034,7 +1034,7 @@ export default function FormsPage() {
                                       "w-4 h-4",
                                       item.comingSoon
                                         ? "text-gray-700"
-                                        : "text-gray-500"
+                                        : "text-foreground0"
                                     )}
                                   />
                                 )}
@@ -1043,14 +1043,14 @@ export default function FormsPage() {
 
                             {/* Expanded content for Contract Management */}
                             {isItemExpanded && item.id === "contract" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-5 py-4">
+                              <div className="bg-card border-t border-border px-5 py-4">
                                 <ContractManagement />
                               </div>
                             )}
 
                             {/* Expanded content for Car On-boarding */}
                             {isItemExpanded && item.id === "car-on" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
                                 {/* Show form for clients, table for admins */}
                                 {formVisibilityData?.isAdmin ||
                                 formVisibilityData?.isEmployee ? (
@@ -1063,7 +1063,7 @@ export default function FormsPage() {
 
                             {/* Expanded content for Car Off-boarding */}
                             {isItemExpanded && item.id === "car-off" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
                                 {/* Show form for clients, table for admins */}
                                 {formVisibilityData?.isAdmin ||
                                 formVisibilityData?.isEmployee ? (
@@ -1076,7 +1076,7 @@ export default function FormsPage() {
 
                             {/* Expanded content for Income & Expense Receipt Submission (employees only) */}
                             {isItemExpanded && item.id === "expense-receipt" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
                                 <ExpenseFormSubmission />
                                 <ExpenseFormMySubmissions />
                               </div>
@@ -1084,23 +1084,23 @@ export default function FormsPage() {
 
                             {/* Expanded content for Approval Dashboard (admins only) */}
                             {isItemExpanded && item.id === "approval-dashboard" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
                                 <ExpenseFormApprovalDashboard isAdmin={true} />
                               </div>
                             )}
 
                             {/* Expanded content for LYC form */}
                             {isItemExpanded && item.id === "lyc" && (
-                              <div className="bg-[#050505] border-t border-[#1a1a1a] px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
                                 {/* QR Code Section */}
                                 <QRCodeSection />
 
                                 <div className="mb-4">
-                                  <h3 className="text-sm font-medium text-white mb-3">
+                                  <h3 className="text-sm font-medium text-foreground mb-3">
                                     Recent Submissions
                                   </h3>
                                   <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
                                     <Input
                                       type="text"
                                       placeholder="Search by name, email, phone, or vehicle..."
@@ -1108,21 +1108,21 @@ export default function FormsPage() {
                                       onChange={(e) =>
                                         setSearchQuery(e.target.value)
                                       }
-                                      className="pl-10 bg-[#111111] border-[#1a1a1a] text-white placeholder:text-gray-600"
+                                      className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600"
                                     />
                                   </div>
                                 </div>
 
                                 {isLoadingSubmissions ? (
                                   <div className="flex items-center justify-center py-8">
-                                    <Loader2 className="w-6 h-6 text-[#EAEB80] animate-spin" />
+                                    <Loader2 className="w-6 h-6 text-primary animate-spin" />
                                   </div>
                                 ) : submissionsError ? (
-                                  <div className="text-center py-8 text-red-400">
+                                  <div className="text-center py-8 text-red-700">
                                     <p className="mb-2">
                                       Error loading submissions
                                     </p>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-foreground0">
                                       {submissionsError.message}
                                     </p>
                                   </div>
@@ -1132,41 +1132,41 @@ export default function FormsPage() {
                                   <div className="overflow-x-auto">
                                       <table className="w-full text-sm table-auto">
                                       <thead>
-                                        <tr className="border-b border-[#1a1a1a]">
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs whitespace-nowrap">
+                                        <tr className="border-b border-border">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs whitespace-nowrap">
                                             Name
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden md:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden md:table-cell whitespace-nowrap">
                                             Email
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden lg:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden lg:table-cell whitespace-nowrap">
                                             Phone
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs whitespace-nowrap">
                                             Vehicle
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden xl:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden xl:table-cell whitespace-nowrap">
                                             VIN#
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden xl:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden xl:table-cell whitespace-nowrap">
                                             Plate #
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden lg:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden lg:table-cell whitespace-nowrap">
                                             Submitted
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs whitespace-nowrap">
                                             Status
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden md:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden md:table-cell whitespace-nowrap">
                                             Contract
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden 2xl:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden 2xl:table-cell whitespace-nowrap">
                                             Car Onboarding Date
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs hidden 2xl:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden 2xl:table-cell whitespace-nowrap">
                                             Car Offboarding Date
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-gray-400 font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs whitespace-nowrap">
                                             Actions
                                           </th>
                                         </tr>
@@ -1176,38 +1176,38 @@ export default function FormsPage() {
                                           (submission) => (
                                             <tr
                                               key={submission.id}
-                                              className="border-b border-[#1a1a1a] hover:bg-[#111111] transition-colors"
+                                              className="border-b border-border hover:bg-card transition-colors"
                                             >
-                                              <td className="py-3 px-2 sm:px-3 text-white text-xs sm:text-sm max-w-[120px] truncate" title={`${submission.firstNameOwner} ${submission.lastNameOwner}`}>
+                                              <td className="py-3 px-2 sm:px-3 text-foreground text-xs sm:text-sm max-w-[120px] truncate" title={`${submission.firstNameOwner} ${submission.lastNameOwner}`}>
                                                 {submission.firstNameOwner}{" "}
                                                 {submission.lastNameOwner}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-gray-300 text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={submission.emailOwner}>
+                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={submission.emailOwner}>
                                                 {submission.emailOwner}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-gray-300 text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={submission.phoneOwner}>
+                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={submission.phoneOwner}>
                                                 {submission.phoneOwner}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-gray-300 text-xs sm:text-sm max-w-[150px] truncate" title={`${submission.vehicleMake} ${submission.vehicleModel} ${submission.vehicleYear}`}>
+                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm max-w-[150px] truncate" title={`${submission.vehicleMake} ${submission.vehicleModel} ${submission.vehicleYear}`}>
                                                 {submission.vehicleMake}{" "}
                                                 {submission.vehicleModel}{" "}
                                                 {submission.vehicleYear}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={submission.vinNumber || "N/A"}>
+                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={submission.vinNumber || "N/A"}>
                                                 {submission.vinNumber || (
-                                                  <span className="text-gray-500">
+                                                  <span className="text-foreground0">
                                                     N/A
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-gray-300 font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={submission.licensePlate || "N/A"}>
+                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={submission.licensePlate || "N/A"}>
                                                 {submission.licensePlate || (
-                                                  <span className="text-gray-500">
+                                                  <span className="text-foreground0">
                                                     N/A
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-gray-400 text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
+                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                                                 {new Date(
                                                   submission.createdAt
                                                 ).toLocaleDateString()}
@@ -1226,7 +1226,7 @@ export default function FormsPage() {
                                                       : submission.status ===
                                                         "rejected"
                                                       ? "border-red-500/50 text-red-500 bg-red-500/10"
-                                                      : "border-gray-500/50 text-gray-500 bg-gray-500/10"
+                                                      : "border-gray-500/50 text-foreground0 bg-gray-500/10"
                                                   )}
                                                 >
                                                   {submission.status ||
@@ -1239,7 +1239,7 @@ export default function FormsPage() {
                                                     "sent" && (
                                                     <Badge
                                                       variant="outline"
-                                                      className="border-blue-500/50 text-blue-400 bg-blue-500/10 text-xs"
+                                                      className="border-blue-500/50 text-blue-700 bg-blue-500/10 text-xs"
                                                     >
                                                       Sent
                                                     </Badge>
@@ -1248,9 +1248,9 @@ export default function FormsPage() {
                                                     "opened" && (
                                                     <Badge
                                                       variant="outline"
-                                                      className="border-yellow-500/50 text-yellow-400 bg-yellow-500/10 text-xs"
+                                                      className="border-blue-500/50 text-blue-700 bg-blue-500/10 text-xs"
                                                     >
-                                                      Opened
+                                                      Sent
                                                     </Badge>
                                                   )}
                                                   {submission.contractStatus ===
@@ -1258,14 +1258,14 @@ export default function FormsPage() {
                                                     <>
                                                       <Badge
                                                         variant="outline"
-                                                        className="border-green-500/50 text-green-400 bg-green-500/10 text-xs"
+                                                        className="border-green-500/50 text-green-700 bg-green-500/10 text-xs"
                                                       >
                                                         Signed
                                                       </Badge>
                                                       <Button
                                                         size="sm"
                                                         variant="outline"
-                                                        className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20"
+                                                        className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-700 hover:bg-green-500/20"
                                                         onClick={() => {
                                                           // Use proxy endpoint for authenticated access
                                                           window.open(
@@ -1283,7 +1283,7 @@ export default function FormsPage() {
                                                     "declined" && (
                                                     <Badge
                                                       variant="outline"
-                                                      className="border-red-500/50 text-red-400 bg-red-500/10 text-xs"
+                                                      className="border-red-500/50 text-red-700 bg-red-500/10 text-xs"
                                                     >
                                                       Declined
                                                     </Badge>
@@ -1293,31 +1293,31 @@ export default function FormsPage() {
                                                       "pending") && (
                                                     <Badge
                                                       variant="outline"
-                                                      className="bg-gray-800/50 text-gray-400 border-gray-700 text-xs"
+                                                      className="border-primary/50 text-primary-foreground bg-primary/20 text-xs"
                                                     >
-                                                      Not Sent
+                                                      Pending
                                                     </Badge>
                                                   )}
                                                 </div>
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-gray-300 text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
+                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
                                                 {submission.contractSignedAt ? (
                                                   new Date(
                                                     submission.contractSignedAt
                                                   ).toLocaleDateString()
                                                 ) : (
-                                                  <span className="text-gray-500">
+                                                  <span className="text-foreground0">
                                                     Not signed
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-gray-300 text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
+                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
                                                 {submission.carOffboardAt ? (
                                                   new Date(
                                                     submission.carOffboardAt
                                                   ).toLocaleDateString()
                                                 ) : (
-                                                  <span className="text-gray-500">
+                                                  <span className="text-foreground0">
                                                     N/A
                                                   </span>
                                                 )}
@@ -1327,7 +1327,7 @@ export default function FormsPage() {
                                                   <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    className="h-8 w-8 p-0 hover:bg-gray-800"
+                                                    className="h-8 w-8 p-0 hover:bg-muted/50"
                                                     onClick={() =>
                                                       handleViewDetails(
                                                         submission
@@ -1335,7 +1335,7 @@ export default function FormsPage() {
                                                     }
                                                     title="View Details"
                                                   >
-                                                    <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
+                                                    <Eye className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                                                   </Button>
 
                                                   {/* Always show Approve/Decline buttons for consistent layout */}
@@ -1379,7 +1379,7 @@ export default function FormsPage() {
                                                   <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    className="h-8 w-8 p-0 text-red-400"
+                                                    className="h-8 w-8 p-0 text-red-700"
                                                     onClick={() => {
                                                       setSubmissionToDecline(submission);
                                                       setShowDeclineModal(true);
@@ -1447,7 +1447,7 @@ export default function FormsPage() {
                                     )}
                                   </div>
                                 ) : (
-                                  <div className="text-center py-8 text-gray-500">
+                                  <div className="text-center py-8 text-foreground0">
                                     No submissions found
                                   </div>
                                 )}
@@ -1476,14 +1476,14 @@ export default function FormsPage() {
           }
         }}
       >
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-card border-primary/30 border-2 text-foreground">
           <DialogHeader>
             <div className="flex items-start justify-between">
               <div>
-            <DialogTitle className="text-white text-2xl">
+            <DialogTitle className="text-foreground text-2xl">
               Complete Submission Details
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-muted-foreground">
               Full onboarding form submission information - All data from
               database
             </DialogDescription>
@@ -1492,7 +1492,7 @@ export default function FormsPage() {
                 <Button
                   onClick={handleRequestSensitiveData}
                   variant="outline"
-                  className="bg-yellow-500/10 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/20"
+                  className="bg-yellow-500/10 border-yellow-500/50 text-yellow-700 hover:bg-yellow-500/20"
                 >
                   View Full Sensitive Information
                 </Button>
@@ -1502,12 +1502,12 @@ export default function FormsPage() {
 
           {/* Confirmation Dialog for Sensitive Data Access */}
           <Dialog open={showAccessConfirmation} onOpenChange={setShowAccessConfirmation}>
-            <DialogContent className="bg-[#111111] border-[#EAEB80]/30 border-2 text-white max-w-md">
+            <DialogContent className="bg-card border-primary/30 border-2 text-foreground max-w-md">
               <DialogHeader>
-                <DialogTitle className="text-white text-xl">
+                <DialogTitle className="text-foreground text-xl">
                   Access Sensitive Data
                 </DialogTitle>
-                <DialogDescription className="text-gray-400 mt-2">
+                <DialogDescription className="text-muted-foreground mt-2">
                   This action is logged. Continue?
                 </DialogDescription>
               </DialogHeader>
@@ -1515,14 +1515,14 @@ export default function FormsPage() {
                 <Button
                   onClick={() => setShowAccessConfirmation(false)}
                   variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                  className="border-border text-muted-foreground hover:bg-muted/50"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleConfirmViewSensitiveData}
                   disabled={logAccessMutation.isPending}
-                  className="bg-yellow-500/20 border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/30"
+                  className="bg-yellow-500/20 border-yellow-500/50 text-yellow-700 hover:bg-yellow-500/30"
                 >
                   {logAccessMutation.isPending ? (
                     <>
@@ -1595,95 +1595,95 @@ export default function FormsPage() {
                 return (
                   <>
                     {/* Personal Information */}
-                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                    <div className="bg-card p-4 rounded-lg border border-primary/20">
+                      <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Personal Information
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Full Name:
                           </span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {formatValue(data.firstNameOwner)}{" "}
                             {formatValue(data.lastNameOwner)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Email:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.emailOwner)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Phone:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.phoneOwner)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Date of Birth:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {showSensitiveData
                               ? formatValue(data.birthday)
                               : getAgeOrBirthYear(data.birthday)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             T-Shirt Size:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.tshirtSize)}
                           </span>
                         </div>
                         {showSensitiveData && (
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                               SSN:
                           </span>
-                            <span className="text-white font-mono">
+                            <span className="text-foreground font-mono">
                               {maskSSN(data.ssn)}
                           </span>
                         </div>
                         )}
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Representative:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.representative)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             How Did You Hear About Us:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.heardAboutUs)}
                           </span>
                         </div>
                         {showSensitiveData && (
                           <>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Emergency Contact Name:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.emergencyContactName)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Emergency Contact Phone:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.emergencyContactPhone)}
                           </span>
                         </div>
@@ -1693,126 +1693,126 @@ export default function FormsPage() {
                     </div>
 
                     {/* Address Information */}
-                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                    <div className="bg-card p-4 rounded-lg border border-primary/20">
+                      <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Address Information
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             T-Shirt Size:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.tshirtSize)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             First Name:
                           </span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {formatValue(data.firstNameOwner)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Last Name:
                           </span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {formatValue(data.lastNameOwner)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Phone:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.phoneOwner)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Email:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.emailOwner)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Representative:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.representative)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             How Did You Hear About Us:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.heardAboutUs)}
                           </span>
                         </div>
                         {showSensitiveData && (
                           <div>
-                            <span className="text-gray-400 block mb-1">
+                            <span className="text-muted-foreground block mb-1">
                               Date of Birth:
                             </span>
-                            <span className="text-white">
+                            <span className="text-foreground">
                               {formatValue(data.birthday)}
                             </span>
                           </div>
                         )}
                         {showSensitiveData && (
                           <div className="md:col-span-2">
-                            <span className="text-gray-400 block mb-1">
+                            <span className="text-muted-foreground block mb-1">
                               Street Address:
                             </span>
-                            <span className="text-white">
+                            <span className="text-foreground">
                               {formatValue(data.streetAddress)}
                             </span>
                           </div>
                         )}
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             City:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.city)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             State:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.state)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Zip Code:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.zipCode)}
                           </span>
                         </div>
                         {showSensitiveData && (
                           <>
                             <div>
-                              <span className="text-gray-400 block mb-1">
+                              <span className="text-muted-foreground block mb-1">
                                 Emergency Contact Name:
                               </span>
-                              <span className="text-white">
+                              <span className="text-foreground">
                                 {formatValue(data.emergencyContactName)}
                               </span>
                             </div>
                             <div>
-                              <span className="text-gray-400 block mb-1">
+                              <span className="text-muted-foreground block mb-1">
                                 Emergency Contact Phone:
                               </span>
-                              <span className="text-white">
+                              <span className="text-foreground">
                                 {formatValue(data.emergencyContactPhone)}
                               </span>
                             </div>
@@ -1822,118 +1822,118 @@ export default function FormsPage() {
                     </div>
 
                     {/* Vehicle Information */}
-                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                    <div className="bg-card p-4 rounded-lg border border-primary/20">
+                      <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Vehicle Information
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Year:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.vehicleYear)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Make:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.vehicleMake)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Model:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.vehicleModel)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Trim:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.vehicleTrim)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             VIN Number:
                           </span>
-                          <span className="text-white font-mono text-xs">
+                          <span className="text-foreground font-mono text-xs">
                             {formatValue(data.vinNumber)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             License Plate:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.licensePlate)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Mileage:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.vehicleMiles)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Exterior Color:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.exteriorColor)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Interior Color:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.interiorColor)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Title Type:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.titleType)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Registration Expiration:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.registrationExpiration)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Fuel Type:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.fuelType)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Vehicle Recall:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.vehicleRecall)}
                           </span>
                         </div>
                         {data.vehicleFeatures && (
                           <div className="md:col-span-2">
-                            <span className="text-gray-400 block mb-2">
+                            <span className="text-muted-foreground block mb-2">
                               Features:
                             </span>
                             <div className="flex flex-wrap gap-2">
@@ -1954,31 +1954,31 @@ export default function FormsPage() {
                                     <Badge
                                       key={index}
                                       variant="outline"
-                                      className="border-[#EAEB80]/50 text-[#EAEB80] bg-[#EAEB80]/10 text-xs"
+                                      className="border-primary/50 text-primary bg-[#EAEB80]/10 text-xs"
                                     >
                                       {feature}
                                     </Badge>
                                   ))
                                 ) : (
-                                  <span className="text-gray-500 text-sm">No features selected</span>
+                                  <span className="text-foreground0 text-sm">No features selected</span>
                                 );
                               })()}
                             </div>
                           </div>
                         )}
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Does Your Vehicle Have Free Dealership Oil Changes?:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.freeDealershipOilChanges)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             If Yes, For How Many Years of Oil Changes OR What Oil Package:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {data.freeDealershipOilChanges === "Yes" 
                               ? formatValue(data.oilPackageDetails)
                               : "N/A"}
@@ -1999,56 +1999,56 @@ export default function FormsPage() {
                     )}
 
                     {/* Financial Information */}
-                    <div className={`bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20 ${(!data.vehicleRecall || data.vehicleRecall.trim() === '' || data.vehicleRecall === 'Not provided') ? 'opacity-30' : ''}`}>
-                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                    <div className={`bg-card p-4 rounded-lg border border-primary/20 ${(!data.vehicleRecall || data.vehicleRecall.trim() === '' || data.vehicleRecall === 'Not provided') ? 'opacity-30' : ''}`}>
+                      <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Financial Information
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Plate #:
                           </span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {formatCurrency(data.purchasePrice)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Down Payment:
                           </span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {formatCurrency(data.downPayment)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Monthly Payment:
                           </span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {formatCurrency(data.monthlyPayment)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Interest Rate:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.interestRate)}%
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Transport City to City:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.transportCityToCity)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Ultimate Goal:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.ultimateGoal)}
                           </span>
                         </div>
@@ -2056,42 +2056,42 @@ export default function FormsPage() {
                     </div>
 
                     {/* Banking Information */}
-                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                    <div className="bg-card p-4 rounded-lg border border-primary/20">
+                      <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Banking Information
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Bank Name:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.bankName)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Tax Classification:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.taxClassification)}
                           </span>
                         </div>
                         {showSensitiveData && (
                           <>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Routing Number:
                           </span>
-                          <span className="text-white font-mono">
+                          <span className="text-foreground font-mono">
                                 {maskAccountInfo(data.routingNumber)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Account Number:
                           </span>
-                          <span className="text-white font-mono">
+                          <span className="text-foreground font-mono">
                                 {maskAccountInfo(data.accountNumber)}
                           </span>
                         </div>
@@ -2099,30 +2099,30 @@ export default function FormsPage() {
                         )}
                         {data.businessName && (
                           <div>
-                            <span className="text-gray-400 block mb-1">
+                            <span className="text-muted-foreground block mb-1">
                               Business Name:
                             </span>
-                            <span className="text-white">
+                            <span className="text-foreground">
                               {formatValue(data.businessName)}
                             </span>
                           </div>
                         )}
                         {data.ein && (
                           <div>
-                            <span className="text-gray-400 block mb-1">
+                            <span className="text-muted-foreground block mb-1">
                               EIN:
                             </span>
-                            <span className="text-white font-mono">
+                            <span className="text-foreground font-mono">
                               {showSensitiveData ? formatValue(data.ein) : maskAccountInfo(data.ein)}
                             </span>
                           </div>
                         )}
                         {data.ssn && (
                           <div>
-                            <span className="text-gray-400 block mb-1">
+                            <span className="text-muted-foreground block mb-1">
                               SSN:
                             </span>
-                            <span className="text-white font-mono">
+                            <span className="text-foreground font-mono">
                               {showSensitiveData ? formatValue(data.ssn) : maskAccountInfo(data.ssn)}
                             </span>
                           </div>
@@ -2131,42 +2131,42 @@ export default function FormsPage() {
                     </div>
 
                     {/* Insurance Information */}
-                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                    <div className="bg-card p-4 rounded-lg border border-primary/20">
+                      <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Insurance Information
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Provider:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.insuranceProvider)}
                           </span>
                         </div>
                         {showSensitiveData && (
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Policy Number:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.policyNumber)}
                           </span>
                         </div>
                         )}
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Insurance Phone:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.insurancePhone)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Insurance Expiration:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatValue(data.insuranceExpiration)}
                           </span>
                         </div>
@@ -2174,13 +2174,13 @@ export default function FormsPage() {
                     </div>
 
                     {/* Contract Status */}
-                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                    <div className="bg-card p-4 rounded-lg border border-primary/20">
+                      <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Contract Status & Details
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Contract Status:
                           </span>
                           <Badge
@@ -2188,14 +2188,14 @@ export default function FormsPage() {
                             className={cn(
                               "mt-1",
                               data.contractStatus === "signed"
-                                ? "border-green-500/50 text-green-400 bg-green-500/10"
+                                ? "border-green-500/50 text-green-700 bg-green-500/10"
                                 : data.contractStatus === "sent"
-                                ? "border-blue-500/50 text-blue-400 bg-blue-500/10"
+                                ? "border-blue-500/50 text-blue-700 bg-blue-500/10"
                                 : data.contractStatus === "opened"
-                                ? "border-yellow-500/50 text-yellow-400 bg-yellow-500/10"
+                                ? "border-yellow-500/50 text-yellow-700 bg-yellow-500/10"
                                 : data.contractStatus === "declined"
-                                ? "border-red-500/50 text-red-400 bg-red-500/10"
-                                : "border-gray-500/50 text-gray-400 bg-gray-500/10"
+                                ? "border-red-500/50 text-red-700 bg-red-500/10"
+                                : "border-primary/50 text-primary-foreground bg-primary/20"
                             )}
                           >
                             {formatValue(data.contractStatus || "Not sent")}
@@ -2203,51 +2203,51 @@ export default function FormsPage() {
                         </div>
                         {showSensitiveData && (
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Contract Token:
                           </span>
-                          <span className="text-white font-mono text-xs break-all">
+                          <span className="text-foreground font-mono text-xs break-all">
                             {formatValue(data.contractToken)}
                           </span>
                         </div>
                         )}
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Contract Sent At:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatDate(data.contractSentAt)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Contract Signed At:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatDate(data.contractSignedAt)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Reminder Count:
                           </span>
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             {data.reminderCount || 0} / 3
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Last Reminder Sent:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatDate(data.lastReminderSentAt)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Next Reminder Due:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatDate(data.nextReminderDueAt)}
                           </span>
                         </div>
@@ -2261,7 +2261,7 @@ export default function FormsPage() {
                                   "_blank"
                                 );
                               }}
-                              className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                              className="bg-primary text-primary-foreground hover:bg-primary/80"
                             >
                               <Download className="w-4 h-4 mr-2" />
                               Download Signed PDF
@@ -2272,16 +2272,16 @@ export default function FormsPage() {
                     </div>
 
                     {/* Health Insurance Card & Driver's License */}
-                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAEB80]/30">
-                        <h3 className="text-lg font-semibold text-[#EAEB80]">
+                    <div className="bg-card p-4 rounded-lg border border-primary/20">
+                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-primary/30">
+                        <h3 className="text-lg font-semibold text-primary">
                           Documents
                         </h3>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Health Insurance Card */}
                         <div className="space-y-4">
-                          <h4 className="text-base font-semibold text-gray-200">Insurance Card</h4>
+                          <h4 className="text-base font-semibold text-muted-foreground">Insurance Card</h4>
                           
                           {/* Insurance Card Display */}
                           {data.insuranceCardUrl ? (() => {
@@ -2297,16 +2297,16 @@ export default function FormsPage() {
                                   setFullScreenDocument({ url: documentUrl, type: 'insurance', isPdf });
                                 }}
                               >
-                                <div className={`relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
+                                <div className={`relative w-full aspect-[4/3] bg-background rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
                                   isPdf 
-                                    ? 'border-[#EAEB80]/50 hover:border-[#EAEB80] shadow-[#EAEB80]/20' 
-                                    : 'border-[#EAEB80]/30 hover:border-[#EAEB80] shadow-[#EAEB80]/20'
+                                    ? 'border-primary/50 hover:border-primary shadow-[#EAEB80]/20' 
+                                    : 'border-primary/30 hover:border-primary shadow-[#EAEB80]/20'
                                 }`}>
                                   {isPdf ? (
                                     <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                                      <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
-                                      <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
-                                      <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
+                                      <FileText className="w-16 h-16 text-primary mb-2" />
+                                      <p className="text-primary text-sm font-semibold">PDF Document</p>
+                                      <p className="text-muted-foreground text-xs mt-1">Click to open in PDF viewer</p>
                                     </div>
                                   ) : (
                                     <img
@@ -2320,20 +2320,20 @@ export default function FormsPage() {
                                         const parent = target.parentElement?.parentElement;
                                         if (parent && !parent.querySelector(".error-message")) {
                                           const errorDiv = document.createElement("div");
-                                          errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                          errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
                                           errorDiv.textContent = "Failed to load image";
                                           parent.appendChild(errorDiv);
                                         }
                                       }}
                                     />
                                   )}
-                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                  <div className="absolute inset-0 bg-background/0 group-hover:bg-background/10 transition-colors flex items-center justify-center">
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/70 text-foreground px-4 py-2 rounded-lg text-sm font-medium">
                                       {isPdf ? 'Click to open PDF' : 'Click to view full screen'}
                                     </div>
                                   </div>
                                   {isPdf && (
-                                    <div className="absolute top-2 right-2 bg-[#EAEB80]/90 text-black text-xs px-2 py-1 rounded font-semibold">
+                                    <div className="absolute top-2 right-2 bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded font-semibold">
                                       PDF
                                     </div>
                                   )}
@@ -2341,15 +2341,15 @@ export default function FormsPage() {
                               </div>
                             );
                           })() : (
-                            <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
-                              <p className="text-sm text-gray-500">No insurance card uploaded</p>
+                            <div className="w-full aspect-[4/3] bg-background rounded-lg border border-border flex items-center justify-center">
+                              <p className="text-sm text-foreground0">No insurance card uploaded</p>
                             </div>
                           )}
                         </div>
 
                         {/* Driver's License */}
                         <div className="space-y-4">
-                          <h4 className="text-base font-semibold text-gray-200">Driver License</h4>
+                          <h4 className="text-base font-semibold text-muted-foreground">Driver License</h4>
                           
                           {/* Driver's License Display */}
                           {driversLicenseUrlsArray.length > 0 ? (
@@ -2364,16 +2364,16 @@ export default function FormsPage() {
                                     className="relative group cursor-pointer"
                                     onClick={() => setFullScreenDocument({ url: documentUrl, type: 'license', index, isPdf })}
                                   >
-                                    <div className={`relative w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
+                                    <div className={`relative w-full aspect-[4/3] bg-background rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
                                       isPdf 
-                                        ? 'border-[#EAEB80]/50 hover:border-[#EAEB80] shadow-[#EAEB80]/20' 
-                                        : 'border-[#EAEB80]/30 hover:border-[#EAEB80] shadow-[#EAEB80]/20'
+                                        ? 'border-primary/50 hover:border-primary shadow-[#EAEB80]/20' 
+                                        : 'border-primary/30 hover:border-primary shadow-[#EAEB80]/20'
                                     }`}>
                                       {isPdf ? (
                                         <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                                          <FileText className="w-16 h-16 text-[#EAEB80] mb-2" />
-                                          <p className="text-[#EAEB80] text-sm font-semibold">PDF Document</p>
-                                          <p className="text-gray-400 text-xs mt-1">Click to open in PDF viewer</p>
+                                          <FileText className="w-16 h-16 text-primary mb-2" />
+                                          <p className="text-primary text-sm font-semibold">PDF Document</p>
+                                          <p className="text-muted-foreground text-xs mt-1">Click to open in PDF viewer</p>
                                         </div>
                                       ) : (
                                         <img
@@ -2387,15 +2387,15 @@ export default function FormsPage() {
                                             const parent = target.parentElement?.parentElement;
                                             if (parent && !parent.querySelector(".error-message")) {
                                               const errorDiv = document.createElement("div");
-                                              errorDiv.className = "error-message text-sm text-gray-500 absolute inset-0 flex items-center justify-center";
+                                              errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
                                               errorDiv.textContent = "Failed to load image";
                                               parent.appendChild(errorDiv);
                                             }
                                           }}
                                         />
                                       )}
-                                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                      <div className="absolute inset-0 bg-background/0 group-hover:bg-background/10 transition-colors flex items-center justify-center">
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/70 text-foreground px-4 py-2 rounded-lg text-sm font-medium">
                                           {isPdf ? 'Click to open PDF' : 'Click to view full screen'}
                                         </div>
                                       </div>
@@ -2405,7 +2405,7 @@ export default function FormsPage() {
                                         </div>
                                       )}
                                       {driversLicenseUrlsArray.length > 1 && (
-                                        <div className="absolute top-2 left-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                                        <div className="absolute top-2 left-2 bg-background/80 text-foreground text-xs px-2 py-1 rounded">
                                           {index + 1} / {driversLicenseUrlsArray.length}
                                         </div>
                                       )}
@@ -2415,8 +2415,8 @@ export default function FormsPage() {
                               })}
                             </div>
                           ) : (
-                            <div className="w-full aspect-[4/3] bg-[#0a0a0a] rounded-lg border border-gray-700 flex items-center justify-center">
-                              <p className="text-sm text-gray-500">No driver's license uploaded</p>
+                            <div className="w-full aspect-[4/3] bg-background rounded-lg border border-border flex items-center justify-center">
+                              <p className="text-sm text-foreground0">No driver's license uploaded</p>
                             </div>
                           )}
                         </div>
@@ -2424,24 +2424,24 @@ export default function FormsPage() {
                     </div>
 
                     {/* Timestamps */}
-                    <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                      <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                    <div className="bg-card p-4 rounded-lg border border-primary/20">
+                      <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Timestamps
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Created At:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatDate(data.createdAt)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block mb-1">
+                          <span className="text-muted-foreground block mb-1">
                             Last Updated:
                           </span>
-                          <span className="text-white">
+                          <span className="text-foreground">
                             {formatDate(data.updatedAt)}
                           </span>
                         </div>
@@ -2453,7 +2453,7 @@ export default function FormsPage() {
             </div>
           ) : (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-6 h-6 text-[#EAEB80] animate-spin" />
+              <Loader2 className="w-6 h-6 text-primary animate-spin" />
             </div>
           )}
         </DialogContent>
@@ -2461,39 +2461,39 @@ export default function FormsPage() {
 
       {/* Decline Reason Modal */}
       <Dialog open={showDeclineModal} onOpenChange={setShowDeclineModal}>
-        <DialogContent className="bg-[#0a0a0a] border-[#1a1a1a] text-white">
+        <DialogContent className="bg-background border-border text-foreground">
           <DialogHeader>
-            <DialogTitle className="text-[#EAEB80]">
+            <DialogTitle className="text-primary">
               Decline Submission
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className="text-muted-foreground">
               Please provide a reason for declining this submission. The client will receive an email with this reason.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {submissionToDecline && (
-              <div className="text-sm text-gray-300">
+              <div className="text-sm text-muted-foreground">
                 <p>
-                  <span className="text-gray-500">Client:</span>{" "}
+                  <span className="text-foreground0">Client:</span>{" "}
                   {submissionToDecline.firstNameOwner}{" "}
                   {submissionToDecline.lastNameOwner}
                 </p>
                 <p>
-                  <span className="text-gray-500">Email:</span>{" "}
+                  <span className="text-foreground0">Email:</span>{" "}
                   {submissionToDecline.emailOwner}
                 </p>
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="decline-reason" className="text-gray-300">
-                Reason for Decline <span className="text-red-400">*</span>
+              <Label htmlFor="decline-reason" className="text-muted-foreground">
+                Reason for Decline <span className="text-red-700">*</span>
               </Label>
               <Textarea
                 id="decline-reason"
                 value={declineReason}
                 onChange={(e) => setDeclineReason(e.target.value)}
                 placeholder="Enter reason for declining this submission..."
-                className="bg-[#111111] border-[#1a1a1a] text-white placeholder:text-gray-600 min-h-[100px]"
+                className="bg-card border-border text-foreground placeholder:text-gray-600 min-h-[100px]"
                 required
               />
             </div>
@@ -2505,7 +2505,7 @@ export default function FormsPage() {
                   setDeclineReason("");
                   setSubmissionToDecline(null);
                 }}
-                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                className="border-border text-muted-foreground hover:bg-muted/50"
               >
                 Cancel
               </Button>
@@ -2528,7 +2528,7 @@ export default function FormsPage() {
                   }
                 }}
                 disabled={!declineReason.trim() || approvalMutation.isPending}
-                className="bg-red-500 hover:bg-red-600 text-white"
+                className="bg-red-500 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground"
               >
                 {approvalMutation.isPending ? (
                   <>
@@ -2547,7 +2547,7 @@ export default function FormsPage() {
       {/* Full Screen Document Viewer Dialog */}
       {fullScreenDocument && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/98 flex items-center justify-center"
+          className="fixed inset-0 z-[100] bg-background/98 flex items-center justify-center"
           onClick={() => setFullScreenDocument(null)}
         >
           {/* Close Button - Top Right Corner */}
@@ -2558,7 +2558,7 @@ export default function FormsPage() {
               e.stopPropagation();
               setFullScreenDocument(null);
             }}
-            className="fixed top-4 right-4 z-[9999] h-14 w-14 bg-red-600/90 hover:bg-red-600 text-white border-2 border-white rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110 flex items-center justify-center"
+            className="fixed top-4 right-4 z-[9999] h-14 w-14 bg-red-500/20 text-red-700 border-red-500/50/90 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground border-2 border-white rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110 flex items-center justify-center"
             aria-label="Close full screen view"
             style={{
               position: 'fixed',
@@ -2589,8 +2589,8 @@ export default function FormsPage() {
                  }
                }
                return driversLicenseUrlsArray.length > 1 ? (
-                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-black/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
-                   <span className="text-white text-base font-semibold tracking-wide">
+                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-background/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
+                   <span className="text-foreground text-base font-semibold tracking-wide">
                      {fullScreenDocument.index + 1} / {driversLicenseUrlsArray.length}
                    </span>
                  </div>
@@ -2634,7 +2634,7 @@ export default function FormsPage() {
                            isPdf
                          });
                        }}
-                       className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+                       className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90 hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
                        aria-label="Previous image"
                      >
                        <ChevronLeft className="w-6 h-6" />
@@ -2659,7 +2659,7 @@ export default function FormsPage() {
                            isPdf
                          });
                        }}
-                       className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-black/90 hover:bg-[#EAEB80]/20 text-white border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+                       className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90 hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
                        aria-label="Next image"
                      >
                        <ChevronRight className="w-6 h-6" />

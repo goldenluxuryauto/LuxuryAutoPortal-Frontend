@@ -958,20 +958,20 @@ export default function ClientDetailPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-          <p className="text-red-400 mb-4">
+          <p className="text-red-700 mb-4">
             {error ? `Failed to load client details: ${error.message}` : "Client not found"}
           </p>
           {clientId && (
             <Button
               onClick={handleTestDB}
-              className="bg-blue-500 text-white hover:bg-blue-600 mb-2"
+              className="bg-blue-500 text-foreground hover:bg-blue-600 mb-2"
             >
               Test DB Connection
             </Button>
           )}
           <Button
             onClick={() => setLocation("/admin/clients")}
-            className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Clients
@@ -997,16 +997,16 @@ export default function ClientDetailPage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation("/admin/clients")}
-            className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Clients</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-foreground">
           {client.firstName} {client.lastName}
         </h1>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Client Details
             </p>
           </div>
@@ -1016,7 +1016,7 @@ export default function ClientDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
+            <Card className="bg-background border-border">
               <CardContent className="p-0">
                 <nav className="space-y-1 p-2">
                   {sections.map((section) => {
@@ -1034,8 +1034,8 @@ export default function ClientDetailPage() {
                           className={cn(
                             "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors",
                             isActive
-                              ? "bg-[#EAEB80]/10 text-[#EAEB80]"
-                              : "text-gray-400 hover:bg-[#1a1a1a] hover:text-[#EAEB80]"
+                              ? "bg-[#EAEB80]/10 text-primary"
+                              : "text-muted-foreground hover:bg-card hover:text-primary"
                           )}
                         >
                           <div className="flex items-center gap-3">
@@ -1059,16 +1059,16 @@ export default function ClientDetailPage() {
           {/* Right Content Area */}
           <div className="lg:col-span-3">
             {activeSection === "profile" && (
-              <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
+              <Card className="bg-background border-border">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-[#EAEB80] text-xl">Client Details</CardTitle>
+                    <CardTitle className="text-primary text-xl">Client Details</CardTitle>
                     <div className="flex items-center gap-2">
                       <Button
                         onClick={handleResendPasswordEmail}
                         variant="outline"
                         size="sm"
-                        className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                        className="text-primary border-primary/30 hover:bg-primary/10"
                         disabled={resendPasswordEmailMutation.isPending}
                       >
                         <Mail className="w-4 h-4 mr-2" />
@@ -1078,7 +1078,7 @@ export default function ClientDetailPage() {
                         onClick={handleEditClick}
                         variant="outline"
                         size="sm"
-                        className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                        className="text-primary border-primary/30 hover:bg-primary/10"
                       >
                         <Edit className="w-4 h-4 mr-2" />
                         Edit
@@ -1088,9 +1088,9 @@ export default function ClientDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {isLoadingOnboarding ? (
-                    <div className="text-center py-8 text-gray-400 space-y-3">
+                    <div className="text-center py-8 text-muted-foreground space-y-3">
                       {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-4 bg-[#252525] rounded animate-pulse w-3/4 mx-auto" />
+                        <div key={i} className="h-4 bg-muted/50 rounded animate-pulse w-3/4 mx-auto" />
                       ))}
                     </div>
                   ) : onboardingData?.success && onboardingData?.data ? (
@@ -1137,27 +1137,27 @@ export default function ClientDetailPage() {
                       return (
                         <>
                           {/* Personal Information */}
-                          <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                            <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                          <div className="bg-card p-4 rounded-lg border border-primary/20">
+                            <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                               Personal Information
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                               <div>
-                                <span className="text-gray-400 block mb-1">Full Name:</span>
-                                <span className="text-white font-medium">
+                                <span className="text-muted-foreground block mb-1">Full Name:</span>
+                                <span className="text-foreground font-medium">
                                   {formatValue(data.firstNameOwner)} {formatValue(data.lastNameOwner)}
                                 </span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">Email:</span>
-                                <span className="text-white">{formatValue(data.emailOwner)}</span>
+                                <span className="text-muted-foreground block mb-1">Email:</span>
+                                <span className="text-foreground">{formatValue(data.emailOwner)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">Last Login:</span>
-                                <span className="text-white">{formatLastLogin(client?.lastLoginAt)}</span>
+                                <span className="text-muted-foreground block mb-1">Last Login:</span>
+                                <span className="text-foreground">{formatLastLogin(client?.lastLoginAt)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">Online Status:</span>
+                                <span className="text-muted-foreground block mb-1">Online Status:</span>
                                 <Badge
                                   variant="outline"
                                   className={getOnlineStatusBadge(
@@ -1172,65 +1172,65 @@ export default function ClientDetailPage() {
                                 </Badge>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">Phone:</span>
-                                <span className="text-white">{formatValue(data.phoneOwner)}</span>
+                                <span className="text-muted-foreground block mb-1">Phone:</span>
+                                <span className="text-foreground">{formatValue(data.phoneOwner)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">Date of Birth:</span>
-                                <span className="text-white">{formatValue(data.birthday)}</span>
+                                <span className="text-muted-foreground block mb-1">Date of Birth:</span>
+                                <span className="text-foreground">{formatValue(data.birthday)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">T-Shirt Size:</span>
-                                <span className="text-white">{formatValue(data.tshirtSize)}</span>
+                                <span className="text-muted-foreground block mb-1">T-Shirt Size:</span>
+                                <span className="text-foreground">{formatValue(data.tshirtSize)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">SSN:</span>
-                                <span className="text-white font-mono">{formatValue(data.ssn)}</span>
+                                <span className="text-muted-foreground block mb-1">SSN:</span>
+                                <span className="text-foreground font-mono">{formatValue(data.ssn)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">Representative:</span>
-                                <span className="text-white">{formatValue(data.representative)}</span>
+                                <span className="text-muted-foreground block mb-1">Representative:</span>
+                                <span className="text-foreground">{formatValue(data.representative)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">How Did You Hear About Us:</span>
-                                <span className="text-white">{formatValue(data.heardAboutUs)}</span>
+                                <span className="text-muted-foreground block mb-1">How Did You Hear About Us:</span>
+                                <span className="text-foreground">{formatValue(data.heardAboutUs)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">Emergency Contact Name:</span>
-                                <span className="text-white">{formatValue(data.emergencyContactName)}</span>
+                                <span className="text-muted-foreground block mb-1">Emergency Contact Name:</span>
+                                <span className="text-foreground">{formatValue(data.emergencyContactName)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">Emergency Contact Phone:</span>
-                                <span className="text-white">{formatValue(data.emergencyContactPhone)}</span>
+                                <span className="text-muted-foreground block mb-1">Emergency Contact Phone:</span>
+                                <span className="text-foreground">{formatValue(data.emergencyContactPhone)}</span>
                               </div>
                             </div>
                           </div>
 
                           {/* Address Information */}
-                          <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                            <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                          <div className="bg-card p-4 rounded-lg border border-primary/20">
+                            <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                               Address Information
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                               <div className="md:col-span-2">
-                                <span className="text-gray-400 block mb-1">Street Address:</span>
-                                <span className="text-white">{formatValue(data.streetAddress)}</span>
+                                <span className="text-muted-foreground block mb-1">Street Address:</span>
+                                <span className="text-foreground">{formatValue(data.streetAddress)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">City:</span>
-                                <span className="text-white">{formatValue(data.city)}</span>
+                                <span className="text-muted-foreground block mb-1">City:</span>
+                                <span className="text-foreground">{formatValue(data.city)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">State:</span>
-                                <span className="text-white">{formatValue(data.state)}</span>
+                                <span className="text-muted-foreground block mb-1">State:</span>
+                                <span className="text-foreground">{formatValue(data.state)}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 block mb-1">Zip Code:</span>
-                                <span className="text-white">{formatValue(data.zipCode)}</span>
+                                <span className="text-muted-foreground block mb-1">Zip Code:</span>
+                                <span className="text-foreground">{formatValue(data.zipCode)}</span>
                               </div>
                               <div className="md:col-span-2">
-                                <span className="text-gray-400 block mb-1">Full Address:</span>
-                                <span className="text-white">
+                                <span className="text-muted-foreground block mb-1">Full Address:</span>
+                                <span className="text-foreground">
                                   {formatAddress(data.city, data.state, data.zipCode)}
                                 </span>
                               </div>
@@ -1238,15 +1238,15 @@ export default function ClientDetailPage() {
                           </div>
 
                           {/* Banking Information */}
-                          <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                            <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAEB80]/30">
-                              <h3 className="text-lg font-semibold text-[#EAEB80]">
+                          <div className="bg-card p-4 rounded-lg border border-primary/20">
+                            <div className="flex items-center justify-between mb-4 pb-2 border-b border-primary/30">
+                              <h3 className="text-lg font-semibold text-primary">
                                 Banking Information (ACH)
                               </h3>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                                className="text-primary border-primary/30 hover:bg-primary/10"
                                 onClick={() => {
                                   setEditingBankingInfo(null);
                                   setIsBankingModalOpen(true);
@@ -1257,17 +1257,17 @@ export default function ClientDetailPage() {
                               </Button>
                             </div>
                             {isLoadingBankingInfo ? (
-                              <div className="text-center py-6 text-gray-400">Loading...</div>
+                              <div className="text-center py-6 text-muted-foreground">Loading...</div>
                             ) : bankingInfoData && bankingInfoData.length > 0 ? (
                               <div className="space-y-4">
                                 {bankingInfoData.map((bankInfo: any, index: number) => (
                                   <div
                                     key={bankInfo.banking_info_aid}
-                                    className="bg-[#111111] border border-[#EAEB80]/10 rounded-lg p-4"
+                                    className="bg-card border border-primary/10 rounded-lg p-4"
                                   >
                                     <div className="flex items-start justify-between mb-3">
                                       <div className="flex items-center gap-2">
-                                        <h4 className="text-white font-medium">
+                                        <h4 className="text-foreground font-medium">
                                           {bankInfo.banking_info_car_id && (bankInfo.car_make || bankInfo.car_specs)
                                             ? `${[bankInfo.car_make, bankInfo.car_specs].filter(Boolean).join(" ")}${
                                                 bankInfo.car_year ? ` ${bankInfo.car_year}` : ""
@@ -1281,7 +1281,7 @@ export default function ClientDetailPage() {
                                         {bankInfo.banking_info_is_default === 1 && (
                                           <Badge
                                             variant="outline"
-                                            className="border-[#EAEB80]/50 text-[#EAEB80] bg-[#EAEB80]/10"
+                                            className="border-primary/50 text-primary bg-[#EAEB80]/10"
                                           >
                                             Default
                                           </Badge>
@@ -1291,7 +1291,7 @@ export default function ClientDetailPage() {
                                         <Button
                                           size="sm"
                                           variant="ghost"
-                                          className="text-gray-400 hover:text-[#EAEB80] h-8 w-8 p-0"
+                                          className="text-muted-foreground hover:text-primary h-8 w-8 p-0"
                                           onClick={() => {
                                             setEditingBankingInfo(bankInfo);
                                             setIsBankingModalOpen(true);
@@ -1302,7 +1302,7 @@ export default function ClientDetailPage() {
                                         <Button
                                           size="sm"
                                           variant="ghost"
-                                          className="text-gray-400 hover:text-red-400 h-8 w-8 p-0"
+                                          className="text-muted-foreground hover:text-red-700 h-8 w-8 p-0"
                                           onClick={() =>
                                             setDeletingBankingId(bankInfo.banking_info_aid)
                                           }
@@ -1313,49 +1313,49 @@ export default function ClientDetailPage() {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                                       <div>
-                                        <span className="text-gray-400 block mb-1">Bank Name:</span>
-                                        <span className="text-white">
+                                        <span className="text-muted-foreground block mb-1">Bank Name:</span>
+                                        <span className="text-foreground">
                                           {formatValue(bankInfo.banking_info_bank_name)}
                                         </span>
                                       </div>
                                       <div>
-                                        <span className="text-gray-400 block mb-1">Tax Classification:</span>
-                                        <span className="text-white">
+                                        <span className="text-muted-foreground block mb-1">Tax Classification:</span>
+                                        <span className="text-foreground">
                                           {formatValue(bankInfo.banking_info_tax_classification)}
                                         </span>
                                       </div>
                                       <div>
-                                        <span className="text-gray-400 block mb-1">Routing Number:</span>
-                                        <span className="text-white font-mono">
+                                        <span className="text-muted-foreground block mb-1">Routing Number:</span>
+                                        <span className="text-foreground font-mono">
                                           {formatValue(bankInfo.banking_info_routing_number)}
                                         </span>
                                       </div>
                                       <div>
-                                        <span className="text-gray-400 block mb-1">Account Number:</span>
-                                        <span className="text-white font-mono">
+                                        <span className="text-muted-foreground block mb-1">Account Number:</span>
+                                        <span className="text-foreground font-mono">
                                           {formatValue(bankInfo.banking_info_account_number)}
                                         </span>
                                       </div>
                                       {bankInfo.banking_info_business_name && (
                                         <div>
-                                          <span className="text-gray-400 block mb-1">Business Name:</span>
-                                          <span className="text-white">
+                                          <span className="text-muted-foreground block mb-1">Business Name:</span>
+                                          <span className="text-foreground">
                                             {formatValue(bankInfo.banking_info_business_name)}
                                           </span>
                                         </div>
                                       )}
                                       {bankInfo.banking_info_ein && (
                                         <div>
-                                          <span className="text-gray-400 block mb-1">EIN:</span>
-                                          <span className="text-white font-mono">
+                                          <span className="text-muted-foreground block mb-1">EIN:</span>
+                                          <span className="text-foreground font-mono">
                                             {formatValue(bankInfo.banking_info_ein)}
                                           </span>
                                         </div>
                                       )}
                                       {bankInfo.banking_info_ssn && (
                                         <div>
-                                          <span className="text-gray-400 block mb-1">SSN:</span>
-                                          <span className="text-white font-mono">
+                                          <span className="text-muted-foreground block mb-1">SSN:</span>
+                                          <span className="text-foreground font-mono">
                                             {formatValue(bankInfo.banking_info_ssn)}
                                           </span>
                                         </div>
@@ -1365,7 +1365,7 @@ export default function ClientDetailPage() {
                                 ))}
                               </div>
                             ) : (
-                              <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                              <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
                                 <DollarSign className="w-8 h-8 mb-2 text-gray-600" />
                                 <p>No banking information available yet.</p>
                               </div>
@@ -1373,15 +1373,15 @@ export default function ClientDetailPage() {
                           </div>
 
                           {/* Signed Contracts Section */}
-                          <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                            <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAEB80]/30">
-                              <h3 className="text-lg font-semibold text-[#EAEB80]">
+                          <div className="bg-card p-4 rounded-lg border border-primary/20">
+                            <div className="flex items-center justify-between mb-4 pb-2 border-b border-primary/30">
+                              <h3 className="text-lg font-semibold text-primary">
                                 Signed Contracts
                               </h3>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                                className="text-primary border-primary/30 hover:bg-primary/10"
                                 onClick={() => setIsUploadContractOpen(true)}
                               >
                                 <Upload className="w-4 h-4 mr-2" />
@@ -1393,28 +1393,28 @@ export default function ClientDetailPage() {
                                 {client.signedContracts.map((contract, index) => (
                                   <div
                                     key={contract.id ?? index}
-                                    className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#111111] border border-[#EAEB80]/10 rounded-lg p-4"
+                                    className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card border border-primary/10 rounded-lg p-4"
                                   >
                                     <div className="space-y-1 text-sm">
-                                      <div className="text-white font-medium">
+                                      <div className="text-foreground font-medium">
                                         {formatValue(contract.vehicleYear)}{" "}
                                         {formatValue(contract.vehicleMake)}{" "}
                                         {formatValue(contract.vehicleModel)}
                                       </div>
-                                      <div className="text-gray-400">
+                                      <div className="text-muted-foreground">
                                         Plate:{" "}
-                                        <span className="text-white">
+                                        <span className="text-foreground">
                                           {formatValue(contract.licensePlate)}
                                         </span>
                                         {" · "}
                                         VIN:{" "}
-                                        <span className="text-white font-mono text-xs">
+                                        <span className="text-foreground font-mono text-xs">
                                           {formatValue(contract.vinNumber)}
                                         </span>
                                       </div>
-                                      <div className="text-gray-400">
+                                      <div className="text-muted-foreground">
                                         Signed on:{" "}
-                                        <span className="text-white">
+                                        <span className="text-foreground">
                                           {formatDate(contract.contractSignedAt || contract.createdAt)}
                                         </span>
                                       </div>
@@ -1422,7 +1422,7 @@ export default function ClientDetailPage() {
                                     <div className="flex items-center gap-3">
                                       <Badge
                                         variant="outline"
-                                        className="border-green-500/50 text-green-400 bg-green-500/10"
+                                        className="border-green-500/50 text-green-700 bg-green-500/10"
                                       >
                                         Signed
                                       </Badge>
@@ -1431,7 +1431,7 @@ export default function ClientDetailPage() {
                                           href={buildApiUrl(`/api/contracts/${contract.id}/view`)}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-[#EAEB80] text-black hover:bg-[#d4d570] transition-colors"
+                                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/80 transition-colors"
                                         >
                                           <Eye className="w-4 h-4" />
                                           View
@@ -1442,7 +1442,7 @@ export default function ClientDetailPage() {
                                 ))}
                               </div>
                             ) : (
-                              <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                              <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
                                 <Folder className="w-8 h-8 mb-2 text-gray-600" />
                                 <p>No signed contracts available yet.</p>
                               </div>
@@ -1455,56 +1455,56 @@ export default function ClientDetailPage() {
                     // Show basic client info when no onboarding data exists (manually created client)
                     <>
                       {/* Basic Client Information */}
-                      <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                        <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                      <div className="bg-card p-4 rounded-lg border border-primary/20">
+                        <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                           Personal Information
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                           <div>
-                            <span className="text-gray-400 block mb-1">Full Name:</span>
-                            <span className="text-white font-medium">
+                            <span className="text-muted-foreground block mb-1">Full Name:</span>
+                            <span className="text-foreground font-medium">
                               {client.firstName} {client.lastName}
                             </span>
                           </div>
                           <div>
-                            <span className="text-gray-400 block mb-1">Email:</span>
-                            <span className="text-white">{client.email}</span>
+                            <span className="text-muted-foreground block mb-1">Email:</span>
+                            <span className="text-foreground">{client.email}</span>
                           </div>
                           {client.phone && (
                             <div>
-                              <span className="text-gray-400 block mb-1">Phone:</span>
-                              <span className="text-white">{client.phone}</span>
+                              <span className="text-muted-foreground block mb-1">Phone:</span>
+                              <span className="text-foreground">{client.phone}</span>
                             </div>
                           )}
                           <div>
-                            <span className="text-gray-400 block mb-1">Status:</span>
+                            <span className="text-muted-foreground block mb-1">Status:</span>
                             <Badge
                               variant="outline"
                               className={cn(
                                 client.isActive
-                                  ? "border-green-500/50 text-green-400 bg-green-500/10"
-                                  : "border-red-500/50 text-red-400 bg-red-500/10"
+                                  ? "border-green-500/50 text-green-700 bg-green-500/10"
+                                  : "border-red-500/50 text-red-700 bg-red-500/10"
                               )}
                             >
                               {client.isActive ? "Active" : "Inactive"}
                             </Badge>
                           </div>
                           <div>
-                            <span className="text-gray-400 block mb-1">Created:</span>
-                            <span className="text-white">
+                            <span className="text-muted-foreground block mb-1">Created:</span>
+                            <span className="text-foreground">
                               {new Date(client.createdAt).toLocaleDateString()}
                             </span>
                           </div>
                           <div>
-                            <span className="text-gray-400 block mb-1">Last Login:</span>
-                            <span className="text-white">
+                            <span className="text-muted-foreground block mb-1">Last Login:</span>
+                            <span className="text-foreground">
                               {formatLastLogin(client.lastLoginAt)}
                             </span>
                           </div>
                           <div>
-                            <span className="text-gray-400 block mb-1">Online Status:</span>
+                            <span className="text-muted-foreground block mb-1">Online Status:</span>
                             {!client ? (
-                              <span className="text-gray-500">N/A</span>
+                              <span className="text-foreground0">N/A</span>
                             ) : onlineStatusBadge ? (
                               <Badge
                                 variant="outline"
@@ -1513,7 +1513,7 @@ export default function ClientDetailPage() {
                                 {onlineStatusBadge.text}
                               </Badge>
                             ) : (
-                              <span className="text-gray-500">N/A</span>
+                              <span className="text-foreground0">N/A</span>
                             )}
                           </div>
                         </div>
@@ -1522,27 +1522,27 @@ export default function ClientDetailPage() {
                       {/* Banking Information (legacy fallback, only if no ACH records) */}
                       {(!bankingInfoData || bankingInfoData.length === 0) &&
                         (client.bankName || client.bankRoutingNumber || client.bankAccountNumber) && (
-                          <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                            <h3 className="text-lg font-semibold text-[#EAEB80] mb-4 pb-2 border-b border-[#EAEB80]/30">
+                          <div className="bg-card p-4 rounded-lg border border-primary/20">
+                            <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                               Banking Information
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                               {client.bankName && (
                                 <div>
-                                  <span className="text-gray-400 block mb-1">Bank Name:</span>
-                                  <span className="text-white">{client.bankName}</span>
+                                  <span className="text-muted-foreground block mb-1">Bank Name:</span>
+                                  <span className="text-foreground">{client.bankName}</span>
                                 </div>
                               )}
                               {client.bankRoutingNumber && (
                                 <div>
-                                  <span className="text-gray-400 block mb-1">Routing Number:</span>
-                                  <span className="text-white font-mono">{client.bankRoutingNumber}</span>
+                                  <span className="text-muted-foreground block mb-1">Routing Number:</span>
+                                  <span className="text-foreground font-mono">{client.bankRoutingNumber}</span>
                                 </div>
                               )}
                               {client.bankAccountNumber && (
                                 <div>
-                                  <span className="text-gray-400 block mb-1">Account Number:</span>
-                                  <span className="text-white font-mono">{client.bankAccountNumber}</span>
+                                  <span className="text-muted-foreground block mb-1">Account Number:</span>
+                                  <span className="text-foreground font-mono">{client.bankAccountNumber}</span>
                                 </div>
                               )}
                             </div>
@@ -1550,15 +1550,15 @@ export default function ClientDetailPage() {
                         )}
 
                       {/* Signed Contracts for manually created clients */}
-                      <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#EAEB80]/20">
-                        <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAEB80]/30">
-                          <h3 className="text-lg font-semibold text-[#EAEB80]">
+                      <div className="bg-card p-4 rounded-lg border border-primary/20">
+                        <div className="flex items-center justify-between mb-4 pb-2 border-b border-primary/30">
+                          <h3 className="text-lg font-semibold text-primary">
                             Signed Contracts
                           </h3>
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                            className="text-primary border-primary/30 hover:bg-primary/10"
                             onClick={() => setIsUploadContractOpen(true)}
                           >
                             <Upload className="w-4 h-4 mr-2" />
@@ -1570,22 +1570,22 @@ export default function ClientDetailPage() {
                             {client.signedContracts.map((contract, index) => (
                               <div
                                 key={contract.id ?? index}
-                                className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#111111] border border-[#EAEB80]/10 rounded-lg p-4"
+                                className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card border border-primary/10 rounded-lg p-4"
                               >
                                 <div className="space-y-1 text-sm">
-                                  <div className="text-white font-medium">
+                                  <div className="text-foreground font-medium">
                                     {contract.vehicleYear || ""}{" "}
                                     {contract.vehicleMake || ""}{" "}
                                     {contract.vehicleModel || ""}
                                   </div>
-                                  <div className="text-gray-400">
-                                    Plate: <span className="text-white">{contract.licensePlate || "N/A"}</span>
+                                  <div className="text-muted-foreground">
+                                    Plate: <span className="text-foreground">{contract.licensePlate || "N/A"}</span>
                                     {" · "}
-                                    VIN: <span className="text-white font-mono text-xs">{contract.vinNumber || "N/A"}</span>
+                                    VIN: <span className="text-foreground font-mono text-xs">{contract.vinNumber || "N/A"}</span>
                                   </div>
-                                  <div className="text-gray-400">
+                                  <div className="text-muted-foreground">
                                     Signed on:{" "}
-                                    <span className="text-white">
+                                    <span className="text-foreground">
                                       {contract.contractSignedAt
                                         ? new Date(contract.contractSignedAt).toLocaleString()
                                         : "N/A"}
@@ -1595,7 +1595,7 @@ export default function ClientDetailPage() {
                                 <div className="flex items-center gap-3">
                                   <Badge
                                     variant="outline"
-                                    className="border-green-500/50 text-green-400 bg-green-500/10"
+                                    className="border-green-500/50 text-green-700 bg-green-500/10"
                                   >
                                     Signed
                                   </Badge>
@@ -1604,7 +1604,7 @@ export default function ClientDetailPage() {
                                       href={buildApiUrl(`/api/contracts/${contract.id}/view`)}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-[#EAEB80] text-black hover:bg-[#d4d570] transition-colors"
+                                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/80 transition-colors"
                                     >
                                       <Eye className="w-4 h-4" />
                                       View
@@ -1615,15 +1615,15 @@ export default function ClientDetailPage() {
                             ))}
                           </div>
                         ) : (
-                          <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                          <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
                             <Folder className="w-8 h-8 mb-2 text-gray-600" />
                             <p>No signed contracts available yet.</p>
                           </div>
                         )}
                       </div>
 
-                      <div className="bg-[#1a1a1a]/50 p-4 rounded-lg border border-[#EAEB80]/10 text-center">
-                        <p className="text-gray-400 text-sm">
+                      <div className="bg-card/50 p-4 rounded-lg border border-primary/10 text-center">
+                        <p className="text-muted-foreground text-sm">
                           This client was created manually. Complete onboarding details are not available.
                         </p>
                       </div>
@@ -1634,17 +1634,17 @@ export default function ClientDetailPage() {
             )}
 
             {activeSection === "cars" && (
-              <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
+              <Card className="bg-background border-border">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-[#EAEB80] text-xl">
+                    <CardTitle className="text-primary text-xl">
                       Assigned Cars ({client.cars.length})
                     </CardTitle>
                     <Button
                       onClick={() => setIsAddCarOpen(true)}
                       variant="outline"
                       size="sm"
-                      className="text-[#EAEB80] border-[#EAEB80]/30 hover:bg-[#EAEB80]/10"
+                      className="text-primary border-primary/30 hover:bg-primary/10"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Add Car
@@ -1655,28 +1655,28 @@ export default function ClientDetailPage() {
                   {client.cars.length === 0 ? (
                     <div className="text-center py-8">
                       <Car className="w-12 h-12 mx-auto mb-4 text-gray-600" />
-                      <p className="text-gray-400 mb-4">No cars assigned to this client</p>
+                      <p className="text-muted-foreground mb-4">No cars assigned to this client</p>
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
-                          <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3 w-12">#</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Status</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Stats</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Management</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Make</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Year</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Model/Specs</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Contact</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">VIN #</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Plate #</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Gas</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Tire Size</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Oil Type</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Turo Link</TableHead>
-                            <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3">Admin Turo Link</TableHead>
+                          <TableRow className="border-border hover:bg-transparent">
+                            <TableHead className="text-center text-primary font-medium px-4 py-3 w-12">#</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Status</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Stats</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Management</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Make</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Year</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Model/Specs</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Contact</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">VIN #</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Plate #</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Gas</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Tire Size</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Oil Type</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Turo Link</TableHead>
+                            <TableHead className="text-center text-primary font-medium px-4 py-3">Admin Turo Link</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -1690,9 +1690,9 @@ export default function ClientDetailPage() {
                             return (
                             <TableRow
                               key={car.id}
-                              className="border-[#2a2a2a] hover:bg-gray-800/50 transition-colors"
+                              className="border-border hover:bg-muted/50/50 transition-colors"
                             >
-                              <TableCell className="text-center text-[#EAEB80] px-4 py-3 align-middle">
+                              <TableCell className="text-center text-primary px-4 py-3 align-middle">
                                 {index + 1}
                               </TableCell>
                               <TableCell className="text-center px-4 py-3 align-middle">
@@ -1701,8 +1701,8 @@ export default function ClientDetailPage() {
                                     variant="outline"
                                     className={cn(
                                       car.status === "available"
-                                        ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                        : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                                        ? "bg-green-500/20 text-green-700 border-green-500/30"
+                                        : "bg-gray-500/20 text-muted-foreground border-gray-500/30"
                                     )}
                                   >
                                     {car.status === "available" ? "Available" : "Off Fleet"}
@@ -1716,39 +1716,39 @@ export default function ClientDetailPage() {
                                     e.preventDefault();
                                     setLocation(`/admin/view-car/${car.id}`);
                                   }}
-                                  className="text-[#EAEB80] hover:underline"
+                                  className="text-primary hover:underline"
                                 >
                                   View Stats
                                 </a>
                               </TableCell>
-                              <TableCell className="text-center text-white px-4 py-3 align-middle">
+                              <TableCell className="text-center text-foreground px-4 py-3 align-middle">
                                 {managementValue}
                               </TableCell>
-                              <TableCell className="text-center text-white px-4 py-3 align-middle">
+                              <TableCell className="text-center text-foreground px-4 py-3 align-middle">
                                 {car.make || "N/A"}
                               </TableCell>
-                              <TableCell className="text-center text-white px-4 py-3 align-middle">
+                              <TableCell className="text-center text-foreground px-4 py-3 align-middle">
                                 {car.year || "N/A"}
                               </TableCell>
-                              <TableCell className="text-center text-white px-4 py-3 align-middle">
+                              <TableCell className="text-center text-foreground px-4 py-3 align-middle">
                                 {car.model || "N/A"}
                               </TableCell>
-                              <TableCell className="text-center text-gray-400 px-4 py-3 align-middle">
+                              <TableCell className="text-center text-muted-foreground px-4 py-3 align-middle">
                                 {car.contactPhone || car.owner?.phone || "N/A"}
                               </TableCell>
-                              <TableCell className="text-center text-white font-mono text-sm px-4 py-3 align-middle">
+                              <TableCell className="text-center text-foreground font-mono text-sm px-4 py-3 align-middle">
                                 {car.vin}
                               </TableCell>
-                              <TableCell className="text-center text-gray-400 px-4 py-3 align-middle">
+                              <TableCell className="text-center text-muted-foreground px-4 py-3 align-middle">
                                 {car.licensePlate || "N/A"}
                               </TableCell>
-                              <TableCell className="text-center text-gray-400 px-4 py-3 align-middle">
+                              <TableCell className="text-center text-muted-foreground px-4 py-3 align-middle">
                                 {car.fuelType || "N/A"}
                               </TableCell>
-                              <TableCell className="text-center text-gray-400 px-4 py-3 align-middle">
+                              <TableCell className="text-center text-muted-foreground px-4 py-3 align-middle">
                                 {car.tireSize || "N/A"}
                               </TableCell>
-                              <TableCell className="text-center text-gray-400 px-4 py-3 align-middle">
+                              <TableCell className="text-center text-muted-foreground px-4 py-3 align-middle">
                                 {car.oilType || "N/A"}
                               </TableCell>
                               <TableCell className="text-center px-4 py-3 align-middle">
@@ -1756,7 +1756,7 @@ export default function ClientDetailPage() {
                                   <a
                                     href="#"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="text-[#EAEB80] hover:underline"
+                                    className="text-primary hover:underline"
                                   >
                                     <ExternalLink className="w-4 h-4" />
                                   </a>
@@ -1766,7 +1766,7 @@ export default function ClientDetailPage() {
                                 <a
                                   href="#"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="text-[#EAEB80] hover:underline"
+                                  className="text-primary hover:underline"
                                 >
                                   <ExternalLink className="w-4 h-4" />
                                 </a>
@@ -1783,14 +1783,14 @@ export default function ClientDetailPage() {
             )}
 
             {activeSection === "totals" && (
-              <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
+              <Card className="bg-background border-border">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                  <CardTitle className="text-[#EAEB80] text-xl">Totals</CardTitle>
+                  <CardTitle className="text-primary text-xl">Totals</CardTitle>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-[#EAEB80] hover:bg-[#EAEB80]/20"
+                      className="text-primary hover:bg-muted/50EAEB80]/20"
                       onClick={() => {
                         // Export functionality
                         console.log("Export totals");
@@ -1804,10 +1804,10 @@ export default function ClientDetailPage() {
                   {/* Filters */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
                     <Select value={selectedCar} onValueChange={setSelectedCar}>
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="Car" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectContent className="bg-card border-border text-foreground">
                         <SelectItem value="all">All cars</SelectItem>
                         {client?.cars?.map((car) => (
                           <SelectItem key={car.id} value={car.id.toString()}>
@@ -1818,10 +1818,10 @@ export default function ClientDetailPage() {
                     </Select>
 
                     <Select value={selectedYear} onValueChange={setSelectedYear}>
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="Filter" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectContent className="bg-card border-border text-foreground">
                         <SelectItem value="2025">2025</SelectItem>
                         <SelectItem value="2024">2024</SelectItem>
                         <SelectItem value="2023">2023</SelectItem>
@@ -1830,10 +1830,10 @@ export default function ClientDetailPage() {
                     </Select>
 
                     <Select value={fromYear} onValueChange={setFromYear}>
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="From" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectContent className="bg-card border-border text-foreground">
                         <SelectItem value="2025">2025</SelectItem>
                         <SelectItem value="2024">2024</SelectItem>
                         <SelectItem value="2023">2023</SelectItem>
@@ -1842,10 +1842,10 @@ export default function ClientDetailPage() {
                     </Select>
 
                     <Select value={toYear} onValueChange={setToYear}>
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="To" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectContent className="bg-card border-border text-foreground">
                         <SelectItem value="2025">2025</SelectItem>
                         <SelectItem value="2024">2024</SelectItem>
                         <SelectItem value="2023">2023</SelectItem>
@@ -1858,36 +1858,36 @@ export default function ClientDetailPage() {
                   {totalsLoading ? (
                     <div className="flex items-center justify-center py-12 space-y-3 flex-col">
                       {[...Array(4)].map((_, i) => (
-                        <div key={i} className="h-4 bg-[#252525] rounded animate-pulse w-3/4" />
+                        <div key={i} className="h-4 bg-muted/50 rounded animate-pulse w-3/4" />
                       ))}
                     </div>
                   ) : !totals ? (
-                    <div className="text-center py-12 text-gray-400">
+                    <div className="text-center py-12 text-muted-foreground">
                       <Folder className="w-12 h-12 mx-auto mb-4 text-gray-600" />
                       <p>No data available</p>
                     </div>
                   ) : (
                     <Accordion type="multiple" className="w-full space-y-2">
                   {/* CAR MANAGEMENT AND CAR OWNER SPLIT */}
-                      <AccordionItem value="split" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                      <AccordionItem value="split" className="border border-border rounded-lg overflow-hidden bg-card">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                      <span className="text-white font-medium">CAR MANAGEMENT AND CAR OWNER SPLIT</span>
+                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                      <span className="text-foreground font-medium">CAR MANAGEMENT AND CAR OWNER SPLIT</span>
                     </div>
                         </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                        <AccordionContent className="px-4 pb-4 bg-background">
                           <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Car Management Split</span>
-                              <span className="text-white font-medium">
+                              <span className="text-foreground font-medium">
                                 ${totals?.carManagementSplit?.toFixed(2) || "0.00"}
                               </span>
                   </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Car Owner Split</span>
-                              <span className="text-white font-medium">
+                              <span className="text-foreground font-medium">
                                 ${totals?.carOwnerSplit?.toFixed(2) || "0.00"}
                               </span>
                             </div>
@@ -1896,83 +1896,83 @@ export default function ClientDetailPage() {
                       </AccordionItem>
 
                   {/* INCOME */}
-                      <AccordionItem value="income" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                      <AccordionItem value="income" className="border border-border rounded-lg overflow-hidden bg-card">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                      <span className="text-white font-medium">INCOME</span>
+                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                      <span className="text-foreground font-medium">INCOME</span>
                         </div>
                         </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                        <AccordionContent className="px-4 pb-4 bg-background">
                           <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Rental Income</span>
-                              <span className="text-white">${totals?.income?.rentalIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.rentalIncome?.toFixed(2) || "0.00"}</span>
                       </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Delivery Income</span>
-                              <span className="text-white">${totals?.income?.deliveryIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.deliveryIncome?.toFixed(2) || "0.00"}</span>
                   </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Electric Prepaid Income</span>
-                              <span className="text-white">${totals?.income?.electricPrepaidIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.electricPrepaidIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Smoking Fines</span>
-                              <span className="text-white">${totals?.income?.smokingFines?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.smokingFines?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Gas Prepaid Income</span>
-                              <span className="text-white">${totals?.income?.gasPrepaidIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.gasPrepaidIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Miles Income</span>
-                              <span className="text-white">${totals?.income?.milesIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.milesIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Ski Racks Income</span>
-                              <span className="text-white">${totals?.income?.skiRacksIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.skiRacksIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Child Seat Income</span>
-                              <span className="text-white">${totals?.income?.childSeatIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.childSeatIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Coolers Income</span>
-                              <span className="text-white">${totals?.income?.coolersIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.coolersIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Income Insurance and Client Wrecks</span>
-                              <span className="text-white">${totals?.income?.incomeInsurance?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.incomeInsurance?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Other Income</span>
-                              <span className="text-white">${totals?.income?.otherIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.otherIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Negative Balance Carry Over</span>
-                              <span className="text-white">${totals?.income?.negativeBalance?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.income?.negativeBalance?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm pt-2 border-t border-[#2a2a2a]">
+                            <div className="flex justify-between text-muted-foreground text-sm pt-2 border-t border-border">
                               <span className="font-medium">Car Management Total Expenses</span>
-                              <span className="text-white font-semibold">
+                              <span className="text-foreground font-semibold">
                                 ${totals?.income?.carManagementTotalExpenses?.toFixed(2) || "0.00"}
                               </span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span className="font-medium">Car Owner Total Expenses</span>
-                              <span className="text-white font-semibold">
+                              <span className="text-foreground font-semibold">
                                 ${totals?.income?.carOwnerTotalExpenses?.toFixed(2) || "0.00"}
                               </span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span className="font-medium">Car Payment</span>
-                              <span className="text-white font-semibold">
+                              <span className="text-foreground font-semibold">
                                 ${totals?.income?.carPayment?.toFixed(2) || "0.00"}
                               </span>
                             </div>
-                            <div className="flex justify-between text-[#EAEB80] text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                            <div className="flex justify-between text-primary text-sm font-bold pt-2 border-t border-border">
                               <span>Total Expenses</span>
                               <span>${totals?.income?.totalExpenses?.toFixed(2) || "0.00"}</span>
                             </div>
@@ -1981,81 +1981,81 @@ export default function ClientDetailPage() {
                       </AccordionItem>
 
                   {/* OPERATING EXPENSES */}
-                      <AccordionItem value="expenses" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                      <AccordionItem value="expenses" className="border border-border rounded-lg overflow-hidden bg-card">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                            <span className="text-white font-medium">OPERATING EXPENSES (COGS - Per Vehicle)</span>
+                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                            <span className="text-foreground font-medium">OPERATING EXPENSES (COGS - Per Vehicle)</span>
                         </div>
                         </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                        <AccordionContent className="px-4 pb-4 bg-background">
                           <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Auto Body Shop / Wreck</span>
-                              <span className="text-white">${totals?.expenses?.autoBodyShop?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.autoBodyShop?.toFixed(2) || "0.00"}</span>
                       </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Alignment</span>
-                              <span className="text-white">${totals?.expenses?.alignment?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.alignment?.toFixed(2) || "0.00"}</span>
                   </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Battery</span>
-                              <span className="text-white">${totals?.expenses?.battery?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.battery?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Brakes</span>
-                              <span className="text-white">${totals?.expenses?.brakes?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.brakes?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Car Payment</span>
-                              <span className="text-white">${totals?.expenses?.carPayment?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.carPayment?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Car Insurance</span>
-                              <span className="text-white">${totals?.expenses?.carInsurance?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.carInsurance?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Car Seats</span>
-                              <span className="text-white">${totals?.expenses?.carSeats?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.carSeats?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Cleaning Supplies / Tools</span>
-                              <span className="text-white">${totals?.expenses?.cleaningSupplies?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.cleaningSupplies?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Emissions</span>
-                              <span className="text-white">${totals?.expenses?.emissions?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.emissions?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>GPS System</span>
-                              <span className="text-white">${totals?.expenses?.gpsSystem?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.gpsSystem?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Keys & Fob</span>
-                              <span className="text-white">${totals?.expenses?.keysFob?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.keysFob?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Labor - Cleaning</span>
-                              <span className="text-white">${totals?.expenses?.laborDetailing?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.laborDetailing?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Parking Airport (Reimbursed - GLA - Client Owner Rentals)</span>
-                              <span className="text-white">${totals?.expenses?.parkingAirport?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.parkingAirport?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Uber/Lyft/Lime - Not Reimbursed</span>
-                              <span className="text-white">${totals?.expenses?.uberNotReimbursed?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.uberNotReimbursed?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Uber/Lyft/Lime - Reimbursed</span>
-                              <span className="text-white">${totals?.expenses?.uberReimbursed?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.uberReimbursed?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Gas - Service Run</span>
-                              <span className="text-white">${totals?.expenses?.gasServiceRun?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.expenses?.gasServiceRun?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-[#EAEB80] text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                            <div className="flex justify-between text-primary text-sm font-bold pt-2 border-t border-border">
                               <span>Total Operating Expenses (COGS - Per Vehicle)</span>
                               <span>${totals?.expenses?.totalOperatingExpenses?.toFixed(2) || "0.00"}</span>
                             </div>
@@ -2064,25 +2064,25 @@ export default function ClientDetailPage() {
                       </AccordionItem>
 
                   {/* GLA PARKING FEE & LABOR CLEANING */}
-                      <AccordionItem value="gla" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                      <AccordionItem value="gla" className="border border-border rounded-lg overflow-hidden bg-card">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                      <span className="text-white font-medium">GLA PARKING FEE & LABOR CLEANING</span>
+                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                      <span className="text-foreground font-medium">GLA PARKING FEE & LABOR CLEANING</span>
                         </div>
                         </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                        <AccordionContent className="px-4 pb-4 bg-background">
                           <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>GLA Labor - Cleaning</span>
-                              <span className="text-white">${totals?.gla?.laborCleaning?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.gla?.laborCleaning?.toFixed(2) || "0.00"}</span>
                       </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>GLA Parking Fee</span>
-                              <span className="text-white">${totals?.gla?.parkingFee?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground">${totals?.gla?.parkingFee?.toFixed(2) || "0.00"}</span>
                   </div>
-                            <div className="flex justify-between text-[#EAEB80] text-sm font-bold pt-2 border-t border-[#2a2a2a]">
+                            <div className="flex justify-between text-primary text-sm font-bold pt-2 border-t border-border">
                               <span>Total GLA Parking Fee & Labor Cleaning</span>
                               <span>${totals?.gla?.total?.toFixed(2) || "0.00"}</span>
                             </div>
@@ -2091,42 +2091,42 @@ export default function ClientDetailPage() {
                       </AccordionItem>
 
                   {/* HISTORY OF THE CARS */}
-                      <AccordionItem value="history" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                      <AccordionItem value="history" className="border border-border rounded-lg overflow-hidden bg-card">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                      <span className="text-white font-medium">HISTORY OF THE CARS</span>
+                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                      <span className="text-foreground font-medium">HISTORY OF THE CARS</span>
                         </div>
                         </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                        <AccordionContent className="px-4 pb-4 bg-background">
                           <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Days Rented</span>
-                              <span className="text-white font-medium">{totals?.history?.daysRented || 0}</span>
+                              <span className="text-foreground font-medium">{totals?.history?.daysRented || 0}</span>
                       </div>
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Trips Taken</span>
-                              <span className="text-white font-medium">{totals?.history?.tripsTaken || 0}</span>
+                              <span className="text-foreground font-medium">{totals?.history?.tripsTaken || 0}</span>
                   </div>
                           </div>
                         </AccordionContent>
                       </AccordionItem>
 
                   {/* PAYMENT HISTORY */}
-                      <AccordionItem value="payments" className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#1a1a1a]">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-[#2a2a2a] transition-colors [&>svg]:hidden">
+                      <AccordionItem value="payments" className="border border-border rounded-lg overflow-hidden bg-card">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-[#EAEB80] group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-[#EAEB80] hidden group-data-[state=open]:block" />
-                      <span className="text-white font-medium">PAYMENT HISTORY</span>
+                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
+                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
+                      <span className="text-foreground font-medium">PAYMENT HISTORY</span>
                         </div>
                         </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-[#0a0a0a]">
+                        <AccordionContent className="px-4 pb-4 bg-background">
                           <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-gray-300 text-sm">
+                            <div className="flex justify-between text-muted-foreground text-sm">
                               <span>{fromYear} - {toYear}</span>
-                              <span className="text-white font-semibold">
+                              <span className="text-foreground font-semibold">
                                 ${totals?.payments?.total?.toFixed(2) || "0.00"}
                               </span>
                       </div>
@@ -2140,18 +2140,18 @@ export default function ClientDetailPage() {
             )}
 
             {activeSection === "maintenance" && (
-              <Card className="bg-[#0a0a0a] border-[#1a1a1a]">
+              <Card className="bg-background border-border">
                 <CardHeader>
-                  <CardTitle className="text-[#EAEB80] text-xl">Car Maintenance</CardTitle>
+                  <CardTitle className="text-primary text-xl">Car Maintenance</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Filters */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Select value={maintenanceTypeFilter} onValueChange={setMaintenanceTypeFilter}>
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="Select a Type" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectContent className="bg-card border-border text-foreground">
                         <SelectItem value="all">All Types</SelectItem>
                         <SelectItem value="oil">Oil Change</SelectItem>
                         <SelectItem value="tire">Tire Service</SelectItem>
@@ -2160,10 +2160,10 @@ export default function ClientDetailPage() {
                     </Select>
 
                     <Select value={maintenanceStatusFilter} onValueChange={setMaintenanceStatusFilter}>
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectContent className="bg-card border-border text-foreground">
                         <SelectItem value="all">All Status</SelectItem>
                         <SelectItem value="scheduled">Scheduled</SelectItem>
                         <SelectItem value="completed">Completed</SelectItem>
@@ -2175,7 +2175,7 @@ export default function ClientDetailPage() {
                       type="date"
                       value={maintenanceDateFilter}
                       onChange={(e) => setMaintenanceDateFilter(e.target.value)}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                      className="bg-card border-border text-foreground"
                       placeholder="Date to Filter"
                     />
                   </div>
@@ -2184,20 +2184,20 @@ export default function ClientDetailPage() {
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
-                        <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                          <TableHead className="text-center text-[#EAEB80] font-medium px-4 py-3 w-12">#</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Make</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Model</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Year</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Plate #</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">VIN #</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Tire Size</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Maintenance Type</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Status</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Schedule Date</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Date Completed</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Price</TableHead>
-                          <TableHead className="text-left text-[#EAEB80] font-medium px-4 py-3">Remarks</TableHead>
+                        <TableRow className="border-border hover:bg-transparent">
+                          <TableHead className="text-center text-primary font-medium px-4 py-3 w-12">#</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Make</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Model</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Year</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Plate #</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">VIN #</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Tire Size</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Maintenance Type</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Status</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Schedule Date</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Date Completed</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Price</TableHead>
+                          <TableHead className="text-left text-primary font-medium px-4 py-3">Remarks</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -2205,7 +2205,7 @@ export default function ClientDetailPage() {
                       <TableCell colSpan={13} className="text-center py-12">
                             <div className="flex flex-col items-center gap-3">
                               <Folder className="w-12 h-12 text-gray-600" />
-                              <p className="text-gray-400">No data</p>
+                              <p className="text-muted-foreground">No data</p>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -2221,10 +2221,10 @@ export default function ClientDetailPage() {
 
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-primary/30 border-2 text-foreground">
           <DialogHeader>
-            <DialogTitle className="text-white text-2xl">Edit Client Details</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-foreground text-2xl">Edit Client Details</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Update client onboarding information
             </DialogDescription>
           </DialogHeader>
@@ -2232,62 +2232,62 @@ export default function ClientDetailPage() {
           <form onSubmit={handleEditSubmit} className="space-y-6 mt-4">
             {/* Personal Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+              <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
                 Personal Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">First Name</Label>
+                  <Label className="text-muted-foreground">First Name</Label>
                   <Input
                     value={editFormData.firstNameOwner || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, firstNameOwner: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Last Name</Label>
+                  <Label className="text-muted-foreground">Last Name</Label>
                   <Input
                     value={editFormData.lastNameOwner || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, lastNameOwner: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Email</Label>
+                  <Label className="text-muted-foreground">Email</Label>
                   <Input
                     type="email"
                     value={editFormData.emailOwner || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, emailOwner: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Phone</Label>
+                  <Label className="text-muted-foreground">Phone</Label>
                   <Input
                     value={editFormData.phoneOwner || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, phoneOwner: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Date of Birth</Label>
+                  <Label className="text-muted-foreground">Date of Birth</Label>
                   <Input
                     type="date"
                     value={editFormData.birthday ? editFormData.birthday.split("T")[0] : ""}
                     onChange={(e) => setEditFormData({ ...editFormData, birthday: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">T-Shirt Size</Label>
+                  <Label className="text-muted-foreground">T-Shirt Size</Label>
                   <Select
                     value={editFormData.tshirtSize || ""}
                     onValueChange={(value) => setEditFormData({ ...editFormData, tshirtSize: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       {["XS", "S", "M", "L", "XL", "XXL"].map(
                         (s) => (
                           <SelectItem key={s} value={s}>
@@ -2299,31 +2299,31 @@ export default function ClientDetailPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-gray-400">SSN</Label>
+                  <Label className="text-muted-foreground">SSN</Label>
                   <Input
                     value={editFormData.ssn || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, ssn: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                    className="bg-card border-border text-foreground font-mono"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Representative</Label>
+                  <Label className="text-muted-foreground">Representative</Label>
                   <Input
                     value={editFormData.representative || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, representative: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">How Did You Hear About Us</Label>
+                  <Label className="text-muted-foreground">How Did You Hear About Us</Label>
                   <Select
                     value={editFormData.heardAboutUs || ""}
                     onValueChange={(value) => setEditFormData({ ...editFormData, heardAboutUs: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="Friend">Friend</SelectItem>
                       <SelectItem value="Google">Google</SelectItem>
                       <SelectItem value="Social Media">Social Media</SelectItem>
@@ -2331,31 +2331,31 @@ export default function ClientDetailPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-gray-400">Emergency Contact Name</Label>
+                  <Label className="text-muted-foreground">Emergency Contact Name</Label>
                   <Input
                     value={editFormData.emergencyContactName || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, emergencyContactName: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Emergency Contact Phone</Label>
+                  <Label className="text-muted-foreground">Emergency Contact Phone</Label>
                   <Input
                     value={editFormData.emergencyContactPhone || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, emergencyContactPhone: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Client Status</Label>
+                  <Label className="text-muted-foreground">Client Status</Label>
                   <Select
                     value={editFormData.status || "ACTIVE"}
                     onValueChange={(value) => setEditFormData({ ...editFormData, status: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select client status" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="ACTIVE">Active</SelectItem>
                       <SelectItem value="INACTIVE">Inactive</SelectItem>
                     </SelectContent>
@@ -2366,40 +2366,40 @@ export default function ClientDetailPage() {
 
             {/* Address Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+              <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
                 Address Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <Label className="text-gray-400">Street Address</Label>
+                  <Label className="text-muted-foreground">Street Address</Label>
                   <Input
                     value={editFormData.streetAddress || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, streetAddress: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">City</Label>
+                  <Label className="text-muted-foreground">City</Label>
                   <Input
                     value={editFormData.city || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, city: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">State</Label>
+                  <Label className="text-muted-foreground">State</Label>
                   <Input
                     value={editFormData.state || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, state: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Zip Code</Label>
+                  <Label className="text-muted-foreground">Zip Code</Label>
                   <Input
                     value={editFormData.zipCode || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, zipCode: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
@@ -2407,91 +2407,91 @@ export default function ClientDetailPage() {
 
             {/* Banking Information (ACH) */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#EAEB80]/30 pb-2">
+              <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
                 Banking Information (ACH)
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Bank Name</Label>
+                  <Label className="text-muted-foreground">Bank Name</Label>
                   <Input
                     value={editFormData.bankName || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, bankName: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Tax Classification</Label>
+                  <Label className="text-muted-foreground">Tax Classification</Label>
                   <Select
                     value={editFormData.taxClassification || ""}
                     onValueChange={(value) => setEditFormData({ ...editFormData, taxClassification: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select tax classification" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="individual">Individual</SelectItem>
                       <SelectItem value="business">Business</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-gray-400">Routing Number</Label>
+                  <Label className="text-muted-foreground">Routing Number</Label>
                   <Input
                     value={editFormData.routingNumber || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, routingNumber: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                    className="bg-card border-border text-foreground font-mono"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Account Number</Label>
+                  <Label className="text-muted-foreground">Account Number</Label>
                   <Input
                     value={editFormData.accountNumber || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, accountNumber: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                    className="bg-card border-border text-foreground font-mono"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">SSN</Label>
+                  <Label className="text-muted-foreground">SSN</Label>
                   <Input
                     value={editFormData.ssn || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, ssn: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                    className="bg-card border-border text-foreground font-mono"
                     placeholder="Enter SSN"
                   />
                 </div>
                   <div>
-                    <Label className="text-gray-400">EIN</Label>
+                    <Label className="text-muted-foreground">EIN</Label>
                     <Input
                       value={editFormData.ein || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, ein: e.target.value })}
-                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                      className="bg-card border-border text-foreground font-mono"
                     placeholder="Enter EIN"
                     />
                   </div>
                 <div>
-                  <Label className="text-gray-400">Business Name</Label>
+                  <Label className="text-muted-foreground">Business Name</Label>
                   <Input
                     value={editFormData.businessName || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, businessName: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
+            <div className="flex justify-end gap-3 pt-4 border-t border-border">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsEditModalOpen(false)}
-                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                className="border-border text-muted-foreground hover:bg-muted/50"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={updateMutation.isPending}
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                className="bg-primary text-primary-foreground hover:bg-primary/80"
               >
                 {updateMutation.isPending ? "Saving..." : "Save Changes"}
               </Button>
@@ -2511,10 +2511,10 @@ export default function ClientDetailPage() {
           });
         }
       }}>
-        <DialogContent className="max-w-lg bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
+        <DialogContent className="max-w-lg bg-card border-primary/30 border-2 text-foreground">
           <DialogHeader>
-            <DialogTitle className="text-white text-xl">Upload Contract</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-foreground text-xl">Upload Contract</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Manually upload a signed contract for this client. Select the car to associate with this contract.
             </DialogDescription>
           </DialogHeader>
@@ -2526,7 +2526,7 @@ export default function ClientDetailPage() {
             className="space-y-4"
           >
             <div>
-              <Label className="text-gray-400">Select Car *</Label>
+              <Label className="text-muted-foreground">Select Car *</Label>
               {(() => {
                 // Filter out cars that have already been onboarded (have a signed contract)
                 const onboardedVins = new Set(
@@ -2543,10 +2543,10 @@ export default function ClientDetailPage() {
                 if (nonOnboardedCars.length === 0) {
                   return (
                     <div className="space-y-2">
-                      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-md p-3 text-gray-400 text-sm">
+                      <div className="bg-card border border-border rounded-md p-3 text-muted-foreground text-sm">
                         No non-onboarded cars available. All cars for this client have already been onboarded.
                       </div>
-                      <p className="text-xs text-gray-500">You cannot upload a contract when all cars are already onboarded.</p>
+                      <p className="text-xs text-foreground0">You cannot upload a contract when all cars are already onboarded.</p>
                     </div>
                   );
                 }
@@ -2560,10 +2560,10 @@ export default function ClientDetailPage() {
                         setUploadContractFormErrors({});
                       }}
                     >
-                      <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="Select a car" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                      <SelectContent className="bg-card border-border text-foreground">
                         {nonOnboardedCars.map((car: any) => (
                           <SelectItem key={car.id} value={car.id.toString()}>
                             {car.make || "N/A"} {car.model || ""} {car.year ? `(${car.year})` : ""} - VIN: {car.vin || "N/A"}
@@ -2572,15 +2572,15 @@ export default function ClientDetailPage() {
                       </SelectContent>
                     </Select>
                     {uploadContractFormErrors.selectedCarId && (
-                      <p className="text-xs text-red-400 mt-1">{uploadContractFormErrors.selectedCarId}</p>
+                      <p className="text-xs text-red-700 mt-1">{uploadContractFormErrors.selectedCarId}</p>
                     )}
-                    <p className="text-xs text-gray-500 mt-1">Select a car that hasn't been onboarded yet</p>
+                    <p className="text-xs text-foreground0 mt-1">Select a car that hasn't been onboarded yet</p>
                   </>
                 );
               })()}
             </div>
             <div>
-              <Label className="text-gray-400">Contract PDF File *</Label>
+              <Label className="text-muted-foreground">Contract PDF File *</Label>
               <div className="mt-2">
                 <input
                   type="file"
@@ -2589,38 +2589,38 @@ export default function ClientDetailPage() {
                     const file = e.target.files?.[0] || null;
                     setUploadContractForm({ ...uploadContractForm, contractFile: file });
                   }}
-                  className="block w-full text-sm text-gray-400
+                  className="block w-full text-sm text-muted-foreground
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-md file:border-0
                     file:text-sm file:font-semibold
-                    file:bg-[#EAEB80] file:text-black
-                    hover:file:bg-[#d4d570]
+                    file:bg-primary file:text-primary-foreground
+                    hover:file:bg-primary/90
                     file:cursor-pointer
                     cursor-pointer
-                    bg-[#1a1a1a] border border-[#2a2a2a] rounded-md p-2"
+                    bg-card border border-border rounded-md p-2"
                 required
               />
                 {uploadContractForm.contractFile && (
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Selected: {uploadContractForm.contractFile.name}
                   </p>
                 )}
-                <p className="text-xs text-gray-500 mt-1">Upload a PDF file from your local device (max 5MB)</p>
+                <p className="text-xs text-foreground0 mt-1">Upload a PDF file from your local device (max 5MB)</p>
               </div>
             </div>
-            <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
+            <div className="flex justify-end gap-3 pt-4 border-t border-border">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsUploadContractOpen(false)}
-                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                className="border-border text-muted-foreground hover:bg-muted/50"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={uploadContractMutation.isPending}
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                className="bg-primary text-primary-foreground hover:bg-primary/80"
               >
                 {uploadContractMutation.isPending ? "Uploading..." : "Upload Contract"}
               </Button>
@@ -2636,10 +2636,10 @@ export default function ClientDetailPage() {
           setAddCarFormErrors({});
         }
       }}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#111111] border-[#EAEB80]/30 border-2 text-white">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-primary/30 border-2 text-foreground">
           <DialogHeader>
-            <DialogTitle className="text-white text-xl">Add Car</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-foreground text-xl">Add Car</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Add a new car for this client
             </DialogDescription>
           </DialogHeader>
@@ -2652,11 +2652,11 @@ export default function ClientDetailPage() {
           >
             {/* Vehicle Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+              <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                 Vehicle Information
               </h3>
               <div>
-                <Label className="text-gray-400">VIN *</Label>
+                <Label className="text-muted-foreground">VIN *</Label>
                 <Input
                   value={addCarForm.vin}
                   onChange={(e) => {
@@ -2669,7 +2669,7 @@ export default function ClientDetailPage() {
                   }}
                   placeholder="WDDNG8GB5LA123456"
                   className={cn(
-                    "bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono",
+                    "bg-card border-border text-foreground font-mono",
                     addCarFormErrors.vin && "border-red-500"
                   )}
                   maxLength={17}
@@ -2681,107 +2681,107 @@ export default function ClientDetailPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Make *</Label>
+                  <Label className="text-muted-foreground">Make *</Label>
                   <Input
                     value={addCarForm.make}
                     onChange={(e) => setAddCarForm({ ...addCarForm, make: e.target.value })}
                     placeholder="Mercedes-Benz"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                     required
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Model *</Label>
+                  <Label className="text-muted-foreground">Model *</Label>
                   <Input
                     value={addCarForm.model}
                     onChange={(e) => setAddCarForm({ ...addCarForm, model: e.target.value })}
                     placeholder="S-Class"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                     required
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Year</Label>
+                  <Label className="text-muted-foreground">Year</Label>
                   <Input
                     type="number"
                     value={addCarForm.year}
                     onChange={(e) => setAddCarForm({ ...addCarForm, year: e.target.value })}
                     placeholder="2024"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">License Plate</Label>
+                  <Label className="text-muted-foreground">License Plate</Label>
                   <Input
                     value={addCarForm.licensePlate}
                     onChange={(e) => setAddCarForm({ ...addCarForm, licensePlate: e.target.value })}
                     placeholder="ABC1234"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Exterior Color</Label>
+                  <Label className="text-muted-foreground">Exterior Color</Label>
                   <Input
                     value={addCarForm.color}
                     onChange={(e) => setAddCarForm({ ...addCarForm, color: e.target.value })}
                     placeholder="Black"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Interior Color</Label>
+                  <Label className="text-muted-foreground">Interior Color</Label>
                   <Input
                     value={addCarForm.interiorColor}
                     onChange={(e) => setAddCarForm({ ...addCarForm, interiorColor: e.target.value })}
                     placeholder="Black"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Mileage</Label>
+                  <Label className="text-muted-foreground">Mileage</Label>
                   <Input
                     type="number"
                     value={addCarForm.mileage}
                     onChange={(e) => setAddCarForm({ ...addCarForm, mileage: e.target.value })}
                     placeholder="0"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Trim</Label>
+                  <Label className="text-muted-foreground">Trim</Label>
                   <Input
                     value={addCarForm.vehicleTrim}
                     onChange={(e) => setAddCarForm({ ...addCarForm, vehicleTrim: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Registration Expiration</Label>
+                  <Label className="text-muted-foreground">Registration Expiration</Label>
                   <Input
                     type="date"
                     value={addCarForm.registrationExpiration}
                     onChange={(e) => setAddCarForm({ ...addCarForm, registrationExpiration: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Title Type</Label>
+                  <Label className="text-muted-foreground">Title Type</Label>
                   <Select
                     value={addCarForm.titleType}
                     onValueChange={(value) => setAddCarForm({ ...addCarForm, titleType: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select title type" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="Clean">Clean</SelectItem>
                       <SelectItem value="Salvage">Salvage</SelectItem>
                       <SelectItem value="Rebuilt">Rebuilt</SelectItem>
@@ -2793,40 +2793,40 @@ export default function ClientDetailPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Vehicle Recall</Label>
+                  <Label className="text-muted-foreground">Vehicle Recall</Label>
                   <Select
                     value={addCarForm.vehicleRecall}
                     onValueChange={(value) => setAddCarForm({ ...addCarForm, vehicleRecall: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="Yes">Yes</SelectItem>
                       <SelectItem value="No">No</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-gray-400">Oil Package Details</Label>
+                  <Label className="text-muted-foreground">Oil Package Details</Label>
                   <Input
                     value={addCarForm.oilPackageDetails}
                     onChange={(e) => setAddCarForm({ ...addCarForm, oilPackageDetails: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Number of Seats</Label>
+                  <Label className="text-muted-foreground">Number of Seats</Label>
                   <Select
                     value={addCarForm.numberOfSeats}
                     onValueChange={(value) => setAddCarForm({ ...addCarForm, numberOfSeats: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       {[2, 4, 5, 6, 7, 8].map((n) => (
                         <SelectItem key={n} value={String(n)}>
                           {n}
@@ -2836,15 +2836,15 @@ export default function ClientDetailPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-gray-400">Number of Doors</Label>
+                  <Label className="text-muted-foreground">Number of Doors</Label>
                   <Select
                     value={addCarForm.numberOfDoors}
                     onValueChange={(value) => setAddCarForm({ ...addCarForm, numberOfDoors: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="2">2</SelectItem>
                       <SelectItem value="4">4</SelectItem>
                     </SelectContent>
@@ -2853,30 +2853,30 @@ export default function ClientDetailPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Ski Rack</Label>
+                  <Label className="text-muted-foreground">Ski Rack</Label>
                   <Select
                     value={addCarForm.skiRacks}
                     onValueChange={(value) => setAddCarForm({ ...addCarForm, skiRacks: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="Yes">Yes</SelectItem>
                       <SelectItem value="No">No</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-gray-400">Ski Crossbars</Label>
+                  <Label className="text-muted-foreground">Ski Crossbars</Label>
                   <Select
                     value={addCarForm.skiCrossBars}
                     onValueChange={(value) => setAddCarForm({ ...addCarForm, skiCrossBars: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="Yes">Yes</SelectItem>
                       <SelectItem value="No">No</SelectItem>
                     </SelectContent>
@@ -2885,50 +2885,50 @@ export default function ClientDetailPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Roof Rails</Label>
+                  <Label className="text-muted-foreground">Roof Rails</Label>
                   <Select
                     value={addCarForm.roofRails}
                     onValueChange={(value) => setAddCarForm({ ...addCarForm, roofRails: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="Yes">Yes</SelectItem>
                       <SelectItem value="No">No</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-gray-400">Oil Type</Label>
+                  <Label className="text-muted-foreground">Oil Type</Label>
                   <Input
                     value={addCarForm.oilType}
                     onChange={(e) => setAddCarForm({ ...addCarForm, oilType: e.target.value })}
                     placeholder="5W-30"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Last Oil Change Date</Label>
+                  <Label className="text-muted-foreground">Last Oil Change Date</Label>
                   <Input
                     type="date"
                     value={addCarForm.lastOilChange}
                     onChange={(e) => setAddCarForm({ ...addCarForm, lastOilChange: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Free Service Center Oil Change</Label>
+                  <Label className="text-muted-foreground">Free Service Center Oil Change</Label>
                   <Select
                     value={addCarForm.freeDealershipOilChanges}
                     onValueChange={(value) => setAddCarForm({ ...addCarForm, freeDealershipOilChanges: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="Yes">Yes</SelectItem>
                       <SelectItem value="No">No</SelectItem>
                     </SelectContent>
@@ -2936,24 +2936,24 @@ export default function ClientDetailPage() {
                 </div>
               </div>
               <div>
-                <Label className="text-gray-400">Dealership Address</Label>
+                <Label className="text-muted-foreground">Dealership Address</Label>
                 <Input
                   value={addCarForm.dealershipAddress}
                   onChange={(e) => setAddCarForm({ ...addCarForm, dealershipAddress: e.target.value })}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  className="bg-card border-border text-foreground"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Fuel Type</Label>
+                  <Label className="text-muted-foreground">Fuel Type</Label>
                   <Select
                     value={addCarForm.fuelType}
                     onValueChange={(value) => setAddCarForm({ ...addCarForm, fuelType: value })}
                   >
-                    <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectTrigger className="bg-card border-border text-foreground">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                    <SelectContent className="bg-card border-border text-foreground">
                       <SelectItem value="Regular">Regular</SelectItem>
                       <SelectItem value="Premium">Premium</SelectItem>
                       <SelectItem value="Premium 91 Unleaded">Premium 91 Unleaded</SelectItem>
@@ -2967,17 +2967,17 @@ export default function ClientDetailPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-gray-400">Tire Size</Label>
+                  <Label className="text-muted-foreground">Tire Size</Label>
                   <Input
                     value={addCarForm.tireSize}
                     onChange={(e) => setAddCarForm({ ...addCarForm, tireSize: e.target.value })}
                     placeholder="225/50R17"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
               <div className="col-span-2">
-                <Label className="text-gray-400 mb-4 block">Features (check all that apply)</Label>
+                <Label className="text-muted-foreground mb-4 block">Features (check all that apply)</Label>
                 <div className="border border-red-500 rounded-lg p-4">
                   <div className="grid grid-cols-2 gap-3">
                     {[
@@ -3012,11 +3012,11 @@ export default function ClientDetailPage() {
                               setAddCarForm({ ...addCarForm, vehicleFeatures: currentValue.filter((f) => f !== feature) });
                             }
                           }}
-                          className="border-gray-600"
+                          className="border-border"
                         />
                         <Label
                           htmlFor={`feature-${feature}`}
-                          className="text-gray-300 text-sm font-normal cursor-pointer"
+                          className="text-muted-foreground text-sm font-normal cursor-pointer"
                         >
                           {feature}
                         </Label>
@@ -3026,15 +3026,15 @@ export default function ClientDetailPage() {
                 </div>
               </div>
               <div>
-                <Label className="text-gray-400">Status *</Label>
+                <Label className="text-muted-foreground">Status *</Label>
                 <Select
                   value={addCarForm.status}
                   onValueChange={(value) => setAddCarForm({ ...addCarForm, status: value })}
                 >
-                  <SelectTrigger className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                  <SelectTrigger className="bg-card border-border text-foreground">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                  <SelectContent className="bg-card border-border text-foreground">
                     <SelectItem value="ACTIVE">ACTIVE</SelectItem>
                     <SelectItem value="INACTIVE">INACTIVE</SelectItem>
                   </SelectContent>
@@ -3044,72 +3044,72 @@ export default function ClientDetailPage() {
 
             {/* Financial Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+              <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                 Financial Information
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Purchase Price</Label>
+                  <Label className="text-muted-foreground">Purchase Price</Label>
                   <Input
                     type="number"
                     step="0.01"
                     value={addCarForm.purchasePrice}
                     onChange={(e) => setAddCarForm({ ...addCarForm, purchasePrice: e.target.value })}
                     placeholder="0.00"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Down Payment</Label>
+                  <Label className="text-muted-foreground">Down Payment</Label>
                   <Input
                     type="number"
                     step="0.01"
                     value={addCarForm.downPayment}
                     onChange={(e) => setAddCarForm({ ...addCarForm, downPayment: e.target.value })}
                     placeholder="0.00"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Monthly Payment</Label>
+                  <Label className="text-muted-foreground">Monthly Payment</Label>
                   <Input
                     type="number"
                     step="0.01"
                     value={addCarForm.monthlyPayment}
                     onChange={(e) => setAddCarForm({ ...addCarForm, monthlyPayment: e.target.value })}
                     placeholder="0.00"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Interest Rate (%)</Label>
+                  <Label className="text-muted-foreground">Interest Rate (%)</Label>
                   <Input
                     type="number"
                     step="0.01"
                     value={addCarForm.interestRate}
                     onChange={(e) => setAddCarForm({ ...addCarForm, interestRate: e.target.value })}
                     placeholder="0.00"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Transport City to City</Label>
+                  <Label className="text-muted-foreground">Transport City to City</Label>
                   <Input
                     value={addCarForm.transportCityToCity}
                     onChange={(e) => setAddCarForm({ ...addCarForm, transportCityToCity: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Ultimate Goal</Label>
+                  <Label className="text-muted-foreground">Ultimate Goal</Label>
                   <Input
                     value={addCarForm.ultimateGoal}
                     onChange={(e) => setAddCarForm({ ...addCarForm, ultimateGoal: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
@@ -3117,44 +3117,44 @@ export default function ClientDetailPage() {
 
             {/* Insurance Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+              <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                 Insurance Information
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Provider</Label>
+                  <Label className="text-muted-foreground">Provider</Label>
                   <Input
                     value={addCarForm.insuranceProvider}
                     onChange={(e) => setAddCarForm({ ...addCarForm, insuranceProvider: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Phone</Label>
+                  <Label className="text-muted-foreground">Phone</Label>
                   <Input
                     type="tel"
                     value={addCarForm.insurancePhone}
                     onChange={(e) => setAddCarForm({ ...addCarForm, insurancePhone: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Policy Number</Label>
+                  <Label className="text-muted-foreground">Policy Number</Label>
                   <Input
                     value={addCarForm.policyNumber}
                     onChange={(e) => setAddCarForm({ ...addCarForm, policyNumber: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                    className="bg-card border-border text-foreground font-mono"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Expiration</Label>
+                  <Label className="text-muted-foreground">Expiration</Label>
                   <Input
                     type="date"
                     value={addCarForm.insuranceExpiration}
                     onChange={(e) => setAddCarForm({ ...addCarForm, insuranceExpiration: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
@@ -3162,79 +3162,79 @@ export default function ClientDetailPage() {
 
             {/* Car Login Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+              <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                 Car Login Information
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Car Manufacturer Website</Label>
+                  <Label className="text-muted-foreground">Car Manufacturer Website</Label>
                   <Input
                     type="url"
                     value={addCarForm.carManufacturerWebsite}
                     onChange={(e) => setAddCarForm({ ...addCarForm, carManufacturerWebsite: e.target.value })}
                     placeholder="https://example.com"
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Manufacturer Username</Label>
+                  <Label className="text-muted-foreground">Manufacturer Username</Label>
                   <Input
                     value={addCarForm.carManufacturerUsername}
                     onChange={(e) => setAddCarForm({ ...addCarForm, carManufacturerUsername: e.target.value })}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
               <div>
-                <Label className="text-gray-400">Password</Label>
+                <Label className="text-muted-foreground">Password</Label>
                 <Input
                   type="password"
                   value={addCarForm.password}
                   onChange={(e) => setAddCarForm({ ...addCarForm, password: e.target.value })}
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white font-mono"
+                  className="bg-card border-border text-foreground font-mono"
                 />
               </div>
             </div>
 
             {/* Car Links Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#EAEB80] border-b border-[#2a2a2a] pb-2">
+              <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
                 Car Links
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Turo Link</Label>
+                  <Label className="text-muted-foreground">Turo Link</Label>
                   <Input
                     value={addCarForm.turoLink}
                     onChange={(e) => setAddCarForm({ ...addCarForm, turoLink: e.target.value })}
                     placeholder="https://turo.com/..."
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-400">Admin Turo Link</Label>
+                  <Label className="text-muted-foreground">Admin Turo Link</Label>
                   <Input
                     value={addCarForm.adminTuroLink}
                     onChange={(e) => setAddCarForm({ ...addCarForm, adminTuroLink: e.target.value })}
                     placeholder="https://turo.com/..."
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                    className="bg-card border-border text-foreground"
                   />
                 </div>
               </div>
             </div>
-            <div className="flex justify-end gap-3 pt-4 border-t border-[#2a2a2a]">
+            <div className="flex justify-end gap-3 pt-4 border-t border-border">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsAddCarOpen(false)}
-                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                className="border-border text-muted-foreground hover:bg-muted/50"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={addCarMutation.isPending}
-                className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
+                className="bg-primary text-primary-foreground hover:bg-primary/80"
               >
                 {addCarMutation.isPending ? "Adding..." : "Add Car"}
               </Button>
@@ -3260,10 +3260,10 @@ export default function ClientDetailPage() {
         open={deletingBankingId !== null}
         onOpenChange={(open) => !open && setDeletingBankingId(null)}
       >
-        <DialogContent className="bg-[#0a0a0a] border-[#2a2a2a] text-white">
+        <DialogContent className="bg-background border-border text-foreground">
           <DialogHeader>
-            <DialogTitle className="text-[#EAEB80]">Delete Banking Information</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-primary">Delete Banking Information</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Are you sure you want to delete this banking information? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -3271,7 +3271,7 @@ export default function ClientDetailPage() {
             <Button
               variant="outline"
               onClick={() => setDeletingBankingId(null)}
-              className="border-[#2a2a2a] text-gray-300 hover:bg-[#1a1a1a]"
+              className="border-border text-muted-foreground hover:bg-card"
             >
               Cancel
             </Button>
@@ -3282,7 +3282,7 @@ export default function ClientDetailPage() {
                 }
               }}
               disabled={deleteBankingInfoMutation.isPending}
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground hover:bg-red-500/30 text-red-700"
             >
               {deleteBankingInfoMutation.isPending ? "Deleting..." : "Delete"}
             </Button>

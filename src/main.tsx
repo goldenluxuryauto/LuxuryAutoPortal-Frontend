@@ -18,10 +18,10 @@ const rootElement = document.getElementById("root");
 if (!rootElement) {
   // Show error in the page if root element is missing
   document.body.innerHTML = `
-    <div style="min-height: 100vh; background: #0a0a0a; display: flex; align-items: center; justify-content: center; padding: 20px; color: white; font-family: system-ui, -apple-system, sans-serif;">
+    <div style="min-height: 100vh; background: #ffffff; display: flex; align-items: center; justify-content: center; padding: 20px; color: #171717; font-family: system-ui, -apple-system, sans-serif;">
       <div style="max-width: 600px; text-align: center;">
-        <h1 style="font-size: 24px; margin-bottom: 16px; color: #EAEB80;">Configuration Error</h1>
-        <p style="color: #999; margin-bottom: 24px;">Root element not found. Please check the HTML structure.</p>
+        <h1 style="font-size: 24px; margin-bottom: 16px; color: #F2C94C;">Configuration Error</h1>
+        <p style="color: #737373; margin-bottom: 24px;">Root element not found. Please check the HTML structure.</p>
       </div>
     </div>
   `;
@@ -39,13 +39,13 @@ const loadingTimeout = setTimeout(() => {
   if (rootElement.innerHTML === '' || rootElement.querySelector('#root-loading-timeout')) {
     console.error("⚠️ [MAIN] App initialization timeout - showing error message");
     rootElement.innerHTML = `
-      <div id="root-loading-timeout" style="min-height: 100vh; background: #0a0a0a; display: flex; align-items: center; justify-content: center; padding: 20px; color: white; font-family: system-ui, -apple-system, sans-serif;">
+      <div id="root-loading-timeout" style="min-height: 100vh; background: #ffffff; display: flex; align-items: center; justify-content: center; padding: 20px; color: #171717; font-family: system-ui, -apple-system, sans-serif;">
         <div style="max-width: 600px; text-align: center;">
-          <h1 style="font-size: 24px; margin-bottom: 16px; color: #EAEB80;">Loading Timeout</h1>
-          <p style="color: #999; margin-bottom: 24px;">The application is taking longer than expected to load. Please check your connection and try refreshing.</p>
+          <h1 style="font-size: 24px; margin-bottom: 16px; color: #F2C94C;">Loading Timeout</h1>
+          <p style="color: #737373; margin-bottom: 24px;">The application is taking longer than expected to load. Please check your connection and try refreshing.</p>
           <button 
             onclick="window.location.reload()" 
-            style="background: #EAEB80; color: black; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;"
+            style="background: #F2C94C; color: #171717; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;"
           >
             Reload Page
           </button>
@@ -81,17 +81,17 @@ try {
   
   // Fallback UI if React fails to initialize
   rootElement.innerHTML = `
-    <div style="min-height: 100vh; background: #0a0a0a; display: flex; align-items: center; justify-content: center; padding: 20px; color: white; font-family: system-ui, -apple-system, sans-serif;">
+    <div style="min-height: 100vh; background: #ffffff; display: flex; align-items: center; justify-content: center; padding: 20px; color: #171717; font-family: system-ui, -apple-system, sans-serif;">
       <div style="max-width: 600px; text-align: center;">
-        <h1 style="font-size: 24px; margin-bottom: 16px; color: #EAEB80;">Application Error</h1>
-        <p style="color: #999; margin-bottom: 24px;">Failed to initialize the application. Please refresh the page.</p>
+        <h1 style="font-size: 24px; margin-bottom: 16px; color: #F2C94C;">Application Error</h1>
+        <p style="color: #737373; margin-bottom: 24px;">Failed to initialize the application. Please refresh the page.</p>
         <button 
           onclick="window.location.reload()" 
-          style="background: #EAEB80; color: black; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;"
+          style="background: #F2C94C; color: #171717; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600;"
         >
           Reload Page
         </button>
-        <div style="margin-top: 24px; padding: 16px; background: #1a1a1a; border-radius: 6px; text-align: left; font-size: 12px; color: #666;">
+        <div style="margin-top: 24px; padding: 16px; background: #f5f5f5; border: 1px solid #e5e5e5; border-radius: 6px; text-align: left; font-size: 12px; color: #525252;">
           <p><strong>Error:</strong> ${error instanceof Error ? error.message : String(error)}</p>
           <p style="margin-top: 8px;"><strong>User Agent:</strong> ${navigator.userAgent}</p>
           ${error instanceof Error && error.stack ? `<p style="margin-top: 8px;"><strong>Stack:</strong><br><pre style="font-size: 10px; overflow: auto; max-height: 200px;">${error.stack}</pre></p>` : ''}

@@ -181,13 +181,13 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="flex h-screen bg-[#0a0a0a]" style={{ overflow: 'auto' }}>
+    <div className="flex h-screen bg-background" style={{ overflow: 'auto' }}>
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 flex flex-col bg-[#0a0a0a] border-r border-[#1a1a1a] transition-all duration-300",
+        "fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar border-r border-sidebar-border transition-all duration-300",
         sidebarOpen ? "w-64" : "w-20",
         mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
-        <div className="flex items-center justify-between h-16 px-4 border-b border-[#1a1a1a]">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
           <Link href="/dashboard" className="flex items-center gap-2">
             <img 
               src="/logo.png" 
@@ -200,7 +200,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           </Link>
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="lg:hidden text-gray-400 hover:text-white"
+            className="lg:hidden text-muted-foreground hover:text-foreground"
           >
             <X className="w-5 h-5" />
           </button>
@@ -222,7 +222,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                   <div
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded transition-colors relative cursor-pointer",
-                      isActiveParent ? "bg-[#EAEB80]/10 text-[#EAEB80]" : "text-gray-400 hover:bg-[#1a1a1a] hover:text-white"
+                      isActiveParent ? "bg-sidebar-primary/10 text-sidebar-primary" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                     )}
                     onClick={() => toggleExpand(item.href)}
                     data-testid={`link-admin-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -247,7 +247,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                             href={child.href}
                             className={cn(
                               "flex items-center gap-3 px-3 py-2 rounded text-sm",
-                              childActive ? "bg-[#EAEB80]/10 text-[#EAEB80]" : "text-gray-400 hover:bg-[#1a1a1a] hover:text-white"
+                              childActive ? "bg-sidebar-primary/10 text-sidebar-primary" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                             )}
                             onClick={() => setMobileMenuOpen(false)}
                             data-testid={`link-admin-${child.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -270,8 +270,8 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 className={cn(
                   "flex items-center gap-3 mx-2 px-3 py-2 rounded transition-colors relative",
                   isActive 
-                    ? "bg-[#EAEB80]/10 text-[#EAEB80]" 
-                    : "text-gray-400 hover:bg-[#1a1a1a] hover:text-white"
+                    ? "bg-sidebar-primary/10 text-sidebar-primary" 
+                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                 )}
                 onClick={() => setMobileMenuOpen(false)}
                 data-testid={`link-admin-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -287,10 +287,10 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-[#1a1a1a]">
+        <div className="p-4 border-t border-sidebar-border">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2 rounded text-gray-400 hover:bg-[#1a1a1a] hover:text-white transition-colors"
+            className="flex items-center gap-3 w-full px-3 py-2 rounded text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
             data-testid="button-logout"
           >
             <LogOut className="w-4 h-4" />
@@ -303,37 +303,37 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         "flex-1 flex flex-col transition-all duration-300",
         sidebarOpen ? "lg:ml-64" : "lg:ml-20"
       )}>
-        <header className="h-14 bg-[#0a0a0a] border-b border-[#1a1a1a] flex items-center justify-between px-3 sm:px-4 lg:px-6">
+        <header className="h-14 bg-background border-b border-border flex items-center justify-between px-3 sm:px-4 lg:px-6">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden text-gray-400 hover:text-white"
+            className="lg:hidden text-muted-foreground hover:text-foreground"
           >
             <Menu className="w-6 h-6" />
           </button>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="hidden lg:flex text-gray-400 hover:text-white"
+            className="hidden lg:flex text-muted-foreground hover:text-foreground"
           >
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2 sm:gap-4">
             <NotificationBell />
             {user && (
-              <span className="text-xs sm:text-sm text-gray-400 truncate max-w-[120px] sm:max-w-none">
+              <span className="text-xs sm:text-sm text-muted-foreground truncate max-w-[120px] sm:max-w-none">
                 {user.firstName} {user.lastName} <span className="hidden sm:inline">({user.roleName})</span>
               </span>
             )}
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto-y p-3 sm:p-4 md:p-6 bg-[#0a0a0a]">
+        <main className="flex-1 overflow-auto-y p-3 sm:p-4 md:p-6 bg-background">
           {children}
         </main>
       </div>
 
       {mobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-foreground/20 z-40 lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
