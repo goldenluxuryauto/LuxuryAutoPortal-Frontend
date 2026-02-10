@@ -29,11 +29,17 @@ import MaintenancePage from "@/pages/admin/maintenance";
 import RecordsPage from "@/pages/admin/records";
 import ViewRecordFilesPage from "@/pages/admin/view-record-files";
 import PaymentsPage from "@/pages/admin/payments";
+import PaymentsMainPage from "@/pages/admin/payments-main";
+import PaymentStatusPage from "@/pages/admin/payment-status";
 import TotalsPage from "@/pages/admin/totals";
 import IncomeExpensesPage from "@/pages/admin/income-expenses/index";
 import CarIncomeExpensePage from "@/pages/admin/car-income-expense";
 import IncomeExpenseLogPage from "@/pages/admin/income-expense-log";
 import SettingsPage from "@/pages/admin/settings";
+import HumanResourcesPage from "@/pages/admin/hr";
+import EmployeesPage from "@/pages/admin/hr/employees";
+import EmployeeViewPage from "@/pages/admin/hr/employee-view";
+import EmployeeFormPage from "@/pages/employee-form";
 
 // Wrapper component for IncomeExpensesPage to handle Wouter route props
 function IncomeExpensesPageWrapper() {
@@ -73,12 +79,18 @@ function Router() {
       <Route path="/admin/totals/all" component={TotalsPage} />
       <Route path="/admin/cars/:id/records" component={RecordsPage} />
       <Route path="/admin/cars/:carId/records/:recordId/files" component={ViewRecordFilesPage} />
+      <Route path="/admin/payments" component={PaymentsMainPage} />
+      <Route path="/admin/payment-status" component={PaymentStatusPage} />
       <Route path="/admin/cars/:id/payments" component={PaymentsPage} />
       <Route path="/admin/cars/:id/income-expense/log" component={IncomeExpenseLogPage} />
       <Route path="/admin/cars/:id/income-expense" component={CarIncomeExpensePage} />
       <Route path="/admin/cars/:id" component={CarDetailPage} />
       <Route path="/admin/income-expenses" component={IncomeExpensesPageWrapper} />
       <Route path="/admin/settings" component={SettingsPage} />
+      <Route path="/admin/hr" component={HumanResourcesPage} />
+      <Route path="/admin/hr/employees/view" component={EmployeeViewPage} />
+      <Route path="/admin/hr/employees" component={EmployeesPage} />
+      <Route path="/employee-form" component={EmployeeFormPage} />
       <Route path="/profile" component={ClientProfilePage} />
       <Route path="/admin/training-manual" component={TrainingManualPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />

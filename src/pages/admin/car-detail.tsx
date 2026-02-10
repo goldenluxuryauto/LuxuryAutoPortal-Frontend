@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Car, Upload, X, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square, FileText, Star } from "lucide-react";
+import { ArrowLeft, Car, Upload, X, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square, FileText, Star, Plus, Minus } from "lucide-react";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -40,6 +40,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+
+/**
+ * Extract Turo vehicle ID from a Turo listing URL.
+ * Turo URLs typically end with the vehicle ID: .../location/make/model/ID
+ */
+function extractTuroVehicleIdFromUrl(url: string | null | undefined): string | null {
+  if (!url || typeof url !== "string") return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  try {
+    const href = trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
+    const u = new URL(href);
+    const pathSegments = u.pathname.split("/").filter(Boolean);
+    const last = pathSegments[pathSegments.length - 1];
+    if (last && /^\d+$/.test(last)) return last;
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Fetch document URL with credentials and return a blob URL for display.
@@ -166,6 +186,7 @@ interface CarDetail {
   photos?: string[];
   turoLink?: string | null;
   adminTuroLink?: string | null;
+  turoVehicleIds?: string[] | null;
   managementStatus?: "management" | "own" | "off_ride";
   // Vehicle Information fields from car table
   interiorColor?: string | null;
@@ -236,6 +257,7 @@ const carSchema = z.object({
   // Car Links
   turoLink: z.string().optional(),
   adminTuroLink: z.string().optional(),
+  turoVehicleIds: z.array(z.string()).max(10).optional(),
   // Car Status (admin-only)
   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
   // Management Status (admin-only)
@@ -638,6 +660,7 @@ export default function CarDetailPage() {
       password: "",
       turoLink: "",
       adminTuroLink: "",
+      turoVehicleIds: [],
       status: "ACTIVE",
       managementStatus: "own",
       offboardAt: "",
@@ -715,6 +738,7 @@ export default function CarDetailPage() {
       // Car Links - Always send all fields to ensure backend can update them
       formData.append("turoLink", data.turoLink || "");
       formData.append("adminTuroLink", data.adminTuroLink || "");
+      formData.append("turoVehicleIds", JSON.stringify((data.turoVehicleIds || []).filter((id): id is string => typeof id === "string" && id.trim().length > 0)));
       // Car Status (admin-only) - Always send if admin and value is provided
       if (isAdmin && data.status) {
         formData.append("status", data.status);
@@ -1182,6 +1206,14 @@ export default function CarDetailPage() {
       // Car Links
       turoLink: car.turoLink || "",
       adminTuroLink: car.adminTuroLink || "",
+      turoVehicleIds: (() => {
+        const dbIds = (car.turoVehicleIds || []).filter((id): id is string => typeof id === "string" && id.trim().length > 0);
+        if (dbIds.length > 0) return [...dbIds];
+        const fromLink = extractTuroVehicleIdFromUrl(car.turoLink);
+        const fromAdmin = extractTuroVehicleIdFromUrl(car.adminTuroLink);
+        const extracted = [...new Set([fromLink, fromAdmin].filter((id): id is string => Boolean(id)))];
+        return extracted.length > 0 ? extracted : [];
+      })(),
       // Car Status
       status: (car.status || "ACTIVE") as "ACTIVE" | "INACTIVE",
       // Management Status
@@ -1931,6 +1963,27 @@ export default function CarDetailPage() {
                       )}
                 </div>
               )}
+                  {isAdmin && (
+                  <div>
+                      <p className="text-xs text-gray-500 mb-1">Turo Vehicle IDs</p>
+                      {(() => {
+                        const dbIds = (car.turoVehicleIds || []).filter((id): id is string => typeof id === "string" && id.trim().length > 0);
+                        const fromTuroLink = extractTuroVehicleIdFromUrl(car.turoLink);
+                        const fromAdminLink = extractTuroVehicleIdFromUrl(car.adminTuroLink);
+                        const allIds = [...new Set([...dbIds, fromTuroLink, fromAdminLink].filter((id): id is string => Boolean(id)))];
+                        return allIds.length > 0 ? (
+                          <div className="space-y-1">
+                            {allIds.map((id, idx) => (
+                              <p key={idx} className="text-white text-sm font-mono">{id}</p>
+                            ))}
+                            <p className="text-xs text-gray-500">({allIds.length} of 10 max — for automation{fromTuroLink || fromAdminLink ? ", includes IDs from links" : ""})</p>
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 text-base">Not provided</p>
+                        );
+                      })()}
+                </div>
+              )}
                 </div>
             </CardContent>
           </Card>
@@ -2489,13 +2542,14 @@ export default function CarDetailPage() {
                     disabled={uploadingPhotos}
                     className="hidden"
                     id="photo-upload"
+                    title="Select one or more images (JPEG, PNG, GIF, WebP - max 10MB each)"
                   />
                   <Button
                     asChild
                     className="bg-[#EAEB80] text-black hover:bg-[#d4d570]"
                     disabled={uploadingPhotos}
                   >
-                    <label htmlFor="photo-upload" className="cursor-pointer">
+                    <label htmlFor="photo-upload" className="cursor-pointer" title="Select multiple images to upload at once">
                       {uploadingPhotos ? (
                         <>
                           Uploading...
@@ -2679,8 +2733,8 @@ export default function CarDetailPage() {
             ) : (
               <div className="flex items-center justify-center py-16">
                 <p className="text-gray-400 text-center">
-                  No photos uploaded. {isAdmin && "Upload photos to get started."}
-              </p>
+                  No photos uploaded. {isAdmin && "Upload one or multiple photos (up to 20) to get started."}
+                </p>
               </div>
             )}
           </CardContent>
@@ -3541,6 +3595,78 @@ export default function CarDetailPage() {
                           </FormItem>
                         )}
                       />
+                    )}
+                    {isAdmin && (
+                      <div className="space-y-2">
+                        <FormLabel className="text-gray-400">Turo Vehicle IDs (5–10 for automation)</FormLabel>
+                        <p className="text-xs text-gray-500">Add up to 10 Turo Vehicle IDs for the automation process.</p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="border-[#2a2a2a] text-gray-400 hover:text-[#EAEB80] hover:border-[#EAEB80] mb-2"
+                          onClick={() => {
+                            const turoLink = form.getValues("turoLink");
+                            const adminTuroLink = form.getValues("adminTuroLink");
+                            const fromLink = extractTuroVehicleIdFromUrl(turoLink);
+                            const fromAdmin = extractTuroVehicleIdFromUrl(adminTuroLink);
+                            const newIds = [fromLink, fromAdmin].filter((id): id is string => Boolean(id));
+                            if (newIds.length === 0) return;
+                            const current = (form.getValues("turoVehicleIds") || []).filter((id): id is string => typeof id === "string" && id.trim().length > 0);
+                            const merged = [...new Set([...current, ...newIds])].slice(0, 10);
+                            form.setValue("turoVehicleIds", merged);
+                          }}
+                        >
+                          Extract from Turo links
+                        </Button>
+                        {form.watch("turoVehicleIds")?.map((_, index) => (
+                          <div key={index} className="flex gap-2 items-center">
+                            <FormField
+                              control={form.control}
+                              name={`turoVehicleIds.${index}`}
+                              render={({ field }) => (
+                                <FormItem className="flex-1">
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder={`Vehicle ID ${index + 1}`}
+                                      className="bg-[#1a1a1a] border-[#2a2a2a] text-white focus:border-[#EAEB80] font-mono"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="text-gray-400 hover:text-red-400 shrink-0"
+                              onClick={() => {
+                                const current = form.getValues("turoVehicleIds") || [];
+                                form.setValue("turoVehicleIds", current.filter((_, i) => i !== index));
+                              }}
+                            >
+                              <Minus className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                        {(form.watch("turoVehicleIds")?.length ?? 0) < 10 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="border-[#2a2a2a] text-gray-400 hover:text-[#EAEB80] hover:border-[#EAEB80]"
+                            onClick={() => {
+                              const current = form.getValues("turoVehicleIds") || [];
+                              form.setValue("turoVehicleIds", [...current, ""]);
+                            }}
+                          >
+                            <Plus className="w-4 h-4 mr-1" />
+                            Add Turo Vehicle ID
+                          </Button>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

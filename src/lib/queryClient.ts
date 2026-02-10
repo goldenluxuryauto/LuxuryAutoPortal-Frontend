@@ -72,6 +72,26 @@ export function buildApiUrl(path: string): string {
 }
 
 /**
+ * Build URL for file upload endpoints (multipart/form-data).
+ * In dev with Vite proxy, the proxy does not forward multipart bodies correctly.
+ * This uses the direct backend URL to bypass the proxy for uploads.
+ * Use VITE_BACKEND_URL to override (default: http://localhost:3000 in dev).
+ */
+export function buildUploadApiUrl(path: string): string {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  // When API_BASE_URL is set, all requests go directly - use normal buildApiUrl
+  if (API_BASE_URL) {
+    return buildApiUrl(path);
+  }
+  // In dev with proxy: use direct backend URL for uploads (proxy strips multipart body)
+  if (import.meta.env.DEV) {
+    const backendUrl = (import.meta.env.VITE_BACKEND_URL || "http://localhost:3000").replace(/\/$/, "");
+    return `${backendUrl}${normalizedPath}`;
+  }
+  return normalizedPath;
+}
+
+/**
  * Convert a Google Cloud Storage URL to a proxy URL to avoid CORS issues.
  * If the URL is not a GCS URL, returns it as-is.
  * 
@@ -114,6 +134,35 @@ export function getProxiedImageUrl(url: string): string {
 
   // Local path - use buildApiUrl to proxy through backend
   return buildApiUrl(normalizedUrl.startsWith("/") ? normalizedUrl : `/${normalizedUrl}`);
+}
+
+/**
+ * Get display URL for an employee document (photo, driver license, car insurance).
+ * Handles: Google Drive file ID, direct URL, or JSON array format.
+ */
+export function getEmployeeDocumentUrl(value: string | null | undefined): string | null {
+  if (!value || !value.trim()) return null;
+  const trimmed = value.trim();
+  // Direct URL
+  if (trimmed.startsWith("http")) return trimmed;
+  // JSON array format
+  try {
+    const parsed = JSON.parse(trimmed);
+    const arr = Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
+    const first = arr[0];
+    if (first?.url) return first.url;
+    if (typeof first?.id === "string") {
+      if (first.id.startsWith("http")) return first.id;
+      return buildApiUrl(`/api/employees/drive-file?fileId=${encodeURIComponent(first.id)}`);
+    }
+  } catch {
+    // Not JSON, treat as Drive file ID
+  }
+  // Plain Drive file ID (alphanumeric, no slashes)
+  if (trimmed.length > 10 && !trimmed.includes("/")) {
+    return buildApiUrl(`/api/employees/drive-file?fileId=${encodeURIComponent(trimmed)}`);
+  }
+  return null;
 }
 
 async function throwIfResNotOk(res: Response) {
@@ -278,6 +327,21 @@ export const getQueryFn = <T,>({ on401: unauthorizedBehavior }: {
       }
     };
 
+/**
+ * Retry failed queries only for transient network errors (e.g. ERR_NETWORK_CHANGED).
+ * Do not retry on 4xx/5xx or other application errors.
+ */
+function shouldRetryOnError(failureCount: number, error: unknown): boolean {
+  if (failureCount >= 3) return false;
+  // Retry on network errors: Failed to fetch, ERR_NETWORK_CHANGED, connection reset, etc.
+  if (error instanceof TypeError && error.message === "Failed to fetch") return true;
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase();
+    if (msg.includes("network") || msg.includes("connection") || msg.includes("load failed")) return true;
+  }
+  return false;
+}
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -285,7 +349,8 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
-      retry: false,
+      retry: shouldRetryOnError,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
       // Don't throw errors by default - let components handle them
       throwOnError: false,
       // Add timeout to prevent queries from hanging indefinitely

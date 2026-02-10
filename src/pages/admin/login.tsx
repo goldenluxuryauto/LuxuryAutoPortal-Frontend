@@ -83,7 +83,7 @@ export default function AdminLogin() {
 
         <div className="text-center mb-10">
           <img 
-            src="/logo.svg" 
+            src="/logo.png" 
             alt="Golden Luxury Auto" 
             className="h-[240px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_15px_rgba(234,235,128,0.5)]"
           />

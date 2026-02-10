@@ -165,7 +165,7 @@ function CarCard({ car }: { car: Partial<Car> }) {
 
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="w-4 h-4 text-primary/70" />
+            <Calendar className="w-4 h-4 text-white" />
             <span>{car.year}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
