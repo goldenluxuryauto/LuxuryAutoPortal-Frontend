@@ -43,6 +43,9 @@ export default function ExpenseFormSubmission() {
     remarks: "",
   });
   const [receiptFiles, setReceiptFiles] = useState<File[]>([]);
+  const [carSearch, setCarSearch] = useState("");
+  const [carDropdownOpen, setCarDropdownOpen] = useState(false);
+  const [isDraggingReceipts, setIsDraggingReceipts] = useState(false);
 
   const { data: optionsData, isLoading: optionsLoading } = useQuery({
     queryKey: ["/api/expense-form-submissions/options"],
@@ -74,6 +77,17 @@ export default function ExpenseFormSubmission() {
   useEffect(() => {
     setFormData((prev) => ({ ...prev, field: "" }));
   }, [formData.category]);
+
+  // Derive Year and Month from Date of receipt (single source of truth)
+  useEffect(() => {
+    const d = formData.submissionDate ? new Date(formData.submissionDate) : new Date();
+    if (isNaN(d.getTime())) return;
+    setFormData((prev) => ({
+      ...prev,
+      year: d.getFullYear().toString(),
+      month: (d.getMonth() + 1).toString(),
+    }));
+  }, [formData.submissionDate]);
 
   // Default Employee Name to current user/account owner (client requirement)
   // Use optionsData as dep only (avoid employees - new [] ref each render when loading)
@@ -204,18 +218,19 @@ export default function ExpenseFormSubmission() {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-gray-400">Date *</Label>
-              <Input
-                type="date"
-                value={formData.submissionDate}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, submissionDate: e.target.value }))
-                }
-                className="bg-[#111111] border-[#2a2a2a] text-white mt-1"
-                required
-              />
-            </div>
+          <div>
+            <Label className="text-gray-400">Date of receipt *</Label>
+            <Input
+              type="date"
+              value={formData.submissionDate}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, submissionDate: e.target.value }))
+              }
+              className="bg-[#111111] border-[#2a2a2a] text-white mt-1"
+              required
+            />
+            <p className="text-xs text-gray-500 mt-0.5">Year and Month are derived from this date.</p>
+          </div>
             <div>
               <Label className="text-gray-400">Employee Name *</Label>
               {isEmployeeOnly ? (
@@ -251,23 +266,61 @@ export default function ExpenseFormSubmission() {
             </div>
           </div>
 
-          <div>
+          <div className="relative">
             <Label className="text-gray-400">Car *</Label>
-            <Select
-              value={formData.carId}
-              onValueChange={(v) => setFormData((prev) => ({ ...prev, carId: v }))}
-            >
-              <SelectTrigger className="bg-[#111111] border-[#2a2a2a] text-white mt-1">
-                <SelectValue placeholder="Select car (Make Model Year - Plate - VIN)" />
-              </SelectTrigger>
-              <SelectContent>
-                {cars.map((car: { id: number; name: string; displayName?: string }) => (
-                  <SelectItem key={car.id} value={String(car.id)}>
-                    {car.displayName ?? car.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <p className="text-xs text-gray-500 mt-0.5 mb-1">Type car name, VIN, or plate number to search.</p>
+            <Input
+              value={
+                carDropdownOpen
+                  ? carSearch
+                  : formData.carId
+                    ? (cars as { id: number; name: string; displayName?: string }[]).find((c) => String(c.id) === formData.carId)?.displayName ??
+                      (cars as { id: number; name: string }[]).find((c) => String(c.id) === formData.carId)?.name ??
+                      ""
+                    : carSearch
+              }
+              onChange={(e) => {
+                setCarSearch(e.target.value);
+                setCarDropdownOpen(true);
+                if (!e.target.value) setFormData((prev) => ({ ...prev, carId: "" }));
+              }}
+              onFocus={() => setCarDropdownOpen(true)}
+              onBlur={() => setTimeout(() => setCarDropdownOpen(false), 150)}
+              placeholder="Type car name, VIN, or plate number..."
+              className="bg-[#111111] border-[#2a2a2a] text-white mt-1"
+            />
+            {carDropdownOpen && (
+              <div className="absolute z-10 mt-1 w-full max-h-48 overflow-auto rounded-md border border-[#2a2a2a] bg-[#111111] shadow-lg">
+                {(cars as { id: number; name: string; displayName?: string }[])
+                  .filter((car) => {
+                    const name = ((car.displayName ?? car.name) || "").toLowerCase();
+                    const q = carSearch.trim().toLowerCase();
+                    return !q || name.includes(q);
+                  })
+                  .map((car) => (
+                    <button
+                      key={car.id}
+                      type="button"
+                      className="w-full px-3 py-2 text-left text-sm text-white hover:bg-[#2a2a2a]"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setFormData((prev) => ({ ...prev, carId: String(car.id) }));
+                        setCarSearch(car.displayName ?? car.name);
+                        setCarDropdownOpen(false);
+                      }}
+                    >
+                      {car.displayName ?? car.name}
+                    </button>
+                  ))}
+                {cars.filter((c: { id: number; name: string; displayName?: string }) => {
+                  const name = ((c.displayName ?? c.name) || "").toLowerCase();
+                  const q = carSearch.trim().toLowerCase();
+                  return !q || name.includes(q);
+                }).length === 0 && (
+                  <div className="px-3 py-2 text-sm text-gray-500">No matching car. Type name, VIN, or plate.</div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -357,18 +410,57 @@ export default function ExpenseFormSubmission() {
 
           <div>
             <Label className="text-gray-400">Upload Receipts</Label>
-            <div className="flex items-center gap-2 mt-1">
-              <Input
+            <p className="text-xs text-gray-500 mt-0.5 mb-1">Drag photos here or click to browse.</p>
+            <div
+              className={`mt-1 flex items-center justify-center gap-2 rounded-md border-2 border-dashed px-4 py-6 transition-colors ${
+                isDraggingReceipts
+                  ? "border-[#EAEB80] bg-[#2a2a2a]"
+                  : "border-[#2a2a2a] bg-[#111111] hover:border-gray-600"
+              }`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDraggingReceipts(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDraggingReceipts(false);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDraggingReceipts(false);
+                const files = e.dataTransfer?.files ? Array.from(e.dataTransfer.files) : [];
+                const accepted = files.filter(
+                  (f) => f.type.startsWith("image/") || f.name.toLowerCase().endsWith(".pdf")
+                );
+                if (accepted.length < files.length) {
+                  toast({ title: "Some files were skipped. Only images and PDF are accepted.", variant: "default" });
+                }
+                setReceiptFiles((prev) => [...prev, ...accepted]);
+              }}
+              onClick={() => document.getElementById("expense-receipt-file-input")?.click()}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === "Enter" && document.getElementById("expense-receipt-file-input")?.click()}
+            >
+              <input
+                id="expense-receipt-file-input"
                 type="file"
                 accept="image/*,.pdf"
                 multiple
+                className="hidden"
                 onChange={(e) => {
                   const files = e.target.files ? Array.from(e.target.files) : [];
                   setReceiptFiles((prev) => [...prev, ...files]);
+                  e.target.value = "";
                 }}
-                className="bg-[#111111] border-[#2a2a2a] text-white"
               />
-              <Upload className="w-4 h-4 text-gray-500" />
+              <Upload className="w-5 h-5 text-gray-500 shrink-0" />
+              <span className="text-sm text-gray-400">
+                {receiptFiles.length > 0 ? `${receiptFiles.length} file(s) chosen` : "Choose files"}
+              </span>
             </div>
             {receiptFiles.length > 0 && (
               <p className="text-xs text-gray-500 mt-1">

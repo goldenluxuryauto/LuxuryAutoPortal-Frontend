@@ -543,9 +543,21 @@ export default function FormsPage() {
       setShowDeclineModal(false);
       setDeclineReason("");
       setSubmissionToDecline(null);
-      // Invalidate and refetch submissions
-      queryClient.invalidateQueries({ queryKey: ["onboarding-submissions"] });
-      // Also invalidate cars list queries so cars page updates (car status changes when approved)
+      // Update the submission in the table cache so the row remains with new status (data stays in table)
+      const newStatus = variables.action === "approve" ? "approved" : "rejected";
+      queryClient.setQueriesData(
+        { queryKey: ["onboarding-submissions"] },
+        (old: { data?: OnboardingSubmission[]; pagination?: { total: number }; success?: boolean } | undefined) => {
+          if (!old?.data) return old;
+          return {
+            ...old,
+            data: old.data.map((s) =>
+              s.id === variables.id ? { ...s, status: newStatus } : s
+            ),
+          };
+        }
+      );
+      // Invalidate cars list so cars page updates (car status changes when approved)
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
       // Invalidate sidebar badges (car counts may change)
       queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
@@ -823,7 +835,7 @@ export default function FormsPage() {
       icon: FileCheck,
     };
 
-    // Admin: Client Onboarding + Employee Forms (only Approval Dashboard, no submission form)
+    // Admin: Client Onboarding + Employee Forms (Income & Expenses Form at bottom hidden)
     if (formVisibilityData?.isAdmin) {
       return [
         {
@@ -834,7 +846,7 @@ export default function FormsPage() {
         },
         {
           id: "employee-forms",
-          title: "Employee Forms",
+          title: "Income & Expenses Form",
           icon: DollarSign,
           items: [approvalDashboardItem],
         },
@@ -846,7 +858,7 @@ export default function FormsPage() {
       return [
         {
           id: "employee-forms",
-          title: "Employee Forms",
+          title: "Income & Expenses Form",
           icon: DollarSign,
           items: [expenseReceiptItem],
         },
@@ -906,7 +918,7 @@ export default function FormsPage() {
       },
       {
         id: "employee-forms",
-        title: "Employee Forms",
+        title: "Employee Onboarding Forms",
         icon: DollarSign,
         items: [expenseReceiptItem],
       },

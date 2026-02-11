@@ -3,7 +3,7 @@
  * Admins can approve, decline, edit, and delete pending submissions
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -49,6 +49,75 @@ const CATEGORY_LABELS: Record<string, string> = {
   reimbursedBills: "Reimbursed Bills",
   income: "Income",
 };
+
+/** Loads receipt from API with credentials and displays as image (fixes broken image when API is cross-origin). */
+function ReceiptImage({
+  url,
+  alt,
+  className,
+}: {
+  url: string;
+  alt: string;
+  className?: string;
+}) {
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let revoked = false;
+    let objectUrl: string | null = null;
+    setLoading(true);
+    setError(null);
+    setBlobUrl(null);
+    fetch(url, { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status === 404 ? "File not found" : `Failed to load (${res.status})`);
+        return res.blob();
+      })
+      .then((blob) => {
+        if (revoked) return;
+        objectUrl = URL.createObjectURL(blob);
+        setBlobUrl(objectUrl);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (!revoked) {
+          setError(err instanceof Error ? err.message : "Failed to load receipt");
+          setLoading(false);
+        }
+      });
+    return () => {
+      revoked = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [url]);
+
+  if (loading) {
+    return (
+      <div className={`flex items-center justify-center rounded border border-[#2a2a2a] bg-[#0d0d0d] min-h-[120px] ${className ?? ""}`}>
+        <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className={`rounded border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300 ${className ?? ""}`}>
+        {error}
+      </div>
+    );
+  }
+  if (blobUrl) {
+    return (
+      <img
+        src={blobUrl}
+        alt={alt}
+        className={className}
+      />
+    );
+  }
+  return null;
+}
 
 const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -119,7 +188,15 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
     },
   });
 
-  const submissions: Submission[] = Array.isArray(data?.data) ? data.data : [];
+  // Normalize list from API: ensure receiptUrls is set (API may send receipt_urls or receiptUrls)
+  const rawList = Array.isArray(data?.data) ? data.data : [];
+  const submissions: Submission[] = rawList.map((sub: Record<string, unknown>) => ({
+    ...sub,
+    receiptUrls:
+      (sub.receiptUrls as string[] | null) ??
+      (Array.isArray(sub.receipt_urls) ? (sub.receipt_urls as string[]) : null) ??
+      null,
+  })) as Submission[];
   const pagination = data?.pagination || { page: 1, total: 0, totalPages: 0 };
 
   const approveMutation = useMutation({
@@ -310,6 +387,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                 <TableHead className="text-gray-400">Status</TableHead>
                 <TableHead className="text-gray-400">Remarks</TableHead>
                 <TableHead className="text-gray-400">Decline Reason</TableHead>
+                <TableHead className="text-gray-400">Receipt</TableHead>
                 {isAdmin && <TableHead className="text-gray-400 text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
@@ -322,7 +400,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                   <TableCell className="text-white text-sm">
                     {sub.employeeName || "-"}
                   </TableCell>
-                  <TableCell className="text-white text-sm max-w-[200px] truncate" title={sub.carDisplayName}>
+                  <TableCell className="text-white text-sm min-w-[220px] max-w-[320px] break-words whitespace-normal" title={sub.carDisplayName || undefined}>
                     {sub.carDisplayName || "-"}
                   </TableCell>
                   <TableCell className="text-white text-sm">
@@ -357,23 +435,28 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                   <TableCell className="text-red-400/80 text-sm max-w-[150px] truncate" title={sub.declineReason || undefined}>
                     {sub.status === "declined" && sub.declineReason ? sub.declineReason : "—"}
                   </TableCell>
+                  <TableCell className="text-sm">
+                    {sub.receiptUrls && sub.receiptUrls.length > 0 ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                        onClick={() => {
+                          setSelectedSubmission(sub);
+                          setViewReceiptsOpen(true);
+                        }}
+                        title="View copy of receipt"
+                      >
+                        <Eye className="w-4 h-4 mr-1 inline" />
+                        View
+                      </Button>
+                    ) : (
+                      <span className="text-gray-500">No receipt</span>
+                    )}
+                  </TableCell>
                   {isAdmin && (
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
-                        {sub.receiptUrls && sub.receiptUrls.length > 0 && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-[#EAEB80]"
-                            onClick={() => {
-                              setSelectedSubmission(sub);
-                              setViewReceiptsOpen(true);
-                            }}
-                            title="View receipts"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        )}
                         {sub.status === "pending" && (
                           <>
                             <Button
@@ -462,7 +545,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
       <Dialog open={viewReceiptsOpen} onOpenChange={setViewReceiptsOpen}>
         <DialogContent className="bg-[#111111] border-[#2a2a2a] max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-[#EAEB80]">Receipts</DialogTitle>
+            <DialogTitle className="text-[#EAEB80]">View copy of receipt</DialogTitle>
             <DialogDescription>
               {selectedSubmission?.employeeName} - ${selectedSubmission?.amount?.toLocaleString()}
               {selectedSubmission?.remarks && ` • Remarks: ${selectedSubmission.remarks}`}
@@ -480,30 +563,37 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                 ? buildApiUrl(`/api/expense-form-submissions/receipt/file?fileId=${encodeURIComponent(urlOrId)}`)
                 : urlOrId;
               const isPdf = urlOrId?.match(/\.pdf$/i);
+              const receiptLabel = `Receipt ${i + 1}`;
+              if (isPdf) {
+                return (
+                  <a
+                    key={i}
+                    href={displayUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-[#EAEB80] hover:underline"
+                  >
+                    <ExternalLink className="w-4 h-4" /> {receiptLabel} (PDF)
+                  </a>
+                );
+              }
               return (
-                <a
-                  key={i}
-                  href={displayUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                >
-                  {isPdf ? (
-                    <span className="flex items-center gap-2 text-[#EAEB80] hover:underline">
-                      <ExternalLink className="w-4 h-4" /> Receipt {i + 1} (PDF)
-                    </span>
-                  ) : isDriveFileId ? (
-                    <span className="flex items-center gap-2 text-[#EAEB80] hover:underline">
-                      <ExternalLink className="w-4 h-4" /> View Receipt {i + 1}
-                    </span>
-                  ) : (
-                    <img
-                      src={displayUrl}
-                      alt={`Receipt ${i + 1}`}
-                      className="max-h-48 rounded border border-[#2a2a2a] object-contain"
-                    />
-                  )}
-                </a>
+                <div key={i} className="space-y-1">
+                  <p className="text-sm text-gray-400">{receiptLabel}</p>
+                  <ReceiptImage
+                    url={displayUrl}
+                    alt={receiptLabel}
+                    className="max-h-64 w-auto rounded border border-[#2a2a2a] object-contain bg-[#0d0d0d]"
+                  />
+                  <a
+                    href={displayUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-[#EAEB80] hover:underline"
+                  >
+                    <ExternalLink className="w-3 h-3" /> Open in new tab
+                  </a>
+                </div>
               );
             })}
           </div>

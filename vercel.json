@@ -4,6 +4,26 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://luxuryautoportal-replit-1.onrender.com/api/:path*"
+    },
+    {
+      "source": "/contracts/:path*",
+      "destination": "https://luxuryautoportal-replit-1.onrender.com/contracts/:path*"
+    },
+    {
+      "source": "/signed-contracts/:path*",
+      "destination": "https://luxuryautoportal-replit-1.onrender.com/signed-contracts/:path*"
+    },
+    {
+      "source": "/car-photos/:path*",
+      "destination": "https://luxuryautoportal-replit-1.onrender.com/car-photos/:path*"
+    },
+    {
+      "source": "/income-expense-images/:path*",
+      "destination": "https://luxuryautoportal-replit-1.onrender.com/income-expense-images/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

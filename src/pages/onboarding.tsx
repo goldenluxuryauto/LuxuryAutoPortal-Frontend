@@ -32,7 +32,7 @@ import {
   ChevronDown,
   Loader2,
 } from "lucide-react";
-import { buildApiUrl } from "@/lib/queryClient";
+import { buildApiUrl, buildUploadApiUrl } from "@/lib/queryClient";
 
 const onboardingSchema = z
   .object({
@@ -94,7 +94,7 @@ const onboardingSchema = z
   ultimateGoal: z.string().min(1, "Ultimate goal is required"),
   bankName: z.string().min(1, "Bank name is required"),
   taxClassification: z.string().min(1, "Tax classification is required"),
-  routingNumber: z.string().min(9, "Routing number is required"),
+  routingNumber: z.string().min(9, "Routing number is required").max(9, "Routing number must be exactly 9 digits"),
   accountNumber: z.string().min(1, "Account number is required"),
   businessName: z.string().optional(),
   ein: z.string().optional(),
@@ -312,7 +312,11 @@ export default function Onboarding() {
 
     setIsSubmitting(true);
     try {
-      const endpoint = buildApiUrl("/api/onboarding/submit");
+      // Use upload URL when sending FormData so multipart body is forwarded correctly in dev
+      const endpoint =
+        insuranceCardFile || driversLicenseFile
+          ? buildUploadApiUrl("/api/onboarding/submit")
+          : buildApiUrl("/api/onboarding/submit");
       
       // Use FormData if there are files, otherwise use JSON
       let requestBody: FormData | string;
@@ -1920,6 +1924,7 @@ export default function Onboarding() {
                                     <Input
                                       {...field}
                                       placeholder="9 digits"
+                                      maxLength={9}
                                       className="bg-[#0a0a0a] border-gray-700"
                                     />
                                   </FormControl>
