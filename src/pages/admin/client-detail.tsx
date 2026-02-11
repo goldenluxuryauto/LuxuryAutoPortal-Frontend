@@ -169,7 +169,7 @@ export default function ClientDetailPage() {
   
   // Upload contract modal state
   const [isUploadContractOpen, setIsUploadContractOpen] = useState(false);
-  const [uploadContractFormErrors, setUploadContractFormErrors] = useState<{ selectedCarId?: string }>({});
+  const [uploadContractFormErrors, setUploadContractFormErrors] = useState<{ selectedCarId?: string; contractFile?: string }>({});
   const [uploadContractForm, setUploadContractForm] = useState({
     contractFile: null as File | null,
     selectedCarId: "" as string,
@@ -492,11 +492,17 @@ export default function ClientDetailPage() {
     },
   });
 
+  const CONTRACT_MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+
   // Upload contract mutation
   const uploadContractMutation = useMutation({
     mutationFn: async (formData: typeof uploadContractForm) => {
       if (!clientId) throw new Error("Invalid client ID");
       if (!formData.contractFile) throw new Error("Please select a PDF file to upload");
+      if (formData.contractFile.size > CONTRACT_MAX_SIZE_BYTES) {
+        setUploadContractFormErrors({ contractFile: "You can upload files under 10MB" });
+        throw new Error("You can upload files under 10MB");
+      }
       if (!formData.selectedCarId) {
         setUploadContractFormErrors({ selectedCarId: "Please select a car" });
         throw new Error("Please select a car");
@@ -2587,7 +2593,14 @@ export default function ClientDetailPage() {
                   accept=".pdf,application/pdf"
                   onChange={(e) => {
                     const file = e.target.files?.[0] || null;
-                    setUploadContractForm({ ...uploadContractForm, contractFile: file });
+                    setUploadContractFormErrors((prev) => ({ ...prev, contractFile: undefined }));
+                    if (file && file.size > CONTRACT_MAX_SIZE_BYTES) {
+                      setUploadContractFormErrors((prev) => ({ ...prev, contractFile: "You can upload files under 10MB" }));
+                      setUploadContractForm({ ...uploadContractForm, contractFile: null });
+                      e.target.value = "";
+                    } else {
+                      setUploadContractForm({ ...uploadContractForm, contractFile: file });
+                    }
                   }}
                   className="block w-full text-sm text-muted-foreground
                     file:mr-4 file:py-2 file:px-4
@@ -2605,7 +2618,10 @@ export default function ClientDetailPage() {
                     Selected: {uploadContractForm.contractFile.name}
                   </p>
                 )}
-                <p className="text-xs text-foreground0 mt-1">Upload a PDF file from your local device (max 5MB)</p>
+                {uploadContractFormErrors.contractFile && (
+                  <p className="text-xs text-red-400 mt-1">{uploadContractFormErrors.contractFile}</p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">Upload a PDF file from your local device (max 10MB)</p>
               </div>
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-border">
