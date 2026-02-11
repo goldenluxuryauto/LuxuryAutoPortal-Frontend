@@ -7,30 +7,24 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
  * - Prod: prefer `VITE_API_URL`; if missing, fall back to known backend URL (Vercel) or same-origin
  */
 const computeApiBaseUrl = () => {
+  // In production on Vercel, use relative URLs so vercel.json rewrites proxy /api to backend (same-origin, credentials work)
+  if (import.meta.env.PROD && typeof window !== 'undefined' && window.location.origin.includes('vercel.app')) {
+    return "";
+  }
+
   if (import.meta.env.VITE_API_URL) {
     const url = import.meta.env.VITE_API_URL.replace(/\/$/, "");
     console.log(`[API] Using VITE_API_URL: ${url}`);
     return url;
   }
 
-  // In production, if VITE_API_URL is not set, use fallback backend URL
-  // This is a temporary fallback - VITE_API_URL should be set in Vercel
+  // In production on other domains, use fallback backend URL
   if (import.meta.env.PROD && typeof window !== 'undefined') {
     const currentOrigin = window.location.origin;
-
-    // If accessing from Vercel, use known backend URL as fallback
-    if (currentOrigin.includes('vercel.app')) {
+    if (!currentOrigin.includes('localhost') && !currentOrigin.includes('127.0.0.1')) {
       const fallbackUrl = 'https://luxuryautoportal-replit-1.onrender.com';
       console.warn(`⚠️ [API] VITE_API_URL not set! Using fallback backend URL: ${fallbackUrl}`);
-      console.warn(`⚠️ [API] Please set VITE_API_URL in Vercel environment variables to: ${fallbackUrl}`);
       return fallbackUrl;
-    }
-
-    // For other production domains, try current origin (for same-origin setups)
-    if (!currentOrigin.includes('localhost') && !currentOrigin.includes('127.0.0.1')) {
-      console.warn(`⚠️ [API] VITE_API_URL not set! Using current origin as fallback: ${currentOrigin}`);
-      console.warn(`⚠️ [API] If API calls fail, please set VITE_API_URL environment variable`);
-      return currentOrigin;
     }
   }
 
