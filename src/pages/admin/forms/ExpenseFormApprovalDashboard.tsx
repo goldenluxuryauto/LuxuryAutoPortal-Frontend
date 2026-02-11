@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -434,6 +435,25 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                   </TableCell>
                   <TableCell className="text-red-700/80 text-sm max-w-[150px] truncate" title={sub.declineReason || undefined}>
                     {sub.status === "declined" && sub.declineReason ? sub.declineReason : "—"}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {sub.receiptUrls && sub.receiptUrls.length > 0 ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                        onClick={() => {
+                          setSelectedSubmission(sub);
+                          setViewReceiptsOpen(true);
+                        }}
+                        title="View copy of receipt"
+                      >
+                        <Eye className="w-4 h-4 mr-1 inline" />
+                        View
+                      </Button>
+                    ) : (
+                      <span className="text-gray-500">No receipt</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-sm">
                     {sub.receiptUrls && sub.receiptUrls.length > 0 ? (

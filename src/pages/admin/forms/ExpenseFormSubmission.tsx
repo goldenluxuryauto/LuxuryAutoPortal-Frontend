@@ -232,7 +232,7 @@ export default function ExpenseFormSubmission() {
             <p className="text-xs text-gray-500 mt-0.5">Year and Month are derived from this date.</p>
           </div>
             <div>
-              <Label className="text-muted-foreground">Employee Name *</Label>
+              <Label className="text-gray-400">Employee Name *</Label>
               {isEmployeeOnly ? (
                 <Input
                   readOnly
