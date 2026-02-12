@@ -635,7 +635,7 @@ export default function NADADepreciationPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-primary hover:underline"
+            className="mt-4 text-blue-700 hover:underline"
           >
             ← Back to View Car
           </button>
@@ -709,15 +709,15 @@ export default function NADADepreciationPage() {
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-xs text-foreground0">Car Name:</span>
+                    <span className="text-xs text-muted-foreground">Car Name:</span>
                     <p className="text-sm text-muted-foreground">{carName}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-foreground0">VIN #:</span>
+                    <span className="text-xs text-muted-foreground">VIN #:</span>
                     <p className="text-sm text-muted-foreground">{car.vin || "N/A"}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-foreground0">License:</span>
+                    <span className="text-xs text-muted-foreground">License:</span>
                     <p className="text-sm text-muted-foreground">
                       {car.licensePlate || "N/A"}
                     </p>
@@ -732,7 +732,7 @@ export default function NADADepreciationPage() {
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-xs text-foreground0">Name:</span>
+                    <span className="text-xs text-muted-foreground">Name:</span>
                     {car?.clientId ? (
                       <button
                         onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
@@ -745,11 +745,11 @@ export default function NADADepreciationPage() {
                     )}
                   </div>
                   <div>
-                    <span className="text-xs text-foreground0">Contact #:</span>
+                    <span className="text-xs text-muted-foreground">Contact #:</span>
                     <p className="text-sm text-muted-foreground">{ownerContact}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-foreground0">Email:</span>
+                    <span className="text-xs text-muted-foreground">Email:</span>
                     <p className="text-sm text-muted-foreground">{ownerEmail}</p>
                   </div>
                 </div>
@@ -762,15 +762,15 @@ export default function NADADepreciationPage() {
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-xs text-foreground0">Fuel/Gas:</span>
+                    <span className="text-xs text-muted-foreground">Fuel/Gas:</span>
                     <p className="text-sm text-muted-foreground">{fuelType}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-foreground0">Tire Size:</span>
+                    <span className="text-xs text-muted-foreground">Tire Size:</span>
                     <p className="text-sm text-muted-foreground">{tireSize}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-foreground0">Oil Type:</span>
+                    <span className="text-xs text-muted-foreground">Oil Type:</span>
                     <p className="text-sm text-muted-foreground">{oilType}</p>
                   </div>
                 </div>
@@ -788,7 +788,7 @@ export default function NADADepreciationPage() {
                         href={car.turoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary hover:underline text-sm flex items-center gap-1"
+                        className="text-blue-700 hover:underline text-sm flex items-center gap-1"
                       >
                         Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -801,7 +801,7 @@ export default function NADADepreciationPage() {
                         href={car.adminTuroLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary hover:underline text-sm flex items-center gap-1"
+                        className="text-blue-700 hover:underline text-sm flex items-center gap-1"
                       >
                         Admin Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -809,7 +809,7 @@ export default function NADADepreciationPage() {
                     </div>
                   )}
                   {!car.turoLink && !car.adminTuroLink && (
-                    <span className="text-foreground0 text-sm">
+                    <span className="text-muted-foreground text-sm">
                       No Turo links available
                     </span>
                   )}
@@ -975,7 +975,7 @@ export default function NADADepreciationPage() {
                                   ? "text-primary underline cursor-pointer hover:bg-card"
                                   : value !== 0
                             ? "text-muted-foreground font-medium"
-                            : "text-foreground0"
+                            : "text-muted-foreground"
                         )}
                       >
                               {row.isMiles
@@ -989,7 +989,7 @@ export default function NADADepreciationPage() {
                             className={cn(
                               row.current !== 0
                                 ? "text-primary font-medium"
-                          : "text-foreground0"
+                          : "text-muted-foreground"
                             )}
                           >
                         {row.isMiles 
@@ -1052,7 +1052,7 @@ export default function NADADepreciationPage() {
                           "text-right px-2 py-2 text-sm border-l border-border whitespace-nowrap",
                           value !== 0
                             ? "text-primary font-medium"
-                            : "text-foreground0"
+                            : "text-muted-foreground"
                         )}
                       >
                         {formatPercentage(value)}
@@ -1063,7 +1063,7 @@ export default function NADADepreciationPage() {
                         className={cn(
                           row.average !== 0
                             ? "text-primary font-medium"
-                            : "text-foreground0"
+                            : "text-muted-foreground"
                         )}
                       >
                         {formatPercentage(row.average)}
@@ -1074,7 +1074,7 @@ export default function NADADepreciationPage() {
                         className={cn(
                           row.current !== 0
                             ? "text-primary font-medium"
-                            : "text-foreground0"
+                            : "text-muted-foreground"
                         )}
                       >
                         {formatPercentage(row.current)}
@@ -1190,7 +1190,7 @@ export default function NADADepreciationPage() {
                                     ? "text-primary underline cursor-pointer hover:bg-card"
                                     : value !== 0
                               ? "text-muted-foreground font-medium"
-                              : "text-foreground0"
+                              : "text-muted-foreground"
                           )}
                         >
                                 {row.isMiles
@@ -1204,7 +1204,7 @@ export default function NADADepreciationPage() {
                               className={cn(
                                 row.current !== 0
                                   ? "text-primary font-medium"
-                            : "text-foreground0"
+                            : "text-muted-foreground"
                               )}
                             >
                               {row.isMiles

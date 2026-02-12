@@ -230,7 +230,7 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
                 required
               />
             </div>
-            <p className="text-xs text-foreground0">The previous rate will be auto-closed (effective end = day before this start date).</p>
+            <p className="text-xs text-muted-foreground">The previous rate will be auto-closed (effective end = day before this start date).</p>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-border2a2a2a]">
                 Cancel
@@ -400,7 +400,7 @@ export default function EmployeeViewPage() {
         <div className="p-6 text-center text-muted-foreground">
           <p>Invalid employee ID.</p>
           <Link href="/admin/hr/employees">
-            <Button variant="outline" className="mt-4 border-primary/30 text-primary">
+            <Button className="mt-4 bg-primary text-primary-foreground hover:bg-primary/80">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Employees
             </Button>
@@ -426,7 +426,7 @@ export default function EmployeeViewPage() {
         <div className="p-6 text-center">
           <p className="text-red-700">Employee not found.</p>
           <Link href="/admin/hr/employees">
-            <Button variant="outline" className="mt-4 border-primary/30 text-primary">
+            <Button className="mt-4 bg-primary text-primary-foreground hover:bg-primary/80">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Employees
             </Button>
@@ -539,7 +539,7 @@ export default function EmployeeViewPage() {
                           <button
                             type="button"
                             onClick={() => setEditBasicOpen(true)}
-                            className="flex items-center gap-2 py-2 text-primary hover:underline"
+                            className="flex items-center gap-2 py-2 text-blue-700 hover:underline"
                           >
                             <Pencil className="h-3 w-3" />
                             <span>Update</span>
@@ -547,7 +547,7 @@ export default function EmployeeViewPage() {
                         </div>
                         <div className="mt-3">
                           <div className="mb-3">
-                            <p className="font-bold text-foreground0 mb-1">Profile Photo <span className="font-normal text-gray-600">(Optional)</span></p>
+                            <p className="font-bold text-muted-foreground mb-1">Profile Photo <span className="font-normal text-gray-600">(Optional)</span></p>
                             {employee.employee_photo ? (
                               <EmployeeDocumentImage
                                 value={employee.employee_photo}
@@ -556,40 +556,40 @@ export default function EmployeeViewPage() {
                               />
                             ) : (
                               <div className="h-20 w-20 rounded-full border-2 border-border2a2a2a] flex items-center justify-center" title="No photo uploaded (optional)">
-                                <Image className="h-10 w-10 text-foreground0" />
+                                <Image className="h-10 w-10 text-muted-foreground" />
                               </div>
                             )}
                           </div>
                           <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
-                            <li className="font-bold text-foreground0">First Name:</li>
+                            <li className="font-bold text-muted-foreground">First Name:</li>
                             <li>{unspecified(employee.employee_first_name)}</li>
-                            <li className="font-bold text-foreground0">Middle Name:</li>
+                            <li className="font-bold text-muted-foreground">Middle Name:</li>
                             <li>{unspecified(employee.employee_middle_name)}</li>
-                            <li className="font-bold text-foreground0">Last Name:</li>
+                            <li className="font-bold text-muted-foreground">Last Name:</li>
                             <li>{unspecified(employee.employee_last_name)}</li>
-                            <li className="font-bold text-foreground0">Birth Date:</li>
+                            <li className="font-bold text-muted-foreground">Birth Date:</li>
                             <li>{employee.employee_birthday ? formatDate(employee.employee_birthday) : "Unspecified"}</li>
-                            <li className="font-bold text-foreground0">Marital Status:</li>
+                            <li className="font-bold text-muted-foreground">Marital Status:</li>
                             <li>{unspecified(employee.employee_marital_status)}</li>
-                            <li className="font-bold text-foreground0">Social Security Number or EIN:</li>
+                            <li className="font-bold text-muted-foreground">Social Security Number or EIN:</li>
                             <li>{unspecified(employee.employee_ssn_ein)}</li>
-                            <li className="font-bold text-foreground0">Street:</li>
+                            <li className="font-bold text-muted-foreground">Street:</li>
                             <li>{unspecified(employee.employee_street)}</li>
-                            <li className="font-bold text-foreground0">City:</li>
+                            <li className="font-bold text-muted-foreground">City:</li>
                             <li>{unspecified(employee.employee_city)}</li>
-                            <li className="font-bold text-foreground0">State:</li>
+                            <li className="font-bold text-muted-foreground">State:</li>
                             <li>{unspecified(employee.employee_state)}</li>
-                            <li className="font-bold text-foreground0">Zip Code:</li>
+                            <li className="font-bold text-muted-foreground">Zip Code:</li>
                             <li>{unspecified(employee.employee_zip_code)}</li>
-                            <li className="font-bold text-foreground0">Country:</li>
+                            <li className="font-bold text-muted-foreground">Country:</li>
                             <li>{unspecified(employee.employee_country)}</li>
-                            <li className="font-bold text-foreground0">Mobile Number:</li>
+                            <li className="font-bold text-muted-foreground">Mobile Number:</li>
                             <li>{unspecified(employee.employee_mobile_number)}</li>
-                            <li className="font-bold text-foreground0">Telephone Number:</li>
+                            <li className="font-bold text-muted-foreground">Telephone Number:</li>
                             <li>{unspecified(employee.employee_telephone)}</li>
-                            <li className="font-bold text-foreground0">Personal Email:</li>
+                            <li className="font-bold text-muted-foreground">Personal Email:</li>
                             <li className="break-words">{unspecified(employee.employee_email)}</li>
-                            <li className="font-bold text-foreground0">Shirt Size:</li>
+                            <li className="font-bold text-muted-foreground">Shirt Size:</li>
                             <li>{unspecified(employee.employee_shirt_size)}</li>
                           </ul>
                         </div>
@@ -607,7 +607,7 @@ export default function EmployeeViewPage() {
                         <button
                           type="button"
                           onClick={() => setEditOtherOpen(true)}
-                          className="flex items-center gap-2 py-2 text-primary hover:underline"
+                          className="flex items-center gap-2 py-2 text-blue-700 hover:underline"
                         >
                           <Pencil className="h-3 w-3" />
                           <span>Update</span>
@@ -615,7 +615,7 @@ export default function EmployeeViewPage() {
                       </div>
                       <div className="mt-3 space-y-4 flex-1">
                         <div>
-                          <p className="font-bold text-foreground0 mb-2">Driver's License <span className="font-normal text-gray-600">(Optional)</span></p>
+                          <p className="font-bold text-muted-foreground mb-2">Driver's License <span className="font-normal text-gray-600">(Optional)</span></p>
                           <div className="w-full max-w-[20rem] h-[9.7rem] border border-border2a2a2a] rounded-md overflow-hidden bg-background">
                             {employee.employee_driver_license_photo ? (
                               <EmployeeDocumentImage
@@ -625,14 +625,14 @@ export default function EmployeeViewPage() {
                               />
                             ) : (
                               <div className="w-full h-full flex flex-col items-center justify-center gap-1" title="No document uploaded">
-                                <Image className="h-12 w-12 text-foreground0" />
+                                <Image className="h-12 w-12 text-muted-foreground" />
                                 <span className="text-xs text-gray-600">No document uploaded</span>
                               </div>
                             )}
                           </div>
                         </div>
                         <div>
-                          <p className="font-bold text-foreground0 mb-2">Car Insurance <span className="font-normal text-gray-600">(Optional)</span></p>
+                          <p className="font-bold text-muted-foreground mb-2">Car Insurance <span className="font-normal text-gray-600">(Optional)</span></p>
                           <div className="w-full max-w-[20rem] h-[9.7rem] border border-border2a2a2a] rounded-md overflow-hidden bg-background">
                             {employee.employee_car_insurance ? (
                               <EmployeeDocumentImage
@@ -642,14 +642,14 @@ export default function EmployeeViewPage() {
                               />
                             ) : (
                               <div className="w-full h-full flex flex-col items-center justify-center gap-1" title="No document uploaded">
-                                <Image className="h-12 w-12 text-foreground0" />
+                                <Image className="h-12 w-12 text-muted-foreground" />
                                 <span className="text-xs text-gray-600">No document uploaded</span>
                               </div>
                             )}
                           </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-[18rem,1fr] gap-2">
-                          <p className="font-bold text-foreground0">How did you hear about Golden Luxury Auto?</p>
+                          <p className="font-bold text-muted-foreground">How did you hear about Golden Luxury Auto?</p>
                           <p className="text-muted-foreground">{unspecified(employee.employee_hear_about_gla)}</p>
                         </div>
                       </div>
@@ -667,7 +667,7 @@ export default function EmployeeViewPage() {
                           <button
                             type="button"
                             onClick={() => setEditFamilyOpen(true)}
-                            className="flex items-center gap-2 py-2 text-primary hover:underline"
+                            className="flex items-center gap-2 py-2 text-blue-700 hover:underline"
                           >
                             <Pencil className="h-3 w-3" />
                             <span>Update</span>
@@ -675,13 +675,13 @@ export default function EmployeeViewPage() {
                         </div>
                         <div className="mt-3">
                           <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
-                            <li className="font-bold text-foreground0">Mother's First Name:</li>
+                            <li className="font-bold text-muted-foreground">Mother's First Name:</li>
                             <li>{unspecified(employee.employee_mother_name)}</li>
-                            <li className="font-bold text-foreground0">Father's First Name:</li>
+                            <li className="font-bold text-muted-foreground">Father's First Name:</li>
                             <li>{unspecified(employee.employee_father_name)}</li>
-                            <li className="font-bold text-foreground0">Home Contact:</li>
+                            <li className="font-bold text-muted-foreground">Home Contact:</li>
                             <li>{unspecified(employee.employee_home_contact)}</li>
-                            <li className="font-bold text-foreground0">Family Home Address:</li>
+                            <li className="font-bold text-muted-foreground">Family Home Address:</li>
                             <li className="break-words">{unspecified(employee.employee_home_address)}</li>
                           </ul>
                         </div>
@@ -699,7 +699,7 @@ export default function EmployeeViewPage() {
                           <button
                             type="button"
                             onClick={() => setEditEmergencyOpen(true)}
-                            className="flex items-center gap-2 py-2 text-primary hover:underline"
+                            className="flex items-center gap-2 py-2 text-blue-700 hover:underline"
                           >
                             <Pencil className="h-3 w-3" />
                             <span>Update</span>
@@ -707,13 +707,13 @@ export default function EmployeeViewPage() {
                         </div>
                         <div className="mt-3">
                           <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
-                            <li className="font-bold text-foreground0">Name:</li>
+                            <li className="font-bold text-muted-foreground">Name:</li>
                             <li>{unspecified(employee.employee_emergency_contact_person)}</li>
-                          <li className="font-bold text-foreground0">Relationship:</li>
+                          <li className="font-bold text-muted-foreground">Relationship:</li>
                           <li>{unspecified(employee.employee_emergency_relationship)}</li>
-                          <li className="font-bold text-foreground0">Number:</li>
+                          <li className="font-bold text-muted-foreground">Number:</li>
                           <li>{unspecified(employee.employee_emergency_number)}</li>
-                          <li className="font-bold text-foreground0">Address:</li>
+                          <li className="font-bold text-muted-foreground">Address:</li>
                           <li className="break-words">{unspecified(employee.employee_emergency_address)}</li>
                         </ul>
                       </div>
@@ -731,26 +731,26 @@ export default function EmployeeViewPage() {
                         <List className="h-4 w-4 text-primary" />
                         <span className="font-bold uppercase text-[13px] text-primary">Job Information</span>
                       </div>
-                      <button type="button" onClick={() => setEditJobOpen(true)} className="flex items-center gap-2 py-2 text-primary hover:underline">
+                      <button type="button" onClick={() => setEditJobOpen(true)} className="flex items-center gap-2 py-2 text-blue-700 hover:underline">
                         <Pencil className="h-3 w-3" /> <span>Update</span>
                       </button>
                     </div>
                     <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                      <li className="font-bold text-foreground0">Employee Number:</li>
+                      <li className="font-bold text-muted-foreground">Employee Number:</li>
                       <li>{unspecified(employee.employee_number)}</li>
-                      <li className="font-bold text-foreground0">Department:</li>
+                      <li className="font-bold text-muted-foreground">Department:</li>
                       <li>{unspecified(employee.employee_job_pay_department_name)}</li>
-                      <li className="font-bold text-foreground0">Job Title:</li>
+                      <li className="font-bold text-muted-foreground">Job Title:</li>
                       <li>{unspecified(employee.employee_job_pay_job_title_name)}</li>
-                      <li className="font-bold text-foreground0">Work Email:</li>
+                      <li className="font-bold text-muted-foreground">Work Email:</li>
                       <li className="break-words">{unspecified(employee.employee_job_pay_work_email ?? employee.employee_email)}</li>
-                      <li className="font-bold text-foreground0">Date Hired:</li>
+                      <li className="font-bold text-muted-foreground">Date Hired:</li>
                       <li>{employee.employee_job_pay_hired ? formatDate(employee.employee_job_pay_hired) : "Unspecified"}</li>
-                      <li className="font-bold text-foreground0">Regularized On:</li>
+                      <li className="font-bold text-muted-foreground">Regularized On:</li>
                       <li>{employee.employee_job_pay_regular_on ? formatDate(employee.employee_job_pay_regular_on) : "Unspecified"}</li>
-                      <li className="font-bold text-foreground0">Date Separated:</li>
+                      <li className="font-bold text-muted-foreground">Date Separated:</li>
                       <li>{employee.employee_job_pay_separated ? formatDate(employee.employee_job_pay_separated) : "Unspecified"}</li>
-                      <li className="font-bold text-foreground0">Comment:</li>
+                      <li className="font-bold text-muted-foreground">Comment:</li>
                       <li>{unspecified(employee.employee_job_pay_comment)}</li>
                     </ul>
                   </CardContent>
@@ -763,7 +763,7 @@ export default function EmployeeViewPage() {
                         <span className="font-bold uppercase text-[13px] text-primary">Pay Information</span>
                       </div>
                       {canEditPay ? (
-                        <button type="button" onClick={() => setEditPayOpen(true)} className="flex items-center gap-2 py-2 text-primary hover:underline">
+                        <button type="button" onClick={() => setEditPayOpen(true)} className="flex items-center gap-2 py-2 text-blue-700 hover:underline">
                           <Pencil className="h-3 w-3" /> <span>Update</span>
                         </button>
                       ) : (
@@ -771,11 +771,11 @@ export default function EmployeeViewPage() {
                       )}
                     </div>
                     <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                      <li className="font-bold text-foreground0">Payroll Eligibility:</li>
+                      <li className="font-bold text-muted-foreground">Payroll Eligibility:</li>
                       <li>{Number(employee.employee_job_pay_eligible) === 1 ? "Eligible" : "Not Eligible"}</li>
-                      <li className="font-bold text-foreground0">Employee rate per hour:</li>
+                      <li className="font-bold text-muted-foreground">Employee rate per hour:</li>
                       <li>{formatCurrency(employee.employee_job_pay_salary_rate)}</li>
-                      <li className="font-bold text-foreground0">Bank Account:</li>
+                      <li className="font-bold text-muted-foreground">Bank Account:</li>
                       <li>{unspecified(employee.employee_job_pay_bank_acc)}</li>
                     </ul>
                   </CardContent>
@@ -803,14 +803,14 @@ export default function EmployeeViewPage() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border2a2a2a] bg-card">
-                            <th className="text-center py-3 w-12 text-foreground0 font-medium">#</th>
-                            <th className="text-left py-3 min-w-[5rem] text-foreground0 font-medium">Status</th>
-                            <th className="text-left py-3 min-w-[6rem] text-foreground0 font-medium">Pay Type</th>
-                            <th className="text-left py-3 min-w-[10rem] text-foreground0 font-medium">Effective Start</th>
-                            <th className="text-left py-3 min-w-[10rem] text-foreground0 font-medium">Effective End</th>
-                            <th className="text-right py-3 min-w-[6rem] text-foreground0 font-medium">Amount</th>
-                            <th className="text-left py-3 min-w-[12rem] text-foreground0 font-medium">Created Date</th>
-                            <th className="text-right py-3 min-w-[8rem] text-foreground0 font-medium"></th>
+                            <th className="text-center py-3 w-12 text-muted-foreground font-medium">#</th>
+                            <th className="text-left py-3 min-w-[5rem] text-muted-foreground font-medium">Status</th>
+                            <th className="text-left py-3 min-w-[6rem] text-muted-foreground font-medium">Pay Type</th>
+                            <th className="text-left py-3 min-w-[10rem] text-muted-foreground font-medium">Effective Start</th>
+                            <th className="text-left py-3 min-w-[10rem] text-muted-foreground font-medium">Effective End</th>
+                            <th className="text-right py-3 min-w-[6rem] text-muted-foreground font-medium">Amount</th>
+                            <th className="text-left py-3 min-w-[12rem] text-muted-foreground font-medium">Created Date</th>
+                            <th className="text-right py-3 min-w-[8rem] text-muted-foreground font-medium"></th>
                           </tr>
                         </thead>
                         <tbody>
@@ -841,10 +841,10 @@ export default function EmployeeViewPage() {
                           ))}
                         </tbody>
                       </table>
-                      <p className="text-center text-sm text-foreground0 py-4">End of list.</p>
+                      <p className="text-center text-sm text-muted-foreground py-4">End of list.</p>
                     </div>
                   ) : (
-                    <p className="text-sm text-foreground0">No rate history recorded yet.</p>
+                    <p className="text-sm text-muted-foreground">No rate history recorded yet.</p>
                   )}
                 </CardContent>
               </Card>
@@ -865,12 +865,12 @@ export default function EmployeeViewPage() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border2a2a2a]">
-                            <th className="text-left py-2 text-foreground0 font-medium">#</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Status</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Company Name</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Years Deployed</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">From</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">To</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">#</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Company Name</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Years Deployed</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">From</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">To</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -878,7 +878,7 @@ export default function EmployeeViewPage() {
                             <tr key={row.employment_history_aid} className="border-b border-border2a2a2a]/50">
                               <td className="py-2 text-muted-foreground">{i + 1}.</td>
                               <td className="py-2">
-                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.employment_history_is_active === 1 ? "bg-green-500/20 text-green-700" : "bg-gray-500/20 text-muted-foreground"}`}>
+                                <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${row.employment_history_is_active === 1 ? "bg-green-500/20 text-green-700" : "bg-gray-500/20 text-gray-700"}`}>
                                   {row.employment_history_is_active === 1 ? "Active" : "Inactive"}
                                 </span>
                               </td>
@@ -892,7 +892,7 @@ export default function EmployeeViewPage() {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-sm text-foreground0">No job history recorded yet.</p>
+                    <p className="text-sm text-muted-foreground">No job history recorded yet.</p>
                   )}
                 </CardContent>
               </Card>
@@ -913,11 +913,11 @@ export default function EmployeeViewPage() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border2a2a2a]">
-                            <th className="text-left py-2 text-foreground0 font-medium">#</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Status</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Date</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Payitem</th>
-                            <th className="text-right py-2 text-foreground0 font-medium">Amount</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">#</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Date</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Payitem</th>
+                            <th className="text-right py-2 text-muted-foreground font-medium">Amount</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -938,7 +938,7 @@ export default function EmployeeViewPage() {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-sm text-foreground0">No earnings recorded yet.</p>
+                    <p className="text-sm text-muted-foreground">No earnings recorded yet.</p>
                   )}
                 </CardContent>
               </Card>
@@ -959,11 +959,11 @@ export default function EmployeeViewPage() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border2a2a2a]">
-                            <th className="text-left py-2 text-foreground0 font-medium">#</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Status</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Date</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Payitem</th>
-                            <th className="text-right py-2 text-foreground0 font-medium">Amount</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">#</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Date</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Payitem</th>
+                            <th className="text-right py-2 text-muted-foreground font-medium">Amount</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -984,7 +984,7 @@ export default function EmployeeViewPage() {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-sm text-foreground0">No deductions recorded yet.</p>
+                    <p className="text-sm text-muted-foreground">No deductions recorded yet.</p>
                   )}
                 </CardContent>
               </Card>
@@ -1005,12 +1005,12 @@ export default function EmployeeViewPage() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border2a2a2a]">
-                            <th className="text-left py-2 text-foreground0 font-medium">#</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Status</th>
-                            <th className="text-left py-2 text-foreground0 font-medium">Payroll ID</th>
-                            <th className="text-right py-2 text-foreground0 font-medium">Gross</th>
-                            <th className="text-right py-2 text-foreground0 font-medium">Deduction</th>
-                            <th className="text-right py-2 text-foreground0 font-medium">Net Pay</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">#</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
+                            <th className="text-left py-2 text-muted-foreground font-medium">Payroll ID</th>
+                            <th className="text-right py-2 text-muted-foreground font-medium">Gross</th>
+                            <th className="text-right py-2 text-muted-foreground font-medium">Deduction</th>
+                            <th className="text-right py-2 text-muted-foreground font-medium">Net Pay</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1032,7 +1032,7 @@ export default function EmployeeViewPage() {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-sm text-foreground0">No payslips available yet.</p>
+                    <p className="text-sm text-muted-foreground">No payslips available yet.</p>
                   )}
                 </CardContent>
               </Card>

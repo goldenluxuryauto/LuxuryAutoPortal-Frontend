@@ -356,7 +356,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground0" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search employee, car, VIN..."
             value={searchQuery}
@@ -389,40 +389,60 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
           {error instanceof Error ? error.message : "Failed to load submissions."}
         </div>
       ) : submissions.length === 0 ? (
-        <div className="text-center py-8 text-foreground0">
+        <div className="text-center py-8 text-muted-foreground">
           No expense submissions found.
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">
           <Table>
             <TableHeader>
-              <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                <TableHead className="text-gray-400 text-center">Status</TableHead>
-                <TableHead className="text-gray-400 text-center">Submitted Date</TableHead>
-                <TableHead className="text-gray-400 text-center">Approval Date</TableHead>
-                <TableHead className="text-gray-400 text-center">Receipt Date</TableHead>
-                <TableHead className="text-gray-400 text-center">Employee Name</TableHead>
-                <TableHead className="text-gray-400 text-center">Car Owner</TableHead>
-                <TableHead className="text-gray-400 text-center">Car Make/Model (Year) - Plate - VIN</TableHead>
-                <TableHead className="text-gray-400 text-center">Total Receipt Cost</TableHead>
-                <TableHead className="text-gray-400 text-center">Decline Reason</TableHead>
-                <TableHead className="text-gray-400 text-center">Remarks</TableHead>
-                <TableHead className="text-gray-400 text-center">Receipt</TableHead>
-                {isAdmin && <TableHead className="text-gray-400 text-center">Actions</TableHead>}
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-foreground font-semibold">Date</TableHead>
+                <TableHead className="text-foreground font-semibold">Employee</TableHead>
+                <TableHead className="text-foreground font-semibold">Car</TableHead>
+                <TableHead className="text-foreground font-semibold">Year/Month</TableHead>
+                <TableHead className="text-foreground font-semibold">Category</TableHead>
+                <TableHead className="text-foreground font-semibold">Type</TableHead>
+                <TableHead className="text-foreground font-semibold">Amount</TableHead>
+                <TableHead className="text-foreground font-semibold">Status</TableHead>
+                <TableHead className="text-foreground font-semibold">Remarks</TableHead>
+                <TableHead className="text-foreground font-semibold">Decline Reason</TableHead>
+                {isAdmin && <TableHead className="text-foreground font-semibold text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {submissions.map((sub) => (
                 <TableRow key={sub.id} className="border-border">
-                  <TableCell className="text-center">
+                  <TableCell className="text-foreground text-sm">
+                    {new Date(sub.submissionDate).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-foreground text-sm">
+                    {sub.employeeName || "-"}
+                  </TableCell>
+                  <TableCell className="text-foreground text-sm max-w-[200px] truncate" title={sub.carDisplayName}>
+                    {sub.carDisplayName || "-"}
+                  </TableCell>
+                  <TableCell className="text-foreground text-sm">
+                    {sub.year} / {MONTHS[sub.month - 1]}
+                  </TableCell>
+                  <TableCell className="text-foreground text-sm">
+                    {CATEGORY_LABELS[sub.category] || sub.category}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-sm">
+                    {formatFieldLabel(sub.field)}
+                  </TableCell>
+                  <TableCell className="text-green-700 font-semibold">
+                    ${Number(sub.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </TableCell>
+                  <TableCell>
                     <Badge
                       variant="outline"
                       className={
                         sub.status === "approved"
-                          ? "border-green-600 text-green-700"
+                          ? "border-green-500/50 text-green-700 bg-green-500/20 font-semibold"
                           : sub.status === "declined"
-                          ? "border-red-600 text-red-700"
-                          : "border-primary/50 text-primary"
+                          ? "border-red-500/50 text-red-700 bg-red-500/20 font-semibold"
+                          : "border-yellow-500/50 text-yellow-800 bg-yellow-500/20 font-semibold"
                       }
                     >
                       {sub.status}
@@ -535,7 +555,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
 
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-foreground0">
+          <p className="text-sm text-muted-foreground">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
           </p>
           <div className="flex gap-2">

@@ -536,11 +536,11 @@ export default function CarsPage() {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "ACTIVE":
-        return "bg-green-500/20 text-green-700 border-green-500/30";
+        return "bg-green-500/20 text-green-700 border-green-500/30 font-medium";
       case "INACTIVE":
-        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
+        return "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium";
       default:
-        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
+        return "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium";
     }
   };
 
@@ -590,7 +590,7 @@ export default function CarsPage() {
           ref={imgRef}
           className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-background/30 border border-border flex items-center justify-center shrink-0"
         >
-          <CarIcon className="h-4 w-4 text-foreground0" />
+          <CarIcon className="h-4 w-4 text-muted-foreground" />
         </div>
       );
     }
@@ -660,7 +660,7 @@ export default function CarsPage() {
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="Search by VIN, Plate, Owner, Make/Model/Year..."
@@ -709,53 +709,53 @@ export default function CarsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 w-8 sm:w-10">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 w-8 sm:w-10">
                       #
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Status
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Stats
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden md:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden md:table-cell">
                       Management
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Owner
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Make
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Year
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
                       Model/Specs
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Contact
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       VIN #
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Plate #
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
                       Gas
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                       Tire Size
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                       Oil Type
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                       Turo Link
                     </th>
                     {isAdmin && (
-                      <th className="text-center text-[10px] sm:text-xs font-medium text-primary uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                      <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
                         Admin Turo Link
                       </th>
                     )}
@@ -843,7 +843,7 @@ export default function CarsPage() {
                                 e.preventDefault();
                                 setLocation(`/admin/view-car/${car.id}`);
                               }}
-                              className="text-primary hover:underline text-xs sm:text-sm"
+                              className="text-blue-700 hover:underline text-xs sm:text-sm font-medium"
                             >
                               View Stats
                             </a>
@@ -854,10 +854,10 @@ export default function CarsPage() {
                               className={cn(
                                 "text-xs",
                                 derivedManagementStatus === "management"
-                                  ? "bg-blue-500/20 text-blue-700 border-blue-500/30"
+                                  ? "bg-blue-500/20 text-blue-700 border-blue-500/30 font-medium"
                                   : derivedManagementStatus === "off_ride"
-                                    ? "bg-yellow-500/20 text-yellow-700 border-yellow-500/30"
-                                    : "bg-gray-500/20 text-muted-foreground border-gray-500/30"
+                                    ? "bg-yellow-500/20 text-yellow-700 border-yellow-500/30 font-medium"
+                                    : "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium"
                               )}
                             >
                             {managementValue}
@@ -874,7 +874,7 @@ export default function CarsPage() {
                                         e.preventDefault();
                                         setLocation(`/admin/clients/${car.clientId}`);
                                       }}
-                                      className="text-primary hover:underline text-xs sm:text-sm font-medium cursor-pointer block"
+                                      className="text-blue-700 hover:underline text-xs sm:text-sm font-medium cursor-pointer block"
                                     >
                                       {car.owner.firstName} {car.owner.lastName}
                                     </a>
@@ -885,7 +885,7 @@ export default function CarsPage() {
                                           e.preventDefault();
                                           setLocation(`/admin/clients/${car.clientId}`);
                                         }}
-                                        className="text-primary hover:underline text-[10px] sm:text-xs cursor-pointer block mt-0.5"
+                                        className="text-blue-700 hover:underline text-[10px] sm:text-xs cursor-pointer block mt-0.5"
                                       >
                                         {car.owner.email}
                                       </a>
@@ -897,7 +897,7 @@ export default function CarsPage() {
                                       {car.owner.firstName} {car.owner.lastName}
                                     </div>
                                     {car.owner.email && (
-                                      <div className="text-foreground0 text-[10px] sm:text-xs">
+                                      <div className="text-muted-foreground text-[10px] sm:text-xs">
                                         {car.owner.email}
                                       </div>
                                     )}
@@ -944,7 +944,7 @@ export default function CarsPage() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="text-primary hover:underline inline-flex items-center justify-center"
+                                className="text-blue-700 hover:underline inline-flex items-center justify-center"
                               >
                                 <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                               </a>
@@ -960,7 +960,7 @@ export default function CarsPage() {
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="text-primary hover:underline inline-flex items-center justify-center"
+                                  className="text-blue-700 hover:underline inline-flex items-center justify-center"
                                 >
                                   <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                                 </a>
@@ -977,7 +977,7 @@ export default function CarsPage() {
                       <td colSpan={isAdmin ? 13 : 12} className="px-4 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <p className="text-muted-foreground text-lg">No cars found</p>
-                          <p className="text-foreground0 text-sm">
+                          <p className="text-muted-foreground text-sm">
                             Try adjusting your search or filters
                           </p>
                         </div>

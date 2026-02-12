@@ -1118,7 +1118,7 @@ export default function EarningsPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-primary hover:underline"
+            className="mt-4 text-blue-700 hover:underline"
           >
             ← Back to View Car
           </button>
@@ -1238,7 +1238,7 @@ export default function EarningsPage() {
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline text-sm flex items-center gap-1"
+                      className="text-blue-700 hover:underline text-sm flex items-center gap-1"
                     >
                       Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -1251,7 +1251,7 @@ export default function EarningsPage() {
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline text-sm flex items-center gap-1"
+                      className="text-blue-700 hover:underline text-sm flex items-center gap-1"
                     >
                       Admin Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -1259,7 +1259,7 @@ export default function EarningsPage() {
                   </div>
                 )}
                 {!car.turoLink && !car.adminTuroLink && (
-                  <span className="text-foreground0 text-sm">No Turo links available</span>
+                  <span className="text-muted-foreground text-sm">No Turo links available</span>
                 )}
               </div>
             </div>
@@ -1989,7 +1989,7 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
               "text-right px-2 py-2 text-sm border-l border-border",
               cellValue !== 0
                 ? isTotal ? "text-primary font-semibold" : "text-muted-foreground font-medium"
-                : "text-foreground0"
+                : "text-muted-foreground"
             )}
           >
             {displayText}

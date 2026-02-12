@@ -222,7 +222,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                   <div
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded transition-colors relative cursor-pointer",
-                      isActiveParent ? "bg-sidebar-primary/10 text-sidebar-primary" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                      isActiveParent ? "bg-sidebar-primary/10 text-black" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                     )}
                     onClick={() => toggleExpand(item.href)}
                     data-testid={`link-admin-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -247,7 +247,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                             href={child.href}
                             className={cn(
                               "flex items-center gap-3 px-3 py-2 rounded text-sm",
-                              childActive ? "bg-sidebar-primary/10 text-sidebar-primary" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                              childActive ? "bg-sidebar-primary/10 text-black" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                             )}
                             onClick={() => setMobileMenuOpen(false)}
                             data-testid={`link-admin-${child.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -270,7 +270,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 className={cn(
                   "flex items-center gap-3 mx-2 px-3 py-2 rounded transition-colors relative",
                   isActive 
-                    ? "bg-sidebar-primary/10 text-sidebar-primary" 
+                    ? "bg-sidebar-primary/10 text-black" 
                     : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                 )}
                 onClick={() => setMobileMenuOpen(false)}

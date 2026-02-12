@@ -179,11 +179,11 @@ export default function Signup() {
           </Button>
         </form>
 
-        <p className="text-center text-foreground0 text-sm mt-6">
+        <p className="text-center text-muted-foreground text-sm mt-6">
           Already have an account?{" "}
           <button
             onClick={() => setLocation("/admin/login")}
-            className="text-primary hover:underline"
+            className="text-blue-700 hover:underline"
           >
             Sign in
           </button>

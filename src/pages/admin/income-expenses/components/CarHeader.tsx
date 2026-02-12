@@ -109,7 +109,7 @@ export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHe
                   href={car.turoLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline text-xs flex items-center gap-1"
+                  className="text-blue-700 hover:underline text-xs flex items-center gap-1"
                 >
                   Turo Link: View Car
                   <ExternalLink className="w-3 h-3" />
@@ -122,7 +122,7 @@ export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHe
                   href={car.adminTuroLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline text-xs flex items-center gap-1"
+                  className="text-blue-700 hover:underline text-xs flex items-center gap-1"
                 >
                   Admin Turo Link
                   <ExternalLink className="w-3 h-3" />
@@ -130,7 +130,7 @@ export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHe
               </div>
             )}
             {!car?.turoLink && !car?.adminTuroLink && (
-              <span className="text-foreground0 text-xs">No Turo links available</span>
+              <span className="text-muted-foreground text-xs">No Turo links available</span>
             )}
           </div>
         </div>

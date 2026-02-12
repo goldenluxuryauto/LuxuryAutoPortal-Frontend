@@ -286,7 +286,7 @@ export default function CarOffboardingForm() {
                     </SelectContent>
                   </Select>
                   <FormMessage />
-                  <p className="text-xs text-foreground0 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Only showing cars currently with GLA (on-boarded status)
                   </p>
                 </FormItem>

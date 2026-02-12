@@ -373,7 +373,7 @@ export default function SettingsPage() {
                 </Button>
                 <a
                   href="/reset-password"
-                  className="text-sm text-primary hover:underline"
+                  className="text-sm text-blue-700 hover:underline"
                 >
                   Forgot your password?
                 </a>
@@ -474,7 +474,7 @@ export default function SettingsPage() {
                         </div>
                       )}
                     </div>
-                    <p className="text-xs text-foreground0">
+                    <p className="text-xs text-muted-foreground">
                       Last updated: {new Date(config.updatedAt).toLocaleString()}
                     </p>
                   </div>

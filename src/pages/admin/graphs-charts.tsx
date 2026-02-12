@@ -73,7 +73,7 @@ export default function GraphsChartsPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-primary hover:underline"
+            className="mt-4 text-blue-700 hover:underline"
           >
             ← Back to View Car
           </button>
@@ -170,15 +170,15 @@ export default function GraphsChartsPage() {
               <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-foreground0">Car Name:</span>
+                  <span className="text-xs text-muted-foreground">Car Name:</span>
                   <p className="text-sm text-muted-foreground">{carName}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-foreground0">VIN #:</span>
+                  <span className="text-xs text-muted-foreground">VIN #:</span>
                   <p className="text-sm text-muted-foreground">{car.vin || "N/A"}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-foreground0">License:</span>
+                  <span className="text-xs text-muted-foreground">License:</span>
                   <p className="text-sm text-muted-foreground">{car.licensePlate || "N/A"}</p>
                 </div>
               </div>
@@ -189,15 +189,15 @@ export default function GraphsChartsPage() {
               <h3 className="text-sm font-semibold text-muted-foreground mb-3">Owner Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-foreground0">Name:</span>
+                  <span className="text-xs text-muted-foreground">Name:</span>
                   <p className="text-sm text-muted-foreground">{ownerName}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-foreground0">Contact #:</span>
+                  <span className="text-xs text-muted-foreground">Contact #:</span>
                   <p className="text-sm text-muted-foreground">{ownerContact}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-foreground0">Email:</span>
+                  <span className="text-xs text-muted-foreground">Email:</span>
                   <p className="text-sm text-muted-foreground">{ownerEmail}</p>
                 </div>
               </div>
@@ -208,15 +208,15 @@ export default function GraphsChartsPage() {
               <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Specifications</h3>
               <div className="space-y-2 mb-4">
                 <div>
-                  <span className="text-xs text-foreground0">Fuel/Gas:</span>
+                  <span className="text-xs text-muted-foreground">Fuel/Gas:</span>
                   <p className="text-sm text-muted-foreground">{fuelType}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-foreground0">Tire Size:</span>
+                  <span className="text-xs text-muted-foreground">Tire Size:</span>
                   <p className="text-sm text-muted-foreground">{tireSize}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-foreground0">Oil Type:</span>
+                  <span className="text-xs text-muted-foreground">Oil Type:</span>
                   <p className="text-sm text-muted-foreground">{oilType}</p>
                 </div>
               </div>
@@ -229,7 +229,7 @@ export default function GraphsChartsPage() {
                         href={car.turoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary hover:underline text-sm flex items-center gap-1"
+                        className="text-blue-700 hover:underline text-sm flex items-center gap-1"
                       >
                         Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -242,7 +242,7 @@ export default function GraphsChartsPage() {
                         href={car.adminTuroLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary hover:underline text-sm flex items-center gap-1"
+                        className="text-blue-700 hover:underline text-sm flex items-center gap-1"
                       >
                         Admin Turo Link: View Car
                         <ExternalLink className="w-3 h-3" />
@@ -250,7 +250,7 @@ export default function GraphsChartsPage() {
                     </div>
                   )}
                   {!car.turoLink && !car.adminTuroLink && (
-                    <span className="text-foreground0 text-sm">No Turo links available</span>
+                    <span className="text-muted-foreground text-sm">No Turo links available</span>
                   )}
                 </div>
               </div>

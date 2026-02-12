@@ -392,7 +392,7 @@ export default function RecordsPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
-            className="mt-4 text-primary hover:underline"
+            className="mt-4 text-blue-700 hover:underline"
           >
             ← Back to Cars
           </button>
@@ -530,7 +530,7 @@ export default function RecordsPage() {
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
+                      className="text-blue-700 hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
                     >
                       View Car
                       <ExternalLink className="w-3 h-3" />
@@ -544,7 +544,7 @@ export default function RecordsPage() {
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
+                      className="text-blue-700 hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
                     >
                       View Car
                       <ExternalLink className="w-3 h-3" />
@@ -596,7 +596,7 @@ export default function RecordsPage() {
               <div className="flex-1 sm:max-w-md w-full">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     type="text"
                     placeholder="Q Search here..."
@@ -643,7 +643,7 @@ export default function RecordsPage() {
                 <TableBody>
                   {(status === "pending" || isFetching) ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-12 text-foreground0">
+                      <TableCell colSpan={4} className="text-center py-12 text-muted-foreground">
                         Loading...
                       </TableCell>
                     </TableRow>
@@ -761,7 +761,7 @@ export default function RecordsPage() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-12 text-foreground0">
+                      <TableCell colSpan={4} className="text-center py-12 text-muted-foreground">
                         No documents found
                       </TableCell>
                     </TableRow>
@@ -802,7 +802,7 @@ export default function RecordsPage() {
                           // Show ellipsis
                           if (page === currentPage - 2 || page === currentPage + 2) {
                             return (
-                              <span key={page} className="text-foreground0 px-2">
+                              <span key={page} className="text-muted-foreground px-2">
                                 ...
                               </span>
                             );
@@ -845,7 +845,7 @@ export default function RecordsPage() {
             )}
 
             {totalDocuments === 0 && !isFetching && status !== "pending" && (
-              <div className="text-center mt-6 text-foreground0 text-sm">
+              <div className="text-center mt-6 text-muted-foreground text-sm">
                 No documents found matching your search criteria.
               </div>
             )}

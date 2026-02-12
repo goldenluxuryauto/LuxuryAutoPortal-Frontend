@@ -453,7 +453,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 )}
               />
               <div className="col-span-2 space-y-2">
-                <FormLabel className="text-muted-foreground">Profile Photo <span className="text-foreground0 font-normal">(Optional)</span></FormLabel>
+                <FormLabel className="text-muted-foreground">Profile Photo <span className="text-muted-foreground font-normal">(Optional)</span></FormLabel>
                 <div className="flex items-center gap-4">
                   <div className="h-20 w-20 rounded-full border-2 border-border flex items-center justify-center overflow-hidden bg-background shrink-0">
                     {photoFile ? (
@@ -469,7 +469,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                         className="h-full w-full object-cover rounded-full"
                       />
                     ) : (
-                      <Image className="h-10 w-10 text-foreground0" />
+                      <Image className="h-10 w-10 text-muted-foreground" />
                     )}
                   </div>
                   <div className="flex flex-col gap-2">
@@ -493,9 +493,8 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                       </Button>
                       <Button
                         type="button"
-                        variant="outline"
                         size="sm"
-                        className="border-primary/50 text-primary hover:bg-primary/10"
+                        className="bg-primary text-primary-foreground hover:bg-primary/80"
                         onClick={handleArchive}
                         disabled={!photoFile || archiveMutation.isPending}
                       >
@@ -508,7 +507,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                       </Button>
                     </div>
                     {photoFile && (
-                      <span className="text-xs text-foreground0">{photoFile.name}</span>
+                      <span className="text-xs text-muted-foreground">{photoFile.name}</span>
                     )}
                   </div>
                 </div>

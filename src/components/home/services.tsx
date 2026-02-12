@@ -42,10 +42,10 @@ export function Services() {
           <p className="text-sm font-medium text-primary tracking-widest uppercase mb-3">
             Why Choose Us
           </p>
-          <h2 className="font-serif text-3xl lg:text-4xl font-medium text-foreground mb-4">
+          <h2 className="font-serif text-3xl lg:text-4xl font-medium text-white mb-4">
             The Luxury Experience
           </h2>
-          <p className="max-w-2xl mx-auto text-muted-foreground">
+          <p className="max-w-2xl mx-auto text-gray-400">
             Beyond exceptional vehicles, we deliver an unparalleled ownership experience
             tailored to the most discerning clientele.
           </p>
@@ -57,16 +57,16 @@ export function Services() {
             return (
               <Card
                 key={index}
-                className="bg-white/[0.02] border-border hover-elevate group"
+                className="bg-white/[0.04] border-white/10 hover-elevate group"
               >
                 <CardContent className="p-6 lg:p-8">
                   <div className="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
                     <Icon className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                  <h3 className="text-lg font-semibold text-white mb-2">
                     {service.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-gray-400 leading-relaxed">
                     {service.description}
                   </p>
                 </CardContent>

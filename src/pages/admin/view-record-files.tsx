@@ -620,7 +620,7 @@ export default function ViewRecordFilesPage() {
                       href={`https://drive.google.com/drive/folders/${record.recordFilesGdrive}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
+                      className="text-blue-700 hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
                     >
                       Open Folder
                       <ExternalLink className="w-3 h-3" />
@@ -672,7 +672,7 @@ export default function ViewRecordFilesPage() {
               <div className="flex-1 sm:max-w-md w-full">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       type="text"
                       placeholder="Q Search here..."
@@ -744,7 +744,7 @@ export default function ViewRecordFilesPage() {
             ) : !record?.recordFilesGdrive ? (
               <div className="text-center text-muted-foreground py-12">
                 <div className="mb-2">No Google Drive Folder ID</div>
-                <div className="text-sm text-foreground0">
+                <div className="text-sm text-muted-foreground">
                   This record does not have a Google Drive folder ID. Files cannot be displayed until a folder ID is assigned.
                 </div>
               </div>
@@ -1006,7 +1006,7 @@ export default function ViewRecordFilesPage() {
                         if (!showPage) {
                           if (page === currentPage - 2 || page === currentPage + 2) {
                             return (
-                              <span key={page} className="text-foreground0 px-2">
+                              <span key={page} className="text-muted-foreground px-2">
                                 ...
                               </span>
                             );
@@ -1050,13 +1050,13 @@ export default function ViewRecordFilesPage() {
 
             {/* End of list message */}
             {currentPage >= totalPages && files.length > 0 && !isFetching && status !== "pending" && (
-              <div className="text-center mt-6 text-foreground0 text-sm">
+              <div className="text-center mt-6 text-muted-foreground text-sm">
                 End of list.
               </div>
             )}
 
             {totalFiles === 0 && !isFetching && status !== "pending" && (
-              <div className="text-center mt-6 text-foreground0 text-sm">
+              <div className="text-center mt-6 text-muted-foreground text-sm">
                 No files found matching your search criteria.
               </div>
             )}

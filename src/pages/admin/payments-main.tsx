@@ -402,7 +402,7 @@ export default function PaymentsMainPage() {
               <TableBody>
                 {isLoadingPayments ? (
                   <TableRow>
-                    <TableCell colSpan={14} className="text-center py-12 text-foreground0">
+                    <TableCell colSpan={14} className="text-center py-12 text-muted-foreground">
                       <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                     </TableCell>
                   </TableRow>
@@ -511,7 +511,7 @@ export default function PaymentsMainPage() {
                   </>
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={14} className="text-center py-12 text-foreground0">
+                    <TableCell colSpan={14} className="text-center py-12 text-muted-foreground">
                       No payment records found
                     </TableCell>
                   </TableRow>

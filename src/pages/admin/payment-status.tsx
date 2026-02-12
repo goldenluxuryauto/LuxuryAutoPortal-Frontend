@@ -265,7 +265,7 @@ export default function PaymentStatusPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-foreground0">
+                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                       <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                     </TableCell>
                   </TableRow>
@@ -286,7 +286,7 @@ export default function PaymentStatusPage() {
                           ) : (
                             <>
                               <span className="w-3 h-3 rounded-full bg-gray-500 shrink-0" />
-                              <span className="text-sm text-foreground0">Inactive</span>
+                              <span className="text-sm text-muted-foreground">Inactive</span>
                             </>
                           )}
                         </div>
@@ -356,7 +356,7 @@ export default function PaymentStatusPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-foreground0">
+                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                       No payment statuses found
                     </TableCell>
                   </TableRow>

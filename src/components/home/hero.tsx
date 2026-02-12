@@ -19,19 +19,19 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-border mb-8">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-sm text-foreground/80 tracking-wide">
+          <span className="text-sm text-white/80 tracking-wide">
             Exclusive Collection Available
           </span>
         </div>
 
-        <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-light tracking-tight text-foreground mb-6">
+        <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-light tracking-tight text-white mb-6">
           Experience
           <span className="block text-primary mt-2">Automotive Excellence</span>
         </h1>
 
-        <p className="max-w-2xl mx-auto text-lg sm:text-xl text-foreground/70 leading-relaxed mb-10">
+        <p className="max-w-2xl mx-auto text-lg sm:text-xl text-white/70 leading-relaxed mb-10">
           Discover our curated collection of the world's most prestigious luxury vehicles.
           Each car tells a story of craftsmanship, performance, and timeless elegance.
         </p>
@@ -58,7 +58,7 @@ export function Hero() {
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
           <button
             onClick={scrollToFleet}
-            className="flex flex-col items-center gap-2 text-foreground/50 hover:text-primary transition-colors group"
+            className="flex flex-col items-center gap-2 text-white/50 hover:text-primary transition-colors group"
             data-testid="button-scroll-down"
           >
             <span className="text-xs tracking-widest uppercase">Scroll to explore</span>

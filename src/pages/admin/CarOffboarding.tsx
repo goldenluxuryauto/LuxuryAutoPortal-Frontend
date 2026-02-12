@@ -240,7 +240,7 @@ export default function CarOffboarding() {
           placeholder="Search by name, email, phone, VIN, plate, or make/model..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-card border-border text-foreground placeholder:text-foreground0"
+          className="pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
         />
       </div>
 
@@ -336,8 +336,8 @@ export default function CarOffboarding() {
                               className={cn(
                                 "text-xs",
                                 (car.status === "available" || car.status === "in_use") 
-                                  ? "bg-green-500/20 text-green-700 border-green-500/30"
-                                  : "bg-gray-500/20 text-muted-foreground border-gray-500/30"
+                                  ? "bg-green-500/20 text-green-700 border-green-500/30 font-medium"
+                                  : "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium"
                               )}
                             >
                               {(car.status === "available" || car.status === "in_use") ? "ACTIVE" : "INACTIVE"}
@@ -351,14 +351,14 @@ export default function CarOffboarding() {
                             className={cn(
                               "text-xs",
                               car.contractStatus === "signed"
-                                ? "border-green-500/50 text-green-700 bg-green-500/10"
+                                ? "border-green-500/50 text-green-700 bg-green-500/20 font-semibold"
                                 : car.contractStatus === "pending"
-                                ? "border-primary/50 text-primary-foreground bg-primary/20"
+                                ? "border-yellow-500/50 text-yellow-800 bg-yellow-500/20 font-semibold"
                                 : car.contractStatus === "sent" || car.contractStatus === "opened"
-                                ? "border-blue-500/50 text-blue-700 bg-blue-500/10"
+                                ? "border-blue-500/50 text-blue-700 bg-blue-500/20 font-semibold"
                                 : car.contractStatus === "declined"
-                                ? "border-red-500/50 text-red-700 bg-red-500/10"
-                                : "bg-muted/30 text-muted-foreground border-border"
+                                ? "border-red-500/50 text-red-700 bg-red-500/20 font-semibold"
+                                : "bg-muted/30 text-gray-700 border-border font-semibold"
                             )}
                           >
                             {car.contractStatus ? car.contractStatus.charAt(0).toUpperCase() + car.contractStatus.slice(1) : "N/A"}
@@ -403,7 +403,7 @@ export default function CarOffboarding() {
               )}
             </>
           ) : (
-            <div className="text-center py-12 text-foreground0">
+            <div className="text-center py-12 text-muted-foreground">
               <p className="text-lg">No records found</p>
               <p className="text-sm mt-2">
                 {searchQuery
