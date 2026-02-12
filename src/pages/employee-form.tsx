@@ -364,7 +364,7 @@ export default function EmployeeFormPage() {
               </section>
 
               {shouldShowRecaptcha && (
-                <div className="pt-2 space-y-1">
+                <div className="pt-2 space-y-1 flex flex-col items-center justify-center">
                   <ReCAPTCHA ref={recaptchaRef} sitekey={siteKey!} />
                   <p className="text-muted-foreground text-xs">
                     Please complete the verification above before submitting.
