@@ -4,7 +4,6 @@
  */
 
 import { useState, useEffect } from "react";
-import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -140,8 +139,10 @@ interface Submission {
   status: "pending" | "approved" | "declined";
   employeeName?: string;
   carDisplayName?: string;
+  carOwnerName?: string | null;
   declineReason?: string | null;
   createdAt: string;
+  approvedAt?: string | null;
 }
 
 interface ExpenseFormApprovalDashboardProps {
@@ -162,7 +163,21 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
   const [declineReason, setDeclineReason] = useState("");
   const [submissionToDecline, setSubmissionToDecline] = useState<Submission | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editForm, setEditForm] = useState<Partial<Submission>>({});
+  const [editForm, setEditForm] = useState<Partial<Submission> & { employeeId?: number; carId?: number }>({});
+
+  const { data: optionsData } = useQuery({
+    queryKey: ["/api/expense-form-submissions/options"],
+    queryFn: async () => {
+      const res = await fetch(buildApiUrl("/api/expense-form-submissions/options"), {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch options");
+      return res.json();
+    },
+    enabled: editModalOpen,
+  });
+  const employees = optionsData?.data?.employees || [];
+  const cars = optionsData?.data?.cars || [];
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: [
@@ -310,6 +325,8 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
       submissionDate: sub.submissionDate,
       amount: sub.amount,
       remarks: sub.remarks ?? "",
+      employeeId: sub.employeeId,
+      carId: sub.carId,
     });
     setEditModalOpen(true);
   };
@@ -322,6 +339,8 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
         submissionDate: editForm.submissionDate,
         amount: editForm.amount,
         remarks: editForm.remarks,
+        employeeId: editForm.employeeId,
+        carId: editForm.carId,
       },
     });
   };
@@ -378,45 +397,24 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
           <Table>
             <TableHeader>
               <TableRow className="border-[#2a2a2a] hover:bg-transparent">
-                <TableHead className="text-gray-400">Date</TableHead>
-                <TableHead className="text-gray-400">Employee</TableHead>
-                <TableHead className="text-gray-400">Car</TableHead>
-                <TableHead className="text-gray-400">Year/Month</TableHead>
-                <TableHead className="text-gray-400">Category</TableHead>
-                <TableHead className="text-gray-400">Type</TableHead>
-                <TableHead className="text-gray-400">Amount</TableHead>
-                <TableHead className="text-gray-400">Status</TableHead>
-                <TableHead className="text-gray-400">Remarks</TableHead>
-                <TableHead className="text-gray-400">Decline Reason</TableHead>
-                <TableHead className="text-gray-400">Receipt</TableHead>
-                {isAdmin && <TableHead className="text-gray-400 text-right">Actions</TableHead>}
+                <TableHead className="text-gray-400 text-center">Status</TableHead>
+                <TableHead className="text-gray-400 text-center">Submitted Date</TableHead>
+                <TableHead className="text-gray-400 text-center">Approval Date</TableHead>
+                <TableHead className="text-gray-400 text-center">Receipt Date</TableHead>
+                <TableHead className="text-gray-400 text-center">Employee Name</TableHead>
+                <TableHead className="text-gray-400 text-center">Car Owner</TableHead>
+                <TableHead className="text-gray-400 text-center">Car Make/Model (Year) - Plate - VIN</TableHead>
+                <TableHead className="text-gray-400 text-center">Total Receipt Cost</TableHead>
+                <TableHead className="text-gray-400 text-center">Decline Reason</TableHead>
+                <TableHead className="text-gray-400 text-center">Remarks</TableHead>
+                <TableHead className="text-gray-400 text-center">Receipt</TableHead>
+                {isAdmin && <TableHead className="text-gray-400 text-center">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {submissions.map((sub) => (
                 <TableRow key={sub.id} className="border-border">
-                  <TableCell className="text-foreground text-sm">
-                    {new Date(sub.submissionDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm">
-                    {sub.employeeName || "-"}
-                  </TableCell>
-                  <TableCell className="text-white text-sm min-w-[220px] max-w-[320px] break-words whitespace-normal" title={sub.carDisplayName || undefined}>
-                    {sub.carDisplayName || "-"}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm">
-                    {sub.year} / {MONTHS[sub.month - 1]}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm">
-                    {CATEGORY_LABELS[sub.category] || sub.category}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {formatFieldLabel(sub.field)}
-                  </TableCell>
-                  <TableCell className="text-primary font-medium">
-                    ${Number(sub.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     <Badge
                       variant="outline"
                       className={
@@ -430,32 +428,34 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                       {sub.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-sm max-w-[120px] truncate" title={sub.remarks || undefined}>
-                    {sub.remarks || "—"}
+                  <TableCell className="text-foreground text-sm text-center">
+                    {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : "—"}
                   </TableCell>
-                  <TableCell className="text-red-700/80 text-sm max-w-[150px] truncate" title={sub.declineReason || undefined}>
+                  <TableCell className="text-foreground text-sm text-center">
+                    {sub.status === "approved" && sub.approvedAt ? new Date(sub.approvedAt).toLocaleDateString() : "—"}
+                  </TableCell>
+                  <TableCell className="text-foreground text-sm text-center">
+                    {sub.submissionDate ? new Date(sub.submissionDate).toLocaleDateString() : "—"}
+                  </TableCell>
+                  <TableCell className="text-foreground text-sm text-center">
+                    {sub.employeeName || "-"}
+                  </TableCell>
+                  <TableCell className="text-foreground text-sm text-center">
+                    {sub.carOwnerName || "—"}
+                  </TableCell>
+                  <TableCell className="text-white text-sm min-w-[220px] max-w-[320px] break-words whitespace-normal text-center" title={sub.carDisplayName || undefined}>
+                    {sub.carDisplayName || "-"}
+                  </TableCell>
+                  <TableCell className="text-primary font-medium text-center">
+                    ${Number(sub.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </TableCell>
+                  <TableCell className="text-red-700/80 text-sm max-w-[150px] truncate text-center" title={sub.declineReason || undefined}>
                     {sub.status === "declined" && sub.declineReason ? sub.declineReason : "—"}
                   </TableCell>
-                  <TableCell className="text-sm">
-                    {sub.receiptUrls && sub.receiptUrls.length > 0 ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
-                        onClick={() => {
-                          setSelectedSubmission(sub);
-                          setViewReceiptsOpen(true);
-                        }}
-                        title="View copy of receipt"
-                      >
-                        <Eye className="w-4 h-4 mr-1 inline" />
-                        View
-                      </Button>
-                    ) : (
-                      <span className="text-gray-500">No receipt</span>
-                    )}
+                  <TableCell className="text-muted-foreground text-sm max-w-[120px] truncate text-center" title={sub.remarks || undefined}>
+                    {sub.remarks || "—"}
                   </TableCell>
-                  <TableCell className="text-sm">
+                  <TableCell className="text-sm text-center">
                     {sub.receiptUrls && sub.receiptUrls.length > 0 ? (
                       <Button
                         variant="ghost"
@@ -475,22 +475,8 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                     )}
                   </TableCell>
                   {isAdmin && (
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {sub.receiptUrls && sub.receiptUrls.length > 0 && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-primary"
-                            onClick={() => {
-                              setSelectedSubmission(sub);
-                              setViewReceiptsOpen(true);
-                            }}
-                            title="View receipts"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        )}
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1">
                         {sub.status === "pending" && (
                           <>
                             <Button
@@ -512,31 +498,31 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                             >
                               <XCircle className="w-4 h-4" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-primary"
-                              onClick={() => handleEdit(sub)}
-                              title="Edit"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-red-500 hover:text-red-700"
-                              onClick={() => {
-                                if (window.confirm("Delete this submission?")) {
-                                  deleteMutation.mutate(sub.id);
-                                }
-                              }}
-                              disabled={deleteMutation.isPending}
-                              title="Delete"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
                           </>
                         )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-primary"
+                          onClick={() => handleEdit(sub)}
+                          title="Edit"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-red-500 hover:text-red-700"
+                          onClick={() => {
+                            if (window.confirm("Delete this submission?")) {
+                              deleteMutation.mutate(sub.id);
+                            }
+                          }}
+                          disabled={deleteMutation.isPending}
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   )}
@@ -671,12 +657,12 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
           <DialogHeader>
             <DialogTitle className="text-primary">Edit Submission</DialogTitle>
             <DialogDescription>
-              Edit date, amount, or remarks. Other fields cannot be changed.
+              Edit receipt date, employee, car, total receipt cost, or remarks.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm text-muted-foreground">Date</label>
+              <label className="text-sm text-muted-foreground">Receipt Date</label>
               <Input
                 type="date"
                 value={editForm.submissionDate || ""}
@@ -685,7 +671,43 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
               />
             </div>
             <div>
-              <label className="text-sm text-muted-foreground">Amount ($)</label>
+              <label className="text-sm text-muted-foreground">Employee</label>
+              <Select
+                value={editForm.employeeId != null ? String(editForm.employeeId) : ""}
+                onValueChange={(v) => setEditForm((p) => ({ ...p, employeeId: v ? Number(v) : undefined }))}
+              >
+                <SelectTrigger className="bg-card border-border text-foreground mt-1">
+                  <SelectValue placeholder="Select employee" />
+                </SelectTrigger>
+                <SelectContent>
+                  {employees.map((emp: { id: number; name: string }) => (
+                    <SelectItem key={emp.id} value={String(emp.id)}>
+                      {emp.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground">Car</label>
+              <Select
+                value={editForm.carId != null ? String(editForm.carId) : ""}
+                onValueChange={(v) => setEditForm((p) => ({ ...p, carId: v ? Number(v) : undefined }))}
+              >
+                <SelectTrigger className="bg-card border-border text-foreground mt-1">
+                  <SelectValue placeholder="Select car" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cars.map((car: { id: number; name?: string; displayName?: string }) => (
+                    <SelectItem key={car.id} value={String(car.id)}>
+                      {car.displayName || car.name || `Car #${car.id}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground">Total Receipt Cost ($)</label>
               <Input
                 type="number"
                 step="0.01"
