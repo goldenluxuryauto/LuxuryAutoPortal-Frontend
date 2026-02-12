@@ -397,17 +397,17 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
           <Table>
             <TableHeader>
               <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="text-primary font-medium">Date</TableHead>
-                <TableHead className="text-primary font-medium">Employee</TableHead>
-                <TableHead className="text-primary font-medium">Car</TableHead>
-                <TableHead className="text-primary font-medium">Year/Month</TableHead>
-                <TableHead className="text-primary font-medium">Category</TableHead>
-                <TableHead className="text-primary font-medium">Type</TableHead>
-                <TableHead className="text-primary font-medium">Amount</TableHead>
-                <TableHead className="text-primary font-medium">Status</TableHead>
-                <TableHead className="text-primary font-medium">Remarks</TableHead>
-                <TableHead className="text-primary font-medium">Decline Reason</TableHead>
-                {isAdmin && <TableHead className="text-primary font-medium text-right">Actions</TableHead>}
+                <TableHead className="text-foreground font-semibold">Date</TableHead>
+                <TableHead className="text-foreground font-semibold">Employee</TableHead>
+                <TableHead className="text-foreground font-semibold">Car</TableHead>
+                <TableHead className="text-foreground font-semibold">Year/Month</TableHead>
+                <TableHead className="text-foreground font-semibold">Category</TableHead>
+                <TableHead className="text-foreground font-semibold">Type</TableHead>
+                <TableHead className="text-foreground font-semibold">Amount</TableHead>
+                <TableHead className="text-foreground font-semibold">Status</TableHead>
+                <TableHead className="text-foreground font-semibold">Remarks</TableHead>
+                <TableHead className="text-foreground font-semibold">Decline Reason</TableHead>
+                {isAdmin && <TableHead className="text-foreground font-semibold text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
