@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import CarHeader from "./components/CarHeader";
 import IncomeExpenseTable from "./components/IncomeExpenseTable";
 import TableActions from "./components/TableActions";
+import FormSubmissionsAndReceipts from "./components/FormSubmissionsAndReceipts";
 import { IncomeExpenseProvider } from "./context/IncomeExpenseContext";
 import type { IncomeExpenseData } from "./types";
 import ModalEditManagementSplit from "./modals/ModalEditManagementSplit";
@@ -586,6 +587,9 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               />
             </div>
           </div>
+
+          {/* Form Submissions & Receipts - separated from manual I&E entries */}
+          <FormSubmissionsAndReceipts carId={activeCarId} year={selectedYear} />
 
           {/* Main Content Area - No scroll on page, only table scrolls */}
           <div className="flex-1 min-h-0 overflow-hidden">

@@ -1,9 +1,10 @@
 /**
  * Employee Form: Income & Expense Receipt Submission
- * Allows employees/staff to submit expense receipts for: Direct Delivery, COGS, Reimbursed Bills
+ * Income, Operating Expenses (Direct Delivery), COGS (Per Vehicle), Reimbursed Bills
+ * COGS workflow: Select sub-category → Upload receipt → AI extracts date/cost, optionally VIN/plate
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -22,10 +23,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Upload, Loader2 } from "lucide-react";
 
 const CATEGORY_LABELS: Record<string, string> = {
+  income: "Income",
   directDelivery: "Operating Expenses (Direct Delivery)",
   cogs: "Operating Expenses (COGS - Per Vehicle)",
   reimbursedBills: "Reimbursed and Non-Reimbursed Bills",
-  income: "Income",
 };
 
 export default function ExpenseFormSubmission() {
@@ -46,6 +47,8 @@ export default function ExpenseFormSubmission() {
   const [carSearch, setCarSearch] = useState("");
   const [carDropdownOpen, setCarDropdownOpen] = useState(false);
   const [isDraggingReceipts, setIsDraggingReceipts] = useState(false);
+  const [isAnalyzingReceipt, setIsAnalyzingReceipt] = useState(false);
+  const [analyzedOnce, setAnalyzedOnce] = useState(false);
 
   const { data: optionsData, isLoading: optionsLoading } = useQuery({
     queryKey: ["/api/expense-form-submissions/options"],
@@ -90,7 +93,6 @@ export default function ExpenseFormSubmission() {
   }, [formData.submissionDate]);
 
   // Default Employee Name to current user/account owner (client requirement)
-  // Use optionsData as dep only (avoid employees - new [] ref each render when loading)
   useEffect(() => {
     if (!currentEmployeeId || !optionsData?.data) return;
     const list = optionsData.data.employees || [];
@@ -99,6 +101,45 @@ export default function ExpenseFormSubmission() {
     if (!exists) return;
     setFormData((prev) => (prev.employeeId === id ? prev : { ...prev, employeeId: id }));
   }, [currentEmployeeId, optionsData]);
+
+  // AI receipt extraction: analyze first image when added (COGS workflow - AI reads cost)
+  const addReceiptFiles = useCallback(
+    (newFiles: File[]) => {
+      setReceiptFiles((prev) => {
+        const combined = [...prev, ...newFiles];
+        const firstImage = newFiles.find((f) => f.type.startsWith("image/"));
+        if (firstImage && !analyzedOnce && combined.length >= 1) {
+          setAnalyzedOnce(true);
+          setIsAnalyzingReceipt(true);
+          const fd = new FormData();
+          fd.append("receipt", firstImage);
+          fetch(buildApiUrl("/api/expense-form-submissions/receipt/analyze"), {
+            method: "POST",
+            credentials: "include",
+            body: fd,
+          })
+            .then((r) => r.json())
+            .then((data: { extracted?: boolean; date?: string | null; amount?: number | null; carId?: number | null }) => {
+              if (data.extracted && data) {
+                setFormData((f) => ({
+                  ...f,
+                  ...(data.date && { submissionDate: data.date }),
+                  ...(typeof data.amount === "number" && data.amount >= 0 && { amount: data.amount.toFixed(2) }),
+                  ...(data.carId && { carId: String(data.carId) }),
+                }));
+                if (data.date || data.amount || data.carId) {
+                  toast({ title: "Receipt analyzed", description: "Date, amount, or car pre-filled from receipt. Please verify." });
+                }
+              }
+            })
+            .catch(() => {})
+            .finally(() => setIsAnalyzingReceipt(false));
+        }
+        return combined;
+      });
+    },
+    [analyzedOnce, toast]
+  );
 
   const submitMutation = useMutation({
     mutationFn: async () => {
@@ -161,6 +202,7 @@ export default function ExpenseFormSubmission() {
         remarks: "",
       });
       setReceiptFiles([]);
+      setAnalyzedOnce(false);
       queryClient.invalidateQueries({ queryKey: ["/api/expense-form-submissions"] });
     },
     onError: (err: Error) => {
@@ -212,7 +254,7 @@ export default function ExpenseFormSubmission() {
           Income & Expense Receipt Submission
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Submit expense receipts for Operating Expenses (Direct Delivery), COGS, or Reimbursed Bills.
+          Income, Operating Expenses (Direct Delivery), COGS (Per Vehicle), or Reimbursed Bills. For COGS, select the expense type then upload a receipt—AI can read the cost.
         </p>
       </CardHeader>
       <CardContent>
@@ -366,8 +408,9 @@ export default function ExpenseFormSubmission() {
             </div>
           </div>
 
+          {/* Category & Expense Type - COGS workflow: select sub-category first */}
           <div>
-            <Label className="text-muted-foreground">Expense Category *</Label>
+            <Label className="text-muted-foreground">Form Category *</Label>
             <Select
               value={formData.category}
               onValueChange={(v) =>
@@ -378,6 +421,7 @@ export default function ExpenseFormSubmission() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="income">{CATEGORY_LABELS.income}</SelectItem>
                 <SelectItem value="directDelivery">
                   {CATEGORY_LABELS.directDelivery}
                 </SelectItem>
@@ -390,13 +434,15 @@ export default function ExpenseFormSubmission() {
           </div>
 
           <div>
-            <Label className="text-muted-foreground">Expense Type *</Label>
+            <Label className="text-muted-foreground">
+              {formData.category === "cogs" ? "Expense Type (e.g. Auto Body Shop / Wreck) *" : "Expense Type *"}
+            </Label>
             <Select
               value={formData.field}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, field: v }))}
             >
               <SelectTrigger className="bg-card border-border text-foreground mt-1">
-                <SelectValue placeholder="Select expense type" />
+                <SelectValue placeholder={formData.category === "cogs" ? "Select expense type, then upload receipt" : "Select expense type"} />
               </SelectTrigger>
               <SelectContent>
                 {fieldOptions.map((f: { value: string; label: string }) => (
@@ -410,7 +456,11 @@ export default function ExpenseFormSubmission() {
 
           <div>
             <Label className="text-gray-400">Upload Receipts</Label>
-            <p className="text-xs text-gray-500 mt-0.5 mb-1">Drag photos here or click to browse.</p>
+            <p className="text-xs text-gray-500 mt-0.5 mb-1">
+              {formData.category === "cogs"
+                ? "Drag or click to upload. AI will read date and cost from the receipt (if enabled)."
+                : "Drag photos here or click to browse."}
+            </p>
             <div
               className={`mt-1 flex items-center justify-center gap-2 rounded-md border-2 border-dashed px-4 py-6 transition-colors ${
                 isDraggingReceipts
@@ -438,7 +488,7 @@ export default function ExpenseFormSubmission() {
                 if (accepted.length < files.length) {
                   toast({ title: "Some files were skipped. Only images and PDF are accepted.", variant: "default" });
                 }
-                setReceiptFiles((prev) => [...prev, ...accepted]);
+                addReceiptFiles(accepted);
               }}
               onClick={() => document.getElementById("expense-receipt-file-input")?.click()}
               role="button"
@@ -453,17 +503,21 @@ export default function ExpenseFormSubmission() {
                 className="hidden"
                 onChange={(e) => {
                   const files = e.target.files ? Array.from(e.target.files) : [];
-                  setReceiptFiles((prev) => [...prev, ...files]);
+                  addReceiptFiles(files);
                   e.target.value = "";
                 }}
               />
-              <Upload className="w-5 h-5 text-gray-500 shrink-0" />
+              {isAnalyzingReceipt ? (
+                <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
+              ) : (
+                <Upload className="w-5 h-5 text-gray-500 shrink-0" />
+              )}
               <span className="text-sm text-gray-400">
-                {receiptFiles.length > 0 ? `${receiptFiles.length} file(s) chosen` : "Choose files"}
+                {isAnalyzingReceipt ? "Analyzing receipt..." : receiptFiles.length > 0 ? `${receiptFiles.length} file(s) chosen` : "Choose files"}
               </span>
             </div>
             {receiptFiles.length > 0 && (
-              <p className="text-xs text-foreground0 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {receiptFiles.length} file(s) selected
               </p>
             )}

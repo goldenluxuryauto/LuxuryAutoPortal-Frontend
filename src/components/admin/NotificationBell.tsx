@@ -1,12 +1,13 @@
 /**
  * Notification Bell - System notifications dropdown
- * Shows expense form submission, approval, decline events
+ * Real-time alerts for expense form, approvals, and other activities
  */
 
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { buildApiUrl } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Bell, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,8 +24,10 @@ interface Notification {
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const prevUnreadRef = useRef<number | undefined>(undefined);
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   const { data, isLoading } = useQuery<{
     success: boolean;
@@ -39,8 +42,22 @@ export function NotificationBell() {
       if (!res.ok) throw new Error("Failed to fetch");
       return res.json();
     },
-    refetchInterval: 60000,
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
   });
+
+  // Toast when new notifications arrive (unread count increased)
+  useEffect(() => {
+    if (data?.unreadCount == null) return;
+    const count = data.unreadCount;
+    if (prevUnreadRef.current !== undefined && count > prevUnreadRef.current) {
+      toast({
+        title: "New notifications",
+        description: "You have new notifications. Click the bell to view.",
+      });
+    }
+    prevUnreadRef.current = count;
+  }, [data?.unreadCount, toast]);
 
   const markReadMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -145,7 +162,7 @@ export function NotificationBell() {
                 <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
               </div>
             ) : notifications.length === 0 ? (
-              <div className="py-8 text-center text-sm text-foreground0">No notifications</div>
+              <div className="py-8 text-center text-sm text-muted-foreground">No notifications</div>
             ) : (
               notifications.map((n) => (
                 <button
@@ -161,7 +178,7 @@ export function NotificationBell() {
                     <div className={cn("flex-1 min-w-0", !n.isRead && "ml-0")}>
                       <p className="text-sm font-medium text-foreground truncate">{n.title}</p>
                       {n.message && <p className="text-xs text-muted-foreground truncate mt-0.5">{n.message}</p>}
-                      <p className="text-[10px] text-foreground0 mt-1">{formatTime(n.createdAt)}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">{formatTime(n.createdAt)}</p>
                     </div>
                   </div>
                 </button>
