@@ -139,12 +139,12 @@ function statusBadge(employee: Employee) {
     return { text: "Pending", className: "bg-yellow-500/20 text-yellow-700 border-yellow-500/30" };
   }
   if (employee.employee_status === "offboarded" || employee.employee_status === "separated") {
-    return { text: "Offboarded", className: "bg-gray-500/20 text-muted-foreground border-gray-500/30" };
+    return { text: "Offboarded", className: "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium" };
   }
   if (employee.employee_is_active === 1) {
     return { text: "Active", className: "bg-green-500/20 text-green-700 border-green-500/30" };
   }
-  return { text: "Inactive", className: "bg-gray-500/20 text-muted-foreground border-gray-500/30" };
+  return { text: "Inactive", className: "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium" };
 }
 
 export default function EmployeesPage() {
@@ -697,8 +697,7 @@ export default function EmployeesPage() {
 
             <Button
               onClick={openQRDialog}
-              variant="outline"
-              className="border-primary/30 text-primary hover:bg-primary/10 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
             >
               <Copy className="w-4 h-4 sm:mr-2" />
               Form Link
@@ -706,8 +705,7 @@ export default function EmployeesPage() {
 
             <Button
               onClick={() => setIsImportModalOpen(true)}
-              variant="outline"
-              className="border-primary/30 text-primary hover:bg-primary/10 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
             >
               <Upload className="w-4 h-4 sm:mr-2" />
               Import
@@ -716,8 +714,7 @@ export default function EmployeesPage() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="outline"
-                  className="border-primary/30 text-primary hover:bg-primary/10 w-full sm:w-auto"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
                 >
                   <Download className="w-4 h-4 sm:mr-2" />
                   Export
@@ -758,7 +755,7 @@ export default function EmployeesPage() {
                     <Button onClick={handlePrintQR} className="bg-primary text-primary-foreground hover:bg-primary/80">
                       Print
                     </Button>
-                    <Button onClick={handleViewForm} variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
+                    <Button onClick={handleViewForm} className="bg-primary text-primary-foreground hover:bg-primary/80">
                       View
                     </Button>
                     <Button onClick={handleCopyFormLink} variant="ghost" className="text-muted-foreground hover:text-foreground">
@@ -777,7 +774,7 @@ export default function EmployeesPage() {
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="Search by name, email, employee #..."
@@ -877,10 +874,9 @@ export default function EmployeesPage() {
                             {error instanceof Error ? error.message : "Failed to fetch employees"}
                           </p>
                           <Button
-                            variant="outline"
                             size="sm"
                             onClick={() => refetch()}
-                            className="border-primary text-primary hover:bg-primary/10"
+                            className="bg-primary text-primary-foreground hover:bg-primary/80"
                           >
                             Retry
                           </Button>
@@ -1270,7 +1266,7 @@ export default function EmployeesPage() {
                           <p className="text-xs text-muted-foreground group-hover:text-primary transition-colors">
                             Click to upload or drag and drop
                           </p>
-                          <p className="text-xs text-foreground0 mt-1">Multiple files allowed</p>
+                          <p className="text-xs text-muted-foreground mt-1">Multiple files allowed</p>
                         </div>
                         <input
                           id="car-insurance-upload"
@@ -1292,7 +1288,7 @@ export default function EmployeesPage() {
                               <div className="flex items-center gap-2">
                                 <FileSpreadsheet className="w-4 h-4 text-primary" />
                                 <span className="text-sm text-muted-foreground">{file.name}</span>
-                                <span className="text-xs text-foreground0">
+                                <span className="text-xs text-muted-foreground">
                                   ({(file.size / 1024).toFixed(2)} KB)
                                 </span>
                               </div>
@@ -1326,7 +1322,7 @@ export default function EmployeesPage() {
                           <p className="text-xs text-muted-foreground group-hover:text-primary transition-colors">
                             Click to upload or drag and drop
                           </p>
-                          <p className="text-xs text-foreground0 mt-1">Single file</p>
+                          <p className="text-xs text-muted-foreground mt-1">Single file</p>
                         </div>
                         <input
                           id="driver-license-upload"
@@ -1344,7 +1340,7 @@ export default function EmployeesPage() {
                           <div className="flex items-center gap-2">
                             <FileSpreadsheet className="w-4 h-4 text-primary" />
                             <span className="text-sm text-muted-foreground">{driverLicensePhoto.name}</span>
-                            <span className="text-xs text-foreground0">
+                            <span className="text-xs text-muted-foreground">
                               ({(driverLicensePhoto.size / 1024).toFixed(2)} KB)
                             </span>
                           </div>
@@ -1422,7 +1418,7 @@ export default function EmployeesPage() {
                     <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors">
                       {importFile ? importFile.name : "Click to Upload or Drag and Drop"}
                     </p>
-                    <p className="text-xs text-foreground0">Excel (.xlsx, .xls) or CSV file (Max 100MB)</p>
+                    <p className="text-xs text-muted-foreground">Excel (.xlsx, .xls) or CSV file (Max 100MB)</p>
                   </div>
                   <input
                     id="import-file"
@@ -1441,7 +1437,7 @@ export default function EmployeesPage() {
                     <div className="flex items-center gap-2">
                       <FileSpreadsheet className="w-5 h-5 text-primary" />
                       <span className="text-sm text-muted-foreground">{importFile.name}</span>
-                      <span className="text-xs text-foreground0">
+                      <span className="text-xs text-muted-foreground">
                         ({(importFile.size / 1024 / 1024).toFixed(2)} MB)
                       </span>
                     </div>

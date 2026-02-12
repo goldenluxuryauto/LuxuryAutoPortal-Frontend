@@ -446,9 +446,9 @@ export default function Onboarding() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 flex flex-col items-center">
             <img
-              src="/logo.svg"
+              src="/logo.png"
               alt="Golden Luxury Auto"
-              className="h-[47px] md:h-[60px] lg:h-[73px] w-auto object-contain mb-4 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
+              className="h-[120px] md:h-[150px] w-auto object-contain mb-4 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
             />
             <p className="text-muted-foreground text-center">Client Onboarding Form</p>
           </div>
@@ -1537,7 +1537,7 @@ export default function Onboarding() {
                                 <p className="text-primary text-sm">
                                   Drag & drop files here or click to browse
                                 </p>
-                                <p className="text-foreground0 text-xs mt-1">
+                                <p className="text-muted-foreground text-xs mt-1">
                                   Supports images and PDF files
                                 </p>
                               </label>
@@ -1707,7 +1707,7 @@ export default function Onboarding() {
                                 <p className="text-primary text-sm">
                                   Drag & drop files here or click to browse
                                 </p>
-                                <p className="text-foreground0 text-xs mt-1">
+                                <p className="text-muted-foreground text-xs mt-1">
                                   Supports images and PDF files
                                 </p>
                               </label>

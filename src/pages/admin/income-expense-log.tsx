@@ -182,7 +182,7 @@ export default function IncomeExpenseLogPage() {
                           <span className="text-foreground font-medium truncate">
                             {log.fieldLabel || log.fieldName}
                           </span>
-                          <span className="text-foreground0">•</span>
+                          <span className="text-muted-foreground">•</span>
                           <span className="text-muted-foreground text-sm whitespace-nowrap">
                             {getMonthName(log.month)} {log.year}
                           </span>
@@ -195,14 +195,14 @@ export default function IncomeExpenseLogPage() {
                               ${Number(log.oldValue || 0).toFixed(2)}
                             </span>
                           </div>
-                          <span className="text-foreground0">→</span>
+                          <span className="text-muted-foreground">→</span>
                           <div className="flex items-center gap-2">
                             <span className="text-muted-foreground">New:</span>
                             <span className="text-green-700 font-mono">
                               ${Number(log.newValue || 0).toFixed(2)}
                             </span>
                           </div>
-                          <span className="text-foreground0">•</span>
+                          <span className="text-muted-foreground">•</span>
                           <span className="text-yellow-700 font-mono">
                             Δ ${(Number(log.newValue || 0) - Number(log.oldValue || 0)).toFixed(2)}
                           </span>
@@ -225,7 +225,7 @@ export default function IncomeExpenseLogPage() {
                           <span className="whitespace-nowrap">{formatDate(log.changedAt)}</span>
                         </div>
                         {log.ipAddress && (
-                          <div className="text-foreground0 text-xs">
+                          <div className="text-muted-foreground text-xs">
                             {log.ipAddress}
                           </div>
                         )}

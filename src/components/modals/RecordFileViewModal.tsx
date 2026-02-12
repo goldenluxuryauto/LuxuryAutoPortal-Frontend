@@ -358,7 +358,7 @@ export function RecordFileViewModal({
                     <span className="text-muted-foreground">multiple files here or</span>{" "}
                     <span className="text-[#EAEB80]">Browse</span>
                   </div>
-                  <p className="text-xs text-foreground0 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Supported formats: PDF, Images, Documents. Maximum 20 files.
                   </p>
                 </div>
@@ -377,11 +377,11 @@ export function RecordFileViewModal({
                         className="flex items-center justify-between text-sm text-muted-foreground p-2 bg-card rounded hover:bg-muted transition-colors"
                       >
                         <span className="flex items-center gap-2 flex-1 min-w-0">
-                          <span className="text-foreground0">{index + 1}.</span>
+                          <span className="text-muted-foreground">{index + 1}.</span>
                           <span className="truncate" title={file.name}>
                             {file.name}
                           </span>
-                          <span className="text-xs text-foreground0">
+                          <span className="text-xs text-muted-foreground">
                             ({(file.size / 1024 / 1024).toFixed(2)} MB)
                           </span>
                         </span>
@@ -424,7 +424,7 @@ export function RecordFileViewModal({
                 className="bg-card border-border text-foreground mt-1"
                 required
               />
-              <p className="text-xs text-foreground0 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Update the file name as it appears in the system
               </p>
             </div>
@@ -455,7 +455,7 @@ export function RecordFileViewModal({
               <Label className="text-muted-foreground flex items-center gap-2">
                 <span>Google Drive File</span>
                 <span title="The Google Drive file ID for this file">
-                  <Info className="w-4 h-4 text-foreground0" />
+                  <Info className="w-4 h-4 text-muted-foreground" />
                 </span>
               </Label>
               <div className="flex items-center gap-2 mt-1">
@@ -463,7 +463,7 @@ export function RecordFileViewModal({
                   type="text"
                   value={itemEdit.recordsFileViewGoogleId}
                   disabled
-                  className="bg-card border-border text-foreground0 flex-1"
+                  className="bg-card border-border text-muted-foreground flex-1"
                 />
                 <a
                   href={`https://drive.google.com/file/d/${itemEdit.recordsFileViewGoogleId}/view`}

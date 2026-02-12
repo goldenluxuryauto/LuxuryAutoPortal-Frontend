@@ -99,9 +99,9 @@ export default function ExpenseFormMySubmissions() {
   const pagination = data?.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 };
 
   function statusBadge(status: string) {
-    if (status === "pending") return <Badge className="bg-primary/20 text-primary-foreground border-primary/50">Pending</Badge>;
-    if (status === "approved") return <Badge className="bg-green-500/20 text-green-700 border-green-500/30">Approved</Badge>;
-    return <Badge className="bg-red-500/20 text-red-700 border-red-500/30">Declined</Badge>;
+    if (status === "pending") return <Badge variant="outline" className="bg-yellow-500/20 text-yellow-800 border-yellow-500/50 font-semibold">Pending</Badge>;
+    if (status === "approved") return <Badge variant="outline" className="bg-green-500/20 text-green-700 border-green-500/50 font-semibold">Approved</Badge>;
+    return <Badge variant="outline" className="bg-red-500/20 text-red-700 border-red-500/50 font-semibold">Declined</Badge>;
   }
 
   return (
@@ -133,20 +133,20 @@ export default function ExpenseFormMySubmissions() {
           {error instanceof Error ? error.message : "Failed to load submissions."}
         </p>
       ) : submissions.length === 0 ? (
-        <p className="text-foreground0 text-sm py-6 text-center">No submissions yet.</p>
+        <p className="text-muted-foreground text-sm py-6 text-center">No submissions yet.</p>
       ) : (
         <div className="rounded-lg border border-border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="text-primary font-medium">Date</TableHead>
-                <TableHead className="text-primary font-medium">Car</TableHead>
-                <TableHead className="text-primary font-medium">Category / Type</TableHead>
-                <TableHead className="text-primary font-medium">Amount</TableHead>
-                <TableHead className="text-primary font-medium">Status</TableHead>
-                <TableHead className="text-primary font-medium">Remarks</TableHead>
-                <TableHead className="text-primary font-medium">Decline Reason</TableHead>
-                <TableHead className="text-primary font-medium text-right">Actions</TableHead>
+                <TableHead className="text-foreground font-semibold">Date</TableHead>
+                <TableHead className="text-foreground font-semibold">Car</TableHead>
+                <TableHead className="text-foreground font-semibold">Category / Type</TableHead>
+                <TableHead className="text-foreground font-semibold">Amount</TableHead>
+                <TableHead className="text-foreground font-semibold">Status</TableHead>
+                <TableHead className="text-foreground font-semibold">Remarks</TableHead>
+                <TableHead className="text-foreground font-semibold">Decline Reason</TableHead>
+                <TableHead className="text-foreground font-semibold text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -159,7 +159,7 @@ export default function ExpenseFormMySubmissions() {
                   <TableCell className="text-muted-foreground text-sm">
                     {CATEGORY_LABELS[s.category] || s.category} / {formatFieldLabel(s.field)}
                   </TableCell>
-                  <TableCell className="text-primary font-medium">
+                  <TableCell className="text-green-700 font-semibold">
                     ${Number(s.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </TableCell>
                   <TableCell>{statusBadge(s.status)}</TableCell>
@@ -193,7 +193,7 @@ export default function ExpenseFormMySubmissions() {
       )}
 
       {pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-foreground0">
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
           </span>
@@ -244,11 +244,11 @@ export default function ExpenseFormMySubmissions() {
                   className="block"
                 >
                   {isPdf ? (
-                    <span className="flex items-center gap-2 text-primary hover:underline">
+                    <span className="flex items-center gap-2 text-blue-700 hover:underline">
                       <ExternalLink className="w-4 h-4" /> Receipt {i + 1} (PDF)
                     </span>
                   ) : isDriveFileId ? (
-                    <span className="flex items-center gap-2 text-primary hover:underline">
+                    <span className="flex items-center gap-2 text-blue-700 hover:underline">
                       <ExternalLink className="w-4 h-4" /> View Receipt {i + 1}
                     </span>
                   ) : (

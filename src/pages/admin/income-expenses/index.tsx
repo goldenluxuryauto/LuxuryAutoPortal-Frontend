@@ -235,7 +235,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                   <Command className="bg-muted">
                     <CommandInput 
                       placeholder="Search car by make, model, plate, or VIN..." 
-                      className="text-foreground placeholder:text-foreground0"
+                      className="text-foreground placeholder:text-muted-foreground"
                     />
                     <CommandList>
                       <CommandEmpty className="text-muted-foreground py-6 text-center text-sm">
@@ -321,7 +321,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           {/* Message to select a car */}
           <div className="bg-card border border-border1a1a1a] rounded-lg p-12 text-center">
             <p className="text-muted-foreground text-lg mb-2">Please select a car to view income and expenses</p>
-            <p className="text-foreground0 text-sm">
+            <p className="text-muted-foreground text-sm">
               Choose a car from the dropdown above to see detailed financial data
             </p>
           </div>
@@ -375,7 +375,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                       <Command className="bg-muted">
                         <CommandInput 
                           placeholder="Search car by make, model, plate, or VIN..." 
-                          className="text-foreground placeholder:text-foreground0"
+                          className="text-foreground placeholder:text-muted-foreground"
                         />
                         <CommandList>
                           <CommandEmpty className="text-muted-foreground py-6 text-center text-sm">
@@ -528,7 +528,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                       <Command className="bg-muted">
                         <CommandInput 
                           placeholder="Search car by make, model, plate, or VIN..." 
-                          className="text-foreground placeholder:text-foreground0"
+                          className="text-foreground placeholder:text-muted-foreground"
                         />
                         <CommandList>
                           <CommandEmpty className="text-muted-foreground py-6 text-center text-sm">

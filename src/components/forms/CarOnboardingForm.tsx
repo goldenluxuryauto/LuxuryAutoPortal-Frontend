@@ -288,7 +288,7 @@ export default function CarOnboardingForm() {
                     </SelectContent>
                   </Select>
                   <FormMessage />
-                  <p className="text-xs text-foreground0 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Only showing offboarded cars (inactive/returned vehicles)
                   </p>
                 </FormItem>

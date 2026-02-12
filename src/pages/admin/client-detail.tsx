@@ -1040,7 +1040,7 @@ export default function ClientDetailPage() {
                           className={cn(
                             "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors",
                             isActive
-                              ? "bg-[#EAEB80]/10 text-primary"
+                              ? "bg-[#EAEB80]/10 text-black"
                               : "text-muted-foreground hover:bg-card hover:text-primary"
                           )}
                         >
@@ -1510,7 +1510,7 @@ export default function ClientDetailPage() {
                           <div>
                             <span className="text-muted-foreground block mb-1">Online Status:</span>
                             {!client ? (
-                              <span className="text-foreground0">N/A</span>
+                              <span className="text-muted-foreground">N/A</span>
                             ) : onlineStatusBadge ? (
                               <Badge
                                 variant="outline"
@@ -1519,7 +1519,7 @@ export default function ClientDetailPage() {
                                 {onlineStatusBadge.text}
                               </Badge>
                             ) : (
-                              <span className="text-foreground0">N/A</span>
+                              <span className="text-muted-foreground">N/A</span>
                             )}
                           </div>
                         </div>
@@ -1708,7 +1708,7 @@ export default function ClientDetailPage() {
                                     className={cn(
                                       car.status === "available"
                                         ? "bg-green-500/20 text-green-700 border-green-500/30"
-                                        : "bg-gray-500/20 text-muted-foreground border-gray-500/30"
+                                        : "bg-gray-500/20 text-gray-700 border-gray-500/30"
                                     )}
                                   >
                                     {car.status === "available" ? "Available" : "Off Fleet"}
@@ -1722,7 +1722,7 @@ export default function ClientDetailPage() {
                                     e.preventDefault();
                                     setLocation(`/admin/view-car/${car.id}`);
                                   }}
-                                  className="text-primary hover:underline"
+                                  className="text-blue-700 hover:underline"
                                 >
                                   View Stats
                                 </a>
@@ -1762,7 +1762,7 @@ export default function ClientDetailPage() {
                                   <a
                                     href="#"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="text-primary hover:underline"
+                                    className="text-blue-700 hover:underline"
                                   >
                                     <ExternalLink className="w-4 h-4" />
                                   </a>
@@ -1772,7 +1772,7 @@ export default function ClientDetailPage() {
                                 <a
                                   href="#"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="text-primary hover:underline"
+                                  className="text-blue-700 hover:underline"
                                 >
                                   <ExternalLink className="w-4 h-4" />
                                 </a>
@@ -2552,7 +2552,7 @@ export default function ClientDetailPage() {
                       <div className="bg-card border border-border rounded-md p-3 text-muted-foreground text-sm">
                         No non-onboarded cars available. All cars for this client have already been onboarded.
                       </div>
-                      <p className="text-xs text-foreground0">You cannot upload a contract when all cars are already onboarded.</p>
+                      <p className="text-xs text-muted-foreground">You cannot upload a contract when all cars are already onboarded.</p>
                     </div>
                   );
                 }
@@ -2580,7 +2580,7 @@ export default function ClientDetailPage() {
                     {uploadContractFormErrors.selectedCarId && (
                       <p className="text-xs text-red-700 mt-1">{uploadContractFormErrors.selectedCarId}</p>
                     )}
-                    <p className="text-xs text-foreground0 mt-1">Select a car that hasn't been onboarded yet</p>
+                    <p className="text-xs text-muted-foreground mt-1">Select a car that hasn't been onboarded yet</p>
                   </>
                 );
               })()}
@@ -2619,7 +2619,7 @@ export default function ClientDetailPage() {
                   </p>
                 )}
                 {uploadContractFormErrors.contractFile && (
-                  <p className="text-xs text-red-400 mt-1">{uploadContractFormErrors.contractFile}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{uploadContractFormErrors.contractFile}</p>
                 )}
                 <p className="text-xs text-gray-500 mt-1">Upload a PDF file from your local device (max 10MB)</p>
               </div>

@@ -67,7 +67,7 @@ export default function NotFound() {
         <p className="text-xl text-muted-foreground mb-2">
           This page is currently under development
         </p>
-        <p className="text-foreground0 mb-8 max-w-md mx-auto">
+        <p className="text-muted-foreground mb-8 max-w-md mx-auto">
           We're working hard to bring you this feature. Please check back soon!
         </p>
         <Button 

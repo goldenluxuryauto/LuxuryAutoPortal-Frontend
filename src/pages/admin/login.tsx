@@ -110,7 +110,7 @@ export default function AdminLogin() {
               <Label htmlFor="password" className="text-muted-foreground text-sm">Password</Label>
               <a
                 href="/reset-password"
-                className="text-xs text-primary hover:underline"
+                className="text-xs text-blue-700 hover:underline"
               >
                 Forgot password?
               </a>

@@ -692,8 +692,7 @@ export default function ClientsPage() {
           <div className="flex flex-col sm:flex-row gap-2">
             <Button
               onClick={() => setIsImportModalOpen(true)}
-              variant="outline"
-              className="border-primary/30 text-primary hover:bg-primary/10 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
             >
               <Upload className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Import</span>
@@ -767,8 +766,7 @@ export default function ClientsPage() {
                   });
                 }
               }}
-              variant="outline"
-              className="border-primary/30 text-primary hover:bg-primary/10 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
             >
               <Download className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Download</span>
@@ -789,7 +787,7 @@ export default function ClientsPage() {
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="Search by name, email, phone, or ID..."
@@ -839,16 +837,16 @@ export default function ClientsPage() {
               <Table className="min-w-[1000px]">
                 <TableHeader>
                   <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-12 sm:w-16 text-[10px] sm:text-xs">No</TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[150px] sm:min-w-[200px] text-[10px] sm:text-xs">Full Name</TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] sm:min-w-[180px] text-[10px] sm:text-xs hidden lg:table-cell">Email</TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden xl:table-cell">Phone</TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs">Role</TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Status</TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden md:table-cell">Joined Date</TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[120px] text-[10px] sm:text-xs">Online Status</TableHead>
-                    <TableHead className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs hidden lg:table-cell">Counts of Cars</TableHead>
-                    <TableHead className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Actions</TableHead>
+                    <TableHead className="text-center text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-12 sm:w-16 text-[10px] sm:text-xs">No</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[150px] sm:min-w-[200px] text-[10px] sm:text-xs">Full Name</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] sm:min-w-[180px] text-[10px] sm:text-xs hidden lg:table-cell">Email</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden xl:table-cell">Phone</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs">Role</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Status</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden md:table-cell">Joined Date</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[120px] text-[10px] sm:text-xs">Online Status</TableHead>
+                    <TableHead className="text-center text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs hidden lg:table-cell">Counts of Cars</TableHead>
+                    <TableHead className="text-center text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -862,10 +860,9 @@ export default function ClientsPage() {
                             {error instanceof Error ? error.message : "Database connection failed. Please try again."}
                           </p>
                           <Button
-                            variant="outline"
                             size="sm"
                             onClick={() => refetch()}
-                            className="border-primary text-primary hover:bg-primary/10"
+                            className="bg-primary text-primary-foreground hover:bg-primary/80"
                           >
                             <RefreshCw className="w-4 h-4 mr-2" />
                             Retry
@@ -909,7 +906,7 @@ export default function ClientsPage() {
                           <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
                             <Badge
                               variant="outline"
-                              className="bg-[#EAEB80]/10 text-primary border-primary/30 text-xs"
+                              className="bg-[#EAEB80]/10 text-black border-primary/30 text-xs font-medium"
                             >
                               {client.roleName}
                             </Badge>
@@ -918,12 +915,12 @@ export default function ClientsPage() {
                             <Badge
                               variant="outline"
                               className={cn(
-                                "text-xs",
+                                "text-xs font-medium",
                                 client.status === 3
-                                  ? "bg-red-500/20 text-red-400 border-red-500/30"
+                                  ? "bg-red-500/20 text-red-700 border-red-500/30"
                                   : client.status === 0
-                                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                  : "bg-gray-500/20 text-muted-foreground border-gray-500/30"
+                                  ? "bg-green-500/20 text-green-700 border-green-500/30"
+                                  : "bg-gray-500/20 text-gray-700 border-gray-500/30"
                               )}
                             >
                               {client.status === 3 ? "Blocked" : client.status === 0 ? "Active" : "Inactive"}
@@ -949,7 +946,7 @@ export default function ClientsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-9 w-9 p-0 text-primary hover:text-primary hover:bg-primary/10 rounded-full"
+                                className="h-9 w-9 p-0 text-primary hover:text-primary/80 hover:bg-primary/10 rounded-full"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleViewClient(client.id);
@@ -965,7 +962,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-700 hover:bg-yellow-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-yellow-700 hover:text-yellow-800 hover:bg-yellow-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleRevokeAccess(client.email);
@@ -984,7 +981,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-700 hover:bg-yellow-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-yellow-700 hover:text-yellow-800 hover:bg-yellow-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleRevokeAccess(client.email);
@@ -1003,7 +1000,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-green-400 hover:text-green-700 hover:bg-green-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-green-700 hover:text-green-800 hover:bg-green-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleReactivateAccess(client.email);
@@ -1046,7 +1043,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-red-400 hover:text-red-500 hover:bg-red-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-red-700 hover:text-red-800 hover:bg-red-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleBlockUser(client.email);
@@ -1720,7 +1717,7 @@ export default function ClientsPage() {
                     <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors">
                       {importFile ? importFile.name : "Click to Upload or Drag and Drop"}
                     </p>
-                    <p className="text-xs text-foreground0">
+                    <p className="text-xs text-muted-foreground">
                       Excel (.xlsx, .xls) or CSV file (Max 100MB)
                     </p>
                   </div>
@@ -1742,7 +1739,7 @@ export default function ClientsPage() {
                     <div className="flex items-center gap-2">
                       <FileSpreadsheet className="w-5 h-5 text-primary" />
                       <span className="text-sm text-muted-foreground">{importFile.name}</span>
-                      <span className="text-xs text-foreground0">
+                      <span className="text-xs text-muted-foreground">
                         ({(importFile.size / 1024 / 1024).toFixed(2)} MB)
                       </span>
                     </div>
@@ -1763,7 +1760,7 @@ export default function ClientsPage() {
                 <p className="text-sm text-muted-foreground mb-2">
                   <strong className="text-primary">Note:</strong> The imported data will:
                 </p>
-                <ul className="text-xs text-foreground0 space-y-1 list-disc list-inside">
+                <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
                   <li>Create onboarding submissions with "pending" status</li>
                   <li>Use the same fields as the client onboarding form</li>
                   <li>Require approval before creating client accounts and cars</li>

@@ -144,7 +144,7 @@ export default function ViewCarPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
-            className="mt-4 text-primary hover:underline"
+            className="mt-4 text-blue-700 hover:underline"
           >
             ← Back to Cars
           </button>
@@ -264,7 +264,7 @@ export default function ViewCarPage() {
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline text-sm flex items-center gap-1"
+                      className="text-blue-700 hover:underline text-sm flex items-center gap-1"
                     >
                       Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -277,7 +277,7 @@ export default function ViewCarPage() {
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline text-sm flex items-center gap-1"
+                      className="text-blue-700 hover:underline text-sm flex items-center gap-1"
                     >
                       Admin Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -291,7 +291,7 @@ export default function ViewCarPage() {
                   </div>
                 )}
                 {!car.turoLink && !car.adminTuroLink && (!car.turoVehicleIds || car.turoVehicleIds.length === 0) && (
-                  <span className="text-foreground0 text-sm">No Turo links available</span>
+                  <span className="text-muted-foreground text-sm">No Turo links available</span>
                 )}
               </div>
             </div>

@@ -263,7 +263,7 @@ export default function ResetPasswordPage() {
               <div className="text-center">
                 <a
                   href="/admin/login"
-                  className="text-sm text-primary hover:underline"
+                  className="text-sm text-blue-700 hover:underline"
                 >
                   Back to Login
                 </a>
@@ -297,7 +297,7 @@ export default function ResetPasswordPage() {
                 <p className="text-muted-foreground">
                   If an account exists with <strong>{email}</strong>, we've sent a password reset link.
                 </p>
-                <p className="text-sm text-foreground0">
+                <p className="text-sm text-muted-foreground">
                   The link will expire in 1 hour.
                 </p>
               </div>
@@ -306,15 +306,14 @@ export default function ResetPasswordPage() {
                   setResetRequestSent(false);
                   setEmail("");
                 }}
-                variant="outline"
-                className="w-full border-primary/30 text-primary hover:bg-primary/10"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/80"
               >
                 Send Another Email
               </Button>
               <div className="text-center">
                 <a
                   href="/admin/login"
-                  className="text-sm text-primary hover:underline"
+                  className="text-sm text-blue-700 hover:underline"
                 >
                   Back to Login
                 </a>
@@ -358,7 +357,7 @@ export default function ResetPasswordPage() {
               <div className="text-center">
                 <a
                   href="/admin/login"
-                  className="text-sm text-primary hover:underline"
+                  className="text-sm text-blue-700 hover:underline"
                 >
                   Back to Login
                 </a>

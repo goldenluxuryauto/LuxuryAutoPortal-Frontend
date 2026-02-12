@@ -206,7 +206,7 @@ export default function ModalEditReimbursedBills() {
               </label>
             </div>
             
-            <p className="text-xs text-foreground0 mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               Supported formats: JPEG, PNG, GIF, WebP (Max 10MB per image)
             </p>
             

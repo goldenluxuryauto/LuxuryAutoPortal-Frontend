@@ -250,8 +250,7 @@ function QRCodeSection() {
             {/* Download Button */}
             <Button
               onClick={handleDownloadQR}
-              variant="outline"
-              className="w-full lg:w-auto border-primary/50 text-primary hover:bg-primary/10 hover:border-primary"
+              className="w-full lg:w-auto bg-primary text-primary-foreground hover:bg-primary/80"
             >
               <Download className="w-4 h-4 mr-2" />
               Download QR Code
@@ -989,9 +988,9 @@ export default function FormsPage() {
                                   <span className="text-sm text-primary">
                                     {item.title}
                                   </span>
-                                  <ExternalLink className="w-3 h-3 text-foreground0 ml-1" />
+                                  <ExternalLink className="w-3 h-3 text-muted-foreground ml-1" />
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-foreground0" />
+                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
                               </a>
                             ) : (
                               // Internal form - expandable
@@ -1028,7 +1027,7 @@ export default function FormsPage() {
                                   {item.comingSoon && (
                                     <Badge
                                       variant="outline"
-                                      className="bg-muted/30 text-foreground0 border-border text-xs ml-2"
+                                      className="bg-muted/30 text-muted-foreground border-border text-xs ml-2"
                                     >
                                       Coming soon
                                     </Badge>
@@ -1036,9 +1035,9 @@ export default function FormsPage() {
                                 </div>
                                 {canExpand ? (
                                   isItemExpanded ? (
-                                    <ChevronDown className="w-4 h-4 text-foreground0" />
+                                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
                                   ) : (
-                                    <ChevronRight className="w-4 h-4 text-foreground0" />
+                                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                   )
                                 ) : (
                                   <ChevronRight
@@ -1046,7 +1045,7 @@ export default function FormsPage() {
                                       "w-4 h-4",
                                       item.comingSoon
                                         ? "text-gray-700"
-                                        : "text-foreground0"
+                                        : "text-muted-foreground"
                                     )}
                                   />
                                 )}
@@ -1112,7 +1111,7 @@ export default function FormsPage() {
                                     Recent Submissions
                                   </h3>
                                   <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground0" />
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                     <Input
                                       type="text"
                                       placeholder="Search by name, email, phone, or vehicle..."
@@ -1134,7 +1133,7 @@ export default function FormsPage() {
                                     <p className="mb-2">
                                       Error loading submissions
                                     </p>
-                                    <p className="text-sm text-foreground0">
+                                    <p className="text-sm text-muted-foreground">
                                       {submissionsError.message}
                                     </p>
                                   </div>
@@ -1207,14 +1206,14 @@ export default function FormsPage() {
                                               </td>
                                               <td className="py-3 px-2 sm:px-3 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={submission.vinNumber || "N/A"}>
                                                 {submission.vinNumber || (
-                                                  <span className="text-foreground0">
+                                                  <span className="text-muted-foreground">
                                                     N/A
                                                   </span>
                                                 )}
                                               </td>
                                               <td className="py-3 px-2 sm:px-3 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={submission.licensePlate || "N/A"}>
                                                 {submission.licensePlate || (
-                                                  <span className="text-foreground0">
+                                                  <span className="text-muted-foreground">
                                                     N/A
                                                   </span>
                                                 )}
@@ -1231,14 +1230,14 @@ export default function FormsPage() {
                                                     "text-xs",
                                                     submission.status ===
                                                       "pending"
-                                                      ? "border-yellow-500/50 text-yellow-500 bg-yellow-500/10"
+                                                      ? "border-yellow-500/50 text-yellow-800 bg-yellow-500/20 font-semibold"
                                                       : submission.status ===
                                                         "approved"
-                                                      ? "border-green-500/50 text-green-500 bg-green-500/10"
+                                                      ? "border-green-500/50 text-green-700 bg-green-500/20 font-semibold"
                                                       : submission.status ===
                                                         "rejected"
-                                                      ? "border-red-500/50 text-red-500 bg-red-500/10"
-                                                      : "border-gray-500/50 text-foreground0 bg-gray-500/10"
+                                                      ? "border-red-500/50 text-red-700 bg-red-500/20 font-semibold"
+                                                      : "border-gray-500/50 text-gray-700 bg-gray-500/20 font-semibold"
                                                   )}
                                                 >
                                                   {submission.status ||
@@ -1305,7 +1304,7 @@ export default function FormsPage() {
                                                       "pending") && (
                                                     <Badge
                                                       variant="outline"
-                                                      className="border-primary/50 text-primary-foreground bg-primary/20 text-xs"
+                                                      className="border-yellow-500/50 text-yellow-800 bg-yellow-500/20 text-xs font-semibold"
                                                     >
                                                       Pending
                                                     </Badge>
@@ -1318,7 +1317,7 @@ export default function FormsPage() {
                                                     submission.contractSignedAt
                                                   ).toLocaleDateString()
                                                 ) : (
-                                                  <span className="text-foreground0">
+                                                  <span className="text-muted-foreground">
                                                     Not signed
                                                   </span>
                                                 )}
@@ -1329,7 +1328,7 @@ export default function FormsPage() {
                                                     submission.carOffboardAt
                                                   ).toLocaleDateString()
                                                 ) : (
-                                                  <span className="text-foreground0">
+                                                  <span className="text-muted-foreground">
                                                     N/A
                                                   </span>
                                                 )}
@@ -1459,7 +1458,7 @@ export default function FormsPage() {
                                     )}
                                   </div>
                                 ) : (
-                                  <div className="text-center py-8 text-foreground0">
+                                  <div className="text-center py-8 text-muted-foreground">
                                     No submissions found
                                   </div>
                                 )}
@@ -1972,7 +1971,7 @@ export default function FormsPage() {
                                     </Badge>
                                   ))
                                 ) : (
-                                  <span className="text-foreground0 text-sm">No features selected</span>
+                                  <span className="text-muted-foreground text-sm">No features selected</span>
                                 );
                               })()}
                             </div>
@@ -2200,14 +2199,14 @@ export default function FormsPage() {
                             className={cn(
                               "mt-1",
                               data.contractStatus === "signed"
-                                ? "border-green-500/50 text-green-700 bg-green-500/10"
+                                ? "border-green-500/50 text-green-700 bg-green-500/20 font-semibold"
                                 : data.contractStatus === "sent"
-                                ? "border-blue-500/50 text-blue-700 bg-blue-500/10"
+                                ? "border-blue-500/50 text-blue-700 bg-blue-500/20 font-semibold"
                                 : data.contractStatus === "opened"
-                                ? "border-yellow-500/50 text-yellow-700 bg-yellow-500/10"
+                                ? "border-yellow-500/50 text-yellow-800 bg-yellow-500/20 font-semibold"
                                 : data.contractStatus === "declined"
-                                ? "border-red-500/50 text-red-700 bg-red-500/10"
-                                : "border-primary/50 text-primary-foreground bg-primary/20"
+                                ? "border-red-500/50 text-red-700 bg-red-500/20 font-semibold"
+                                : "border-yellow-500/50 text-yellow-800 bg-yellow-500/20 font-semibold"
                             )}
                           >
                             {formatValue(data.contractStatus || "Not sent")}
@@ -2332,7 +2331,7 @@ export default function FormsPage() {
                                         const parent = target.parentElement?.parentElement;
                                         if (parent && !parent.querySelector(".error-message")) {
                                           const errorDiv = document.createElement("div");
-                                          errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
+                                          errorDiv.className = "error-message text-sm text-muted-foreground absolute inset-0 flex items-center justify-center";
                                           errorDiv.textContent = "Failed to load image";
                                           parent.appendChild(errorDiv);
                                         }
@@ -2354,7 +2353,7 @@ export default function FormsPage() {
                             );
                           })() : (
                             <div className="w-full aspect-[4/3] bg-background rounded-lg border border-border flex items-center justify-center">
-                              <p className="text-sm text-foreground0">No insurance card uploaded</p>
+                              <p className="text-sm text-muted-foreground">No insurance card uploaded</p>
                             </div>
                           )}
                         </div>
@@ -2399,7 +2398,7 @@ export default function FormsPage() {
                                             const parent = target.parentElement?.parentElement;
                                             if (parent && !parent.querySelector(".error-message")) {
                                               const errorDiv = document.createElement("div");
-                                              errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
+                                              errorDiv.className = "error-message text-sm text-muted-foreground absolute inset-0 flex items-center justify-center";
                                               errorDiv.textContent = "Failed to load image";
                                               parent.appendChild(errorDiv);
                                             }
@@ -2428,7 +2427,7 @@ export default function FormsPage() {
                             </div>
                           ) : (
                             <div className="w-full aspect-[4/3] bg-background rounded-lg border border-border flex items-center justify-center">
-                              <p className="text-sm text-foreground0">No driver's license uploaded</p>
+                              <p className="text-sm text-muted-foreground">No driver's license uploaded</p>
                             </div>
                           )}
                         </div>
@@ -2486,12 +2485,12 @@ export default function FormsPage() {
             {submissionToDecline && (
               <div className="text-sm text-muted-foreground">
                 <p>
-                  <span className="text-foreground0">Client:</span>{" "}
+                  <span className="text-muted-foreground">Client:</span>{" "}
                   {submissionToDecline.firstNameOwner}{" "}
                   {submissionToDecline.lastNameOwner}
                 </p>
                 <p>
-                  <span className="text-foreground0">Email:</span>{" "}
+                  <span className="text-muted-foreground">Email:</span>{" "}
                   {submissionToDecline.emailOwner}
                 </p>
               </div>

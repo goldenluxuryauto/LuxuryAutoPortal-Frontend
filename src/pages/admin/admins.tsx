@@ -403,12 +403,12 @@ export default function AdminsPage() {
 
   const getRoleBadgeColor = (role: string) => {
     if (role.toLowerCase().includes("admin")) {
-      return "bg-[#EAEB80]/20 text-primary border-primary/30";
+      return "bg-[#EAEB80]/40 text-black border-[#EAEB80]/60 font-semibold";
     }
     if (role.toLowerCase().includes("employee")) {
-      return "bg-blue-500/20 text-blue-700 border-blue-500/30";
+      return "bg-blue-500/20 text-blue-700 border-blue-500/30 font-medium";
     }
-    return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
+    return "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium";
   };
 
   return (
@@ -438,22 +438,22 @@ export default function AdminsPage() {
               <table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Name
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                       Email
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Role
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Status
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
                       Created
                     </th>
-                    <th className="text-right text-[10px] sm:text-xs font-medium text-foreground0 uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-right text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Actions
                     </th>
                   </tr>
@@ -746,19 +746,19 @@ export default function AdminsPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left text-xs font-medium text-foreground0 uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                         Category
                       </th>
-                      <th className="text-left text-xs font-medium text-foreground0 uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                         Title
                       </th>
-                      <th className="text-left text-xs font-medium text-foreground0 uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                         URL
                       </th>
-                      <th className="text-left text-xs font-medium text-foreground0 uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                         Visibility
                       </th>
-                      <th className="text-right text-xs font-medium text-foreground0 uppercase tracking-wider px-6 py-4">
+                      <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                         Actions
                       </th>
                     </tr>
@@ -786,7 +786,7 @@ export default function AdminsPage() {
                               href={link.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-muted-foreground hover:text-primary flex items-center gap-1 text-sm"
+                              className="text-muted-foreground hover:text-blue-700 flex items-center gap-1 text-sm"
                             >
                               {link.url.length > 40
                                 ? `${link.url.substring(0, 40)}...`
@@ -799,7 +799,7 @@ export default function AdminsPage() {
                               {link.visibleToAdmins && (
                                 <Badge
                                   variant="outline"
-                                  className="bg-[#EAEB80]/20 text-primary border-primary/30 text-xs"
+                                  className="bg-[#EAEB80]/40 text-black border-[#EAEB80]/60 text-xs font-semibold"
                                 >
                                   Admin
                                 </Badge>
@@ -807,7 +807,7 @@ export default function AdminsPage() {
                               {link.visibleToClients && (
                                 <Badge
                                   variant="outline"
-                                  className="bg-green-500/20 text-green-700 border-green-500/30 text-xs"
+                                  className="bg-green-500/20 text-green-700 border-green-500/30 text-xs font-semibold"
                                 >
                                   Client
                                 </Badge>
@@ -815,7 +815,7 @@ export default function AdminsPage() {
                               {link.visibleToEmployees && (
                                 <Badge
                                   variant="outline"
-                                  className="bg-blue-500/20 text-blue-700 border-blue-500/30 text-xs"
+                                  className="bg-blue-500/20 text-blue-700 border-blue-500/30 text-xs font-semibold"
                                 >
                                   Employee
                                 </Badge>

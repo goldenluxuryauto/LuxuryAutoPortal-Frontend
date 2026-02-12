@@ -76,7 +76,7 @@ export function EmployeeDocumentImage({ value, alt, className }: EmployeeDocumen
       <div
         className={`flex items-center justify-center bg-background border border-border rounded-md ${className || ""}`}
       >
-        <Image className="h-12 w-12 text-foreground0" />
+        <Image className="h-12 w-12 text-muted-foreground" />
       </div>
     );
   }

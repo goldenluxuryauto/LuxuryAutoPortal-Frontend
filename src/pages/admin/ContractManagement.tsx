@@ -142,7 +142,7 @@ export default function ContractManagement() {
       return (
         <Badge
           variant="outline"
-          className="border-primary/50 text-primary-foreground bg-primary/20 text-xs"
+          className="border-yellow-500/50 text-yellow-800 bg-yellow-500/20 text-xs font-semibold"
         >
           Pending
         </Badge>
@@ -152,7 +152,7 @@ export default function ContractManagement() {
       return (
         <Badge
           variant="outline"
-          className="border-blue-500/50 text-blue-700 bg-blue-500/10 text-xs"
+          className="border-blue-500/50 text-blue-700 bg-blue-500/20 text-xs font-semibold"
         >
           Sent
         </Badge>
@@ -162,7 +162,7 @@ export default function ContractManagement() {
       return (
         <Badge
           variant="outline"
-          className="border-green-500/50 text-green-700 bg-green-500/10 text-xs"
+          className="border-green-500/50 text-green-700 bg-green-500/20 text-xs font-semibold"
         >
           Signed
         </Badge>
@@ -172,7 +172,7 @@ export default function ContractManagement() {
       return (
         <Badge
           variant="outline"
-          className="border-red-500/50 text-red-700 bg-red-500/10 text-xs"
+          className="border-red-500/50 text-red-700 bg-red-500/20 text-xs font-semibold"
         >
           Expired
         </Badge>
@@ -181,7 +181,7 @@ export default function ContractManagement() {
     return (
       <Badge
         variant="outline"
-        className="border-primary/50 text-primary-foreground bg-primary/20 text-xs"
+        className="border-yellow-500/50 text-yellow-800 bg-yellow-500/20 text-xs font-semibold"
       >
         Pending
       </Badge>
@@ -207,7 +207,7 @@ export default function ContractManagement() {
             placeholder="Search by name, email, phone, or vehicle..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-card border-border text-foreground placeholder:text-foreground0"
+            className="pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
           />
         </div>
       </div>
@@ -222,7 +222,7 @@ export default function ContractManagement() {
           ) : error ? (
             <div className="text-center py-12 text-red-700">
               <p className="mb-2">Error loading contracts</p>
-              <p className="text-sm text-foreground0">
+              <p className="text-sm text-muted-foreground">
                 {error instanceof Error ? error.message : "Unknown error"}
               </p>
             </div>
@@ -294,12 +294,12 @@ export default function ContractManagement() {
                     </TableCell>
                         <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={contract.vinNumber || "—"}>
                           {contract.vinNumber || (
-                            <span className="text-foreground0">—</span>
+                            <span className="text-muted-foreground">—</span>
                         )}
                     </TableCell>
                         <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={contract.licensePlate || "—"}>
                           {contract.licensePlate || (
-                            <span className="text-foreground0">—</span>
+                            <span className="text-muted-foreground">—</span>
                           )}
                         </TableCell>
                         <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
@@ -332,7 +332,7 @@ export default function ContractManagement() {
                                   View PDF
                                 </Button>
                               ) : (
-                                <span className="text-foreground0 text-xs">
+                                <span className="text-muted-foreground text-xs">
                                   {contract.contractStatus === "sent" ||
                                   contract.contractStatus === "opened"
                                     ? "Contract sent"
@@ -351,7 +351,7 @@ export default function ContractManagement() {
                               year: "numeric",
                             })
                           ) : (
-                            <span className="text-foreground0">Not signed</span>
+                            <span className="text-muted-foreground">Not signed</span>
                           )}
                         </TableCell>
                         <TableCell className="px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
@@ -364,7 +364,7 @@ export default function ContractManagement() {
                                 Offboarded
                               </Badge>
                               {contract.carOffboardAt && (
-                                <span className="text-xs text-foreground0">
+                                <span className="text-xs text-muted-foreground">
                                   {new Date(
                                     contract.carOffboardAt
                                   ).toLocaleDateString("en-US", {
@@ -375,7 +375,7 @@ export default function ContractManagement() {
                                 </span>
                               )}
                               {contract.carOffboardReason && (
-                                <span className="text-xs text-foreground0 capitalize">
+                                <span className="text-xs text-muted-foreground capitalize">
                                   {contract.carOffboardReason.replace("_", " ")}
                                 </span>
                               )}
@@ -392,8 +392,7 @@ export default function ContractManagement() {
                         <TableCell className="px-6 py-4">
                       <Button
                         size="sm"
-                            variant="outline"
-                            className="h-8 px-3 bg-primary/10 border-primary/30 text-primary hover:bg-primary/20"
+                            className="h-8 px-3 bg-primary text-primary-foreground hover:bg-primary/80"
                             onClick={() => {
                               resendMutation.mutate(contract.id);
                             }}
@@ -438,7 +437,7 @@ export default function ContractManagement() {
               )}
             </>
           ) : (
-            <div className="text-center py-12 text-foreground0">
+            <div className="text-center py-12 text-muted-foreground">
               <p className="text-lg">No records found</p>
               <p className="text-sm mt-2">
                 {searchQuery
