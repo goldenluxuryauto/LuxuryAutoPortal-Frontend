@@ -271,7 +271,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
             )}
             <div className="space-y-4">
               <div>
-                <FormLabel className="text-muted-foreground">Driver's License <span className="text-foreground0 font-normal">(Optional)</span></FormLabel>
+                <FormLabel className="text-muted-foreground">Driver's License <span className="text-muted-foreground font-normal">(Optional)</span></FormLabel>
                 <div className="flex items-center gap-4 mt-2">
                   <div className="w-32 h-24 border border-border rounded-md overflow-hidden bg-background shrink-0">
                     {licenseFile ? (
@@ -288,7 +288,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Image className="h-8 w-8 text-foreground0" />
+                        <Image className="h-8 w-8 text-muted-foreground" />
                       </div>
                     )}
                   </div>
@@ -313,9 +313,8 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       </Button>
                       <Button
                         type="button"
-                        variant="outline"
                         size="sm"
-                        className="border-primary/50 text-primary hover:bg-primary/10"
+                        className="bg-primary text-primary-foreground hover:bg-primary/80"
                         onClick={handleArchiveLicense}
                         disabled={!licenseFile || archiveLicenseMutation.isPending}
                       >
@@ -328,13 +327,13 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       </Button>
                     </div>
                     {licenseFile && (
-                      <span className="text-xs text-foreground0 truncate max-w-[12rem]">{licenseFile.name}</span>
+                      <span className="text-xs text-muted-foreground truncate max-w-[12rem]">{licenseFile.name}</span>
                     )}
                   </div>
                 </div>
               </div>
               <div>
-                <FormLabel className="text-muted-foreground">Car Insurance <span className="text-foreground0 font-normal">(Optional)</span></FormLabel>
+                <FormLabel className="text-muted-foreground">Car Insurance <span className="text-muted-foreground font-normal">(Optional)</span></FormLabel>
                 <div className="flex items-center gap-4 mt-2">
                   <div className="w-32 h-24 border border-border rounded-md overflow-hidden bg-background shrink-0">
                     {insuranceFile ? (
@@ -351,7 +350,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Image className="h-8 w-8 text-foreground0" />
+                        <Image className="h-8 w-8 text-muted-foreground" />
                       </div>
                     )}
                   </div>
@@ -376,9 +375,8 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       </Button>
                       <Button
                         type="button"
-                        variant="outline"
                         size="sm"
-                        className="border-primary/50 text-primary hover:bg-primary/10"
+                        className="bg-primary text-primary-foreground hover:bg-primary/80"
                         onClick={handleArchiveInsurance}
                         disabled={!insuranceFile || archiveInsuranceMutation.isPending}
                       >
@@ -391,7 +389,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       </Button>
                     </div>
                     {insuranceFile && (
-                      <span className="text-xs text-foreground0 truncate max-w-[12rem]">{insuranceFile.name}</span>
+                      <span className="text-xs text-muted-foreground truncate max-w-[12rem]">{insuranceFile.name}</span>
                     )}
                   </div>
                 </div>

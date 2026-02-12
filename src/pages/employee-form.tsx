@@ -372,7 +372,7 @@ export default function EmployeeFormPage() {
                 </div>
               )}
               {!shouldShowRecaptcha && (
-                <p className="text-foreground0 text-xs italic">
+                <p className="text-muted-foreground text-xs italic">
                   reCAPTCHA is not configured. For production, set VITE_RECAPTCHA_SITE_KEY (frontend) and RECAPTCHA_SECRET_KEY (backend).
                 </p>
               )}

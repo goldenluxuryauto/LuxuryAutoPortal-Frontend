@@ -49,7 +49,7 @@ export function ConfirmDialog({
             }}
             className={
               variant === "destructive"
-                ? "bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30 text-foreground"
+                ? "bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90"
                 : ""
             }
           >

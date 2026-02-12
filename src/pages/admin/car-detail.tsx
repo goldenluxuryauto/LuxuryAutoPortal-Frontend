@@ -142,14 +142,14 @@ function DocumentImageWithAuth({
   const { src, loading, error } = useDocumentBlobUrl(url);
   if (loading) {
     return (
-      <div className={cn("w-full h-full flex items-center justify-center text-foreground0 text-sm", className)}>
+      <div className={cn("w-full h-full flex items-center justify-center text-muted-foreground text-sm", className)}>
         Loading...
       </div>
     );
   }
   if (error || !src) {
     return (
-      <div className={cn("w-full h-full flex items-center justify-center text-foreground0 text-sm", className)}>
+      <div className={cn("w-full h-full flex items-center justify-center text-muted-foreground text-sm", className)}>
         Failed to load document
       </div>
     );
@@ -1406,19 +1406,19 @@ export default function CarDetailPage() {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "ACTIVE":
-        return "bg-green-500/20 text-green-700 border-green-500/30";
+        return "bg-green-500/20 text-green-700 border-green-500/30 font-medium";
       case "INACTIVE":
-        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
+        return "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium";
       // Legacy support for database values (if any still exist)
       case "available":
       case "in_use":
-        return "bg-green-500/20 text-green-700 border-green-500/30";
+        return "bg-green-500/20 text-green-700 border-green-500/30 font-medium";
       case "maintenance":
-        return "bg-yellow-500/20 text-yellow-700 border-yellow-500/30";
+        return "bg-yellow-500/20 text-yellow-700 border-yellow-500/30 font-medium";
       case "off_fleet":
-        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
+        return "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium";
       default:
-        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
+        return "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium";
     }
   };
 
@@ -1513,31 +1513,31 @@ export default function CarDetailPage() {
                 {/* Column 1: Basic Vehicle Information */}
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Make & Model</p>
+                    <p className="text-xs text-muted-foreground mb-1">Make & Model</p>
                     <p className="text-foreground text-base font-medium">{car.makeModel}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Year</p>
+                    <p className="text-xs text-muted-foreground mb-1">Year</p>
                     <p className="text-foreground text-base">{car.year || "N/A"}</p>
                   </div>
                 <div>
-                  <p className="text-xs text-foreground0 mb-1">VIN</p>
+                  <p className="text-xs text-muted-foreground mb-1">VIN</p>
                     <p className="text-foreground text-base font-mono">{car.vin}</p>
                 </div>
                 <div>
-                    <p className="text-xs text-foreground0 mb-1">License Plate</p>
+                    <p className="text-xs text-muted-foreground mb-1">License Plate</p>
                     <p className="text-foreground text-base">{car.licensePlate || "N/A"}</p>
                 </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Title Type</p>
+                    <p className="text-xs text-muted-foreground mb-1">Title Type</p>
                     <p className="text-foreground text-base">{onboarding?.titleType ? formatValue(onboarding.titleType) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Trim</p>
+                    <p className="text-xs text-muted-foreground mb-1">Trim</p>
                     <p className="text-foreground text-base">{car.vehicleTrim ? formatValue(car.vehicleTrim) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Mileage</p>
+                    <p className="text-xs text-muted-foreground mb-1">Mileage</p>
                     <p className="text-foreground text-base">{car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A"}</p>
                   </div>
                 </div>
@@ -1545,27 +1545,27 @@ export default function CarDetailPage() {
                 {/* Column 2: Specifications & Colors */}
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Exterior Color</p>
+                    <p className="text-xs text-muted-foreground mb-1">Exterior Color</p>
                     <p className="text-foreground text-base">{car.color ? formatValue(car.color) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Interior Color</p>
+                    <p className="text-xs text-muted-foreground mb-1">Interior Color</p>
                     <p className="text-foreground text-base">{car.interiorColor ? formatValue(car.interiorColor) : "N/A"}</p>
                   </div>
                 <div>
-                    <p className="text-xs text-foreground0 mb-1">Fuel Type</p>
+                    <p className="text-xs text-muted-foreground mb-1">Fuel Type</p>
                     <p className="text-foreground text-base">{car.fuelType ? formatValue(car.fuelType) : "N/A"}</p>
                 </div>
                 <div>
-                    <p className="text-xs text-foreground0 mb-1">Tire Size</p>
+                    <p className="text-xs text-muted-foreground mb-1">Tire Size</p>
                     <p className="text-foreground text-base">{car.tireSize ? formatValue(car.tireSize) : "N/A"}</p>
                 </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Number of Doors</p>
+                    <p className="text-xs text-muted-foreground mb-1">Number of Doors</p>
                     <p className="text-foreground text-base">{car.numberOfDoors ? formatValue(car.numberOfDoors) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Number of Seats</p>
+                    <p className="text-xs text-muted-foreground mb-1">Number of Seats</p>
                     <p className="text-foreground text-base">{car.numberOfSeats ? formatValue(car.numberOfSeats) : "N/A"}</p>
                   </div>
                   </div>
@@ -1573,35 +1573,35 @@ export default function CarDetailPage() {
                 {/* Column 3: Maintenance & Accessories */}
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Oil Type</p>
+                    <p className="text-xs text-muted-foreground mb-1">Oil Type</p>
                     <p className="text-foreground text-base">{car.oilType ? formatValue(car.oilType) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Last Oil Change</p>
+                    <p className="text-xs text-muted-foreground mb-1">Last Oil Change</p>
                     <p className="text-foreground text-base">{car.lastOilChange ? formatValue(car.lastOilChange) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Does Your Vehicle Have Free Dealership Oil Changes?</p>
+                    <p className="text-xs text-muted-foreground mb-1">Does Your Vehicle Have Free Dealership Oil Changes?</p>
                     <p className="text-foreground text-base">{car.freeDealershipOilChanges ? formatValue(car.freeDealershipOilChanges) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">If Yes, For How Many Years of Oil Changes, or What Oil Package</p>
+                    <p className="text-xs text-muted-foreground mb-1">If Yes, For How Many Years of Oil Changes, or What Oil Package</p>
                     <p className="text-foreground text-base">
                       {car.oilPackageDetails ? formatValue(car.oilPackageDetails) : "N/A"}
                     </p>
                   </div>
                   {car.dealershipAddress && (
                 <div>
-                      <p className="text-xs text-foreground0 mb-1">Dealership Address</p>
+                      <p className="text-xs text-muted-foreground mb-1">Dealership Address</p>
                       <p className="text-foreground text-base">{formatValue(car.dealershipAddress)}</p>
                 </div>
                   )}
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Registration Expiration</p>
+                    <p className="text-xs text-muted-foreground mb-1">Registration Expiration</p>
                     <p className="text-foreground text-base">{car.registrationExpiration ? formatValue(car.registrationExpiration) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Vehicle Recall</p>
+                    <p className="text-xs text-muted-foreground mb-1">Vehicle Recall</p>
                     <p className="text-foreground text-base">{car.vehicleRecall ? formatValue(car.vehicleRecall) : "N/A"}</p>
                   </div>
                 </div>
@@ -1611,15 +1611,15 @@ export default function CarDetailPage() {
               <div className="pt-4 border-t border-border">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Roof Rails</p>
+                    <p className="text-xs text-muted-foreground mb-1">Roof Rails</p>
                     <p className="text-foreground text-base">{car.roofRails ? formatValue(car.roofRails) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Ski Crossbars</p>
+                    <p className="text-xs text-muted-foreground mb-1">Ski Crossbars</p>
                     <p className="text-foreground text-base">{car.skiCrossBars ? formatValue(car.skiCrossBars) : "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Ski Rack</p>
+                    <p className="text-xs text-muted-foreground mb-1">Ski Rack</p>
                     <p className="text-foreground text-base">{car.skiRacks ? formatValue(car.skiRacks) : "N/A"}</p>
                   </div>
               </div>
@@ -1627,7 +1627,7 @@ export default function CarDetailPage() {
               
               {/* Features - Full width */}
               <div className="pt-4 border-t border-border">
-                <p className="text-xs text-foreground0 mb-1">Features</p>
+                <p className="text-xs text-muted-foreground mb-1">Features</p>
                 <p className="text-foreground text-base">
                   {car.vehicleFeatures && Array.isArray(car.vehicleFeatures) && car.vehicleFeatures.length > 0
                     ? car.vehicleFeatures.join(", ")
@@ -1642,7 +1642,7 @@ export default function CarDetailPage() {
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8">
                     {/* Left: Assigned To */}
                     <div className="flex-shrink-0 text-center lg:text-left">
-                      <p className="text-xs text-foreground0 mb-1.5">Assigned To</p>
+                      <p className="text-xs text-muted-foreground mb-1.5">Assigned To</p>
                     {/* Display maintenance status if car is in maintenance */}
                     {car.rawStatus === "maintenance" ? (
                       <div>
@@ -1669,13 +1669,13 @@ export default function CarDetailPage() {
                       car.clientId ? (
                         <button
                           onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                            className="hover:text-primary transition-colors"
+                            className="hover:text-blue-700 transition-colors"
                         >
                             <p className="text-foreground text-sm sm:text-base font-semibold hover:underline">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
-                              <p className="text-foreground text-xs mt-0.5 hover:text-primary break-all">
+                              <p className="text-foreground text-xs mt-0.5 hover:text-blue-700 break-all">
                               {car.owner.email}
                             </p>
                           )}
@@ -1693,7 +1693,7 @@ export default function CarDetailPage() {
                         </>
                       )
                     ) : (
-                      <p className="text-foreground0 text-xs sm:text-sm">Unassigned</p>
+                      <p className="text-muted-foreground text-xs sm:text-sm">Unassigned</p>
                       )}
                     </div>
 
@@ -1701,7 +1701,7 @@ export default function CarDetailPage() {
                     <div className="grid grid-cols-2 lg:flex lg:items-start lg:gap-8 lg:flex-1 lg:justify-end gap-4">
                       {/* Car Status */}
                       <div className="text-center lg:min-w-[100px]">
-                        <p className="text-xs text-foreground0 mb-1.5">Car Status</p>
+                        <p className="text-xs text-muted-foreground mb-1.5">Car Status</p>
                         <div className="flex justify-center">
                           <Badge
                             variant="outline"
@@ -1718,7 +1718,7 @@ export default function CarDetailPage() {
 
                       {/* Management */}
                       <div className="text-center lg:min-w-[100px]">
-                        <p className="text-xs text-foreground0 mb-1.5">Management</p>
+                        <p className="text-xs text-muted-foreground mb-1.5">Management</p>
                         <p className="text-foreground text-xs sm:text-sm font-medium">
                           {car.managementStatus === "management"
                             ? "Management"
@@ -1732,9 +1732,9 @@ export default function CarDetailPage() {
 
                       {/* Online Status */}
                       <div className="text-center lg:min-w-[120px]">
-                        <p className="text-xs text-foreground0 mb-1.5">Online Status</p>
+                        <p className="text-xs text-muted-foreground mb-1.5">Online Status</p>
                         {!car.owner ? (
-                          <p className="text-foreground0 text-xs sm:text-sm">N/A</p>
+                          <p className="text-muted-foreground text-xs sm:text-sm">N/A</p>
                         ) : onlineStatusBadge ? (
                           <div className="flex justify-center">
                             <Badge
@@ -1745,13 +1745,13 @@ export default function CarDetailPage() {
                             </Badge>
                           </div>
                         ) : (
-                          <p className="text-foreground0 text-xs sm:text-sm">N/A</p>
+                          <p className="text-muted-foreground text-xs sm:text-sm">N/A</p>
                         )}
                       </div>
 
                       {/* Last Login */}
                       <div className="text-center lg:min-w-[140px] col-span-2 lg:col-span-1">
-                        <p className="text-xs text-foreground0 mb-1.5">Last Login</p>
+                        <p className="text-xs text-muted-foreground mb-1.5">Last Login</p>
                         <p className="text-foreground text-xs sm:text-sm font-medium whitespace-normal break-words">
                           {car.owner
                             ? formatLastLogin(car.owner.lastLoginAt)
@@ -1763,7 +1763,7 @@ export default function CarDetailPage() {
               </div>
               {car.offboardAt && (
                   <div className="pt-1.5 border-t border-border">
-                    <p className="text-xs text-foreground0 mb-0.5">Off-boarded</p>
+                    <p className="text-xs text-muted-foreground mb-0.5">Off-boarded</p>
                     <p className="text-foreground text-base">
                     {formatDate(car.offboardAt)}
                   </p>
@@ -1928,44 +1928,44 @@ export default function CarDetailPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Turo Link</p>
+                    <p className="text-xs text-muted-foreground mb-1">Turo Link</p>
                     {car.turoLink ? (
                       <p className="text-foreground text-base break-all">
                         <a
                           href={car.turoLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline"
+                          className="text-blue-700 hover:underline"
                         >
                           {formatValue(car.turoLink)}
                         </a>
                       </p>
                     ) : (
-                      <p className="text-foreground0 text-base">Not provided</p>
+                      <p className="text-muted-foreground text-base">Not provided</p>
                     )}
                   </div>
                   {isAdmin && (
                   <div>
-                      <p className="text-xs text-foreground0 mb-1">Admin Turo Link</p>
+                      <p className="text-xs text-muted-foreground mb-1">Admin Turo Link</p>
                       {car.adminTuroLink ? (
                         <p className="text-foreground text-base break-all">
                           <a
                             href={car.adminTuroLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary hover:underline"
+                            className="text-blue-700 hover:underline"
                           >
                             {formatValue(car.adminTuroLink)}
                           </a>
                         </p>
               ) : (
-                        <p className="text-foreground0 text-base">Not provided</p>
+                        <p className="text-muted-foreground text-base">Not provided</p>
                       )}
                 </div>
               )}
                   {isAdmin && (
                   <div>
-                      <p className="text-xs text-foreground0 mb-1">Turo Vehicle IDs</p>
+                      <p className="text-xs text-muted-foreground mb-1">Turo Vehicle IDs</p>
                       {(() => {
                         const dbIds = (car.turoVehicleIds || []).filter((id): id is string => typeof id === "string" && id.trim().length > 0);
                         const fromTuroLink = extractTuroVehicleIdFromUrl(car.turoLink);
@@ -1976,10 +1976,10 @@ export default function CarDetailPage() {
                             {allIds.map((id, idx) => (
                               <p key={idx} className="text-foreground text-sm font-mono">{id}</p>
                             ))}
-                            <p className="text-xs text-foreground0">({allIds.length} of 10 max — for automation{fromTuroLink || fromAdminLink ? ", includes IDs from links" : ""})</p>
+                            <p className="text-xs text-muted-foreground">({allIds.length} of 10 max — for automation{fromTuroLink || fromAdminLink ? ", includes IDs from links" : ""})</p>
                           </div>
                         ) : (
-                          <p className="text-foreground0 text-base">Not provided</p>
+                          <p className="text-muted-foreground text-base">Not provided</p>
                         );
                       })()}
                 </div>
@@ -2088,7 +2088,7 @@ export default function CarDetailPage() {
                                     parent.appendChild(iframe);
                                   } else if (parent && !parent.querySelector(".error-message")) {
                                     const errorDiv = document.createElement("div");
-                                    errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
+                                    errorDiv.className = "error-message text-sm text-muted-foreground absolute inset-0 flex items-center justify-center";
                                     errorDiv.textContent = "Failed to load document";
                                     parent.appendChild(errorDiv);
                                   }
@@ -2114,7 +2114,7 @@ export default function CarDetailPage() {
                                   const parent = target.parentElement?.parentElement;
                                   if (parent && !parent.querySelector(".error-message")) {
                                     const errorDiv = document.createElement("div");
-                                    errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
+                                    errorDiv.className = "error-message text-sm text-muted-foreground absolute inset-0 flex items-center justify-center";
                                     errorDiv.textContent = "Failed to load image";
                                     parent.appendChild(errorDiv);
                                   }
@@ -2136,7 +2136,7 @@ export default function CarDetailPage() {
                       );
                     })() : (
                       <div className="w-full aspect-[4/3] bg-background rounded-lg border border-border flex items-center justify-center">
-                        <p className="text-sm text-foreground0">No insurance card uploaded</p>
+                        <p className="text-sm text-muted-foreground">No insurance card uploaded</p>
                       </div>
                     )}
                   </div>
@@ -2229,7 +2229,7 @@ export default function CarDetailPage() {
                                         parent.appendChild(iframe);
                                       } else if (parent && !parent.querySelector(".error-message")) {
                                         const errorDiv = document.createElement("div");
-                                        errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
+                                        errorDiv.className = "error-message text-sm text-muted-foreground absolute inset-0 flex items-center justify-center";
                                         errorDiv.textContent = "Failed to load document";
                                         parent.appendChild(errorDiv);
                                       }
@@ -2255,7 +2255,7 @@ export default function CarDetailPage() {
                                       const parent = target.parentElement?.parentElement;
                                       if (parent && !parent.querySelector(".error-message")) {
                                         const errorDiv = document.createElement("div");
-                                        errorDiv.className = "error-message text-sm text-foreground0 absolute inset-0 flex items-center justify-center";
+                                        errorDiv.className = "error-message text-sm text-muted-foreground absolute inset-0 flex items-center justify-center";
                                         errorDiv.textContent = "Failed to load image";
                                         parent.appendChild(errorDiv);
                                       }
@@ -2284,7 +2284,7 @@ export default function CarDetailPage() {
                       </div>
                     ) : (
                       <div className="w-full aspect-[4/3] bg-background rounded-lg border border-border flex items-center justify-center">
-                        <p className="text-sm text-foreground0">No drivers license uploaded</p>
+                        <p className="text-sm text-muted-foreground">No drivers license uploaded</p>
                       </div>
                     )}
                   </div>
@@ -2314,19 +2314,19 @@ export default function CarDetailPage() {
                   {/* Financial Details - 2 columns */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Purchase Price</p>
+                    <p className="text-xs text-muted-foreground mb-1">Purchase Price</p>
                       <p className="text-foreground text-base font-medium">{formatCurrency(onboarding.purchasePrice)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Down Payment</p>
+                    <p className="text-xs text-muted-foreground mb-1">Down Payment</p>
                       <p className="text-foreground text-base font-medium">{formatCurrency(onboarding.downPayment)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Monthly Payment</p>
+                    <p className="text-xs text-muted-foreground mb-1">Monthly Payment</p>
                       <p className="text-foreground text-base font-medium">{formatCurrency(onboarding.monthlyPayment)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Interest Rate</p>
+                    <p className="text-xs text-muted-foreground mb-1">Interest Rate</p>
                       <p className="text-foreground text-base font-medium">{formatValue(onboarding.interestRate)}%</p>
                   </div>
                   </div>
@@ -2334,11 +2334,11 @@ export default function CarDetailPage() {
                   {/* Additional Information - Full width with separator */}
                   <div className="pt-4 border-t border-border space-y-4">
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Transport City to City</p>
+                    <p className="text-xs text-muted-foreground mb-1">Transport City to City</p>
                     <p className="text-foreground text-base">{formatValue(onboarding.transportCityToCity)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Ultimate Goal</p>
+                    <p className="text-xs text-muted-foreground mb-1">Ultimate Goal</p>
                     <p className="text-foreground text-base">{formatValue(onboarding.ultimateGoal)}</p>
                   </div>
                 </div>
@@ -2367,13 +2367,13 @@ export default function CarDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                   {onboarding.carManufacturerWebsite && (
                     <div>
-                      <p className="text-xs text-foreground0 mb-1">Car Manufacturer Website</p>
+                      <p className="text-xs text-muted-foreground mb-1">Car Manufacturer Website</p>
                       <p className="text-foreground text-base break-all">
                         <a
                           href={onboarding.carManufacturerWebsite}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline"
+                          className="text-blue-700 hover:underline"
                         >
                           {formatValue(onboarding.carManufacturerWebsite)}
                         </a>
@@ -2382,13 +2382,13 @@ export default function CarDetailPage() {
                   )}
                   {onboarding.carManufacturerUsername && (
                     <div>
-                      <p className="text-xs text-foreground0 mb-1">Manufacturer Username</p>
+                      <p className="text-xs text-muted-foreground mb-1">Manufacturer Username</p>
                       <p className="text-foreground text-base">{formatValue(onboarding.carManufacturerUsername)}</p>
                     </div>
                   )}
                   {onboarding.password && (
                     <div>
-                      <p className="text-xs text-foreground0 mb-1">Password</p>
+                      <p className="text-xs text-muted-foreground mb-1">Password</p>
                       <p className="text-foreground text-base font-mono">{formatValue(onboarding.password)}</p>
                     </div>
                   )}
@@ -2401,13 +2401,13 @@ export default function CarDetailPage() {
               {/* Timestamps */}
               <div className="pt-3 border-t border-border space-y-2">
               <div>
-                <p className="text-xs text-foreground0 mb-1">Created</p>
+                <p className="text-xs text-muted-foreground mb-1">Created</p>
                   <p className="text-foreground text-base">
                   {formatDate(car.createdAt)}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-foreground0 mb-1">Last Updated</p>
+                <p className="text-xs text-muted-foreground mb-1">Last Updated</p>
                   <p className="text-foreground text-base">
                   {formatDate(car.updatedAt)}
                 </p>
@@ -2432,19 +2432,19 @@ export default function CarDetailPage() {
                 <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Provider</p>
+                    <p className="text-xs text-muted-foreground mb-1">Provider</p>
                     <p className="text-foreground text-base">{formatValue(onboarding.insuranceProvider)}</p>
                         </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Phone</p>
+                    <p className="text-xs text-muted-foreground mb-1">Phone</p>
                     <p className="text-foreground text-base">{formatValue(onboarding.insurancePhone)}</p>
                       </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Policy Number</p>
+                    <p className="text-xs text-muted-foreground mb-1">Policy Number</p>
                     <p className="text-foreground text-base font-mono">{formatValue(onboarding.policyNumber)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-foreground0 mb-1">Expiration</p>
+                    <p className="text-xs text-muted-foreground mb-1">Expiration</p>
                     <p className="text-foreground text-base">{formatValue(onboarding.insuranceExpiration)}</p>
                     </div>
                   </div>
@@ -2509,9 +2509,8 @@ export default function CarDetailPage() {
                   )}
                   {car.photos && car.photos.length > 0 && (
                     <Button
-                      variant="outline"
                       onClick={handleSelectAll}
-                      className="border-primary/50 text-primary hover:bg-primary/10"
+                      className="bg-primary text-primary-foreground hover:bg-primary/80"
                     >
                       {(() => {
                         // Check if all photos are selected
@@ -3599,7 +3598,7 @@ export default function CarDetailPage() {
                     {isAdmin && (
                       <div className="space-y-2">
                         <FormLabel className="text-muted-foreground">Turo Vehicle IDs (5–10 for automation)</FormLabel>
-                        <p className="text-xs text-foreground0">Add up to 10 Turo Vehicle IDs for the automation process.</p>
+                        <p className="text-xs text-muted-foreground">Add up to 10 Turo Vehicle IDs for the automation process.</p>
                         <Button
                           type="button"
                           variant="outline"
@@ -3716,7 +3715,7 @@ export default function CarDetailPage() {
                             </Select>
                           </FormControl>
                           <FormMessage />
-                          <p className="text-xs text-foreground0">
+                          <p className="text-xs text-muted-foreground">
                             Only admins can change car status. When set to Inactive, offboarding status will be automatically updated to Offboarded. When set to Active, offboarding status will be automatically updated to Active.
                           </p>
                         </FormItem>
@@ -3754,7 +3753,7 @@ export default function CarDetailPage() {
                             </Select>
                           </FormControl>
                           <FormMessage />
-                          <p className="text-xs text-foreground0">
+                          <p className="text-xs text-muted-foreground">
                             Only admins can change management status. Automatic updates occur on onboarding approval, offboarding, and maintenance events.
                           </p>
                         </FormItem>
@@ -3781,7 +3780,7 @@ export default function CarDetailPage() {
                       {/* Current Insurance Card Preview */}
                       {onboarding?.insuranceCardUrl && !insuranceCardFile && (
                         <div className="space-y-2">
-                          <p className="text-xs text-foreground0 font-medium">Current Document</p>
+                          <p className="text-xs text-muted-foreground font-medium">Current Document</p>
                           <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg hover:border-primary/30 transition-all">
                             {(() => {
                               const trimmedUrl = String(onboarding.insuranceCardUrl).trim();
@@ -3873,7 +3872,7 @@ export default function CarDetailPage() {
                             <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors">
                               {insuranceCardFile ? "Change File" : "Click to Upload"}
                             </p>
-                            <p className="text-xs text-foreground0">
+                            <p className="text-xs text-muted-foreground">
                               Image or PDF (Max 10MB)
                             </p>
                           </div>
@@ -3903,7 +3902,7 @@ export default function CarDetailPage() {
                       {/* Current Drivers License Previews */}
                       {onboarding?.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 && driversLicenseFiles.length === 0 && (
                         <div className="space-y-2">
-                          <p className="text-xs text-foreground0 font-medium">Current Documents ({onboarding.driversLicenseUrls.length})</p>
+                          <p className="text-xs text-muted-foreground font-medium">Current Documents ({onboarding.driversLicenseUrls.length})</p>
                           {onboarding.driversLicenseUrls.length === 1 ? (
                             // Single document - full width to match Insurance Card
                             <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg hover:border-primary/30 transition-all">
@@ -4028,7 +4027,7 @@ export default function CarDetailPage() {
                                 </div>
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">
-                                  <p className="text-xs text-foreground0">Loading...</p>
+                                  <p className="text-xs text-muted-foreground">Loading...</p>
                                 </div>
                               )}
                             </div>
@@ -4067,7 +4066,7 @@ export default function CarDetailPage() {
                                     </div>
                                   ) : (
                                     <div className="w-full h-full flex items-center justify-center">
-                                      <p className="text-xs text-foreground0">Loading...</p>
+                                      <p className="text-xs text-muted-foreground">Loading...</p>
                                     </div>
                                   )}
                                   <div className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded font-bold shadow-lg">
@@ -4091,7 +4090,7 @@ export default function CarDetailPage() {
                             <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors">
                               {driversLicenseFiles.length > 0 ? `Change Files (${driversLicenseFiles.length} selected)` : "Click to Upload"}
                             </p>
-                            <p className="text-xs text-foreground0">
+                            <p className="text-xs text-muted-foreground">
                               Multiple files allowed (Max 10MB each)
                             </p>
                           </div>

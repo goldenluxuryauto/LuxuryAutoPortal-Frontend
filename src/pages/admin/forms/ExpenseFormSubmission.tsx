@@ -368,10 +368,10 @@ export default function ExpenseFormSubmission() {
                 }}
                 className="bg-card border-border text-foreground"
               />
-              <Upload className="w-4 h-4 text-foreground0" />
+              <Upload className="w-4 h-4 text-muted-foreground" />
             </div>
             {receiptFiles.length > 0 && (
-              <p className="text-xs text-foreground0 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {receiptFiles.length} file(s) selected
               </p>
             )}

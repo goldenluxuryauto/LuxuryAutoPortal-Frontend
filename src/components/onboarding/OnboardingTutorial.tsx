@@ -867,7 +867,7 @@ export function OnboardingTutorial({
         {/* Progress Bar */}
         <div className="space-y-1 pb-2">
           <Progress value={progress} className="h-2 bg-gray-800" />
-          <div className="flex justify-between text-xs text-foreground0">
+          <div className="flex justify-between text-xs text-muted-foreground">
             <span>{Math.round(progress)}% Complete</span>
             <span>
               {currentStepIndex >= 0 ? currentStepIndex + 1 : currentStep} / {stepsForProgress.length}
@@ -882,7 +882,7 @@ export function OnboardingTutorial({
              {videoError || !hasValidVideoUrl ? (
                <div className="w-full h-full flex items-center justify-center p-8">
                  <div className="text-center space-y-2">
-                   <div className="text-foreground0 text-sm">
+                   <div className="text-muted-foreground text-sm">
                      {currentStepData.videoPlaceholder || "Video will be available soon"}
                    </div>
                    {hasValidVideoUrl && videoError && (
@@ -945,7 +945,7 @@ export function OnboardingTutorial({
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-foreground0 italic">No instructions available for this step.</p>
+              <p className="text-sm text-muted-foreground italic">No instructions available for this step.</p>
             )}
           </div>
         </div>

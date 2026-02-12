@@ -734,7 +734,7 @@ export default function TrainingManualPage() {
                                 {module.description && (
                                   <p className="text-sm text-muted-foreground mt-1">{module.description}</p>
                                 )}
-                                <p className="text-xs text-foreground0 mt-1">
+                                <p className="text-xs text-muted-foreground mt-1">
                                   {moduleSteps.length} {moduleSteps.length !== 1 ? 'steps' : 'step'}
                                 </p>
                               </div>
@@ -834,8 +834,8 @@ export default function TrainingManualPage() {
                                                   {stepVideoStates[step.id]?.error ? (
                                                     <div className="w-full h-full flex items-center justify-center p-8">
                                                       <div className="text-center space-y-2">
-                                                        <AlertCircle className="w-8 h-8 text-foreground0 mx-auto" />
-                                                        <div className="text-foreground0 text-sm">
+                                                        <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto" />
+                                                        <div className="text-muted-foreground text-sm">
                                                           {step.videoPlaceholder || "Video failed to load"}
                                                         </div>
                                                         <div className="text-xs text-gray-600 mt-2 break-all">
@@ -898,7 +898,7 @@ export default function TrainingManualPage() {
                                                 <div className="w-full aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex items-center justify-center p-8">
                                                   <div className="text-center space-y-2">
                                                     <Video className="w-12 h-12 text-gray-600 mx-auto" />
-                                                    <p className="text-foreground0 text-sm">{step.videoPlaceholder}</p>
+                                                    <p className="text-muted-foreground text-sm">{step.videoPlaceholder}</p>
                                                   </div>
                                                 </div>
                                               ) : null}
@@ -907,7 +907,7 @@ export default function TrainingManualPage() {
                                               {step.videoUrl && !stepVideoStates[step.id]?.error && (
                                   <div className="space-y-2">
                                     <div>
-                                      <p className="text-xs text-foreground0 mb-1">Video URL:</p>
+                                      <p className="text-xs text-muted-foreground mb-1">Video URL:</p>
                                       <div className="flex items-center gap-2">
                                         <p className="text-xs text-muted-foreground break-all bg-background p-2 rounded border border-border flex-1">
                                           {step.videoUrl}
@@ -1024,7 +1024,7 @@ export default function TrainingManualPage() {
                           <div className="flex items-center justify-between">
                             <div>
                               <h3 className="text-lg font-semibold text-foreground">Steps without Module</h3>
-                              <p className="text-xs text-foreground0 mt-1">
+                              <p className="text-xs text-muted-foreground mt-1">
                                 {stepsWithoutModule.length} {stepsWithoutModule.length !== 1 ? 'steps' : 'step'}
                               </p>
                             </div>
@@ -1070,8 +1070,8 @@ export default function TrainingManualPage() {
                                             {stepVideoStates[step.id]?.error ? (
                                               <div className="w-full h-full flex items-center justify-center p-8">
                                                 <div className="text-center space-y-2">
-                                                  <AlertCircle className="w-8 h-8 text-foreground0 mx-auto" />
-                                                  <div className="text-foreground0 text-sm">
+                                                  <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto" />
+                                                  <div className="text-muted-foreground text-sm">
                                                     {step.videoPlaceholder || "Video failed to load"}
                                                   </div>
                                                   <div className="text-xs text-gray-600 mt-2 break-all">
@@ -1134,7 +1134,7 @@ export default function TrainingManualPage() {
                                           <div className="w-full aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex items-center justify-center p-8">
                                             <div className="text-center space-y-2">
                                               <Video className="w-12 h-12 text-gray-600 mx-auto" />
-                                              <p className="text-foreground0 text-sm">{step.videoPlaceholder}</p>
+                                              <p className="text-muted-foreground text-sm">{step.videoPlaceholder}</p>
                                             </div>
                                           </div>
                                         ) : null}
@@ -1143,7 +1143,7 @@ export default function TrainingManualPage() {
                                         {step.videoUrl && !stepVideoStates[step.id]?.error && (
                                           <div className="space-y-2">
                                             <div>
-                                              <p className="text-xs text-foreground0 mb-1">Video URL:</p>
+                                              <p className="text-xs text-muted-foreground mb-1">Video URL:</p>
                                               <div className="flex items-center gap-2">
                                                 <p className="text-xs text-muted-foreground break-all bg-background p-2 rounded border border-border flex-1">
                                                   {step.videoUrl}
@@ -1601,7 +1601,7 @@ export default function TrainingManualPage() {
                             <div className="text-center space-y-2">
                               <AlertCircle className="w-8 h-8 text-red-700 mx-auto" />
                               <p className="text-sm text-muted-foreground">{videoError}</p>
-                              <p className="text-xs text-foreground0 break-all">{videoPreviewUrl}</p>
+                              <p className="text-xs text-muted-foreground break-all">{videoPreviewUrl}</p>
                             </div>
                           </div>
                         ) : (
@@ -1677,9 +1677,8 @@ export default function TrainingManualPage() {
                       />
                       <Button
                         type="button"
-                        variant="outline"
                         onClick={handleAddInstruction}
-                        className="border-primary/30 text-primary hover:bg-primary/10"
+                        className="bg-primary text-primary-foreground hover:bg-primary/80"
                       >
                         <Plus className="w-4 h-4" />
                       </Button>

@@ -307,10 +307,10 @@ export function PaymentReceiptModal({
             <div className="flex items-center justify-center p-12 bg-card rounded-lg">
               <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                  <X className="w-8 h-8 text-foreground0" />
+                  <X className="w-8 h-8 text-muted-foreground" />
                 </div>
                 <p className="text-muted-foreground text-lg">No receipt attached</p>
-                <p className="text-foreground0 text-sm mt-2">
+                <p className="text-muted-foreground text-sm mt-2">
                   Upload a receipt to view it here
                 </p>
               </div>
@@ -329,10 +329,10 @@ export function PaymentReceiptModal({
                       <p className="text-muted-foreground text-sm max-w-md">
                         {currentFile.error}
                       </p>
-                      <p className="text-foreground0 text-xs mt-4">
+                      <p className="text-muted-foreground text-xs mt-4">
                         File ID: {currentFile.fileId}
                       </p>
-                      <p className="text-foreground0 text-xs mt-2">
+                      <p className="text-muted-foreground text-xs mt-2">
                         If this error persists, the receipt may need to be re-uploaded.
                       </p>
                     </div>
@@ -465,7 +465,7 @@ export function PaymentReceiptModal({
                         ) : (
                           <div className="text-sm text-yellow-700">
                             <p>Folder ID detected. Please re-upload the receipt file.</p>
-                            <p className="text-xs text-foreground0 mt-1">Folder ID: {currentFile.fileId}</p>
+                            <p className="text-xs text-muted-foreground mt-1">Folder ID: {currentFile.fileId}</p>
                           </div>
                         )}
                       </div>

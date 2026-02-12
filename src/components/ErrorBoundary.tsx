@@ -85,7 +85,7 @@ export class ErrorBoundary extends Component<Props, State> {
                     <summary className="text-muted-foreground text-xs cursor-pointer">
                       Stack trace
                     </summary>
-                    <pre className="text-foreground0 text-xs mt-2 overflow-auto max-h-40">
+                    <pre className="text-muted-foreground text-xs mt-2 overflow-auto max-h-40">
                       {this.state.errorInfo.componentStack}
                     </pre>
                   </details>
@@ -111,7 +111,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </Button>
             </div>
 
-            <div className="mt-6 text-xs text-foreground0">
+            <div className="mt-6 text-xs text-muted-foreground">
               <p>If this problem persists, please contact support.</p>
               <p className="mt-2">
                 User Agent: {typeof window !== 'undefined' ? navigator.userAgent : 'Unknown'}

@@ -180,7 +180,7 @@ export function TablePagination({
               return (
                 <span
                   key={`ellipsis-${index}`}
-                  className="px-2 text-foreground0"
+                  className="px-2 text-muted-foreground"
                 >
                   ...
                 </span>

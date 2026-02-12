@@ -145,7 +145,7 @@ export function NotificationBell() {
                 <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
               </div>
             ) : notifications.length === 0 ? (
-              <div className="py-8 text-center text-sm text-foreground0">No notifications</div>
+              <div className="py-8 text-center text-sm text-muted-foreground">No notifications</div>
             ) : (
               notifications.map((n) => (
                 <button
@@ -161,7 +161,7 @@ export function NotificationBell() {
                     <div className={cn("flex-1 min-w-0", !n.isRead && "ml-0")}>
                       <p className="text-sm font-medium text-foreground truncate">{n.title}</p>
                       {n.message && <p className="text-xs text-muted-foreground truncate mt-0.5">{n.message}</p>}
-                      <p className="text-[10px] text-foreground0 mt-1">{formatTime(n.createdAt)}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">{formatTime(n.createdAt)}</p>
                     </div>
                   </div>
                 </button>

@@ -22,7 +22,7 @@ export function CTASection() {
           Ready to Find Your
           <span className="block text-primary mt-2">Dream Vehicle?</span>
         </h2>
-        <p className="text-lg text-foreground/70 mb-10 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
           Our team of luxury automotive specialists is ready to help you find
           the perfect vehicle that matches your lifestyle and preferences.
         </p>

@@ -259,7 +259,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground0" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search employee, car, VIN..."
             value={searchQuery}
@@ -292,7 +292,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
           {error instanceof Error ? error.message : "Failed to load submissions."}
         </div>
       ) : submissions.length === 0 ? (
-        <div className="text-center py-8 text-foreground0">
+        <div className="text-center py-8 text-muted-foreground">
           No expense submissions found.
         </div>
       ) : (
@@ -300,17 +300,17 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
           <Table>
             <TableHeader>
               <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="text-primary font-medium">Date</TableHead>
-                <TableHead className="text-primary font-medium">Employee</TableHead>
-                <TableHead className="text-primary font-medium">Car</TableHead>
-                <TableHead className="text-primary font-medium">Year/Month</TableHead>
-                <TableHead className="text-primary font-medium">Category</TableHead>
-                <TableHead className="text-primary font-medium">Type</TableHead>
-                <TableHead className="text-primary font-medium">Amount</TableHead>
-                <TableHead className="text-primary font-medium">Status</TableHead>
-                <TableHead className="text-primary font-medium">Remarks</TableHead>
-                <TableHead className="text-primary font-medium">Decline Reason</TableHead>
-                {isAdmin && <TableHead className="text-primary font-medium text-right">Actions</TableHead>}
+                <TableHead className="text-foreground font-semibold">Date</TableHead>
+                <TableHead className="text-foreground font-semibold">Employee</TableHead>
+                <TableHead className="text-foreground font-semibold">Car</TableHead>
+                <TableHead className="text-foreground font-semibold">Year/Month</TableHead>
+                <TableHead className="text-foreground font-semibold">Category</TableHead>
+                <TableHead className="text-foreground font-semibold">Type</TableHead>
+                <TableHead className="text-foreground font-semibold">Amount</TableHead>
+                <TableHead className="text-foreground font-semibold">Status</TableHead>
+                <TableHead className="text-foreground font-semibold">Remarks</TableHead>
+                <TableHead className="text-foreground font-semibold">Decline Reason</TableHead>
+                {isAdmin && <TableHead className="text-foreground font-semibold text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -334,7 +334,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                   <TableCell className="text-muted-foreground text-sm">
                     {formatFieldLabel(sub.field)}
                   </TableCell>
-                  <TableCell className="text-primary font-medium">
+                  <TableCell className="text-green-700 font-semibold">
                     ${Number(sub.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </TableCell>
                   <TableCell>
@@ -342,10 +342,10 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                       variant="outline"
                       className={
                         sub.status === "approved"
-                          ? "border-green-600 text-green-700"
+                          ? "border-green-500/50 text-green-700 bg-green-500/20 font-semibold"
                           : sub.status === "declined"
-                          ? "border-red-600 text-red-700"
-                          : "border-primary/50 text-primary"
+                          ? "border-red-500/50 text-red-700 bg-red-500/20 font-semibold"
+                          : "border-yellow-500/50 text-yellow-800 bg-yellow-500/20 font-semibold"
                       }
                     >
                       {sub.status}
@@ -432,7 +432,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
 
       {pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-foreground0">
+          <p className="text-sm text-muted-foreground">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
           </p>
           <div className="flex gap-2">
@@ -489,11 +489,11 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                   className="block"
                 >
                   {isPdf ? (
-                    <span className="flex items-center gap-2 text-primary hover:underline">
+                    <span className="flex items-center gap-2 text-blue-700 hover:underline">
                       <ExternalLink className="w-4 h-4" /> Receipt {i + 1} (PDF)
                     </span>
                   ) : isDriveFileId ? (
-                    <span className="flex items-center gap-2 text-primary hover:underline">
+                    <span className="flex items-center gap-2 text-blue-700 hover:underline">
                       <ExternalLink className="w-4 h-4" /> View Receipt {i + 1}
                     </span>
                   ) : (

@@ -84,30 +84,30 @@ function CarCard({ car }: { car: Partial<Car> }) {
             <h3 className="text-xl font-semibold text-foreground">
               {car.make} {car.model}
             </h3>
-            <p className="text-sm text-muted-foreground">{car.exteriorColor}</p>
+            <p className="text-sm text-gray-500">{car.exteriorColor}</p>
           </div>
-          <p className="text-xl font-semibold text-primary whitespace-nowrap">
+          <p className="text-xl font-semibold text-green-700 whitespace-nowrap">
             {formatPrice(String(car.price || "0"))}
           </p>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="w-4 h-4 text-foreground" />
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Calendar className="w-4 h-4 text-gray-700" />
             <span>{car.year}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Gauge className="w-4 h-4 text-primary/70" />
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Gauge className="w-4 h-4 text-gray-700" />
             <span>{car.mileage?.toLocaleString()} mi</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Fuel className="w-4 h-4 text-primary/70" />
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Fuel className="w-4 h-4 text-gray-700" />
             <span>{car.fuelType}</span>
           </div>
         </div>
 
         <Link href={`/fleet/${car.id}`}>
-          <Button variant="outline" className="w-full group/btn border-white/20" data-testid={`button-view-details-${car.id}`}>
+            <Button variant="outline" className="w-full group/btn border-gray-300 text-foreground hover:bg-gray-50" data-testid={`button-view-details-${car.id}`}>
             View Details
             <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
           </Button>
@@ -128,7 +128,7 @@ export function FeaturedCars() {
           <h2 className="font-serif text-3xl lg:text-4xl font-medium text-foreground mb-4">
             Featured Vehicles
           </h2>
-          <p className="max-w-2xl mx-auto text-muted-foreground">
+          <p className="max-w-2xl mx-auto text-gray-600">
             Hand-picked automobiles representing the pinnacle of automotive engineering and design.
           </p>
         </div>
@@ -141,7 +141,7 @@ export function FeaturedCars() {
 
         <div className="text-center mt-12">
           <Link href="/fleet">
-            <Button size="lg" variant="outline" className="border-white/20" data-testid="button-view-all-fleet">
+            <Button size="lg" variant="outline" className="border-gray-300 text-foreground hover:bg-gray-50" data-testid="button-view-all-fleet">
               View All Vehicles
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>

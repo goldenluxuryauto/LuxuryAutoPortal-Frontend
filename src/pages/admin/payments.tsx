@@ -278,7 +278,7 @@ export default function PaymentsPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
-            className="mt-4 text-primary hover:underline"
+            className="mt-4 text-blue-700 hover:underline"
           >
             ← Back to Cars
           </button>
@@ -453,7 +453,7 @@ export default function PaymentsPage() {
                 <TableBody>
                   {isLoadingPayments ? (
                     <TableRow>
-                      <TableCell colSpan={isAdmin ? 11 : 10} className="text-center py-12 text-foreground0">
+                      <TableCell colSpan={isAdmin ? 11 : 10} className="text-center py-12 text-muted-foreground">
                         Loading...
                       </TableCell>
                     </TableRow>
@@ -554,7 +554,7 @@ export default function PaymentsPage() {
                     </>
                   ) : (
                     <TableRow>
-                        <TableCell colSpan={isAdmin ? 11 : 10} className="text-center py-12 text-foreground0">
+                        <TableCell colSpan={isAdmin ? 11 : 10} className="text-center py-12 text-muted-foreground">
                         No payment records found
                       </TableCell>
                     </TableRow>
