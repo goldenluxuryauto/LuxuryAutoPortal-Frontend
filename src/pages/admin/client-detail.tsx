@@ -1041,7 +1041,6 @@ export default function ClientDetailPage() {
                             "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors",
                             isActive
                               ? "bg-[#EAEB80]/10 text-black"
-                              ? "bg-[#EAEB80]/10 text-black"
                               : "text-muted-foreground hover:bg-card hover:text-primary"
                           )}
                         >
