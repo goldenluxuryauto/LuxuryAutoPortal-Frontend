@@ -650,7 +650,7 @@ export default function CarsPage() {
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Cars</h1>
+            <h1 className="text-2xl font-bold text-primary">Cars</h1>
             <p className="text-muted-foreground text-xs sm:text-sm">{isAdmin ? "Manage your vehicle fleet" : "View your vehicles"}</p>
           </div>
         </div>
@@ -843,7 +843,7 @@ export default function CarsPage() {
                                 e.preventDefault();
                                 setLocation(`/admin/view-car/${car.id}`);
                               }}
-                              className="text-blue-700 hover:underline text-xs sm:text-sm font-medium"
+                              className="text-[#B8860B] hover:text-[#9A7209] hover:underline font-semibold text-xs sm:text-sm transition-colors duration-200"
                             >
                               View Stats
                             </a>
@@ -854,10 +854,10 @@ export default function CarsPage() {
                               className={cn(
                                 "text-xs",
                                 derivedManagementStatus === "management"
-                                  ? "bg-blue-500/20 text-blue-700 border-blue-500/30 font-medium"
+                                  ? "bg-[#EAEB80]/25 text-[#8B6914] border-[#EAEB80]/60 font-semibold shadow-sm"
                                   : derivedManagementStatus === "off_ride"
-                                    ? "bg-yellow-500/20 text-yellow-700 border-yellow-500/30 font-medium"
-                                    : "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium"
+                                    ? "bg-yellow-500/20 text-yellow-800 border-yellow-600/50 font-semibold shadow-sm"
+                                    : "bg-[#EAEB80]/15 text-[#8B6914] border-[#EAEB80]/40 font-semibold shadow-sm"
                               )}
                             >
                             {managementValue}
@@ -874,7 +874,7 @@ export default function CarsPage() {
                                         e.preventDefault();
                                         setLocation(`/admin/clients/${car.clientId}`);
                                       }}
-                                      className="text-blue-700 hover:underline text-xs sm:text-sm font-medium cursor-pointer block"
+                                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline font-semibold text-xs sm:text-sm cursor-pointer block transition-colors duration-200"
                                     >
                                       {car.owner.firstName} {car.owner.lastName}
                                     </a>
@@ -885,7 +885,7 @@ export default function CarsPage() {
                                           e.preventDefault();
                                           setLocation(`/admin/clients/${car.clientId}`);
                                         }}
-                                        className="text-blue-700 hover:underline text-[10px] sm:text-xs cursor-pointer block mt-0.5"
+                                        className="text-[#8B6914] hover:text-[#B8860B] hover:underline text-[10px] sm:text-xs cursor-pointer block mt-0.5 transition-colors duration-200 font-medium"
                                       >
                                         {car.owner.email}
                                       </a>
@@ -905,7 +905,7 @@ export default function CarsPage() {
                                 )}
                               </div>
                             ) : (
-                              <span className="text-gray-600 text-xs sm:text-sm">
+                              <span className="text-muted-foreground text-xs sm:text-sm">
                                 Unassigned
                               </span>
                             )}
@@ -944,7 +944,7 @@ export default function CarsPage() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="text-blue-700 hover:underline inline-flex items-center justify-center"
+                                className="text-[#B8860B] hover:text-[#9A7209] hover:underline inline-flex items-center justify-center transition-colors duration-200"
                               >
                                 <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                               </a>

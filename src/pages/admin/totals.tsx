@@ -200,7 +200,7 @@ export default function TotalsPage() {
             </button>
           )}
           <div>
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 className="text-2xl font-bold text-primary">
               {isAllCarsReport ? "ALL CARS REPORT - TOTALS" : "INDIVIDUAL CAR REPORT - TOTALS"}
             </h1>
             {!isAllCarsReport && car && (
@@ -216,7 +216,7 @@ export default function TotalsPage() {
           <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
               <div className="flex-1">
-                <h1 className="text-xl sm:text-2xl font-semibold text-foreground mb-2">Totals</h1>
+                <h1 className="text-2xl font-bold text-primary mb-2">Totals</h1>
               </div>
               <Button
                 variant="outline"
@@ -255,12 +255,12 @@ export default function TotalsPage() {
                   {car.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
+                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer font-semibold"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                    <span className="text-foreground text-xs sm:text-sm break-words">{ownerName}</span>
+                    <span className="text-[#B8860B] text-xs sm:text-sm break-words font-semibold">{ownerName}</span>
                   )}
                 </div>
                 <div>

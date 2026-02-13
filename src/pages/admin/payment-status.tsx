@@ -232,7 +232,7 @@ export default function PaymentStatusPage() {
     <AdminLayout>
       <div className="flex flex-col h-full overflow-x-hidden">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground">Payment Status</h1>
+          <h1 className="text-2xl font-bold text-primary">Payment Status</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage payment statuses for client payments
           </p>

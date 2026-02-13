@@ -1470,27 +1470,27 @@ export default function CarDetailPage() {
   return (
     <AdminLayout>
       <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
             <Button
               variant="ghost"
               onClick={() => setLocation(`/admin/view-car/${carId}`)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground shrink-0"
             >
               <ArrowLeft className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Back</span>
             </Button>
-            <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-primary italic">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-primary truncate">
                 {car.makeModel}
               </h1>
-              <p className="text-muted-foreground text-xs sm:text-sm">Car Details</p>
+              <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">Car Details</p>
             </div>
           </div>
           {isAdmin && (
             <Button
               onClick={handleEditClick}
-              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto shrink-0"
             >
               <Edit className="w-4 h-4 mr-2" />
               Edit

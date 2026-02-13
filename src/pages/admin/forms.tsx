@@ -929,6 +929,12 @@ export default function FormsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6 max-w-full">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-primary">Forms</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage client onboarding and expense forms
+          </p>
+        </div>
         <Card className="bg-card border-primary/20 max-w-full overflow-hidden">
           <CardContent className="p-0 max-w-full overflow-hidden">
             {formSections.map((section) => {

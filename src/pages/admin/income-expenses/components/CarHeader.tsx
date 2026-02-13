@@ -41,7 +41,7 @@ export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHe
               {car?.clientId && onNavigateToClient ? (
                 <button
                   onClick={() => onNavigateToClient(car.clientId)}
-                  className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-xs cursor-pointer"
+                  className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs cursor-pointer font-semibold"
                 >
                   {car?.owner 
                     ? `${car.owner.firstName} ${car.owner.lastName}` 
@@ -50,7 +50,7 @@ export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHe
                     : "N/A"}
                 </button>
               ) : (
-                <span className="text-foreground text-xs">
+                <span className="text-[#B8860B] text-xs font-semibold">
                   {car?.owner 
                     ? `${car.owner.firstName} ${car.owner.lastName}` 
                     : car?.ownerFirstName && car?.ownerLastName

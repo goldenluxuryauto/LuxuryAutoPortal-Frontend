@@ -136,7 +136,7 @@ export default function PaymentCalculatorPage() {
             <span>Back to View Car</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Payment Calculator</h1>
+            <h1 className="text-2xl font-bold text-primary">Payment Calculator</h1>
             {car && (
               <p className="text-sm text-muted-foreground mt-1">
                 Car: {car.makeModel || "Unknown Car"}
@@ -173,7 +173,7 @@ export default function PaymentCalculatorPage() {
               <div className="space-y-2">
                 <div>
                   <span className="text-xs text-muted-foreground">Name:</span>
-                  <p className="text-sm text-muted-foreground">{ownerName}</p>
+                  <p className="text-sm text-[#B8860B] font-semibold">{ownerName}</p>
                 </div>
                 <div>
                   <span className="text-xs text-muted-foreground">Contact #:</span>

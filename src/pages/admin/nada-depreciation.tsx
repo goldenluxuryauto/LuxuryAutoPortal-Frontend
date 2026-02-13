@@ -689,7 +689,7 @@ export default function NADADepreciationPage() {
             <span>Back to View Car</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">NADA Depreciation Schedule</h1>
+            <h1 className="text-2xl font-bold text-primary">NADA Depreciation Schedule</h1>
             {car && (
               <p className="text-sm text-muted-foreground mt-1">
                 Car: {car.makeModel || "Unknown Car"}
@@ -736,12 +736,12 @@ export default function NADADepreciationPage() {
                     {car?.clientId ? (
                       <button
                         onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                        className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-sm cursor-pointer"
+                        className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-sm cursor-pointer font-semibold"
                       >
                         {ownerName}
                       </button>
                     ) : (
-                      <p className="text-sm text-muted-foreground">{ownerName}</p>
+                      <p className="text-sm text-[#B8860B] font-semibold">{ownerName}</p>
                     )}
                   </div>
                   <div>

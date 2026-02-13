@@ -77,7 +77,7 @@ export function TablePagination({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-card border-t border-border1a1a1a]">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-card border-t border-border">
       {/* Left: Rows per page + Info */}
       <div className="flex flex-col sm:flex-row items-center gap-4">
         {/* Rows per page buttons */}
@@ -91,10 +91,10 @@ export function TablePagination({
                 disabled={isLoading}
                 className={cn(
                   "px-3 py-1.5 text-sm font-medium rounded transition-all duration-200",
-                  "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
                   itemsPerPage === limit
-                    ? "bg-primary text-primary-foreground font-bold shadow-lg"
-                    : "bg-card text-muted-foreground hover:text-foreground border border-border"
+                    ? "bg-[#EAEB80] text-[#1a1a1a] font-bold shadow-md"
+                    : "bg-card text-foreground border border-border hover:bg-[#EAEB80]/20 hover:border-[#EAEB80]/50 hover:text-[#8B6914] font-medium"
                 )}
               >
                 {limit}
@@ -119,9 +119,9 @@ export function TablePagination({
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1 || isLoading}
             className={cn(
-              "p-2 rounded transition-colors",
-              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-muted-foreground hover:text-foreground"
+              "p-2 rounded transition-all duration-200",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
             )}
             aria-label="Previous page"
           >
@@ -134,9 +134,9 @@ export function TablePagination({
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages || isLoading}
             className={cn(
-              "p-2 rounded transition-colors",
-              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-muted-foreground hover:text-foreground"
+              "p-2 rounded transition-all duration-200",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
             )}
             aria-label="Next page"
           >
@@ -151,9 +151,9 @@ export function TablePagination({
             onClick={() => handlePageChange(1)}
             disabled={currentPage === 1 || isLoading}
             className={cn(
-              "p-2 rounded transition-colors",
-              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-muted-foreground hover:text-foreground"
+              "p-2 rounded transition-all duration-200",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
             )}
             aria-label="First page"
           >
@@ -165,9 +165,9 @@ export function TablePagination({
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1 || isLoading}
             className={cn(
-              "p-2 rounded transition-colors",
-              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-muted-foreground hover:text-foreground"
+              "p-2 rounded transition-all duration-200",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
             )}
             aria-label="Previous page"
           >
@@ -195,10 +195,10 @@ export function TablePagination({
                 disabled={isLoading}
                 className={cn(
                   "min-w-[2.5rem] px-3 py-1.5 text-sm font-medium rounded transition-all duration-200",
-                  "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
                   currentPage === pageNum
-                    ? "bg-primary text-primary-foreground font-bold shadow-lg"
-                    : "bg-card text-muted-foreground hover:text-foreground border border-border"
+                    ? "bg-[#EAEB80] text-[#1a1a1a] font-bold shadow-md"
+                    : "bg-card text-foreground border border-border hover:bg-[#EAEB80]/20 hover:border-[#EAEB80]/50 hover:text-[#8B6914] font-medium"
                 )}
                 aria-label={`Page ${pageNum}`}
                 aria-current={currentPage === pageNum ? "page" : undefined}
@@ -213,9 +213,9 @@ export function TablePagination({
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages || isLoading}
             className={cn(
-              "p-2 rounded transition-colors",
-              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-muted-foreground hover:text-foreground"
+              "p-2 rounded transition-all duration-200",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
             )}
             aria-label="Next page"
           >
@@ -227,9 +227,9 @@ export function TablePagination({
             onClick={() => handlePageChange(totalPages)}
             disabled={currentPage === totalPages || isLoading}
             className={cn(
-              "p-2 rounded transition-colors",
-              "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-muted-foreground hover:text-foreground"
+              "p-2 rounded transition-all duration-200",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
             )}
             aria-label="Last page"
           >

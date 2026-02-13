@@ -1300,7 +1300,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                   <td colSpan={14} className="px-3 py-2">
                     <button
                       onClick={() => setAddSubcategoryModal({ open: true, categoryType: "directDelivery", name: "" })}
-                      className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                      className="flex items-center gap-2 text-xs text-[#B8860B] hover:text-[#9A7209] transition-colors font-semibold"
                     >
                       <Plus className="w-4 h-4" />
                       Add Subcategory
@@ -1509,7 +1509,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                   <td colSpan={14} className="px-3 py-2">
                     <button
                       onClick={() => setAddSubcategoryModal({ open: true, categoryType: "cogs", name: "" })}
-                      className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                      className="flex items-center gap-2 text-xs text-[#B8860B] hover:text-[#9A7209] transition-colors font-semibold"
                     >
                       <Plus className="w-4 h-4" />
                       Add Subcategory
@@ -1605,7 +1605,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                   <td colSpan={14} className="px-3 py-2">
                     <button
                       onClick={() => setAddSubcategoryModal({ open: true, categoryType: "parkingFeeLabor", name: "" })}
-                      className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                      className="flex items-center gap-2 text-xs text-[#B8860B] hover:text-[#9A7209] transition-colors font-semibold"
                     >
                       <Plus className="w-4 h-4" />
                       Add Subcategory
@@ -1715,7 +1715,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                   <td colSpan={14} className="px-3 py-2">
                     <button
                       onClick={() => setAddSubcategoryModal({ open: true, categoryType: "reimbursedBills", name: "" })}
-                      className="flex items-center gap-2 text-xs text-[#EAEB80] hover:text-[#d4d570] transition-colors"
+                      className="flex items-center gap-2 text-xs text-[#B8860B] hover:text-[#9A7209] transition-colors font-semibold"
                     >
                       <Plus className="w-4 h-4" />
                       Add Subcategory

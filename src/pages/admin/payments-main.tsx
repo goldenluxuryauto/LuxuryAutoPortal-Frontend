@@ -294,7 +294,7 @@ export default function PaymentsMainPage() {
     <AdminLayout>
       <div className="flex flex-col h-full overflow-x-hidden">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground">Payments</h1>
+          <h1 className="text-2xl font-bold text-primary">Payments</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage client payments across all cars
           </p>
@@ -383,20 +383,20 @@ export default function PaymentsMainPage() {
             <Table className="table-fixed w-full">
               <TableHeader>
                 <TableRow className="border-border hover:bg-transparent">
-                  <TableHead className="text-left text-primary font-medium w-12">#</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-24">Status</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-36">Client</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-28 whitespace-nowrap">Date</TableHead>
-                  <TableHead className="text-left text-primary font-medium min-w-[180px]">Car</TableHead>
-                  <TableHead className="text-right text-primary font-medium w-24 tabular-nums">Payable</TableHead>
-                  <TableHead className="text-right text-primary font-medium w-24 tabular-nums">Payout</TableHead>
-                  <TableHead className="text-right text-primary font-medium w-24 tabular-nums">Balance</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-24">Ref #</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-24">Invoice #</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-28 whitespace-nowrap">Payment Date</TableHead>
-                  <TableHead className="text-center text-primary font-medium w-16">Receipt</TableHead>
-                  <TableHead className="text-left text-primary font-medium min-w-[100px]">Remarks</TableHead>
-                  <TableHead className="text-center text-primary font-medium w-24">Actions</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-12 text-xs">#</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-24 text-xs">Status</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-36 text-xs">Client</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-28 whitespace-nowrap text-xs">Date</TableHead>
+                  <TableHead className="text-left text-primary font-medium min-w-[180px] text-xs">Car</TableHead>
+                  <TableHead className="text-right text-primary font-medium w-32 tabular-nums text-xs whitespace-nowrap">Payable</TableHead>
+                  <TableHead className="text-right text-primary font-medium w-32 tabular-nums text-xs whitespace-nowrap">Payout</TableHead>
+                  <TableHead className="text-right text-primary font-medium w-32 tabular-nums text-xs whitespace-nowrap">Balance</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-24 text-xs">Ref #</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-24 text-xs">Invoice #</TableHead>
+                  <TableHead className="text-left text-primary font-medium w-28 whitespace-nowrap text-xs">Payment Date</TableHead>
+                  <TableHead className="text-center text-primary font-medium w-16 text-xs">Receipt</TableHead>
+                  <TableHead className="text-left text-primary font-medium min-w-[100px] text-xs">Remarks</TableHead>
+                  <TableHead className="text-center text-primary font-medium w-24 text-xs">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -417,35 +417,35 @@ export default function PaymentsMainPage() {
                           key={payment.payments_aid}
                           className="border-border hover:bg-card"
                         >
-                          <TableCell className="text-muted-foreground w-12">{index + 1}.</TableCell>
+                          <TableCell className="text-muted-foreground w-12 text-xs">{index + 1}.</TableCell>
                           <TableCell className="w-24">
                             <Badge
                               style={{
                                 backgroundColor: payment.payment_status_color,
                                 color: "#000",
                               }}
-                              className="text-xs font-medium"
+                              className="text-[10px] font-medium"
                             >
                               {payment.payment_status_name}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-foreground w-36">{payment.fullname}</TableCell>
-                          <TableCell className="w-28 whitespace-nowrap text-muted-foreground">{formatYearMonth(payment.payments_year_month)}</TableCell>
-                          <TableCell className="text-muted-foreground text-sm min-w-[180px]">
+                          <TableCell className="text-foreground w-36 text-xs">{payment.fullname}</TableCell>
+                          <TableCell className="w-28 whitespace-nowrap text-muted-foreground text-xs">{formatYearMonth(payment.payments_year_month)}</TableCell>
+                          <TableCell className="text-muted-foreground text-xs min-w-[180px]">
                             {formatVehicleInfo(payment)}
                           </TableCell>
-                          <TableCell className="text-right text-primary font-medium w-24 tabular-nums">
+                          <TableCell className="text-right text-primary font-medium w-32 tabular-nums text-xs whitespace-nowrap">
                             {formatCurrency(Number(payment.payments_amount || 0))}
                           </TableCell>
-                          <TableCell className="text-right w-24 tabular-nums text-muted-foreground">
+                          <TableCell className="text-right w-32 tabular-nums text-muted-foreground text-xs whitespace-nowrap">
                             {formatCurrency(Number(payment.payments_amount_payout || 0))}
                           </TableCell>
-                          <TableCell className="text-right w-24 tabular-nums text-muted-foreground">
+                          <TableCell className="text-right w-32 tabular-nums text-muted-foreground text-xs whitespace-nowrap">
                             {formatCurrency(balance)}
                           </TableCell>
-                          <TableCell className="text-muted-foreground w-24">{payment.payments_reference_number || "--"}</TableCell>
-                          <TableCell className="text-muted-foreground w-24">{payment.payments_invoice_id || "--"}</TableCell>
-                          <TableCell className="text-muted-foreground w-28 whitespace-nowrap">{formatDate(payment.payments_invoice_date)}</TableCell>
+                          <TableCell className="text-muted-foreground w-24 text-xs">{payment.payments_reference_number || "--"}</TableCell>
+                          <TableCell className="text-muted-foreground w-24 text-xs">{payment.payments_invoice_id || "--"}</TableCell>
+                          <TableCell className="text-muted-foreground w-28 whitespace-nowrap text-xs">{formatDate(payment.payments_invoice_date)}</TableCell>
                           <TableCell className="text-center w-16">
                             <Button
                               variant="ghost"
@@ -459,7 +459,7 @@ export default function PaymentsMainPage() {
                               <FileText className="w-4 h-4" />
                             </Button>
                           </TableCell>
-                          <TableCell className="min-w-[100px] max-w-[150px] truncate text-muted-foreground">
+                          <TableCell className="min-w-[100px] max-w-[150px] truncate text-muted-foreground text-xs">
                             {payment.payments_remarks || "--"}
                           </TableCell>
                           <TableCell className="text-center w-24">
@@ -497,13 +497,13 @@ export default function PaymentsMainPage() {
                       <TableCell colSpan={5} className="text-right font-bold text-foreground pr-4">
                         Total:
                       </TableCell>
-                      <TableCell className="text-right font-bold text-primary w-24 tabular-nums">
+                      <TableCell className="text-right font-bold text-primary w-32 tabular-nums whitespace-nowrap">
                         {formatCurrency(totals.payable)}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-primary w-24 tabular-nums">
+                      <TableCell className="text-right font-bold text-primary w-32 tabular-nums whitespace-nowrap">
                         {formatCurrency(totals.payout)}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-primary w-24 tabular-nums">
+                      <TableCell className="text-right font-bold text-primary w-32 tabular-nums whitespace-nowrap">
                         {formatCurrency(totals.balance)}
                       </TableCell>
                       <TableCell colSpan={6}></TableCell>

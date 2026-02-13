@@ -196,7 +196,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
         <div className="flex flex-col w-full h-full overflow-hidden">
           {/* Page Title */}
           <div className="mb-6">
-            <h1 className="text-2xl font-serif text-[#EAEB80] italic mb-2">
+            <h1 className="text-2xl font-bold text-primary mb-2">
               Income and Expenses
             </h1>
             <p className="text-muted-foreground text-sm">
@@ -349,14 +349,14 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                 <span>Back to Cars</span>
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Income and Expenses</h1>
+                <h1 className="text-2xl font-bold text-primary">Income and Expenses</h1>
                 <p className="text-sm text-muted-foreground mt-1">All Cars - Aggregate View</p>
               </div>
             </div>
 
             {/* Page Title and Actions */}
             <div className="flex items-center justify-between mb-2 flex-shrink-0">
-              <h1 className="text-xl font-semibold text-foreground">INCOME AND EXPENSES - ALL CARS</h1>
+              <h1 className="text-2xl font-bold text-primary">INCOME AND EXPENSES - ALL CARS</h1>
               <div className="flex items-center gap-2">
                 <div className="w-[300px]">
                   <Popover open={carComboboxOpenPerCar} onOpenChange={setCarComboboxOpenPerCar}>
@@ -478,7 +478,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               </button>
             )}
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Income and Expenses</h1>
+              <h1 className="text-2xl font-bold text-primary">Income and Expenses</h1>
               {car && (
                 <p className="text-sm text-muted-foreground mt-1">
                   Car: {car.makeModel || "Unknown Car"}
@@ -498,7 +498,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
 
           {/* Page Title and Actions */}
           <div className="flex items-center justify-between mb-2 flex-shrink-0">
-            <h1 className="text-xl font-semibold text-foreground">INCOME AND EXPENSES</h1>
+            <h1 className="text-2xl font-bold text-primary">INCOME AND EXPENSES</h1>
             <div className="flex items-center gap-2">
               {/* Show car selector only in admin all-cars view */}
               {!isFromRoute && (

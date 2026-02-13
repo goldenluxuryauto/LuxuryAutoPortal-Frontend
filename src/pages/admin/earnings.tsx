@@ -1118,7 +1118,7 @@ export default function EarningsPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-blue-700 hover:underline"
+            className="mt-4 text-[#B8860B] hover:text-[#9A7209] hover:underline font-semibold"
           >
             ← Back to View Car
           </button>
@@ -1150,7 +1150,7 @@ export default function EarningsPage() {
             <span>Back to View Car</span>
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Earnings</h1>
+            <h1 className="text-2xl font-bold text-primary">Earnings</h1>
             {car && (
               <p className="text-sm text-muted-foreground mt-1">
                 Car: {car.makeModel || "Unknown Car"}
@@ -1190,12 +1190,12 @@ export default function EarningsPage() {
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
+                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer font-semibold"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                  <span className="text-foreground text-xs sm:text-sm break-words">{ownerName}</span>
+                  <span className="text-[#B8860B] text-xs sm:text-sm break-words font-semibold">{ownerName}</span>
                   )}
                 </div>
                 <div>
@@ -1238,7 +1238,7 @@ export default function EarningsPage() {
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline text-sm flex items-center gap-1 font-medium"
                     >
                       Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -1251,7 +1251,7 @@ export default function EarningsPage() {
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline text-sm flex items-center gap-1 font-medium"
                     >
                       Admin Turo Link: View Car
                       <ExternalLink className="w-3 h-3" />
@@ -1988,7 +1988,7 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
             className={cn(
               "text-right px-2 py-2 text-sm border-l border-border",
               cellValue !== 0
-                ? isTotal ? "text-primary font-semibold" : "text-muted-foreground font-medium"
+                ? isTotal ? "text-primary font-semibold" : "text-[#B8860B] font-semibold"
                 : "text-muted-foreground"
             )}
           >
@@ -1998,7 +1998,7 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
       })}
       <td className={cn(
         "text-right px-2 py-2 text-sm font-semibold border-l border-border bg-card sticky right-0 z-[3]",
-        isTotal ? "text-primary" : total !== 0 ? "text-muted-foreground" : "text-muted-foreground"
+        isTotal ? "text-primary" : total !== 0 ? "text-[#B8860B]" : "text-muted-foreground"
       )}>
         {isNegativeBalance && total < 0 
           ? `(${Math.abs(total).toFixed(2)})`

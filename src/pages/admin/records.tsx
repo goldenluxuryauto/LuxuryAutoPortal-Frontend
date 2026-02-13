@@ -425,7 +425,7 @@ export default function RecordsPage() {
             </button>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Records and Files</h1>
+              <h1 className="text-2xl font-bold text-primary">Records and Files</h1>
               {car && (
                 <p className="text-sm text-muted-foreground mt-1">
                   Car: {car.makeModel || "Unknown Car"}
@@ -488,12 +488,12 @@ export default function RecordsPage() {
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer"
+                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer font-semibold"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                    <span className="text-foreground text-xs sm:text-sm break-words">{ownerName}</span>
+                    <span className="text-[#B8860B] text-xs sm:text-sm break-words font-semibold">{ownerName}</span>
                   )}
                 </div>
                 <div>

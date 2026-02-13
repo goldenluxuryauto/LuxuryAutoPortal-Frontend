@@ -68,7 +68,7 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         {/* Back to Home Button */}
-        <div className="mb-6">
+        <div className="mb-4">
           <Button
             type="button"
             variant="ghost"
@@ -81,16 +81,16 @@ export default function AdminLogin() {
           </Button>
         </div>
 
-        <div className="text-center mb-10">
+        <div className="text-center mb-6">
           <img 
             src="/logo.png" 
             alt="Golden Luxury Auto" 
-            className="h-[240px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_15px_rgba(234,235,128,0.5)]"
+            className="h-[200px] w-auto mx-auto object-contain mb-4 drop-shadow-[0_0_15px_rgba(234,235,128,0.5)]"
           />
-          <p className="text-muted-foreground mt-6 text-sm">Admin Portal Login</p>
+          <p className="text-muted-foreground text-sm">Admin Portal Login</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-muted-foreground text-sm">Email</Label>
             <Input
@@ -98,7 +98,7 @@ export default function AdminLogin() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-card border-border222222] text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
+              className="bg-card border-border text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
               placeholder="admin@goldenluxuryauto.com"
               required
               data-testid="input-email"
@@ -120,7 +120,7 @@ export default function AdminLogin() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-card border-border222222] text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
+              className="bg-card border-border text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
               placeholder="••••••••"
               required
               data-testid="input-password"
@@ -137,7 +137,7 @@ export default function AdminLogin() {
           </Button>
         </form>
 
-        <p className="text-center text-gray-700 text-xs mt-8">
+        <p className="text-center text-muted-foreground text-xs mt-6">
           Premium vehicle management portal
         </p>
       </div>
