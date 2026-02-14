@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,10 +9,11 @@ import { OnboardingTutorial, useTutorial } from "@/components/onboarding/Onboard
 import { buildApiUrl } from "@/lib/queryClient";
 
 export default function AdminDashboard() {
+  const [, setLocation] = useLocation();
   const { openTutorial, isOpen: tutorialIsOpen } = useTutorial();
   const queryClient = useQueryClient();
   const hasAttemptedOpen = useRef(false); // Track if we've already tried to open the tutorial
-  
+
   // Fetch user role information
   const { data: userData } = useQuery<{ user?: { id?: number; isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean; firstName?: string; lastName?: string; roleName?: string; tourCompleted?: boolean } }>({
     queryKey: ["/api/auth/me"],
@@ -73,6 +75,13 @@ export default function AdminDashboard() {
   const isClient = user?.isClient || false;
   const isEmployee = user?.isEmployee || false;
   const tourCompleted = user?.tourCompleted === true;
+
+  // Redirect employees to staff dashboard so they see the staff sidebar
+  useEffect(() => {
+    if (userData && user?.isEmployee && !user?.isAdmin) {
+      setLocation("/staff/dashboard");
+    }
+  }, [userData, user?.isEmployee, user?.isAdmin, setLocation]);
 
   // Auto-open tutorial for new users (admin, client, employee) who haven't completed the tour
   // Only on dashboard page, only once per user
