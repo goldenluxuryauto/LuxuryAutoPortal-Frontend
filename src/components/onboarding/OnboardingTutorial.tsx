@@ -640,7 +640,7 @@ export function OnboardingTutorial({
   isOpen: controlledIsOpen,
   onClose: controlledOnClose,
   autoStart = false,
-  autoPlay = true, // Default to autoplay for dashboard, but can be disabled for training-manual page
+  autoPlay = true, // Default to autoplay for dashboard, but can be disabled for System Tutorial page
 }: OnboardingTutorialProps) {
   const [, setLocation] = useLocation();
   const [videoError, setVideoError] = useState(false);

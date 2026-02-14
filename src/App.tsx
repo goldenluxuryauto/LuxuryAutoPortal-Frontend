@@ -39,6 +39,7 @@ import SettingsPage from "@/pages/admin/settings";
 import HumanResourcesPage from "@/pages/admin/hr";
 import EmployeesPage from "@/pages/admin/hr/employees";
 import EmployeeViewPage from "@/pages/admin/hr/employee-view";
+import WorkSchedulePage from "@/pages/admin/hr/work-schedule";
 import EmployeeFormPage from "@/pages/employee-form";
 
 // Wrapper component for IncomeExpensesPage to handle Wouter route props
@@ -50,6 +51,19 @@ import TrainingManualPage from "@/pages/admin/training-manual";
 import SignContract from "@/pages/sign-contract";
 import Signup from "@/pages/signup";
 import ResetPasswordPage from "@/pages/reset-password";
+import StaffDashboard from "@/pages/staff/dashboard";
+import StaffMyInfo from "@/pages/staff/my-info";
+import StaffMyInfoSection from "@/pages/staff/my-info-section";
+import StaffForms from "@/pages/staff/forms";
+import StaffTaskManagement from "@/pages/staff/task-management";
+import StaffTime from "@/pages/staff/time";
+import StaffTimeOff from "@/pages/staff/time-off";
+import StaffTuroGuide from "@/pages/staff/turo-guide";
+import StaffTrainingManual from "@/pages/staff/training-manual";
+import StaffClientTestimonials from "@/pages/staff/client-testimonials";
+import StaffCarRentalTrips from "@/pages/staff/car-rental-trips";
+import StaffCarRentalForms from "@/pages/staff/car-rental-forms";
+import StaffCarRentalFormSubmit from "@/pages/staff/car-rental-form-submit";
 
 function Router() {
   return (
@@ -61,6 +75,19 @@ function Router() {
       <Route path="/sign-contract/:token" component={SignContract} />
       <Route path="/signup" component={Signup} />
       <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/staff/dashboard" component={StaffDashboard} />
+      <Route path="/staff/my-info/:section" component={StaffMyInfoSection} />
+      <Route path="/staff/my-info" component={StaffMyInfo} />
+      <Route path="/staff/forms" component={StaffForms} />
+      <Route path="/staff/task-management" component={StaffTaskManagement} />
+      <Route path="/staff/time" component={StaffTime} />
+      <Route path="/staff/time-off" component={StaffTimeOff} />
+      <Route path="/staff/turo-guide" component={StaffTuroGuide} />
+      <Route path="/staff/training-manual" component={StaffTrainingManual} />
+      <Route path="/staff/client-testimonials" component={StaffClientTestimonials} />
+      <Route path="/staff/car-rental/trips" component={StaffCarRentalTrips} />
+      <Route path="/staff/car-rental/forms/submit" component={StaffCarRentalFormSubmit} />
+      <Route path="/staff/car-rental/forms" component={StaffCarRentalForms} />
       <Route path="/dashboard" component={AdminDashboard} />
       <Route path="/admin/admins" component={AdminsPage} />
       <Route path="/admin/clients" component={ClientsPage} />
@@ -88,6 +115,7 @@ function Router() {
       <Route path="/admin/income-expenses" component={IncomeExpensesPageWrapper} />
       <Route path="/admin/settings" component={SettingsPage} />
       <Route path="/admin/hr" component={HumanResourcesPage} />
+      <Route path="/admin/hr/work-schedule" component={WorkSchedulePage} />
       <Route path="/admin/hr/employees/view" component={EmployeeViewPage} />
       <Route path="/admin/hr/employees" component={EmployeesPage} />
       <Route path="/employee-form" component={EmployeeFormPage} />
@@ -100,23 +128,14 @@ function Router() {
 }
 
 function App() {
-  // Log initialization for debugging
-  if (typeof window !== 'undefined') {
+  // Dev-only: log initialization (never log secrets like API keys or reCAPTCHA key)
+  if (import.meta.env.DEV && typeof window !== "undefined") {
     const apiBaseUrl = getApiBaseUrl();
-    
-    console.log('[APP] Initializing application...');
-    console.log('[APP] Current URL:', window.location.href);
-    console.log('[APP] User Agent:', navigator.userAgent);
-    console.log('[APP] VITE_API_URL:', import.meta.env.VITE_API_URL || 'Not set');
-    console.log('[APP] API Base URL:', apiBaseUrl || 'relative (using Vite proxy)');
-    console.log('[APP] Environment:', import.meta.env.PROD ? 'Production' : 'Development');
-    
-    // Warn if VITE_API_URL is not set in production
-    if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
-      console.warn('⚠️ [APP] VITE_API_URL is not set in production!');
-      console.warn('⚠️ [APP] API calls may fail. Please set VITE_API_URL in Vercel environment variables.');
-      console.warn('⚠️ [APP] Expected value: https://luxuryautoportal-replit-1.onrender.com');
-    }
+    console.log("[APP] Environment: development");
+    console.log("[APP] API base:", apiBaseUrl || "relative (Vite proxy)");
+  }
+  if (import.meta.env.PROD && typeof window !== "undefined" && !import.meta.env.VITE_API_URL) {
+    console.warn("⚠️ [APP] VITE_API_URL is not set in production; API calls may fail.");
   }
 
   return (
