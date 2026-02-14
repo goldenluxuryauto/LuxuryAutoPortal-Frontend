@@ -21,7 +21,11 @@ import {
   Menu,
   X,
   User,
-  ChevronDown
+  ChevronDown,
+  FileText,
+  Clock,
+  TreePalm,
+  MessageCircle
 } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { cn } from "@/lib/utils";
@@ -70,7 +74,8 @@ const allSidebarItems: SidebarItem[] = [
     icon: Briefcase,
     roles: ["admin"],
     children: [
-      { href: "/admin/hr/employees", label: "Employees", icon: Users, roles: ["admin"] }
+      { href: "/admin/hr/employees", label: "Employees", icon: Users, roles: ["admin"] },
+      { href: "/admin/hr/work-schedule", label: "Work Schedule", icon: Clock, roles: ["admin"] }
     ],
   },
   { href: "/admin/payroll", label: "Payroll", icon: DollarSign, roles: ["admin"] },
@@ -80,6 +85,29 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/testimonials", label: "Client Testimonials", icon: Star },
 ];
 
+// Staff/employee sidebar (matches GLA v1 employee nav: Dashboard, My Info, Forms, Task Management, Time, Time off, Turo Guide, System Tutorial, Client Testimonials, Car Rental)
+const employeeSidebarItems: SidebarItem[] = [
+  { href: "/staff/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["employee"] },
+  { href: "/staff/my-info", label: "My Info", icon: User, roles: ["employee"] },
+  { href: "/staff/forms", label: "Forms", icon: FileText, roles: ["employee"] },
+  { href: "/staff/task-management", label: "Task Management", icon: Briefcase, roles: ["employee"] },
+  { href: "/staff/time", label: "Time", icon: Clock, roles: ["employee"] },
+  { href: "/staff/time-off", label: "Time off", icon: TreePalm, roles: ["employee"] },
+  { href: "/staff/turo-guide", label: "Turo Guide", icon: BookOpen, roles: ["employee"] },
+  { href: "/staff/training-manual", label: "System Tutorial", icon: GraduationCap, roles: ["employee"] },
+  { href: "/staff/client-testimonials", label: "Client Testimonials", icon: MessageCircle, roles: ["employee"] },
+  {
+    href: "/staff/car-rental",
+    label: "Car Rental",
+    icon: Car,
+    roles: ["employee"],
+    children: [
+      { href: "/staff/car-rental/trips", label: "Trips", icon: Car, roles: ["employee"] },
+      { href: "/staff/car-rental/forms", label: "Forms", icon: FileText, roles: ["employee"] },
+    ],
+  },
+];
+
 function AdminLayoutContent({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -87,7 +115,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
   const [expandedParents, setExpandedParents] = useState<Record<string, boolean>>(() => {
     const obj: Record<string, boolean> = {};
-    allSidebarItems.forEach((it) => {
+    [...allSidebarItems, ...employeeSidebarItems].forEach((it) => {
       if (it.children && it.children.length > 0) {
         obj[it.href] = it.children.some((c) => location === c.href || location.startsWith(c.href));
       }
@@ -101,7 +129,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
     // Auto-expand parent when a child matches the current location
     let changed = false;
     const newState = { ...expandedParents };
-    allSidebarItems.forEach((it) => {
+    [...allSidebarItems, ...employeeSidebarItems].forEach((it) => {
       if (it.children && it.children.length > 0) {
         const childActive = it.children.some((c) => location === c.href || location.startsWith(c.href));
         if (childActive && !newState[it.href]) {
@@ -139,13 +167,31 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
   const user = data?.user;
 
-  // Filter sidebar items based on user role
+  // Filter sidebar items based on user role (employees see staff nav only; admin/client see main nav)
   const sidebarItems = useMemo(() => {
     if (!user) return [];
 
     const userRole = user.isAdmin ? "admin" : user.isClient ? "client" : user.isEmployee ? "employee" : null;
-    
-    // Filter parent's visibility based on role and also filter children by role
+
+    // Employees see the staff sidebar (v1-style nav); admin/client see the main sidebar filtered by role
+    if (user.isEmployee) {
+      return employeeSidebarItems.filter((item) => {
+        const visible = !item.roles || item.roles.length === 0 || (userRole && item.roles.includes(userRole));
+        if (!visible) return false;
+        if (item.children && item.children.length > 0) {
+          const filteredChildren = item.children.filter((c) => !c.roles || c.roles.length === 0 || (userRole && c.roles.includes(userRole)));
+          return filteredChildren.length > 0;
+        }
+        return true;
+      }).map((item) => {
+        if (item.children && item.children.length > 0) {
+          const filteredChildren = item.children.filter((c) => !c.roles || c.roles.length === 0 || (userRole && c.roles.includes(userRole)));
+          return { ...item, children: filteredChildren };
+        }
+        return item;
+      }) as SidebarItem[];
+    }
+
     return allSidebarItems
       .map((item) => {
         const visible = !item.roles || item.roles.length === 0 || (userRole && item.roles.includes(userRole));

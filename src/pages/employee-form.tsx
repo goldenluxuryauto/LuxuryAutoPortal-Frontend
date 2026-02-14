@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -73,8 +73,8 @@ export default function EmployeeFormPage() {
   const [submitted, setSubmitted] = useState(false);
   const recaptchaRef = useRef<ReCAPTCHA | null>(null);
 
-  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined;
-  const shouldShowRecaptcha = useMemo(() => !!siteKey && siteKey.trim() !== "", [siteKey]);
+  const siteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? "").toString().trim();
+  const shouldShowRecaptcha = siteKey.length > 0;
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -365,7 +365,7 @@ export default function EmployeeFormPage() {
 
               {shouldShowRecaptcha && (
                 <div className="pt-2 space-y-1 flex flex-col items-center justify-center">
-                  <ReCAPTCHA ref={recaptchaRef} sitekey={siteKey!} />
+                  <ReCAPTCHA ref={recaptchaRef} sitekey={siteKey} />
                   <p className="text-muted-foreground text-xs">
                     Please complete the verification above before submitting.
                   </p>
