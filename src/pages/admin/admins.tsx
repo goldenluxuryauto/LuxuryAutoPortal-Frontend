@@ -438,22 +438,22 @@ export default function AdminsPage() {
               <table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Name
                     </th>
                     <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                       Email
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Role
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Status
                     </th>
                     <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
                       Created
                     </th>
-                    <th className="text-right text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-right text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
                       Actions
                     </th>
                   </tr>
@@ -746,19 +746,19 @@ export default function AdminsPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-foreground uppercase tracking-wider px-6 py-4">
                         Category
                       </th>
-                      <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-foreground uppercase tracking-wider px-6 py-4">
                         Title
                       </th>
-                      <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-foreground uppercase tracking-wider px-6 py-4">
                         URL
                       </th>
-                      <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                      <th className="text-left text-xs font-medium text-foreground uppercase tracking-wider px-6 py-4">
                         Visibility
                       </th>
-                      <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                      <th className="text-right text-xs font-medium text-foreground uppercase tracking-wider px-6 py-4">
                         Actions
                       </th>
                     </tr>

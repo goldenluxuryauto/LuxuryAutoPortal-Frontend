@@ -254,12 +254,12 @@ export default function PaymentStatusPage() {
             <Table>
               <TableHeader>
                 <TableRow className="border-border hover:bg-transparent">
-                  <TableHead className="text-left text-primary font-medium w-12">#</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-24">Status</TableHead>
-                  <TableHead className="text-left text-primary font-medium">Name</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-24">Color</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-36">Computed TOTALS</TableHead>
-                  <TableHead className="text-center text-primary font-medium w-28">Actions</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-12">#</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-24">Status</TableHead>
+                  <TableHead className="text-left text-foreground font-medium">Name</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-24">Color</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-36">Computed TOTALS</TableHead>
+                  <TableHead className="text-center text-foreground font-medium w-28">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

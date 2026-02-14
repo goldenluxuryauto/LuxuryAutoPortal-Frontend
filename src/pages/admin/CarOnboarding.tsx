@@ -289,7 +289,7 @@ function CarOnboarding() {
                 <Table className="w-full table-auto">
                   <TableHeader>
                     <TableRow className="border-b border-border">
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Name
                       </TableHead>
                       <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
@@ -298,7 +298,7 @@ function CarOnboarding() {
                       <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
                         Phone
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Vehicle
                       </TableHead>
                       <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
@@ -310,7 +310,7 @@ function CarOnboarding() {
                       <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
                         Submitted
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
                         Status
                       </TableHead>
                       <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">

@@ -1668,21 +1668,21 @@ export default function ClientDetailPage() {
                       <Table>
                         <TableHeader>
                           <TableRow className="border-border hover:bg-transparent">
-                            <TableHead className="text-center text-primary font-medium px-4 py-3 w-12">#</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Status</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Stats</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Management</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Make</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Year</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Model/Specs</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Contact</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">VIN #</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Plate #</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Gas</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Tire Size</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Oil Type</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Turo Link</TableHead>
-                            <TableHead className="text-center text-primary font-medium px-4 py-3">Admin Turo Link</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3 w-12">#</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Status</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Stats</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Management</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Make</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Year</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Model/Specs</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Contact</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">VIN #</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Plate #</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Gas</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Tire Size</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Oil Type</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Turo Link</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Admin Turo Link</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -2191,19 +2191,19 @@ export default function ClientDetailPage() {
                     <Table>
                       <TableHeader>
                         <TableRow className="border-border hover:bg-transparent">
-                          <TableHead className="text-center text-primary font-medium px-4 py-3 w-12">#</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Make</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Model</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Year</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Plate #</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">VIN #</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Tire Size</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Maintenance Type</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Status</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Schedule Date</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Date Completed</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Price</TableHead>
-                          <TableHead className="text-left text-primary font-medium px-4 py-3">Remarks</TableHead>
+                          <TableHead className="text-center text-foreground font-medium px-4 py-3 w-12">#</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Make</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Model</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Year</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Plate #</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">VIN #</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Tire Size</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Maintenance Type</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Status</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Schedule Date</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Date Completed</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Price</TableHead>
+                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Remarks</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>

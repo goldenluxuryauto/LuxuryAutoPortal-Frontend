@@ -875,11 +875,11 @@ export default function ViewRecordFilesPage() {
                   <Table>
                     <TableHeader>
                       <TableRow className="border-border">
-                        <TableHead className="text-center text-primary font-medium w-16">#</TableHead>
-                        <TableHead className="text-primary font-medium">File Name</TableHead>
-                        <TableHead className="text-primary font-medium">Upload Date</TableHead>
-                        <TableHead className="text-primary font-medium">Status</TableHead>
-                        <TableHead className="text-primary font-medium">Actions</TableHead>
+                        <TableHead className="text-center text-foreground font-medium w-16">#</TableHead>
+                        <TableHead className="text-foreground font-medium">File Name</TableHead>
+                        <TableHead className="text-foreground font-medium">Upload Date</TableHead>
+                        <TableHead className="text-foreground font-medium">Status</TableHead>
+                        <TableHead className="text-foreground font-medium">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

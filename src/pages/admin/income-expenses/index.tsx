@@ -216,7 +216,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                     variant="outline"
                     role="combobox"
                     aria-expanded={carComboboxOpen}
-                    className="w-full justify-between bg-muted border-border2a2a2a] text-foreground hover:bg-muted overflow-hidden"
+                    className="w-full justify-between bg-muted border-border text-foreground hover:bg-muted overflow-hidden"
                   >
                     <span className="truncate text-left flex-1 min-w-0">
                     {selectedCar === "all"
@@ -231,7 +231,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[400px] p-0 bg-muted border-border2a2a2a]">
+                <PopoverContent className="w-[400px] p-0 bg-muted border-border">
                   <Command className="bg-muted">
                     <CommandInput 
                       placeholder="Search car by make, model, plate, or VIN..." 
@@ -304,10 +304,10 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
             <div className="w-[150px]">
               <label className="block text-sm font-medium text-muted-foreground mb-2">Year</label>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="bg-muted border-border2a2a2a] text-foreground">
+                <SelectTrigger className="bg-muted border-border text-foreground">
                   <SelectValue placeholder="Year" />
                 </SelectTrigger>
-                <SelectContent className="bg-muted border-border2a2a2a] text-foreground">
+                <SelectContent className="bg-muted border-border text-foreground">
                   {yearOptions.map((yr) => (
                     <SelectItem key={yr} value={String(yr)}>
                       {yr}
@@ -319,7 +319,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           </div>
 
           {/* Message to select a car */}
-          <div className="bg-card border border-border1a1a1a] rounded-lg p-12 text-center">
+          <div className="bg-card border border-border rounded-lg p-12 text-center">
             <p className="text-muted-foreground text-lg mb-2">Please select a car to view income and expenses</p>
             <p className="text-muted-foreground text-sm">
               Choose a car from the dropdown above to see detailed financial data
@@ -365,13 +365,13 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         variant="outline"
                         role="combobox"
                         aria-expanded={carComboboxOpenPerCar}
-                        className="w-full justify-between bg-muted border-border2a2a2a] text-foreground hover:bg-muted text-sm overflow-hidden"
+                        className="w-full justify-between bg-muted border-border text-foreground hover:bg-muted text-sm overflow-hidden"
                       >
                         <span className="truncate text-left flex-1 min-w-0">All Cars</span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 bg-muted border-border2a2a2a]">
+                    <PopoverContent className="w-[300px] p-0 bg-muted border-border">
                       <Command className="bg-muted">
                         <CommandInput 
                           placeholder="Search car by make, model, plate, or VIN..." 
@@ -509,7 +509,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         variant="outline"
                         role="combobox"
                         aria-expanded={carComboboxOpenPerCar}
-                        className="w-full justify-between bg-muted border-border2a2a2a] text-foreground hover:bg-muted text-sm overflow-hidden"
+                        className="w-full justify-between bg-muted border-border text-foreground hover:bg-muted text-sm overflow-hidden"
                       >
                         <span className="truncate text-left flex-1 min-w-0">
                         {selectedCar === "all"
@@ -524,7 +524,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 bg-muted border-border2a2a2a]">
+                    <PopoverContent className="w-[300px] p-0 bg-muted border-border">
                       <Command className="bg-muted">
                         <CommandInput 
                           placeholder="Search car by make, model, plate, or VIN..." 

@@ -376,18 +376,18 @@ export default function PaymentsPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="text-left text-primary font-medium w-12">#</TableHead>
-                    <TableHead className="text-left text-primary font-medium">Status</TableHead>
-                    <TableHead className="text-left text-primary font-medium">Date</TableHead>
-                    <TableHead className="text-left text-primary font-medium">Payment Date</TableHead>
-                    <TableHead className="text-right text-primary font-medium">Payable</TableHead>
-                    <TableHead className="text-right text-primary font-medium">Payout</TableHead>
-                    <TableHead className="text-right text-primary font-medium">Balance</TableHead>
-                    <TableHead className="text-left text-primary font-medium">Ref #</TableHead>
-                    <TableHead className="text-center text-primary font-medium">Receipt</TableHead>
-                    <TableHead className="text-left text-primary font-medium">Remarks</TableHead>
+                    <TableHead className="text-left text-foreground font-medium w-12">#</TableHead>
+                    <TableHead className="text-left text-foreground font-medium">Status</TableHead>
+                    <TableHead className="text-left text-foreground font-medium">Date</TableHead>
+                    <TableHead className="text-left text-foreground font-medium">Payment Date</TableHead>
+                    <TableHead className="text-right text-foreground font-medium">Payable</TableHead>
+                    <TableHead className="text-right text-foreground font-medium">Payout</TableHead>
+                    <TableHead className="text-right text-foreground font-medium">Balance</TableHead>
+                    <TableHead className="text-left text-foreground font-medium">Ref #</TableHead>
+                    <TableHead className="text-center text-foreground font-medium">Receipt</TableHead>
+                    <TableHead className="text-left text-foreground font-medium">Remarks</TableHead>
                     {isAdmin && (
-                      <TableHead className="text-center text-primary font-medium">Actions</TableHead>
+                      <TableHead className="text-center text-foreground font-medium">Actions</TableHead>
                     )}
                   </TableRow>
                 </TableHeader>

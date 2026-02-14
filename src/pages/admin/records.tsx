@@ -634,10 +634,10 @@ export default function RecordsPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="text-center text-primary font-medium w-12">#</TableHead>
-                    <TableHead className="text-left text-primary font-medium">Document Name</TableHead>
-                    <TableHead className="text-left text-primary font-medium">Date</TableHead>
-                    <TableHead className="text-left text-primary font-medium">Remarks</TableHead>
+                    <TableHead className="text-center text-foreground font-medium w-12">#</TableHead>
+                    <TableHead className="text-left text-foreground font-medium">Document Name</TableHead>
+                    <TableHead className="text-left text-foreground font-medium">Date</TableHead>
+                    <TableHead className="text-left text-foreground font-medium">Remarks</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

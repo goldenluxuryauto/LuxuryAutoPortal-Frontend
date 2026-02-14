@@ -1925,7 +1925,7 @@ export default function Onboarding() {
                                       {...field}
                                       placeholder="9 digits"
                                       maxLength={9}
-                                      className="bg-[#0a0a0a] border-gray-700"
+                                      className="bg-background border-border"
                                     />
                                   </FormControl>
                                   <FormMessage />

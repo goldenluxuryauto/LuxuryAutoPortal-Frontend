@@ -1297,7 +1297,7 @@ export default function EarningsPage() {
               </colgroup>
               <thead className="bg-card">
                 <tr className="bg-card border-b border-border">
-                  <th className="text-left px-3 py-2 text-sm font-medium text-muted-foreground sticky top-0 left-0 bg-card z-[5] border-r border-border align-middle">
+                  <th className="text-left px-3 py-2 text-sm font-medium text-foreground sticky top-0 left-0 bg-card z-[5] border-r border-border align-middle">
                     Category / Expense
                   </th>
                   {months.map((month, index) => {
@@ -1314,15 +1314,15 @@ export default function EarningsPage() {
                         className="border-l border-border px-2 py-2 text-center min-w-[100px] sticky top-0 bg-card z-[5] align-middle"
                       >
                         <div className="flex flex-col items-center gap-1 justify-center">
-                          <span className="text-foreground text-xs">{month}</span>
+                          <span className="text-foreground text-xs font-medium">{month}</span>
                           <div className="flex items-center justify-center gap-1 h-[24px]">
                             {/* Mode Toggle (Read-only) - Shows 50:50 or 30:70 split mode */}
                             <div
                               className={cn(
                                 "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-default",
                                 currentMode === 50 
-                                  ? "bg-green-600 text-foreground" 
-                                  : "bg-blue-600 text-foreground"
+                                  ? "bg-green-600 text-white" 
+                                  : "bg-blue-600 text-white"
                               )}
                               title={`Rate mode: ${currentMode === 50 ? "50:50 (green)" : "30:70 (blue)"} (Read-only)`}
                             >
@@ -1334,8 +1334,8 @@ export default function EarningsPage() {
                                 className={cn(
                                   "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px] cursor-default",
                                   currentSkiRacksOwner === "GLA"
-                                    ? "bg-purple-600 text-foreground"
-                                    : "bg-orange-600 text-foreground"
+                                    ? "bg-purple-600 text-white"
+                                    : "bg-orange-600 text-white"
                                 )}
                                 title={`Ski racks owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"} (Read-only)`}
                               >
@@ -1347,7 +1347,7 @@ export default function EarningsPage() {
                     </th>
                     );
                   })}
-                  <th className="text-right px-2 py-2 text-sm font-medium text-muted-foreground sticky top-0 bg-card z-[5] border-l border-border whitespace-nowrap align-middle">
+                  <th className="text-right px-2 py-2 text-sm font-medium text-foreground sticky top-0 bg-card z-[5] border-l border-border whitespace-nowrap align-middle">
                     Total
                   </th>
                 </tr>
@@ -1934,11 +1934,11 @@ interface CategorySectionProps {
 function CategorySection({ title, isExpanded, onToggle, children }: CategorySectionProps) {
   return (
     <>
-      <tr className="bg-card hover:bg-muted">
-        <td colSpan={14} className="sticky left-0 z-[3] bg-card hover:bg-muted px-3 py-2 border-b border-border">
+      <tr className="bg-primary">
+        <td colSpan={14} className="sticky left-0 z-[3] bg-primary px-3 py-2 border-b border-primary">
           <div className="flex items-center gap-2 cursor-pointer" onClick={onToggle}>
-            {isExpanded ? <ChevronDown className="w-4 h-4 text-primary" /> : <ChevronRight className="w-4 h-4 text-primary" />}
-            <span className="text-sm font-semibold text-primary">{title}</span>
+            {isExpanded ? <ChevronDown className="w-4 h-4 text-white" /> : <ChevronRight className="w-4 h-4 text-white" />}
+            <span className="text-sm font-semibold text-white">{title}</span>
           </div>
         </td>
       </tr>
@@ -1961,7 +1961,7 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
   
   return (
     <tr className={cn(
-      "border-b border-border hover:bg-muted/50151515] transition-colors",
+      "border-b border-border transition-colors",
       isTotal && "bg-background font-semibold"
     )}>
       <td className={cn(

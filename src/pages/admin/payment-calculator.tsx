@@ -426,8 +426,8 @@ export default function PaymentCalculatorPage() {
                 <table className="border-collapse w-full" style={{ minWidth: '800px' }}>
                   <thead className="bg-card">
                     <tr className="border-b border-border">
-                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">No.</th>
-                      <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Due Date</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-foreground">No.</th>
+                      <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Due Date</th>
                       <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Payment Due</th>
                       <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Additional Payment</th>
                       <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Interest</th>

@@ -185,7 +185,7 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
         Add New Rate
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-card border-border2a2a2a] text-muted-foreground max-w-md">
+        <DialogContent className="bg-card border-border text-muted-foreground max-w-md">
           <DialogHeader>
             <DialogTitle className="text-primary">Add New Rate</DialogTitle>
           </DialogHeader>
@@ -199,10 +199,10 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
             <div>
               <Label className="text-muted-foreground">Pay Type</Label>
               <Select value={payType} onValueChange={setPayType}>
-                <SelectTrigger className="bg-background border-border2a2a2a] mt-1">
+                <SelectTrigger className="bg-background border-border mt-1">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-border2a2a2a]">
+                <SelectContent className="bg-card border-border">
                   <SelectItem value="hourly">Hourly</SelectItem>
                   <SelectItem value="salary">Salary</SelectItem>
                 </SelectContent>
@@ -214,7 +214,7 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
                 type="date"
                 value={effectiveStart}
                 onChange={(e) => setEffectiveStart(e.target.value)}
-                className="bg-background border-border2a2a2a] mt-1"
+                className="bg-background border-border mt-1"
               />
             </div>
             <div>
@@ -225,14 +225,14 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
                 min="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="bg-background border-border2a2a2a] mt-1"
+                className="bg-background border-border mt-1"
                 placeholder="0.00"
                 required
               />
             </div>
             <p className="text-xs text-muted-foreground">The previous rate will be auto-closed (effective end = day before this start date).</p>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-border2a2a2a]">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-border">
                 Cancel
               </Button>
               <Button type="submit" disabled={mutation.isPending || !amount} className="bg-primary text-primary-foreground hover:bg-primary/90">
@@ -497,7 +497,7 @@ export default function EmployeeViewPage() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Section navigation list */}
           <div className="w-full lg:w-72 shrink-0">
-            <ul className="rounded-lg border border-border2a2a2a] bg-card overflow-hidden">
+            <ul className="rounded-lg border border-border bg-card overflow-hidden">
               {PROFILE_SECTIONS.map((section) => {
                 const isActive = activeSection === section.id;
                 return (
@@ -529,9 +529,9 @@ export default function EmployeeViewPage() {
             {activeSection === "personal-information" && (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 text-sm xl:items-stretch">
                   {/* Basic Information - v1 exact structure */}
-                  <Card className="bg-card border-border2a2a2a] xl:h-full flex flex-col order-1">
+                  <Card className="bg-card border-border xl:h-full flex flex-col order-1">
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
+                        <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                           <div className="flex items-center gap-2">
                             <List className="h-4 w-4 text-primary" />
                             <span className="font-bold uppercase text-[13px] text-primary">Basic Information</span>
@@ -555,7 +555,7 @@ export default function EmployeeViewPage() {
                                 className="h-20 w-20 rounded-full object-cover object-center"
                               />
                             ) : (
-                              <div className="h-20 w-20 rounded-full border-2 border-border2a2a2a] flex items-center justify-center" title="No photo uploaded (optional)">
+                              <div className="h-20 w-20 rounded-full border-2 border-border flex items-center justify-center" title="No photo uploaded (optional)">
                                 <Image className="h-10 w-10 text-muted-foreground" />
                               </div>
                             )}
@@ -597,9 +597,9 @@ export default function EmployeeViewPage() {
                     </Card>
 
                   {/* Other Information - v1 (same row as Basic on xl for equal height) */}
-                  <Card className="bg-card border-border2a2a2a] xl:h-full flex flex-col order-4 xl:order-2">
+                  <Card className="bg-card border-border xl:h-full flex flex-col order-4 xl:order-2">
                     <CardContent className="p-4 flex flex-col flex-1">
-                      <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
+                      <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                         <div className="flex items-center gap-2">
                           <List className="h-4 w-4 text-primary" />
                           <span className="font-bold uppercase text-[13px] text-primary">Other Information</span>
@@ -616,7 +616,7 @@ export default function EmployeeViewPage() {
                       <div className="mt-3 space-y-4 flex-1">
                         <div>
                           <p className="font-bold text-muted-foreground mb-2">Driver's License <span className="font-normal text-gray-600">(Optional)</span></p>
-                          <div className="w-full max-w-[20rem] h-[9.7rem] border border-border2a2a2a] rounded-md overflow-hidden bg-background">
+                          <div className="w-full max-w-[20rem] h-[9.7rem] border border-border rounded-md overflow-hidden bg-background">
                             {employee.employee_driver_license_photo ? (
                               <EmployeeDocumentImage
                                 value={employee.employee_driver_license_photo}
@@ -633,7 +633,7 @@ export default function EmployeeViewPage() {
                         </div>
                         <div>
                           <p className="font-bold text-muted-foreground mb-2">Car Insurance <span className="font-normal text-gray-600">(Optional)</span></p>
-                          <div className="w-full max-w-[20rem] h-[9.7rem] border border-border2a2a2a] rounded-md overflow-hidden bg-background">
+                          <div className="w-full max-w-[20rem] h-[9.7rem] border border-border rounded-md overflow-hidden bg-background">
                             {employee.employee_car_insurance ? (
                               <EmployeeDocumentImage
                                 value={employee.employee_car_insurance}
@@ -657,9 +657,9 @@ export default function EmployeeViewPage() {
                   </Card>
 
                   {/* Family Information - v1 exact structure */}
-                  <Card className="bg-card border-border2a2a2a] order-2 xl:order-3">
+                  <Card className="bg-card border-border order-2 xl:order-3">
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
+                        <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                           <div className="flex items-center gap-2">
                             <List className="h-4 w-4 text-primary" />
                             <span className="font-bold uppercase text-[13px] text-primary">Family Information</span>
@@ -689,9 +689,9 @@ export default function EmployeeViewPage() {
                     </Card>
 
                   {/* Emergency Contact - v1 */}
-                  <Card className="bg-card border-border2a2a2a] order-3 xl:order-4">
+                  <Card className="bg-card border-border order-3 xl:order-4">
                     <CardContent className="p-4">
-                      <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
+                      <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                         <div className="flex items-center gap-2">
                           <List className="h-4 w-4 text-primary" />
                           <span className="font-bold uppercase text-[13px] text-primary">Emergency Contact</span>
@@ -724,9 +724,9 @@ export default function EmployeeViewPage() {
 
             {activeSection === "job-and-pay" && (
               <div className="space-y-4 max-w-[50rem]">
-                <Card className="bg-card border-border2a2a2a]">
+                <Card className="bg-card border-border">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
+                    <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                       <div className="flex items-center gap-2">
                         <List className="h-4 w-4 text-primary" />
                         <span className="font-bold uppercase text-[13px] text-primary">Job Information</span>
@@ -755,9 +755,9 @@ export default function EmployeeViewPage() {
                     </ul>
                   </CardContent>
                 </Card>
-                <Card className="bg-card border-border2a2a2a]">
+                <Card className="bg-card border-border">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between border-b border-border2a2a2a] pb-2 mb-3">
+                    <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                       <div className="flex items-center gap-2">
                         <List className="h-4 w-4 text-primary" />
                         <span className="font-bold uppercase text-[13px] text-primary">Pay Information</span>
@@ -784,9 +784,9 @@ export default function EmployeeViewPage() {
             )}
 
             {activeSection === "rate-history" && (
-              <Card className="bg-card border-border2a2a2a]">
+              <Card className="bg-card border-border">
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-3 border-b border-border2a2a2a] pb-2">
+                  <div className="flex items-center justify-between mb-3 border-b border-border pb-2">
                     <h3 className="text-primary font-semibold">
                       Rate History
                     </h3>
@@ -802,20 +802,20 @@ export default function EmployeeViewPage() {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-border2a2a2a] bg-card">
-                            <th className="text-center py-3 w-12 text-muted-foreground font-medium">#</th>
-                            <th className="text-left py-3 min-w-[5rem] text-muted-foreground font-medium">Status</th>
-                            <th className="text-left py-3 min-w-[6rem] text-muted-foreground font-medium">Pay Type</th>
-                            <th className="text-left py-3 min-w-[10rem] text-muted-foreground font-medium">Effective Start</th>
-                            <th className="text-left py-3 min-w-[10rem] text-muted-foreground font-medium">Effective End</th>
-                            <th className="text-right py-3 min-w-[6rem] text-muted-foreground font-medium">Amount</th>
-                            <th className="text-left py-3 min-w-[12rem] text-muted-foreground font-medium">Created Date</th>
-                            <th className="text-right py-3 min-w-[8rem] text-muted-foreground font-medium"></th>
+                          <tr className="border-b border-border bg-card">
+                            <th className="text-center py-3 w-12 text-foreground font-medium">#</th>
+                            <th className="text-left py-3 min-w-[5rem] text-foreground font-medium">Status</th>
+                            <th className="text-left py-3 min-w-[6rem] text-foreground font-medium">Pay Type</th>
+                            <th className="text-left py-3 min-w-[10rem] text-foreground font-medium">Effective Start</th>
+                            <th className="text-left py-3 min-w-[10rem] text-foreground font-medium">Effective End</th>
+                            <th className="text-right py-3 min-w-[6rem] text-foreground font-medium">Amount</th>
+                            <th className="text-left py-3 min-w-[12rem] text-foreground font-medium">Created Date</th>
+                            <th className="text-right py-3 min-w-[8rem] text-foreground font-medium"></th>
                           </tr>
                         </thead>
                         <tbody>
                           {rateHistoryData.data.map((row, i) => (
-                            <tr key={row.rate_history_aid} className="border-b border-border2a2a2a]/50 hover:bg-card/50">
+                            <tr key={row.rate_history_aid} className="border-b border-border/50 hover:bg-card/50">
                               <td className="py-3 text-center text-muted-foreground">{i + 1}.</td>
                               <td className="py-3 pl-2">
                                 <span
@@ -851,9 +851,9 @@ export default function EmployeeViewPage() {
             )}
 
             {activeSection === "job-history" && (
-              <Card className="bg-card border-border2a2a2a]">
+              <Card className="bg-card border-border">
                 <CardContent className="p-6">
-                  <h3 className="text-primary font-semibold mb-3 border-b border-border2a2a2a] pb-2">
+                  <h3 className="text-primary font-semibold mb-3 border-b border-border pb-2">
                     Job History
                   </h3>
                   {jobHistoryLoading ? (
@@ -864,18 +864,18 @@ export default function EmployeeViewPage() {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-border2a2a2a]">
-                            <th className="text-left py-2 text-muted-foreground font-medium">#</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">Company Name</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">Years Deployed</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">From</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">To</th>
+                          <tr className="border-b border-border">
+                            <th className="text-left py-2 text-foreground font-medium">#</th>
+                            <th className="text-left py-2 text-foreground font-medium">Status</th>
+                            <th className="text-left py-2 text-foreground font-medium">Company Name</th>
+                            <th className="text-left py-2 text-foreground font-medium">Years Deployed</th>
+                            <th className="text-left py-2 text-foreground font-medium">From</th>
+                            <th className="text-left py-2 text-foreground font-medium">To</th>
                           </tr>
                         </thead>
                         <tbody>
                           {jobHistoryData.data.map((row, i) => (
-                            <tr key={row.employment_history_aid} className="border-b border-border2a2a2a]/50">
+                            <tr key={row.employment_history_aid} className="border-b border-border/50">
                               <td className="py-2 text-muted-foreground">{i + 1}.</td>
                               <td className="py-2">
                                 <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${row.employment_history_is_active === 1 ? "bg-green-500/20 text-green-700" : "bg-gray-500/20 text-gray-700"}`}>
@@ -899,9 +899,9 @@ export default function EmployeeViewPage() {
             )}
 
             {activeSection === "earnings" && (
-              <Card className="bg-card border-border2a2a2a]">
+              <Card className="bg-card border-border">
                 <CardContent className="p-6">
-                  <h3 className="text-primary font-semibold mb-3 border-b border-border2a2a2a] pb-2">
+                  <h3 className="text-primary font-semibold mb-3 border-b border-border pb-2">
                     Earnings
                   </h3>
                   {earningsLoading ? (
@@ -912,17 +912,17 @@ export default function EmployeeViewPage() {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-border2a2a2a]">
-                            <th className="text-left py-2 text-muted-foreground font-medium">#</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">Date</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">Payitem</th>
-                            <th className="text-right py-2 text-muted-foreground font-medium">Amount</th>
+                          <tr className="border-b border-border">
+                            <th className="text-left py-2 text-foreground font-medium">#</th>
+                            <th className="text-left py-2 text-foreground font-medium">Status</th>
+                            <th className="text-left py-2 text-foreground font-medium">Date</th>
+                            <th className="text-left py-2 text-foreground font-medium">Payitem</th>
+                            <th className="text-right py-2 text-foreground font-medium">Amount</th>
                           </tr>
                         </thead>
                         <tbody>
                           {earningsData.data.map((row, i) => (
-                            <tr key={row.hris_earning_deduction_aid} className="border-b border-border2a2a2a]/50">
+                            <tr key={row.hris_earning_deduction_aid} className="border-b border-border/50">
                               <td className="py-2 text-muted-foreground">{i + 1}.</td>
                               <td className="py-2">
                                 <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
@@ -945,9 +945,9 @@ export default function EmployeeViewPage() {
             )}
 
             {activeSection === "deduction" && (
-              <Card className="bg-card border-border2a2a2a]">
+              <Card className="bg-card border-border">
                 <CardContent className="p-6">
-                  <h3 className="text-primary font-semibold mb-3 border-b border-border2a2a2a] pb-2">
+                  <h3 className="text-primary font-semibold mb-3 border-b border-border pb-2">
                     Deduction
                   </h3>
                   {deductionsLoading ? (
@@ -958,17 +958,17 @@ export default function EmployeeViewPage() {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-border2a2a2a]">
-                            <th className="text-left py-2 text-muted-foreground font-medium">#</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">Date</th>
-                            <th className="text-left py-2 text-muted-foreground font-medium">Payitem</th>
-                            <th className="text-right py-2 text-muted-foreground font-medium">Amount</th>
+                          <tr className="border-b border-border">
+                            <th className="text-left py-2 text-foreground font-medium">#</th>
+                            <th className="text-left py-2 text-foreground font-medium">Status</th>
+                            <th className="text-left py-2 text-foreground font-medium">Date</th>
+                            <th className="text-left py-2 text-foreground font-medium">Payitem</th>
+                            <th className="text-right py-2 text-foreground font-medium">Amount</th>
                           </tr>
                         </thead>
                         <tbody>
                           {deductionsData.data.map((row, i) => (
-                            <tr key={row.hris_earning_deduction_aid} className="border-b border-border2a2a2a]/50">
+                            <tr key={row.hris_earning_deduction_aid} className="border-b border-border/50">
                               <td className="py-2 text-muted-foreground">{i + 1}.</td>
                               <td className="py-2">
                                 <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
@@ -991,9 +991,9 @@ export default function EmployeeViewPage() {
             )}
 
             {activeSection === "payslip" && (
-              <Card className="bg-card border-border2a2a2a]">
+              <Card className="bg-card border-border">
                 <CardContent className="p-6">
-                  <h3 className="text-primary font-semibold mb-3 border-b border-border2a2a2a] pb-2">
+                  <h3 className="text-primary font-semibold mb-3 border-b border-border pb-2">
                     Payslip
                   </h3>
                   {payslipsLoading ? (
@@ -1004,7 +1004,7 @@ export default function EmployeeViewPage() {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-border2a2a2a]">
+                          <tr className="border-b border-border">
                             <th className="text-left py-2 text-muted-foreground font-medium">#</th>
                             <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
                             <th className="text-left py-2 text-muted-foreground font-medium">Payroll ID</th>
@@ -1015,7 +1015,7 @@ export default function EmployeeViewPage() {
                         </thead>
                         <tbody>
                           {payslipsData.data.map((row, i) => (
-                            <tr key={row.payrun_list_aid} className="border-b border-border2a2a2a]/50">
+                            <tr key={row.payrun_list_aid} className="border-b border-border/50">
                               <td className="py-2 text-muted-foreground">{i + 1}.</td>
                               <td className="py-2">
                                 <span className={`px-2 py-0.5 text-xs rounded-full ${row.payrun_status === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>

@@ -741,7 +741,7 @@ export function AddEditPaymentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card border-border2a2a2a] text-foreground max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border text-foreground max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-foreground text-xl">
             {isEdit ? "Update" : "Add"} Payment
@@ -765,7 +765,7 @@ export function AddEditPaymentModal({
               value={yearMonth}
               onChange={(e) => setYearMonth(e.target.value)}
               disabled={isPending || isEdit}
-              className="bg-muted border-border2a2a2a] text-foreground mt-1"
+              className="bg-muted border-border text-foreground mt-1"
               required
             />
           </div>
@@ -785,7 +785,7 @@ export function AddEditPaymentModal({
                 value={payable}
                 readOnly
                 disabled={isPending || isLoadingIncomeExpense}
-                className="bg-background border-border2a2a2a] text-foreground mt-1 pl-8 cursor-not-allowed"
+                className="bg-background border-border text-foreground mt-1 pl-8 cursor-not-allowed"
                 placeholder="0.00"
               />
             </div>
@@ -817,7 +817,7 @@ export function AddEditPaymentModal({
                 value={payout}
                 onChange={(e) => setPayout(e.target.value)}
                 disabled={isPending}
-                className="bg-muted border-border2a2a2a] text-foreground mt-1 pl-8"
+                className="bg-muted border-border text-foreground mt-1 pl-8"
                 placeholder="0.00"
                 required
               />
@@ -838,7 +838,7 @@ export function AddEditPaymentModal({
                 type="text"
                 value={balance}
                 disabled
-                className="bg-background border-border2a2a2a] text-[#EAEB80] font-bold mt-1 pl-8"
+                className="bg-background border-border text-[#EAEB80] font-bold mt-1 pl-8"
               />
             </div>
           </div>
@@ -849,10 +849,10 @@ export function AddEditPaymentModal({
               Payment Status <span className="text-red-700">*</span>
             </Label>
             <Select value={statusId} onValueChange={setStatusId} disabled={isPending}>
-              <SelectTrigger className="bg-muted border-border2a2a2a] text-foreground mt-1">
+              <SelectTrigger className="bg-muted border-border text-foreground mt-1">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
-              <SelectContent className="bg-muted border-border2a2a2a] text-foreground">
+              <SelectContent className="bg-muted border-border text-foreground">
                 {statuses.map((status) => (
                   <SelectItem
                     key={status.payment_status_aid}
@@ -876,7 +876,7 @@ export function AddEditPaymentModal({
               value={referenceNumber}
               onChange={(e) => setReferenceNumber(e.target.value)}
               disabled={isPending}
-              className="bg-muted border-border2a2a2a] text-foreground mt-1"
+              className="bg-muted border-border text-foreground mt-1"
               placeholder="Enter reference number"
             />
           </div>
@@ -892,7 +892,7 @@ export function AddEditPaymentModal({
               value={paymentDate}
               onChange={(e) => setPaymentDate(e.target.value)}
               disabled={isPending}
-              className="bg-muted border-border2a2a2a] text-foreground mt-1"
+              className="bg-muted border-border text-foreground mt-1"
             />
           </div>
 
@@ -914,7 +914,7 @@ export function AddEditPaymentModal({
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isPending}
-                className="w-full bg-muted border-border2a2a2a] text-foreground hover:bg-muted"
+                className="w-full bg-muted border-border text-foreground hover:bg-muted"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 {receiptFiles.length > 0 ? "Add More Files" : "Upload Receipt"}
@@ -928,7 +928,7 @@ export function AddEditPaymentModal({
                   {receiptFiles.map((file, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between bg-background border border-border2a2a2a] rounded p-2"
+                      className="flex items-center justify-between bg-background border border-border rounded p-2"
                     >
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         {file.type.startsWith("image/") ? (
@@ -970,20 +970,20 @@ export function AddEditPaymentModal({
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               disabled={isPending}
-              className="bg-muted border-border2a2a2a] text-foreground mt-1"
+              className="bg-muted border-border text-foreground mt-1"
               placeholder="Enter any additional notes"
               rows={3}
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-2 pt-4 border-t border-border2a2a2a]">
+          <div className="flex justify-end gap-2 pt-4 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
               disabled={isPending}
-              className="bg-muted text-foreground hover:bg-muted border-border2a2a2a]"
+              className="bg-muted text-foreground hover:bg-muted border-border"
             >
               Cancel
             </Button>

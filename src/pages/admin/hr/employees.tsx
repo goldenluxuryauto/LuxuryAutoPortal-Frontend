@@ -831,34 +831,34 @@ export default function EmployeesPage() {
               <Table className="min-w-[1000px]">
                 <TableHeader>
                   <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-16 text-[10px] sm:text-xs">
+                    <TableHead className="text-center text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-16 text-[10px] sm:text-xs">
                       No
                     </TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
+                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
                       Status
                     </TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
+                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
                       Employee #
                     </TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[220px] text-[10px] sm:text-xs">
+                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[220px] text-[10px] sm:text-xs">
                       Employee Name
                     </TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[240px] text-[10px] sm:text-xs hidden lg:table-cell">
+                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[240px] text-[10px] sm:text-xs hidden lg:table-cell">
                       Work Email
                     </TableHead>
                     <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden lg:table-cell">
                       Mobile
                     </TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
+                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
                       Department
                     </TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
+                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
                       Job Title
                     </TableHead>
                     <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden md:table-cell">
                       Created
                     </TableHead>
-                    <TableHead className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-28 text-[10px] sm:text-xs">
+                    <TableHead className="text-center text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-28 text-[10px] sm:text-xs">
                       Actions
                     </TableHead>
                   </TableRow>

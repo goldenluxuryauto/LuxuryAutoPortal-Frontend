@@ -980,13 +980,13 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
   };
 
   return (
-    <div className="bg-card border border-border1a1a1a] rounded-lg overflow-hidden h-full flex flex-col">
+    <div className="bg-card border border-border rounded-lg overflow-hidden h-full flex flex-col">
       <div className="overflow-auto flex-1" style={{ maxHeight: '100%' }}>
         <table className="w-full border-collapse text-xs">
           {/* Table Header */}
           <thead className="sticky top-0 z-40 bg-muted">
             <tr>
-              <th className="sticky left-0 z-50 bg-muted border-r border-border2a2a2a] px-3 py-2 text-left text-foreground min-w-[200px]">
+              <th className="sticky left-0 z-50 bg-muted border-r border-border px-3 py-2 text-left text-foreground min-w-[200px]">
                 Category
               </th>
               {MONTHS.map((month, index) => {
@@ -999,7 +999,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                 return (
                   <th
                     key={month}
-                    className="border-l border-border2a2a2a] px-2 py-2 text-center min-w-[100px]"
+                    className="border-l border-border px-2 py-2 text-center min-w-[100px]"
                   >
                     <div className="flex flex-col items-center gap-1">
                       <span className="text-foreground text-xs">{month} {year}</span>
@@ -1011,8 +1011,8 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                             "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200",
                             "disabled:opacity-50 disabled:cursor-not-allowed",
                             currentMode === 50 
-                              ? "bg-green-600 text-foreground hover:bg-green-700 active:bg-green-800 shadow-lg shadow-green-600/50" 
-                              : "bg-blue-600 text-foreground hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/50",
+                              ? "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-lg shadow-green-600/50" 
+                              : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-lg shadow-blue-600/50",
                             isSavingMode && "animate-pulse",
                             isReadOnly && "cursor-default hover:bg-inherit active:bg-inherit"
                           )}
@@ -1034,8 +1034,8 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                             "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px]",
                             "disabled:opacity-50 disabled:cursor-not-allowed",
                             currentSkiRacksOwner === "GLA"
-                              ? "bg-purple-600 text-foreground hover:bg-purple-700 active:bg-purple-800 shadow-lg shadow-purple-600/50"
-                              : "bg-orange-600 text-foreground hover:bg-orange-700 active:bg-orange-800 shadow-lg shadow-orange-600/50",
+                              ? "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 shadow-lg shadow-purple-600/50"
+                              : "bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800 shadow-lg shadow-orange-600/50",
                             isSavingSkiRacksOwner && "animate-pulse",
                             isReadOnly && "cursor-default hover:bg-inherit active:bg-inherit"
                           )}
@@ -1055,7 +1055,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                   </th>
                 );
               })}
-              <th className="sticky right-0 z-30 border-l border-border2a2a2a] px-2 py-2 text-center text-foreground min-w-[100px] bg-card font-bold">
+              <th className="sticky right-0 z-30 border-l border-border px-2 py-2 text-center text-foreground min-w-[100px] bg-card font-bold">
                 Total
               </th>
             </tr>
@@ -2271,7 +2271,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
 
       {/* Add Subcategory Modal */}
       <Dialog open={addSubcategoryModal.open} onOpenChange={(open) => setAddSubcategoryModal({ ...addSubcategoryModal, open })}>
-        <DialogContent className="bg-card border-border1a1a1a] text-foreground">
+        <DialogContent className="bg-card border-border text-foreground">
           <DialogHeader>
             <DialogTitle>Add Subcategory</DialogTitle>
             <DialogDescription>Enter a name for the new subcategory</DialogDescription>
@@ -2282,7 +2282,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               <Input
                 value={addSubcategoryModal.name}
                 onChange={(e) => setAddSubcategoryModal({ ...addSubcategoryModal, name: e.target.value })}
-                className="bg-muted border-border2a2a2a] text-foreground"
+                className="bg-muted border-border text-foreground"
                 autoFocus
               />
             </div>
@@ -2291,7 +2291,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
             <Button
               variant="outline"
               onClick={() => setAddSubcategoryModal({ open: false, categoryType: "", name: "" })}
-              className="border-border2a2a2a] text-muted-foreground hover:text-foreground"
+              className="border-border text-muted-foreground hover:text-foreground"
             >
               Cancel
             </Button>
@@ -2313,7 +2313,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
 
       {/* Edit Subcategory Name Modal */}
       <Dialog open={editSubcategoryModal.open} onOpenChange={(open) => setEditSubcategoryModal({ ...editSubcategoryModal, open })}>
-        <DialogContent className="bg-card border-border1a1a1a] text-foreground">
+        <DialogContent className="bg-card border-border text-foreground">
           <DialogHeader>
             <DialogTitle>Edit Subcategory Name</DialogTitle>
             <DialogDescription>Update the name of this subcategory</DialogDescription>
@@ -2324,7 +2324,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
               <Input
                 value={editSubcategoryModal.newName}
                 onChange={(e) => setEditSubcategoryModal({ ...editSubcategoryModal, newName: e.target.value })}
-                className="bg-muted border-border2a2a2a] text-foreground"
+                className="bg-muted border-border text-foreground"
                 autoFocus
               />
             </div>
@@ -2333,7 +2333,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
             <Button
               variant="outline"
               onClick={() => setEditSubcategoryModal({ open: false, categoryType: "", metadataId: 0, currentName: "", newName: "" })}
-              className="border-border2a2a2a] text-muted-foreground hover:text-foreground"
+              className="border-border text-muted-foreground hover:text-foreground"
             >
               Cancel
             </Button>
@@ -2394,8 +2394,8 @@ function DynamicSubcategoryRow({
   };
   
   return (
-    <tr className="border-b border-border1a1a1a] hover:bg-muted/50151515]">
-      <td className="sticky left-0 z-20 bg-card px-3 py-2 text-left text-muted-foreground border-r border-border1a1a1a] text-xs">
+    <tr className="border-b border-border">
+      <td className="sticky left-0 z-20 bg-card px-3 py-2 text-left text-muted-foreground border-r border-border text-xs">
         <div className="flex items-center gap-2">
           <span>{subcategory.name}</span>
           {!isReadOnly && (
@@ -2424,7 +2424,7 @@ function DynamicSubcategoryRow({
         const value = monthValue?.value || 0;
         
         return (
-          <td key={month} className="border-l border-border1a1a1a] px-2 py-2 text-right">
+          <td key={month} className="border-l border-border px-2 py-2 text-right">
             <span
               onClick={() => handleCellClick(month, value)}
               className={cn(
@@ -2441,7 +2441,7 @@ function DynamicSubcategoryRow({
         );
       })}
       <td className={cn(
-        "sticky right-0 z-20 border-l border-border2a2a2a] px-2 py-2 text-right font-bold text-xs bg-card",
+        "sticky right-0 z-20 border-l border-border px-2 py-2 text-right font-bold text-xs bg-card",
         total === 0 ? "text-gray-600" : "text-[#EAEB80]"
       )}>
         ${total.toFixed(2)}
@@ -2467,14 +2467,14 @@ function CategorySection({ title, isExpanded, onToggle, children, hasActions = t
   
   return (
     <>
-      <tr className="bg-muted hover:bg-muted">
-        <td colSpan={14} className="sticky left-0 z-30 bg-muted hover:bg-muted px-3 py-2 border-b border-border2a2a2a]">
+      <tr className="bg-primary">
+        <td colSpan={14} className="sticky left-0 z-30 bg-primary px-3 py-2 border-b border-primary">
           <div 
             className={`flex items-center gap-2 ${shouldShowToggle ? 'cursor-pointer' : ''}`} 
             onClick={shouldShowToggle ? onToggle : undefined}
           >
-            {shouldShowToggle && (isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />)}
-            <span className="text-xs font-semibold text-foreground">{title}</span>
+            {shouldShowToggle && (isExpanded ? <ChevronDown className="w-4 h-4 text-white" /> : <ChevronRight className="w-4 h-4 text-white" />)}
+            <span className="text-xs font-semibold text-white">{title}</span>
           </div>
         </td>
       </tr>
@@ -2592,10 +2592,10 @@ function CategoryRow({
 
   return (
     <tr className={cn(
-      "border-b border-border1a1a1a] hover:bg-muted/50151515]",
+      "border-b border-border",
       isTotal && "bg-background font-semibold"
     )}>
-      <td className="sticky left-0 z-20 bg-card px-3 py-2 text-left text-muted-foreground border-r border-border1a1a1a] text-xs">
+      <td className="sticky left-0 z-20 bg-card px-3 py-2 text-left text-muted-foreground border-r border-border text-xs">
         {label}
       </td>
       {values.map((value, i) => {
@@ -2608,7 +2608,7 @@ function CategoryRow({
         return (
           <td 
             key={month} 
-            className="border-l border-border1a1a1a] px-2 py-2 text-right"
+            className="border-l border-border px-2 py-2 text-right"
           >
             {category && field && isMonthEditable ? (
               showAmountAndPercentage && percentageValues ? (
@@ -2650,7 +2650,7 @@ function CategoryRow({
       })}
       {!hideTotal && (
         <td className={cn(
-          "sticky right-0 z-20 border-l border-border2a2a2a] px-2 py-2 text-right text-foreground font-bold text-xs",
+          "sticky right-0 z-20 border-l border-border px-2 py-2 text-right text-foreground font-bold text-xs",
           isTotal ? "bg-background" : "bg-card"
         )}>
           {formatTotal()}

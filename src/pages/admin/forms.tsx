@@ -1150,7 +1150,7 @@ export default function FormsPage() {
                                       <table className="w-full text-sm table-auto">
                                       <thead>
                                         <tr className="border-b border-border">
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
                                             Name
                                           </th>
                                           <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden md:table-cell whitespace-nowrap">
@@ -1159,7 +1159,7 @@ export default function FormsPage() {
                                           <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden lg:table-cell whitespace-nowrap">
                                             Phone
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
                                             Vehicle
                                           </th>
                                           <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden xl:table-cell whitespace-nowrap">
@@ -1171,7 +1171,7 @@ export default function FormsPage() {
                                           <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden lg:table-cell whitespace-nowrap">
                                             Submitted
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
                                             Status
                                           </th>
                                           <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden md:table-cell whitespace-nowrap">
@@ -1183,7 +1183,7 @@ export default function FormsPage() {
                                           <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden 2xl:table-cell whitespace-nowrap">
                                             Car Offboarding Date
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2 sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
                                             Actions
                                           </th>
                                         </tr>

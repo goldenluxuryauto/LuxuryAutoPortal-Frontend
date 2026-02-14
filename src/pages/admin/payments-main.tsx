@@ -383,20 +383,20 @@ export default function PaymentsMainPage() {
             <Table className="table-fixed w-full">
               <TableHeader>
                 <TableRow className="border-border hover:bg-transparent">
-                  <TableHead className="text-left text-primary font-medium w-12 text-xs">#</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-24 text-xs">Status</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-36 text-xs">Client</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-28 whitespace-nowrap text-xs">Date</TableHead>
-                  <TableHead className="text-left text-primary font-medium min-w-[180px] text-xs">Car</TableHead>
-                  <TableHead className="text-right text-primary font-medium w-32 tabular-nums text-xs whitespace-nowrap">Payable</TableHead>
-                  <TableHead className="text-right text-primary font-medium w-32 tabular-nums text-xs whitespace-nowrap">Payout</TableHead>
-                  <TableHead className="text-right text-primary font-medium w-32 tabular-nums text-xs whitespace-nowrap">Balance</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-24 text-xs">Ref #</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-24 text-xs">Invoice #</TableHead>
-                  <TableHead className="text-left text-primary font-medium w-28 whitespace-nowrap text-xs">Payment Date</TableHead>
-                  <TableHead className="text-center text-primary font-medium w-16 text-xs">Receipt</TableHead>
-                  <TableHead className="text-left text-primary font-medium min-w-[100px] text-xs">Remarks</TableHead>
-                  <TableHead className="text-center text-primary font-medium w-24 text-xs">Actions</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-12 text-xs">#</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-24 text-xs">Status</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-36 text-xs">Client</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-28 whitespace-nowrap text-xs">Date</TableHead>
+                  <TableHead className="text-left text-foreground font-medium min-w-[180px] text-xs">Car</TableHead>
+                  <TableHead className="text-right text-foreground font-medium w-32 tabular-nums text-xs whitespace-nowrap">Payable</TableHead>
+                  <TableHead className="text-right text-foreground font-medium w-32 tabular-nums text-xs whitespace-nowrap">Payout</TableHead>
+                  <TableHead className="text-right text-foreground font-medium w-32 tabular-nums text-xs whitespace-nowrap">Balance</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-24 text-xs">Ref #</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-24 text-xs">Invoice #</TableHead>
+                  <TableHead className="text-left text-foreground font-medium w-28 whitespace-nowrap text-xs">Payment Date</TableHead>
+                  <TableHead className="text-center text-foreground font-medium w-16 text-xs">Receipt</TableHead>
+                  <TableHead className="text-left text-foreground font-medium min-w-[100px] text-xs">Remarks</TableHead>
+                  <TableHead className="text-center text-foreground font-medium w-24 text-xs">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

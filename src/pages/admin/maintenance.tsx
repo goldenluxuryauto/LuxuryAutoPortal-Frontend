@@ -339,14 +339,14 @@ export default function MaintenancePage() {
               <table className="border-collapse w-full" style={{ minWidth: '1000px' }}>
                 <thead className="bg-card">
                   <tr className="border-b border-border">
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">#</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Maintenance Type</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Status</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-foreground">#</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Maintenance Type</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Status</th>
                     <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Oil Miles</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Schedule Date</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Date Completed</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Schedule Date</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Date Completed</th>
                     <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Price</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Remarks</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Remarks</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -363,7 +363,7 @@ export default function MaintenancePage() {
                     maintenanceRecords.map((record, index) => (
                       <tr
                         key={index}
-                        className="border-b border-border hover:bg-muted/50151515] transition-colors"
+                        className="border-b border-border transition-colors"
                       >
                         <td className="px-4 py-3 text-sm text-muted-foreground">{index + 1}</td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">{record.type}</td>

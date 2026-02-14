@@ -1469,7 +1469,7 @@ export default function CarDetailPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
             <Button
@@ -1499,9 +1499,9 @@ export default function CarDetailPage() {
         </div>
 
         {/* Row 1: Vehicle Information, Car Photos, and Car Links */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch max-w-full">
           {/* Vehicle Information Card */}
-          <Card className="bg-card border-border lg:col-span-6 flex flex-col">
+          <Card className="bg-card border-border lg:col-span-6 flex flex-col min-w-0 max-w-full">
             <CardHeader className="pb-2">
               <CardTitle className="text-primary text-base sm:text-lg flex items-center gap-2">
                 <Car className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -1639,7 +1639,7 @@ export default function CarDetailPage() {
               
               {/* Assigned To Section */}
                 <div className="pt-1.5 border-t border-border">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-8">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-6">
                     {/* Left: Assigned To */}
                     <div className="flex-shrink-0 text-center lg:text-left">
                       <p className="text-xs text-muted-foreground mb-1.5">Assigned To</p>
@@ -1698,7 +1698,7 @@ export default function CarDetailPage() {
                     </div>
 
                     {/* Right: Car Status, Management, Online Status, Last Login */}
-                    <div className="grid grid-cols-2 lg:flex lg:items-start lg:gap-8 lg:flex-1 lg:justify-end gap-4">
+                    <div className="grid grid-cols-2 lg:flex lg:items-start lg:gap-6 lg:flex-1 lg:justify-end gap-4 max-w-full">
                       {/* Car Status */}
                       <div className="text-center lg:min-w-[100px]">
                         <p className="text-xs text-muted-foreground mb-1.5">Car Status</p>
@@ -1785,7 +1785,7 @@ export default function CarDetailPage() {
           {/* Column 2: Car Photos and Car Links stacked vertically */}
           <div className="lg:col-span-6 flex flex-col gap-6">
             {/* Car Photos Carousel Card */}
-            <Card className="bg-card border-border flex flex-col flex-1">
+            <Card className="bg-card border-border flex flex-col flex-1 min-w-0 max-w-full">
               <CardHeader className="pb-2">
                 <CardTitle className="text-primary text-lg flex items-center gap-2">
                   <Car className="w-5 h-5" />
@@ -1991,9 +1991,9 @@ export default function CarDetailPage() {
         </div>
 
         {/* Row 2: Documents, Vehicle Purchase Information, Car Login Information, Insurance Information */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 max-w-full">
           {/* Documents Card */}
-          <Card className="bg-card border-border lg:col-span-3">
+          <Card className="bg-card border-border lg:col-span-3 min-w-0 max-w-full">
             <CardHeader>
               <CardTitle className="text-primary text-lg">
                 Documents
@@ -2005,7 +2005,7 @@ export default function CarDetailPage() {
                   <p className="text-sm">Loading documents...</p>
                 </div>
               ) : onboarding ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
                   {/* Insurance Card */}
                   <div>
                     <h4 className="text-base font-semibold text-muted-foreground mb-4">Insurance Card</h4>
@@ -2298,7 +2298,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Vehicle Purchase Information Card */}
-          <Card className="bg-card border-border lg:col-span-3">
+          <Card className="bg-card border-border lg:col-span-3 min-w-0 max-w-full">
             <CardHeader>
               <CardTitle className="text-primary text-lg">
               Purchase Information
@@ -2352,7 +2352,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Car Login Information Card */}
-          <Card className="bg-card border-border lg:col-span-3">
+          <Card className="bg-card border-border lg:col-span-3 min-w-0 max-w-full">
             <CardHeader>
               <CardTitle className="text-primary text-lg">
                 Car Login Information
@@ -2417,7 +2417,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Insurance Information Card */}
-          <Card className="bg-card border-border lg:col-span-3">
+          <Card className="bg-card border-border lg:col-span-3 min-w-0 max-w-full">
             <CardHeader>
               <CardTitle className="text-primary text-lg">
                 Insurance Information
