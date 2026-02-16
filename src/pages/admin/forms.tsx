@@ -930,7 +930,7 @@ export default function FormsPage() {
     <AdminLayout>
       <div className="space-y-6 max-w-full">
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-primary">Forms</h1>
+          <h1 className="text-2xl font-semibold text-primary">Forms</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage client onboarding and expense forms
           </p>
@@ -950,7 +950,7 @@ export default function FormsPage() {
                   >
                     <div className="flex items-center gap-3">
                       <SectionIcon className="w-5 h-5 text-primary" />
-                      <span className="text-foreground font-medium">
+                      <span className="text-primary font-semibold text-base">
                         {section.title}
                       </span>
                     </div>
@@ -1016,15 +1016,15 @@ export default function FormsPage() {
                                     className={cn(
                                       "w-4 h-4",
                                       item.comingSoon
-                                        ? "text-gray-600"
+                                        ? "text-muted-foreground"
                                         : "text-primary"
                                     )}
                                   />
                                   <span
                                     className={cn(
-                                      "text-sm",
+                                      "text-sm font-medium",
                                       item.comingSoon
-                                        ? "text-gray-600"
+                                        ? "text-muted-foreground"
                                         : "text-primary"
                                     )}
                                   >

@@ -163,7 +163,7 @@ export default function EmployeeFormPage() {
     <div className="min-h-screen bg-background text-foreground flex items-start justify-center p-4">
       <div className="w-full max-w-3xl space-y-6">
         <div className="text-center">
-          <img src="/logo.svg" alt="Golden Luxury Auto" className="h-10 mx-auto mb-3" />
+          <img src="/logo.png" alt="Golden Luxury Auto" className="h-10 mx-auto mb-3" />
           <h1 className="text-2xl sm:text-3xl font-serif text-primary italic">Employee Onboarding</h1>
           <p className="text-muted-foreground text-sm mt-1">Please complete your personal information.</p>
         </div>

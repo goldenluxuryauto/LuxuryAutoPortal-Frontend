@@ -122,7 +122,7 @@ export default function StaffTaskManagement() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Task Management</h1>
+          <h1 className="text-2xl font-semibold text-primary">Task Management</h1>
           <p className="text-muted-foreground">View and manage your assigned tasks.</p>
         </div>
 

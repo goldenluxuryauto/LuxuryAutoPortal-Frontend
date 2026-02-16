@@ -88,7 +88,7 @@ export default function StaffClientTestimonials() {
       <div className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">Client Testimonials</h1>
+            <h1 className="text-2xl font-semibold text-primary">Client Testimonials</h1>
             <p className="text-muted-foreground">View and add client feedback and testimonials.</p>
           </div>
           <Button onClick={() => setAddOpen(true)} className="gap-2">

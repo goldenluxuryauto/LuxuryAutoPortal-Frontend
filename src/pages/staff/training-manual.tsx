@@ -75,7 +75,7 @@ export default function StaffTrainingManual() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">System Tutorial</h1>
+          <h1 className="text-2xl font-semibold text-primary">System Tutorial</h1>
           <p className="text-muted-foreground">Learn how to use the GLA portal with our guided tutorial.</p>
         </div>
 

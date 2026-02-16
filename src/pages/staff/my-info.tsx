@@ -35,7 +35,7 @@ export default function StaffMyInfo() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">My Info</h1>
+          <h1 className="text-2xl font-semibold text-primary">My Info</h1>
           <p className="text-muted-foreground">Your profile and employment information.</p>
         </div>
 

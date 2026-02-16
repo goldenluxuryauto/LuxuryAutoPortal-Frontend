@@ -2470,7 +2470,7 @@ function CategorySection({ title, isExpanded, onToggle, children, hasActions = t
       <tr className="bg-primary">
         <td colSpan={14} className="sticky left-0 z-30 bg-primary px-3 py-2 border-b border-primary">
           <div 
-            className={`flex items-center gap-2 ${shouldShowToggle ? 'cursor-pointer' : ''}`} 
+            className={`flex items-center gap-2 ${shouldShowToggle ? 'cursor-pointer hover:bg-inherit' : ''}`} 
             onClick={shouldShowToggle ? onToggle : undefined}
           >
             {shouldShowToggle && (isExpanded ? <ChevronDown className="w-4 h-4 text-white" /> : <ChevronRight className="w-4 h-4 text-white" />)}

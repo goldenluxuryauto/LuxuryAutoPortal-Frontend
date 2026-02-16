@@ -150,7 +150,7 @@ export default function StaffTime() {
       <div className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">Time</h1>
+            <h1 className="text-2xl font-semibold text-primary">Time</h1>
             <p className="text-muted-foreground">Time entries and timesheets.</p>
           </div>
           <Button onClick={handleTimeInOut} disabled={isOnBreak} className="gap-2">

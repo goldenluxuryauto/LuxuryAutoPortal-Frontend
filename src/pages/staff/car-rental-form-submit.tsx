@@ -32,7 +32,7 @@ export default function StaffCarRentalFormSubmit() {
     return (
       <AdminLayout>
         <div className="space-y-6">
-          <h1 className="text-2xl font-semibold text-foreground">Submit form</h1>
+          <h1 className="text-2xl font-semibold text-primary">Submit form</h1>
           <Card className="bg-card border-border">
             <CardContent className="pt-6">
               <p className="text-muted-foreground">Unknown form type. Please choose a form from the list.</p>
@@ -50,7 +50,7 @@ export default function StaffCarRentalFormSubmit() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Submit form</h1>
+          <h1 className="text-2xl font-semibold text-primary">Submit form</h1>
           <p className="text-muted-foreground">{formName}</p>
         </div>
 
