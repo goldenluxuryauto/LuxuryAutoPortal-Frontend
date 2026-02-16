@@ -385,6 +385,24 @@ export default function CarDetailPage() {
 
   const onboarding = onboardingData?.success ? onboardingData?.data : null;
 
+  // Fetch the corresponding client so Last Login (and online status) match the Client profile page (same API, same polling).
+  const { data: clientData } = useQuery<{ success: boolean; data?: { lastLoginAt?: string | null; lastLogoutAt?: string | null } }>({
+    queryKey: ["/api/clients", car?.clientId],
+    queryFn: async () => {
+      if (!car?.clientId) throw new Error("No client ID");
+      const url = buildApiUrl(`/api/clients/${car.clientId}`);
+      const response = await fetch(url, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch client");
+      return response.json();
+    },
+    enabled: !!car?.clientId,
+    retry: false,
+    refetchInterval: 2000,
+    refetchOnWindowFocus: true,
+  });
+  const ownerLastLoginAt = clientData?.data?.lastLoginAt ?? car?.owner?.lastLoginAt ?? null;
+  const ownerLastLogoutAt = clientData?.data?.lastLogoutAt ?? car?.owner?.lastLogoutAt ?? null;
+
   // Debug logging for documents (only in development)
   useEffect(() => {
     if (import.meta.env.DEV && onboarding) {
@@ -446,17 +464,17 @@ export default function CarDetailPage() {
       .map((url: string) => url.trim());
   }, [onboarding?.driversLicenseUrls]);
 
-  // Calculate online status badge (moved to top level to avoid hooks violation)
+  // Calculate online status badge (use client API lastLoginAt/lastLogoutAt so it matches Client profile page)
   const onlineStatusBadge = useMemo(() => {
     if (!car?.owner) {
       return null;
     }
     
     // Online Status is based ONLY on login/logout activity, NOT on account status
-    // No time threshold - status changes immediately based on login/logout events
+    // Use ownerLastLoginAt/ownerLastLogoutAt (from client API when car.clientId exists) so value matches Client profile
     const onlineStatus = getOnlineStatusBadge(
-      car.owner.lastLoginAt,
-      car.owner.lastLogoutAt // lastLogoutAt - if exists and more recent than login, user is offline
+      ownerLastLoginAt,
+      ownerLastLogoutAt
     );
     
     // Debug logging (only in development)
@@ -466,15 +484,14 @@ export default function CarDetailPage() {
       console.log('[Car Detail] Online Status Calculation:', {
         ownerName: `${car.owner.firstName} ${car.owner.lastName}`,
         email: car.owner.email,
-        lastLoginAt: car.owner.lastLoginAt,
-        lastLogoutAt: car.owner.lastLogoutAt,
+        lastLoginAt: ownerLastLoginAt,
+        lastLogoutAt: ownerLastLogoutAt,
         result: onlineStatus.text,
         isOnline: onlineStatus.isOnline,
         timestamp: now.toISOString(),
       });
       
-      // Warn if lastLoginAt is null but owner exists (might indicate database issue)
-      if (!car.owner.lastLoginAt && car.owner.email) {
+      if (!ownerLastLoginAt && car.owner.email) {
         console.warn(`⚠️ [Car Detail] Owner ${car.owner.email} has no lastLoginAt value. This could indicate:`);
         console.warn('   1. Database columns (lastLoginAt/lastLogoutAt) don\'t exist in user table');
         console.warn('   2. User has never logged in through /api/auth/login endpoint');
@@ -484,7 +501,7 @@ export default function CarDetailPage() {
     }
     
     return onlineStatus;
-  }, [car?.owner?.lastLoginAt, car?.owner?.lastLogoutAt, car?.owner?.firstName, car?.owner?.lastName, car?.owner?.email]);
+  }, [car?.owner, ownerLastLoginAt, ownerLastLogoutAt]);
 
   // Helper functions
   const formatValue = (value: any): string => {
@@ -1749,12 +1766,12 @@ export default function CarDetailPage() {
                         )}
                       </div>
 
-                      {/* Last Login */}
+                      {/* Last Login - use client API value so it matches Client profile page */}
                       <div className="text-center lg:min-w-[140px] col-span-2 lg:col-span-1">
                         <p className="text-xs text-muted-foreground mb-1.5">Last Login</p>
                         <p className="text-foreground text-xs sm:text-sm font-medium whitespace-normal break-words">
                           {car.owner
-                            ? formatLastLogin(car.owner.lastLoginAt)
+                            ? formatLastLogin(ownerLastLoginAt)
                             : "N/A"}
                         </p>
                     </div>

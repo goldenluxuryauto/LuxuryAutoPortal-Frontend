@@ -353,7 +353,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-w-0 max-w-full">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -393,163 +393,146 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
           No expense submissions found.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="text-foreground font-semibold">Date</TableHead>
-                <TableHead className="text-foreground font-semibold">Employee</TableHead>
-                <TableHead className="text-foreground font-semibold">Car</TableHead>
-                <TableHead className="text-foreground font-semibold">Year/Month</TableHead>
-                <TableHead className="text-foreground font-semibold">Category</TableHead>
-                <TableHead className="text-foreground font-semibold">Type</TableHead>
-                <TableHead className="text-foreground font-semibold">Amount</TableHead>
-                <TableHead className="text-foreground font-semibold">Status</TableHead>
-                <TableHead className="text-foreground font-semibold">Remarks</TableHead>
-                <TableHead className="text-foreground font-semibold">Decline Reason</TableHead>
-                {isAdmin && <TableHead className="text-foreground font-semibold text-right">Actions</TableHead>}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {submissions.map((sub) => (
-                <TableRow key={sub.id} className="border-border">
-                  <TableCell className="text-foreground text-sm">
-                    {new Date(sub.submissionDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm">
-                    {sub.employeeName || "-"}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm max-w-[200px] truncate" title={sub.carDisplayName}>
-                    {sub.carDisplayName || "-"}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm">
-                    {sub.year} / {MONTHS[sub.month - 1]}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm">
-                    {CATEGORY_LABELS[sub.category] || sub.category}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {formatFieldLabel(sub.field)}
-                  </TableCell>
-                  <TableCell className="text-green-700 font-semibold">
-                    ${Number(sub.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={
-                        sub.status === "approved"
-                          ? "border-green-500/50 text-green-700 bg-green-500/20 font-semibold"
-                          : sub.status === "declined"
-                          ? "border-red-500/50 text-red-700 bg-red-500/20 font-semibold"
-                          : "border-yellow-500/50 text-yellow-800 bg-yellow-500/20 font-semibold"
-                      }
-                    >
-                      {sub.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm text-center">
-                    {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : "—"}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm text-center">
-                    {sub.status === "approved" && sub.approvedAt ? new Date(sub.approvedAt).toLocaleDateString() : "—"}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm text-center">
-                    {sub.submissionDate ? new Date(sub.submissionDate).toLocaleDateString() : "—"}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm text-center">
-                    {sub.employeeName || "-"}
-                  </TableCell>
-                  <TableCell className="text-foreground text-sm text-center">
-                    {sub.carOwnerName || "—"}
-                  </TableCell>
-                  <TableCell className="text-white text-sm min-w-[220px] max-w-[320px] break-words whitespace-normal text-center" title={sub.carDisplayName || undefined}>
-                    {sub.carDisplayName || "-"}
-                  </TableCell>
-                  <TableCell className="text-primary font-medium text-center">
-                    ${Number(sub.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </TableCell>
-                  <TableCell className="text-red-700/80 text-sm max-w-[150px] truncate text-center" title={sub.declineReason || undefined}>
-                    {sub.status === "declined" && sub.declineReason ? sub.declineReason : "—"}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm max-w-[120px] truncate text-center" title={sub.remarks || undefined}>
-                    {sub.remarks || "—"}
-                  </TableCell>
-                  <TableCell className="text-sm text-center">
-                    {sub.receiptUrls && sub.receiptUrls.length > 0 ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
-                        onClick={() => {
-                          setSelectedSubmission(sub);
-                          setViewReceiptsOpen(true);
-                        }}
-                        title="View copy of receipt"
-                      >
-                        <Eye className="w-4 h-4 mr-1 inline" />
-                        View
-                      </Button>
-                    ) : (
-                      <span className="text-gray-500">No receipt</span>
-                    )}
-                  </TableCell>
-                  {isAdmin && (
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        {sub.status === "pending" && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-green-500 hover:text-green-700"
-                              onClick={() => approveMutation.mutate(sub.id)}
-                              disabled={approveMutation.isPending}
-                              title="Approve"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-red-500 hover:text-red-700"
-                              onClick={() => handleDecline(sub)}
-                              title="Decline"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </Button>
-                          </>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-primary"
-                          onClick={() => handleEdit(sub)}
-                          title="Edit"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-red-500 hover:text-red-700"
-                          onClick={() => {
-                            if (window.confirm("Delete this submission?")) {
-                              deleteMutation.mutate(sub.id);
-                            }
-                          }}
-                          disabled={deleteMutation.isPending}
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  )}
+        <div className="min-w-0 w-full max-w-full rounded-lg border border-border overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table className="table-fixed w-full min-w-0 text-xs">
+              <TableHeader>
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-foreground font-semibold w-[90px] text-xs whitespace-nowrap py-2 px-2 h-auto">Date</TableHead>
+                  <TableHead className="text-foreground font-semibold min-w-0 text-xs whitespace-nowrap py-2 px-2 h-auto">Employee</TableHead>
+                  <TableHead className="text-foreground font-semibold w-[200px] min-w-[160px] text-xs whitespace-nowrap py-2 px-2 h-auto">Car</TableHead>
+                  <TableHead className="text-foreground font-semibold w-[80px] text-xs whitespace-nowrap py-2 px-2 h-auto">Year/Month</TableHead>
+                  <TableHead className="text-foreground font-semibold w-[100px] text-xs whitespace-nowrap py-2 px-2 h-auto">Category</TableHead>
+                  <TableHead className="text-foreground font-semibold min-w-0 text-xs whitespace-nowrap py-2 px-2 h-auto">Type</TableHead>
+                  <TableHead className="text-foreground font-semibold w-[80px] text-xs whitespace-nowrap py-2 px-2 h-auto">Amount</TableHead>
+                  <TableHead className="text-foreground font-semibold w-[88px] text-xs whitespace-nowrap py-2 px-2 h-auto">Status</TableHead>
+                  <TableHead className="text-foreground font-semibold min-w-0 text-xs whitespace-nowrap py-2 px-2 h-auto">Remarks</TableHead>
+                  <TableHead className="text-foreground font-semibold min-w-0 text-xs whitespace-nowrap py-2 px-2 h-auto">Decline Reason</TableHead>
+                  <TableHead className="text-foreground font-semibold w-[72px] text-xs whitespace-nowrap py-2 px-2 h-auto">Receipt</TableHead>
+                  {isAdmin && <TableHead className="text-foreground font-semibold text-right w-[140px] text-xs whitespace-nowrap py-2 px-2 h-auto">Actions</TableHead>}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {submissions.map((sub) => (
+                  <TableRow key={sub.id} className="border-border">
+                    <TableCell className="text-foreground text-xs truncate whitespace-nowrap py-2 px-2" title={new Date(sub.submissionDate).toLocaleDateString()}>
+                      {new Date(sub.submissionDate).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-foreground text-xs truncate min-w-0 whitespace-nowrap py-2 px-2" title={sub.employeeName || undefined}>
+                      {sub.employeeName || "-"}
+                    </TableCell>
+                    <TableCell className="text-foreground text-xs py-2 px-2 align-top w-[200px] min-w-[160px] whitespace-normal break-words" title={sub.carDisplayName || undefined}>
+                      {sub.carDisplayName || "-"}
+                    </TableCell>
+                    <TableCell className="text-foreground text-xs whitespace-nowrap py-2 px-2">
+                      {sub.year} / {MONTHS[sub.month - 1]}
+                    </TableCell>
+                    <TableCell className="text-foreground text-xs truncate whitespace-nowrap py-2 px-2">
+                      {CATEGORY_LABELS[sub.category] || sub.category}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs truncate min-w-0 whitespace-nowrap py-2 px-2">
+                      {formatFieldLabel(sub.field)}
+                    </TableCell>
+                    <TableCell className="text-green-700 font-semibold text-xs whitespace-nowrap py-2 px-2">
+                      ${Number(sub.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    </TableCell>
+                    <TableCell className="py-2 px-2">
+                      <Badge
+                        variant="outline"
+                        className={
+                          "text-xs whitespace-nowrap " +
+                          (sub.status === "approved"
+                            ? "border-green-500/50 text-green-700 bg-green-500/20 font-semibold"
+                            : sub.status === "declined"
+                            ? "border-red-500/50 text-red-700 bg-red-500/20 font-semibold"
+                            : "border-yellow-500/50 text-yellow-800 bg-yellow-500/20 font-semibold")
+                        }
+                      >
+                        {sub.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs truncate min-w-0 whitespace-nowrap py-2 px-2" title={sub.remarks || undefined}>
+                      {sub.remarks || "—"}
+                    </TableCell>
+                    <TableCell className="text-red-700/80 text-xs truncate min-w-0 whitespace-nowrap py-2 px-2" title={sub.declineReason || undefined}>
+                      {sub.status === "declined" && sub.declineReason ? sub.declineReason : "—"}
+                    </TableCell>
+                    <TableCell className="text-xs whitespace-nowrap py-2 px-2">
+                      {sub.receiptUrls && sub.receiptUrls.length > 0 ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs text-[#EAEB80] hover:text-[#EAEB80] hover:bg-[#EAEB80]/10"
+                          onClick={() => {
+                            setSelectedSubmission(sub);
+                            setViewReceiptsOpen(true);
+                          }}
+                          title="View copy of receipt"
+                        >
+                          <Eye className="w-3.5 h-3.5 mr-1 inline" />
+                          View
+                        </Button>
+                      ) : (
+                        <span className="text-gray-500 text-xs">No receipt</span>
+                      )}
+                    </TableCell>
+                    {isAdmin && (
+                      <TableCell className="text-center text-xs whitespace-nowrap py-2 px-2">
+                        <div className="flex items-center justify-center gap-0.5">
+                          {sub.status === "pending" && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-green-500 hover:text-green-700"
+                                onClick={() => approveMutation.mutate(sub.id)}
+                                disabled={approveMutation.isPending}
+                                title="Approve"
+                              >
+                                <CheckCircle className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-red-500 hover:text-red-700"
+                                onClick={() => handleDecline(sub)}
+                                title="Decline"
+                              >
+                                <XCircle className="w-3.5 h-3.5" />
+                              </Button>
+                            </>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-primary"
+                            onClick={() => handleEdit(sub)}
+                            title="Edit"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-red-500 hover:text-red-700"
+                            onClick={() => {
+                              if (window.confirm("Delete this submission?")) {
+                                deleteMutation.mutate(sub.id);
+                              }
+                            }}
+                            disabled={deleteMutation.isPending}
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       )}
 

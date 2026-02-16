@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Folder, Download, ExternalLink, Edit2, Save, X } from "lucide-react";
+import { Folder, Download, ExternalLink } from "lucide-react";
 import { ProfileSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -19,11 +18,6 @@ interface ClientProfileResponse {
 
 export default function ClientProfilePage() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [isEditingBanking, setIsEditingBanking] = useState(false);
-  const [ssnValue, setSsnValue] = useState("");
-  const [einValue, setEinValue] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
 
   const {
     data,
@@ -84,64 +78,6 @@ export default function ClientProfilePage() {
       console.log("⚠️ [PROFILE PAGE] No banking info in profile data");
     }
   }, [bankingInfo]);
-
-  // Initialize form values when banking info is loaded
-  useEffect(() => {
-    if (bankingInfo && !isEditingBanking) {
-      setSsnValue(bankingInfo.ssn || "");
-      setEinValue(bankingInfo.ein || "");
-    }
-  }, [bankingInfo, isEditingBanking]);
-
-  const handleSaveBankingInfo = async () => {
-    setIsSaving(true);
-    try {
-      const response = await fetch(buildApiUrl("/api/client/profile/banking-info"), {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          ssn: ssnValue.trim() || "",
-          ein: einValue.trim() || "",
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to update banking information");
-      }
-
-      toast({
-        title: "Success",
-        description: "Banking information updated successfully",
-      });
-
-      setIsEditingBanking(false);
-      // Invalidate and refetch profile data
-      queryClient.invalidateQueries({ queryKey: ["/api/client/profile"] });
-    } catch (error: any) {
-      console.error("Error updating banking info:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update banking information",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    // Reset to original values
-    if (bankingInfo) {
-      setSsnValue(bankingInfo.ssn || "");
-      setEinValue(bankingInfo.ein || "");
-    }
-    setIsEditingBanking(false);
-  };
 
   const formatValue = (value: any): string => {
     if (value === null || value === undefined || value === "") {
@@ -364,23 +300,12 @@ export default function ClientProfilePage() {
                             </div>
                           </div>
 
-                          {/* Banking Information */}
+                          {/* Banking Information - read-only for client accounts; no Edit Banking / Edit SSN/EIN */}
                             <div className="bg-card p-4 rounded-lg border border-primary/20">
                               <div className="flex justify-between items-center mb-4 pb-2 border-b border-primary/30">
                                 <h3 className="text-lg font-semibold text-primary">
                                   Banking Information (ACH)
                                 </h3>
-                                {!isEditingBanking && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setIsEditingBanking(true)}
-                                    className="text-primary hover:text-[#d4d570] hover:bg-primary/10"
-                                  >
-                                    <Edit2 className="w-4 h-4 mr-2" />
-                                    Edit SSN/EIN
-                                  </Button>
-                                )}
                               </div>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                   {/* Bank Name */}
@@ -418,67 +343,21 @@ export default function ClientProfilePage() {
                                       {formatValue(bankingInfo?.businessName)}
                                     </span>
                                   </div>
-                                  {/* EIN Field - Editable (always visible) */}
+                                  {/* EIN - read-only for client profile */}
                                   <div>
                                     <span className="text-muted-foreground block mb-1">EIN:</span>
-                                    {isEditingBanking ? (
-                                      <Input
-                                        type="text"
-                                        value={einValue}
-                                        onChange={(e) => setEinValue(e.target.value)}
-                                        placeholder="Enter EIN"
-                                        className="bg-background border-border text-foreground font-mono focus:border-primary"
-                                        maxLength={10}
-                                      />
-                                    ) : (
-                                      <span className="text-foreground font-mono">
-                                        {formatValue(bankingInfo?.ein)}
-                                      </span>
-                                    )}
+                                    <span className="text-foreground font-mono">
+                                      {formatValue(bankingInfo?.ein)}
+                                    </span>
                                   </div>
-                                  {/* SSN Field - Editable */}
+                                  {/* SSN - read-only for client profile */}
                                   <div>
                                     <span className="text-muted-foreground block mb-1">SSN:</span>
-                                    {isEditingBanking ? (
-                                      <Input
-                                        type="text"
-                                        value={ssnValue}
-                                        onChange={(e) => setSsnValue(e.target.value)}
-                                        placeholder="Enter SSN"
-                                        className="bg-background border-border text-foreground font-mono focus:border-primary"
-                                        maxLength={11}
-                                      />
-                                    ) : (
-                                      <span className="text-foreground font-mono">
-                                        {formatValue(bankingInfo?.ssn)}
-                                      </span>
-                                    )}
+                                    <span className="text-foreground font-mono">
+                                      {formatValue(bankingInfo?.ssn)}
+                                    </span>
                                   </div>
                               </div>
-                              {/* Save/Cancel Buttons */}
-                              {isEditingBanking && (
-                                <div className="flex gap-2 mt-4 pt-4 border-t border-border">
-                                  <Button
-                                    onClick={handleSaveBankingInfo}
-                                    disabled={isSaving}
-                                    className="bg-primary text-primary-foreground hover:bg-primary/80"
-                                    size="sm"
-                                  >
-                                    <Save className="w-4 h-4 mr-2" />
-                                    {isSaving ? "Saving..." : "Save"}
-                                  </Button>
-                                  <Button
-                                    onClick={handleCancelEdit}
-                                    disabled={isSaving}
-                                    variant="outline"
-                                    className="bg-card text-foreground hover:bg-muted border-border"
-                                    size="sm"
-                                  >
-                                    <X className="w-4 h-4 mr-2" />
-                                    Cancel
-                                  </Button>
-                                </div>
-                              )}
                             </div>
 
                         </>

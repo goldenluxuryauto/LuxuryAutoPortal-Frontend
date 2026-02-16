@@ -55,10 +55,12 @@ export default function SettingsPage() {
   });
   const isAdmin = userData?.user?.isAdmin === true;
 
-  // Fetch Slack channel configurations (only for admins)
+  // Fetch Slack channel configurations and bot token status (only for admins)
   const { data: channelsData, isLoading } = useQuery<{
     success: boolean;
     data: SlackChannelConfig[];
+    slackBotTokenConfigured?: boolean;
+    slackBotTokenUpdatedAt?: string | null;
   }>({
     queryKey: ["/api/settings/slack-channels"],
     queryFn: async () => {
@@ -72,6 +74,47 @@ export default function SettingsPage() {
     },
     enabled: isAdmin, // Only fetch if user is admin
   });
+
+  const slackBotTokenConfigured = channelsData?.slackBotTokenConfigured === true;
+  const [editingBotToken, setEditingBotToken] = useState(false);
+  const [slackBotToken, setSlackBotToken] = useState("");
+
+  const saveSlackBotTokenMutation = useMutation({
+    mutationFn: async (token: string) => {
+      const response = await fetch(buildApiUrl("/api/settings/slack-bot-token"), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ botToken: token }),
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Failed to save Slack bot token");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/settings/slack-channels"] });
+      setSlackBotToken("");
+      setEditingBotToken(false);
+      toast({
+        title: "Success",
+        description: "Slack bot token saved. All Slack notifications will use this token.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCancelBotToken = () => {
+    setEditingBotToken(false);
+    setSlackBotToken("");
+  };
 
   // Update channel mutation
   const updateMutation = useMutation({
@@ -396,6 +439,95 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+            {/* Slack Bot Token - same edit pattern as Slack Channel ID */}
+            <div className="p-4 border border-border rounded-lg bg-card">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <Label className="text-foreground font-medium text-lg flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-primary" />
+                    Slack Bot Token
+                  </Label>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    All Slack notifications use this token. Get a Bot User OAuth Token from your Slack app (starts with <code className="bg-muted px-1 rounded">xoxb-</code>).
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="slack-bot-token" className="text-muted-foreground text-sm">
+                    Bot Token
+                  </Label>
+                  {editingBotToken ? (
+                    <div className="flex gap-2 mt-2">
+                      <Input
+                        id="slack-bot-token"
+                        type="password"
+                        value={slackBotToken}
+                        onChange={(e) => setSlackBotToken(e.target.value)}
+                        placeholder="e.g. xoxb-..."
+                        className="max-w-md bg-background border-border text-foreground focus:border-primary font-mono text-sm"
+                        autoComplete="off"
+                      />
+                      <Button
+                        onClick={() => {
+                          const t = slackBotToken.trim();
+                          if (!t) {
+                            toast({
+                              title: "Error",
+                              description: "Enter a Slack bot token to save",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+                          saveSlackBotTokenMutation.mutate(t);
+                        }}
+                        disabled={saveSlackBotTokenMutation.isPending || !slackBotToken.trim()}
+                        className="bg-primary text-primary-foreground hover:bg-primary/80"
+                        size="sm"
+                      >
+                        {saveSlackBotTokenMutation.isPending ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Save className="w-4 h-4" />
+                        )}
+                      </Button>
+                      <Button
+                        onClick={handleCancelBotToken}
+                        variant="outline"
+                        size="sm"
+                        className="border-border text-muted-foreground hover:bg-muted"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 mt-2">
+                      <Input
+                        id="slack-bot-token"
+                        value={slackBotTokenConfigured ? "••••••••••••••••••••••••••••••••" : ""}
+                        readOnly
+                        placeholder="Not set"
+                        className="max-w-md bg-background border-border text-muted-foreground font-mono text-sm"
+                      />
+                      <Button
+                        onClick={() => setEditingBotToken(true)}
+                        variant="outline"
+                        size="sm"
+                        className="border-border text-muted-foreground hover:bg-muted"
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                {slackBotTokenConfigured && channelsData?.slackBotTokenUpdatedAt && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Last updated: {new Date(channelsData.slackBotTokenUpdatedAt).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            </div>
+
             {channels.map((config) => {
               const isEditing = editingChannels.hasOwnProperty(config.formType);
               const editingValue = editingChannels[config.formType] || config.channelId;

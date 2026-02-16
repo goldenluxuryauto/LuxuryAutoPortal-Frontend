@@ -238,7 +238,7 @@ export default function SignContract() {
             alt="Golden Luxury Auto" 
             className="h-20 md:h-24 w-auto mx-auto object-contain mb-3 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
           />
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-lg text-[white]">
             Contract Agreement - {contractData.firstNameOwner} {contractData.lastNameOwner}
           </p>
         </div>
