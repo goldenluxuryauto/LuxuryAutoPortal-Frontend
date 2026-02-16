@@ -349,7 +349,7 @@ export default function ExpenseFormSubmission() {
               className="bg-background border-border/60 text-foreground h-10 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             />
             {carDropdownOpen && (
-              <div className="absolute z-10 mt-1 w-full max-h-64 overflow-auto rounded-md border border-[#2a2a2a] bg-[#111111] shadow-lg">
+              <div className="absolute z-10 mt-1 w-full max-h-64 overflow-auto rounded-md border border-border/60 bg-background shadow-lg">
                 {(cars as { id: number; name: string; displayName?: string; vin?: string | null; plate?: string | null }[])
                   .filter((car) => {
                     const q = carSearch.trim().toLowerCase();
