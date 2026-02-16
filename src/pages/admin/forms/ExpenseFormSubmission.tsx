@@ -68,11 +68,12 @@ export default function ExpenseFormSubmission() {
   const currentUser = options.currentUser || null;
   const isAdmin = options.isAdmin === true;
   const isEmployee = options.isEmployee === true;
-  const isEmployeeOnly = isEmployee && !isAdmin && !!currentEmployeeId;
+  // When logged in as employee (non-admin), always show Employee Name as the logged-in user (default, required)
+  const isEmployeeView = isEmployee && !isAdmin;
   const currentEmployeeName =
-    isEmployeeOnly && currentEmployeeId
+    isEmployeeView && currentEmployeeId
       ? (employees.find((e: { id: number }) => e.id === currentEmployeeId)?.name ?? currentUser?.displayName ?? "")
-      : "";
+      : (isEmployeeView && currentUser?.displayName) ? currentUser.displayName : "";
   const categoryFields: Record<string, { value: string; label: string }[]> =
     options.categoryFields || {};
   const fieldOptions = categoryFields[formData.category] || [];
@@ -92,15 +93,28 @@ export default function ExpenseFormSubmission() {
     }));
   }, [formData.submissionDate]);
 
-  // Default Employee Name to current user/account owner (client requirement)
+  // Default Employee Name (and id) to logged-in employee when viewing as employee (required, not optional)
   useEffect(() => {
-    if (!currentEmployeeId || !optionsData?.data) return;
+    if (!isEmployeeView || !optionsData?.data) return;
     const list = optionsData.data.employees || [];
-    const id = String(currentEmployeeId);
-    const exists = list.some((e: { id: number }) => String(e.id) === id);
-    if (!exists) return;
-    setFormData((prev) => (prev.employeeId === id ? prev : { ...prev, employeeId: id }));
-  }, [currentEmployeeId, optionsData]);
+    if (currentEmployeeId) {
+      const id = String(currentEmployeeId);
+      const exists = list.some((e: { id: number }) => String(e.id) === id);
+      if (exists) setFormData((prev) => (prev.employeeId === id ? prev : { ...prev, employeeId: id }));
+      return;
+    }
+    // Fallback: match by display name (session "First Last" vs API "Last, First") so employeeId is set for submit
+    const displayName = (currentUser?.displayName ?? "").trim();
+    if (!displayName || list.length === 0) return;
+    const parts = (s: string) => s.split(/\s+|,\s*/).map((p) => p.trim().toLowerCase()).filter(Boolean).sort();
+    const displayParts = parts(displayName);
+    const match = list.find((e: { name: string }) => {
+      if (!e?.name) return false;
+      const empParts = parts(e.name);
+      return displayParts.length === empParts.length && displayParts.every((p, i) => p === empParts[i]);
+    });
+    if (match) setFormData((prev) => (prev.employeeId === String(match.id) ? prev : { ...prev, employeeId: String(match.id) }));
+  }, [isEmployeeView, currentEmployeeId, currentUser?.displayName, optionsData]);
 
   // AI receipt extraction: analyze first image when added (COGS workflow - AI reads cost)
   const addReceiptFiles = useCallback(
@@ -192,7 +206,7 @@ export default function ExpenseFormSubmission() {
       });
       setFormData({
         submissionDate: new Date().toISOString().slice(0, 10),
-        employeeId: isEmployeeOnly && currentEmployeeId ? String(currentEmployeeId) : "",
+        employeeId: isEmployeeView ? (formData.employeeId || (currentEmployeeId ? String(currentEmployeeId) : "")) : "",
         carId: "",
         year: new Date().getFullYear().toString(),
         month: (new Date().getMonth() + 1).toString(),
@@ -277,12 +291,13 @@ export default function ExpenseFormSubmission() {
           </div>
             <div className="space-y-2">
               <Label className="text-foreground font-medium text-sm">Employee Name <span className="text-primary">*</span></Label>
-              {isEmployeeOnly ? (
+              {isEmployeeView ? (
                 <Input
                   readOnly
-                  value={currentEmployeeName}
-                  className="bg-muted/30 border-border/60 text-foreground h-10 cursor-default"
-                  title="Your name (pre-filled for employee accounts)"
+                  required
+                  value={currentEmployeeName || "Loading…"}
+                  className="bg-card border-border text-foreground mt-1 cursor-default"
+                  title="Logged-in employee (required)"
                 />
               ) : (
                 <Select
@@ -334,12 +349,15 @@ export default function ExpenseFormSubmission() {
               className="bg-background border-border/60 text-foreground h-10 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             />
             {carDropdownOpen && (
-              <div className="absolute z-10 mt-2 w-full max-h-48 overflow-auto rounded-lg border border-border/60 bg-card shadow-xl backdrop-blur-sm">
-                {(cars as { id: number; name: string; displayName?: string }[])
+              <div className="absolute z-10 mt-1 w-full max-h-64 overflow-auto rounded-md border border-[#2a2a2a] bg-[#111111] shadow-lg">
+                {(cars as { id: number; name: string; displayName?: string; vin?: string | null; plate?: string | null }[])
                   .filter((car) => {
-                    const name = ((car.displayName ?? car.name) || "").toLowerCase();
                     const q = carSearch.trim().toLowerCase();
-                    return !q || name.includes(q);
+                    if (!q) return true;
+                    const name = ((car.displayName ?? car.name) || "").toLowerCase();
+                    const vin = (car.vin ?? "").toLowerCase();
+                    const plate = (car.plate ?? "").toLowerCase();
+                    return name.includes(q) || vin.includes(q) || plate.includes(q);
                   })
                   .map((car) => (
                     <button
@@ -356,13 +374,18 @@ export default function ExpenseFormSubmission() {
                       {car.displayName ?? car.name}
                     </button>
                   ))}
-                {cars.filter((c: { id: number; name: string; displayName?: string }) => {
-                  const name = ((c.displayName ?? c.name) || "").toLowerCase();
+                {cars.length === 0 ? (
+                  <div className="px-3 py-2 text-sm text-gray-500">No cars loaded. Check connection.</div>
+                ) : (cars as { id: number; name: string; displayName?: string; vin?: string | null; plate?: string | null }[]).filter((c) => {
                   const q = carSearch.trim().toLowerCase();
-                  return !q || name.includes(q);
-                }).length === 0 && (
-                  <div className="px-4 py-3 text-sm text-muted-foreground">No matching car. Type name, VIN, or plate.</div>
-                )}
+                  if (!q) return true;
+                  const name = ((c.displayName ?? c.name) || "").toLowerCase();
+                  const vin = (c.vin ?? "").toLowerCase();
+                  const plate = (c.plate ?? "").toLowerCase();
+                  return name.includes(q) || vin.includes(q) || plate.includes(q);
+                }).length === 0 ? (
+                  <div className="px-3 py-2 text-sm text-gray-500">No matching car. Try name, VIN, or plate.</div>
+                ) : null}
               </div>
             )}
           </div>

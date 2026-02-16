@@ -24,8 +24,8 @@ import {
   ChevronDown,
   FileText,
   Clock,
-  TreePalm,
-  MessageCircle
+  MessageCircle,
+  Cog
 } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { cn } from "@/lib/utils";
@@ -63,6 +63,7 @@ const allSidebarItems: SidebarItem[] = [
     ],
   },
   { href: "/admin/totals", label: "Totals", icon: Calculator, roles: ["admin"] },
+  { href: "/admin/operations", label: "Operations", icon: Cog, roles: ["admin"] },
   { href: "/admin/maintenance", label: "Car Maintenance", icon: Wrench, roles: ["admin"] },
   { href: "/admin/forms", label: "Forms", icon: ClipboardList },
   { href: "/admin/view-client", label: "View as a Client", icon: Eye, roles: ["admin"] },
@@ -81,18 +82,17 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/payroll", label: "Payroll", icon: DollarSign, roles: ["admin"] },
   { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/admin/turo-guide", label: "Turo Guide", icon: BookOpen },
-  { href: "/admin/training-manual", label: "System Tutorial", icon: GraduationCap },
+  { href: "/admin/training-manual", label: "System Tutorial", icon: GraduationCap, roles: ["admin"] },
+  { href: "/tutorial", label: "System Tutorial", icon: GraduationCap, roles: ["client"] },
   { href: "/admin/testimonials", label: "Client Testimonials", icon: Star },
 ];
 
-// Staff/employee sidebar (matches GLA v1 employee nav: Dashboard, My Info, Forms, Task Management, Time, Time off, Turo Guide, System Tutorial, Client Testimonials, Car Rental)
+// Staff/employee sidebar: Dashboard, My Info, Forms, Task Management, Turo Guide, System Tutorial, Client Testimonials, Car Rental
 const employeeSidebarItems: SidebarItem[] = [
   { href: "/staff/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["employee"] },
   { href: "/staff/my-info", label: "My Info", icon: User, roles: ["employee"] },
   { href: "/staff/forms", label: "Forms", icon: FileText, roles: ["employee"] },
   { href: "/staff/task-management", label: "Task Management", icon: Briefcase, roles: ["employee"] },
-  { href: "/staff/time", label: "Time", icon: Clock, roles: ["employee"] },
-  { href: "/staff/time-off", label: "Time off", icon: TreePalm, roles: ["employee"] },
   { href: "/staff/turo-guide", label: "Turo Guide", icon: BookOpen, roles: ["employee"] },
   { href: "/staff/training-manual", label: "System Tutorial", icon: GraduationCap, roles: ["employee"] },
   { href: "/staff/client-testimonials", label: "Client Testimonials", icon: MessageCircle, roles: ["employee"] },

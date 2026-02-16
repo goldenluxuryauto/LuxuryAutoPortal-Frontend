@@ -17,6 +17,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -392,6 +393,35 @@ export default function TrainingManualPage() {
     },
   });
 
+  const seedEmployeeMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(buildApiUrl("/api/admin/tutorial/seed-employee"), {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Failed to seed employee tutorial");
+      }
+      return response.json();
+    },
+    onSuccess: (data: { message?: string }) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/modules", "employee"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps", "employee", "with-modules"] });
+      toast({
+        title: "Success",
+        description: data?.message || "Employee tutorial guide seeded. Employee accounts will see it in System Tutorial.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to seed",
+        variant: "destructive",
+      });
+    },
+  });
+
   const form = useForm<TutorialStepFormData>({
     resolver: zodResolver(tutorialStepSchema),
     defaultValues: {
@@ -659,7 +689,8 @@ export default function TrainingManualPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-primary text-xl">Tutorial Configuration</CardTitle>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Manage tutorial (modules, steps, videos) by role:</span>
                   <Select value={selectedRole} onValueChange={(value: 'admin' | 'client' | 'employee') => {
                     setSelectedRole(value);
                     setExpandedModules(new Set()); // Reset expanded modules when role changes
@@ -687,6 +718,18 @@ export default function TrainingManualPage() {
                     <Plus className="w-4 h-4 mr-2" />
                     Add Step
                   </Button>
+                  {selectedRole === "employee" && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="border-primary text-primary hover:bg-primary/10 font-medium"
+                      onClick={() => seedEmployeeMutation.mutate()}
+                      disabled={seedEmployeeMutation.isPending}
+                    >
+                      {seedEmployeeMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                      Seed employee tutorial guide
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -702,6 +745,9 @@ export default function TrainingManualPage() {
               ) : (tutorialDataWithModules.modules.length === 0 && allSteps.length === 0 && !isFetching && !isLoading) ? (
                 <div className="text-center py-8">
                   <p className="text-muted-foreground mb-4">No modules or steps found. Click "Add Module" or "Add Step" to get started.</p>
+                  {selectedRole === "employee" && (
+                    <p className="text-sm text-muted-foreground">Or use <strong>Seed employee tutorial guide</strong> above to add the default employee onboarding tutorial (1 module, 4 steps with videos) so it appears for employee accounts.</p>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -1514,7 +1560,7 @@ export default function TrainingManualPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-muted-foreground flex items-center gap-2">
-                            Video URL
+                            Tutorial guide video URL
                             {videoValid === true && (
                               <CheckCircle2 className="w-4 h-4 text-green-700" />
                             )}
@@ -1522,6 +1568,9 @@ export default function TrainingManualPage() {
                               <AlertCircle className="w-4 h-4 text-red-700" />
                             )}
                           </FormLabel>
+                          <FormDescription className="text-xs">
+                            This video is shown to users for this step. For Employee role, it appears on the employee System Tutorial page and in the guided walkthrough.
+                          </FormDescription>
                           <FormControl>
                             <div className="space-y-2">
                               <Input
