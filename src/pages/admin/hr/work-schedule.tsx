@@ -203,7 +203,7 @@ function AddEditModal({
       const json = await res.json();
       return (json.data ?? []) as EmployeeOption[];
     },
-    enabled: open && employeeSearch.trim().length >= 1,
+    enabled: open,
   });
 
   const createMutation = useMutation({
@@ -325,8 +325,7 @@ function AddEditModal({
                       <li key={emp.employee_aid}>
                         <button
                           type="button"
-                          className={`w-full px-3 py-2 text-left hover:bg-accent ${!emp.employee_job_pay_salary_rate ? "text-destructive" : ""}`}
-                          disabled={!emp.employee_job_pay_salary_rate}
+                          className="w-full px-3 py-2 text-left hover:bg-accent"
                           onClick={() => {
                             setSelectedEmployee(emp);
                             setEmployeeSearch(emp.fullname);

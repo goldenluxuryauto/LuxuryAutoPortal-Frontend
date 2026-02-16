@@ -1,13 +1,21 @@
 /**
  * Approved Form Submissions & Receipts
- * Displays approved expense form submissions with receipt photos, separated from manual I&E entries
+ * Displays approved expense form submissions with receipt photos in the Income and Expenses area.
+ * Receipts uploaded through forms are visible here so users can view them alongside I&E data.
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
-import { ChevronDown, ChevronRight, FileText, Receipt } from "lucide-react";
+import { ChevronDown, ChevronRight, FileText, Receipt, Eye, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const CATEGORY_LABELS: Record<string, string> = {
@@ -21,14 +29,65 @@ function formatFieldLabel(field: string) {
   return field.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()).trim();
 }
 
+/** Loads receipt from API with credentials and displays as image. */
+function ReceiptImage({
+  url,
+  alt,
+  className,
+}: {
+  url: string;
+  alt: string;
+  className?: string;
+}) {
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let revoked = false;
+    let objectUrl: string | null = null;
+    setLoading(true);
+    setError(null);
+    setBlobUrl(null);
+    fetch(url, { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status === 404 ? "File not found" : `Failed to load (${res.status})`);
+        return res.blob();
+      })
+      .then((blob) => {
+        if (revoked) return;
+        objectUrl = URL.createObjectURL(blob);
+        setBlobUrl(objectUrl);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (!revoked) {
+          setError(err?.message || "Failed to load");
+          setLoading(false);
+        }
+      });
+    return () => {
+      revoked = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [url]);
+
+  if (loading) return <div className={cn("flex items-center justify-center min-h-[120px] bg-muted rounded border", className)}><span className="text-xs text-muted-foreground">Loading...</span></div>;
+  if (error) return <div className={cn("flex items-center justify-center min-h-[120px] bg-muted rounded border text-xs text-destructive", className)}>{error}</div>;
+  if (!blobUrl) return null;
+  return <img src={blobUrl} alt={alt} className={className} />;
+}
+
 interface FormSubmissionsAndReceiptsProps {
-  carId: number;
+  carId: number | null;
   year: string;
   className?: string;
 }
 
 export default function FormSubmissionsAndReceipts({ carId, year, className }: FormSubmissionsAndReceiptsProps) {
   const [expanded, setExpanded] = useState(true);
+  const [selectedSubmission, setSelectedSubmission] = useState<any | null>(null);
+  const [viewReceiptsOpen, setViewReceiptsOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["/api/expense-form-submissions/approved-by-car", carId, year],
@@ -60,10 +119,10 @@ export default function FormSubmissionsAndReceipts({ carId, year, className }: F
           )}
           <Receipt className="w-4 h-4 text-primary" />
           <span className="font-medium text-foreground">
-            Form Submissions & Receipts ({submissions.length})
+            Uploaded Receipts from Forms ({submissions.length})
           </span>
           <span className="text-xs text-muted-foreground">
-            — Values from approved receipt forms (separate from manual entries)
+            — Receipts uploaded through forms are visible here in the Income and Expenses area
           </span>
         </div>
       </button>
@@ -73,7 +132,7 @@ export default function FormSubmissionsAndReceipts({ carId, year, className }: F
             <div className="py-6 text-center text-sm text-muted-foreground">Loading...</div>
           ) : submissions.length === 0 ? (
             <div className="py-6 text-center text-sm text-muted-foreground">
-              No approved form submissions for this car/year.
+              No approved form submissions for this car/year. Receipts uploaded through forms will appear here.
             </div>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -82,7 +141,7 @@ export default function FormSubmissionsAndReceipts({ carId, year, className }: F
                   key={sub.id}
                   className="border border-border rounded-md p-3 bg-background/80"
                 >
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">
                         {formatFieldLabel(sub.field)} — ${Number(sub.amount).toFixed(2)}
@@ -91,11 +150,25 @@ export default function FormSubmissionsAndReceipts({ carId, year, className }: F
                         {sub.employeeName} • {MONTHS[Number(sub.month) - 1]} • {CATEGORY_LABELS[sub.category] || sub.category}
                       </p>
                     </div>
+                    {sub.receiptUrls && sub.receiptUrls.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedSubmission(sub);
+                          setViewReceiptsOpen(true);
+                        }}
+                        className="shrink-0 inline-flex items-center gap-1 text-xs text-primary hover:underline font-medium"
+                        title="View copy of receipt"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        View
+                      </button>
+                    )}
                   </div>
                   {sub.receiptUrls && sub.receiptUrls.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {sub.receiptUrls.map((fileId: string, i: number) => {
-                        const isPdf = fileId.toLowerCase().endsWith(".pdf");
+                        const isPdf = typeof fileId === "string" && fileId.toLowerCase().endsWith(".pdf");
                         const url = buildApiUrl(
                           `/api/expense-form-submissions/receipt/file?fileId=${encodeURIComponent(fileId)}`
                         );
@@ -120,6 +193,60 @@ export default function FormSubmissionsAndReceipts({ carId, year, className }: F
           )}
         </div>
       )}
+
+      {/* View copy of receipt – same experience as Forms page */}
+      <Dialog open={viewReceiptsOpen} onOpenChange={setViewReceiptsOpen}>
+        <DialogContent className="bg-card border-border max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-primary">View copy of receipt</DialogTitle>
+            <DialogDescription>
+              {selectedSubmission?.employeeName} - ${Number(selectedSubmission?.amount ?? 0).toLocaleString()}
+              {selectedSubmission?.remarks && ` • Remarks: ${selectedSubmission.remarks}`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-wrap gap-4">
+            {selectedSubmission?.receiptUrls?.map((urlOrId: string, i: number) => {
+              const isDriveFileId = urlOrId && !urlOrId.startsWith("http");
+              const displayUrl = isDriveFileId
+                ? buildApiUrl(`/api/expense-form-submissions/receipt/file?fileId=${encodeURIComponent(urlOrId)}`)
+                : urlOrId;
+              const isPdf = typeof urlOrId === "string" && urlOrId.match(/\.pdf$/i);
+              const receiptLabel = `Receipt ${i + 1}`;
+              if (isPdf) {
+                return (
+                  <a
+                    key={i}
+                    href={displayUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-primary hover:underline"
+                  >
+                    <ExternalLink className="w-4 h-4" /> {receiptLabel} (PDF)
+                  </a>
+                );
+              }
+              return (
+                <div key={i} className="space-y-1">
+                  <p className="text-sm text-muted-foreground">{receiptLabel}</p>
+                  <ReceiptImage
+                    url={displayUrl}
+                    alt={receiptLabel}
+                    className="max-h-64 w-auto rounded border border-border object-contain bg-muted"
+                  />
+                  <a
+                    href={displayUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                  >
+                    <ExternalLink className="w-3 h-3" /> Open in new tab
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

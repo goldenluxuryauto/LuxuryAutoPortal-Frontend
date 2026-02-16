@@ -24,15 +24,15 @@ interface TutorialModule {
   steps?: TutorialStep[];
 }
 
-export default function StaffTrainingManual() {
+export default function ClientTrainingManual() {
   const { resetTutorial } = useTutorial();
   const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set());
   const [stepVideoState, setStepVideoState] = useState<Record<number, { loading: boolean; error: boolean }>>({});
 
   const { data: modulesData, isLoading: modulesLoading } = useQuery<{ success: boolean; data: TutorialModule[] }>({
-    queryKey: ["/api/tutorial/modules", "employee"],
+    queryKey: ["/api/tutorial/modules", "client"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/tutorial/modules?role=employee"), { credentials: "include" });
+      const res = await fetch(buildApiUrl("/api/tutorial/modules?role=client"), { credentials: "include" });
       if (!res.ok) return { success: false, data: [] };
       return res.json();
     },
@@ -43,10 +43,10 @@ export default function StaffTrainingManual() {
     success: boolean;
     data: { modules: (TutorialModule & { steps: TutorialStep[] })[] };
   }>({
-    queryKey: ["/api/tutorial/steps", "employee", "with-modules"],
+    queryKey: ["/api/tutorial/steps", "client", "with-modules"],
     queryFn: async () => {
       const res = await fetch(
-        buildApiUrl("/api/tutorial/steps?role=employee&includeModules=true"),
+        buildApiUrl("/api/tutorial/steps?role=client&includeModules=true"),
         { credentials: "include" }
       );
       if (!res.ok) return { success: false, data: { modules: [] } };
@@ -76,7 +76,7 @@ export default function StaffTrainingManual() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-semibold text-foreground">System Tutorial</h1>
-          <p className="text-muted-foreground">Employee onboarding and how to use the GLA portal—guided tutorial and step-by-step videos.</p>
+          <p className="text-muted-foreground">Client onboarding and how to use the GLA portal—guided tutorial and step-by-step videos.</p>
         </div>
 
         <Card className="bg-card border-border">
@@ -85,7 +85,7 @@ export default function StaffTrainingManual() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground text-sm">
-              Complete your employee onboarding and learn portal procedures. Start the guided walkthrough or browse modules and videos below.
+              Complete your client onboarding and learn portal procedures. Start the guided walkthrough or browse modules and videos below.
             </p>
             <button
               type="button"
@@ -105,7 +105,7 @@ export default function StaffTrainingManual() {
         ) : modules.length === 0 ? (
           <Card className="bg-card border-border">
             <CardContent className="py-12 text-center text-muted-foreground">
-              No employee onboarding modules yet. Your admin can add them from the Admin System Tutorial page.
+              No client tutorial modules yet. Your admin can add them from the Admin System Tutorial page.
             </CardContent>
           </Card>
         ) : (

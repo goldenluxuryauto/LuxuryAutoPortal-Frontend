@@ -36,6 +36,7 @@ import IncomeExpensesPage from "@/pages/admin/income-expenses/index";
 import CarIncomeExpensePage from "@/pages/admin/car-income-expense";
 import IncomeExpenseLogPage from "@/pages/admin/income-expense-log";
 import SettingsPage from "@/pages/admin/settings";
+import OperationsPage from "@/pages/admin/operations";
 import HumanResourcesPage from "@/pages/admin/hr";
 import EmployeesPage from "@/pages/admin/hr/employees";
 import EmployeeViewPage from "@/pages/admin/hr/employee-view";
@@ -48,6 +49,7 @@ function IncomeExpensesPageWrapper() {
 }
 import ClientProfilePage from "@/pages/admin/profile";
 import TrainingManualPage from "@/pages/admin/training-manual";
+import ClientTrainingManualPage from "@/pages/client/training-manual";
 import SignContract from "@/pages/sign-contract";
 import Signup from "@/pages/signup";
 import ResetPasswordPage from "@/pages/reset-password";
@@ -114,12 +116,14 @@ function Router() {
       <Route path="/admin/cars/:id" component={CarDetailPage} />
       <Route path="/admin/income-expenses" component={IncomeExpensesPageWrapper} />
       <Route path="/admin/settings" component={SettingsPage} />
+      <Route path="/admin/operations" component={OperationsPage} />
       <Route path="/admin/hr" component={HumanResourcesPage} />
       <Route path="/admin/hr/work-schedule" component={WorkSchedulePage} />
       <Route path="/admin/hr/employees/view" component={EmployeeViewPage} />
       <Route path="/admin/hr/employees" component={EmployeesPage} />
       <Route path="/employee-form" component={EmployeeFormPage} />
       <Route path="/profile" component={ClientProfilePage} />
+      <Route path="/tutorial" component={ClientTrainingManualPage} />
       <Route path="/admin/training-manual" component={TrainingManualPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
       <Route component={NotFound} />

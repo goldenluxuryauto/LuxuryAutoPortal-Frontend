@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, Loader2, Wand2 } from "lucide-react";
+import { CheckCircle2, Loader2, Wand2, X } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
 
 const schema = z.object({
@@ -68,9 +68,15 @@ const sampleFormData: FormData = {
   shirtSize: "Medium",
 };
 
+const ACCEPTED_DOC_TYPES = "image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf";
+const MAX_FILE_SIZE_MB = 10;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 export default function EmployeeFormPage() {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
+  const [driverLicenseFile, setDriverLicenseFile] = useState<File | null>(null);
+  const [carInsuranceFile, setCarInsuranceFile] = useState<File | null>(null);
   const recaptchaRef = useRef<ReCAPTCHA | null>(null);
 
   const siteKey = (import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? "").toString().trim();
@@ -114,10 +120,22 @@ export default function EmployeeFormPage() {
         link: window.location.origin,
       };
 
+      if (driverLicenseFile && driverLicenseFile.size > MAX_FILE_SIZE_BYTES) {
+        throw new Error(`Driver's license must be under ${MAX_FILE_SIZE_MB}MB`);
+      }
+      if (carInsuranceFile && carInsuranceFile.size > MAX_FILE_SIZE_BYTES) {
+        throw new Error(`Car insurance document must be under ${MAX_FILE_SIZE_MB}MB`);
+      }
+
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(payload));
+      if (driverLicenseFile) formData.append("driver_license", driverLicenseFile, driverLicenseFile.name || "driver-license");
+      if (carInsuranceFile) formData.append("car_insurance", carInsuranceFile, carInsuranceFile.name || "car-insurance");
+
       const response = await fetch(buildApiUrl("/api/employees/onboarding/submit"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: formData,
+        // Do not set Content-Type; browser sets multipart/form-data with boundary
       });
 
       const json = await response.json().catch(() => null);
@@ -128,6 +146,8 @@ export default function EmployeeFormPage() {
     },
     onSuccess: () => {
       recaptchaRef.current?.reset();
+      setDriverLicenseFile(null);
+      setCarInsuranceFile(null);
       setSubmitted(true);
     },
     onError: (e: any) => {
@@ -359,6 +379,66 @@ export default function EmployeeFormPage() {
                       </SelectContent>
                     </Select>
                     {errors.shirtSize && <p className="text-red-700 text-xs">{errors.shirtSize.message}</p>}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground">Driver&apos;s License (optional)</Label>
+                    <p className="text-xs text-muted-foreground">JPEG, PNG, GIF, WebP or PDF, max {MAX_FILE_SIZE_MB}MB</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Input
+                        id="driver-license-upload"
+                        type="file"
+                        accept={ACCEPTED_DOC_TYPES}
+                        className="bg-card border-border text-foreground file:mr-2 file:rounded file:border-0 file:bg-primary  file:text-primary-foreground file:text-sm"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setDriverLicenseFile(file);
+                        }}
+                      />
+                      {driverLicenseFile && (
+                        <span className="text-sm text-muted-foreground flex items-center gap-1">
+                          {driverLicenseFile.name}
+                          <button
+                            type="button"
+                            onClick={() => setDriverLicenseFile(null)}
+                            className="p-0.5 rounded hover:bg-muted text-muted-foreground"
+                            aria-label="Remove file"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground">Car Insurance (optional)</Label>
+                    <p className="text-xs text-muted-foreground">JPEG, PNG, GIF, WebP or PDF, max {MAX_FILE_SIZE_MB}MB</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Input
+                        id="car-insurance-upload"
+                        type="file"
+                        accept={ACCEPTED_DOC_TYPES}
+                        className="bg-card border-border text-foreground file:mr-2 file:rounded file:border-0 file:bg-primary  file:text-primary-foreground file:text-sm"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setCarInsuranceFile(file);
+                        }}
+                      />
+                      {carInsuranceFile && (
+                        <span className="text-sm text-muted-foreground flex items-center gap-1">
+                          {carInsuranceFile.name}
+                          <button
+                            type="button"
+                            onClick={() => setCarInsuranceFile(null)}
+                            className="p-0.5 rounded hover:bg-muted text-muted-foreground"
+                            aria-label="Remove file"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </section>
