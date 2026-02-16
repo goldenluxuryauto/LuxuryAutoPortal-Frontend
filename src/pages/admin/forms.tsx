@@ -1101,7 +1101,7 @@ export default function FormsPage() {
 
                             {/* Expanded content for Approval Dashboard (admins only) */}
                             {isItemExpanded && item.id === "approval-dashboard" && (
-                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 min-w-0 max-w-full overflow-hidden">
                                 <ExpenseFormApprovalDashboard isAdmin={true} />
                               </div>
                             )}

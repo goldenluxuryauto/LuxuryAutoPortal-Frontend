@@ -11,8 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, Loader2, Wand2, X } from "lucide-react";
+import { CheckCircle2, Loader2, Wand2, X, ArrowLeft } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
+import { useLocation } from "wouter";
 
 const schema = z.object({
   firstName: z.string().min(1, "Required"),
@@ -160,16 +161,27 @@ export default function EmployeeFormPage() {
     },
   });
 
+  const [, setLocation] = useLocation();
+
   if (submitted) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
         <Card className="bg-card border-border max-w-md w-full">
-          <CardContent className="p-6 text-center space-y-3">
+          <CardContent className="p-6 text-center space-y-4">
             <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto" />
             <h1 className="text-xl font-semibold text-primary">Success!</h1>
             <p className="text-muted-foreground text-sm">
               Your employee onboarding form has been submitted.
             </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-2"
+              onClick={() => setLocation("/")}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Button>
           </CardContent>
         </Card>
       </div>
