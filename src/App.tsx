@@ -66,6 +66,7 @@ import StaffClientTestimonials from "@/pages/staff/client-testimonials";
 import StaffCarRentalTrips from "@/pages/staff/car-rental-trips";
 import StaffCarRentalForms from "@/pages/staff/car-rental-forms";
 import StaffCarRentalFormSubmit from "@/pages/staff/car-rental-form-submit";
+import TuroTripsPage from "@/pages/admin/turo-trips";
 
 function Router() {
   return (
@@ -125,6 +126,7 @@ function Router() {
       <Route path="/profile" component={ClientProfilePage} />
       <Route path="/tutorial" component={ClientTrainingManualPage} />
       <Route path="/admin/training-manual" component={TrainingManualPage} />
+      <Route path="/admin/turo-trips" component={TuroTripsPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
       <Route component={NotFound} />
     </Switch>
