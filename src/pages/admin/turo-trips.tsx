@@ -85,23 +85,36 @@ export default function TuroTripsPage() {
   const [selectedTrip, setSelectedTrip] = useState<TuroTrip | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "booked" | "cancelled">("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const itemsPerPage = 20;
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Fetch trips
+  // Debounced search to avoid too many API calls
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch trips with pagination
   const { data: tripsData, isLoading: isLoadingTrips } = useQuery<{
     success: boolean;
     data: TuroTrip[];
     total: number;
   }>({
-    queryKey: ["/api/turo-trips", statusFilter, searchQuery],
+    queryKey: ["/api/turo-trips", statusFilter, debouncedSearchQuery, currentPage, itemsPerPage],
     queryFn: async () => {
-      let url = buildApiUrl("/api/turo-trips?limit=100");
+      const offset = (currentPage - 1) * itemsPerPage;
+      let url = buildApiUrl(`/api/turo-trips?limit=${itemsPerPage}&offset=${offset}`);
       if (statusFilter !== "all") {
         url += `&status=${statusFilter}`;
       }
-      if (searchQuery) {
-        url += `&guestName=${encodeURIComponent(searchQuery)}`;
+      if (debouncedSearchQuery) {
+        url += `&guestName=${encodeURIComponent(debouncedSearchQuery)}`;
       }
       const response = await fetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch trips");
@@ -152,19 +165,34 @@ export default function TuroTripsPage() {
   });
 
   const trips = tripsData?.data || [];
+  const totalTrips = tripsData?.total || 0;
   const summary = summaryData?.data;
+  const totalPages = Math.ceil(totalTrips / itemsPerPage);
 
-  const filteredTrips = trips.filter((trip) => {
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        trip.guestName?.toLowerCase().includes(query) ||
-        trip.carName?.toLowerCase().includes(query) ||
-        trip.reservationId.toLowerCase().includes(query)
-      );
-    }
-    return true;
-  });
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, searchQuery]);
+
+  // Keyboard shortcuts
+  React.useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + K to focus search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[placeholder*="Search"]') as HTMLInputElement;
+        searchInput?.focus();
+      }
+      
+      // Escape to clear search
+      if (e.key === 'Escape' && searchQuery) {
+        setSearchQuery("");
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [searchQuery]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -187,6 +215,26 @@ export default function TuroTripsPage() {
     } catch {
       return dateStr;
     }
+  };
+
+  // Highlight search terms in text
+  const highlightText = (text: string | null, searchTerm: string) => {
+    if (!text || !searchTerm) return text || "";
+    
+    const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'));
+    return (
+      <>
+        {parts.map((part, index) => 
+          part.toLowerCase() === searchTerm.toLowerCase() ? (
+            <mark key={index} className="bg-yellow-200 dark:bg-yellow-900 px-0.5 rounded">
+              {part}
+            </mark>
+          ) : (
+            <span key={index}>{part}</span>
+          )
+        )}
+      </>
+    );
   };
 
   return (
@@ -298,12 +346,24 @@ export default function TuroTripsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <Input
-                placeholder="Search by guest, car, or reservation ID..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1"
-              />
+              <div className="flex-1 relative">
+                <Input
+                  placeholder="Search by guest, car, or reservation ID... (Ctrl+K)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pr-10"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Clear search"
+                    title="Clear search (Esc)"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
               <Select
                 value={statusFilter}
                 onValueChange={(value: any) => setStatusFilter(value)}
@@ -317,7 +377,33 @@ export default function TuroTripsPage() {
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
+              {(searchQuery || statusFilter !== "all") && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setStatusFilter("all");
+                  }}
+                  className="whitespace-nowrap"
+                >
+                  Clear All
+                </Button>
+              )}
             </div>
+
+            {/* Search Results Info */}
+            {debouncedSearchQuery && (
+              <div className="mb-4 p-3 bg-muted/50 rounded-md">
+                <p className="text-sm text-muted-foreground">
+                  Found <span className="font-semibold text-foreground">{totalTrips}</span> result{totalTrips !== 1 ? 's' : ''} for{" "}
+                  <span className="font-semibold text-foreground">"{debouncedSearchQuery}"</span>
+                  {statusFilter !== "all" && (
+                    <> in <span className="font-semibold text-foreground">{statusFilter}</span> trips</>
+                  )}
+                </p>
+              </div>
+            )}
 
             {/* Trips Table */}
             <div className="rounded-md border">
@@ -341,28 +427,56 @@ export default function TuroTripsPage() {
                         <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                       </TableCell>
                     </TableRow>
-                  ) : filteredTrips.length === 0 ? (
+                  ) : trips.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                        No trips found
+                      <TableCell colSpan={8} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                          {debouncedSearchQuery || statusFilter !== "all" ? (
+                            <>
+                              <Calendar className="w-12 h-12 opacity-20" />
+                              <div>
+                                <p className="font-medium text-foreground">No trips found</p>
+                                <p className="text-sm">Try adjusting your search or filters</p>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSearchQuery("");
+                                  setStatusFilter("all");
+                                }}
+                              >
+                                Clear all filters
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Calendar className="w-12 h-12 opacity-20" />
+                              <div>
+                                <p className="font-medium text-foreground">No trips yet</p>
+                                <p className="text-sm">Click "Sync Now" to fetch trips from your emails</p>
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredTrips.map((trip) => (
+                    trips.map((trip) => (
                       <TableRow key={trip.id}>
                         <TableCell className="font-mono text-sm">
-                          #{trip.reservationId}
+                          #{debouncedSearchQuery ? highlightText(trip.reservationId, debouncedSearchQuery) : trip.reservationId}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <User className="w-4 h-4 text-muted-foreground" />
-                            {trip.guestName || "Unknown"}
+                            {debouncedSearchQuery ? highlightText(trip.guestName, debouncedSearchQuery) : (trip.guestName || "Unknown")}
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Car className="w-4 h-4 text-muted-foreground" />
-                            {trip.carName || "Unknown"}
+                            {debouncedSearchQuery ? highlightText(trip.carName, debouncedSearchQuery) : (trip.carName || "Unknown")}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -413,6 +527,77 @@ export default function TuroTripsPage() {
                 </TableBody>
               </Table>
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t">
+                <div className="text-sm text-muted-foreground">
+                  Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
+                  <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalTrips)}</span> of{" "}
+                  <span className="font-medium">{totalTrips}</span> trips
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                  >
+                    First
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum: number;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(pageNum)}
+                          className="w-10"
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Last
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
