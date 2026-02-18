@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -45,9 +44,8 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
-  Download,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, differenceInDays, differenceInHours } from "date-fns";
 
 interface TuroTrip {
   id: number;
@@ -62,8 +60,10 @@ interface TuroTrip {
   tripEnd: string;
   earnings: number;
   cancelledEarnings: number;
-  status: "booked" | "cancelled";
+  status: "booked" | "cancelled" | "completed";
   calendarEventId: string | null;
+  pickupLocation: string | null;
+  returnLocation: string | null;
   deliveryLocation: string | null;
   totalDistance: string | null;
   emailSubject: string | null;
@@ -77,26 +77,41 @@ interface TripsSummary {
   totalTrips: number;
   bookedTrips: number;
   cancelledTrips: number;
+  completedTrips: number;
   totalEarnings: number;
   cancelledEarnings: number;
+}
+
+function calculateDaysRented(tripStart: string, tripEnd: string, status: string): number {
+  if (status === "cancelled") return 0;
+  try {
+    const start = new Date(tripStart);
+    const end = new Date(tripEnd);
+    const hours = differenceInHours(end, start);
+    // Round up: any partial day counts as a day
+    return Math.max(1, Math.ceil(hours / 24));
+  } catch {
+    return 0;
+  }
 }
 
 export default function TuroTripsPage() {
   const [selectedTrip, setSelectedTrip] = useState<TuroTrip | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "booked" | "cancelled">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "booked" | "cancelled" | "completed">("all");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const itemsPerPage = 20;
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Debounced search to avoid too many API calls
+  // Debounced search
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-    }, 300); // 300ms delay
-
+    }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
@@ -106,7 +121,7 @@ export default function TuroTripsPage() {
     data: TuroTrip[];
     total: number;
   }>({
-    queryKey: ["/api/turo-trips", statusFilter, debouncedSearchQuery, currentPage, itemsPerPage],
+    queryKey: ["/api/turo-trips", statusFilter, debouncedSearchQuery, currentPage, itemsPerPage, startDate, endDate],
     queryFn: async () => {
       const offset = (currentPage - 1) * itemsPerPage;
       let url = buildApiUrl(`/api/turo-trips?limit=${itemsPerPage}&offset=${offset}`);
@@ -115,6 +130,12 @@ export default function TuroTripsPage() {
       }
       if (debouncedSearchQuery) {
         url += `&guestName=${encodeURIComponent(debouncedSearchQuery)}`;
+      }
+      if (startDate) {
+        url += `&startDate=${encodeURIComponent(startDate)}`;
+      }
+      if (endDate) {
+        url += `&endDate=${encodeURIComponent(endDate)}`;
       }
       const response = await fetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch trips");
@@ -152,7 +173,7 @@ export default function TuroTripsPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/turo-trips/summary"] });
       toast({
         title: "Sync completed",
-        description: `Processed ${data.data.processedCount} emails. ${data.data.newBookings} new bookings, ${data.data.newCancellations} cancellations.`,
+        description: `${data.data.newBookings} bookings, ${data.data.newCancellations} cancellations, ${data.data.tripChanges || 0} changes, ${data.data.vehicleReturns || 0} returns.`,
       });
     },
     onError: (error: any) => {
@@ -172,19 +193,16 @@ export default function TuroTripsPage() {
   // Reset to page 1 when filters change
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [statusFilter, searchQuery]);
+  }, [statusFilter, searchQuery, startDate, endDate]);
 
   // Keyboard shortcuts
   React.useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      // Ctrl/Cmd + K to focus search
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         const searchInput = document.querySelector('input[placeholder*="Search"]') as HTMLInputElement;
         searchInput?.focus();
       }
-      
-      // Escape to clear search
       if (e.key === 'Escape' && searchQuery) {
         setSearchQuery("");
       }
@@ -217,6 +235,14 @@ export default function TuroTripsPage() {
     }
   };
 
+  const formatDateTime = (dateStr: string) => {
+    try {
+      return format(new Date(dateStr), "MMM d, yyyy h:mm a");
+    } catch {
+      return dateStr;
+    }
+  };
+
   // Highlight search terms in text
   const highlightText = (text: string | null, searchTerm: string) => {
     if (!text || !searchTerm) return text || "";
@@ -235,6 +261,19 @@ export default function TuroTripsPage() {
         )}
       </>
     );
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "booked":
+        return <Badge className="bg-green-500">Booked</Badge>;
+      case "cancelled":
+        return <Badge variant="destructive">Cancelled</Badge>;
+      case "completed":
+        return <Badge className="bg-blue-500">Completed</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
+    }
   };
 
   return (
@@ -364,6 +403,24 @@ export default function TuroTripsPage() {
                   </button>
                 )}
               </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-muted-foreground whitespace-nowrap">From:</label>
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-[160px]"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-muted-foreground whitespace-nowrap">To:</label>
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-[160px]"
+                />
+              </div>
               <Select
                 value={statusFilter}
                 onValueChange={(value: any) => setStatusFilter(value)}
@@ -375,15 +432,18 @@ export default function TuroTripsPage() {
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="booked">Booked</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
                 </SelectContent>
               </Select>
-              {(searchQuery || statusFilter !== "all") && (
+              {(searchQuery || statusFilter !== "all" || startDate || endDate) && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
                     setSearchQuery("");
                     setStatusFilter("all");
+                    setStartDate("");
+                    setEndDate("");
                   }}
                   className="whitespace-nowrap"
                 >
@@ -406,30 +466,33 @@ export default function TuroTripsPage() {
             )}
 
             {/* Trips Table */}
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Reservation ID</TableHead>
                     <TableHead>Guest</TableHead>
                     <TableHead>Car</TableHead>
-                    <TableHead>Trip Dates</TableHead>
+                    <TableHead>Trip Start</TableHead>
+                    <TableHead>Trip End</TableHead>
+                    <TableHead>Pickup Location</TableHead>
+                    <TableHead>Return Location</TableHead>
+                    <TableHead className="text-center">Days</TableHead>
                     <TableHead>Earnings</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Calendar</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoadingTrips ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
+                      <TableCell colSpan={11} className="text-center py-8">
                         <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                       </TableCell>
                     </TableRow>
                   ) : trips.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-12">
+                      <TableCell colSpan={11} className="text-center py-12">
                         <div className="flex flex-col items-center gap-3 text-muted-foreground">
                           {debouncedSearchQuery || statusFilter !== "all" ? (
                             <>
@@ -462,67 +525,80 @@ export default function TuroTripsPage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    trips.map((trip) => (
-                      <TableRow key={trip.id}>
-                        <TableCell className="font-mono text-sm">
-                          #{debouncedSearchQuery ? highlightText(trip.reservationId, debouncedSearchQuery) : trip.reservationId}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-muted-foreground" />
-                            {debouncedSearchQuery ? highlightText(trip.guestName, debouncedSearchQuery) : (trip.guestName || "Unknown")}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Car className="w-4 h-4 text-muted-foreground" />
-                            {debouncedSearchQuery ? highlightText(trip.carName, debouncedSearchQuery) : (trip.carName || "Unknown")}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <div>{formatDateShort(trip.tripStart)}</div>
-                            <div className="text-muted-foreground text-xs">
-                              to {formatDateShort(trip.tripEnd)}
+                    trips.map((trip) => {
+                      const daysRented = calculateDaysRented(trip.tripStart, trip.tripEnd, trip.status);
+                      return (
+                        <TableRow
+                          key={trip.id}
+                          className="cursor-pointer hover:bg-muted/50"
+                          onClick={() => setSelectedTrip(trip)}
+                        >
+                          <TableCell className="font-mono text-sm">
+                            #{debouncedSearchQuery ? highlightText(trip.reservationId, debouncedSearchQuery) : trip.reservationId}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              {debouncedSearchQuery ? highlightText(trip.guestName, debouncedSearchQuery) : (trip.guestName || "Unknown")}
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {trip.status === "booked" ? (
-                            <span className="text-green-600 font-semibold">
-                              {formatCurrency(trip.earnings)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Car className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              <span className="whitespace-nowrap">
+                                {debouncedSearchQuery ? highlightText(trip.carName, debouncedSearchQuery) : (trip.carName || "Unknown")}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm whitespace-nowrap">
+                              {formatDateTime(trip.tripStart)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm whitespace-nowrap">
+                              {formatDateTime(trip.tripEnd)}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm max-w-[150px] truncate" title={trip.pickupLocation || trip.deliveryLocation || ""}>
+                              {trip.pickupLocation || trip.deliveryLocation || "-"}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm max-w-[150px] truncate" title={trip.returnLocation || ""}>
+                              {trip.returnLocation || "-"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <span className={`font-semibold ${trip.status === "cancelled" ? "text-muted-foreground" : "text-foreground"}`}>
+                              {daysRented}
                             </span>
-                          ) : (
-                            <span className="text-red-600 font-semibold">
-                              ({formatCurrency(trip.cancelledEarnings)})
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {trip.status === "booked" ? (
-                            <Badge className="bg-green-500">Booked</Badge>
-                          ) : (
-                            <Badge variant="destructive">Cancelled</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {trip.calendarEventId ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          ) : (
-                            <XCircle className="w-4 h-4 text-muted-foreground" />
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedTrip(trip)}
-                          >
-                            View Details
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                          </TableCell>
+                          <TableCell>
+                            {trip.status === "cancelled" ? (
+                              <span className="text-red-600 font-semibold whitespace-nowrap">
+                                ({formatCurrency(trip.cancelledEarnings)})
+                              </span>
+                            ) : (
+                              <span className="text-green-600 font-semibold whitespace-nowrap">
+                                {formatCurrency(trip.earnings)}
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(trip.status)}
+                          </TableCell>
+                          <TableCell>
+                            {trip.calendarEventId ? (
+                              <CheckCircle className="w-4 h-4 text-green-500" />
+                            ) : (
+                              <XCircle className="w-4 h-4 text-muted-foreground" />
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
@@ -614,9 +690,7 @@ export default function TuroTripsPage() {
           {selectedTrip && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Badge className={selectedTrip.status === "booked" ? "bg-green-500" : ""} variant={selectedTrip.status === "cancelled" ? "destructive" : "default"}>
-                  {selectedTrip.status === "booked" ? "Booked" : "Cancelled"}
-                </Badge>
+                {getStatusBadge(selectedTrip.status)}
                 {selectedTrip.calendarEventId && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="w-4 h-4" />
@@ -693,11 +767,23 @@ export default function TuroTripsPage() {
                     <span className="font-medium">End:</span>
                     {formatDate(selectedTrip.tripEnd)}
                   </div>
-                  {selectedTrip.deliveryLocation && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-medium">Days Rented:</span>
+                    {calculateDaysRented(selectedTrip.tripStart, selectedTrip.tripEnd, selectedTrip.status)}
+                  </div>
+                  {(selectedTrip.pickupLocation || selectedTrip.deliveryLocation) && (
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium">Location:</span>
-                      {selectedTrip.deliveryLocation}
+                      <span className="font-medium">Pickup:</span>
+                      {selectedTrip.pickupLocation || selectedTrip.deliveryLocation}
+                    </div>
+                  )}
+                  {selectedTrip.returnLocation && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium">Return:</span>
+                      {selectedTrip.returnLocation}
                     </div>
                   )}
                   {selectedTrip.totalDistance && (
@@ -713,13 +799,13 @@ export default function TuroTripsPage() {
               <div>
                 <h4 className="text-sm font-semibold mb-2">Earnings</h4>
                 <div className="text-2xl font-bold">
-                  {selectedTrip.status === "booked" ? (
-                    <span className="text-green-600">
-                      {formatCurrency(selectedTrip.earnings)}
-                    </span>
-                  ) : (
+                  {selectedTrip.status === "cancelled" ? (
                     <span className="text-red-600">
                       {formatCurrency(selectedTrip.cancelledEarnings)} (Lost)
+                    </span>
+                  ) : (
+                    <span className="text-green-600">
+                      {formatCurrency(selectedTrip.earnings)}
                     </span>
                   )}
                 </div>
