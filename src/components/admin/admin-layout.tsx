@@ -26,7 +26,8 @@ import {
   Clock,
   MessageCircle,
   Cog,
-  RefreshCw
+  RefreshCw,
+  Mail,
 } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { cn } from "@/lib/utils";

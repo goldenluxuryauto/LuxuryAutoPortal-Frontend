@@ -197,12 +197,15 @@ export default function ExpenseFormSubmission() {
         const err = await res.json();
         throw new Error(err.error || "Failed to submit");
       }
-      return res.json();
+      return res.json() as Promise<{ success: boolean; id: number; slackNotificationSent?: boolean }>;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const slackSent = data?.slackNotificationSent === true;
       toast({
         title: "Submitted",
-        description: "Expense receipt form submitted successfully. Awaiting admin approval.",
+        description: slackSent
+          ? "Expense receipt form submitted successfully. Slack notification sent. Awaiting admin approval."
+          : "Expense receipt form submitted successfully. Awaiting admin approval. (Slack notification was not sent—check Admin → Settings → Slack channels.)",
       });
       setFormData({
         submissionDate: new Date().toISOString().slice(0, 10),

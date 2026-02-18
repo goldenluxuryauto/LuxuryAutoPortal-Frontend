@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useIncomeExpense } from "../context/IncomeExpenseContext";
 import ImagePreview from "../components/ImagePreview";
+import FormReceiptInModal from "../components/FormReceiptInModal";
 import { Upload, Image as ImageIcon } from "lucide-react";
 import { useImageUpload } from "../utils/useImageUpload";
 import { buildApiUrl } from "@/lib/queryClient";
@@ -206,6 +207,8 @@ export default function ModalEditCOGS() {
               className="bg-card border-border text-foreground text-sm min-h-[80px] mt-1"
             />
           </div>
+
+          <FormReceiptInModal carId={carId} year={year} editingCell={editingCell} isOpen={isOpen} />
 
           <div>
             <Label className="text-muted-foreground text-xs mb-2 block">Receipt Images</Label>

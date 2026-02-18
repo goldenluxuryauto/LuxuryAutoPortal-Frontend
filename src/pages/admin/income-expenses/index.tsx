@@ -110,17 +110,18 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
 
   const onboarding = onboardingData?.data;
 
-  // Fetch all cars for dropdown (only if admin all-cars view)
+  // Fetch all cars for dropdown so the search box searches all vehicles in the system
   const { data: carsData } = useQuery({
-    queryKey: ["/api/cars"],
+    queryKey: ["/api/cars", "income-expenses", "all"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/cars"), {
+      const params = new URLSearchParams({ limit: "1000", status: "all" });
+      const response = await fetch(buildApiUrl(`/api/cars?${params}`), {
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to fetch cars");
       return response.json();
     },
-    enabled: isAdminAllCarsView, // Only fetch if viewing all cars
+    enabled: true, // Always fetch so vehicle selection searches all vehicles in the system
   });
 
   const cars = carsData?.data || [];
