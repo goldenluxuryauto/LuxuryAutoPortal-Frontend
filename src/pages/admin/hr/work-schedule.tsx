@@ -25,7 +25,7 @@ import {
 import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Calendar, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { Calendar, Copy, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const LIMIT_CELL = 3;
@@ -60,6 +60,18 @@ function useWorkSchedByCode(code: string, limit: number) {
   });
 }
 
+/** Get next calendar day as YYYY-MM-DD and YYYYMMDD. */
+function getNextDay(originalDate: string): { date: string; code: string } | null {
+  if (!originalDate || originalDate.length < 10) return null;
+  const d = new Date(originalDate + "T12:00:00");
+  if (Number.isNaN(d.getTime())) return null;
+  d.setDate(d.getDate() + 1);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return { date: `${y}-${m}-${day}`, code: `${y}${m}${day}` };
+}
+
 function DayCellContent({
   cell,
   month,
@@ -67,6 +79,7 @@ function DayCellContent({
   onViewMore,
   onEdit,
   onDelete,
+  onCopyToNextDay,
 }: {
   cell: DayCell;
   month: string;
@@ -74,10 +87,12 @@ function DayCellContent({
   onViewMore: (cell: DayCell) => void;
   onEdit: (cell: DayCell, entry: WorkSchedEntry) => void;
   onDelete: (entry: WorkSchedEntry) => void;
+  onCopyToNextDay: (cell: DayCell) => void;
 }) {
   const code = cell.originalDateCode;
   const { data: list = [], isLoading, refetch } = useWorkSchedByCode(code, LIMIT_CELL);
   const isToday = code && new Date().toISOString().slice(0, 10).replace(/-/g, "") === code;
+  const hasEntries = list.length > 0;
 
   if (cell.day === 0) {
     return (
@@ -90,9 +105,9 @@ function DayCellContent({
   return (
     <td className="min-w-[10rem] border-b border-border p-2 align-top">
       <div className="min-h-[10rem]">
-        <div className="mb-2 flex items-center gap-2">
+        <div className="mb-2 flex flex-wrap items-center gap-1">
           <span
-            className={`inline-flex h-[21px] w-[21px] items-center justify-center rounded-full border text-center text-sm font-semibold ${
+            className={`inline-flex h-[21px] w-[21px] shrink-0 items-center justify-center rounded-full border text-center text-sm font-semibold ${
               isToday ? "border-primary bg-primary text-primary-foreground" : "border-accent text-accent"
             }`}
           >
@@ -105,6 +120,16 @@ function DayCellContent({
           >
             <Plus className="h-3 w-3" /> Add
           </button>
+          {hasEntries && (
+            <button
+              type="button"
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground hover:underline"
+              onClick={() => onCopyToNextDay(cell)}
+              title="Copy schedule to next day"
+            >
+              <Copy className="h-3 w-3" /> Copy →
+            </button>
+          )}
         </div>
         {isLoading ? (
           <div className="flex items-center gap-1 text-muted-foreground">
@@ -389,6 +414,7 @@ function ViewMoreModal({
   onAdd,
   onEdit,
   onDelete,
+  onCopyToNextDay,
 }: {
   open: boolean;
   onClose: () => void;
@@ -396,6 +422,7 @@ function ViewMoreModal({
   onAdd: (cell: DayCell) => void;
   onEdit: (cell: DayCell, entry: WorkSchedEntry) => void;
   onDelete: (entry: WorkSchedEntry) => void;
+  onCopyToNextDay: (cell: DayCell) => void;
 }) {
   const code = cell?.originalDateCode ?? "";
   const { data: list = [], isLoading } = useWorkSchedByCode(code, 0);
@@ -407,12 +434,26 @@ function ViewMoreModal({
         <DialogHeader>
           <DialogTitle>View Work Schedule</DialogTitle>
         </DialogHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="font-medium">Date: {dateLabel}</p>
           {cell && (
-            <Button size="sm" variant="outline" onClick={() => { onAdd(cell); onClose(); }}>
-              <Plus className="mr-1 h-4 w-4" /> Add
-            </Button>
+            <div className="flex items-center gap-2">
+              {list.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    onCopyToNextDay(cell);
+                    onClose();
+                  }}
+                >
+                  <Copy className="mr-1 h-4 w-4" /> Copy to next day
+                </Button>
+              )}
+              <Button size="sm" variant="outline" onClick={() => { onAdd(cell); onClose(); }}>
+                <Plus className="mr-1 h-4 w-4" /> Add
+              </Button>
+            </div>
           )}
         </div>
         <div className="max-h-[60vh] overflow-auto rounded border">
@@ -514,6 +555,8 @@ function DeleteConfirmModal({
 }
 
 export default function WorkSchedulePage() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [month, setMonth] = useState(getMonthYearNow());
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -521,6 +564,43 @@ export default function WorkSchedulePage() {
   const [selectedCell, setSelectedCell] = useState<DayCell | null>(null);
   const [editEntry, setEditEntry] = useState<WorkSchedEntry | null>(null);
   const [deleteEntry, setDeleteEntry] = useState<WorkSchedEntry | null>(null);
+
+  const copyMutation = useMutation({
+    mutationFn: async ({ fromDate, toDate }: { fromDate: string; toDate: string }) => {
+      const res = await fetch(buildApiUrl("/api/admin/work-sched/copy"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ fromDate, toDate }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Copy failed");
+      return json as { data: { copied: number }; message?: string };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["work-sched"] });
+      const n = data?.data?.copied ?? 0;
+      toast({
+        title: "Schedule copied",
+        description: n === 0 ? "No entries to copy." : `Copied ${n} schedule(s) to the next day.`,
+      });
+    },
+    onError: (e) => {
+      toast({ title: "Error", description: e instanceof Error ? e.message : "Copy failed", variant: "destructive" });
+    },
+  });
+
+  const handleCopyToNextDay = useCallback(
+    (cell: DayCell) => {
+      const next = getNextDay(cell.originalDate);
+      if (!next) {
+        toast({ title: "Error", description: "Invalid date.", variant: "destructive" });
+        return;
+      }
+      copyMutation.mutate({ fromDate: cell.originalDate, toDate: next.date });
+    },
+    [copyMutation, toast]
+  );
 
   const dayCells = getArrayTotalDaysInMonthAndYear(month);
   const weeksCount = getWeeksCount(dayCells);
@@ -606,6 +686,7 @@ export default function WorkSchedulePage() {
                             onViewMore={handleViewMore}
                             onEdit={handleEdit}
                             onDelete={handleDelete}
+                            onCopyToNextDay={handleCopyToNextDay}
                           />
                         ))}
                       </tr>
@@ -632,6 +713,7 @@ export default function WorkSchedulePage() {
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onCopyToNextDay={handleCopyToNextDay}
       />
       <DeleteConfirmModal
         open={deleteModalOpen}

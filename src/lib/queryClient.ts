@@ -52,9 +52,9 @@ export function buildApiUrl(path: string): string {
 
   // In development mode, check if VITE_API_URL is incorrectly set to localhost:5000
   // This would break the Vite proxy - warn and use relative URL instead
-  if (import.meta.env.DEV && API_BASE_URL === "http://localhost:5000") {
+  if (import.meta.env.DEV && API_BASE_URL === "http://localhost:3000") {
     console.warn(
-      "⚠️ [API] VITE_API_URL is set to http://localhost:5000 which bypasses Vite proxy.\n" +
+      "⚠️ [API] VITE_API_URL is set to http://localhost:3000 which bypasses Vite proxy.\n" +
       "   Using relative URL to enable proxy. Set VITE_API_URL to http://localhost:3000 or unset it."
     );
     return normalizedPath; // Use relative URL to trigger Vite proxy

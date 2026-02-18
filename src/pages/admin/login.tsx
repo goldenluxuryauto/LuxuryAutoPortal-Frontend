@@ -33,7 +33,9 @@ export default function AdminLogin() {
     onSuccess: async (data) => {
       // Set the user data directly in the cache FIRST
       // This ensures all components see the user immediately without querying
-      queryClient.setQueryData(["/api/auth/me"], { user: data.user });
+      queryClient.setQueryData(["/api/auth/me"], {
+        user: { ...data.user, ...(data.roles && data.roles.length ? { roles: data.roles } : {}) },
+      });
       
       // Wait for session cookie to be fully set and propagated
       // This prevents race conditions where queries fire before cookie is ready
