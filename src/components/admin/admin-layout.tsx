@@ -26,12 +26,20 @@ import {
   Clock,
   MessageCircle,
   Cog,
-  Mail
+  RefreshCw
 } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { cn } from "@/lib/utils";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, buildApiUrl } from "@/lib/queryClient";
 import { AuthGuard } from "./auth-guard";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -110,10 +118,19 @@ const employeeSidebarItems: SidebarItem[] = [
   },
 ];
 
+interface RoleOption {
+  id: number;
+  name: string;
+  isAdmin: boolean;
+  isEmployee: boolean;
+  isClient: boolean;
+}
+
 function AdminLayoutContent({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location, setLocation] = useLocation();
+  const [switching, setSwitching] = useState(false);
 
   const [expandedParents, setExpandedParents] = useState<Record<string, boolean>>(() => {
     const obj: Record<string, boolean> = {};
@@ -225,6 +242,31 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       console.error("Logout failed:", error);
       // Even if logout fails on server, clear cache to prevent data leakage
       queryClient.clear();
+    }
+  };
+
+  const handleSwitchRole = async (roleId: number, role: RoleOption) => {
+    if (roleId === user?.roleId) return;
+    setSwitching(true);
+    try {
+      const res = await fetch(buildApiUrl("/api/auth/switch-role"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ roleId }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || "Failed to switch account");
+      }
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      if (role.isAdmin) setLocation("/admin/dashboard");
+      else if (role.isEmployee) setLocation("/staff/dashboard");
+      else setLocation("/dashboard");
+    } catch (e) {
+      console.error("Switch role failed:", e);
+    } finally {
+      setSwitching(false);
     }
   };
 
@@ -367,9 +409,45 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           <div className="flex items-center gap-2 sm:gap-4">
             <NotificationBell />
             {user && (
-              <span className="text-xs sm:text-sm text-muted-foreground truncate max-w-[120px] sm:max-w-none">
-                {user.firstName} {user.lastName} <span className="hidden sm:inline">({user.roleName})</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm text-muted-foreground truncate max-w-[120px] sm:max-w-none">
+                  {user.firstName} {user.lastName} <span className="hidden sm:inline">({user.roleName})</span>
+                </span>
+                {(user as any).roles?.length > 1 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground"
+                        disabled={switching}
+                        title="Switch account (same login)"
+                      >
+                        {switching ? (
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <RefreshCw className="h-4 w-4 sm:mr-1" />
+                            <span className="hidden sm:inline">Switch account</span>
+                          </>
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuLabel>Switch to</DropdownMenuLabel>
+                      {((user as any).roles as RoleOption[]).map((r) => (
+                        <DropdownMenuItem
+                          key={r.id}
+                          onClick={() => handleSwitchRole(r.id, r)}
+                          disabled={r.id === user.roleId || switching}
+                        >
+                          {r.name} {r.id === user.roleId ? "(current)" : ""}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
             )}
           </div>
         </header>

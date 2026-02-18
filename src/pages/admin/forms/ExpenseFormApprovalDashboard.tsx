@@ -50,6 +50,203 @@ const CATEGORY_LABELS: Record<string, string> = {
   income: "Income",
 };
 
+/** Extract Google Drive file ID from share/view URLs. */
+function getGoogleDriveFileId(url: string): string | null {
+  if (!url || typeof url !== "string") return null;
+  const trimmed = url.trim();
+  const dMatch = trimmed.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (dMatch) return dMatch[1];
+  const openMatch = trimmed.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+  if (openMatch) return openMatch[1];
+  const ucMatch = trimmed.match(/drive\.google\.com\/uc\?(?:.*&)?id=([a-zA-Z0-9_-]+)/);
+  if (ucMatch) return ucMatch[1];
+  return null;
+}
+
+/** True if the string looks like a Google Drive file/view URL. */
+function isGoogleDriveUrl(url: string): boolean {
+  return getGoogleDriveFileId(url) != null;
+}
+
+/**
+ * For Google Drive PDF: fetch via uc?export=view and return blob URL (frontend-only).
+ * For images we use thumbnail URL in img directly to avoid CORS.
+ */
+function useGoogleDrivePdfBlobUrl(googleDriveUrl: string | null): { blobUrl: string | null; loading: boolean; error: string | null } {
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(!!googleDriveUrl);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fileId = googleDriveUrl ? getGoogleDriveFileId(googleDriveUrl) : null;
+    if (!fileId) {
+      setBlobUrl(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+    let revoked = false;
+    let objectUrl: string | null = null;
+    setLoading(true);
+    setError(null);
+    setBlobUrl(null);
+    const directUrl = `https://drive.google.com/uc?export=view&id=${encodeURIComponent(fileId)}`;
+    fetch(directUrl, { mode: "cors", credentials: "omit" })
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status === 404 ? "File not found" : `Failed to load (${res.status})`);
+        const ct = res.headers.get("content-type") || "";
+        if (ct.includes("text/html")) throw new Error("Drive returned a page instead of file (link may need to be shared)");
+        return res.blob();
+      })
+      .then((blob) => {
+        if (revoked) return;
+        objectUrl = URL.createObjectURL(blob);
+        setBlobUrl(objectUrl);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (!revoked) {
+          setError(err instanceof Error ? err.message : "Failed to load from Drive");
+          setLoading(false);
+        }
+      });
+    return () => {
+      revoked = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [googleDriveUrl]);
+
+  return { blobUrl, loading, error };
+}
+
+/** Direct thumbnail URL for a Google Drive file (use in img src; no CORS for display). */
+function getGoogleDriveThumbnailUrl(url: string): string | null {
+  const fileId = getGoogleDriveFileId(url);
+  if (!fileId) return null;
+  return `https://drive.google.com/thumbnail?id=${encodeURIComponent(fileId)}&sz=w1200`;
+}
+
+/** Renders a receipt that may be a Google Drive share URL; displays on frontend only (no backend). */
+function ReceiptImageOrDrive({
+  urlOrId,
+  alt,
+  className,
+  isPdf,
+}: {
+  urlOrId: string;
+  alt: string;
+  className?: string;
+  isPdf: boolean;
+}) {
+  const isDrive = isGoogleDriveUrl(urlOrId);
+  const { blobUrl, loading, error } = useGoogleDrivePdfBlobUrl(isDrive && isPdf ? urlOrId : null);
+  const driveOpenUrl = urlOrId;
+
+  if (isDrive) {
+    if (isPdf) {
+      if (loading) {
+        return (
+          <div className={`flex items-center justify-center rounded border border-[#2a2a2a] bg-[#0d0d0d] min-h-[120px] ${className ?? ""}`}>
+            <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+          </div>
+        );
+      }
+      if (error) {
+        return (
+          <div className={`space-y-2 rounded border border-[#2a2a2a] bg-[#0d0d0d] p-3 ${className ?? ""}`}>
+            <p className="text-sm text-red-300">{error}</p>
+            <a href={driveOpenUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-[#EAEB80] hover:underline">
+              <ExternalLink className="w-3 h-3" /> Open in Google Drive
+            </a>
+          </div>
+        );
+      }
+      if (blobUrl) {
+        return (
+          <object
+            data={blobUrl}
+            type="application/pdf"
+            className={className}
+            title={alt}
+          >
+            <a href={driveOpenUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#EAEB80] hover:underline">
+              <ExternalLink className="w-4 h-4" /> Open PDF in new tab
+            </a>
+          </object>
+        );
+      }
+      return (
+        <a href={driveOpenUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#EAEB80] hover:underline">
+          <ExternalLink className="w-4 h-4" /> Open PDF in Google Drive
+        </a>
+      );
+    }
+
+    // Image: use thumbnail URL directly in img (no CORS for display)
+    const thumbUrl = getGoogleDriveThumbnailUrl(urlOrId);
+    if (thumbUrl) {
+      return (
+        <GoogleDriveThumbnailImg
+          thumbUrl={thumbUrl}
+          fallbackUrl={driveOpenUrl}
+          alt={alt}
+          className={className}
+        />
+      );
+    }
+    return (
+      <a href={driveOpenUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#EAEB80] hover:underline">
+        <ExternalLink className="w-4 h-4" /> Open in Google Drive
+      </a>
+    );
+  }
+
+  const isDriveFileId = urlOrId && !urlOrId.startsWith("http");
+  const displayUrl = isDriveFileId
+    ? buildApiUrl(`/api/expense-form-submissions/receipt/file?fileId=${encodeURIComponent(urlOrId)}`)
+    : urlOrId;
+  return (
+    <ReceiptImage
+      url={displayUrl}
+      alt={alt}
+      className={className}
+    />
+  );
+}
+
+/** Renders an img using Drive thumbnail URL; on error shows link to open in Drive. */
+function GoogleDriveThumbnailImg({
+  thumbUrl,
+  fallbackUrl,
+  alt,
+  className,
+}: {
+  thumbUrl: string;
+  fallbackUrl: string;
+  alt: string;
+  className?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+  if (failed) {
+    return (
+      <div className={`space-y-2 rounded border border-[#2a2a2a] bg-[#0d0d0d] p-3 ${className ?? ""}`}>
+        <p className="text-sm text-gray-400">Image could not be loaded.</p>
+        <a href={fallbackUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-[#EAEB80] hover:underline">
+          <ExternalLink className="w-3 h-3" /> Open in Google Drive
+        </a>
+      </div>
+    );
+  }
+  return (
+    <img
+      src={thumbUrl}
+      alt={alt}
+      className={className}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 /** Loads receipt from API with credentials and displays as image (fixes broken image when API is cross-origin). */
 function ReceiptImage({
   url,
@@ -70,7 +267,8 @@ function ReceiptImage({
     setLoading(true);
     setError(null);
     setBlobUrl(null);
-    fetch(url, { credentials: "include" })
+    const isOurReceiptApi = url.includes("/api/expense-form-submissions/receipt/file");
+    fetch(url, { credentials: isOurReceiptApi ? "include" : "omit" })
       .then((res) => {
         if (!res.ok) throw new Error(res.status === 404 ? "File not found" : `Failed to load (${res.status})`);
         return res.blob();
@@ -204,14 +402,49 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
     },
   });
 
-  // Normalize list from API: ensure receiptUrls is set (API may send receipt_urls or receiptUrls)
+  // When View Receipt dialog is open, fetch submission by ID so receipt_urls come from DB
+  const submissionIdForReceipt = viewReceiptsOpen && selectedSubmission?.id ? selectedSubmission.id : null;
+  const { data: submissionForReceiptData, isLoading: submissionForReceiptLoading } = useQuery({
+    queryKey: ["/api/expense-form-submissions", submissionIdForReceipt, "embedReceipts"],
+    queryFn: async () => {
+      if (!submissionIdForReceipt) return null;
+      const res = await fetch(
+        buildApiUrl(`/api/expense-form-submissions/${submissionIdForReceipt}?embedReceipts=1`),
+        { credentials: "include" }
+      );
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json?.error || "Failed to fetch submission");
+      }
+      return res.json();
+    },
+    enabled: !!submissionIdForReceipt,
+  });
+  const submissionForReceipt = submissionForReceiptData?.data as Record<string, unknown> | undefined;
+  const receiptUrlsFromDb = submissionForReceipt
+    ? parseReceiptUrlsFromSub(submissionForReceipt)
+    : selectedSubmission?.receiptUrls ?? null;
+  const receiptDataUrls = (submissionForReceipt?.receiptDataUrls as Record<string, string> | undefined) ?? null;
+
+  // Normalize list from API: ensure receiptUrls is set (API may send receipt_urls or receiptUrls, string or array)
+  function parseReceiptUrlsFromSub(sub: Record<string, unknown>): string[] | null {
+    const urls = sub.receiptUrls ?? sub.receipt_urls;
+    if (urls == null) return null;
+    if (Array.isArray(urls) && urls.every((x) => typeof x === "string")) return urls as string[];
+    if (typeof urls === "string") {
+      try {
+        const parsed = JSON.parse(urls);
+        return Array.isArray(parsed) && parsed.every((x: unknown) => typeof x === "string") ? parsed : null;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
   const rawList = Array.isArray(data?.data) ? data.data : [];
   const submissions: Submission[] = rawList.map((sub: Record<string, unknown>) => ({
     ...sub,
-    receiptUrls:
-      (sub.receiptUrls as string[] | null) ??
-      (Array.isArray(sub.receipt_urls) ? (sub.receipt_urls as string[]) : null) ??
-      null,
+    receiptUrls: parseReceiptUrlsFromSub(sub),
   })) as Submission[];
   const pagination = data?.pagination || { page: 1, total: 0, totalPages: 0 };
 
@@ -580,45 +813,93 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
             </div>
           )}
           <div className="flex flex-wrap gap-4">
-            {selectedSubmission?.receiptUrls?.map((urlOrId, i) => {
-              const isDriveFileId = urlOrId && !urlOrId.startsWith("http");
-              const displayUrl = isDriveFileId
-                ? buildApiUrl(`/api/expense-form-submissions/receipt/file?fileId=${encodeURIComponent(urlOrId)}`)
-                : urlOrId;
-              const isPdf = urlOrId?.match(/\.pdf$/i);
-              const receiptLabel = `Receipt ${i + 1}`;
-              if (isPdf) {
+            {submissionIdForReceipt && submissionForReceiptLoading ? (
+              <div className="flex items-center justify-center rounded border border-[#2a2a2a] bg-[#0d0d0d] min-h-[120px] w-full">
+                <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+              </div>
+            ) : receiptUrlsFromDb?.length ? (
+              receiptUrlsFromDb.map((urlOrId, i) => {
+                const isPdf = urlOrId?.match(/\.pdf$/i);
+                const receiptLabel = `Receipt ${i + 1}`;
+                const embeddedDataUrl = receiptDataUrls?.[urlOrId];
+                const isBackendFileId = urlOrId && !urlOrId.startsWith("http");
+                const isDriveUrl = isGoogleDriveUrl(urlOrId);
+                const displayUrl =
+                  isBackendFileId || isDriveUrl
+                    ? buildApiUrl(`/api/expense-form-submissions/receipt/file?fileId=${encodeURIComponent(urlOrId)}`)
+                    : urlOrId;
+                if (!displayUrl && !embeddedDataUrl) return null;
+                if (isPdf) {
+                  return (
+                    <div key={i} className="space-y-1">
+                      <p className="text-sm text-gray-400">{receiptLabel} (PDF)</p>
+                      {embeddedDataUrl ? (
+                        <object
+                          data={embeddedDataUrl}
+                          type="application/pdf"
+                          className="w-full min-h-[300px] max-h-[64vh] rounded border border-[#2a2a2a] bg-[#0d0d0d]"
+                          title={receiptLabel}
+                        >
+                          <a
+                            href={embeddedDataUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-[#EAEB80] hover:underline"
+                          >
+                            <ExternalLink className="w-4 h-4" /> Open PDF in new tab
+                          </a>
+                        </object>
+                      ) : (
+                        <a
+                          href={displayUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-[#EAEB80] hover:underline"
+                        >
+                          <ExternalLink className="w-4 h-4" /> {receiptLabel} (PDF) — Open in new tab
+                        </a>
+                      )}
+                      <a
+                        href={embeddedDataUrl ?? (isDriveUrl ? urlOrId : displayUrl)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-[#EAEB80] hover:underline"
+                      >
+                        <ExternalLink className="w-3 h-3" /> Open in new tab
+                      </a>
+                    </div>
+                  );
+                }
                 return (
-                  <a
-                    key={i}
-                    href={displayUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-[#EAEB80] hover:underline"
-                  >
-                    <ExternalLink className="w-4 h-4" /> {receiptLabel} (PDF)
-                  </a>
+                  <div key={i} className="space-y-1">
+                    <p className="text-sm text-gray-400">{receiptLabel}</p>
+                    {embeddedDataUrl ? (
+                      <img
+                        src={embeddedDataUrl}
+                        alt={receiptLabel}
+                        className="max-h-64 w-auto rounded border border-[#2a2a2a] object-contain bg-[#0d0d0d]"
+                      />
+                    ) : (
+                      <ReceiptImage
+                        url={displayUrl!}
+                        alt={receiptLabel}
+                        className="max-h-64 w-auto rounded border border-[#2a2a2a] object-contain bg-[#0d0d0d]"
+                      />
+                    )}
+                    <a
+                      href={embeddedDataUrl ?? (isDriveUrl ? urlOrId : displayUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-[#EAEB80] hover:underline"
+                    >
+                      <ExternalLink className="w-3 h-3" /> Open in new tab
+                    </a>
+                  </div>
                 );
-              }
-              return (
-                <div key={i} className="space-y-1">
-                  <p className="text-sm text-gray-400">{receiptLabel}</p>
-                  <ReceiptImage
-                    url={displayUrl}
-                    alt={receiptLabel}
-                    className="max-h-64 w-auto rounded border border-[#2a2a2a] object-contain bg-[#0d0d0d]"
-                  />
-                  <a
-                    href={displayUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-[#EAEB80] hover:underline"
-                  >
-                    <ExternalLink className="w-3 h-3" /> Open in new tab
-                  </a>
-                </div>
-              );
-            })}
+              })
+            ) : (
+              <p className="text-sm text-muted-foreground">No receipt attached.</p>
+            )}
           </div>
         </DialogContent>
       </Dialog>

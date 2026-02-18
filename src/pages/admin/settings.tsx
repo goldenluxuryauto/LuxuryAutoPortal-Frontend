@@ -60,6 +60,7 @@ export default function SettingsPage() {
     success: boolean;
     data: SlackChannelConfig[];
     slackBotTokenConfigured?: boolean;
+    slackBotToken?: string | null;
     slackBotTokenUpdatedAt?: string | null;
   }>({
     queryKey: ["/api/settings/slack-channels"],
@@ -76,6 +77,7 @@ export default function SettingsPage() {
   });
 
   const slackBotTokenConfigured = channelsData?.slackBotTokenConfigured === true;
+  const slackBotTokenValue = channelsData?.slackBotToken ?? "";
   const [editingBotToken, setEditingBotToken] = useState(false);
   const [slackBotToken, setSlackBotToken] = useState("");
 
@@ -504,10 +506,12 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-2 mt-2">
                       <Input
                         id="slack-bot-token"
-                        value={slackBotTokenConfigured ? "••••••••••••••••••••••••••••••••" : ""}
+                        type="text"
+                        value={slackBotTokenValue}
                         readOnly
                         placeholder="Not set"
-                        className="max-w-md bg-background border-border text-muted-foreground font-mono text-sm"
+                        className="max-w-md bg-background border-border text-foreground font-mono text-sm"
+                        title="Slack bot token (exact value)"
                       />
                       <Button
                         onClick={() => setEditingBotToken(true)}

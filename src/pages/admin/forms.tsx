@@ -18,6 +18,11 @@ import ExpenseFormSubmission from "./forms/ExpenseFormSubmission";
 import ExpenseFormMySubmissions from "./forms/ExpenseFormMySubmissions";
 import ExpenseFormApprovalDashboard from "./forms/ExpenseFormApprovalDashboard";
 import {
+  EmployeeOnboardingFormContent,
+  EmployeeContract1099Content,
+  EmployeeOffboardingContent,
+} from "./forms/EmployeeOnboardingProcess";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -32,6 +37,7 @@ import {
   ClipboardList,
   Car,
   LogOut,
+  UserPlus,
   Search,
   Loader2,
   Eye,
@@ -296,6 +302,7 @@ function QRCodeSection() {
 export default function FormsPage() {
   const [expandedSections, setExpandedSections] = useState<string[]>([
     "client-onboarding",
+    "employee-onboarding-process",
     "employee-forms",
   ]);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
@@ -382,7 +389,10 @@ export default function FormsPage() {
       itemId === "car-on" ||
       itemId === "car-off" ||
       itemId === "expense-receipt" ||
-      itemId === "approval-dashboard"
+      itemId === "approval-dashboard" ||
+      itemId === "employee-onboarding-form" ||
+      itemId === "employee-contract-1099" ||
+      itemId === "employee-offboarding"
     ) {
       setExpandedItems((prev) =>
         prev.includes(itemId)
@@ -834,7 +844,13 @@ export default function FormsPage() {
       icon: FileCheck,
     };
 
-    // Admin: Client Onboarding + Employee Forms (Income & Expenses Form at bottom hidden)
+    const employeeOnboardingItems: FormItem[] = [
+      { id: "employee-onboarding-form", title: "Employee Onboarding Form", icon: UserPlus },
+      { id: "employee-contract-1099", title: "Contract GLA Contractor Policy 1099", icon: FileText },
+      { id: "employee-offboarding", title: "Employee Offboarding Form", icon: LogOut },
+    ];
+
+    // Admin: Client Onboarding + Employee Onboarding Process + Income & Expenses Form
     if (formVisibilityData?.isAdmin) {
       return [
         {
@@ -842,6 +858,12 @@ export default function FormsPage() {
           title: "Client Onboarding Form",
           icon: ClipboardList,
           items: allItems,
+        },
+        {
+          id: "employee-onboarding-process",
+          title: "Employee Onboarding Process",
+          icon: UserPlus,
+          items: employeeOnboardingItems,
         },
         {
           id: "employee-forms",
@@ -932,7 +954,7 @@ export default function FormsPage() {
         <div className="mb-4">
           <h1 className="text-2xl font-semibold text-primary">Forms</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage client onboarding and expense forms
+            Manage client onboarding, employee onboarding, and expense forms
           </p>
         </div>
         <Card className="bg-card border-primary/20 max-w-full overflow-hidden">
@@ -972,7 +994,10 @@ export default function FormsPage() {
                             item.id === "car-on" ||
                             item.id === "car-off" ||
                             item.id === "expense-receipt" ||
-                            item.id === "approval-dashboard") &&
+                            item.id === "approval-dashboard" ||
+                            item.id === "employee-onboarding-form" ||
+                            item.id === "employee-contract-1099" ||
+                            item.id === "employee-offboarding") &&
                           !item.comingSoon;
 
                         return (
@@ -1103,6 +1128,27 @@ export default function FormsPage() {
                             {isItemExpanded && item.id === "approval-dashboard" && (
                               <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 min-w-0 max-w-full overflow-hidden">
                                 <ExpenseFormApprovalDashboard isAdmin={true} />
+                              </div>
+                            )}
+
+                            {/* Expanded content for Employee Onboarding Form */}
+                            {isItemExpanded && item.id === "employee-onboarding-form" && (
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                                <EmployeeOnboardingFormContent />
+                              </div>
+                            )}
+
+                            {/* Expanded content for Contract GLA Contractor Policy 1099 */}
+                            {isItemExpanded && item.id === "employee-contract-1099" && (
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                                <EmployeeContract1099Content />
+                              </div>
+                            )}
+
+                            {/* Expanded content for Employee Offboarding Form */}
+                            {isItemExpanded && item.id === "employee-offboarding" && (
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                                <EmployeeOffboardingContent />
                               </div>
                             )}
 

@@ -119,6 +119,7 @@ function Router() {
       <Route path="/admin/settings" component={SettingsPage} />
       <Route path="/admin/operations" component={OperationsPage} />
       <Route path="/admin/hr" component={HumanResourcesPage} />
+      <Route path="/admin/work-schedule" component={WorkSchedulePage} />
       <Route path="/admin/hr/work-schedule" component={WorkSchedulePage} />
       <Route path="/admin/hr/employees/view" component={EmployeeViewPage} />
       <Route path="/admin/hr/employees" component={EmployeesPage} />

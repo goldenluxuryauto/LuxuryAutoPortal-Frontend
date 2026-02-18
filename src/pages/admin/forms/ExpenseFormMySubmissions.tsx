@@ -70,6 +70,21 @@ function formatFieldLabel(field: string) {
     .trim();
 }
 
+function parseReceiptUrlsFromSub(sub: Record<string, unknown>): string[] | null {
+  const urls = sub.receiptUrls ?? sub.receipt_urls;
+  if (urls == null) return null;
+  if (Array.isArray(urls) && urls.every((x) => typeof x === "string")) return urls as string[];
+  if (typeof urls === "string") {
+    try {
+      const parsed = JSON.parse(urls);
+      return Array.isArray(parsed) && parsed.every((x: unknown) => typeof x === "string") ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 export default function ExpenseFormMySubmissions() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
@@ -95,7 +110,36 @@ export default function ExpenseFormMySubmissions() {
     },
   });
 
-  const submissions: Submission[] = Array.isArray(data?.data) ? data.data : [];
+  const rawList = Array.isArray(data?.data) ? data.data : [];
+  const submissions: Submission[] = rawList.map((sub: Record<string, unknown>) => ({
+    ...sub,
+    receiptUrls: parseReceiptUrlsFromSub(sub),
+  })) as Submission[];
+
+  const submissionIdForReceipt = viewReceiptsOpen && selectedSubmission?.id ? selectedSubmission.id : null;
+  const { data: submissionForReceiptData, isLoading: submissionForReceiptLoading } = useQuery({
+    queryKey: ["/api/expense-form-submissions", submissionIdForReceipt, "embedReceipts"],
+    queryFn: async () => {
+      if (!submissionIdForReceipt) return null;
+      const res = await fetch(
+        buildApiUrl(`/api/expense-form-submissions/${submissionIdForReceipt}?embedReceipts=1`),
+        { credentials: "include" }
+      );
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || "Failed to load submission");
+      }
+      return res.json();
+    },
+    enabled: !!submissionIdForReceipt,
+  });
+
+  const submissionForReceipt = submissionForReceiptData?.data as Record<string, unknown> | undefined;
+  const receiptUrlsFromDb = submissionForReceipt
+    ? parseReceiptUrlsFromSub(submissionForReceipt)
+    : selectedSubmission?.receiptUrls ?? null;
+  const receiptDataUrls = (submissionForReceipt?.receiptDataUrls as Record<string, string> | undefined) ?? null;
+
   const pagination = data?.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 };
 
   function statusBadge(status: string) {
@@ -218,49 +262,86 @@ export default function ExpenseFormMySubmissions() {
         </div>
       )}
 
-      {/* View Receipts Dialog */}
+      {/* View Receipts Dialog — employees can view their submissions regardless of status */}
       <Dialog open={viewReceiptsOpen} onOpenChange={setViewReceiptsOpen}>
         <DialogContent className="bg-card border-border max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-primary">Receipts</DialogTitle>
+            <DialogTitle className="text-primary">View copy of receipt</DialogTitle>
             <DialogDescription>
-              {selectedSubmission?.employeeName} - ${selectedSubmission?.amount?.toLocaleString()}
+              {selectedSubmission?.employeeName} — ${selectedSubmission?.amount?.toLocaleString()}
               {selectedSubmission?.remarks && ` • ${selectedSubmission.remarks}`}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-wrap gap-4">
-            {selectedSubmission?.receiptUrls?.map((urlOrId, i) => {
-              const isDriveFileId = urlOrId && !urlOrId.startsWith("http");
-              const displayUrl = isDriveFileId
-                ? buildApiUrl(`/api/expense-form-submissions/receipt/file?fileId=${encodeURIComponent(urlOrId)}`)
-                : urlOrId;
-              const isPdf = urlOrId?.match(/\.pdf$/i);
-              return (
-                <a
-                  key={i}
-                  href={displayUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                >
-                  {isPdf ? (
-                    <span className="flex items-center gap-2 text-blue-700 hover:underline">
-                      <ExternalLink className="w-4 h-4" /> Receipt {i + 1} (PDF)
-                    </span>
-                  ) : isDriveFileId ? (
-                    <span className="flex items-center gap-2 text-blue-700 hover:underline">
-                      <ExternalLink className="w-4 h-4" /> View Receipt {i + 1}
-                    </span>
-                  ) : (
-                    <img
-                      src={displayUrl}
-                      alt={`Receipt ${i + 1}`}
-                      className="max-h-48 rounded border border-border object-contain"
-                    />
-                  )}
-                </a>
-              );
-            })}
+          <div className="flex flex-col gap-4">
+            {submissionIdForReceipt && submissionForReceiptLoading ? (
+              <div className="flex items-center justify-center rounded border border-border bg-muted/30 min-h-[120px] w-full">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : receiptUrlsFromDb?.length ? (
+              receiptUrlsFromDb.map((urlOrId, i) => {
+                const isPdf = urlOrId?.match(/\.pdf$/i);
+                const receiptLabel = `Receipt ${i + 1}`;
+                const embeddedDataUrl = receiptDataUrls?.[urlOrId];
+                const isOurFileId = urlOrId && !urlOrId.startsWith("http");
+                const receiptUrl =
+                  isOurFileId && submissionIdForReceipt
+                    ? buildApiUrl(
+                        `/api/expense-form-submissions/receipt/file?fileId=${encodeURIComponent(urlOrId)}&submissionId=${submissionIdForReceipt}`
+                      )
+                    : urlOrId;
+                const displayUrl = isOurFileId ? receiptUrl : urlOrId;
+
+                if (isPdf) {
+                  return (
+                    <div key={i} className="space-y-1">
+                      <p className="text-sm text-muted-foreground">{receiptLabel} (PDF)</p>
+                      {embeddedDataUrl ? (
+                        <object
+                          data={embeddedDataUrl}
+                          type="application/pdf"
+                          className="w-full min-h-[300px] max-h-[64vh] rounded border border-border bg-muted/30 object-contain"
+                          title={receiptLabel}
+                        >
+                          <a href={embeddedDataUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+                            <ExternalLink className="h-4 w-4" /> Open PDF in new tab
+                          </a>
+                        </object>
+                      ) : (
+                        <a href={displayUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+                          <ExternalLink className="h-4 w-4" /> {receiptLabel} (PDF) — Open in new tab
+                        </a>
+                      )}
+                      <a href={embeddedDataUrl ?? displayUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                        <ExternalLink className="h-3 w-3" /> Open in new tab
+                      </a>
+                    </div>
+                  );
+                }
+                return (
+                  <div key={i} className="space-y-1">
+                    <p className="text-sm text-muted-foreground">{receiptLabel}</p>
+                    {embeddedDataUrl ? (
+                      <img
+                        src={embeddedDataUrl}
+                        alt={receiptLabel}
+                        className="max-h-64 w-auto rounded border border-border object-contain bg-muted/30"
+                      />
+                    ) : (
+                      <img
+                        src={displayUrl}
+                        alt={receiptLabel}
+                        className="max-h-64 w-auto rounded border border-border object-contain bg-muted/30"
+                      />
+                    )}
+                    <a href={embeddedDataUrl ?? displayUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                      <ExternalLink className="h-3 w-3" /> Open in new tab
+                    </a>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-sm text-muted-foreground">No receipt attached.</p>
+            )}
           </div>
         </DialogContent>
       </Dialog>
