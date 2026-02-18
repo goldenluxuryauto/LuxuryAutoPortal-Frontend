@@ -569,7 +569,7 @@ export default function SettingsPage() {
                               }))
                             }
                             className="bg-background border-border text-foreground focus:border-primary"
-                            placeholder="C1234567890"
+                            placeholder="C08N5U77HSS or paste full Slack channel URL"
                           />
                           <Button
                             onClick={() => handleSave(config)}
@@ -635,8 +635,8 @@ export default function SettingsPage() {
               <ol className="list-decimal list-inside space-y-2">
                 <li>Open Slack and navigate to the channel you want to use</li>
                 <li>Click on the channel name at the top</li>
-                <li>Scroll down to find the "Channel ID" (starts with "C")</li>
-                <li>Copy the Channel ID and paste it in the field above</li>
+                <li>Scroll down to find the &quot;Channel ID&quot; (starts with &quot;C&quot;) or copy the channel URL from the browser</li>
+                <li>Paste the Channel ID (e.g. C08N5U77HSS) or the full URL in the field above—both work</li>
               </ol>
               <p className="text-sm text-muted-foreground mt-4">
                 Note: Make sure your Slack bot has been invited to the channel before notifications can be sent.
