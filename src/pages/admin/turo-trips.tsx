@@ -82,8 +82,8 @@ interface TripsSummary {
   cancelledEarnings: number;
 }
 
-function calculateDaysRented(tripStart: string, tripEnd: string, status: string): number {
-  if (status === "cancelled") return 0;
+function calculateDaysRented(tripStart: string, tripEnd: string, status: string): number | null {
+  if (status === "cancelled") return null; // Show "-" for cancelled
   try {
     const start = new Date(tripStart);
     const end = new Date(tripEnd);
@@ -143,14 +143,19 @@ export default function TuroTripsPage() {
     },
   });
 
-  // Fetch summary
+  // Fetch summary (responds to date filters)
   const { data: summaryData } = useQuery<{
     success: boolean;
     data: TripsSummary;
   }>({
-    queryKey: ["/api/turo-trips/summary"],
+    queryKey: ["/api/turo-trips/summary", startDate, endDate],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/turo-trips/summary"), {
+      let url = buildApiUrl("/api/turo-trips/summary");
+      const params = new URLSearchParams();
+      if (startDate) params.append("startDate", startDate);
+      if (endDate) params.append("endDate", endDate);
+      if (params.toString()) url += `?${params.toString()}`;
+      const response = await fetch(url, {
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to fetch summary");
@@ -307,7 +312,7 @@ export default function TuroTripsPage() {
 
         {/* Summary Cards */}
         {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -329,6 +334,20 @@ export default function TuroTripsPage() {
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">
                   {summary.bookedTrips}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-blue-500" />
+                  Completed Trips
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-600">
+                  {summary.completedTrips}
                 </div>
               </CardContent>
             </Card>
@@ -473,6 +492,7 @@ export default function TuroTripsPage() {
                     <TableHead>Reservation ID</TableHead>
                     <TableHead>Guest</TableHead>
                     <TableHead>Car</TableHead>
+                    <TableHead>Trip Booked</TableHead>
                     <TableHead>Trip Start</TableHead>
                     <TableHead>Trip End</TableHead>
                     <TableHead>Pickup Location</TableHead>
@@ -486,13 +506,13 @@ export default function TuroTripsPage() {
                 <TableBody>
                   {isLoadingTrips ? (
                     <TableRow>
-                      <TableCell colSpan={11} className="text-center py-8">
+                      <TableCell colSpan={12} className="text-center py-8">
                         <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                       </TableCell>
                     </TableRow>
                   ) : trips.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={11} className="text-center py-12">
+                      <TableCell colSpan={12} className="text-center py-12">
                         <div className="flex flex-col items-center gap-3 text-muted-foreground">
                           {debouncedSearchQuery || statusFilter !== "all" ? (
                             <>
@@ -551,6 +571,11 @@ export default function TuroTripsPage() {
                             </div>
                           </TableCell>
                           <TableCell>
+                            <div className="text-sm whitespace-nowrap text-muted-foreground">
+                              {trip.dateBooked ? formatDateShort(trip.dateBooked) : "-"}
+                            </div>
+                          </TableCell>
+                          <TableCell>
                             <div className="text-sm whitespace-nowrap">
                               {formatDateTime(trip.tripStart)}
                             </div>
@@ -571,8 +596,8 @@ export default function TuroTripsPage() {
                             </div>
                           </TableCell>
                           <TableCell className="text-center">
-                            <span className={`font-semibold ${trip.status === "cancelled" ? "text-muted-foreground" : "text-foreground"}`}>
-                              {daysRented}
+                            <span className={`font-semibold ${daysRented === null ? "text-muted-foreground" : "text-foreground"}`}>
+                              {daysRented === null ? "-" : daysRented}
                             </span>
                           </TableCell>
                           <TableCell>
@@ -770,7 +795,10 @@ export default function TuroTripsPage() {
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-muted-foreground" />
                     <span className="font-medium">Days Rented:</span>
-                    {calculateDaysRented(selectedTrip.tripStart, selectedTrip.tripEnd, selectedTrip.status)}
+                    {(() => {
+                      const days = calculateDaysRented(selectedTrip.tripStart, selectedTrip.tripEnd, selectedTrip.status);
+                      return days === null ? "-" : days;
+                    })()}
                   </div>
                   {(selectedTrip.pickupLocation || selectedTrip.deliveryLocation) && (
                     <div className="flex items-center gap-2">
