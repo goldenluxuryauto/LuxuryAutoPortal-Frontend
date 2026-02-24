@@ -42,7 +42,7 @@ interface EditFamilyInfoModalProps {
   employee: Employee;
 }
 
-export function EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamilyInfoModalProps) {
+export function, EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamilyInfoModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -61,22 +61,22 @@ export function EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamily
         employee_mother_name: employee.employee_mother_name || "",
         employee_father_name: employee.employee_father_name || "",
         employee_home_contact: employee.employee_home_contact || "",
-        employee_home_address: employee.employee_home_address || "",
+        employee_home_address: employee.employee_home_address || "`,
       });
     }
   }, [open, employee]);
 
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
-        method: "PUT",
+      const res = await, fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
+        method: `PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(values),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to update");
+        throw new, Error(err.error || "Failed to update");
       }
     },
     onSuccess: () => {
@@ -147,7 +147,7 @@ export function EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamily
                 </FormItem>
               )}
             />
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter className="gap-2, sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
@@ -160,7 +160,7 @@ export function EditFamilyInfoModal({ open, onOpenChange, employee }: EditFamily
               <Button
                 type="submit"
                 disabled={mutation.isPending}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground, hover:bg-primary/90"
               >
                 {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
               </Button>

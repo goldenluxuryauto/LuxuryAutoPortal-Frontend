@@ -88,15 +88,14 @@ const TextAnnotationBox = memo(
         e.stopPropagation();
         e.preventDefault();
         setIsDragging(true);
-        // Store initial pointer position (screen coords) and annotation position (PDF coords)
+        // Store initial pointer, position(screen coords) and annotation, position(PDF coords)
         dragStartRef.current = {
           x: e.clientX, // Initial mouse X in screen coordinates
           y: e.clientY, // Initial mouse Y in screen coordinates
           startX: annotation.x, // Initial annotation X in PDF coordinates
           startY: annotation.y, // Initial annotation Y in PDF coordinates
         };
-        // Capture pointer for smooth dragging
-        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        // Capture pointer for smooth, dragging(e.target as HTMLElement).setPointerCapture(e.pointerId);
       },
       [isEditing, annotation.x, annotation.y]
     );
@@ -112,8 +111,7 @@ const TextAnnotationBox = memo(
           mouseX: e.clientX,
           mouseY: e.clientY,
         };
-        // Capture pointer for smooth resizing
-        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        // Capture pointer for smooth, resizing(e.target as HTMLElement).setPointerCapture(e.pointerId);
       },
       [annotation.width, annotation.height]
     );
@@ -130,11 +128,11 @@ const TextAnnotationBox = memo(
           // Convert screen delta to PDF coordinates
           const pdfDeltaX = deltaX / scale;
           const pdfDeltaY = deltaY / scale;
-          // Add delta to initial PDF position for pixel-perfect 1:1 movement
+          // Add delta to initial PDF position for pixel-perfect, 1:1 movement
           const newX = dragStartRef.current.startX + pdfDeltaX;
           const newY = dragStartRef.current.startY + pdfDeltaY;
           onPositionChange(newX, newY);
-        } else if (isResizing) {
+        } else, if(isResizing) {
           // Instant resize - direct delta calculation
           const deltaX = e.clientX - resizeStartRef.current.mouseX;
           const deltaY = e.clientY - resizeStartRef.current.mouseY;
@@ -171,8 +169,7 @@ const TextAnnotationBox = memo(
       annotation.fontSize,
     ]);
 
-    // Position cursor at the start when editing begins
-    useEffect(() => {
+    // Position cursor at the start when editing begins, useEffect(() => {
       if (isEditing && inputRef.current) {
         inputRef.current.focus();
         inputRef.current.setSelectionRange(0, 0);
@@ -186,7 +183,7 @@ const TextAnnotationBox = memo(
           !isDragging && "transition-all duration-200", // Only transition when not dragging
           isEditing
             ? "border border-black bg-white/95 shadow-lg"
-            : "border border-transparent bg-transparent hover:border hover:border-gray-300 hover:bg-white/5 cursor-move"
+            : "border border-transparent bg-transparent, hover:border, hover:border-gray-300, hover:bg-white/5 cursor-move`
         )}
         style={{
           left: `${annotation.x * scale}px`,
@@ -196,7 +193,7 @@ const TextAnnotationBox = memo(
           minWidth: `${annotation.fontSize * scale}px`, // Min width matches current font size
           minHeight: `${14 * scale}px`, // Min height for 12px font + 2px padding
           zIndex: isEditing ? 1000 : 999,
-          padding: "1px 0", // 1px top/bottom padding
+          padding: `1px 0", // 1px top/bottom padding
           transition: isDragging ? "none" : undefined, // Disable transition during drag for instant movement
         }}
         onPointerDown={handlePointerDown}
@@ -224,9 +221,9 @@ const TextAnnotationBox = memo(
                 position: "absolute",
                 visibility: "hidden",
                 whiteSpace: "pre",
-                fontFamily: "'Courier New', monospace",
+                fontFamily: "'Courier New', monospace`,
                 fontSize: `${annotation.fontSize}px`,
-                padding: "1px 1px 1px 1px",
+                padding: `1px 1px 1px 1px",
               }}
             >
               {annotation.text || " "}
@@ -240,24 +237,22 @@ const TextAnnotationBox = memo(
                 const newText = e.target.value;
                 onChange(newText);
 
-                // Calculate width: (text.length * fontSize) - matches font size
+                // Calculate, width: (text.length * fontSize) - matches font size
                 const newWidth = Math.max(
                   annotation.fontSize,
                   (newText.length * annotation.fontSize) / 5
                 );
-                // Only update width, keep height and font size unchanged when typing
-                onSizeChange(newWidth, annotation.height);
+                // Only update width, keep height and font size unchanged when typing, onSizeChange(newWidth, annotation.height);
               }}
               onBlur={(e) => {
                 e.stopPropagation();
-                // Final width calculation on blur: (text.length * fontSize)
+                // Final width calculation on, blur: (text.length * fontSize)
                 if (annotation.text) {
                   const finalWidth = Math.max(
                     annotation.fontSize,
                     (annotation.text.length * annotation.fontSize) / 5
                   );
-                  // Only update width, keep height and font size unchanged when typing
-                  onSizeChange(finalWidth, annotation.height);
+                  // Only update width, keep height and font size unchanged when typing, onSizeChange(finalWidth, annotation.height);
                 }
                 onBlur();
               }}
@@ -267,24 +262,23 @@ const TextAnnotationBox = memo(
                 e.stopPropagation();
                 if (e.key === "Enter" || e.key === "Escape") {
                   e.preventDefault();
-                  // Final width calculation before blur: (text.length * fontSize)
+                  // Final width calculation before, blur: (text.length * fontSize)
                   if (annotation.text) {
                     const finalWidth = Math.max(
                       annotation.fontSize,
                       (annotation.text.length * annotation.fontSize) / 5
                     );
-                    // Only update width, keep height and font size unchanged when typing
-                    onSizeChange(finalWidth, annotation.height);
+                    // Only update width, keep height and font size unchanged when typing, onSizeChange(finalWidth, annotation.height);
                   }
                   onBlur();
                 }
               }}
               className="h-full border-none outline-none bg-transparent text-left"
               style={{
-                fontFamily: "'Courier New', monospace",
+                fontFamily: "'Courier New', monospace`,
                 fontSize: `${annotation.fontSize}px`,
                 color: annotation.color,
-                padding: "1px 1px 1px 1px", // 1px top/bottom, 0px left/right
+                padding: `1px 1px 1px 1px", // 1px top/bottom, 0px left/right
                 textAlign: "left",
                 width: "100%",
                 transition: "font-size 0.15s ease",
@@ -295,10 +289,10 @@ const TextAnnotationBox = memo(
           <div
             className="w-full h-full flex items-center overflow-hidden pointer-events-none text-left"
             style={{
-              fontFamily: "'Courier New', monospace",
+              fontFamily: "'Courier New', monospace`,
               fontSize: `${annotation.fontSize}px`,
               color: annotation.color,
-              padding: "1px 5px", // 1px top/bottom, 5px left/right
+              padding: `1px 5px", // 1px top/bottom, 5px left/right
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -313,7 +307,7 @@ const TextAnnotationBox = memo(
         {/* Resize Handle - only visible when editing */}
         {isEditing && (
           <div
-            className="absolute bottom-0 right-0 w-4 h-4 bg-background cursor-se-resize rounded-tl hover:bg-gray-700 transition-colors"
+            className="absolute bottom-0 right-0 w-4 h-4 bg-background cursor-se-resize rounded-tl, hover:bg-gray-700 transition-colors"
             onPointerDown={handleResizePointerDown}
             onClick={(e) => e.stopPropagation()}
           />
@@ -332,7 +326,7 @@ const TextAnnotationBox = memo(
               e.stopPropagation();
               e.preventDefault();
             }}
-            className="absolute -top-2 -right-2 bg-red-500 text-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-500/20 text-red-700 border-red-500/50 transition-colors cursor-pointer"
+            className="absolute -top-2 -right-2 bg-red-500 text-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs, hover:bg-red-500/20 text-red-700 border-red-500/50 transition-colors cursor-pointer"
             style={{
               zIndex: 1001,
               pointerEvents: "auto",
@@ -346,8 +340,7 @@ const TextAnnotationBox = memo(
     );
   },
   (prevProps, nextProps) => {
-    // Custom comparison to prevent unnecessary re-renders
-    return (
+    // Custom comparison to prevent unnecessary re-renders, return(
       prevProps.annotation.id === nextProps.annotation.id &&
       prevProps.annotation.text === nextProps.annotation.text &&
       prevProps.annotation.x === nextProps.annotation.x &&
@@ -400,15 +393,14 @@ const SignatureAnnotationBox = memo(
         e.preventDefault();
         onSelect();
         setIsDragging(true);
-        // Store initial pointer position (screen coords) and annotation position (PDF coords)
+        // Store initial pointer, position(screen coords) and annotation, position(PDF coords)
         dragStartRef.current = {
           x: e.clientX, // Initial mouse X in screen coordinates
           y: e.clientY, // Initial mouse Y in screen coordinates
           startX: annotation.x, // Initial annotation X in PDF coordinates
           startY: annotation.y, // Initial annotation Y in PDF coordinates
         };
-        // Capture pointer for smooth dragging
-        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        // Capture pointer for smooth, dragging(e.target as HTMLElement).setPointerCapture(e.pointerId);
       },
       [annotation.x, annotation.y, onSelect]
     );
@@ -424,8 +416,7 @@ const SignatureAnnotationBox = memo(
           mouseX: e.clientX,
           mouseY: e.clientY,
         };
-        // Capture pointer for smooth resizing
-        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        // Capture pointer for smooth, resizing(e.target as HTMLElement).setPointerCapture(e.pointerId);
       },
       [annotation.width, annotation.height]
     );
@@ -442,11 +433,11 @@ const SignatureAnnotationBox = memo(
           // Convert screen delta to PDF coordinates
           const pdfDeltaX = deltaX / scale;
           const pdfDeltaY = deltaY / scale;
-          // Add delta to initial PDF position for pixel-perfect 1:1 movement
+          // Add delta to initial PDF position for pixel-perfect, 1:1 movement
           const newX = dragStartRef.current.startX + pdfDeltaX;
           const newY = dragStartRef.current.startY + pdfDeltaY;
           onPositionChange(newX, newY);
-        } else if (isResizing) {
+        } else, if(isResizing) {
           // Instant resize - direct delta calculation
           const deltaX = e.clientX - resizeStartRef.current.mouseX;
           const deltaY = e.clientY - resizeStartRef.current.mouseY;
@@ -483,7 +474,7 @@ const SignatureAnnotationBox = memo(
           !isDragging && "transition-all duration-200", // Only transition when not dragging
           isSelected
             ? "border-2 border-black bg-white/5 shadow-lg cursor-move"
-            : "border-0 bg-transparent hover:border hover:border-gray-300 hover:bg-white/5 cursor-move"
+            : "border-0 bg-transparent, hover:border, hover:border-gray-300, hover:bg-white/5 cursor-move`
         )}
         style={{
           left: `${annotation.x * scale}px`,
@@ -491,7 +482,7 @@ const SignatureAnnotationBox = memo(
           width: `${annotation.width * scale}px`,
           height: `${annotation.height * scale}px`,
           zIndex: isSelected ? 1000 : 999,
-          padding: "1px",
+          padding: `1px",
           transition: isDragging ? "none" : undefined, // Disable transition during drag for instant movement
         }}
         onPointerDown={handlePointerDown}
@@ -519,7 +510,7 @@ const SignatureAnnotationBox = memo(
               e.preventDefault();
               onRemove();
             }}
-            className="absolute -top-2 -right-2 bg-red-500 text-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-500/20 text-red-700 border-red-500/50 transition-colors z-10"
+            className="absolute -top-2 -right-2 bg-red-500 text-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs, hover:bg-red-500/20 text-red-700 border-red-500/50 transition-colors z-10"
             title="Remove signature"
           >
             <X className="w-3 h-3" />
@@ -529,7 +520,7 @@ const SignatureAnnotationBox = memo(
         {/* Resize Handle - only visible when selected */}
         {isSelected && (
           <div
-            className="absolute bottom-0 right-0 w-4 h-4 bg-background cursor-se-resize rounded-tl hover:bg-gray-700 transition-colors"
+            className="absolute bottom-0 right-0 w-4 h-4 bg-background cursor-se-resize rounded-tl, hover:bg-gray-700 transition-colors"
             onPointerDown={handleResizePointerDown}
             onClick={(e) => e.stopPropagation()}
           />
@@ -654,8 +645,7 @@ const PDFPageWithAnnotations = memo(
     );
   },
   (prevProps, nextProps) => {
-    // Custom comparison function - only re-render if these specific props change
-    return (
+    // Custom comparison function - only re-render if these specific props change, return(
       prevProps.pageNumber === nextProps.pageNumber &&
       prevProps.scale === nextProps.scale &&
       prevProps.editingTextId === nextProps.editingTextId &&
@@ -669,7 +659,7 @@ const PDFPageWithAnnotations = memo(
 
 PDFPageWithAnnotations.displayName = "PDFPageWithAnnotations";
 
-export function PDFEditor({
+export function, PDFEditor({
   pdfUrl,
   onSign,
   contractId,
@@ -702,7 +692,7 @@ export function PDFEditor({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pdfDocRef = useRef<PDFDocument | null>(null);
 
-  // Memoize Document options to prevent reloads (fixes the warning and reload issue)
+  // Memoize Document options to prevent, reloads(fixes the warning and reload issue)
   const documentOptions = useMemo(
     () => ({
       cMapPacked: true,
@@ -738,7 +728,7 @@ export function PDFEditor({
     setEditingTextId(null);
   }, []);
 
-  // Handle text position change (drag)
+  // Handle text position, change(drag)
   const handleTextPositionChange = useCallback(
     (annotationId: string, x: number, y: number) => {
       setTextAnnotations((prev) =>
@@ -748,13 +738,13 @@ export function PDFEditor({
     []
   );
 
-  // Handle text size change (resize) - font size controlled by height only
+  // Handle text size, change(resize) - font size controlled by height only
   const handleTextSizeChange = useCallback(
     (annotationId: string, width: number, height: number) => {
       setTextAnnotations((prev) =>
         prev.map((ann) => {
           if (ann.id === annotationId) {
-            // If only width changed (typing), preserve font size and height
+            // If only width, changed(typing), preserve font size and height
             const heightChanged = Math.abs(height - ann.height) > 0.1;
             const widthOnlyChange =
               !heightChanged && Math.abs(width - ann.width) > 0.1;
@@ -764,7 +754,7 @@ export function PDFEditor({
               return { ...ann, width };
             }
 
-            // Height changed: calculate font size from height
+            // Height, changed: calculate font size from height
             // Font size = height - 2px (subtract padding)
             const newFontSize = Math.max(
               12,
@@ -793,7 +783,7 @@ export function PDFEditor({
     setSelectedSignatureId(null);
   }, []);
 
-  // Handle signature position change (drag)
+  // Handle signature position, change(drag)
   const handleSignaturePositionChange = useCallback(
     (annotationId: string, x: number, y: number) => {
       setSignatureAnnotations((prev) =>
@@ -803,7 +793,7 @@ export function PDFEditor({
     []
   );
 
-  // Handle signature size change (resize)
+  // Handle signature size, change(resize)
   const handleSignatureSizeChange = useCallback(
     (annotationId: string, width: number, height: number) => {
       setSignatureAnnotations((prev) =>
@@ -815,12 +805,10 @@ export function PDFEditor({
     []
   );
 
-  // Set initial scale to fit width on mount
-  useEffect(() => {
+  // Set initial scale to fit width on mount, useEffect(() => {
     if (containerRef.current) {
       const containerWidth = containerRef.current.clientWidth - 64;
-      const calculatedScale = containerWidth / 612; // Standard PDF page width
-      setScale(calculatedScale);
+      const calculatedScale = containerWidth / 612; // Standard PDF page width, setScale(calculatedScale);
     }
   }, []);
 
@@ -830,20 +818,20 @@ export function PDFEditor({
   };
 
   const onDocumentLoadError = (error: Error) => {
-    console.error("PDF load error:", error);
+    console.error("PDF load, error:", error);
     setPdfError(error.message);
   };
 
   // Text tool - simplified (no modal, direct placement)
   const handleTextClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, pageNum: number) => {
-      if (tool !== "text") return;
+      if (tool !== "text`) return;
 
       const rect = e.currentTarget.getBoundingClientRect();
       const x = (e.clientX - rect.left) / scale - 20;
       const y = (e.clientY - rect.top) / scale - 10;
 
-      // Initial state: 20px width (1 char), 22px height (20px font + 2px padding), 20px font
+      // Initial, state: 20px, width(1 char), 22px, height(20px font + 2px padding), 20px font
       const initialWidth = 30; // One character at 20px font
       const initialFontSize = 30; // 20px font size fixed
       const initialHeight = initialFontSize; // Font size + 2px padding = 22px
@@ -852,7 +840,7 @@ export function PDFEditor({
         id: `text-${Date.now()}`,
         x,
         y,
-        text: "",
+        text: `",
         width: initialWidth,
         height: initialHeight,
         page: pageNum,
@@ -886,20 +874,20 @@ export function PDFEditor({
       e.stopPropagation();
 
       const rect = e.currentTarget.getBoundingClientRect();
-      // Adjust position to match cursor hotspot (20, 40)
+      // Adjust position to match cursor, hotspot(20, 40)
       const x = (e.clientX - rect.left) / scale - 20;
       const y = (e.clientY - rect.top) / scale - 40;
 
-      console.log("✅ Creating signature at", { x, y, pageNum, scale });
+      console.log(`✅ Creating signature at`, { x, y, pageNum, scale });
 
       // Create a temporary image to get actual dimensions
-      const img = new Image();
+      const img = new, Image();
       img.src = pendingSignature;
 
       // Wait for image to load to get proper dimensions
       img.onload = () => {
         const aspectRatio = img.width / img.height;
-        const width = 100; // Fixed width: 100px
+        const width = 100; // Fixed, width: 100px
         const height = width / aspectRatio; // Auto height to maintain aspect ratio
 
         const newSignature: SignatureAnnotation = {
@@ -913,12 +901,10 @@ export function PDFEditor({
         };
 
         setSignatureAnnotations((prev) => [...prev, newSignature]);
-        // DO NOT select the signature after placement - keeps it clean
-        setSelectedSignatureId(null);
+        // DO NOT select the signature after placement - keeps it clean, setSelectedSignatureId(null);
 
-        // Show success toast with smooth animation
-        toast({
-          title: "✅ Signature added",
+        // Show success toast with smooth animation, toast({
+          title: `✅ Signature added`,
           description: "Your signature has been placed on the document.",
           duration: 2000,
           className: "bg-primary text-[#1a1a1a] border-primary",
@@ -927,7 +913,7 @@ export function PDFEditor({
         console.log("✅ Signature placed successfully - no selection border!");
       };
 
-      // Clear state immediately (don't wait for image load)
+      // Clear state, immediately(don't wait for image load)
       setPendingSignature(null);
       setSignaturePlacementMode(false);
       setTool("select");
@@ -939,22 +925,20 @@ export function PDFEditor({
   // Signature modal handlers
   const handleDrawSignature = () => {
     if (signatureCanvasRef.current && !signatureCanvasRef.current.isEmpty()) {
-      // Export with transparent background (PNG with transparency)
+      // Export with transparent, background(PNG with transparency)
       const signatureDataURL =
         signatureCanvasRef.current.toDataURL("image/png");
       console.log("✅ Draw signature confirmed - transparent PNG created");
 
-      // Set pending signature FIRST
-      setPendingSignature(signatureDataURL);
+      // Set pending signature FIRST, setPendingSignature(signatureDataURL);
       setSignaturePlacementMode(true);
       setTool("signature"); // Special tool mode for signature placement
 
-      // Set cursor to crosshair (plus cursor) - professional and clean
+      // Set cursor to, crosshair(plus cursor) - professional and clean
       document.body.style.cursor = "crosshair";
-      console.log("✅ Cursor set to crosshair (plus)");
+      console.log("✅ Cursor set to, crosshair(plus)");
 
-      // Close modal after state is set
-      setTimeout(() => {
+      // Close modal after state is set, setTimeout(() => {
         setSignatureModalOpen(false);
         console.log("✅ Modal closed - ready to place signature");
       }, 50); // Small delay to ensure state updates
@@ -979,24 +963,22 @@ export function PDFEditor({
         canvas.width = textWidth + 40; // 20px padding on each side
         canvas.height = textHeight + 20; // 10px padding top/bottom
 
-        // Redraw with proper font (context resets after size change)
+        // Redraw with proper, font(context resets after size change)
         ctx.font = "italic 48px 'Brush Script MT', 'Dancing Script', cursive";
         ctx.fillStyle = "#000000";
         ctx.textBaseline = "middle";
         ctx.fillText(typedSignature, 20, canvas.height / 2);
         const signatureDataURL = canvas.toDataURL("image/png"); // PNG with transparency
 
-        // Set pending signature FIRST
-        setPendingSignature(signatureDataURL);
+        // Set pending signature FIRST, setPendingSignature(signatureDataURL);
         setSignaturePlacementMode(true);
         setTool("signature"); // Special tool mode for signature placement
 
-        // Set cursor to crosshair (plus cursor) - professional and clean
+        // Set cursor to, crosshair(plus cursor) - professional and clean
         document.body.style.cursor = "crosshair";
-        console.log("✅ Cursor set to crosshair (plus)");
+        console.log("✅ Cursor set to, crosshair(plus)");
 
-        // Close modal after state is set
-        setTimeout(() => {
+        // Close modal after state is set, setTimeout(() => {
           setSignatureModalOpen(false);
           console.log("✅ Modal closed - ready to place signature");
         }, 50);
@@ -1007,23 +989,21 @@ export function PDFEditor({
   const handleUploadSignature = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
+      const reader = new, FileReader();
       reader.onload = (event) => {
         const signatureDataURL = event.target?.result as string;
         console.log("✅ Upload signature confirmed");
 
-        // Set pending signature FIRST
-        setSignatureImage(signatureDataURL);
+        // Set pending signature FIRST, setSignatureImage(signatureDataURL);
         setPendingSignature(signatureDataURL);
         setSignaturePlacementMode(true);
         setTool("signature"); // Special tool mode for signature placement
 
-        // Set cursor to crosshair (plus cursor) - professional and clean
+        // Set cursor to, crosshair(plus cursor) - professional and clean
         document.body.style.cursor = "crosshair";
-        console.log("✅ Cursor set to crosshair (plus)");
+        console.log("✅ Cursor set to, crosshair(plus)");
 
-        // Close modal after state is set
-        setTimeout(() => {
+        // Close modal after state is set, setTimeout(() => {
           setSignatureModalOpen(false);
           console.log("✅ Modal closed - ready to place signature");
         }, 50);
@@ -1035,7 +1015,7 @@ export function PDFEditor({
   // Download PDF with annotations
   const handleDownload = async () => {
     try {
-      const response = await fetch(pdfUrl);
+      const response = await, fetch(pdfUrl);
       const arrayBuffer = await response.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
       pdfDocRef.current = pdfDoc;
@@ -1043,8 +1023,7 @@ export function PDFEditor({
       const pages = pdfDoc.getPages();
       const helveticaFont = await pdfDoc.embedFont("Helvetica");
 
-      // Add text annotations
-      for (const annotation of textAnnotations) {
+      // Add text annotations, for(const annotation of textAnnotations) {
         const page = pages[annotation.page - 1];
         if (page) {
           try {
@@ -1062,13 +1041,12 @@ export function PDFEditor({
               color: rgb(r, g, b),
             });
           } catch (error) {
-            console.error("Error adding text annotation:", error);
+            console.error("Error adding text, annotation:", error);
           }
         }
       }
 
-      // Add signature annotations
-      for (const annotation of signatureAnnotations) {
+      // Add signature annotations, for(const annotation of signatureAnnotations) {
         const page = pages[annotation.page - 1];
         if (page) {
           try {
@@ -1085,7 +1063,7 @@ export function PDFEditor({
                 width: annotation.width,
                 height: annotation.height,
               });
-            } else if (
+            } else, if(
               annotation.imageData.startsWith("data:image/jpeg") ||
               annotation.imageData.startsWith("data:image/jpg")
             ) {
@@ -1103,13 +1081,13 @@ export function PDFEditor({
               });
             }
           } catch (error) {
-            console.error("Error adding signature annotation:", error);
+            console.error("Error adding signature, annotation:", error);
           }
         }
       }
 
       const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([new Uint8Array(pdfBytes)], {
+      const blob = new, Blob([new, Uint8Array(pdfBytes)], {
         type: "application/pdf",
       });
       const url = URL.createObjectURL(blob);
@@ -1119,7 +1097,7 @@ export function PDFEditor({
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Download error:", error);
+      console.error("Download, error:", error);
     }
   };
 
@@ -1130,15 +1108,14 @@ export function PDFEditor({
 
   // Final sign and save
   const handleFinalSign = useCallback(async (): Promise<Blob> => {
-    const response = await fetch(pdfUrl);
+    const response = await, fetch(pdfUrl);
     const arrayBuffer = await response.arrayBuffer();
     const pdfDoc = await PDFDocument.load(arrayBuffer);
 
     const pages = pdfDoc.getPages();
     const helveticaFont = await pdfDoc.embedFont("Helvetica");
 
-    // Add all text annotations
-    for (const annotation of textAnnotations) {
+    // Add all text annotations, for(const annotation of textAnnotations) {
       const page = pages[annotation.page - 1];
       if (page) {
         try {
@@ -1156,13 +1133,12 @@ export function PDFEditor({
             color: rgb(r, g, b),
           });
         } catch (error) {
-          console.error("Error adding text annotation:", error);
+          console.error("Error adding text, annotation:", error);
         }
       }
     }
 
-    // Add all signature annotations
-    for (const annotation of signatureAnnotations) {
+    // Add all signature annotations, for(const annotation of signatureAnnotations) {
       const page = pages[annotation.page - 1];
       if (page) {
         try {
@@ -1181,7 +1157,7 @@ export function PDFEditor({
               width: annotation.width,
               height: annotation.height,
             });
-          } else if (
+          } else, if(
             annotation.imageData.startsWith("data:image/jpeg") ||
             annotation.imageData.startsWith("data:image/jpg")
           ) {
@@ -1199,37 +1175,34 @@ export function PDFEditor({
             });
           }
         } catch (error) {
-          console.error("Error adding signature annotation:", error);
+          console.error("Error adding signature, annotation:", error);
         }
       }
     }
 
     const pdfBytes = await pdfDoc.save();
-    return new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
+    return new, Blob([new, Uint8Array(pdfBytes)], { type: "application/pdf" });
   }, [textAnnotations, signatureAnnotations, pdfUrl]);
 
-  // Expose handleFinalSign to parent
-  useEffect(() => {
+  // Expose handleFinalSign to parent, useEffect(() => {
     if (onSignReady) {
       onSignReady(handleFinalSign);
     }
   }, [handleFinalSign, onSignReady]);
 
-  // Maintain cursor state during signature placement mode
-  useEffect(() => {
+  // Maintain cursor state during signature placement mode, useEffect(() => {
     if (signaturePlacementMode && pendingSignature) {
-      // Set cursor to crosshair (plus cursor) for professional placement
+      // Set cursor to, crosshair(plus cursor) for professional placement
       document.body.style.cursor = "crosshair";
       console.log("🖱️ Cursor set to crosshair");
-    } else if (tool === "text") {
+    } else, if(tool === "text") {
       document.body.style.cursor = "crosshair";
     } else {
       document.body.style.cursor = "default";
     }
   }, [signaturePlacementMode, pendingSignature, tool]);
 
-  // Cleanup cursor on unmount
-  useEffect(() => {
+  // Cleanup cursor on unmount, useEffect(() => {
     return () => {
       document.body.style.cursor = "default";
     };
@@ -1239,8 +1212,7 @@ export function PDFEditor({
     <div
       className="relative w-full h-full bg-gray-100"
       onClick={(e) => {
-        // Deselect annotations when clicking on empty space
-        if (e.target === e.currentTarget) {
+        // Deselect annotations when clicking on empty space, if(e.target === e.currentTarget) {
           setEditingTextId(null);
           setSelectedSignatureId(null);
           console.log("✅ Deselected all annotations - clicked empty space");
@@ -1272,7 +1244,7 @@ export function PDFEditor({
               onClick={() => {
                 setTool("select");
               }}
-              className="ml-2 h-6 w-6 p-0 hover:bg-card/10"
+              className="ml-2 h-6 w-6 p-0, hover:bg-card/10"
             >
               <X className="w-3 h-3" />
             </Button>
@@ -1294,7 +1266,7 @@ export function PDFEditor({
                 setTool("select");
                 document.body.style.cursor = "default";
               }}
-              className="ml-2 h-6 w-6 p-0 hover:bg-card/10"
+              className="ml-2 h-6 w-6 p-0, hover:bg-card/10"
             >
               <X className="w-3 h-3" />
             </Button>
@@ -1315,7 +1287,7 @@ export function PDFEditor({
                 ? "bg-primary text-[#1a1a1a]"
                 : "text-[#EAEB80] hover:bg-primary/20"
             )}
-            title="Add Text (Click to activate, then click on PDF)"
+            title="Add, Text(Click to activate, then click on PDF)"
           >
             <Type className="w-4 h-4" />
           </Button>
@@ -1352,7 +1324,7 @@ export function PDFEditor({
       >
         {pdfError ? (
           <div className="flex items-center justify-center h-full text-red-500">
-            <p>Failed to load PDF: {pdfError}</p>
+            <p>Failed to load, PDF: {pdfError}</p>
           </div>
         ) : (
           <div
@@ -1363,7 +1335,7 @@ export function PDFEditor({
                   ? "crosshair"
                   : tool === "text"
                   ? "crosshair"
-                  : "default",
+                  : "default`,
             }}
           >
             <Document
@@ -1372,7 +1344,7 @@ export function PDFEditor({
               onLoadError={onDocumentLoadError}
               options={documentOptions}
             >
-              {Array.from(new Array(numPages), (el, index) => {
+              {Array.from(new, Array(numPages), (el, index) => {
                 const pageNumber = index + 1;
                 return (
                   <PDFPageWithAnnotations
@@ -1395,28 +1367,26 @@ export function PDFEditor({
                     onSignaturePositionChange={handleSignaturePositionChange}
                     onSignatureSizeChange={handleSignatureSizeChange}
                     onPageClick={(e) => {
-                      console.log("Page clicked", {
+                      console.log(`Page clicked", {
                         signaturePlacementMode,
                         tool,
                         pageNumber,
                       });
                       setSelectedSignatureId(null);
 
-                      // Check if clicked on empty space (not on annotation)
+                      // Check if clicked on empty, space(not on annotation)
                       const target = e.target as HTMLElement;
                       const clickedOnAnnotation =
                         target.closest(".annotation-box");
 
                       if (!clickedOnAnnotation) {
-                        // Clicked on empty PDF space
-                        if (signaturePlacementMode) {
+                        // Clicked on empty PDF space, if(signaturePlacementMode) {
                           console.log("Calling handleSignatureClick");
                           handleSignatureClick(e, pageNumber);
-                        } else if (tool === "text") {
+                        } else, if(tool === "text") {
                           handleTextClick(e, pageNumber);
                         } else {
-                          // Deselect all when clicking empty space in select mode
-                          setEditingTextId(null);
+                          // Deselect all when clicking empty space in select mode, setEditingTextId(null);
                           console.log(
                             "✅ Deselected all - clicked empty PDF space"
                           );
@@ -1437,15 +1407,13 @@ export function PDFEditor({
         open={signatureModalOpen}
         onOpenChange={(open) => {
           // Only handle opening the modal, not closing
-          // When closing via "Use This Signature", the handlers already close it
-          if (open) {
+          // When closing via "Use This Signature", the handlers already close it, if(open) {
             setSignatureModalOpen(true);
           } else {
             // Only close if we're not in placement mode
             // (placement mode means user clicked "Use This Signature")
             setTimeout(() => {
-              // Use setTimeout to check state after signature handlers have run
-              if (!signaturePlacementMode) {
+              // Use setTimeout to check state after signature handlers have run, if(!signaturePlacementMode) {
                 setSignatureModalOpen(false);
                 // Clear the signature canvas when closing without confirming
                 signatureCanvasRef.current?.clear();
@@ -1579,8 +1547,7 @@ export function PDFEditor({
                     variant="outline"
                     onClick={() => {
                       signatureCanvasRef.current?.clear();
-                      // Also clear any pending signature state
-                      setPendingSignature(null);
+                      // Also clear any pending signature state, setPendingSignature(null);
                       setSignaturePlacementMode(false);
                       document.body.style.cursor = "default";
                     }}

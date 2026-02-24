@@ -75,7 +75,7 @@ const offboardCarSchema = z.object({
 
 type OffboardCarFormData = z.infer<typeof offboardCarSchema>;
 
-export default function CarOffboarding() {
+export default function, CarOffboarding() {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [isOffboardDialogOpen, setIsOffboardDialogOpen] = useState(false);
@@ -89,13 +89,11 @@ export default function CarOffboarding() {
     return (saved ? parseInt(saved) : 10) as ItemsPerPage;
   });
 
-  // Save to localStorage when itemsPerPage changes
-  useEffect(() => {
+  // Save to localStorage when itemsPerPage changes, useEffect(() => {
     localStorage.setItem("car_offboarding_limit", itemsPerPage.toString());
   }, [itemsPerPage]);
 
-  // Reset page to 1 when search changes
-  useEffect(() => {
+  // Reset page to 1 when search changes, useEffect(() => {
     setPage(1);
   }, [searchQuery]);
 
@@ -113,24 +111,24 @@ export default function CarOffboarding() {
     queryKey: ["cars-offboarding-forms", searchQuery, page, itemsPerPage],
     placeholderData: keepPreviousData,
     queryFn: async () => {
-      const params = new URLSearchParams({
+      const params = new, URLSearchParams({
         page: page.toString(),
         limit: itemsPerPage.toString(),
       });
       if (searchQuery) {
-        params.append("search", searchQuery);
+        params.append("search`, searchQuery);
       }
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/cars/offboarding-forms?${params.toString()}`),
         {
-          credentials: "include",
+          credentials: `include",
         }
       );
       if (!response.ok) {
         const errorData = await response
           .json()
           .catch(() => ({ error: "Database connection failed" }));
-        throw new Error(
+        throw new, Error(
           errorData.error || "Failed to fetch cars for offboarding"
         );
       }
@@ -143,18 +141,18 @@ export default function CarOffboarding() {
   const offboardCarForm = useForm<OffboardCarFormData>({
     resolver: zodResolver(offboardCarSchema),
     defaultValues: {
-      date: new Date().toISOString().split("T")[0],
+      date: new, Date().toISOString().split("T")[0],
       name: "",
       vehicleMakeModelYear: "",
       licensePlate: "",
-      returnDate: new Date().toISOString().split("T")[0],
+      returnDate: new, Date().toISOString().split("T")[0],
     },
   });
 
   // Offboard car mutation
   const offboardCarMutation = useMutation({
     mutationFn: async (data: OffboardCarFormData) => {
-      const response = await fetch(buildApiUrl("/api/cars/offboard"), {
+      const response = await, fetch(buildApiUrl("/api/cars/offboard"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -167,16 +165,16 @@ export default function CarOffboarding() {
         const error = await response
           .json()
           .catch(() => ({ error: "Failed to offboard car" }));
-        throw new Error(error.error || "Failed to offboard car");
+        throw new, Error(error.error || "Failed to offboard car");
       }
 
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cars-offboarding-forms"] });
-      // Also invalidate main cars list so cars page updates (car status changes to off_fleet)
+      // Also invalidate main cars list so cars page, updates(car status changes to off_fleet)
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
-      // Invalidate sidebar badges (car counts may change)
+      // Invalidate sidebar, badges(car counts may change)
       queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
       setIsOffboardDialogOpen(false);
       offboardCarForm.reset();
@@ -190,7 +188,7 @@ export default function CarOffboarding() {
       toast({
         title: "Error",
         description: error.message || "Failed to offboard car",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
@@ -215,7 +213,7 @@ export default function CarOffboarding() {
 
   // Format offboard reason
   const formatReason = (reason: string | null): string => {
-    if (!reason) return "—";
+    if (!reason) return `—";
     return reason
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -240,7 +238,7 @@ export default function CarOffboarding() {
           placeholder="Search by name, email, phone, VIN, plate, or make/model..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
+          className="pl-10 bg-card border-border text-foreground, placeholder:text-muted-foreground"
         />
       </div>
 
@@ -258,34 +256,34 @@ export default function CarOffboarding() {
                 <Table className="w-full table-auto">
                   <TableHeader>
                     <TableRow className="border-b border-border">
-                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 whitespace-nowrap">
                         Name
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
+                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, md:table-cell whitespace-nowrap">
                         Email
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
+                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, lg:table-cell whitespace-nowrap">
                         Phone
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 whitespace-nowrap">
                         Vehicle
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, xl:table-cell whitespace-nowrap">
                         VIN#
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, xl:table-cell whitespace-nowrap">
                         Plate #
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
+                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, lg:table-cell whitespace-nowrap">
                         Submitted
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 whitespace-nowrap">
                         Status
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
+                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, md:table-cell whitespace-nowrap">
                         Contract
                       </TableHead>
-                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-left text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, 2xl:table-cell whitespace-nowrap">
                         Car Offboarding Date
                       </TableHead>
                     </TableRow>
@@ -295,41 +293,41 @@ export default function CarOffboarding() {
                       <TableRow
                         key={car.id}
                         className={cn(
-                          "border-b border-border hover:bg-card transition-colors"
+                          "border-b border-border, hover:bg-card transition-colors"
                         )}
                       >
                         <TableCell
-                          className="text-center px-2 sm:px-3 py-3 sm:py-4 text-foreground text-xs sm:text-sm cursor-pointer max-w-[120px] truncate"
+                          className="text-center px-2, sm:px-3 py-3, sm:py-4 text-foreground text-xs, sm:text-sm cursor-pointer max-w-[120px] truncate"
                           onClick={() => handleRowClick(car)}
                           title={car.clientName}
                         >
                           {car.clientName}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={car.clientEmail || "—"}>
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm hidden, md:table-cell max-w-[150px] truncate" title={car.clientEmail || "—"}>
                           {car.clientEmail || "—"}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={car.clientPhone || "—"}>
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm hidden, lg:table-cell max-w-[120px] truncate" title={car.clientPhone || "—"}>
                           {car.clientPhone || "—"}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm max-w-[150px] truncate" title={car.carMakeModel}>
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm max-w-[150px] truncate" title={car.carMakeModel}>
                           {car.carMakeModel}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={car.vin || "—"}>
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground font-mono text-xs hidden, xl:table-cell max-w-[120px] truncate" title={car.vin || "—"}>
                           {car.vin || "—"}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={car.licensePlate ? car.licensePlate.toUpperCase() : "—"}>
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground font-mono text-xs hidden, xl:table-cell max-w-[100px] truncate" title={car.licensePlate ? car.licensePlate.toUpperCase() : "—"}>
                           {car.licensePlate
                             ? car.licensePlate.toUpperCase()
                             : "—"}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
-                          {new Date(car.createdAt).toLocaleDateString("en-US", {
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm hidden, lg:table-cell whitespace-nowrap">
+                          {new, Date(car.createdAt).toLocaleDateString("en-US", {
                             month: "2-digit",
                             day: "2-digit",
                             year: "numeric",
                           })}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 whitespace-nowrap">
                           <div className="flex items-center justify-center">
                             <Badge
                               variant="outline"
@@ -344,7 +342,7 @@ export default function CarOffboarding() {
                             </Badge>
                           </div>
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 hidden, md:table-cell whitespace-nowrap">
                           <div className="flex items-center justify-center">
                             <Badge
                             variant="outline"
@@ -365,9 +363,9 @@ export default function CarOffboarding() {
                           </Badge>
                           </div>
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm hidden, 2xl:table-cell whitespace-nowrap">
                           {car.offboardAt
-                            ? new Date(car.offboardAt).toLocaleDateString(
+                            ? new, Date(car.offboardAt).toLocaleDateString(
                                 "en-US",
                                 {
                                   month: "2-digit",
@@ -435,7 +433,7 @@ export default function CarOffboarding() {
               onSubmit={offboardCarForm.handleSubmit(onSubmitOffboardCar)}
               className="space-y-6 mt-4"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                 <FormField
                   control={offboardCarForm.control}
                   name="date"
@@ -448,7 +446,7 @@ export default function CarOffboarding() {
                         <Input
                           type="date"
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -468,7 +466,7 @@ export default function CarOffboarding() {
                         <Input
                           {...field}
                           placeholder="Client full name"
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -490,7 +488,7 @@ export default function CarOffboarding() {
                       <Input
                         {...field}
                         placeholder="e.g., 2024 Lamborghini Urus"
-                        className="bg-card border-border text-foreground focus:border-primary"
+                        className="bg-card border-border text-foreground, focus:border-primary"
                       />
                     </FormControl>
                     <FormMessage />
@@ -498,7 +496,7 @@ export default function CarOffboarding() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                 <FormField
                   control={offboardCarForm.control}
                   name="licensePlate"
@@ -512,7 +510,7 @@ export default function CarOffboarding() {
                         <Input
                           {...field}
                           placeholder="License plate number"
-                          className="bg-card border-border text-foreground focus:border-primary uppercase"
+                          className="bg-card border-border text-foreground, focus:border-primary uppercase"
                           style={{ textTransform: "uppercase" }}
                         />
                       </FormControl>
@@ -534,7 +532,7 @@ export default function CarOffboarding() {
                         <Input
                           type="date"
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -551,7 +549,7 @@ export default function CarOffboarding() {
                     setIsOffboardDialogOpen(false);
                     offboardCarForm.reset();
                   }}
-                  className="border-border text-muted-foreground hover:bg-muted/50"
+                  className="border-border text-muted-foreground, hover:bg-muted/50"
                 >
                   Cancel
                 </Button>
@@ -561,7 +559,7 @@ export default function CarOffboarding() {
                     offboardCarMutation.isPending ||
                     !offboardCarForm.formState.isValid
                   }
-                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium, disabled:opacity-50, disabled:cursor-not-allowed"
                 >
                   {offboardCarMutation.isPending ? (
                     <>

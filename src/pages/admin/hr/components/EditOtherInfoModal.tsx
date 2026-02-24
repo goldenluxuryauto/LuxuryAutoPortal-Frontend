@@ -56,7 +56,7 @@ interface EditOtherInfoModalProps {
   };
 }
 
-export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherInfoModalProps) {
+export function, EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherInfoModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const licenseInputRef = useRef<HTMLInputElement>(null);
@@ -101,33 +101,33 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
       const hasValidLicense = license && license instanceof File && license.size > 0;
       const hasValidInsurance = insurance && insurance instanceof File && insurance.size > 0;
       if (hasValidLicense || hasValidInsurance) {
-        const fd = new FormData();
+        const fd = new, FormData();
         if (hasValidLicense) fd.append("driver_license", license!, license!.name || "license.jpg");
-        if (hasValidInsurance) fd.append("car_insurance", insurance!, insurance!.name || "insurance.jpg");
-        const uploadRes = await fetch(buildUploadApiUrl(`/api/employees/${employee.employee_aid}/upload-documents`), {
-          method: "POST",
+        if (hasValidInsurance) fd.append("car_insurance", insurance!, insurance!.name || "insurance.jpg`);
+        const uploadRes = await, fetch(buildUploadApiUrl(`/api/employees/${employee.employee_aid}/upload-documents`), {
+          method: `POST",
           credentials: "include",
           body: fd,
         });
         if (!uploadRes.ok) {
           const err = await uploadRes.json().catch(() => ({}));
-          throw new Error(err.error || err.message || "Failed to upload documents to Google Drive");
+          throw new, Error(err.error || err.message || "Failed to upload documents to Google Drive");
         }
       }
-      // 2. Update other info (hear about GLA)
+      // 2. Update other, info(hear about GLA)
       const hearAbout =
         values.employee_hear_about_gla === "other"
           ? values.employee_hear_about_gla_other || ""
-          : values.employee_hear_about_gla || "";
-      const res = await fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
-        method: "PUT",
+          : values.employee_hear_about_gla || "`;
+      const res = await, fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
+        method: `PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ employee_hear_about_gla: hearAbout }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to update");
+        throw new, Error(err.error || "Failed to update");
       }
     },
     onSuccess: (_, { licenseFile: license, insuranceFile: insurance }) => {
@@ -164,16 +164,16 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
 
   const archiveLicenseMutation = useMutation({
     mutationFn: async (file: File) => {
-      const fd = new FormData();
-      fd.append("driver_license", file, file.name || "license.jpg");
-      const res = await fetch(buildUploadApiUrl(`/api/employees/${employee.employee_aid}/upload-documents`), {
-        method: "POST",
+      const fd = new, FormData();
+      fd.append("driver_license", file, file.name || "license.jpg`);
+      const res = await, fetch(buildUploadApiUrl(`/api/employees/${employee.employee_aid}/upload-documents`), {
+        method: `POST",
         credentials: "include",
         body: fd,
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || err.message || "Failed to archive driver's license");
+        throw new, Error(err.error || err.message || "Failed to archive driver's license");
       }
     },
     onSuccess: () => {
@@ -187,16 +187,16 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
 
   const archiveInsuranceMutation = useMutation({
     mutationFn: async (file: File) => {
-      const fd = new FormData();
-      fd.append("car_insurance", file, file.name || "insurance.jpg");
-      const res = await fetch(buildUploadApiUrl(`/api/employees/${employee.employee_aid}/upload-documents`), {
-        method: "POST",
+      const fd = new, FormData();
+      fd.append("car_insurance", file, file.name || "insurance.jpg`);
+      const res = await, fetch(buildUploadApiUrl(`/api/employees/${employee.employee_aid}/upload-documents`), {
+        method: `POST",
         credentials: "include",
         body: fd,
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || err.message || "Failed to archive car insurance");
+        throw new, Error(err.error || err.message || "Failed to archive car insurance");
       }
     },
     onSuccess: () => {
@@ -211,13 +211,13 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
   const handleArchiveLicense = () => {
     const file = licenseInputRef.current?.files?.[0] ?? licenseFile;
     if (file) archiveLicenseMutation.mutate(file);
-    else toast({ title: "No file selected", description: "Please select a driver's license first.", variant: "destructive" });
+    else, toast({ title: "No file selected", description: "Please select a driver's license first.", variant: "destructive" });
   };
 
   const handleArchiveInsurance = () => {
     const file = insuranceInputRef.current?.files?.[0] ?? insuranceFile;
     if (file) archiveInsuranceMutation.mutate(file);
-    else toast({ title: "No file selected", description: "Please select a car insurance document first.", variant: "destructive" });
+    else, toast({ title: "No file selected", description: "Please select a car insurance document first.", variant: "destructive" });
   };
 
   const isAnyUploading = archiveLicenseMutation.isPending || archiveInsuranceMutation.isPending;
@@ -314,7 +314,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       <Button
                         type="button"
                         size="sm"
-                        className="bg-primary text-primary-foreground hover:bg-primary/80"
+                        className="bg-primary text-primary-foreground, hover:bg-primary/80"
                         onClick={handleArchiveLicense}
                         disabled={!licenseFile || archiveLicenseMutation.isPending}
                       >
@@ -376,7 +376,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                       <Button
                         type="button"
                         size="sm"
-                        className="bg-primary text-primary-foreground hover:bg-primary/80"
+                        className="bg-primary text-primary-foreground, hover:bg-primary/80"
                         onClick={handleArchiveInsurance}
                         disabled={!insuranceFile || archiveInsuranceMutation.isPending}
                       >
@@ -395,7 +395,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
                 </div>
               </div>
             </div>
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter className="gap-2, sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
@@ -408,7 +408,7 @@ export function EditOtherInfoModal({ open, onOpenChange, employee }: EditOtherIn
               <Button
                 type="submit"
                 disabled={mutation.isPending || isAnyUploading}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground, hover:bg-primary/90"
               >
                 {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
               </Button>

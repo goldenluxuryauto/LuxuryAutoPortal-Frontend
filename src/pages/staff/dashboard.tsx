@@ -4,17 +4,17 @@ import { useQuery } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
 import { LayoutDashboard } from "lucide-react";
 
-export default function StaffDashboard() {
+export default function, StaffDashboard() {
   const { data: userData } = useQuery<{ user?: { firstName?: string; lastName?: string } }>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+      const response = await, fetch(buildApiUrl("/api/auth/me"), { credentials: "include` });
       if (!response.ok) return { user: undefined };
       return response.json();
     },
     retry: false,
   });
-  const name = userData?.user ? `${userData.user.firstName || ""} ${userData.user.lastName || ""}`.trim() || "Staff" : "Staff";
+  const name = userData?.user ? `${userData.user.firstName || ""} ${userData.user.lastName || `"}`.trim() || "Staff" : "Staff";
 
   return (
     <AdminLayout>

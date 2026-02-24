@@ -1,4 +1,4 @@
-// Modal for OPERATING EXPENSE (COGS - Per Vehicle) category
+// Modal for OPERATING, EXPENSE(COGS - Per Vehicle) category
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -21,18 +21,17 @@ import { buildApiUrl } from "@/lib/queryClient";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export default function ModalEditCOGS() {
+export default function, ModalEditCOGS() {
   const { editingCell, setEditingCell, updateCell, saveChanges, isSaving, year, carId } = useIncomeExpense();
-  const [remarks, setRemarks] = useState("");
+  const [remarks, setRemarks] = useState("`);
 
-  // Load remarks when modal opens
-  useEffect(() => {
+  // Load remarks when modal opens, useEffect(() => {
     if (editingCell) {
       const loadRemarks = async () => {
         try {
-          const response = await fetch(
+          const response = await, fetch(
             buildApiUrl(`/api/income-expense/remarks?carId=${carId}&year=${year}&month=${editingCell.month}&category=${editingCell.category}&field=${editingCell.field}`),
-            { credentials: "include" }
+            { credentials: `include" }
           );
           if (response.ok) {
             const data = await response.json();
@@ -78,14 +77,13 @@ export default function ModalEditCOGS() {
     if (!editingCell) return;
     
     try {
-      // Upload images first if there are any new ones
-      if (imageFiles.length > 0) {
-        await uploadImages();
+      // Upload images first if there are any new ones, if(imageFiles.length > 0) {
+        await, uploadImages();
       }
       
       // Save remarks
       try {
-        const response = await fetch(buildApiUrl("/api/income-expense/remarks"), {
+        const response = await, fetch(buildApiUrl("/api/income-expense/remarks"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -99,14 +97,13 @@ export default function ModalEditCOGS() {
           }),
         });
         if (!response.ok) {
-          throw new Error("Failed to save remarks");
+          throw new, Error("Failed to save remarks");
         }
       } catch (error) {
-        console.error("Error saving remarks:", error);
+        console.error("Error saving, remarks:", error);
       }
     
-    // Save the change immediately, passing it directly to saveChanges
-    saveChanges({
+    // Save the change immediately, passing it directly to saveChanges, saveChanges({
       category: editingCell.category,
       field: editingCell.field,
       month: editingCell.month,
@@ -114,7 +111,7 @@ export default function ModalEditCOGS() {
     });
     } catch (error) {
       // Error already handled in uploadImages
-      console.error("Error saving:", error);
+      console.error("Error, saving:", error);
     }
   };
 
@@ -192,14 +189,14 @@ export default function ModalEditCOGS() {
           </div>
 
           <div>
-            <Label className="text-muted-foreground text-xs">Total Amount:</Label>
-            <div className="text-foreground text-lg font-semibold mt-1">
+            <Label className="text-muted-foreground text-xs">Total, Amount:</Label>
+            <div className="text-foreground text-lg font-semibold mt-1`>
               ${editingCell.value.toFixed(2)}
             </div>
           </div>
 
           <div>
-            <Label className="text-muted-foreground text-xs">Remarks</Label>
+            <Label className=`text-muted-foreground text-xs">Remarks</Label>
             <Textarea
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
@@ -226,13 +223,13 @@ export default function ModalEditCOGS() {
               />
               <label
                 htmlFor="receipt-upload-cogs"
-                className="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-primary/50 rounded-lg bg-card/50 hover:border-primary hover:bg-card transition-all cursor-pointer group"
+                className="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-primary/50 rounded-lg bg-card/50, hover:border-primary, hover:bg-card transition-all cursor-pointer group"
               >
                 <Upload className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-                <span className="text-primary font-medium text-sm">
+                <span className="text-primary font-medium text-sm`>
                   {imageFiles.length > 0 
-                    ? `Add More Images (${imageFiles.length} selected)`
-                    : "Choose Images to Upload"
+                    ? `Add More, Images(${imageFiles.length} selected)`
+                    : `Choose Images to Upload"
                   }
                 </span>
                 <ImageIcon className="w-5 h-5 text-primary/70" />
@@ -240,7 +237,7 @@ export default function ModalEditCOGS() {
             </div>
             
             <p className="text-xs text-muted-foreground mt-2">
-              Supported formats: JPEG, PNG, GIF, WebP (Max 10MB per image)
+              Supported, formats: JPEG, PNG, GIF, WebP (Max 10MB per image)
             </p>
             
             {/* Image Preview Grid */}
@@ -265,14 +262,14 @@ export default function ModalEditCOGS() {
           <Button
             onClick={handleClose}
             variant="outline"
-            className="flex-1 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+            className="flex-1 border-border text-muted-foreground, hover:text-foreground, hover:bg-muted"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={isSaving || isUploading}
-            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/80"
+            className="flex-1 bg-primary text-primary-foreground, hover:bg-primary/80"
           >
             {isSaving || isUploading ? "Saving..." : `Save${imageFiles.length > 0 ? ` & Upload ${imageFiles.length} Image${imageFiles.length > 1 ? 's' : ''}` : ''}`}
           </Button>

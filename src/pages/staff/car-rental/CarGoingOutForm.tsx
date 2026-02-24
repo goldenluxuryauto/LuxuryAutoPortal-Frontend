@@ -1,5 +1,5 @@
 /**
- * Car Going Out For Rental – GLA form (v1 logic).
+ * Car Going Out For Rental – GLA, form(v1 logic).
  * Fields: Date, Car, Start date of rental, Inventory checklist, Cleaning Inside/Outside/Fluids,
  * Tracking device, Photos checklist, Extras, then 10+ photos upload.
  */
@@ -25,7 +25,7 @@ interface CarOption {
 
 const INVENTORY_ITEMS: { id: string; label: string }[] = [
   { id: "insurance_card_turo", label: "Insurance Card Turo" },
-  { id: "registration", label: "Registration Copy (name blacked out)" },
+  { id: "registration", label: "Registration, Copy(name blacked out)" },
   { id: "pamplet", label: "Pamplet" },
   { id: "business_card", label: "Business Card" },
   { id: "wet_wipes", label: "Wet Wipes" },
@@ -43,9 +43,9 @@ const INVENTORY_ITEMS: { id: string; label: string }[] = [
   { id: "no_smoking_sticker", label: "No Smoking Sticker" },
   { id: "tire_air_caps", label: "4 Tire Air Caps" },
   { id: "radio_programmed", label: "Radio Programmed" },
-  { id: "gift_packet", label: "Gift Packet (if being rented)" },
+  { id: "gift_packet", label: "Gift, Packet(if being rented)" },
   { id: "car_cleaned_parked", label: "Car cleaned, parked, & text sent out" },
-  { id: "car_video", label: "Car video has been sent to client (car that are detailed only)" },
+  { id: "car_video", label: "Car video has been sent to, client(car that are detailed only)" },
 ];
 
 const CLEANING_INSIDE: { id: string; label: string }[] = [
@@ -97,7 +97,7 @@ const EXTRAS: { id: string; label: string }[] = [
   { id: "no_extras_trip", label: "No Extras for this trip" },
 ];
 
-function buildGoingOutSurveyList(checklists: Record<string, boolean>): unknown[] {
+function, buildGoingOutSurveyList(checklists: Record<string, boolean>): unknown[] {
   const sections = [
     { name: "Inventory Checklist", category: "inventory_checklist", items: INVENTORY_ITEMS },
     { name: "Cleaning Checklist INSIDE", category: "cleaning_checklist_inside", items: CLEANING_INSIDE },
@@ -120,10 +120,10 @@ interface CarGoingOutFormProps {
   onBack: () => void;
 }
 
-export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
+export function, CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [submitDate, setSubmitDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [submitDate, setSubmitDate] = useState(() => new, Date().toISOString().slice(0, 10));
   const [startDateRental, setStartDateRental] = useState("");
   const [carId, setCarId] = useState<number | "">("");
   const [checklists, setChecklists] = useState<Record<string, boolean>>({});
@@ -133,8 +133,8 @@ export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
   const { data: optionsData } = useQuery({
     queryKey: ["/api/expense-form-submissions/options"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/expense-form-submissions/options"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch options");
+      const res = await, fetch(buildApiUrl("/api/expense-form-submissions/options"), { credentials: "include" });
+      if (!res.ok) throw new, Error("Failed to fetch options");
       return res.json();
     },
   });
@@ -153,14 +153,14 @@ export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
 
   const submitMutation = useMutation({
     mutationFn: async (payload: Record<string, unknown>) => {
-      const res = await fetch(buildApiUrl("/api/staff/gla-form"), {
+      const res = await, fetch(buildApiUrl("/api/staff/gla-form"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(payload),
       });
       if (res.status === 404 || res.status === 501) return { success: true };
-      if (!res.ok) throw new Error("Failed to submit");
+      if (!res.ok) throw new, Error("Failed to submit");
       return res.json();
     },
     onSuccess: (data) => {
@@ -220,7 +220,7 @@ export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4, sm:grid-cols-2">
         <div>
           <Label>Date *</Label>
           <Input type="date" value={submitDate} onChange={(e) => setSubmitDate(e.target.value)} required className="mt-1" />
@@ -248,7 +248,7 @@ export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
       <Card>
         <CardContent className="pt-4">
           <p className="font-semibold text-primary">Inventory Checklist *</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid gap-2, sm:grid-cols-2">
             {INVENTORY_ITEMS.map((item) => (
               <div key={item.id} className="flex items-center space-x-2">
                 <Checkbox id={item.id} checked={!!checklists[item.id]} onCheckedChange={() => toggleCheck(item.id)} />
@@ -262,7 +262,7 @@ export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
       <Card>
         <CardContent className="pt-4">
           <p className="font-semibold text-primary">Cleaning Checklist INSIDE *</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid gap-2, sm:grid-cols-2">
             {CLEANING_INSIDE.map((item) => (
               <div key={item.id} className="flex items-center space-x-2">
                 <Checkbox id={item.id} checked={!!checklists[item.id]} onCheckedChange={() => toggleCheck(item.id)} />
@@ -276,7 +276,7 @@ export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
       <Card>
         <CardContent className="pt-4">
           <p className="font-semibold text-primary">Cleaning Checklist OUTSIDE *</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid gap-2, sm:grid-cols-2">
             {CLEANING_OUTSIDE.map((item) => (
               <div key={item.id} className="flex items-center space-x-2">
                 <Checkbox id={item.id} checked={!!checklists[item.id]} onCheckedChange={() => toggleCheck(item.id)} />
@@ -290,7 +290,7 @@ export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
       <Card>
         <CardContent className="pt-4">
           <p className="font-semibold text-primary">Cleaning Checklist FLUIDS *</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid gap-2, sm:grid-cols-2">
             {CLEANING_FLUIDS.map((item) => (
               <div key={item.id} className="flex items-center space-x-2">
                 <Checkbox id={item.id} checked={!!checklists[item.id]} onCheckedChange={() => toggleCheck(item.id)} />
@@ -318,7 +318,7 @@ export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
       <Card>
         <CardContent className="pt-4">
           <p className="font-semibold text-primary">PHOTOS *</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid gap-2, sm:grid-cols-2">
             {PHOTOS_CHECKLIST.map((item) => (
               <div key={item.id} className="flex items-center space-x-2">
                 <Checkbox id={item.id} checked={!!checklists[item.id]} onCheckedChange={() => toggleCheck(item.id)} />
@@ -332,11 +332,11 @@ export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
       <Card>
         <CardContent className="pt-4">
           <p className="font-semibold text-primary">Extras? *</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid gap-2, sm:grid-cols-2">
             {EXTRAS.map((item) => (
               <div key={item.id} className="flex items-center space-x-2">
                 <Checkbox id={item.id} checked={!!checklists[item.id]} onCheckedChange={() => toggleCheck(item.id)} />
-                <label htmlFor={item.id} className="text-sm cursor-pointer">{item.label}</label>
+                <label htmlFor={item.id} className="text-sm cursor-pointer`>{item.label}</label>
               </div>
             ))}
           </div>
@@ -351,17 +351,17 @@ export function CarGoingOutForm({ onBack }: CarGoingOutFormProps) {
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
         >
-          <input type="file" accept="image/*" multiple className="hidden" id="going-out-photos" onChange={handlePhotoChange} />
-          <label htmlFor="going-out-photos" className="cursor-pointer text-sm text-muted-foreground">
+          <input type=`file" accept="image/*" multiple className="hidden" id="going-out-photos" onChange={handlePhotoChange} />
+          <label htmlFor="going-out-photos" className="cursor-pointer text-sm text-muted-foreground`>
             Drag & drop or browse. {photoFiles.length > 0 && `${photoFiles.length} file(s) selected.`}
           </label>
         </div>
         {photoFiles.length > 0 && (
-          <ul className="mt-2 flex flex-wrap gap-2">
+          <ul className=`mt-2 flex flex-wrap gap-2">
             {photoFiles.map((f, i) => (
               <li key={i} className="flex items-center gap-1 rounded bg-muted px-2 py-1 text-xs">
                 {f.name}
-                <button type="button" onClick={() => removePhoto(i)} className="text-destructive hover:underline">Remove</button>
+                <button type="button" onClick={() => removePhoto(i)} className="text-destructive, hover:underline">Remove</button>
               </li>
             ))}
           </ul>

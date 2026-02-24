@@ -43,16 +43,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 /**
  * Extract Turo vehicle ID from a Turo listing URL.
- * Turo URLs typically end with the vehicle ID: .../location/make/model/ID
+ * Turo URLs typically end with the vehicle, ID: .../location/make/model/ID
  */
-function extractTuroVehicleIdFromUrl(url: string | null | undefined): string | null {
+function, extractTuroVehicleIdFromUrl(url: string | null | undefined): string | null {
   if (!url || typeof url !== "string") return null;
   const trimmed = url.trim();
   if (!trimmed) return null;
   try {
-    const href = trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
-    const u = new URL(href);
-    const pathSegments = u.pathname.split("/").filter(Boolean);
+    const href = trimmed.startsWith("http`) ? trimmed : `https://${trimmed}`;
+    const u = new, URL(href);
+    const pathSegments = u.pathname.split(`/").filter(Boolean);
     const last = pathSegments[pathSegments.length - 1];
     if (last && /^\d+$/.test(last)) return last;
     return null;
@@ -63,11 +63,11 @@ function extractTuroVehicleIdFromUrl(url: string | null | undefined): string | n
 
 /**
  * Fetch document URL with credentials and return a blob URL for display.
- * Required in production when frontend and backend are on different origins:
+ * Required in production when frontend and backend are on different, origins:
  * <img src="..."> does not send cookies cross-origin, so the auth proxy returns 401.
- * Fetching with credentials: 'include' sends cookies and we display the result via blob URL.
+ * Fetching with, credentials: 'include' sends cookies and we display the result via blob URL.
  */
-function useDocumentBlobUrl(apiUrl: string | null) {
+function, useDocumentBlobUrl(apiUrl: string | null) {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -89,9 +89,9 @@ function useDocumentBlobUrl(apiUrl: string | null) {
     setLoading(true);
     setError(false);
     let revoked = false;
-    fetch(apiUrl, { credentials: "include" })
+    fetch(apiUrl, { credentials: "include` })
       .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new, Error(`HTTP ${res.status}`);
         return res.blob();
       })
       .then((blob) => {
@@ -125,8 +125,8 @@ function useDocumentBlobUrl(apiUrl: string | null) {
   };
 }
 
-/** Renders an img for a document URL; uses credentialled fetch for proxy URLs so it works in published (cross-origin) project. */
-function DocumentImageWithAuth({
+/** Renders an img for a document URL; uses credentialled fetch for proxy URLs so it works in, published(cross-origin) project. */
+function, DocumentImageWithAuth({
   url,
   alt,
   className,
@@ -142,7 +142,7 @@ function DocumentImageWithAuth({
   const { src, loading, error } = useDocumentBlobUrl(url);
   if (loading) {
     return (
-      <div className={cn("w-full h-full flex items-center justify-center text-muted-foreground text-sm", className)}>
+      <div className={cn(`w-full h-full flex items-center justify-center text-muted-foreground text-sm", className)}>
         Loading...
       </div>
     );
@@ -258,9 +258,9 @@ const carSchema = z.object({
   turoLink: z.string().optional(),
   adminTuroLink: z.string().optional(),
   turoVehicleIds: z.array(z.string()).max(10).optional(),
-  // Car Status (admin-only)
+  // Car, Status(admin-only)
   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
-  // Management Status (admin-only)
+  // Management, Status(admin-only)
   managementStatus: z.enum(["management", "own", "off_ride"]).optional(),
   // Offboarding Information
   offboardAt: z.string().optional(),
@@ -273,7 +273,7 @@ const carSchema = z.object({
 
 type CarFormData = z.infer<typeof carSchema>;
 
-export default function CarDetailPage() {
+export default function, CarDetailPage() {
   const [, params] = useRoute("/admin/cars/:id");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -281,7 +281,7 @@ export default function CarDetailPage() {
   const carId = params?.id ? parseInt(params.id, 10) : null;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
-  const [selectedPhotos, setSelectedPhotos] = useState<Set<number>>(new Set());
+  const [selectedPhotos, setSelectedPhotos] = useState<Set<number>>(new, Set());
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
   const [fullScreenImageIndex, setFullScreenImageIndex] = useState<number | null>(null);
@@ -316,12 +316,12 @@ export default function CarDetailPage() {
   }>({
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       const url = buildApiUrl(`/api/cars/${carId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
+      if (!response.ok) throw new, Error("Failed to fetch car`);
       return response.json();
     },
     enabled: !!carId,
@@ -338,10 +338,9 @@ export default function CarDetailPage() {
 
   const car = data?.data;
   
-  // Debug logging for photos
-  useEffect(() => {
+  // Debug logging for photos, useEffect(() => {
     if (car?.photos) {
-      console.log(`📸 [CAR DETAIL] Car photos loaded:`, {
+      console.log(`📸 [CAR DETAIL] Car photos, loaded:`, {
         count: car.photos.length,
         photos: car.photos.map((p: string, i: number) => ({
           index: i,
@@ -360,21 +359,20 @@ export default function CarDetailPage() {
     success: boolean;
     data: any;
   }>({
-    queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
+    queryKey: [`/api/onboarding/vin", car?.vin, "onboarding"],
     queryFn: async () => {
-      if (!car?.vin) throw new Error("No VIN");
+      if (!car?.vin) throw new, Error("No VIN`);
       // Use VIN to fetch onboarding data
       const url = buildApiUrl(`/api/onboarding/vin/${encodeURIComponent(car.vin)}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include`,
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        // Return null if no onboarding found (404) instead of throwing
-        if (response.status === 404) {
+        // Return null if no onboarding, found(404) instead of throwing, if(response.status === 404) {
           return { success: false, data: null };
         }
-        throw new Error(errorData.error || `Failed to fetch onboarding: ${response.statusText}`);
+        throw new, Error(errorData.error || `Failed to fetch, onboarding: ${response.statusText}`);
       }
       const result = await response.json();
       return result;
@@ -385,14 +383,14 @@ export default function CarDetailPage() {
 
   const onboarding = onboardingData?.success ? onboardingData?.data : null;
 
-  // Fetch the corresponding client so Last Login (and online status) match the Client profile page (same API, same polling).
+  // Fetch the corresponding client so Last, Login(and online status) match the Client profile, page(same API, same polling).
   const { data: clientData } = useQuery<{ success: boolean; data?: { lastLoginAt?: string | null; lastLogoutAt?: string | null } }>({
-    queryKey: ["/api/clients", car?.clientId],
+    queryKey: [`/api/clients", car?.clientId],
     queryFn: async () => {
-      if (!car?.clientId) throw new Error("No client ID");
+      if (!car?.clientId) throw new, Error("No client ID`);
       const url = buildApiUrl(`/api/clients/${car.clientId}`);
-      const response = await fetch(url, { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch client");
+      const response = await, fetch(url, { credentials: `include" });
+      if (!response.ok) throw new, Error("Failed to fetch client`);
       return response.json();
     },
     enabled: !!car?.clientId,
@@ -403,10 +401,10 @@ export default function CarDetailPage() {
   const ownerLastLoginAt = clientData?.data?.lastLoginAt ?? car?.owner?.lastLoginAt ?? null;
   const ownerLastLogoutAt = clientData?.data?.lastLogoutAt ?? car?.owner?.lastLogoutAt ?? null;
 
-  // Debug logging for documents (only in development)
+  // Debug logging for, documents(only in development)
   useEffect(() => {
     if (import.meta.env.DEV && onboarding) {
-      console.log('[Car Detail] Onboarding data:', {
+      console.log('[Car Detail] Onboarding, data:', {
         hasInsuranceCardUrl: !!onboarding.insuranceCardUrl,
         insuranceCardUrl: onboarding.insuranceCardUrl,
         insuranceCardUrlType: typeof onboarding.insuranceCardUrl,
@@ -417,8 +415,7 @@ export default function CarDetailPage() {
         isArray: Array.isArray(onboarding.driversLicenseUrls),
       });
       
-      // Check if insuranceCardUrl looks like a Google Drive ID
-      if (onboarding.insuranceCardUrl) {
+      // Check if insuranceCardUrl looks like a Google Drive ID, if(onboarding.insuranceCardUrl) {
         const trimmed = String(onboarding.insuranceCardUrl).trim();
         const looksLikeGoogleDriveId = trimmed && 
           !trimmed.includes('/') && 
@@ -426,7 +423,7 @@ export default function CarDetailPage() {
           trimmed.length >= 10 && 
           /^[a-zA-Z0-9_-]+$/.test(trimmed) &&
           !trimmed.startsWith('http');
-        console.log('[Car Detail] Insurance Card ID Analysis:', {
+        console.log('[Car Detail] Insurance Card ID, Analysis:', {
           trimmed,
           looksLikeGoogleDriveId,
           hasSlash: trimmed.includes('/'),
@@ -445,16 +442,16 @@ export default function CarDetailPage() {
       return [];
     }
     
-    // Handle both array and string (JSON) formats
+    // Handle both array and, string(JSON) formats
     let urlsArray: any[] = [];
     if (Array.isArray(onboarding.driversLicenseUrls)) {
       urlsArray = onboarding.driversLicenseUrls;
-    } else if (typeof onboarding.driversLicenseUrls === 'string') {
+    } else, if(typeof onboarding.driversLicenseUrls === 'string') {
       try {
         const parsed = JSON.parse(onboarding.driversLicenseUrls);
         urlsArray = Array.isArray(parsed) ? parsed : [];
       } catch (e) {
-        console.error('[Car Detail] Failed to parse driversLicenseUrls as JSON:', e);
+        console.error('[Car Detail] Failed to parse driversLicenseUrls as, JSON:', e);
         urlsArray = [];
       }
     }
@@ -464,7 +461,7 @@ export default function CarDetailPage() {
       .map((url: string) => url.trim());
   }, [onboarding?.driversLicenseUrls]);
 
-  // Calculate online status badge (use client API lastLoginAt/lastLogoutAt so it matches Client profile page)
+  // Calculate online status, badge(use client API lastLoginAt/lastLogoutAt so it matches Client profile page)
   const onlineStatusBadge = useMemo(() => {
     if (!car?.owner) {
       return null;
@@ -477,11 +474,11 @@ export default function CarDetailPage() {
       ownerLastLogoutAt
     );
     
-    // Debug logging (only in development)
+    // Debug, logging(only in development)
     if (import.meta.env.DEV) {
-      const now = new Date();
+      const now = new, Date();
       
-      console.log('[Car Detail] Online Status Calculation:', {
+      console.log('[Car Detail] Online Status, Calculation:', {
         ownerName: `${car.owner.firstName} ${car.owner.lastName}`,
         email: car.owner.email,
         lastLoginAt: ownerLastLoginAt,
@@ -492,8 +489,8 @@ export default function CarDetailPage() {
       });
       
       if (!ownerLastLoginAt && car.owner.email) {
-        console.warn(`⚠️ [Car Detail] Owner ${car.owner.email} has no lastLoginAt value. This could indicate:`);
-        console.warn('   1. Database columns (lastLoginAt/lastLogoutAt) don\'t exist in user table');
+        console.warn(`⚠️ [Car Detail] Owner ${car.owner.email} has no lastLoginAt value. This could, indicate:`);
+        console.warn('   1. Database, columns(lastLoginAt/lastLogoutAt) don\'t exist in user table');
         console.warn('   2. User has never logged in through /api/auth/login endpoint');
         console.warn('   3. Login endpoint failed to update lastLoginAt');
         console.warn('   Check backend logs for migration warnings or login update errors.');
@@ -505,14 +502,14 @@ export default function CarDetailPage() {
 
   // Helper functions
   const formatValue = (value: any): string => {
-    if (value === null || value === undefined || value === "") {
+    if (value === null || value === undefined || value === `") {
       return "Not provided";
     }
-    return String(value);
+    return, String(value);
   };
 
   const formatCurrency = (value: string | null | undefined): string => {
-    if (!value) return "Not provided";
+    if (!value) return "Not provided`;
     const num = parseFloat(value);
     if (isNaN(num)) return value;
     return `$${num.toLocaleString("en-US", {
@@ -521,16 +518,12 @@ export default function CarDetailPage() {
     })}`;
   };
 
-  // Reset carousel index when car changes or photos change
-  useEffect(() => {
+  // Reset carousel index when car changes or photos change, useEffect(() => {
     if (car?.photos && car.photos.length > 0) {
-      // Ensure carousel index is within bounds
-      if (carouselIndex >= car.photos.length) {
-        // If current index is out of bounds, go to last available photo
-        setCarouselIndex(Math.max(0, car.photos.length - 1));
+      // Ensure carousel index is within bounds, if(carouselIndex >= car.photos.length) {
+        // If current index is out of bounds, go to last available photo, setCarouselIndex(Math.max(0, car.photos.length - 1));
       }
-      // If carousel index is 0 but there are photos, ensure it's valid
-      if (carouselIndex < 0) {
+      // If carousel index is 0 but there are photos, ensure it's valid, if(carouselIndex < 0) {
         setCarouselIndex(0);
       }
     } else {
@@ -542,8 +535,7 @@ export default function CarDetailPage() {
   // Note: We no longer automatically deselect photos when carousel changes
   // Carousel navigation does not affect Photos card selection
 
-  // Keyboard navigation for full screen document viewer
-  useEffect(() => {
+  // Keyboard navigation for full screen document viewer, useEffect(() => {
     if (fullScreenDocument === null || !onboarding) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -571,7 +563,7 @@ export default function CarDetailPage() {
               ? (prevUrl.toLowerCase().includes('pdf') || prevUrl.toLowerCase().endsWith('.pdf'))
               : isPdfDocument(prevUrl)
           });
-        } else if (e.key === 'ArrowRight' && fullScreenDocument.index < validDriversLicenseUrls.length - 1) {
+        } else, if(e.key === 'ArrowRight' && fullScreenDocument.index < validDriversLicenseUrls.length - 1) {
           const nextIndex = fullScreenDocument.index + 1;
           const nextUrl = validDriversLicenseUrls[nextIndex];
           // Check if it's a Google Drive file ID
@@ -604,17 +596,16 @@ export default function CarDetailPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [fullScreenDocument, validDriversLicenseUrls]);
 
-  // Keyboard navigation for full screen image viewer
-  useEffect(() => {
+  // Keyboard navigation for full screen image viewer, useEffect(() => {
     if (fullScreenImageIndex === null || !car?.photos) return;
 
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === `Escape") {
         setFullScreenImageIndex(null);
-      } else if (e.key === "ArrowLeft" && car.photos && car.photos.length > 1) {
+      } else, if(e.key === "ArrowLeft" && car.photos && car.photos.length > 1) {
         const prevIndex = (fullScreenImageIndex - 1 + car.photos.length) % car.photos.length;
         setFullScreenImageIndex(prevIndex);
-      } else if (e.key === "ArrowRight" && car.photos && car.photos.length > 1) {
+      } else, if(e.key === "ArrowRight" && car.photos && car.photos.length > 1) {
         const nextIndex = (fullScreenImageIndex + 1) % car.photos.length;
         setFullScreenImageIndex(nextIndex);
       }
@@ -624,8 +615,7 @@ export default function CarDetailPage() {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [fullScreenImageIndex, car?.photos]);
 
-  // Auto-advance carousel every 3 seconds
-  useEffect(() => {
+  // Auto-advance carousel every 3 seconds, useEffect(() => {
     if (!car?.photos || car.photos.length <= 1 || isCarouselPaused) return;
 
     const interval = setInterval(() => {
@@ -690,7 +680,7 @@ export default function CarDetailPage() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: CarFormData) => {
-      const formData = new FormData();
+      const formData = new, FormData();
       // Vehicle Information
       formData.append("vin", data.vin);
       formData.append("makeModel", data.makeModel);
@@ -716,11 +706,10 @@ export default function CarDetailPage() {
       formData.append("fuelType", data.fuelType || "");
       formData.append("tireSize", data.tireSize || "");
       formData.append("titleType", data.titleType || "");
-      // Convert vehicleFeatures array to JSON string
-      if (data.vehicleFeatures) {
+      // Convert vehicleFeatures array to JSON string, if(data.vehicleFeatures) {
         if (Array.isArray(data.vehicleFeatures)) {
           formData.append("vehicleFeatures", JSON.stringify(data.vehicleFeatures));
-        } else if (typeof data.vehicleFeatures === 'string') {
+        } else, if(typeof data.vehicleFeatures === 'string') {
         try {
           // Try to parse as JSON first
           JSON.parse(data.vehicleFeatures);
@@ -756,12 +745,10 @@ export default function CarDetailPage() {
       formData.append("turoLink", data.turoLink || "");
       formData.append("adminTuroLink", data.adminTuroLink || "");
       formData.append("turoVehicleIds", JSON.stringify((data.turoVehicleIds || []).filter((id): id is string => typeof id === "string" && id.trim().length > 0)));
-      // Car Status (admin-only) - Always send if admin and value is provided
-      if (isAdmin && data.status) {
+      // Car, Status(admin-only) - Always send if admin and value is provided, if(isAdmin && data.status) {
         formData.append("status", data.status);
       }
-      // Management Status (admin-only) - Only send if admin and value is provided
-      if (isAdmin && data.managementStatus) {
+      // Management, Status(admin-only) - Only send if admin and value is provided, if(isAdmin && data.managementStatus) {
         formData.append("managementStatus", data.managementStatus);
       }
       // Offboarding Information - Always send all fields
@@ -769,10 +756,9 @@ export default function CarDetailPage() {
       formData.append("offboardReason", data.offboardReason || "");
       formData.append("offboardNote", data.offboardNote || "");
       
-      // Documents - Handle file uploads using state
-      if (insuranceCardFile instanceof File) {
+      // Documents - Handle file uploads using state, if(insuranceCardFile instanceof File) {
         formData.append("insuranceCard", insuranceCardFile);
-      } else if (data.insuranceCardUrl !== undefined) {
+      } else, if(data.insuranceCardUrl !== undefined) {
         // Fallback to URL if no file uploaded
         formData.append("insuranceCardUrl", data.insuranceCardUrl || "");
       }
@@ -783,31 +769,30 @@ export default function CarDetailPage() {
             formData.append("driversLicense", file);
           }
         });
-      } else if (data.driversLicenseUrls !== undefined) {
+      } else, if(data.driversLicenseUrls !== undefined) {
         // Fallback to URLs if no files uploaded
-        formData.append("driversLicenseUrls", data.driversLicenseUrls || "");
+        formData.append("driversLicenseUrls", data.driversLicenseUrls || "`);
       }
 
-      const response = await fetch(buildApiUrl(`/api/cars/${carId}`), {
-        method: "PATCH",
+      const response = await, fetch(buildApiUrl(`/api/cars/${carId}`), {
+        method: `PATCH",
         credentials: "include",
         body: formData,
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update car");
+        throw new, Error(error.error || "Failed to update car");
       }
       const result = await response.json();
       return result;
     },
     onSuccess: async (responseData, variables) => {
       // Immediately update the car data in cache to reflect changes
-      // This ensures the UI updates instantly without waiting for refetch
-      if (responseData?.data) {
+      // This ensures the UI updates instantly without waiting for refetch, if(responseData?.data) {
         queryClient.setQueryData(["/api/cars", carId], responseData);
       }
       
-      // Get the VIN from form data (most reliable), then updated car data, then current car
+      // Get the VIN from form, data(most reliable), then updated car data, then current car
       // The form data VIN is the source of truth for what was submitted
       const updatedCar = responseData?.data || car;
       const newVin = variables?.vin || updatedCar?.vin || car?.vin;
@@ -819,14 +804,13 @@ export default function CarDetailPage() {
       
       // Invalidate and refetch onboarding data using VIN
       // This ensures Financial, Insurance, Additional Information, and Documents are updated immediately
-      // If VIN changed, invalidate both old and new VIN queries
-      if (oldVin && oldVin !== newVin) {
+      // If VIN changed, invalidate both old and new VIN queries, if(oldVin && oldVin !== newVin) {
         // VIN was changed - invalidate old VIN query
         queryClient.invalidateQueries({ queryKey: ["/api/onboarding/vin", oldVin, "onboarding"] });
       }
       
       if (newVin) {
-        // Invalidate the new VIN query (or current VIN if it didn't change)
+        // Invalidate the new VIN, query(or current VIN if it didn't change)
         queryClient.invalidateQueries({ queryKey: ["/api/onboarding/vin", newVin, "onboarding"] });
         // Also invalidate all onboarding queries that start with this pattern to catch any variations
         queryClient.invalidateQueries({ 
@@ -841,12 +825,12 @@ export default function CarDetailPage() {
         // Refetch the onboarding data with the new VIN - wait for it to complete
         try {
           await queryClient.refetchQueries({ 
-            queryKey: ["/api/onboarding/vin", newVin, "onboarding"],
+            queryKey: ["/api/onboarding/vin", newVin, "onboarding`],
             exact: false // Also refetch partial matches
           });
-          console.log(`✅ [CAR DETAIL] Refetched onboarding data for VIN: ${newVin}`);
+          console.log(`✅ [CAR DETAIL] Refetched onboarding data for, VIN: ${newVin}`);
         } catch (error) {
-          console.error(`❌ [CAR DETAIL] Failed to refetch onboarding data:`, error);
+          console.error(`❌ [CAR DETAIL] Failed to refetch onboarding, data:`, error);
         }
       } else {
         // If no VIN, still try to invalidate all onboarding queries for this car
@@ -855,7 +839,7 @@ export default function CarDetailPage() {
         queryClient.invalidateQueries({ 
           predicate: (query) => {
             const key = query.queryKey;
-            return Array.isArray(key) && key[0] === "/api/onboarding/vin";
+            return Array.isArray(key) && key[0] === `/api/onboarding/vin";
           }
         });
       }
@@ -865,7 +849,7 @@ export default function CarDetailPage() {
       if (finalCar?.clientId) {
         queryClient.invalidateQueries({ queryKey: ["/api/clients", finalCar.clientId, "onboarding"] });
         await queryClient.refetchQueries({ queryKey: ["/api/clients", finalCar.clientId, "onboarding"] });
-      } else if (car?.clientId) {
+      } else, if(car?.clientId) {
         queryClient.invalidateQueries({ queryKey: ["/api/clients", car.clientId, "onboarding"] });
         await queryClient.refetchQueries({ queryKey: ["/api/clients", car.clientId, "onboarding"] });
       }
@@ -878,8 +862,7 @@ export default function CarDetailPage() {
         title: "Success",
         description: "Car information updated successfully",
       });
-      // Reset document file state after successful update
-      setInsuranceCardFile(null);
+      // Reset document file state after successful update, setInsuranceCardFile(null);
       setInsuranceCardPreview(null);
       setDriversLicenseFiles([]);
       setDriversLicensePreviews([]);
@@ -889,7 +872,7 @@ export default function CarDetailPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to update car",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
@@ -899,18 +882,18 @@ export default function CarDetailPage() {
       // Send the full photo path/URL to backend for proper matching
       // Backend will handle extraction of filename and matching
       // Use encodeURIComponent to safely encode URLs and paths
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(
           `/api/cars/${carId}/photos/${encodeURIComponent(photoPath)}`
         ),
         {
-          method: "DELETE",
+          method: `DELETE",
           credentials: "include",
         }
       );
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to delete photo");
+        throw new, Error(error.error || "Failed to delete photo");
       }
       return response.json();
     },
@@ -943,14 +926,14 @@ export default function CarDetailPage() {
         try {
           // Send the full photo path/URL to backend for proper matching
           // Extract a short identifier for error messages
-          const shortId = photoPath.split("/").pop()?.split("?")[0] || photoPath.substring(0, 50);
-          const response = await fetch(
+          const shortId = photoPath.split("/").pop()?.split("?`)[0] || photoPath.substring(0, 50);
+          const response = await, fetch(
             buildApiUrl(
               `/api/cars/${carId}/photos/${encodeURIComponent(photoPath)}`
             ),
             {
-              method: "DELETE",
-              credentials: "include",
+              method: `DELETE",
+              credentials: "include`,
             }
           );
           
@@ -962,14 +945,13 @@ export default function CarDetailPage() {
             results.push(result);
           }
         } catch (error: any) {
-          const shortId = photoPath.split("/").pop()?.split("?")[0] || photoPath.substring(0, 50);
+          const shortId = photoPath.split(`/").pop()?.split("?`)[0] || photoPath.substring(0, 50);
           errors.push(`${shortId}: ${error.message || "Failed to delete"}`);
         }
       }
       
-      // If any deletions failed, throw error with details
-      if (errors.length > 0) {
-        throw new Error(`Failed to delete some photos:\n${errors.join("\n")}`);
+      // If any deletions failed, throw error with details, if(errors.length > 0) {
+        throw new, Error(`Failed to delete some, photos:\n${errors.join(`\n")}`);
       }
       
       return { success: true, deletedCount: results.length };
@@ -980,24 +962,21 @@ export default function CarDetailPage() {
       
       const deletedCount = variables.length;
       toast({
-        title: "Success",
+        title: "Success`,
         description: `${deletedCount} photo(s) deleted successfully`,
       });
       
-      // Clear all selections
-      setSelectedPhotos(new Set());
+      // Clear all selections, setSelectedPhotos(new, Set());
       
       // Reset carousel index - will be adjusted by useEffect when car data refreshes
-      // Set to 0 initially, useEffect will handle bounds checking
-      setCarouselIndex(0);
+      // Set to 0 initially, useEffect will handle bounds checking, setCarouselIndex(0);
       setIsCarouselPaused(false);
       
-      // Close full screen viewer if open
-      setFullScreenImageIndex(null);
+      // Close full screen viewer if open, setFullScreenImageIndex(null);
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
+        title: `Error",
         description: error.message || "Failed to delete photos",
         variant: "destructive",
       });
@@ -1005,32 +984,31 @@ export default function CarDetailPage() {
   });
 
   /**
-   * Set the selected photo as the "main" photo.
+   * Set the selected photo as the "main` photo.
    * Backend models main photo as the first photo in the stored list, so the Cars page
    * thumbnail and the carousel will both reflect the new main photo.
    */
   const setMainPhotoMutation = useMutation({
     mutationFn: async (photoPath: string) => {
-      const response = await fetch(buildApiUrl(`/api/cars/${carId}/photos/main`), {
-        method: "POST",
+      const response = await, fetch(buildApiUrl(`/api/cars/${carId}/photos/main`), {
+        method: `POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ photoPath }),
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.error || error.message || "Failed to set main photo");
+        throw new, Error(error.error || error.message || "Failed to set main photo");
       }
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cars", carId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/cars"] }); // refresh Cars list thumbnails
-      toast({
+      queryClient.invalidateQueries({ queryKey: ["/api/cars"] }); // refresh Cars list thumbnails, toast({
         title: "Success",
         description: "Main photo updated successfully",
       });
-      // Reset carousel to the first image (new main)
+      // Reset carousel to the first, image(new main)
       setCarouselIndex(0);
     },
     onError: (error: any) => {
@@ -1050,9 +1028,9 @@ export default function CarDetailPage() {
     const currentPhotoCount = car?.photos?.length || 0;
     if (currentPhotoCount + files.length > 20) {
       toast({
-        title: "Error",
-        description: `Maximum 20 photos allowed. Current: ${currentPhotoCount}, Trying to add: ${files.length}`,
-        variant: "destructive",
+        title: "Error`,
+        description: `Maximum 20 photos allowed. Current: ${currentPhotoCount}, Trying to, add: ${files.length}`,
+        variant: `destructive",
       });
       e.target.value = "";
       return;
@@ -1060,25 +1038,25 @@ export default function CarDetailPage() {
 
     setUploadingPhotos(true);
     try {
-      const formData = new FormData();
+      const formData = new, FormData();
       Array.from(files).forEach((file) => {
-        formData.append("photos", file);
+        formData.append("photos`, file);
       });
 
-      const response = await fetch(buildApiUrl(`/api/cars/${carId}/photos`), {
-        method: "POST",
+      const response = await, fetch(buildApiUrl(`/api/cars/${carId}/photos`), {
+        method: `POST",
         credentials: "include",
         body: formData,
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to upload photos");
+        throw new, Error(error.error || "Failed to upload photos");
       }
 
       const result = await response.json();
       
-      console.log('📸 [CAR DETAIL] Photo upload response:', {
+      console.log('📸 [CAR DETAIL] Photo upload, response:', {
         success: result.success,
         message: result.message,
         hasData: !!result.data,
@@ -1086,13 +1064,12 @@ export default function CarDetailPage() {
         photos: result.data?.photos || []
       });
       
-      // Update the query cache with the new car data immediately
-      if (result.data) {
+      // Update the query cache with the new car data immediately, if(result.data) {
         queryClient.setQueryData(["/api/cars", carId], {
           success: true,
           data: result.data,
         });
-        console.log('✅ [CAR DETAIL] Updated query cache with new car data:', {
+        console.log('✅ [CAR DETAIL] Updated query cache with new car, data:', {
           photoCount: result.data.photos?.length || 0,
           photos: result.data.photos || []
         });
@@ -1130,12 +1107,12 @@ export default function CarDetailPage() {
   const handleEditClick = () => {
     if (!car) return;
     
-    // Format vehicleFeatures for form (parse to array for checkboxes)
+    // Format vehicleFeatures for, form(parse to array for checkboxes)
     let vehicleFeaturesValue: string[] = [];
     if (onboarding?.vehicleFeatures) {
       if (Array.isArray(onboarding.vehicleFeatures)) {
         vehicleFeaturesValue = onboarding.vehicleFeatures;
-      } else if (typeof onboarding.vehicleFeatures === 'string') {
+      } else, if(typeof onboarding.vehicleFeatures === 'string') {
         try {
           // Try to parse as JSON array
           const parsed = JSON.parse(onboarding.vehicleFeatures);
@@ -1152,17 +1129,16 @@ export default function CarDetailPage() {
       }
     }
     
-    // Helper function to format date for date input fields (YYYY-MM-DD)
+    // Helper function to format date for date input, fields(YYYY-MM-DD)
     const formatDateForInput = (dateValue: any): string => {
       if (!dateValue) return "";
       try {
         // Handle various date formats
-        const date = new Date(dateValue);
+        const date = new, Date(dateValue);
         if (isNaN(date.getTime())) return "";
         return date.toISOString().split('T')[0];
       } catch {
-        // If it's already in YYYY-MM-DD format, return as is
-        if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+        // If it's already in YYYY-MM-DD format, return as is, if(typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
           return dateValue;
         }
         return "";
@@ -1174,7 +1150,7 @@ export default function CarDetailPage() {
       if (value === null || value === undefined) return "";
       if (typeof value === 'number') return value.toString();
       if (typeof value === 'string') return value;
-      return String(value || "");
+      return, String(value || "");
     };
 
     form.reset({
@@ -1216,7 +1192,7 @@ export default function CarDetailPage() {
       insurancePhone: onboarding?.insurancePhone || "",
       policyNumber: onboarding?.policyNumber || "",
       insuranceExpiration: formatDateForInput(onboarding?.insuranceExpiration),
-      // Additional Information (Car Login)
+      // Additional, Information(Car Login)
       carManufacturerWebsite: onboarding?.carManufacturerWebsite || "",
       carManufacturerUsername: onboarding?.carManufacturerUsername || "",
       password: onboarding?.password || "",
@@ -1228,7 +1204,7 @@ export default function CarDetailPage() {
         if (dbIds.length > 0) return [...dbIds];
         const fromLink = extractTuroVehicleIdFromUrl(car.turoLink);
         const fromAdmin = extractTuroVehicleIdFromUrl(car.adminTuroLink);
-        const extracted = [...new Set([fromLink, fromAdmin].filter((id): id is string => Boolean(id)))];
+        const extracted = [...new, Set([fromLink, fromAdmin].filter((id): id is string => Boolean(id)))];
         return extracted.length > 0 ? extracted : [];
       })(),
       // Car Status
@@ -1243,8 +1219,7 @@ export default function CarDetailPage() {
       insuranceCardUrl: onboarding?.insuranceCardUrl || "",
       driversLicenseUrls: onboarding?.driversLicenseUrls ? (Array.isArray(onboarding.driversLicenseUrls) ? JSON.stringify(onboarding.driversLicenseUrls) : onboarding.driversLicenseUrls) : "",
     });
-    // Reset document file state when opening edit dialog
-    setInsuranceCardFile(null);
+    // Reset document file state when opening edit dialog, setInsuranceCardFile(null);
     setInsuranceCardPreview(null);
     setDriversLicenseFiles([]);
     setDriversLicensePreviews([]);
@@ -1256,11 +1231,10 @@ export default function CarDetailPage() {
     const file = e.target.files?.[0];
     if (file) {
       setInsuranceCardFile(file);
-      // Generate preview
-      if (file.type === 'application/pdf') {
+      // Generate preview, if(file.type === 'application/pdf') {
         setInsuranceCardPreview(null); // PDF preview handled separately
       } else {
-        const reader = new FileReader();
+        const reader = new, FileReader();
         reader.onloadend = () => {
           setInsuranceCardPreview(reader.result as string);
         };
@@ -1286,7 +1260,7 @@ export default function CarDetailPage() {
             setDriversLicensePreviews(previews);
           }
         } else {
-          const reader = new FileReader();
+          const reader = new, FileReader();
           reader.onloadend = () => {
             previews[index] = reader.result as string;
             loadedCount++;
@@ -1315,8 +1289,7 @@ export default function CarDetailPage() {
     const newPreviews = driversLicensePreviews.filter((_, i) => i !== index);
     setDriversLicenseFiles(newFiles);
     setDriversLicensePreviews(newPreviews);
-    // Reset file input if all files removed
-    if (newFiles.length === 0) {
+    // Reset file input if all files removed, if(newFiles.length === 0) {
       const input = document.getElementById('drivers-license-input') as HTMLInputElement;
       if (input) input.value = '';
     }
@@ -1332,7 +1305,7 @@ export default function CarDetailPage() {
     
     // Allow selecting any photo, including the carousel photo
     // The carousel photo will only be automatically deselected when "Select All" is clicked
-    const newSelected = new Set(selectedPhotos);
+    const newSelected = new, Set(selectedPhotos);
     if (newSelected.has(index)) {
       newSelected.delete(index);
     } else {
@@ -1349,11 +1322,9 @@ export default function CarDetailPage() {
     const allSelected = allIndices.length > 0 && allIndices.every(index => selectedPhotos.has(index));
     
     if (allSelected && selectedPhotos.size === allIndices.length) {
-      // Deselect all
-      setSelectedPhotos(new Set());
+      // Deselect all, setSelectedPhotos(new, Set());
     } else {
-      // Select all photos including the one currently displayed in the carousel
-      setSelectedPhotos(new Set(allIndices));
+      // Select all photos including the one currently displayed in the carousel, setSelectedPhotos(new, Set(allIndices));
     }
   };
 
@@ -1373,7 +1344,7 @@ export default function CarDetailPage() {
       return;
     }
     
-    // Delete all selected photos (even if currently displayed in carousel)
+    // Delete all selected, photos(even if currently displayed in carousel)
     deleteMultiplePhotosMutation.mutate(photoPaths);
   };
 
@@ -1384,8 +1355,7 @@ export default function CarDetailPage() {
     setIsCarouselPaused(true);
     const nextIndex = (carouselIndex + 1) % car.photos!.length;
     setCarouselIndex(nextIndex);
-    // Resume auto-advance after 5 seconds
-    setTimeout(() => setIsCarouselPaused(false), 5000);
+    // Resume auto-advance after 5 seconds, setTimeout(() => setIsCarouselPaused(false), 5000);
   };
 
   const handleCarouselPrev = () => {
@@ -1393,25 +1363,22 @@ export default function CarDetailPage() {
     setIsCarouselPaused(true);
     const prevIndex = (carouselIndex - 1 + car.photos!.length) % car.photos!.length;
     setCarouselIndex(prevIndex);
-    // Resume auto-advance after 5 seconds
-    setTimeout(() => setIsCarouselPaused(false), 5000);
+    // Resume auto-advance after 5 seconds, setTimeout(() => setIsCarouselPaused(false), 5000);
   };
 
   const handleCarouselGoTo = (index: number) => {
     if (!car?.photos || car.photos.length === 0) return;
     setIsCarouselPaused(true);
     setCarouselIndex(index);
-    // Resume auto-advance after 5 seconds
-    setTimeout(() => setIsCarouselPaused(false), 5000);
+    // Resume auto-advance after 5 seconds, setTimeout(() => setIsCarouselPaused(false), 5000);
   };
 
-  // Keyboard navigation for carousel
-  useEffect(() => {
+  // Keyboard navigation for carousel, useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (!car?.photos || car.photos.length === 0) return;
       if (e.key === "ArrowLeft") {
         setCarouselIndex((prev) => (prev - 1 + car.photos!.length) % car.photos!.length);
-      } else if (e.key === "ArrowRight") {
+      } else, if(e.key === "ArrowRight") {
         setCarouselIndex((prev) => (prev + 1) % car.photos!.length);
       }
     };
@@ -1426,7 +1393,7 @@ export default function CarDetailPage() {
         return "bg-green-500/20 text-green-700 border-green-500/30 font-medium";
       case "INACTIVE":
         return "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium";
-      // Legacy support for database values (if any still exist)
+      // Legacy support for database, values(if any still exist)
       case "available":
       case "in_use":
         return "bg-green-500/20 text-green-700 border-green-500/30 font-medium";
@@ -1441,7 +1408,7 @@ export default function CarDetailPage() {
 
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString("en-US", {
+      return new, Date(dateString).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -1465,16 +1432,16 @@ export default function CarDetailPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <p className="text-red-700 mb-4">Failed to load car details</p>
+          <p className="text-red-700 mb-4`>Failed to load car details</p>
           <Button
             onClick={() => {
               if (carId) {
                 setLocation(`/admin/view-car/${carId}`);
               } else {
-                setLocation("/cars");
+                setLocation(`/cars");
               }
             }}
-            className="bg-primary text-primary-foreground hover:bg-primary/80"
+            className="bg-primary text-primary-foreground, hover:bg-primary/80"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -1486,28 +1453,28 @@ export default function CarDetailPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+      <div className="space-y-4, sm:space-y-6 overflow-x-hidden max-w-full">
+        <div className="flex flex-col gap-3, sm:flex-row, sm:items-center, sm:justify-between, sm:gap-4">
+          <div className="flex items-center gap-2, sm:gap-4 flex-1 min-w-0">
             <Button
-              variant="ghost"
+              variant="ghost`
               onClick={() => setLocation(`/admin/view-car/${carId}`)}
-              className="text-muted-foreground hover:text-foreground shrink-0"
+              className=`text-muted-foreground, hover:text-foreground shrink-0"
             >
-              <ArrowLeft className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Back</span>
+              <ArrowLeft className="w-4 h-4, sm:mr-2" />
+              <span className="hidden, sm:inline">Back</span>
             </Button>
             <div className="min-w-0 flex-1">
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-primary truncate">
+              <h1 className="text-lg, sm:text-xl, md:text-2xl font-bold text-primary truncate">
                 {car.makeModel}
               </h1>
-              <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">Car Details</p>
+              <p className="text-muted-foreground text-xs, sm:text-sm mt-0.5">Car Details</p>
             </div>
           </div>
           {isAdmin && (
             <Button
               onClick={handleEditClick}
-              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto shrink-0"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80 w-full, sm:w-auto shrink-0"
             >
               <Edit className="w-4 h-4 mr-2" />
               Edit
@@ -1515,19 +1482,19 @@ export default function CarDetailPage() {
           )}
         </div>
 
-        {/* Row 1: Vehicle Information, Car Photos, and Car Links */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch max-w-full">
+        {/* Row, 1: Vehicle Information, Car Photos, and Car Links */}
+        <div className="grid grid-cols-1, lg:grid-cols-12 gap-4, sm:gap-6 items-stretch max-w-full">
           {/* Vehicle Information Card */}
-          <Card className="bg-card border-border lg:col-span-6 flex flex-col min-w-0 max-w-full">
+          <Card className="bg-card border-border, lg:col-span-6 flex flex-col min-w-0 max-w-full">
             <CardHeader className="pb-2">
-              <CardTitle className="text-primary text-base sm:text-lg flex items-center gap-2">
-                <Car className="w-4 h-4 sm:w-5 sm:h-5" />
+              <CardTitle className="text-primary text-base, sm:text-lg flex items-center gap-2">
+                <Car className="w-4 h-4, sm:w-5, sm:h-5" />
                 Vehicle Information
               </CardTitle>
             </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {/* Column 1: Basic Vehicle Information */}
+                <div className="grid grid-cols-1, sm:grid-cols-2, md:grid-cols-3 gap-4">
+                {/* Column, 1: Basic Vehicle Information */}
                 <div className="space-y-4">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Make & Model</p>
@@ -1555,11 +1522,11 @@ export default function CarDetailPage() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Mileage</p>
-                    <p className="text-foreground text-base">{car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A"}</p>
+                    <p className="text-foreground text-base`>{car.mileage ? `${car.mileage.toLocaleString()} miles` : `N/A"}</p>
                   </div>
                 </div>
 
-                {/* Column 2: Specifications & Colors */}
+                {/* Column, 2: Specifications & Colors */}
                 <div className="space-y-4">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Exterior Color</p>
@@ -1587,7 +1554,7 @@ export default function CarDetailPage() {
                   </div>
                   </div>
 
-                {/* Column 3: Maintenance & Accessories */}
+                {/* Column, 3: Maintenance & Accessories */}
                 <div className="space-y-4">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Oil Type</p>
@@ -1626,7 +1593,7 @@ export default function CarDetailPage() {
               
               {/* Accessories Section - Full width */}
               <div className="pt-4 border-t border-border">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1, sm:grid-cols-3 gap-4">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Roof Rails</p>
                     <p className="text-foreground text-base">{car.roofRails ? formatValue(car.roofRails) : "N/A"}</p>
@@ -1656,9 +1623,9 @@ export default function CarDetailPage() {
               
               {/* Assigned To Section */}
                 <div className="pt-1.5 border-t border-border">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-6">
+                  <div className="flex flex-col, lg:flex-row, lg:items-start, lg:justify-between gap-4, lg:gap-6">
                     {/* Left: Assigned To */}
-                    <div className="flex-shrink-0 text-center lg:text-left">
+                    <div className="flex-shrink-0 text-center, lg:text-left">
                       <p className="text-xs text-muted-foreground mb-1.5">Assigned To</p>
                     {/* Display maintenance status if car is in maintenance */}
                     {car.rawStatus === "maintenance" ? (
@@ -1671,11 +1638,11 @@ export default function CarDetailPage() {
                         </Badge>
                         {car.owner && (
                           <div className="mt-2">
-                              <p className="text-foreground text-sm sm:text-base font-semibold">
+                              <p className="text-foreground text-sm, sm:text-base font-semibold">
                               {car.owner.firstName} {car.owner.lastName}
                             </p>
                             {car.owner.email && (
-                                <p className="text-foreground text-xs mt-0.5 break-all">
+                                <p className="text-foreground text-xs mt-0.5 break-all`>
                                 {car.owner.email}
                               </p>
                             )}
@@ -1686,20 +1653,20 @@ export default function CarDetailPage() {
                       car.clientId ? (
                         <button
                           onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                            className="hover:text-blue-700 transition-colors"
+                            className=`hover:text-blue-700 transition-colors"
                         >
-                            <p className="text-foreground text-sm sm:text-base font-semibold hover:underline">
+                            <p className="text-foreground text-sm, sm:text-base font-semibold, hover:underline">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
-                              <p className="text-foreground text-xs mt-0.5 hover:text-blue-700 break-all">
+                              <p className="text-foreground text-xs mt-0.5, hover:text-blue-700 break-all">
                               {car.owner.email}
                             </p>
                           )}
                         </button>
                       ) : (
                         <>
-                            <p className="text-foreground text-sm sm:text-base font-semibold">
+                            <p className="text-foreground text-sm, sm:text-base font-semibold">
                             {car.owner.firstName} {car.owner.lastName}
                           </p>
                           {car.owner.email && (
@@ -1710,14 +1677,14 @@ export default function CarDetailPage() {
                         </>
                       )
                     ) : (
-                      <p className="text-muted-foreground text-xs sm:text-sm">Unassigned</p>
+                      <p className="text-muted-foreground text-xs, sm:text-sm">Unassigned</p>
                       )}
                     </div>
 
                     {/* Right: Car Status, Management, Online Status, Last Login */}
-                    <div className="grid grid-cols-2 lg:flex lg:items-start lg:gap-6 lg:flex-1 lg:justify-end gap-4 max-w-full">
+                    <div className="grid grid-cols-2, lg:flex, lg:items-start, lg:gap-6, lg:flex-1, lg:justify-end gap-4 max-w-full">
                       {/* Car Status */}
-                      <div className="text-center lg:min-w-[100px]">
+                      <div className="text-center, lg:min-w-[100px]">
                         <p className="text-xs text-muted-foreground mb-1.5">Car Status</p>
                         <div className="flex justify-center">
                           <Badge
@@ -1734,9 +1701,9 @@ export default function CarDetailPage() {
                       </div>
 
                       {/* Management */}
-                      <div className="text-center lg:min-w-[100px]">
+                      <div className="text-center, lg:min-w-[100px]">
                         <p className="text-xs text-muted-foreground mb-1.5">Management</p>
-                        <p className="text-foreground text-xs sm:text-sm font-medium">
+                        <p className="text-foreground text-xs, sm:text-sm font-medium">
                           {car.managementStatus === "management"
                             ? "Management"
                             : car.managementStatus === "own"
@@ -1748,10 +1715,10 @@ export default function CarDetailPage() {
                       </div>
 
                       {/* Online Status */}
-                      <div className="text-center lg:min-w-[120px]">
+                      <div className="text-center, lg:min-w-[120px]">
                         <p className="text-xs text-muted-foreground mb-1.5">Online Status</p>
                         {!car.owner ? (
-                          <p className="text-muted-foreground text-xs sm:text-sm">N/A</p>
+                          <p className="text-muted-foreground text-xs, sm:text-sm">N/A</p>
                         ) : onlineStatusBadge ? (
                           <div className="flex justify-center">
                             <Badge
@@ -1762,14 +1729,14 @@ export default function CarDetailPage() {
                             </Badge>
                           </div>
                         ) : (
-                          <p className="text-muted-foreground text-xs sm:text-sm">N/A</p>
+                          <p className="text-muted-foreground text-xs, sm:text-sm">N/A</p>
                         )}
                       </div>
 
                       {/* Last Login - use client API value so it matches Client profile page */}
-                      <div className="text-center lg:min-w-[140px] col-span-2 lg:col-span-1">
+                      <div className="text-center, lg:min-w-[140px] col-span-2, lg:col-span-1">
                         <p className="text-xs text-muted-foreground mb-1.5">Last Login</p>
-                        <p className="text-foreground text-xs sm:text-sm font-medium whitespace-normal break-words">
+                        <p className="text-foreground text-xs, sm:text-sm font-medium whitespace-normal break-words">
                           {car.owner
                             ? formatLastLogin(ownerLastLoginAt)
                             : "N/A"}
@@ -1799,7 +1766,7 @@ export default function CarDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Column 2: Car Photos and Car Links stacked vertically */}
+          {/* Column, 2: Car Photos and Car Links stacked vertically */}
           <div className="lg:col-span-6 flex flex-col gap-6">
             {/* Car Photos Carousel Card */}
             <Card className="bg-card border-border flex flex-col flex-1 min-w-0 max-w-full">
@@ -1813,7 +1780,7 @@ export default function CarDetailPage() {
                 {car.photos && car.photos.length > 0 ? (
                   <div className="space-y-2 flex-1 flex flex-col">
                       {/* Main Carousel Display - Flexible height to match Vehicle Information card */}
-                      <div className="relative w-full flex-1 bg-background rounded-lg overflow-hidden border border-border">
+                      <div className="relative w-full flex-1 bg-background rounded-lg overflow-hidden border border-border`>
                       {car.photos.map((photo, index) => {
                         // Use getProxiedImageUrl to handle both GCS URLs and local paths
                         // This ensures CORS issues are avoided by proxying GCS URLs through the backend
@@ -1823,9 +1790,8 @@ export default function CarDetailPage() {
                           photoUrl = '';
                         } else {
                           photoUrl = getProxiedImageUrl(photo);
-                          // Log first photo for debugging
-                          if (index === 0) {
-                            console.log(`📸 [CAR DETAIL] Photo ${index + 1}: Using proxied URL:`, photoUrl.substring(0, 100) + '...');
+                          // Log first photo for debugging, if(index === 0) {
+                            console.log(`📸 [CAR DETAIL] Photo ${index + 1}: Using proxied, URL:`, photoUrl.substring(0, 100) + '...');
                           }
                         }
                         const isActive = index === carouselIndex;
@@ -1833,31 +1799,30 @@ export default function CarDetailPage() {
                           <div
                             key={index}
                             className={cn(
-                              "absolute inset-0 transition-all duration-500 ease-in-out px-6",
-                              isActive ? "opacity-100 z-10" : "opacity-0 z-0"
+                              `absolute inset-0 transition-all duration-500 ease-in-out px-6",
+                              isActive ? "opacity-100 z-10" : "opacity-0 z-0`
                             )}
                           >
                             <img
                               src={photoUrl}
                               alt={`Car photo ${index + 1}`}
-                              className="w-full h-full object-contain"
+                              className=`w-full h-full object-contain"
                               onError={(e) => {
-                                console.error('❌ [CAR DETAIL] Failed to load photo:', photoUrl);
-                                console.error('   Original photo:', photo);
-                                console.error('   API Base URL:', import.meta.env.VITE_API_URL || 'Not set');
-                                console.error('   Photo URL type:', photo?.startsWith('https://storage.googleapis.com/') ? 'GCS' : 'Other');
-                                console.error('   Proxy URL:', photoUrl);
+                                console.error('❌ [CAR DETAIL] Failed to load, photo:', photoUrl);
+                                console.error('   Original, photo:', photo);
+                                console.error('   API Base, URL:', import.meta.env.VITE_API_URL || 'Not set');
+                                console.error('   Photo URL, type:', photo?.startsWith('https://storage.googleapis.com/') ? 'GCS' : 'Other');
+                                console.error('   Proxy, URL:', photoUrl);
                                 
-                                // Try to fetch the image directly to see what error we get
-                                if (photoUrl && photoUrl.includes('/api/gcs-image-proxy')) {
+                                // Try to fetch the image directly to see what error we get, if(photoUrl && photoUrl.includes('/api/gcs-image-proxy')) {
                                   fetch(photoUrl)
                                     .then(res => {
-                                      console.error('   Proxy response status:', res.status);
-                                      console.error('   Proxy response headers:', Object.fromEntries(res.headers.entries()));
+                                      console.error('   Proxy response, status:', res.status);
+                                      console.error('   Proxy response, headers:', Object.fromEntries(res.headers.entries()));
                                       return res.text();
                                     })
-                                    .then(text => console.error('   Proxy response body:', text.substring(0, 200)))
-                                    .catch(err => console.error('   Proxy fetch error:', err));
+                                    .then(text => console.error('   Proxy response, body:', text.substring(0, 200)))
+                                    .catch(err => console.error('   Proxy fetch, error:', err));
                                 }
                                 
                                 // Don't hide the image - keep it visible but show error state
@@ -1878,7 +1843,7 @@ export default function CarDetailPage() {
                             variant="ghost"
                             size="icon"
                             onClick={handleCarouselPrev}
-                            className="h-9 w-9 bg-background/70 hover:bg-background/90 text-foreground border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                            className="h-9 w-9 bg-background/70, hover:bg-background/90 text-foreground border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all, hover:scale-110"
                             aria-label="Previous image"
                           >
                             <ChevronLeft className="w-5 h-5" />
@@ -1896,7 +1861,7 @@ export default function CarDetailPage() {
                             variant="ghost"
                             size="icon"
                             onClick={handleCarouselNext}
-                            className="h-9 w-9 bg-background/70 hover:bg-background/90 text-foreground border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                            className="h-9 w-9 bg-background/70, hover:bg-background/90 text-foreground border border-white/30 rounded-full shadow-lg backdrop-blur-sm transition-all, hover:scale-110"
                             aria-label="Next image"
                           >
                             <ChevronRight className="w-5 h-5" />
@@ -1916,7 +1881,7 @@ export default function CarDetailPage() {
                               "w-3 h-3 rounded-full transition-all duration-300",
                               index === carouselIndex
                                 ? "bg-[#EAEB80] w-8"
-                                : "bg-gray-600 hover:bg-gray-500"
+                                : "bg-gray-600, hover:bg-gray-500`
                             )}
                             aria-label={`Go to image ${index + 1}`}
                           />
@@ -1925,7 +1890,7 @@ export default function CarDetailPage() {
                     )}
                 </div>
               ) : (
-                    <div className="flex items-center justify-center flex-1 bg-background/20 rounded-lg border border-border">
+                    <div className=`flex items-center justify-center flex-1 bg-background/20 rounded-lg border border-border">
                       <p className="text-muted-foreground text-center">
                         No photos available
                       </p>
@@ -1952,7 +1917,7 @@ export default function CarDetailPage() {
                           href={car.turoLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-700 hover:underline"
+                          className="text-blue-700, hover:underline"
                         >
                           {formatValue(car.turoLink)}
                         </a>
@@ -1970,7 +1935,7 @@ export default function CarDetailPage() {
                             href={car.adminTuroLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-700 hover:underline"
+                            className="text-blue-700, hover:underline"
                           >
                             {formatValue(car.adminTuroLink)}
                           </a>
@@ -1987,7 +1952,7 @@ export default function CarDetailPage() {
                         const dbIds = (car.turoVehicleIds || []).filter((id): id is string => typeof id === "string" && id.trim().length > 0);
                         const fromTuroLink = extractTuroVehicleIdFromUrl(car.turoLink);
                         const fromAdminLink = extractTuroVehicleIdFromUrl(car.adminTuroLink);
-                        const allIds = [...new Set([...dbIds, fromTuroLink, fromAdminLink].filter((id): id is string => Boolean(id)))];
+                        const allIds = [...new, Set([...dbIds, fromTuroLink, fromAdminLink].filter((id): id is string => Boolean(id)))];
                         return allIds.length > 0 ? (
                           <div className="space-y-1">
                             {allIds.map((id, idx) => (
@@ -2007,10 +1972,10 @@ export default function CarDetailPage() {
           </div>
         </div>
 
-        {/* Row 2: Documents, Vehicle Purchase Information, Car Login Information, Insurance Information */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 max-w-full">
+        {/* Row, 2: Documents, Vehicle Purchase Information, Car Login Information, Insurance Information */}
+        <div className="grid grid-cols-1, lg:grid-cols-12 gap-4, sm:gap-6 max-w-full">
           {/* Documents Card */}
-          <Card className="bg-card border-border lg:col-span-3 min-w-0 max-w-full">
+          <Card className="bg-card border-border, lg:col-span-3 min-w-0 max-w-full">
             <CardHeader>
               <CardTitle className="text-primary text-lg">
                 Documents
@@ -2022,21 +1987,21 @@ export default function CarDetailPage() {
                   <p className="text-sm">Loading documents...</p>
                 </div>
               ) : onboarding ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-4, sm:gap-6, md:gap-8">
                   {/* Insurance Card */}
                   <div>
-                    <h4 className="text-base font-semibold text-muted-foreground mb-4">Insurance Card</h4>
+                    <h4 className="text-base font-semibold text-muted-foreground mb-4`>Insurance Card</h4>
                     {onboarding.insuranceCardUrl && String(onboarding.insuranceCardUrl).trim() ? (() => {
                       const trimmedUrl = String(onboarding.insuranceCardUrl).trim();
                       
                       // Check if it's a Google Drive file ID
-                      // Google Drive IDs are typically: alphanumeric with hyphens/underscores, no slashes, no dots (unless it's a full URL)
+                      // Google Drive IDs are, typically: alphanumeric with hyphens/underscores, no slashes, no, dots(unless it's a full URL)
                       // Length is usually 28-44 characters, but we'll accept anything >= 10 that matches the pattern
-                      // Also check: if it doesn't look like a URL or local path, treat it as a Google Drive ID
+                      // Also, check: if it doesn't look like a URL or local path, treat it as a Google Drive ID
                       const looksLikeUrl = trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://') || trimmedUrl.startsWith('/');
                       const looksLikeLocalPath = trimmedUrl.includes('/') && (trimmedUrl.includes('.') || trimmedUrl.startsWith('/'));
                       
-                      // More lenient detection: if it doesn't look like a URL or local path, and matches Google Drive ID pattern, treat it as one
+                      // More lenient, detection: if it doesn't look like a URL or local path, and matches Google Drive ID pattern, treat it as one
                       const isGoogleDriveId = trimmedUrl && 
                         !looksLikeUrl &&
                         !looksLikeLocalPath &&
@@ -2058,9 +2023,8 @@ export default function CarDetailPage() {
                         ? false // Default to image, proxy endpoint will handle PDFs via Content-Type
                         : isPdfDocument(trimmedUrl);
                       
-                      // Debug logging
-                      if (import.meta.env.DEV) {
-                        console.log('[Car Detail] Insurance Card URL:', {
+                      // Debug logging, if(import.meta.env.DEV) {
+                        console.log('[Car Detail] Insurance Card, URL:', {
                           original: onboarding.insuranceCardUrl,
                           trimmed: trimmedUrl,
                           isGoogleDriveId,
@@ -2071,24 +2035,24 @@ export default function CarDetailPage() {
                       
                       return (
                         <div 
-                          className="relative group cursor-pointer"
+                          className=`relative group cursor-pointer`
                           onClick={() => {
                             setFullScreenDocument({ url: documentUrl, type: 'insurance', isPdf });
                           }}
                         >
                           <div className={`relative w-full aspect-[4/3] bg-background rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
                             isPdf 
-                              ? 'border-primary/50 hover:border-primary shadow-[#EAEB80]/20' 
-                              : 'border-primary/30 hover:border-primary shadow-[#EAEB80]/20'
+                              ? 'border-primary/50, hover:border-primary shadow-[#EAEB80]/20' 
+                              : 'border-primary/30, hover:border-primary shadow-[#EAEB80]/20'
                           }`}>
                             {isPdf ? (
-                              <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                              <div className=`w-full h-full flex flex-col items-center justify-center p-4">
                                 <FileText className="w-16 h-16 text-primary mb-2" />
                                 <p className="text-primary text-sm font-semibold">PDF Document</p>
                                 <p className="text-muted-foreground text-xs mt-1">Click to open in PDF viewer</p>
                               </div>
                             ) : isGoogleDriveId ? (
-                              // For Google Drive: use credentialled fetch so documents display in published (cross-origin) project
+                              // For Google, Drive: use credentialled fetch so documents display in, published(cross-origin) project
                               <DocumentImageWithAuth
                                 url={documentUrl}
                                 alt="Insurance Card"
@@ -2103,7 +2067,7 @@ export default function CarDetailPage() {
                                     iframe.className = "w-full h-full border-0";
                                     iframe.title = "Insurance Card";
                                     parent.appendChild(iframe);
-                                  } else if (parent && !parent.querySelector(".error-message")) {
+                                  } else, if(parent && !parent.querySelector(".error-message")) {
                                     const errorDiv = document.createElement("div");
                                     errorDiv.className = "error-message text-sm text-muted-foreground absolute inset-0 flex items-center justify-center";
                                     errorDiv.textContent = "Failed to load document";
@@ -2125,7 +2089,7 @@ export default function CarDetailPage() {
                                   }
                                 }}
                                 onError={(e) => {
-                                  console.error('Failed to load insurance card image:', onboarding.insuranceCardUrl);
+                                  console.error('Failed to load insurance card, image:', onboarding.insuranceCardUrl);
                                   const target = e.target as HTMLImageElement;
                                   target.style.display = "none";
                                   const parent = target.parentElement?.parentElement;
@@ -2162,16 +2126,16 @@ export default function CarDetailPage() {
                   <div>
                     <h4 className="text-base font-semibold text-muted-foreground mb-4">Drivers License</h4>
                     {validDriversLicenseUrls.length > 0 ? (
-                      <div className="space-y-4">
+                      <div className="space-y-4`>
                         {validDriversLicenseUrls.map((url: string, index: number) => {
                             // Check if it's a Google Drive file ID
-                            // Google Drive IDs are typically: alphanumeric with hyphens/underscores, no slashes, no dots (unless it's a full URL)
+                            // Google Drive IDs are, typically: alphanumeric with hyphens/underscores, no slashes, no, dots(unless it's a full URL)
                             // Length is usually 28-44 characters, but we'll accept anything >= 10 that matches the pattern
-                            // Also check: if it doesn't look like a URL or local path, treat it as a Google Drive ID
+                            // Also, check: if it doesn't look like a URL or local path, treat it as a Google Drive ID
                             const looksLikeUrl = url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/');
                             const looksLikeLocalPath = url.includes('/') && (url.includes('.') || url.startsWith('/'));
                             
-                            // More lenient detection: if it doesn't look like a URL or local path, and matches Google Drive ID pattern, treat it as one
+                            // More lenient, detection: if it doesn't look like a URL or local path, and matches Google Drive ID pattern, treat it as one
                             const isGoogleDriveId = url && 
                               !looksLikeUrl &&
                               !looksLikeLocalPath &&
@@ -2191,9 +2155,9 @@ export default function CarDetailPage() {
                               ? false // Default to image, proxy endpoint will handle PDFs via Content-Type
                               : isPdfDocument(url);
                             
-                            // Debug logging (always log to help diagnose issues)
+                            // Debug, logging(always log to help diagnose issues)
                             if (index === 0) {
-                              console.log('[Car Detail] Drivers License URL:', {
+                              console.log('[Car Detail] Drivers License, URL:', {
                                 url,
                                 isGoogleDriveId,
                                 documentUrl,
@@ -2210,30 +2174,30 @@ export default function CarDetailPage() {
                           return (
                             <div 
                               key={index}
-                              className="relative group cursor-pointer"
+                              className=`relative group cursor-pointer`
                               onClick={() => setFullScreenDocument({ url: documentUrl, type: 'license', index, isPdf })}
                             >
                               <div className={`relative w-full aspect-[4/3] bg-background rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
                                 isPdf 
-                                  ? 'border-primary/50 hover:border-primary shadow-[#EAEB80]/20' 
-                                  : 'border-primary/30 hover:border-primary shadow-[#EAEB80]/20'
+                                  ? 'border-primary/50, hover:border-primary shadow-[#EAEB80]/20' 
+                                  : 'border-primary/30, hover:border-primary shadow-[#EAEB80]/20'
                               }`}>
                                 {isPdf ? (
-                                  <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                  <div className=`w-full h-full flex flex-col items-center justify-center p-4">
                                     <div className="text-primary mb-2">
                                       <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                       </svg>
                                     </div>
                                     <p className="text-primary text-sm font-semibold">PDF Document</p>
-                                    <p className="text-muted-foreground text-xs mt-1">Click to open in PDF viewer</p>
+                                    <p className="text-muted-foreground text-xs mt-1`>Click to open in PDF viewer</p>
                                   </div>
                                 ) : isGoogleDriveId ? (
-                                  // For Google Drive: use credentialled fetch so documents display in published (cross-origin) project
+                                  // For Google, Drive: use credentialled fetch so documents display in, published(cross-origin) project
                                   <DocumentImageWithAuth
                                     url={documentUrl}
                                     alt={`Drivers License ${index + 1}`}
-                                    className="w-full h-full object-contain p-2"
+                                    className=`w-full h-full object-contain p-2"
                                     onError={(e) => {
                                       const target = e.target as HTMLImageElement;
                                       const parent = target.parentElement;
@@ -2241,13 +2205,13 @@ export default function CarDetailPage() {
                                         target.style.display = "none";
                                         const iframe = document.createElement('iframe');
                                         iframe.src = documentUrl;
-                                        iframe.className = "w-full h-full border-0";
+                                        iframe.className = "w-full h-full border-0`;
                                         iframe.title = `Drivers License ${index + 1}`;
                                         parent.appendChild(iframe);
-                                      } else if (parent && !parent.querySelector(".error-message")) {
+                                      } else, if(parent && !parent.querySelector(`.error-message")) {
                                         const errorDiv = document.createElement("div");
                                         errorDiv.className = "error-message text-sm text-muted-foreground absolute inset-0 flex items-center justify-center";
-                                        errorDiv.textContent = "Failed to load document";
+                                        errorDiv.textContent = "Failed to load document`;
                                         parent.appendChild(errorDiv);
                                       }
                                     }}
@@ -2256,7 +2220,7 @@ export default function CarDetailPage() {
                                   <img
                                     src={documentUrl}
                                     alt={`Drivers License ${index + 1}`}
-                                    className="w-full h-full object-contain p-2"
+                                    className=`w-full h-full object-contain p-2"
                                     onLoad={(e) => {
                                       const target = e.target as HTMLImageElement;
                                       const parent = target.parentElement?.parentElement;
@@ -2266,7 +2230,7 @@ export default function CarDetailPage() {
                                       }
                                     }}
                                     onError={(e) => {
-                                      console.error('Failed to load drivers license image:', url);
+                                      console.error('Failed to load drivers license, image:', url);
                                       const target = e.target as HTMLImageElement;
                                       target.style.display = "none";
                                       const parent = target.parentElement?.parentElement;
@@ -2315,7 +2279,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Vehicle Purchase Information Card */}
-          <Card className="bg-card border-border lg:col-span-3 min-w-0 max-w-full">
+          <Card className="bg-card border-border, lg:col-span-3 min-w-0 max-w-full">
             <CardHeader>
               <CardTitle className="text-primary text-lg">
               Purchase Information
@@ -2329,7 +2293,7 @@ export default function CarDetailPage() {
               ) : onboarding ? (
                 <>
                   {/* Financial Details - 2 columns */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1, sm:grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Purchase Price</p>
                       <p className="text-foreground text-base font-medium">{formatCurrency(onboarding.purchasePrice)}</p>
@@ -2369,7 +2333,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Car Login Information Card */}
-          <Card className="bg-card border-border lg:col-span-3 min-w-0 max-w-full">
+          <Card className="bg-card border-border, lg:col-span-3 min-w-0 max-w-full">
             <CardHeader>
               <CardTitle className="text-primary text-lg">
                 Car Login Information
@@ -2381,7 +2345,7 @@ export default function CarDetailPage() {
                   <p className="text-sm">Loading...</p>
                 </div>
               ) : onboarding ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-2 text-sm">
                   {onboarding.carManufacturerWebsite && (
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Car Manufacturer Website</p>
@@ -2390,7 +2354,7 @@ export default function CarDetailPage() {
                           href={onboarding.carManufacturerWebsite}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-700 hover:underline"
+                          className="text-blue-700, hover:underline"
                         >
                           {formatValue(onboarding.carManufacturerWebsite)}
                         </a>
@@ -2434,7 +2398,7 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Insurance Information Card */}
-          <Card className="bg-card border-border lg:col-span-3 min-w-0 max-w-full">
+          <Card className="bg-card border-border, lg:col-span-3 min-w-0 max-w-full">
             <CardHeader>
               <CardTitle className="text-primary text-lg">
                 Insurance Information
@@ -2447,7 +2411,7 @@ export default function CarDetailPage() {
         </div>
               ) : onboarding ? (
                 <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-2 text-sm">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Provider</p>
                     <p className="text-foreground text-base">{formatValue(onboarding.insuranceProvider)}</p>
@@ -2476,7 +2440,7 @@ export default function CarDetailPage() {
 
         </div>
 
-        {/* Photos Grid - 8 columns per row (up to 20 images) - Hidden for client accounts */}
+        {/* Photos Grid - 8 columns per, row(up to 20 images) - Hidden for client accounts */}
         {isAdmin && (
         <Card className="bg-card border-border">
           <CardHeader>
@@ -2494,7 +2458,7 @@ export default function CarDetailPage() {
                           <Button
                             variant="outline"
                             disabled={deleteMultiplePhotosMutation.isPending}
-                            className="border-red-500/50 text-red-700 hover:bg-red-500/10 hover:border-red-500"
+                            className="border-red-500/50 text-red-700, hover:bg-red-500/10, hover:border-red-500"
                           >
                             {deleteMultiplePhotosMutation.isPending ? (
                               <>
@@ -2503,22 +2467,22 @@ export default function CarDetailPage() {
                             ) : (
                               <>
                                 <Trash2 className="w-4 h-4 mr-2" />
-                                Delete Selected ({selectedPhotos.size})
+                                Delete, Selected({selectedPhotos.size})
                               </>
                             )}
                           </Button>
                         }
-                        title="Delete Selected Photos"
+                        title="Delete Selected Photos`
                         description={`Are you sure you want to delete ${selectedPhotos.size} photo(s)? This action cannot be undone. Photos will be deleted from both the interface and storage.`}
-                        confirmText="Delete"
+                        confirmText=`Delete"
                         cancelText="Cancel"
                         variant="destructive"
                         onConfirm={handleDeleteSelected}
                       />
                       <Button
                         variant="ghost"
-                        onClick={() => setSelectedPhotos(new Set())}
-                        className="text-muted-foreground hover:text-foreground"
+                        onClick={() => setSelectedPhotos(new, Set())}
+                        className="text-muted-foreground, hover:text-foreground"
                       >
                         Clear Selection
                       </Button>
@@ -2527,7 +2491,7 @@ export default function CarDetailPage() {
                   {car.photos && car.photos.length > 0 && (
                     <Button
                       onClick={handleSelectAll}
-                      className="bg-primary text-primary-foreground hover:bg-primary/80"
+                      className="bg-primary text-primary-foreground, hover:bg-primary/80"
                     >
                       {(() => {
                         // Check if all photos are selected
@@ -2558,11 +2522,11 @@ export default function CarDetailPage() {
                     disabled={uploadingPhotos}
                     className="hidden"
                     id="photo-upload"
-                    title="Select one or more images (JPEG, PNG, GIF, WebP - max 10MB each)"
+                    title="Select one or more, images(JPEG, PNG, GIF, WebP - max 10MB each)"
                   />
                   <Button
                     asChild
-                    className="bg-primary text-primary-foreground hover:bg-primary/80"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80"
                     disabled={uploadingPhotos}
                   >
                     <label htmlFor="photo-upload" className="cursor-pointer" title="Select multiple images to upload at once">
@@ -2584,7 +2548,7 @@ export default function CarDetailPage() {
           </CardHeader>
           <CardContent>
             {car.photos && car.photos.length > 0 ? (
-              <div className="grid grid-cols-8 gap-4">
+              <div className="grid grid-cols-8 gap-4`>
                 {car.photos.map((photo, index) => {
                   // Use getProxiedImageUrl to handle both GCS URLs and local paths
                   // This ensures CORS issues are avoided by proxying GCS URLs through the backend
@@ -2595,11 +2559,10 @@ export default function CarDetailPage() {
                   } else {
                     photoUrl = getProxiedImageUrl(photo);
                   }
-                  // Log in production to help debug
-                  if (import.meta.env.PROD && index === 0) {
-                    console.log(`[CAR DETAIL] Main photo URL (grid):`, photoUrl);
-                    console.log(`[CAR DETAIL] Photo path (grid):`, photo);
-                    console.log(`[CAR DETAIL] Original photo (grid):`, photo);
+                  // Log in production to help debug, if(import.meta.env.PROD && index === 0) {
+                    console.log(`[CAR DETAIL] Main photo, URL(grid):`, photoUrl);
+                    console.log(`[CAR DETAIL] Photo, path(grid):`, photo);
+                    console.log(`[CAR DETAIL] Original, photo(grid):`, photo);
                   }
                   const isSelected = selectedPhotos.has(index);
                   const isMain = index === 0;
@@ -2607,14 +2570,13 @@ export default function CarDetailPage() {
                     <div
                       key={index}
                       className={cn(
-                        "relative group",
+                        `relative group",
                         isSelected && "ring-2 ring-[#EAEB80] rounded-lg",
                         // Removed carousel sync indicator - carousel and Photos card are independent
                         isAdmin && "cursor-pointer"
                       )}
                       onClick={(e) => {
-                        // Only select if admin and not clicking on checkbox or delete button
-                        if (isAdmin) {
+                        // Only select if admin and not clicking on checkbox or delete button, if(isAdmin) {
                           const target = e.target as HTMLElement;
                           if (!target.closest('.checkbox-area') && !target.closest('button')) {
                             handleSelectPhoto(index);
@@ -2622,12 +2584,12 @@ export default function CarDetailPage() {
                         }
                       }}
                     >
-                      <div className="relative aspect-square">
+                      <div className="relative aspect-square`>
                     <img
                       src={photoUrl}
                       alt={`Car photo ${index + 1}`}
                           className={cn(
-                            "w-full h-full object-cover rounded-lg border transition-all",
+                            `w-full h-full object-cover rounded-lg border transition-all",
                             isSelected
                               ? "border-primary opacity-80"
                               : "border-border group-hover:border-primary/50"
@@ -2660,8 +2622,8 @@ export default function CarDetailPage() {
                               className={cn(
                                 "w-6 h-6 rounded border-2 flex items-center justify-center transition-all cursor-pointer",
                                 isSelected
-                                  ? "bg-[#EAEB80] border-primary hover:bg-primary/80"
-                                  : "bg-background/50 border-white/50 hover:border-white hover:bg-background/70"
+                                  ? "bg-[#EAEB80] border-primary, hover:bg-primary/80"
+                                  : "bg-background/50 border-white/50, hover:border-white, hover:bg-background/70"
                               )}
                             >
                               {isSelected && (
@@ -2670,7 +2632,7 @@ export default function CarDetailPage() {
                             </button>
                           </div>
                         )}
-                        {/* Delete Button (Admin only, single delete) */}
+                        {/* Delete, Button(Admin only, single delete) */}
                         {isAdmin && (
                           <div 
                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
@@ -2681,7 +2643,7 @@ export default function CarDetailPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                                  className="bg-red-500/80 hover:bg-red-500 text-foreground"
+                                  className="bg-red-500/80, hover:bg-red-500 text-foreground"
                           >
                             <X className="w-4 h-4" />
                           </Button>
@@ -2699,14 +2661,12 @@ export default function CarDetailPage() {
                                 // Delete only this specific photo
                                 deletePhotoMutation.mutate(photoToDelete, {
                                   onSuccess: () => {
-                                    // Remove from selection if it was selected
-                                    if (selectedPhotos.has(photoIndex)) {
-                                      const newSelected = new Set(selectedPhotos);
+                                    // Remove from selection if it was selected, if(selectedPhotos.has(photoIndex)) {
+                                      const newSelected = new, Set(selectedPhotos);
                                       newSelected.delete(photoIndex);
                                       setSelectedPhotos(newSelected);
                                     }
-                                    // Adjust carousel index if needed
-                                    if (car.photos && carouselIndex >= car.photos.length - 1) {
+                                    // Adjust carousel index if needed, if(car.photos && carouselIndex >= car.photos.length - 1) {
                                       setCarouselIndex(Math.max(0, car.photos.length - 2));
                                     }
                                   }
@@ -2715,7 +2675,7 @@ export default function CarDetailPage() {
                             />
                           </div>
                         )}
-                        {/* Set Main Button (Admin only) */}
+                        {/* Set Main, Button(Admin only) */}
                         {isAdmin && !isMain && (
                           <div
                             className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
@@ -2730,7 +2690,7 @@ export default function CarDetailPage() {
                                 e.stopPropagation();
                                 setMainPhotoMutation.mutate(photo);
                               }}
-                              className="bg-background/70 hover:bg-background/90 text-primary border border-primary/30 h-7 w-7 p-0"
+                              className="bg-background/70, hover:bg-background/90 text-primary border border-primary/30 h-7 w-7 p-0"
                               title="Set as main photo"
                             >
                               <Star className="w-4 h-4" />
@@ -2749,7 +2709,7 @@ export default function CarDetailPage() {
             ) : (
               <div className="flex items-center justify-center py-16">
                 <p className="text-muted-foreground text-center">
-                  No photos uploaded. {isAdmin && "Upload one or multiple photos (up to 20) to get started."}
+                  No photos uploaded. {isAdmin && "Upload one or multiple, photos(up to 20) to get started."}
                 </p>
               </div>
             )}
@@ -2774,8 +2734,7 @@ export default function CarDetailPage() {
           <Dialog open={isEditModalOpen} onOpenChange={(open) => {
             setIsEditModalOpen(open);
             if (!open) {
-              // Reset document file state when dialog closes
-              setInsuranceCardFile(null);
+              // Reset document file state when dialog closes, setInsuranceCardFile(null);
               setInsuranceCardPreview(null);
               setDriversLicenseFiles([]);
               setDriversLicensePreviews([]);
@@ -2783,7 +2742,7 @@ export default function CarDetailPage() {
           }}>
           <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold">
+              <DialogTitle className="text-lg, sm:text-xl font-semibold">
                 Edit Car Information
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
@@ -2810,7 +2769,7 @@ export default function CarDetailPage() {
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           maxLength={17}
                         />
                       </FormControl>
@@ -2830,7 +2789,7 @@ export default function CarDetailPage() {
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -2850,7 +2809,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2868,7 +2827,7 @@ export default function CarDetailPage() {
                           <Input
                             {...field}
                             type="number"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2887,7 +2846,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2905,7 +2864,7 @@ export default function CarDetailPage() {
                             <Input
                               {...field}
                               type="number"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2922,7 +2881,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2939,7 +2898,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2956,7 +2915,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2974,7 +2933,7 @@ export default function CarDetailPage() {
                           <Input
                             {...field}
                             type="date"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -2991,7 +2950,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3009,7 +2968,7 @@ export default function CarDetailPage() {
                           <Input
                             {...field}
                             type="number"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3027,7 +2986,7 @@ export default function CarDetailPage() {
                           <Input
                             {...field}
                             type="number"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3044,7 +3003,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3061,7 +3020,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3078,7 +3037,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3095,7 +3054,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3113,7 +3072,7 @@ export default function CarDetailPage() {
                           <Input
                             {...field}
                             type="date"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3132,7 +3091,7 @@ export default function CarDetailPage() {
                           value={field.value}
                         >
                         <FormControl>
-                            <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                            <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                               <SelectValue placeholder="Select" />
                             </SelectTrigger>
                         </FormControl>
@@ -3155,7 +3114,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="e.g., 3 years or Premium Package"
                           />
                         </FormControl>
@@ -3173,7 +3132,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3192,7 +3151,7 @@ export default function CarDetailPage() {
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                            <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                               <SelectValue placeholder="Select fuel type" />
                             </SelectTrigger>
                           </FormControl>
@@ -3222,7 +3181,7 @@ export default function CarDetailPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -3323,7 +3282,7 @@ export default function CarDetailPage() {
                               type="number"
                               step="0.01"
                               placeholder="0.00"
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3343,7 +3302,7 @@ export default function CarDetailPage() {
                               type="number"
                               step="0.01"
                               placeholder="0.00"
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3363,7 +3322,7 @@ export default function CarDetailPage() {
                               type="number"
                               step="0.01"
                               placeholder="0.00"
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3376,14 +3335,14 @@ export default function CarDetailPage() {
                       name="interestRate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-muted-foreground">Interest Rate (%)</FormLabel>
+                          <FormLabel className="text-muted-foreground">Interest, Rate(%)</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="number"
                               step="0.01"
                               placeholder="0.00"
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3400,7 +3359,7 @@ export default function CarDetailPage() {
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3417,7 +3376,7 @@ export default function CarDetailPage() {
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3442,7 +3401,7 @@ export default function CarDetailPage() {
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3460,7 +3419,7 @@ export default function CarDetailPage() {
                             <Input
                               {...field}
                               type="tel"
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3477,7 +3436,7 @@ export default function CarDetailPage() {
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-card border-border text-foreground focus:border-primary font-mono"
+                              className="bg-card border-border text-foreground, focus:border-primary font-mono"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3495,7 +3454,7 @@ export default function CarDetailPage() {
                             <Input
                               {...field}
                               type="date"
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3522,7 +3481,7 @@ export default function CarDetailPage() {
                               {...field}
                               type="url"
                               placeholder="https://example.com"
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3539,7 +3498,7 @@ export default function CarDetailPage() {
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3557,7 +3516,7 @@ export default function CarDetailPage() {
                             <Input
                               {...field}
                               type="password"
-                              className="bg-card border-border text-foreground focus:border-primary font-mono"
+                              className="bg-card border-border text-foreground, focus:border-primary font-mono"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3584,7 +3543,7 @@ export default function CarDetailPage() {
                               {...field}
                               type="url"
                               placeholder="https://turo.com/..."
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                             />
                           </FormControl>
                           <FormMessage />
@@ -3604,7 +3563,7 @@ export default function CarDetailPage() {
                                 {...field}
                                 type="url"
                                 placeholder="https://turo.com/..."
-                                className="bg-card border-border text-foreground focus:border-primary"
+                                className="bg-card border-border text-foreground, focus:border-primary"
                               />
                             </FormControl>
                             <FormMessage />
@@ -3614,13 +3573,13 @@ export default function CarDetailPage() {
                     )}
                     {isAdmin && (
                       <div className="space-y-2">
-                        <FormLabel className="text-muted-foreground">Turo Vehicle IDs (5–10 for automation)</FormLabel>
+                        <FormLabel className="text-muted-foreground">Turo Vehicle, IDs(5–10 for automation)</FormLabel>
                         <p className="text-xs text-muted-foreground">Add up to 10 Turo Vehicle IDs for the automation process.</p>
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="border-border text-muted-foreground hover:text-primary hover:border-primary mb-2"
+                          className="border-border text-muted-foreground, hover:text-primary, hover:border-primary mb-2"
                           onClick={() => {
                             const turoLink = form.getValues("turoLink");
                             const adminTuroLink = form.getValues("adminTuroLink");
@@ -3629,24 +3588,24 @@ export default function CarDetailPage() {
                             const newIds = [fromLink, fromAdmin].filter((id): id is string => Boolean(id));
                             if (newIds.length === 0) return;
                             const current = (form.getValues("turoVehicleIds") || []).filter((id): id is string => typeof id === "string" && id.trim().length > 0);
-                            const merged = [...new Set([...current, ...newIds])].slice(0, 10);
+                            const merged = [...new, Set([...current, ...newIds])].slice(0, 10);
                             form.setValue("turoVehicleIds", merged);
                           }}
                         >
                           Extract from Turo links
                         </Button>
                         {form.watch("turoVehicleIds")?.map((_, index) => (
-                          <div key={index} className="flex gap-2 items-center">
+                          <div key={index} className="flex gap-2 items-center`>
                             <FormField
                               control={form.control}
                               name={`turoVehicleIds.${index}`}
                               render={({ field }) => (
-                                <FormItem className="flex-1">
+                                <FormItem className=`flex-1`>
                                   <FormControl>
                                     <Input
                                       {...field}
                                       placeholder={`Vehicle ID ${index + 1}`}
-                                      className="bg-card border-border text-foreground focus:border-primary font-mono"
+                                      className=`bg-card border-border text-foreground, focus:border-primary font-mono"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -3657,7 +3616,7 @@ export default function CarDetailPage() {
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="text-muted-foreground hover:text-red-700 shrink-0"
+                              className="text-muted-foreground, hover:text-red-700 shrink-0"
                               onClick={() => {
                                 const current = form.getValues("turoVehicleIds") || [];
                                 form.setValue("turoVehicleIds", current.filter((_, i) => i !== index));
@@ -3672,7 +3631,7 @@ export default function CarDetailPage() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="border-border text-muted-foreground hover:text-primary hover:border-primary"
+                            className="border-border text-muted-foreground, hover:text-primary, hover:border-primary"
                             onClick={() => {
                               const current = form.getValues("turoVehicleIds") || [];
                               form.setValue("turoVehicleIds", [...current, ""]);
@@ -3687,7 +3646,7 @@ export default function CarDetailPage() {
                   </div>
                 </div>
 
-                {/* Car Status Section (Admin Only) */}
+                {/* Car Status, Section(Admin Only) */}
                 {isAdmin && (
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
@@ -3704,16 +3663,15 @@ export default function CarDetailPage() {
                               value={field.value || "ACTIVE"}
                               onValueChange={(value) => {
                                 field.onChange(value);
-                                // Automation: Update offboarding status based on car status
-                                if (value === "INACTIVE") {
+                                // Automation: Update offboarding status based on car status, if(value === "INACTIVE") {
                                   // When status changes to INACTIVE, set offboarding status to Offboarded
                                   // Set offboardAt to current date if not already set
                                   const currentOffboardAt = form.getValues("offboardAt");
                                   if (!currentOffboardAt) {
-                                    form.setValue("offboardAt", new Date().toISOString().split('T')[0]);
+                                    form.setValue("offboardAt", new, Date().toISOString().split('T')[0]);
                                   }
                                   // Keep offboardReason if already set, otherwise leave it
-                                } else if (value === "ACTIVE") {
+                                } else, if(value === "ACTIVE") {
                                   // When status changes to ACTIVE, clear offboarding status
                                   form.setValue("offboardAt", "");
                                   form.setValue("offboardReason", undefined);
@@ -3722,7 +3680,7 @@ export default function CarDetailPage() {
                               }}
                               disabled={!isAdmin}
                             >
-                              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                              <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                                 <SelectValue placeholder="Select car status" />
                               </SelectTrigger>
                               <SelectContent className="bg-card border-border text-foreground">
@@ -3741,7 +3699,7 @@ export default function CarDetailPage() {
                   </div>
                 )}
 
-                {/* Management Status Section (Admin Only) */}
+                {/* Management Status, Section(Admin Only) */}
                 {isAdmin && (
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-primary border-b border-border pb-2">
@@ -3759,7 +3717,7 @@ export default function CarDetailPage() {
                               onValueChange={field.onChange}
                               disabled={!isAdmin}
                             >
-                              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                              <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                                 <SelectValue placeholder="Select management status" />
                               </SelectTrigger>
                               <SelectContent className="bg-card border-border text-foreground">
@@ -3798,7 +3756,7 @@ export default function CarDetailPage() {
                       {onboarding?.insuranceCardUrl && !insuranceCardFile && (
                         <div className="space-y-2">
                           <p className="text-xs text-muted-foreground font-medium">Current Document</p>
-                          <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg hover:border-primary/30 transition-all">
+                          <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg, hover:border-primary/30 transition-all`>
                             {(() => {
                               const trimmedUrl = String(onboarding.insuranceCardUrl).trim();
                               // Check if it's a Google Drive file ID
@@ -3818,7 +3776,7 @@ export default function CarDetailPage() {
                                 : isPdfDocument(trimmedUrl);
                               
                               return isPdf ? (
-                                <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                <div className=`w-full h-full flex flex-col items-center justify-center p-4">
                                   <div className="relative">
                                     <FileText className="w-16 h-16 text-primary mb-2" />
                                     <div className="absolute -top-1 -right-1 bg-[#EAEB80]/20 text-primary text-xs px-2 py-0.5 rounded-full font-bold">
@@ -3868,7 +3826,7 @@ export default function CarDetailPage() {
                                   variant="ghost"
                                   size="icon"
                                   onClick={handleRemoveInsuranceCard}
-                                  className="absolute top-2 right-2 h-8 w-8 bg-red-500/20 text-red-700 border-red-500/50/90 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground rounded-full shadow-lg hover:scale-110 transition-transform"
+                                  className="absolute top-2 right-2 h-8 w-8 bg-red-500/20 text-red-700 border-red-500/50/90, hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground rounded-full shadow-lg, hover:scale-110 transition-transform"
                                 >
                                   <X className="w-4 h-4" />
                                 </Button>
@@ -3882,7 +3840,7 @@ export default function CarDetailPage() {
                       <div className="relative">
                         <label
                           htmlFor="insurance-card-input"
-                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
+                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50, hover:border-primary/60, hover:bg-primary/5 transition-all cursor-pointer group"
                         >
                           <div className="flex flex-col items-center justify-center pt-5 pb-6">
                             <Upload className="w-8 h-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
@@ -3890,7 +3848,7 @@ export default function CarDetailPage() {
                               {insuranceCardFile ? "Change File" : "Click to Upload"}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              Image or PDF (Max 10MB)
+                              Image or, PDF(Max 10MB)
                             </p>
                           </div>
                           <Input
@@ -3919,10 +3877,10 @@ export default function CarDetailPage() {
                       {/* Current Drivers License Previews */}
                       {onboarding?.driversLicenseUrls && Array.isArray(onboarding.driversLicenseUrls) && onboarding.driversLicenseUrls.length > 0 && driversLicenseFiles.length === 0 && (
                         <div className="space-y-2">
-                          <p className="text-xs text-muted-foreground font-medium">Current Documents ({onboarding.driversLicenseUrls.length})</p>
+                          <p className="text-xs text-muted-foreground font-medium">Current, Documents({onboarding.driversLicenseUrls.length})</p>
                           {onboarding.driversLicenseUrls.length === 1 ? (
                             // Single document - full width to match Insurance Card
-                            <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg hover:border-primary/30 transition-all">
+                            <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg, hover:border-primary/30 transition-all`>
                               {(() => {
                                 const url = onboarding.driversLicenseUrls[0];
                                 // Check if it's a Google Drive file ID
@@ -3940,7 +3898,7 @@ export default function CarDetailPage() {
                                   : isPdfDocument(url);
                                 
                                 return isPdf ? (
-                                  <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                  <div className=`w-full h-full flex flex-col items-center justify-center p-4">
                                     <div className="relative">
                                       <FileText className="w-16 h-16 text-primary mb-2" />
                                       <div className="absolute -top-1 -right-1 bg-[#EAEB80]/20 text-primary text-xs px-2 py-0.5 rounded-full font-bold">
@@ -3961,7 +3919,7 @@ export default function CarDetailPage() {
                             </div>
                           ) : (
                             // Multiple documents - grid layout
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-2 gap-3`>
                               {onboarding.driversLicenseUrls.map((url: string, index: number) => {
                                 // Check if it's a Google Drive file ID
                                 const isGoogleDriveId = url && 
@@ -3978,7 +3936,7 @@ export default function CarDetailPage() {
                                   : isPdfDocument(url);
                                 
                                 return (
-                                <div key={index} className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg hover:border-primary/30 transition-all">
+                                <div key={index} className=`relative w-full aspect-[4/3] bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl border-2 border-border overflow-hidden shadow-lg, hover:border-primary/30 transition-all">
                                   {isPdf ? (
                                     <div className="w-full h-full flex flex-col items-center justify-center p-2">
                                       <div className="relative">
@@ -3987,13 +3945,13 @@ export default function CarDetailPage() {
                                           PDF
                                         </div>
                                       </div>
-                                      <p className="text-primary text-xs font-semibold">PDF</p>
+                                      <p className="text-primary text-xs font-semibold`>PDF</p>
                                     </div>
                                   ) : (
                                       <img
                                         src={documentUrl}
                                         alt={`License ${index + 1}`}
-                                        className="w-full h-full object-contain p-1"
+                                        className=`w-full h-full object-contain p-1"
                                       />
                                     )}
                                     <div className="absolute top-1 left-1 bg-background/90 text-primary text-xs px-1.5 py-0.5 rounded font-semibold shadow-lg">
@@ -4010,7 +3968,7 @@ export default function CarDetailPage() {
                       {/* New Drivers License Previews */}
                       {driversLicenseFiles.length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-xs text-primary font-semibold">New Documents Selected ({driversLicenseFiles.length})</p>
+                          <p className="text-xs text-primary font-semibold">New Documents, Selected({driversLicenseFiles.length})</p>
                           {driversLicenseFiles.length === 1 ? (
                             // Single file - full width to match Insurance Card
                             <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#EAEB80]/10 to-[#EAEB80]/5 rounded-xl border-2 border-primary/60 overflow-hidden shadow-lg ring-2 ring-[#EAEB80]/20">
@@ -4037,7 +3995,7 @@ export default function CarDetailPage() {
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => handleRemoveDriversLicense(0)}
-                                    className="absolute top-2 right-2 h-8 w-8 bg-red-500/20 text-red-700 border-red-500/50/90 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground rounded-full shadow-lg hover:scale-110 transition-transform"
+                                    className="absolute top-2 right-2 h-8 w-8 bg-red-500/20 text-red-700 border-red-500/50/90, hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground rounded-full shadow-lg, hover:scale-110 transition-transform"
                                   >
                                     <X className="w-4 h-4" />
                                   </Button>
@@ -4065,18 +4023,18 @@ export default function CarDetailPage() {
                                     <p className="text-muted-foreground text-xs truncate w-full px-1">{file.name}</p>
                                   </div>
                                 ) : driversLicensePreviews[index] && driversLicensePreviews[index] !== 'pdf' ? (
-                                    <div className="relative w-full h-full">
+                                    <div className="relative w-full h-full`>
                                       <img
                                         src={driversLicensePreviews[index]}
                                         alt={`Preview ${index + 1}`}
-                                        className="w-full h-full object-contain p-1"
+                                        className=`w-full h-full object-contain p-1"
                                       />
                                       <Button
                                         type="button"
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => handleRemoveDriversLicense(index)}
-                                        className="absolute top-1 right-1 h-6 w-6 bg-red-500/20 text-red-700 border-red-500/50/90 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground rounded-full shadow-lg hover:scale-110 transition-transform"
+                                        className="absolute top-1 right-1 h-6 w-6 bg-red-500/20 text-red-700 border-red-500/50/90, hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground rounded-full shadow-lg, hover:scale-110 transition-transform"
                                       >
                                         <X className="w-3 h-3" />
                                       </Button>
@@ -4100,15 +4058,15 @@ export default function CarDetailPage() {
                       <div className="relative">
                         <label
                           htmlFor="drivers-license-input"
-                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
+                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50, hover:border-primary/60, hover:bg-primary/5 transition-all cursor-pointer group"
                         >
                           <div className="flex flex-col items-center justify-center pt-5 pb-6">
                             <Upload className="w-8 h-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
-                            <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors">
-                              {driversLicenseFiles.length > 0 ? `Change Files (${driversLicenseFiles.length} selected)` : "Click to Upload"}
+                            <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors`>
+                              {driversLicenseFiles.length > 0 ? `Change, Files(${driversLicenseFiles.length} selected)` : `Click to Upload"}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              Multiple files allowed (Max 10MB each)
+                              Multiple files, allowed(Max 10MB each)
                             </p>
                           </div>
                           <Input
@@ -4135,13 +4093,13 @@ export default function CarDetailPage() {
                     type="button"
                     variant="ghost"
                     onClick={() => setIsEditModalOpen(false)}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground, hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                     disabled={updateMutation.isPending}
                   >
                     {updateMutation.isPending ? "Updating..." : "Update"}
@@ -4167,7 +4125,7 @@ export default function CarDetailPage() {
                 e.stopPropagation();
                 setFullScreenImageIndex(null);
               }}
-              className="fixed top-6 right-6 z-[200] h-12 w-12 bg-background/90 hover:bg-red-500/20 text-red-700 border-red-500/50/90 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+              className="fixed top-6 right-6 z-[200] h-12 w-12 bg-background/90, hover:bg-red-500/20 text-red-700 border-red-500/50/90 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all, hover:scale-110"
               aria-label="Close full screen view"
             >
               <X className="w-7 h-7" />
@@ -4178,7 +4136,7 @@ export default function CarDetailPage() {
               {/* Image Counter - Bottom Center */}
               {car.photos.length > 1 && (
                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[101] bg-background/80 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-white/40 shadow-2xl">
-                  <span className="text-foreground text-base font-semibold tracking-wide">
+                  <span className="text-foreground text-base font-semibold tracking-wide`>
                     {fullScreenImageIndex + 1} / {car.photos.length}
                   </span>
                 </div>
@@ -4189,14 +4147,14 @@ export default function CarDetailPage() {
                 <img
                   src={getProxiedImageUrl(car.photos[fullScreenImageIndex])}
                   alt={`Car photo ${fullScreenImageIndex + 1}`}
-                  className="w-full h-full object-contain"
+                  className=`w-full h-full object-contain"
                   onClick={(e) => e.stopPropagation()}
                   style={{
                     maxWidth: '100vw',
                     maxHeight: '100vh',
                   }}
                   onError={(e) => {
-                    console.error('Failed to load photo:', car.photos?.[fullScreenImageIndex]);
+                    console.error('Failed to load, photo:', car.photos?.[fullScreenImageIndex]);
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
@@ -4219,7 +4177,7 @@ export default function CarDetailPage() {
                 e.stopPropagation();
                 setFullScreenDocument(null);
               }}
-              className="fixed top-4 right-4 z-[9999] h-14 w-14 bg-red-500/20 text-red-700 border-red-500/50/90 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground border-2 border-white rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110 flex items-center justify-center"
+              className="fixed top-4 right-4 z-[9999] h-14 w-14 bg-red-500/20 text-red-700 border-red-500/50/90, hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground border-2 border-white rounded-full shadow-2xl backdrop-blur-sm transition-all, hover:scale-110 flex items-center justify-center"
               aria-label="Close full screen view"
               style={{
                 position: 'fixed',
@@ -4232,7 +4190,7 @@ export default function CarDetailPage() {
             </Button>
 
             <div className="relative w-full h-full flex items-center justify-center p-8">
-              {/* Image Counter - Bottom Center (for multiple drivers licenses) */}
+              {/* Image Counter - Bottom, Center(for multiple drivers licenses) */}
               {fullScreenDocument.type === 'license' && 
                validDriversLicenseUrls.length > 1 && 
                fullScreenDocument.index !== undefined && (
@@ -4243,7 +4201,7 @@ export default function CarDetailPage() {
                 </div>
               )}
 
-              {/* Navigation Buttons (for multiple drivers licenses) */}
+              {/* Navigation, Buttons(for multiple drivers licenses) */}
               {fullScreenDocument.type === 'license' && 
                validDriversLicenseUrls.length > 1 && 
                fullScreenDocument.index !== undefined && (
@@ -4252,7 +4210,7 @@ export default function CarDetailPage() {
                   {fullScreenDocument.index > 0 && (
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="icon`
                       onClick={(e) => {
                         e.stopPropagation();
                         const prevIndex = fullScreenDocument.index! - 1;
@@ -4276,7 +4234,7 @@ export default function CarDetailPage() {
                             : isPdfDocument(prevUrl)
                         });
                       }}
-                      className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90 hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+                      className=`fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90, hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all, hover:scale-110"
                       aria-label="Previous image"
                     >
                       <ChevronLeft className="w-6 h-6" />
@@ -4287,7 +4245,7 @@ export default function CarDetailPage() {
                   {fullScreenDocument.index < validDriversLicenseUrls.length - 1 && (
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="icon`
                       onClick={(e) => {
                         e.stopPropagation();
                         const nextIndex = fullScreenDocument.index! + 1;
@@ -4311,7 +4269,7 @@ export default function CarDetailPage() {
                             : isPdfDocument(nextUrl)
                         });
                       }}
-                      className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90 hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+                      className=`fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90, hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all, hover:scale-110"
                       aria-label="Next image"
                     >
                       <ChevronRight className="w-6 h-6" />
@@ -4324,7 +4282,7 @@ export default function CarDetailPage() {
               {fullScreenDocument.isPdf ? (
                 <iframe
                   src={fullScreenDocument.url}
-                  className="w-full h-full border-0"
+                  className="w-full h-full border-0`
                   style={{
                     maxWidth: '100vw',
                     maxHeight: '100vh',
@@ -4336,14 +4294,14 @@ export default function CarDetailPage() {
                 <img
                   src={fullScreenDocument.url}
                   alt={fullScreenDocument.type === 'insurance' ? 'Insurance Card' : `Drivers License ${fullScreenDocument.index !== undefined ? fullScreenDocument.index + 1 : ''}`}
-                  className="w-full h-full object-contain"
+                  className=`w-full h-full object-contain"
                   onClick={(e) => e.stopPropagation()}
                   style={{
                     maxWidth: '100vw',
                     maxHeight: '100vh',
                   }}
                   onError={(e) => {
-                    console.error('Failed to load image in full screen viewer:', fullScreenDocument.url);
+                    console.error('Failed to load image in full screen, viewer:', fullScreenDocument.url);
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />

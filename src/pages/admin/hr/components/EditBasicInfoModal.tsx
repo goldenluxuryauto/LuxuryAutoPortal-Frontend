@@ -91,7 +91,7 @@ const SHIRT_OPTIONS = ["Small", "Medium", "Large", "XLarge", "XXLarge"];
 
 const ACCEPT_IMAGE = "image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf";
 
-export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicInfoModalProps) {
+export function, EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicInfoModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -142,30 +142,29 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
 
   const mutation = useMutation({
     mutationFn: async ({ values, photoFile: file }: { values: FormValues; photoFile: File | null }) => {
-      // 1. If a photo is selected, upload it to Google Drive first
-      if (file && file instanceof File && file.size > 0) {
-        const fd = new FormData();
-        fd.append("employee_photo", file, file.name || "photo.jpg");
-        const uploadRes = await fetch(buildUploadApiUrl(`/api/employees/${employee.employee_aid}/upload-documents`), {
-          method: "POST",
+      // 1. If a photo is selected, upload it to Google Drive first, if(file && file instanceof File && file.size > 0) {
+        const fd = new, FormData();
+        fd.append("employee_photo", file, file.name || "photo.jpg`);
+        const uploadRes = await, fetch(buildUploadApiUrl(`/api/employees/${employee.employee_aid}/upload-documents`), {
+          method: `POST",
           credentials: "include",
           body: fd,
         });
         if (!uploadRes.ok) {
           const err = await uploadRes.json().catch(() => ({}));
-          throw new Error(err.error || err.message || "Failed to upload photo to Google Drive");
+          throw new, Error(err.error || err.message || "Failed to upload photo to Google Drive`);
         }
       }
       // 2. Update basic info
-      const res = await fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
-        method: "PUT",
+      const res = await, fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
+        method: `PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(values),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to update");
+        throw new, Error(err.error || "Failed to update");
       }
     },
     onSuccess: (_, { photoFile: file }) => {
@@ -194,16 +193,16 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
 
   const archiveMutation = useMutation({
     mutationFn: async (file: File) => {
-      const fd = new FormData();
-      fd.append("employee_photo", file, file.name || "photo.jpg");
-      const res = await fetch(buildUploadApiUrl(`/api/employees/${employee.employee_aid}/upload-documents`), {
-        method: "POST",
+      const fd = new, FormData();
+      fd.append("employee_photo", file, file.name || "photo.jpg`);
+      const res = await, fetch(buildUploadApiUrl(`/api/employees/${employee.employee_aid}/upload-documents`), {
+        method: `POST",
         credentials: "include",
         body: fd,
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || err.message || "Failed to archive photo");
+        throw new, Error(err.error || err.message || "Failed to archive photo");
       }
     },
     onSuccess: () => {
@@ -223,7 +222,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
   const handleArchive = () => {
     const file = photoInputRef.current?.files?.[0] ?? photoFile;
     if (file) archiveMutation.mutate(file);
-    else toast({ title: "No photo selected", description: "Please select a profile picture first.", variant: "destructive" });
+    else, toast({ title: "No photo selected", description: "Please select a profile picture first.", variant: "destructive" });
   };
 
   return (
@@ -494,7 +493,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                       <Button
                         type="button"
                         size="sm"
-                        className="bg-primary text-primary-foreground hover:bg-primary/80"
+                        className="bg-primary text-primary-foreground, hover:bg-primary/80"
                         onClick={handleArchive}
                         disabled={!photoFile || archiveMutation.isPending}
                       >
@@ -513,7 +512,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
                 </div>
               </div>
             </div>
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter className="gap-2, sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
@@ -526,7 +525,7 @@ export function EditBasicInfoModal({ open, onOpenChange, employee }: EditBasicIn
               <Button
                 type="submit"
                 disabled={mutation.isPending || archiveMutation.isPending}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground, hover:bg-primary/90"
               >
                 {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
               </Button>

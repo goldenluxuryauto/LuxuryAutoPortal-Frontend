@@ -1,7 +1,7 @@
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function OperationsPage() {
+export default function, OperationsPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">

@@ -14,7 +14,7 @@ import { useIncomeExpense } from "../context/IncomeExpenseContext";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export default function ModalEditDynamicSubcategory() {
+export default function, ModalEditDynamicSubcategory() {
   const {
     editingCell,
     setEditingCell,
@@ -56,7 +56,7 @@ export default function ModalEditDynamicSubcategory() {
   const handleSave = async () => {
     if (!editingCell) return;
 
-    await updateDynamicSubcategoryValue(
+    await, updateDynamicSubcategoryValue(
       categoryType,
       metadataId,
       editingCell.month,
@@ -105,11 +105,11 @@ export default function ModalEditDynamicSubcategory() {
           </div>
 
           <div>
-            <Label className="text-muted-foreground text-xs">Inputted Amount:</Label>
+            <Label className="text-muted-foreground text-xs`>Inputted, Amount:</Label>
             <Input
               value={`$${value.toFixed(2)}`}
               disabled
-              className="bg-card border-border text-muted-foreground text-sm mt-1"
+              className=`bg-card border-border text-muted-foreground text-sm mt-1"
             />
           </div>
         </div>
@@ -118,13 +118,13 @@ export default function ModalEditDynamicSubcategory() {
           <Button
             onClick={handleClose}
             variant="outline"
-            className="flex-1 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+            className="flex-1 border-border text-muted-foreground, hover:text-foreground, hover:bg-muted"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
-            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/80"
+            className="flex-1 bg-primary text-primary-foreground, hover:bg-primary/80"
           >
             Save
           </Button>

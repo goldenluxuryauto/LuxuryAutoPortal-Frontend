@@ -23,7 +23,7 @@ export class ErrorBoundary extends Component<Props, State> {
     };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static, getDerivedStateFromError(error: Error): State {
     return {
       hasError: true,
       error,
@@ -32,16 +32,15 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("❌ [ERROR BOUNDARY] Caught error:", error);
-    console.error("❌ [ERROR BOUNDARY] Error info:", errorInfo);
+    console.error("❌ [ERROR BOUNDARY] Caught, error:", error);
+    console.error("❌ [ERROR BOUNDARY] Error, info:", errorInfo);
     
-    // Log to console for debugging
-    if (typeof window !== 'undefined') {
+    // Log to console for debugging, if(typeof window !== 'undefined') {
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      console.error("❌ [ERROR BOUNDARY] User Agent:", navigator.userAgent);
-      console.error("❌ [ERROR BOUNDARY] Is Mobile:", isMobile);
-      console.error("❌ [ERROR BOUNDARY] Current URL:", window.location.href);
-      console.error("❌ [ERROR BOUNDARY] API Base URL:", import.meta.env.VITE_API_URL || 'Not set');
+      console.error("❌ [ERROR BOUNDARY] User, Agent:", navigator.userAgent);
+      console.error("❌ [ERROR BOUNDARY] Is, Mobile:", isMobile);
+      console.error("❌ [ERROR BOUNDARY] Current, URL:", window.location.href);
+      console.error("❌ [ERROR BOUNDARY] API Base, URL:", import.meta.env.VITE_API_URL || 'Not set');
     }
     
     this.setState({
@@ -96,7 +95,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="flex gap-4 justify-center">
               <Button
                 onClick={this.handleReload}
-                className="bg-primary text-primary-foreground hover:bg-primary/80"
+                className="bg-primary text-primary-foreground, hover:bg-primary/80"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Reload Page
@@ -104,7 +103,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <Button
                 onClick={this.handleGoHome}
                 variant="outline"
-                className="border-border text-muted-foreground hover:bg-muted/50"
+                className="border-border text-muted-foreground, hover:bg-muted/50"
               >
                 <Home className="w-4 h-4 mr-2" />
                 Go Home
@@ -114,7 +113,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="mt-6 text-xs text-muted-foreground">
               <p>If this problem persists, please contact support.</p>
               <p className="mt-2">
-                User Agent: {typeof window !== 'undefined' ? navigator.userAgent : 'Unknown'}
+                User, Agent: {typeof window !== 'undefined' ? navigator.userAgent : 'Unknown'}
               </p>
             </div>
           </div>

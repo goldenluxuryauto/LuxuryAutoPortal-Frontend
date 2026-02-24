@@ -12,11 +12,11 @@ const legalLinks = [
   { href: "/terms", label: "Terms of Service" },
 ];
 
-export function Footer() {
+export function, Footer() {
   return (
     <footer className="bg-background border-t border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+      <div className="max-w-7xl mx-auto px-4, sm:px-6, lg:px-8 py-12, lg:py-16">
+        <div className="grid grid-cols-1, md:grid-cols-2, lg:grid-cols-4 gap-8, lg:gap-12">
           <div className="lg:col-span-1">
             <Link
               href="/"
@@ -49,7 +49,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className="text-sm text-muted-foreground, hover:text-primary transition-colors`
                     data-testid={`link-footer-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     {link.label}
@@ -60,7 +60,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-foreground tracking-wide uppercase mb-4">
+            <h3 className=`text-sm font-semibold text-foreground tracking-wide uppercase mb-4">
               Contact
             </h3>
             <ul className="space-y-3">
@@ -74,7 +74,7 @@ export function Footer() {
                 <Phone className="w-4 h-4 text-primary shrink-0" />
                 <a
                   href="tel:+1234567890"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className="text-sm text-muted-foreground, hover:text-primary transition-colors"
                   data-testid="link-footer-phone"
                 >
                   +1 (234) 567-890
@@ -84,7 +84,7 @@ export function Footer() {
                 <Mail className="w-4 h-4 text-primary shrink-0" />
                 <a
                   href="mailto:info@luxuryauto.com"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className="text-sm text-muted-foreground, hover:text-primary transition-colors"
                   data-testid="link-footer-email"
                 >
                   info@luxuryauto.com
@@ -114,16 +114,16 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="mt-12 pt-8 border-t border-border flex flex-col, md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Luxury Auto Gallery. All rights reserved.
+            &copy; {new, Date().getFullYear()} Luxury Auto Gallery. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             {legalLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                className="text-xs text-muted-foreground, hover:text-primary transition-colors"
                 data-testid={`link-footer-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 {link.label}

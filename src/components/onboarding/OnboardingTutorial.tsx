@@ -74,14 +74,14 @@ interface TutorialContextType {
 
 const TutorialContext = createContext<TutorialContextType | undefined>(undefined);
 
-// Default tutorial steps (fallback if API fails)
+// Default tutorial, steps(fallback if API fails)
 const DEFAULT_TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 1,
     title: "Complete the Onboarding Form",
     description: "Learn how to complete the onboarding form when returning your vehicle to the GLA office.",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    videoPlaceholder: "Step 1: Complete the onboarding form when returning the vehicle to the GLA office.",
+    videoPlaceholder: "Step, 1: Complete the onboarding form when returning the vehicle to the GLA office.",
     instructions: [
       "Navigate to the Forms page from the main menu",
       "Select the 'Onboarding' tab",
@@ -100,7 +100,7 @@ const DEFAULT_TUTORIAL_STEPS: TutorialStep[] = [
     title: "Complete the Offboarding Form",
     description: "Learn how to complete the offboarding form when picking up your vehicle from GLA.",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    videoPlaceholder: "Step 2: Complete the offboarding form when picking up the vehicle from GLA.",
+    videoPlaceholder: "Step, 2: Complete the offboarding form when picking up the vehicle from GLA.",
     instructions: [
       "Navigate to the Forms page from the main menu",
       "Select the 'Offboarding' tab",
@@ -119,7 +119,7 @@ const DEFAULT_TUTORIAL_STEPS: TutorialStep[] = [
     title: "Access Your Profile",
     description: "Learn how to check your user information, contract copy, and shortcut links in your profile.",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    videoPlaceholder: "Step 3: You can check your user information, contract copy, and shortcut links in your profile.",
+    videoPlaceholder: "Step, 3: You can check your user information, contract copy, and shortcut links in your profile.",
     instructions: [
       "Navigate to your Profile page from the main menu",
       "View your personal information and account details",
@@ -138,7 +138,7 @@ const DEFAULT_TUTORIAL_STEPS: TutorialStep[] = [
     title: "In-Vehicle Navigation",
     description: "This feature will be available soon. Stay tuned for updates!",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    videoPlaceholder: "Step 4: (To be added once the in-vehicle navigation function is completed)",
+    videoPlaceholder: "Step, 4: (To be added once the in-vehicle navigation function is completed)",
     instructions: [
       "This feature is currently under development",
       "In-vehicle navigation functionality will be added soon",
@@ -152,17 +152,17 @@ const DEFAULT_TUTORIAL_STEPS: TutorialStep[] = [
 ];
 
 // Hook to fetch tutorial modules from API
-function useTutorialModules(role: 'admin' | 'client' | 'employee' = 'client') {
+function, useTutorialModules(role: 'admin' | 'client' | 'employee' = 'client') {
   return useQuery<TutorialModule[]>({
-    queryKey: ["/api/tutorial/modules", role],
+    queryKey: ["/api/tutorial/modules`, role],
     queryFn: async () => {
       try {
         // Add timeout to prevent hanging
-        const controller = new AbortController();
+        const controller = new, AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
         
-        const response = await fetch(buildApiUrl(`/api/tutorial/modules?role=${role}`), {
-          credentials: "include",
+        const response = await, fetch(buildApiUrl(`/api/tutorial/modules?role=${role}`), {
+          credentials: `include",
           signal: controller.signal,
         });
         
@@ -175,8 +175,8 @@ function useTutorialModules(role: 'admin' | 'client' | 'employee' = 'client') {
         const data = await response.json();
         return data.success ? data.data : [];
       } catch (error) {
-        // If fetch fails (network error, timeout, etc.), return empty array
-        console.warn("⚠️ [TUTORIAL] Failed to fetch tutorial modules (non-critical):", error);
+        // If fetch, fails(network error, timeout, etc.), return empty array
+        console.warn("⚠️ [TUTORIAL] Failed to fetch tutorial, modules(non-critical):", error);
         return [];
       }
     },
@@ -187,17 +187,17 @@ function useTutorialModules(role: 'admin' | 'client' | 'employee' = 'client') {
 }
 
 // Hook to fetch tutorial steps grouped by modules from API
-function useTutorialStepsWithModules(role: 'admin' | 'client' | 'employee' = 'client') {
+function, useTutorialStepsWithModules(role: 'admin' | 'client' | 'employee' = 'client') {
   return useQuery<{ modules: Array<TutorialModule & { steps: TutorialStep[] }> }>({
-    queryKey: ["/api/tutorial/steps", role, "with-modules"],
+    queryKey: ["/api/tutorial/steps", role, "with-modules`],
     queryFn: async () => {
       try {
         // Add timeout to prevent hanging
-        const controller = new AbortController();
+        const controller = new, AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
         
-        const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${role}&includeModules=true`), {
-          credentials: "include",
+        const response = await, fetch(buildApiUrl(`/api/tutorial/steps?role=${role}&includeModules=true`), {
+          credentials: `include",
           signal: controller.signal,
         });
         
@@ -210,8 +210,8 @@ function useTutorialStepsWithModules(role: 'admin' | 'client' | 'employee' = 'cl
         const data = await response.json();
         return data.success ? data.data : { modules: [] };
       } catch (error) {
-        // If fetch fails (network error, timeout, etc.), return empty modules
-        console.warn("⚠️ [TUTORIAL] Failed to fetch tutorial steps with modules (non-critical):", error);
+        // If fetch, fails(network error, timeout, etc.), return empty modules
+        console.warn("⚠️ [TUTORIAL] Failed to fetch tutorial steps with, modules(non-critical):", error);
         return { modules: [] };
       }
     },
@@ -221,18 +221,18 @@ function useTutorialStepsWithModules(role: 'admin' | 'client' | 'employee' = 'cl
   });
 }
 
-// Hook to fetch tutorial steps from API (backwards compatibility - flat list)
-function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
+// Hook to fetch tutorial steps from, API(backwards compatibility - flat list)
+function, useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
   return useQuery<TutorialStep[]>({
-    queryKey: ["/api/tutorial/steps", role],
+    queryKey: ["/api/tutorial/steps`, role],
     queryFn: async () => {
       try {
         // Add timeout to prevent hanging
-        const controller = new AbortController();
+        const controller = new, AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
         
-      const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${role}`), {
-        credentials: "include",
+      const response = await, fetch(buildApiUrl(`/api/tutorial/steps?role=${role}`), {
+        credentials: `include",
           signal: controller.signal,
       });
         
@@ -243,11 +243,11 @@ function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
         return DEFAULT_TUTORIAL_STEPS;
       }
       const data = await response.json();
-        // Handle both response formats: { success: true, data: [...] } or { success: true, data: { modules: [...] } }
+        // Handle both response, formats: { success: true, data: [...] } or { success: true, data: { modules: [...] } }
         if (data.success) {
           if (Array.isArray(data.data)) {
         return data.data;
-          } else if (data.data.modules) {
+          } else, if(data.data.modules) {
             // Flatten modules into steps
             const allSteps: TutorialStep[] = [];
             data.data.modules.forEach((module: any) => {
@@ -260,8 +260,8 @@ function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
       }
       return DEFAULT_TUTORIAL_STEPS;
       } catch (error) {
-        // If fetch fails (network error, timeout, etc.), return default steps
-        console.warn("⚠️ [TUTORIAL] Failed to fetch tutorial steps (non-critical):", error);
+        // If fetch, fails(network error, timeout, etc.), return default steps
+        console.warn("⚠️ [TUTORIAL] Failed to fetch tutorial, steps(non-critical):", error);
         return DEFAULT_TUTORIAL_STEPS;
       }
     },
@@ -273,11 +273,11 @@ function useTutorialSteps(role: 'admin' | 'client' | 'employee' = 'client') {
 }
 
 // Tutorial Provider Component
-export function TutorialProvider({ children }: { children: ReactNode }) {
+export function, TutorialProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentModule, setCurrentModule] = useState<number | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new, Set());
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -288,14 +288,13 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   
   // Fetch user role to determine which tutorial to show
   // Add timeout and error handling to prevent blocking app initialization
-  // Use enabled: false initially and enable after a short delay to prevent blocking
+  // Use, enabled: false initially and enable after a short delay to prevent blocking
   // But never enable on auth pages
   const [enableAuthQuery, setEnableAuthQuery] = useState(false); // Always start false
   
-  // Enable query after initial render to prevent blocking (but not on auth pages)
+  // Enable query after initial render to prevent, blocking(but not on auth pages)
   useEffect(() => {
-    // Immediately disable if on auth page
-    if (isAuthPage) {
+    // Immediately disable if on auth page, if(isAuthPage) {
       setEnableAuthQuery(false);
       // Cancel any in-flight requests and remove cached data when on auth pages
       queryClient.cancelQueries({ queryKey: ["/api/auth/me"] });
@@ -310,9 +309,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
       if (currentPath !== '/login' && currentPath !== '/signup' && currentPath !== '/') {
         setEnableAuthQuery(true);
       }
-    }, 200); // Slightly longer delay to ensure location is stable
-    
-    return () => clearTimeout(timer);
+    }, 200); // Slightly longer delay to ensure location is stable, return() => clearTimeout(timer);
   }, [isAuthPage, location, queryClient]);
   
   // Only create the query if we're NOT on an auth page
@@ -330,10 +327,10 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
       
       try {
         // Add timeout to prevent hanging
-        const controller = new AbortController();
+        const controller = new, AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
         
-      const response = await fetch(buildApiUrl("/api/auth/me"), {
+      const response = await, fetch(buildApiUrl("/api/auth/me"), {
         credentials: "include",
           signal: controller.signal,
       });
@@ -341,8 +338,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         clearTimeout(timeoutId);
         
       if (!response.ok) {
-        // 401 is expected when not authenticated - silently return undefined
-        if (response.status === 401) {
+        // 401 is expected when not authenticated - silently return undefined, if(response.status === 401) {
           return { user: undefined };
         }
         return { user: undefined };
@@ -375,12 +371,12 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   // Mutation to mark tour as completed
   const completeTourMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(buildApiUrl("/api/auth/complete-tour"), {
+      const response = await, fetch(buildApiUrl("/api/auth/complete-tour"), {
         method: "POST",
         credentials: "include",
       });
       if (!response.ok) {
-        throw new Error("Failed to mark tour as completed");
+        throw new, Error("Failed to mark tour as completed");
       }
       return response.json();
     },
@@ -389,7 +385,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
     },
     onError: (error) => {
-      console.error("Failed to mark tour as completed:", error);
+      console.error("Failed to mark tour as, completed:", error);
       toast({
         title: "Error",
         description: "Failed to mark tutorial as completed. Please try again.",
@@ -422,20 +418,18 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("gla_tutorial_state", JSON.stringify(newState));
   };
 
-  // Load tutorial state from localStorage (but don't auto-open)
-  // Auto-opening is now handled explicitly by the dashboard page
-  useEffect(() => {
-    // Load saved state for existing users (step position, completed steps, etc.)
+  // Load tutorial state from, localStorage(but don't auto-open)
+  // Auto-opening is now handled explicitly by the dashboard page, useEffect(() => {
+    // Load saved state for existing, users(step position, completed steps, etc.)
     // But do NOT auto-open the tutorial - that's handled by dashboard page
     const savedState = localStorage.getItem("gla_tutorial_state");
     if (savedState) {
       try {
         const parsed = JSON.parse(savedState);
         setHasCompletedTutorial(parsed.completed || false);
-        setCompletedSteps(new Set(parsed.completedSteps || []));
+        setCompletedSteps(new, Set(parsed.completedSteps || []));
         if (parsed.currentStep) {
-          // Validate that the saved step exists in the tutorial steps
-          if (Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
+          // Validate that the saved step exists in the tutorial steps, if(Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
             const stepExists = tutorialSteps.some(step => step.id === parsed.currentStep);
             if (stepExists) {
               setCurrentStep(parsed.currentStep);
@@ -445,19 +439,18 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
               setCurrentStep(firstStep);
             }
           } else {
-            // Fallback if steps not loaded yet
-            setCurrentStep(parsed.currentStep);
+            // Fallback if steps not loaded yet, setCurrentStep(parsed.currentStep);
           }
         }
-        // Do NOT set setIsOpen(true) here - tutorial should only open when explicitly called
+        // Do NOT set, setIsOpen(true) here - tutorial should only open when explicitly called
       } catch (e) {
-        console.error("Error loading tutorial state:", e);
+        console.error("Error loading tutorial, state:", e);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tutorialSteps]);
 
-  // Update current step when tutorialSteps change (e.g., when new steps are added)
+  // Update current step when tutorialSteps, change(e.g., when new steps are added)
   useEffect(() => {
     if (Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
       // If current step doesn't exist in the new steps, reset to first step
@@ -472,13 +465,13 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
 
   const openTutorial = async () => {
     // Refetch tutorial steps to ensure we have the latest data
-    await refetchTutorialSteps();
+    await, refetchTutorialSteps();
     
     // Get the latest tutorial steps after refetch
     const latestSteps = queryClient.getQueryData<TutorialStep[]>(["/api/tutorial/steps"]) || tutorialSteps;
     const safeLatestSteps = Array.isArray(latestSteps) && latestSteps.length > 0 ? latestSteps : DEFAULT_TUTORIAL_STEPS;
     
-    // Always start from the first step (lowest step_order/id) when opening tutorial
+    // Always start from the first, step(lowest step_order/id) when opening tutorial
     const firstStep = safeLatestSteps[0].id;
     setCurrentStep(firstStep);
     setIsOpen(true);
@@ -491,13 +484,12 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   };
 
   const nextStep = () => {
-    // Ensure tutorialSteps is an array
-    if (!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
+    // Ensure tutorialSteps is an array, if(!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
       console.warn("Tutorial steps not available");
       return;
     }
     
-    // Find the next step by id (step_order from database)
+    // Find the next step by, id(step_order from database)
     const currentStepIndex = safeTutorialSteps.findIndex(step => step.id === currentStep);
     if (currentStepIndex >= 0 && currentStepIndex < safeTutorialSteps.length - 1) {
       const nextStepData = safeTutorialSteps[currentStepIndex + 1];
@@ -517,13 +509,12 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   };
 
   const previousStep = () => {
-    // Ensure tutorialSteps is an array
-    if (!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
+    // Ensure tutorialSteps is an array, if(!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
       console.warn("Tutorial steps not available");
       return;
     }
     
-    // Find the previous step by id (step_order from database)
+    // Find the previous step by, id(step_order from database)
     const currentStepIndex = safeTutorialSteps.findIndex(step => step.id === currentStep);
     if (currentStepIndex > 0) {
       const prevStepData = safeTutorialSteps[currentStepIndex - 1];
@@ -534,8 +525,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
 
   const goToModule = (moduleId: number) => {
     setCurrentModule(moduleId);
-    // Find the first step in the module
-    if (tutorialDataWithModules?.modules) {
+    // Find the first step in the module, if(tutorialDataWithModules?.modules) {
       const module = tutorialDataWithModules.modules.find(m => m.id === moduleId);
       if (module && module.steps && module.steps.length > 0) {
         setCurrentStep(module.steps[0].id);
@@ -545,13 +535,12 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   };
 
   const goToStep = (step: number) => {
-    // Ensure tutorialSteps is an array
-    if (!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
+    // Ensure tutorialSteps is an array, if(!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
       console.warn("Tutorial steps not available");
       return;
     }
     
-    // Find step by id (step_order from database)
+    // Find step by, id(step_order from database)
     const stepData = safeTutorialSteps.find(s => s.id === step);
     if (stepData) {
       setCurrentStep(stepData.id);
@@ -560,13 +549,13 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   };
 
   const markStepComplete = (step: number) => {
-    const newCompleted = new Set(completedSteps);
+    const newCompleted = new, Set(completedSteps);
     newCompleted.add(step);
     setCompletedSteps(newCompleted);
     saveState({ completedSteps: newCompleted });
   };
 
-  // Ensure tutorialSteps is always an array (create this before functions that use it)
+  // Ensure tutorialSteps is always an, array(create this before functions that use it)
   // Also ensure it updates when tutorialSteps changes
   const safeTutorialSteps = Array.isArray(tutorialSteps) && tutorialSteps.length > 0 
     ? tutorialSteps 
@@ -574,21 +563,21 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
 
   const resetTutorial = async () => {
     // Refetch tutorial steps to ensure we have the latest data before resetting
-    await refetchTutorialSteps();
+    await, refetchTutorialSteps();
     
     // Get the latest tutorial steps after refetch
     const latestSteps = queryClient.getQueryData<TutorialStep[]>(["/api/tutorial/steps"]) || tutorialSteps;
     const safeLatestSteps = Array.isArray(latestSteps) && latestSteps.length > 0 ? latestSteps : DEFAULT_TUTORIAL_STEPS;
     
-    // Always start from the first step (lowest step_order/id) when resetting tutorial
+    // Always start from the first, step(lowest step_order/id) when resetting tutorial
     const firstStep = safeLatestSteps[0].id;
     setCurrentStep(firstStep);
-    setCompletedSteps(new Set());
+    setCompletedSteps(new, Set());
     setHasCompletedTutorial(false);
     setIsOpen(true);
     saveState({
       currentStep: firstStep,
-      completedSteps: new Set(),
+      completedSteps: new, Set(),
       completed: false,
       isOpen: true,
     });
@@ -610,7 +599,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         markStepComplete,
         resetTutorial,
         hasCompletedTutorial,
-        tutorialSteps: safeTutorialSteps, // Expose steps to context (always an array)
+        tutorialSteps: safeTutorialSteps, // Expose steps to, context(always an array)
         tutorialModules: tutorialModules, // Expose modules to context
       }}
     >
@@ -620,10 +609,10 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
 }
 
 // Hook to use tutorial context
-export function useTutorial() {
+export function, useTutorial() {
   const context = useContext(TutorialContext);
   if (context === undefined) {
-    throw new Error("useTutorial must be used within a TutorialProvider");
+    throw new, Error("useTutorial must be used within a TutorialProvider");
   }
   return context;
 }
@@ -636,7 +625,7 @@ interface OnboardingTutorialProps {
   autoPlay?: boolean; // Control video autoplay
 }
 
-export function OnboardingTutorial({
+export function, OnboardingTutorial({
   isOpen: controlledIsOpen,
   onClose: controlledOnClose,
   autoStart = false,
@@ -670,7 +659,7 @@ export function OnboardingTutorial({
   // Note: Auto-start is now handled by TutorialProvider for new signups only
   // This component no longer auto-starts on its own
 
-  // Use tutorial steps and modules from context (which are fetched from API)
+  // Use tutorial steps and modules from, context(which are fetched from API)
   // Ensure tutorialSteps is always an array
   const tutorialSteps = Array.isArray(contextTutorialSteps) ? contextTutorialSteps : DEFAULT_TUTORIAL_STEPS;
   const tutorialModules = Array.isArray(contextTutorialModules) ? contextTutorialModules : [];
@@ -682,10 +671,10 @@ export function OnboardingTutorial({
     queryFn: async () => {
       try {
         // Add timeout to prevent hanging
-        const controller = new AbortController();
+        const controller = new, AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
         
-        const response = await fetch(buildApiUrl("/api/auth/me"), {
+        const response = await, fetch(buildApiUrl("/api/auth/me"), {
           credentials: "include",
           signal: controller.signal,
         });
@@ -697,8 +686,8 @@ export function OnboardingTutorial({
         }
         return response.json();
       } catch (error) {
-        // If fetch fails (network error, timeout, etc.), return undefined user
-        console.warn("⚠️ [TUTORIAL] Failed to fetch user data (non-critical):", error);
+        // If fetch, fails(network error, timeout, etc.), return undefined user
+        console.warn("⚠️ [TUTORIAL] Failed to fetch user, data(non-critical):", error);
         return { user: undefined };
       }
     },
@@ -744,8 +733,7 @@ export function OnboardingTutorial({
   // Get steps for current module if we have module data
   const currentModuleSteps = tutorialDataWithModules?.modules?.find(m => m.id === currentModuleData?.id)?.steps || tutorialSteps;
   
-  // Reset video state when step changes or video URL changes
-  useEffect(() => {
+  // Reset video state when step changes or video URL changes, useEffect(() => {
     setVideoError(false);
     setVideoLoading(true);
   }, [currentStep, currentStepData?.videoUrl]);
@@ -764,7 +752,7 @@ export function OnboardingTutorial({
   const handleVideoError = () => {
     setVideoError(true);
     setVideoLoading(false);
-    console.warn("Video failed to load:", currentStepData.videoUrl);
+    console.warn("Video failed to, load:", currentStepData.videoUrl);
   };
   
   const handleVideoLoad = () => {
@@ -786,7 +774,7 @@ export function OnboardingTutorial({
     if (currentStepData.actionButton?.href) {
       setLocation(currentStepData.actionButton.href);
       handleClose();
-    } else if (currentStepData.actionButton?.onClick) {
+    } else, if(currentStepData.actionButton?.onClick) {
       currentStepData.actionButton.onClick();
     }
   };
@@ -797,13 +785,13 @@ export function OnboardingTutorial({
 
   const getStepIcon = (stepId: number) => {
     switch (stepId) {
-      case 1:
+      case, 1:
         return <FileText className="w-5 h-5" />;
-      case 2:
+      case, 2:
         return <LogOut className="w-5 h-5" />;
-      case 3:
+      case, 3:
         return <User className="w-5 h-5" />;
-      case 4:
+      case, 4:
         return <Navigation className="w-5 h-5" />;
       default:
         return <Sparkles className="w-5 h-5" />;
@@ -815,7 +803,7 @@ export function OnboardingTutorial({
       open={isOpen} 
       onOpenChange={(open) => {
         // Only close when user explicitly closes the dialog
-        // Don't close when open is true (that's a programmatic open)
+        // Don't close when open is, true(that's a programmatic open)
         if (!open) {
           handleClose();
         }
@@ -854,8 +842,8 @@ export function OnboardingTutorial({
                 className={cn(
                   "whitespace-nowrap",
                   currentModuleData?.id === module.id
-                    ? "bg-primary text-black hover:bg-primary/90"
-                    : "border-border text-muted-foreground hover:bg-muted/50"
+                    ? "bg-primary text-black, hover:bg-primary/90"
+                    : "border-border text-muted-foreground, hover:bg-muted/50"
                 )}
               >
                 {module.title}
@@ -887,7 +875,7 @@ export function OnboardingTutorial({
                    </div>
                    {hasValidVideoUrl && videoError && (
                      <div className="text-xs text-gray-600 mt-2 break-all">
-                       Video URL: {currentStepData.videoUrl}
+                       Video, URL: {currentStepData.videoUrl}
                      </div>
                    )}
                  </div>
@@ -898,14 +886,14 @@ export function OnboardingTutorial({
                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
                      <div className="text-center space-y-2">
                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-                       <p className="text-sm text-muted-foreground">Loading video...</p>
+                       <p className="text-sm text-muted-foreground`>Loading video...</p>
                      </div>
                    </div>
                  )}
                  <video
                    key={`${currentStep}-${currentStepData.videoUrl}`}
                    src={currentStepData.videoUrl}
-                   className="w-full h-full object-contain"
+                   className=`w-full h-full object-contain"
                    controls
                    {...(autoPlay ? { autoPlay: true } : {})}
                    loop
@@ -956,7 +944,7 @@ export function OnboardingTutorial({
             <Button
               variant="outline"
               onClick={handleClose}
-              className="border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+              className="border-border text-muted-foreground, hover:bg-muted/50, hover:text-foreground"
             >
               Skip Tutorial
             </Button>
@@ -964,7 +952,7 @@ export function OnboardingTutorial({
               <Button
                 variant="outline"
                 onClick={previousStep}
-                className="border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                className="border-border text-muted-foreground, hover:bg-muted/50, hover:text-foreground"
               >
                 <ChevronLeft className="w-4 h-4 mr-2" />
                 Previous
@@ -988,7 +976,7 @@ export function OnboardingTutorial({
                   markStepComplete(currentStep);
                   nextStep();
                 }}
-                className="bg-primary text-black hover:bg-primary/80"
+                className="bg-primary text-black, hover:bg-primary/80"
               >
                 Next
                 <ChevronRight className="w-4 h-4 ml-2" />
@@ -999,7 +987,7 @@ export function OnboardingTutorial({
                   markStepComplete(currentStep);
                   nextStep(); // This will complete the tutorial
                 }}
-                className="bg-green-600 text-foreground hover:bg-green-700"
+                className="bg-green-600 text-foreground, hover:bg-green-700"
               >
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Complete Tutorial

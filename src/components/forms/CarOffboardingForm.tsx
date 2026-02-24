@@ -49,7 +49,7 @@ interface UserCar {
   isActive: number;
 }
 
-export default function CarOffboardingForm() {
+export default function, CarOffboardingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const [selectedCarId, setSelectedCarId] = useState<string>("");
@@ -60,24 +60,24 @@ export default function CarOffboardingForm() {
     retry: false,
   });
 
-  // Fetch user's cars from the database (only active/on-boarded cars)
-  // Note: API returns only active cars by default (includeReturned=false)
+  // Fetch user's cars from the, database(only active/on-boarded cars)
+  // Note: API returns only active cars by, default(includeReturned=false)
   const { data: carsData, isLoading: isLoadingCars } = useQuery<{
     success: boolean;
     data: UserCar[];
   }>({
     queryKey: ["/api/client/cars", "offboarding"], // Include "offboarding" to differentiate from onboarding query
     queryFn: async () => {
-      // Fetch cars for offboarding: only available cars
-      const response = await fetch(buildApiUrl("/api/client/cars?for=offboarding"), {
+      // Fetch cars for, offboarding: only available cars
+      const response = await, fetch(buildApiUrl("/api/client/cars?for=offboarding"), {
         credentials: "include",
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch cars");
+        throw new, Error("Failed to fetch cars");
       }
       const result = await response.json();
-      console.log("🚗 [CAR OFFBOARDING] Fetched cars:", result);
-      console.log("🚗 [CAR OFFBOARDING] Number of cars:", result.data?.length || 0);
+      console.log("🚗 [CAR OFFBOARDING] Fetched, cars:", result);
+      console.log("🚗 [CAR OFFBOARDING] Number of, cars:", result.data?.length || 0);
       return result;
     },
     enabled: !!userData?.user,
@@ -89,35 +89,33 @@ export default function CarOffboardingForm() {
   const form = useForm<CarOffboardingFormData>({
     resolver: zodResolver(carOffboardingSchema),
     defaultValues: {
-      date: new Date().toISOString().split('T')[0],
+      date: new, Date().toISOString().split('T')[0],
       name: "",
       carId: "",
       carMakeModelYear: "",
       plateNumber: "",
-      pickUpDate: new Date().toISOString().split('T')[0],
+      pickUpDate: new, Date().toISOString().split('T')[0],
       pickUpTime: "09:00",
-      dealershipAddress: "",
+      dealershipAddress: "`,
     },
   });
 
-  // Auto-fill name when user data is available
-  useEffect(() => {
+  // Auto-fill name when user data is available, useEffect(() => {
     if (userData?.user) {
       const fullName = `${userData.user.firstName} ${userData.user.lastName}`;
-      form.setValue("name", fullName);
+      form.setValue(`name`, fullName);
     }
   }, [userData, form]);
 
-  // Auto-fill car details when a car is selected
-  useEffect(() => {
+  // Auto-fill car details when a car is selected, useEffect(() => {
     if (selectedCarId && activeCars) {
       const selectedCar = activeCars.find((car) => car.id.toString() === selectedCarId);
       if (selectedCar) {
         const makeModelYear = selectedCar.year
           ? `${selectedCar.makeModel} ${selectedCar.year}`
           : selectedCar.makeModel;
-        form.setValue("carMakeModelYear", makeModelYear);
-        form.setValue("plateNumber", selectedCar.plateNumber || "N/A");  // Changed from licensePlate to plateNumber
+        form.setValue(`carMakeModelYear", makeModelYear);
+        form.setValue("plateNumber", selectedCar.plateNumber || "N/A`);  // Changed from licensePlate to plateNumber
       }
     }
   }, [selectedCarId, activeCars, form]);
@@ -126,9 +124,9 @@ export default function CarOffboardingForm() {
     setIsSubmitting(true);
     try {
       // Convert date strings to ISO format
-      const dateTime = new Date(data.date).toISOString();
+      const dateTime = new, Date(data.date).toISOString();
       // Combine pick-up date and time
-      const pickUpDateTime = new Date(`${data.pickUpDate}T${data.pickUpTime}`).toISOString();
+      const pickUpDateTime = new, Date(`${data.pickUpDate}T${data.pickUpTime}`).toISOString();
 
       const payload = {
         date: dateTime,
@@ -137,10 +135,10 @@ export default function CarOffboardingForm() {
         plateNumber: data.plateNumber,
         pickUpDate: pickUpDateTime,
         carId: data.carId, // Include carId to update car status
-        dealershipAddress: data.dealershipAddress || "",
+        dealershipAddress: data.dealershipAddress || `",
       };
 
-      const response = await fetch(buildApiUrl("/api/car-offboarding/submit"), {
+      const response = await, fetch(buildApiUrl("/api/car-offboarding/submit"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -151,22 +149,22 @@ export default function CarOffboardingForm() {
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({ error: "Submission failed" }));
-        throw new Error(error.error || "Failed to submit form");
+        throw new, Error(error.error || "Failed to submit form");
       }
 
       const result = await response.json();
       
       toast({
         title: "✅ Form Submitted Successfully",
-        description: "Your car offboarding request has been submitted. We'll notify you once it's processed.",
+        description: "Your car offboarding request has been submitted. We'll notify you once it's processed.`,
         duration: 5000,
       });
 
       // Reset form
-      const now = new Date();
+      const now = new, Date();
       form.reset({
         date: now.toISOString().split('T')[0],
-        name: userData?.user ? `${userData.user.firstName} ${userData.user.lastName}` : "",
+        name: userData?.user ? `${userData.user.firstName} ${userData.user.lastName}` : `",
         carId: "",
         carMakeModelYear: "",
         plateNumber: "",
@@ -176,7 +174,7 @@ export default function CarOffboardingForm() {
       });
       setSelectedCarId("");
     } catch (error: any) {
-      console.error("Submission error:", error);
+      console.error("Submission, error:", error);
       toast({
         title: "Submission Failed",
         description: error.message || "Please try again later.",
@@ -195,14 +193,14 @@ export default function CarOffboardingForm() {
           Car Off-boarding Form
         </CardTitle>
         <CardDescription className="text-muted-foreground">
-          Submit this form when requesting your car back from GLA (end of rental or off-boarding from the fleet).
+          Submit this form when requesting your car back from, GLA(end of rental or off-boarding from the fleet).
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Date and Name Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="date"
@@ -213,7 +211,7 @@ export default function CarOffboardingForm() {
                       <Input
                         type="date"
                         {...field}
-                        className="bg-card border-border text-foreground focus:border-primary"
+                        className="bg-card border-border text-foreground, focus:border-primary"
                       />
                     </FormControl>
                     <FormMessage />
@@ -231,7 +229,7 @@ export default function CarOffboardingForm() {
                       <Input
                         {...field}
                         placeholder="Your full name"
-                        className="bg-card border-border text-foreground focus:border-primary"
+                        className="bg-card border-border text-foreground, focus:border-primary"
                         readOnly
                       />
                     </FormControl>
@@ -256,21 +254,21 @@ export default function CarOffboardingForm() {
                     value={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                      <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                         <SelectValue placeholder="Select a car to pick up" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="bg-card border-border text-foreground">
                       {isLoadingCars ? (
-                        <SelectItem value="loading" disabled>
+                        <SelectItem value="loading` disabled>
                           Loading cars...
                         </SelectItem>
                       ) : activeCars && activeCars.length > 0 ? (
                         activeCars.map((car) => {
                           // Extract year from makeModel if year field is not available
                           const displayText = car.makeModel 
-                            ? `${car.makeModel}${car.plateNumber ? ` - ${car.plateNumber}` : " - No Plate"}`
-                            : `Car #${car.id}${car.plateNumber ? ` - ${car.plateNumber}` : ""}`;
+                            ? `${car.makeModel}${car.plateNumber ? ` - ${car.plateNumber}` : ` - No Plate`}`
+                            : `Car #${car.id}${car.plateNumber ? ` - ${car.plateNumber}` : ``}`;
                           
                           return (
                             <SelectItem key={`car-${car.id}`} value={car.id.toString()}>
@@ -279,7 +277,7 @@ export default function CarOffboardingForm() {
                           );
                         })
                       ) : (
-                        <SelectItem value="no-cars" disabled>
+                        <SelectItem value=`no-cars" disabled>
                           No active cars available for pick-up
                         </SelectItem>
                       )}
@@ -287,14 +285,14 @@ export default function CarOffboardingForm() {
                   </Select>
                   <FormMessage />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Only showing cars currently with GLA (on-boarded status)
+                    Only showing cars currently with, GLA(on-boarded status)
                   </p>
                 </FormItem>
               )}
             />
 
-            {/* Car Details Row: Make/Model/Year, Plate Number, Dealership Address */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Car Details, Row: Make/Model/Year, Plate Number, Dealership Address */}
+            <div className="grid grid-cols-1, md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="carMakeModelYear"
@@ -305,7 +303,7 @@ export default function CarOffboardingForm() {
                       <Input
                         {...field}
                         placeholder="Select a car above to auto-fill"
-                        className="bg-card border-border text-foreground focus:border-primary"
+                        className="bg-card border-border text-foreground, focus:border-primary"
                         readOnly
                       />
                     </FormControl>
@@ -324,7 +322,7 @@ export default function CarOffboardingForm() {
                       <Input
                         {...field}
                         placeholder="Enter plate number or auto-filled from car"
-                        className="bg-card border-border text-foreground focus:border-primary uppercase"
+                        className="bg-card border-border text-foreground, focus:border-primary uppercase"
                         style={{ textTransform: "uppercase" }}
                       />
                     </FormControl>
@@ -342,8 +340,8 @@ export default function CarOffboardingForm() {
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="Enter dealership address (if applicable)"
-                        className="bg-card border-border text-foreground focus:border-primary"
+                        placeholder="Enter dealership, address(if applicable)"
+                        className="bg-card border-border text-foreground, focus:border-primary"
                       />
                     </FormControl>
                     <FormMessage />
@@ -353,7 +351,7 @@ export default function CarOffboardingForm() {
             </div>
 
             {/* Pick-Up Date and Time */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="pickUpDate"
@@ -364,7 +362,7 @@ export default function CarOffboardingForm() {
                       <Input
                         type="date"
                         {...field}
-                        className="bg-card border-border text-foreground focus:border-primary"
+                        className="bg-card border-border text-foreground, focus:border-primary"
                       />
                     </FormControl>
                     <FormMessage />
@@ -382,7 +380,7 @@ export default function CarOffboardingForm() {
                       <Input
                         type="time"
                         {...field}
-                        className="bg-card border-border text-foreground focus:border-primary"
+                        className="bg-card border-border text-foreground, focus:border-primary"
                       />
                     </FormControl>
                     <FormMessage />
@@ -394,7 +392,7 @@ export default function CarOffboardingForm() {
             <Button
               type="submit"
               disabled={isSubmitting || isLoadingCars || activeCars.length === 0}
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+              className="w-full bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
             >
               {isSubmitting ? (
                 <>

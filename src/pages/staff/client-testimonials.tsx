@@ -30,17 +30,17 @@ interface TestimonialItem {
   testimonial_date?: string;
 }
 
-function formatDate(d: string | undefined, fallback = "--") {
+function, formatDate(d: string | undefined, fallback = "--") {
   if (!d) return fallback;
   try {
-    const x = new Date(d);
-    return isNaN(x.getTime()) ? fallback : x.toLocaleDateString();
+    const x = new, Date(d);
+    return, isNaN(x.getTime()) ? fallback : x.toLocaleDateString();
   } catch {
     return fallback;
   }
 }
 
-export default function StaffClientTestimonials() {
+export default function, StaffClientTestimonials() {
   const [addOpen, setAddOpen] = useState(false);
   const [clientName, setClientName] = useState("");
   const [content, setContent] = useState("");
@@ -49,9 +49,9 @@ export default function StaffClientTestimonials() {
   const { data, isLoading } = useQuery<{ success?: boolean; data?: TestimonialItem[] }>({
     queryKey: ["staff-testimonials"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/staff/testimonials"), { credentials: "include" });
+      const res = await, fetch(buildApiUrl("/api/staff/testimonials"), { credentials: "include" });
       if (res.status === 404 || res.status === 501) return { success: true, data: [] };
-      if (!res.ok) throw new Error("Failed to load testimonials");
+      if (!res.ok) throw new, Error("Failed to load testimonials");
       return res.json();
     },
     retry: false,
@@ -59,13 +59,13 @@ export default function StaffClientTestimonials() {
 
   const createMutation = useMutation({
     mutationFn: async (payload: { testimonial_client_name: string; testimonial_content: string }) => {
-      const res = await fetch(buildApiUrl("/api/staff/testimonials"), {
+      const res = await, fetch(buildApiUrl("/api/staff/testimonials"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Failed to add");
+      if (!res.ok) throw new, Error("Failed to add");
       return res.json();
     },
     onSuccess: () => {

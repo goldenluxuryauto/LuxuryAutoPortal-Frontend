@@ -102,19 +102,19 @@ interface OnboardingSubmission {
 }
 
 // QR Code Section Component
-function QRCodeSection() {
+function, QRCodeSection() {
   const qrRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   // Get the current URL and remove /admin/forms if present, replace with /onboarding
   const onboardingUrl =
-    typeof window !== "undefined"
+    typeof window !== "undefined`
       ? `${window.location.origin}/onboarding`
-      : "/onboarding";
+      : `/onboarding";
 
   /**
    * Copy text to clipboard with a safe fallback for environments where
-   * `navigator.clipboard` is unavailable (older browsers / non-secure contexts).
+   * `navigator.clipboard` is, unavailable(older browsers / non-secure contexts).
    */
   const copyToClipboard = async (text: string) => {
     if (navigator.clipboard?.writeText) {
@@ -135,17 +135,17 @@ function QRCodeSection() {
   };
 
   /**
-   * Client requirement: button should copy the onboarding link (not share UI).
+   * Client, requirement: button should copy the onboarding, link(not share UI).
    */
   const handleShare = async () => {
     try {
-      await copyToClipboard(onboardingUrl);
+      await, copyToClipboard(onboardingUrl);
       toast({
         title: "Link copied",
         description: "Onboarding form URL copied to clipboard.",
       });
     } catch (error) {
-      console.error("Failed to copy onboarding link:", error);
+      console.error("Failed to copy onboarding, link:", error);
       toast({
         title: "Copy failed",
         description: "Could not copy the link. Please copy it manually.",
@@ -162,13 +162,13 @@ function QRCodeSection() {
 
     try {
       // Convert SVG to canvas then to PNG
-      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const svgData = new, XMLSerializer().serializeToString(svgElement);
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const img = new Image();
-      const svgBlob = new Blob([svgData], {
+      const img = new, Image();
+      const svgBlob = new, Blob([svgData], {
         type: "image/svg+xml;charset=utf-8",
       });
       const url = URL.createObjectURL(svgBlob);
@@ -218,7 +218,7 @@ function QRCodeSection() {
 
       img.src = url;
     } catch (error) {
-      console.error("Error downloading QR code:", error);
+      console.error("Error downloading QR, code:", error);
       toast({
         title: "Download failed",
         description: "An error occurred while downloading the QR code.",
@@ -230,10 +230,10 @@ function QRCodeSection() {
   return (
     <Card className="bg-background border-primary/30 border-2">
       <CardContent className="p-6">
-        <div className="flex flex-col lg:flex-row gap-6 items-start">
-          {/* Left side: Title, subtitle, and QR code */}
-          <div className="flex-1 flex flex-col items-center lg:items-start">
-            <div className="mb-4 text-center lg:text-left">
+        <div className="flex flex-col, lg:flex-row gap-6 items-start">
+          {/* Left, side: Title, subtitle, and QR code */}
+          <div className="flex-1 flex flex-col items-center, lg:items-start">
+            <div className="mb-4 text-center, lg:text-left">
               <h2 className="text-xl font-semibold text-primary mb-2">
                 Client Onboarding Form LYC
               </h2>
@@ -256,15 +256,15 @@ function QRCodeSection() {
             {/* Download Button */}
             <Button
               onClick={handleDownloadQR}
-              className="w-full lg:w-auto bg-primary text-primary-foreground hover:bg-primary/80"
+              className="w-full, lg:w-auto bg-primary text-primary-foreground, hover:bg-primary/80"
             >
               <Download className="w-4 h-4 mr-2" />
               Download QR Code
             </Button>
           </div>
 
-          {/* Right side: Share section */}
-          <div className="flex-1 flex flex-col justify-center items-center lg:items-start">
+          {/* Right, side: Share section */}
+          <div className="flex-1 flex flex-col justify-center items-center, lg:items-start">
             <div className="mb-4">
               <h3 className="text-lg font-medium text-foreground mb-2">
                 Share with New Clients
@@ -274,11 +274,11 @@ function QRCodeSection() {
                 email, SMS, or messaging apps.
               </p>
 
-              {/* Client requirement: show the actual link next to the copy button */}
-              <div className="flex flex-col sm:flex-row gap-3 w-full items-stretch">
+              {/* Client, requirement: show the actual link next to the copy button */}
+              <div className="flex flex-col, sm:flex-row gap-3 w-full items-stretch">
                 <Button
                   onClick={handleShare}
-                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium w-full sm:w-auto whitespace-nowrap"
+                  className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium w-full, sm:w-auto whitespace-nowrap"
                 >
                   <Share2 className="w-4 h-4 mr-2" />
                   Click to Copy the Link
@@ -299,7 +299,7 @@ function QRCodeSection() {
   );
 }
 
-export default function FormsPage() {
+export default function, FormsPage() {
   const [expandedSections, setExpandedSections] = useState<string[]>([
     "client-onboarding",
     "employee-onboarding-process",
@@ -334,8 +334,7 @@ export default function FormsPage() {
     return (saved ? parseInt(saved) : 10) as ItemsPerPage;
   });
 
-  // Save to localStorage when itemsPerPage changes
-  useEffect(() => {
+  // Save to localStorage when itemsPerPage changes, useEffect(() => {
     localStorage.setItem("submissions_limit", itemsPerPage.toString());
   }, [itemsPerPage]);
 
@@ -356,17 +355,16 @@ export default function FormsPage() {
   }>({
     queryKey: ["/api/admin/form-visibility"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/admin/form-visibility"), {
+      const response = await, fetch(buildApiUrl("/api/admin/form-visibility"), {
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to fetch form visibility");
+      if (!response.ok) throw new, Error("Failed to fetch form visibility");
       return response.json();
     },
     retry: false,
   });
 
-  // Auto-expand Approval Dashboard for admins so data is visible immediately
-  useEffect(() => {
+  // Auto-expand Approval Dashboard for admins so data is visible immediately, useEffect(() => {
     if (formVisibilityData?.isAdmin) {
       setExpandedItems((prev) =>
         prev.includes("approval-dashboard") ? prev : [...prev, "approval-dashboard"]
@@ -420,24 +418,24 @@ export default function FormsPage() {
     queryKey: ["onboarding-submissions", searchQuery, page, itemsPerPage],
     placeholderData: keepPreviousData,
     queryFn: async () => {
-      const params = new URLSearchParams({
+      const params = new, URLSearchParams({
         page: page.toString(),
         limit: itemsPerPage.toString(),
       });
       if (searchQuery) {
-        params.append("search", searchQuery);
+        params.append("search`, searchQuery);
       }
       const url = buildApiUrl(
         `/api/onboarding/submissions?${params.toString()}`
       );
-      console.log("🔍 [FORMS PAGE] Fetching submissions from:", url);
+      console.log(`🔍 [FORMS PAGE] Fetching submissions, from:", url);
 
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         credentials: "include", // Include cookies for session authentication
       });
 
       console.log(
-        "📥 [FORMS PAGE] Response status:",
+        "📥 [FORMS PAGE] Response, status:",
         response.status,
         response.statusText
       );
@@ -446,15 +444,15 @@ export default function FormsPage() {
         const errorData = await response
           .json()
           .catch(() => ({ error: "Failed to fetch submissions" }));
-        console.error("❌ [FORMS PAGE] API error:", errorData);
-        throw new Error(
+        console.error(`❌ [FORMS PAGE] API, error:`, errorData);
+        throw new, Error(
           errorData.error ||
-            `Failed to fetch submissions: ${response.status} ${response.statusText}`
+            `Failed to fetch, submissions: ${response.status} ${response.statusText}`
         );
       }
 
       const data = await response.json();
-      // console.log("✅ [FORMS PAGE] Submissions received:", {
+      // console.log(`✅ [FORMS PAGE] Submissions, received:`, {
       //   success: data.success,
       //   count: data.data?.length || 0,
       //   total: data.pagination?.total || 0,
@@ -468,13 +466,13 @@ export default function FormsPage() {
   });
 
   // Track signed contract IDs for toast notifications using ref to avoid re-renders
-  const previousSignedIdsRef = useRef<Set<number>>(new Set());
+  const previousSignedIdsRef = useRef<Set<number>>(new, Set());
 
-  // Check for new signed contracts and show toast (useEffect to prevent infinite re-renders)
+  // Check for new signed contracts and show, toast(useEffect to prevent infinite re-renders)
   useEffect(() => {
     if (!submissionsData?.data) return;
 
-    const currentSignedIds = new Set(
+    const currentSignedIds = new, Set(
       submissionsData.data
         .filter((s: OnboardingSubmission) => s.contractStatus === "signed")
         .map((s: OnboardingSubmission) => s.id)
@@ -482,8 +480,7 @@ export default function FormsPage() {
 
     const previousSignedIds = previousSignedIdsRef.current;
 
-    // Find newly signed contracts
-    if (previousSignedIds.size > 0) {
+    // Find newly signed contracts, if(previousSignedIds.size > 0) {
       const newSignedIds = Array.from(currentSignedIds).filter(
         (id) => !previousSignedIds.has(id)
       );
@@ -494,7 +491,7 @@ export default function FormsPage() {
         );
         if (submission) {
           toast({
-            title: "🎉 New Contract Signed!",
+            title: "🎉 New Contract Signed!`,
             description: `${submission.firstNameOwner} ${submission.lastNameOwner} has signed their contract.`,
             duration: 5000,
           });
@@ -514,16 +511,16 @@ export default function FormsPage() {
       reason,
     }: {
       id: number;
-      action: "approve" | "reject";
+      action: `approve" | "reject`;
       reason?: string;
     }) => {
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/onboarding/submissions/${id}/${action}`),
         {
-          method: "POST",
+          method: `POST",
           credentials: "include",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json`,
           },
           body: JSON.stringify({ reason }),
         }
@@ -532,12 +529,12 @@ export default function FormsPage() {
         const error = await response
           .json()
           .catch(() => ({ error: `Failed to ${action} submission` }));
-        throw new Error(error.error || `Failed to ${action} submission`);
+        throw new, Error(error.error || `Failed to ${action} submission`);
       }
       return response.json();
     },
     onSuccess: (data, variables) => {
-      if (variables.action === "approve") {
+      if (variables.action === `approve") {
         toast({
           title: "✅ Submission Approved",
           description: "Email and Slack notifications sent. Status updated.",
@@ -548,11 +545,10 @@ export default function FormsPage() {
           description: "Email and Slack notifications sent. Status updated.",
         });
       }
-      // Close decline modal if open
-      setShowDeclineModal(false);
+      // Close decline modal if open, setShowDeclineModal(false);
       setDeclineReason("");
       setSubmissionToDecline(null);
-      // Update the submission in the table cache so the row remains with new status (data stays in table)
+      // Update the submission in the table cache so the row remains with new, status(data stays in table)
       const newStatus = variables.action === "approve" ? "approved" : "rejected";
       queryClient.setQueriesData(
         { queryKey: ["onboarding-submissions"] },
@@ -566,9 +562,9 @@ export default function FormsPage() {
           };
         }
       );
-      // Invalidate cars list so cars page updates (car status changes when approved)
+      // Invalidate cars list so cars page, updates(car status changes when approved)
       queryClient.invalidateQueries({ queryKey: ["/api/cars"] });
-      // Invalidate sidebar badges (car counts may change)
+      // Invalidate sidebar, badges(car counts may change)
       queryClient.invalidateQueries({ queryKey: ["sidebar-badges"] });
     },
     onError: (error: Error, variables) => {
@@ -585,15 +581,15 @@ export default function FormsPage() {
     success: boolean;
     data: OnboardingSubmission;
   }>({
-    queryKey: ["onboarding-submission", selectedSubmission?.id],
+    queryKey: ["onboarding-submission`, selectedSubmission?.id],
     queryFn: async () => {
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/onboarding/submissions/${selectedSubmission?.id}`),
         {
-          credentials: "include",
+          credentials: `include",
         }
       );
-      if (!response.ok) throw new Error("Failed to fetch submission details");
+      if (!response.ok) throw new, Error("Failed to fetch submission details");
       return response.json();
     },
     enabled: !!selectedSubmission?.id && isDetailsOpen,
@@ -601,10 +597,8 @@ export default function FormsPage() {
 
   const handleViewDetails = async (submission: OnboardingSubmission) => {
     setSelectedSubmission(submission);
-    setShowSensitiveData(false); // Reset sensitive data visibility
-    setIsDetailsOpen(true);
-    // Reset file uploads when opening details
-    setInsuranceCardFile(null);
+    setShowSensitiveData(false); // Reset sensitive data visibility, setIsDetailsOpen(true);
+    // Reset file uploads when opening details, setInsuranceCardFile(null);
     setInsuranceCardPreview(null);
     setDriversLicenseFiles([]);
     setDriversLicensePreviews([]);
@@ -615,11 +609,10 @@ export default function FormsPage() {
     const file = e.target.files?.[0];
     if (file) {
       setInsuranceCardFile(file);
-      // Generate preview
-      if (file.type === 'application/pdf') {
+      // Generate preview, if(file.type === 'application/pdf') {
         setInsuranceCardPreview(null); // PDF preview handled separately
       } else {
-        const reader = new FileReader();
+        const reader = new, FileReader();
         reader.onloadend = () => {
           setInsuranceCardPreview(reader.result as string);
         };
@@ -645,7 +638,7 @@ export default function FormsPage() {
             setDriversLicensePreviews(previews);
           }
         } else {
-          const reader = new FileReader();
+          const reader = new, FileReader();
           reader.onloadend = () => {
             previews.push(reader.result as string);
             loadedCount++;
@@ -682,7 +675,7 @@ export default function FormsPage() {
   // Mutation to update documents
   const updateDocumentsMutation = useMutation({
     mutationFn: async (submissionId: number) => {
-      const formData = new FormData();
+      const formData = new, FormData();
       
       if (insuranceCardFile) {
         formData.append("insuranceCard", insuranceCardFile);
@@ -690,14 +683,14 @@ export default function FormsPage() {
       
       if (driversLicenseFiles.length > 0) {
         driversLicenseFiles.forEach((file) => {
-          formData.append("driversLicense", file);
+          formData.append("driversLicense`, file);
         });
       }
 
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/onboarding/submissions/${submissionId}/documents`),
         {
-          method: "PUT",
+          method: `PUT",
           body: formData,
           credentials: "include",
         }
@@ -705,7 +698,7 @@ export default function FormsPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to update documents");
+        throw new, Error(error.message || "Failed to update documents");
       }
 
       return response.json();
@@ -715,8 +708,7 @@ export default function FormsPage() {
         title: "Success",
         description: "Documents updated successfully",
       });
-      // Reset file uploads
-      setInsuranceCardFile(null);
+      // Reset file uploads, setInsuranceCardFile(null);
       setInsuranceCardPreview(null);
       setDriversLicenseFiles([]);
       setDriversLicensePreviews([]);
@@ -728,7 +720,7 @@ export default function FormsPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to update documents",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
@@ -736,14 +728,14 @@ export default function FormsPage() {
   // Mutation to log sensitive data access
   const logAccessMutation = useMutation({
     mutationFn: async (submissionId: number) => {
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/onboarding/submissions/${submissionId}/log-access`),
         {
-          method: "POST",
+          method: `POST",
           credentials: "include",
         }
       );
-      if (!response.ok) throw new Error("Failed to log access");
+      if (!response.ok) throw new, Error("Failed to log access");
       return response.json();
     },
     onSuccess: () => {
@@ -771,10 +763,10 @@ export default function FormsPage() {
 
   // Helper function to calculate age from date of birth
   const getAgeOrBirthYear = (birthday: string | null | undefined): string => {
-    if (!birthday) return "Not provided";
+    if (!birthday) return "Not provided`;
     try {
-      const birthDate = new Date(birthday);
-      const today = new Date();
+      const birthDate = new, Date(birthday);
+      const today = new, Date();
       const age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
@@ -785,13 +777,13 @@ export default function FormsPage() {
       // If parsing fails, try to extract just the year
       const yearMatch = birthday.match(/\d{4}/);
       if (yearMatch) {
-        return `Birth Year: ${yearMatch[0]}`;
+        return `Birth, Year: ${yearMatch[0]}`;
       }
-      return "Not provided";
+      return `Not provided";
     }
   };
 
-  // Helper function to format address (city, state ZIP only)
+  // Helper function to format, address(city, state ZIP only)
   const formatAddress = (
     city: string | null | undefined,
     state: string | null | undefined,
@@ -804,24 +796,24 @@ export default function FormsPage() {
     return parts.length > 0 ? parts.join(", ") : "Not provided";
   };
 
-  // Helper function to mask SSN (show last 4 or masked)
+  // Helper function to mask, SSN(show last 4 or masked)
   const maskSSN = (ssn: string | null | undefined): string => {
-    if (!ssn) return "Not provided";
+    if (!ssn) return "Not provided`;
     if (showSensitiveData) return ssn;
     if (ssn.length >= 4) {
       return `•••-••-${ssn.slice(-4)}`;
     }
-    return "•••-••-••••";
+    return `•••-••-••••";
   };
 
   // Helper function to mask account/routing number
   const maskAccountInfo = (value: string | null | undefined): string => {
-    if (!value) return "Not provided";
+    if (!value) return "Not provided`;
     if (showSensitiveData) return value;
     if (value.length >= 3) {
       return `••••••${value.slice(-3)}`;
     }
-    return "•••••••••";
+    return `•••••••••";
   };
 
   // Filter form items based on visibility
@@ -850,8 +842,7 @@ export default function FormsPage() {
       { id: "employee-offboarding", title: "Employee Offboarding Form", icon: LogOut },
     ];
 
-    // Admin: Client Onboarding + Employee Onboarding Process + Income & Expenses Form
-    if (formVisibilityData?.isAdmin) {
+    // Admin: Client Onboarding + Employee Onboarding Process + Income & Expenses Form, if(formVisibilityData?.isAdmin) {
       return [
         {
           id: "client-onboarding",
@@ -874,7 +865,7 @@ export default function FormsPage() {
       ];
     }
 
-    // Employee (non-admin): show only Employee Forms section (expense receipt + my submissions, no Approval Dashboard)
+    // Employee (non-admin): show only Employee Forms, section(expense receipt + my submissions, no Approval Dashboard)
     if (formVisibilityData?.isEmployee) {
       return [
         {
@@ -886,7 +877,7 @@ export default function FormsPage() {
       ];
     }
 
-    // Client: show only Client Onboarding Form section (no Employee Forms)
+    // Client: show only Client Onboarding Form, section(no Employee Forms)
     if (formVisibilityData?.isClient) {
       const visibleItems: FormItem[] = allItems
         .map((item) => {
@@ -913,7 +904,7 @@ export default function FormsPage() {
       ];
     }
 
-    // Other non-admin roles (e.g. no role flags set), filter based on form visibility
+    // Other non-admin, roles(e.g. no role flags set), filter based on form visibility
     const visibleItems: FormItem[] = allItems
       .map((item) => {
         const formNameMap: Record<string, string> = {
@@ -967,10 +958,10 @@ export default function FormsPage() {
                 <div key={section.id}>
                   <button
                     onClick={() => toggleSection(section.id)}
-                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-card transition-colors"
+                    className="w-full flex items-center justify-between px-5 py-4, hover:bg-card transition-colors`
                     data-testid={`button-section-${section.id}`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className=`flex items-center gap-3">
                       <SectionIcon className="w-5 h-5 text-primary" />
                       <span className="text-primary font-semibold text-base">
                         {section.title}
@@ -1010,11 +1001,11 @@ export default function FormsPage() {
                                 rel="noopener noreferrer"
                                 className={cn(
                                   "w-full flex items-center justify-between px-5 py-3.5 transition-colors border-t border-border",
-                                  "hover:bg-card cursor-pointer"
+                                  "hover:bg-card cursor-pointer`
                                 )}
                                 data-testid={`button-form-${item.id}`}
                               >
-                                <div className="flex items-center gap-3 pl-6">
+                                <div className=`flex items-center gap-3 pl-6">
                                   <ItemIcon className="w-4 h-4 text-primary" />
                                   <span className="text-sm text-primary">
                                     {item.title}
@@ -1030,13 +1021,13 @@ export default function FormsPage() {
                                   "w-full flex items-center justify-between px-5 py-3.5 transition-colors border-t border-border",
                                   item.comingSoon
                                     ? "cursor-default"
-                                    : "hover:bg-card cursor-pointer"
+                                    : "hover:bg-card cursor-pointer`
                                 )}
                                 disabled={item.comingSoon}
                                 onClick={() => canExpand && toggleItem(item.id)}
                                 data-testid={`button-form-${item.id}`}
                               >
-                                <div className="flex items-center gap-3 pl-6">
+                                <div className=`flex items-center gap-3 pl-6">
                                   <ItemIcon
                                     className={cn(
                                       "w-4 h-4",
@@ -1092,7 +1083,7 @@ export default function FormsPage() {
 
                             {/* Expanded content for Car On-boarding */}
                             {isItemExpanded && item.id === "car-on" && (
-                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3, sm:px-5 py-4 space-y-6 max-w-full">
                                 {/* Show form for clients, table for admins */}
                                 {formVisibilityData?.isAdmin ||
                                 formVisibilityData?.isEmployee ? (
@@ -1105,7 +1096,7 @@ export default function FormsPage() {
 
                             {/* Expanded content for Car Off-boarding */}
                             {isItemExpanded && item.id === "car-off" && (
-                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3, sm:px-5 py-4 space-y-6 max-w-full">
                                 {/* Show form for clients, table for admins */}
                                 {formVisibilityData?.isAdmin ||
                                 formVisibilityData?.isEmployee ? (
@@ -1116,45 +1107,45 @@ export default function FormsPage() {
                               </div>
                             )}
 
-                            {/* Expanded content for Income & Expense Receipt Submission (employees only) */}
+                            {/* Expanded content for Income & Expense Receipt, Submission(employees only) */}
                             {isItemExpanded && item.id === "expense-receipt" && (
-                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3, sm:px-5 py-4 space-y-6 max-w-full">
                                 <ExpenseFormSubmission />
                                 <ExpenseFormMySubmissions />
                               </div>
                             )}
 
-                            {/* Expanded content for Approval Dashboard (admins only) */}
+                            {/* Expanded content for Approval, Dashboard(admins only) */}
                             {isItemExpanded && item.id === "approval-dashboard" && (
-                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 min-w-0 max-w-full overflow-hidden">
+                              <div className="bg-card border-t border-border px-3, sm:px-5 py-4 space-y-6 min-w-0 max-w-full overflow-hidden">
                                 <ExpenseFormApprovalDashboard isAdmin={true} />
                               </div>
                             )}
 
                             {/* Expanded content for Employee Onboarding Form */}
                             {isItemExpanded && item.id === "employee-onboarding-form" && (
-                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3, sm:px-5 py-4 space-y-6 max-w-full">
                                 <EmployeeOnboardingFormContent />
                               </div>
                             )}
 
                             {/* Expanded content for Contract GLA Contractor Policy 1099 */}
                             {isItemExpanded && item.id === "employee-contract-1099" && (
-                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3, sm:px-5 py-4 space-y-6 max-w-full">
                                 <EmployeeContract1099Content />
                               </div>
                             )}
 
                             {/* Expanded content for Employee Offboarding Form */}
                             {isItemExpanded && item.id === "employee-offboarding" && (
-                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3, sm:px-5 py-4 space-y-6 max-w-full">
                                 <EmployeeOffboardingContent />
                               </div>
                             )}
 
                             {/* Expanded content for LYC form */}
                             {isItemExpanded && item.id === "lyc" && (
-                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
+                              <div className="bg-card border-t border-border px-3, sm:px-5 py-4 space-y-6 max-w-full">
                                 {/* QR Code Section */}
                                 <QRCodeSection />
 
@@ -1171,7 +1162,7 @@ export default function FormsPage() {
                                       onChange={(e) =>
                                         setSearchQuery(e.target.value)
                                       }
-                                      className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600"
+                                      className="pl-10 bg-card border-border text-foreground, placeholder:text-gray-600"
                                     />
                                   </div>
                                 </div>
@@ -1196,40 +1187,40 @@ export default function FormsPage() {
                                       <table className="w-full text-sm table-auto">
                                       <thead>
                                         <tr className="border-b border-border">
-                                          <th className="text-left py-3 px-2 sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
                                             Name
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden md:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-muted-foreground font-medium text-xs hidden, md:table-cell whitespace-nowrap">
                                             Email
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden lg:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-muted-foreground font-medium text-xs hidden, lg:table-cell whitespace-nowrap">
                                             Phone
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
                                             Vehicle
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden xl:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-muted-foreground font-medium text-xs hidden, xl:table-cell whitespace-nowrap">
                                             VIN#
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden xl:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-muted-foreground font-medium text-xs hidden, xl:table-cell whitespace-nowrap">
                                             Plate #
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden lg:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-muted-foreground font-medium text-xs hidden, lg:table-cell whitespace-nowrap">
                                             Submitted
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
                                             Status
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden md:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-muted-foreground font-medium text-xs hidden, md:table-cell whitespace-nowrap">
                                             Contract
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden 2xl:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-muted-foreground font-medium text-xs hidden, 2xl:table-cell whitespace-nowrap">
                                             Car Onboarding Date
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-muted-foreground font-medium text-xs hidden 2xl:table-cell whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-muted-foreground font-medium text-xs hidden, 2xl:table-cell whitespace-nowrap">
                                             Car Offboarding Date
                                           </th>
-                                          <th className="text-left py-3 px-2 sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
+                                          <th className="text-left py-3 px-2, sm:px-3 text-foreground font-medium text-xs whitespace-nowrap">
                                             Actions
                                           </th>
                                         </tr>
@@ -1239,43 +1230,43 @@ export default function FormsPage() {
                                           (submission) => (
                                             <tr
                                               key={submission.id}
-                                              className="border-b border-border hover:bg-card transition-colors"
+                                              className="border-b border-border, hover:bg-card transition-colors"
                                             >
-                                              <td className="py-3 px-2 sm:px-3 text-foreground text-xs sm:text-sm max-w-[120px] truncate" title={`${submission.firstNameOwner} ${submission.lastNameOwner}`}>
-                                                {submission.firstNameOwner}{" "}
+                                              <td className="py-3 px-2, sm:px-3 text-foreground text-xs, sm:text-sm max-w-[120px] truncate` title={`${submission.firstNameOwner} ${submission.lastNameOwner}`}>
+                                                {submission.firstNameOwner}{` "}
                                                 {submission.lastNameOwner}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={submission.emailOwner}>
+                                              <td className="py-3 px-2, sm:px-3 text-muted-foreground text-xs, sm:text-sm hidden, md:table-cell max-w-[150px] truncate" title={submission.emailOwner}>
                                                 {submission.emailOwner}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={submission.phoneOwner}>
+                                              <td className="py-3 px-2, sm:px-3 text-muted-foreground text-xs, sm:text-sm hidden, lg:table-cell max-w-[120px] truncate" title={submission.phoneOwner}>
                                                 {submission.phoneOwner}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm max-w-[150px] truncate" title={`${submission.vehicleMake} ${submission.vehicleModel} ${submission.vehicleYear}`}>
-                                                {submission.vehicleMake}{" "}
+                                              <td className="py-3 px-2, sm:px-3 text-muted-foreground text-xs, sm:text-sm max-w-[150px] truncate` title={`${submission.vehicleMake} ${submission.vehicleModel} ${submission.vehicleYear}`}>
+                                                {submission.vehicleMake}{` "}
                                                 {submission.vehicleModel}{" "}
                                                 {submission.vehicleYear}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={submission.vinNumber || "N/A"}>
+                                              <td className="py-3 px-2, sm:px-3 text-muted-foreground font-mono text-xs hidden, xl:table-cell max-w-[120px] truncate" title={submission.vinNumber || "N/A"}>
                                                 {submission.vinNumber || (
                                                   <span className="text-muted-foreground">
                                                     N/A
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={submission.licensePlate || "N/A"}>
+                                              <td className="py-3 px-2, sm:px-3 text-muted-foreground font-mono text-xs hidden, xl:table-cell max-w-[100px] truncate" title={submission.licensePlate || "N/A"}>
                                                 {submission.licensePlate || (
                                                   <span className="text-muted-foreground">
                                                     N/A
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
-                                                {new Date(
+                                              <td className="py-3 px-2, sm:px-3 text-muted-foreground text-xs, sm:text-sm hidden, lg:table-cell whitespace-nowrap">
+                                                {new, Date(
                                                   submission.createdAt
                                                 ).toLocaleDateString()}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 whitespace-nowrap">
+                                              <td className="py-3 px-2, sm:px-3 whitespace-nowrap">
                                                 <Badge
                                                   variant="outline"
                                                   className={cn(
@@ -1296,7 +1287,7 @@ export default function FormsPage() {
                                                     "pending"}
                                                 </Badge>
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 hidden md:table-cell whitespace-nowrap">
+                                              <td className="py-3 px-2, sm:px-3 hidden, md:table-cell whitespace-nowrap">
                                                 <div className="flex items-center gap-2">
                                                   {submission.contractStatus ===
                                                     "sent" && (
@@ -1328,12 +1319,12 @@ export default function FormsPage() {
                                                       <Button
                                                         size="sm"
                                                         variant="outline"
-                                                        className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-700 hover:bg-green-500/20"
+                                                        className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-700, hover:bg-green-500/20`
                                                         onClick={() => {
                                                           // Use proxy endpoint for authenticated access
                                                           window.open(
                                                             buildApiUrl(`/api/contracts/${submission.id}/view`),
-                                                            "_blank"
+                                                            `_blank"
                                                           );
                                                         }}
                                                       >
@@ -1363,9 +1354,9 @@ export default function FormsPage() {
                                                   )}
                                                 </div>
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
+                                              <td className="py-3 px-2, sm:px-3 text-muted-foreground text-xs, sm:text-sm hidden, 2xl:table-cell whitespace-nowrap">
                                                 {submission.contractSignedAt ? (
-                                                  new Date(
+                                                  new, Date(
                                                     submission.contractSignedAt
                                                   ).toLocaleDateString()
                                                 ) : (
@@ -1374,9 +1365,9 @@ export default function FormsPage() {
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
+                                              <td className="py-3 px-2, sm:px-3 text-muted-foreground text-xs, sm:text-sm hidden, 2xl:table-cell whitespace-nowrap">
                                                 {submission.carOffboardAt ? (
-                                                  new Date(
+                                                  new, Date(
                                                     submission.carOffboardAt
                                                   ).toLocaleDateString()
                                                 ) : (
@@ -1385,12 +1376,12 @@ export default function FormsPage() {
                                                   </span>
                                                 )}
                                               </td>
-                                              <td className="py-3 px-2 sm:px-3 whitespace-nowrap">
+                                              <td className="py-3 px-2, sm:px-3 whitespace-nowrap">
                                                 <div className="flex items-center gap-2">
                                                   <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    className="h-8 w-8 p-0 hover:bg-muted/50"
+                                                    className="h-8 w-8 p-0, hover:bg-muted/50"
                                                     onClick={() =>
                                                       handleViewDetails(
                                                         submission
@@ -1398,7 +1389,7 @@ export default function FormsPage() {
                                                     }
                                                     title="View Details"
                                                   >
-                                                    <Eye className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                                                    <Eye className="w-4 h-4 text-muted-foreground, hover:text-foreground" />
                                                   </Button>
 
                                                   {/* Always show Approve/Decline buttons for consistent layout */}
@@ -1555,7 +1546,7 @@ export default function FormsPage() {
                 <Button
                   onClick={handleRequestSensitiveData}
                   variant="outline"
-                  className="bg-yellow-500/10 border-yellow-500/50 text-yellow-700 hover:bg-yellow-500/20"
+                  className="bg-yellow-500/10 border-yellow-500/50 text-yellow-700, hover:bg-yellow-500/20"
                 >
                   View Full Sensitive Information
                 </Button>
@@ -1578,14 +1569,14 @@ export default function FormsPage() {
                 <Button
                   onClick={() => setShowAccessConfirmation(false)}
                   variant="outline"
-                  className="border-border text-muted-foreground hover:bg-muted/50"
+                  className="border-border text-muted-foreground, hover:bg-muted/50"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleConfirmViewSensitiveData}
                   disabled={logAccessMutation.isPending}
-                  className="bg-yellow-500/20 border-yellow-500/50 text-yellow-700 hover:bg-yellow-500/30"
+                  className="bg-yellow-500/20 border-yellow-500/50 text-yellow-700, hover:bg-yellow-500/30"
                 >
                   {logAccessMutation.isPending ? (
                     <>
@@ -1607,7 +1598,7 @@ export default function FormsPage() {
                 const formatValue = (value: any): string => {
                   if (value === null || value === undefined || value === "")
                     return "Not provided";
-                  return String(value);
+                  return, String(value);
                 };
 
                 const formatDate = (
@@ -1615,14 +1606,14 @@ export default function FormsPage() {
                 ): string => {
                   if (!dateStr) return "Not provided";
                   try {
-                    return new Date(dateStr).toLocaleString();
+                    return new, Date(dateStr).toLocaleString();
                   } catch {
-                    return String(dateStr);
+                    return, String(dateStr);
                   }
                 };
 
                 const formatCurrency = (value: string | null): string => {
-                  if (!value) return "Not provided";
+                  if (!value) return "Not provided`;
                   const num = parseFloat(value);
                   if (isNaN(num)) return value;
                   return `$${num.toLocaleString("en-US", {
@@ -1650,7 +1641,7 @@ export default function FormsPage() {
                     } catch {
                       driversLicenseUrlsArray = [];
                     }
-                  } else if (Array.isArray(data.driversLicenseUrls)) {
+                  } else, if(Array.isArray(data.driversLicenseUrls)) {
                     driversLicenseUrlsArray = data.driversLicenseUrls;
                   }
                 }
@@ -1658,14 +1649,14 @@ export default function FormsPage() {
                 return (
                   <>
                     {/* Personal Information */}
-                    <div className="bg-card p-4 rounded-lg border border-primary/20">
+                    <div className=`bg-card p-4 rounded-lg border border-primary/20">
                       <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Personal Information
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Full Name:
+                            Full, Name:
                           </span>
                           <span className="text-foreground font-medium">
                             {formatValue(data.firstNameOwner)}{" "}
@@ -1690,7 +1681,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Date of Birth:
+                            Date of, Birth:
                           </span>
                           <span className="text-foreground">
                             {showSensitiveData
@@ -1700,7 +1691,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            T-Shirt Size:
+                            T-Shirt, Size:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.tshirtSize)}
@@ -1726,7 +1717,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            How Did You Hear About Us:
+                            How Did You Hear About, Us:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.heardAboutUs)}
@@ -1736,7 +1727,7 @@ export default function FormsPage() {
                           <>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Emergency Contact Name:
+                            Emergency Contact, Name:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.emergencyContactName)}
@@ -1744,7 +1735,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Emergency Contact Phone:
+                            Emergency Contact, Phone:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.emergencyContactPhone)}
@@ -1760,10 +1751,10 @@ export default function FormsPage() {
                       <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Address Information
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            T-Shirt Size:
+                            T-Shirt, Size:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.tshirtSize)}
@@ -1771,7 +1762,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            First Name:
+                            First, Name:
                           </span>
                           <span className="text-foreground font-medium">
                             {formatValue(data.firstNameOwner)}
@@ -1779,7 +1770,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Last Name:
+                            Last, Name:
                           </span>
                           <span className="text-foreground font-medium">
                             {formatValue(data.lastNameOwner)}
@@ -1811,7 +1802,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            How Did You Hear About Us:
+                            How Did You Hear About, Us:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.heardAboutUs)}
@@ -1820,7 +1811,7 @@ export default function FormsPage() {
                         {showSensitiveData && (
                           <div>
                             <span className="text-muted-foreground block mb-1">
-                              Date of Birth:
+                              Date of, Birth:
                             </span>
                             <span className="text-foreground">
                               {formatValue(data.birthday)}
@@ -1830,7 +1821,7 @@ export default function FormsPage() {
                         {showSensitiveData && (
                           <div className="md:col-span-2">
                             <span className="text-muted-foreground block mb-1">
-                              Street Address:
+                              Street, Address:
                             </span>
                             <span className="text-foreground">
                               {formatValue(data.streetAddress)}
@@ -1855,7 +1846,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Zip Code:
+                            Zip, Code:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.zipCode)}
@@ -1865,7 +1856,7 @@ export default function FormsPage() {
                           <>
                             <div>
                               <span className="text-muted-foreground block mb-1">
-                                Emergency Contact Name:
+                                Emergency Contact, Name:
                               </span>
                               <span className="text-foreground">
                                 {formatValue(data.emergencyContactName)}
@@ -1873,7 +1864,7 @@ export default function FormsPage() {
                             </div>
                             <div>
                               <span className="text-muted-foreground block mb-1">
-                                Emergency Contact Phone:
+                                Emergency Contact, Phone:
                               </span>
                               <span className="text-foreground">
                                 {formatValue(data.emergencyContactPhone)}
@@ -1889,7 +1880,7 @@ export default function FormsPage() {
                       <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Vehicle Information
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground block mb-1">
                             Year:
@@ -1924,7 +1915,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            VIN Number:
+                            VIN, Number:
                           </span>
                           <span className="text-foreground font-mono text-xs">
                             {formatValue(data.vinNumber)}
@@ -1932,7 +1923,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            License Plate:
+                            License, Plate:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.licensePlate)}
@@ -1948,7 +1939,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Exterior Color:
+                            Exterior, Color:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.exteriorColor)}
@@ -1956,7 +1947,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Interior Color:
+                            Interior, Color:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.interiorColor)}
@@ -1964,7 +1955,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Title Type:
+                            Title, Type:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.titleType)}
@@ -1972,7 +1963,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Registration Expiration:
+                            Registration, Expiration:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.registrationExpiration)}
@@ -1980,7 +1971,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Fuel Type:
+                            Fuel, Type:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.fuelType)}
@@ -1988,7 +1979,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Vehicle Recall:
+                            Vehicle, Recall:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.vehicleRecall)}
@@ -2006,7 +1997,7 @@ export default function FormsPage() {
                                   if (typeof data.vehicleFeatures === 'string') {
                                     const parsed = JSON.parse(data.vehicleFeatures);
                                     featuresArray = Array.isArray(parsed) ? parsed : [];
-                                  } else if (Array.isArray(data.vehicleFeatures)) {
+                                  } else, if(Array.isArray(data.vehicleFeatures)) {
                                     featuresArray = data.vehicleFeatures;
                                   }
                                 } catch {
@@ -2039,7 +2030,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            If Yes, For How Many Years of Oil Changes OR What Oil Package:
+                            If Yes, For How Many Years of Oil Changes OR What Oil, Package:
                           </span>
                           <span className="text-foreground">
                             {data.freeDealershipOilChanges === "Yes" 
@@ -2054,7 +2045,7 @@ export default function FormsPage() {
                     {(!data.vehicleRecall || data.vehicleRecall.trim() === '' || data.vehicleRecall === 'Not provided') && (
                       <div className="relative my-4 z-20">
                         <div className="bg-white border-4 border-red-500 rounded-lg p-6 shadow-2xl flex items-center justify-center">
-                          <p className="text-red-500 text-xl font-semibold text-center m-0">
+                          <p className="text-red-500 text-xl font-semibold text-center m-0`>
                             Vehicle Recall is missing
                           </p>
                         </div>
@@ -2063,10 +2054,10 @@ export default function FormsPage() {
 
                     {/* Financial Information */}
                     <div className={`bg-card p-4 rounded-lg border border-primary/20 ${(!data.vehicleRecall || data.vehicleRecall.trim() === '' || data.vehicleRecall === 'Not provided') ? 'opacity-30' : ''}`}>
-                      <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
+                      <h3 className=`text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Financial Information
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground block mb-1">
                             Plate #:
@@ -2077,7 +2068,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Down Payment:
+                            Down, Payment:
                           </span>
                           <span className="text-foreground font-medium">
                             {formatCurrency(data.downPayment)}
@@ -2085,7 +2076,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Monthly Payment:
+                            Monthly, Payment:
                           </span>
                           <span className="text-foreground font-medium">
                             {formatCurrency(data.monthlyPayment)}
@@ -2093,7 +2084,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Interest Rate:
+                            Interest, Rate:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.interestRate)}%
@@ -2101,7 +2092,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Transport City to City:
+                            Transport City to, City:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.transportCityToCity)}
@@ -2109,7 +2100,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Ultimate Goal:
+                            Ultimate, Goal:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.ultimateGoal)}
@@ -2123,10 +2114,10 @@ export default function FormsPage() {
                       <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Banking Information
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Bank Name:
+                            Bank, Name:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.bankName)}
@@ -2134,7 +2125,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Tax Classification:
+                            Tax, Classification:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.taxClassification)}
@@ -2144,7 +2135,7 @@ export default function FormsPage() {
                           <>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Routing Number:
+                            Routing, Number:
                           </span>
                           <span className="text-foreground font-mono">
                                 {maskAccountInfo(data.routingNumber)}
@@ -2152,7 +2143,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Account Number:
+                            Account, Number:
                           </span>
                           <span className="text-foreground font-mono">
                                 {maskAccountInfo(data.accountNumber)}
@@ -2163,7 +2154,7 @@ export default function FormsPage() {
                         {data.businessName && (
                           <div>
                             <span className="text-muted-foreground block mb-1">
-                              Business Name:
+                              Business, Name:
                             </span>
                             <span className="text-foreground">
                               {formatValue(data.businessName)}
@@ -2198,7 +2189,7 @@ export default function FormsPage() {
                       <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Insurance Information
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground block mb-1">
                             Provider:
@@ -2210,7 +2201,7 @@ export default function FormsPage() {
                         {showSensitiveData && (
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Policy Number:
+                            Policy, Number:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.policyNumber)}
@@ -2219,7 +2210,7 @@ export default function FormsPage() {
                         )}
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Insurance Phone:
+                            Insurance, Phone:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.insurancePhone)}
@@ -2227,7 +2218,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Insurance Expiration:
+                            Insurance, Expiration:
                           </span>
                           <span className="text-foreground">
                             {formatValue(data.insuranceExpiration)}
@@ -2241,10 +2232,10 @@ export default function FormsPage() {
                       <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Contract Status & Details
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Contract Status:
+                            Contract, Status:
                           </span>
                           <Badge
                             variant="outline"
@@ -2267,7 +2258,7 @@ export default function FormsPage() {
                         {showSensitiveData && (
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Contract Token:
+                            Contract, Token:
                           </span>
                           <span className="text-foreground font-mono text-xs break-all">
                             {formatValue(data.contractToken)}
@@ -2276,7 +2267,7 @@ export default function FormsPage() {
                         )}
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Contract Sent At:
+                            Contract Sent, At:
                           </span>
                           <span className="text-foreground">
                             {formatDate(data.contractSentAt)}
@@ -2284,7 +2275,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Contract Signed At:
+                            Contract Signed, At:
                           </span>
                           <span className="text-foreground">
                             {formatDate(data.contractSignedAt)}
@@ -2292,7 +2283,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Reminder Count:
+                            Reminder, Count:
                           </span>
                           <span className="text-foreground font-medium">
                             {data.reminderCount || 0} / 3
@@ -2300,7 +2291,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Last Reminder Sent:
+                            Last Reminder, Sent:
                           </span>
                           <span className="text-foreground">
                             {formatDate(data.lastReminderSentAt)}
@@ -2308,23 +2299,23 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Next Reminder Due:
+                            Next Reminder, Due:
                           </span>
                           <span className="text-foreground">
                             {formatDate(data.nextReminderDueAt)}
                           </span>
                         </div>
                         {data.contractStatus === "signed" && (
-                          <div className="md:col-span-2">
+                          <div className="md:col-span-2`>
                             <Button
                               onClick={() => {
                                 // Use proxy endpoint for authenticated access
                                 window.open(
                                   buildApiUrl(`/api/contracts/${data.id}/view`),
-                                  "_blank"
+                                  `_blank"
                                 );
                               }}
-                              className="bg-primary text-primary-foreground hover:bg-primary/80"
+                              className="bg-primary text-primary-foreground, hover:bg-primary/80"
                             >
                               <Download className="w-4 h-4 mr-2" />
                               Download Signed PDF
@@ -2341,7 +2332,7 @@ export default function FormsPage() {
                           Documents
                         </h3>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1, md:grid-cols-2 gap-6">
                         {/* Health Insurance Card */}
                         <div className="space-y-4">
                           <h4 className="text-base font-semibold text-muted-foreground">Insurance Card</h4>
@@ -2355,18 +2346,18 @@ export default function FormsPage() {
                             
                             return (
                               <div 
-                                className="relative group cursor-pointer"
+                                className="relative group cursor-pointer`
                                 onClick={() => {
                                   setFullScreenDocument({ url: documentUrl, type: 'insurance', isPdf });
                                 }}
                               >
                                 <div className={`relative w-full aspect-[4/3] bg-background rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
                                   isPdf 
-                                    ? 'border-primary/50 hover:border-primary shadow-[#EAEB80]/20' 
-                                    : 'border-primary/30 hover:border-primary shadow-[#EAEB80]/20'
+                                    ? 'border-primary/50, hover:border-primary shadow-[#EAEB80]/20' 
+                                    : 'border-primary/30, hover:border-primary shadow-[#EAEB80]/20'
                                 }`}>
                                   {isPdf ? (
-                                    <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                    <div className=`w-full h-full flex flex-col items-center justify-center p-4">
                                       <FileText className="w-16 h-16 text-primary mb-2" />
                                       <p className="text-primary text-sm font-semibold">PDF Document</p>
                                       <p className="text-muted-foreground text-xs mt-1">Click to open in PDF viewer</p>
@@ -2377,7 +2368,7 @@ export default function FormsPage() {
                                       alt="Insurance Card"
                                       className="w-full h-full object-contain p-2"
                                       onError={(e) => {
-                                        console.error('Failed to load insurance card image:', data.insuranceCardUrl);
+                                        console.error('Failed to load insurance card, image:', data.insuranceCardUrl);
                                         const target = e.target as HTMLImageElement;
                                         target.style.display = "none";
                                         const parent = target.parentElement?.parentElement;
@@ -2424,27 +2415,27 @@ export default function FormsPage() {
                                 return (
                                   <div 
                                     key={index}
-                                    className="relative group cursor-pointer"
+                                    className="relative group cursor-pointer`
                                     onClick={() => setFullScreenDocument({ url: documentUrl, type: 'license', index, isPdf })}
                                   >
                                     <div className={`relative w-full aspect-[4/3] bg-background rounded-lg border-2 transition-all overflow-hidden shadow-lg ${
                                       isPdf 
-                                        ? 'border-primary/50 hover:border-primary shadow-[#EAEB80]/20' 
-                                        : 'border-primary/30 hover:border-primary shadow-[#EAEB80]/20'
+                                        ? 'border-primary/50, hover:border-primary shadow-[#EAEB80]/20' 
+                                        : 'border-primary/30, hover:border-primary shadow-[#EAEB80]/20'
                                     }`}>
                                       {isPdf ? (
-                                        <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                                        <div className=`w-full h-full flex flex-col items-center justify-center p-4">
                                           <FileText className="w-16 h-16 text-primary mb-2" />
                                           <p className="text-primary text-sm font-semibold">PDF Document</p>
-                                          <p className="text-muted-foreground text-xs mt-1">Click to open in PDF viewer</p>
+                                          <p className="text-muted-foreground text-xs mt-1`>Click to open in PDF viewer</p>
                                         </div>
                                       ) : (
                                         <img
                                           src={documentUrl}
                                           alt={`Driver's License ${index + 1}`}
-                                          className="w-full h-full object-contain p-2"
+                                          className=`w-full h-full object-contain p-2"
                                           onError={(e) => {
-                                            console.error('Failed to load drivers license image:', url);
+                                            console.error('Failed to load drivers license, image:', url);
                                             const target = e.target as HTMLImageElement;
                                             target.style.display = "none";
                                             const parent = target.parentElement?.parentElement;
@@ -2491,10 +2482,10 @@ export default function FormsPage() {
                       <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                         Timestamps
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Created At:
+                            Created, At:
                           </span>
                           <span className="text-foreground">
                             {formatDate(data.createdAt)}
@@ -2502,7 +2493,7 @@ export default function FormsPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block mb-1">
-                            Last Updated:
+                            Last, Updated:
                           </span>
                           <span className="text-foreground">
                             {formatDate(data.updatedAt)}
@@ -2556,7 +2547,7 @@ export default function FormsPage() {
                 value={declineReason}
                 onChange={(e) => setDeclineReason(e.target.value)}
                 placeholder="Enter reason for declining this submission..."
-                className="bg-card border-border text-foreground placeholder:text-gray-600 min-h-[100px]"
+                className="bg-card border-border text-foreground, placeholder:text-gray-600 min-h-[100px]"
                 required
               />
             </div>
@@ -2568,7 +2559,7 @@ export default function FormsPage() {
                   setDeclineReason("");
                   setSubmissionToDecline(null);
                 }}
-                className="border-border text-muted-foreground hover:bg-muted/50"
+                className="border-border text-muted-foreground, hover:bg-muted/50"
               >
                 Cancel
               </Button>
@@ -2591,7 +2582,7 @@ export default function FormsPage() {
                   }
                 }}
                 disabled={!declineReason.trim() || approvalMutation.isPending}
-                className="bg-red-500 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground"
+                className="bg-red-500, hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground"
               >
                 {approvalMutation.isPending ? (
                   <>
@@ -2621,7 +2612,7 @@ export default function FormsPage() {
               e.stopPropagation();
               setFullScreenDocument(null);
             }}
-            className="fixed top-4 right-4 z-[9999] h-14 w-14 bg-red-500/20 text-red-700 border-red-500/50/90 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground border-2 border-white rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110 flex items-center justify-center"
+            className="fixed top-4 right-4 z-[9999] h-14 w-14 bg-red-500/20 text-red-700 border-red-500/50/90, hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground border-2 border-white rounded-full shadow-2xl backdrop-blur-sm transition-all, hover:scale-110 flex items-center justify-center"
             aria-label="Close full screen view"
             style={{
               position: 'fixed',
@@ -2634,7 +2625,7 @@ export default function FormsPage() {
           </Button>
 
           <div className="relative w-full h-full flex items-center justify-center p-8">
-            {/* Image Counter - Bottom Center (for multiple drivers licenses) */}
+            {/* Image Counter - Bottom, Center(for multiple drivers licenses) */}
             {fullScreenDocument.type === 'license' && 
              submissionDetails?.data?.driversLicenseUrls && 
              fullScreenDocument.index !== undefined && (() => {
@@ -2647,7 +2638,7 @@ export default function FormsPage() {
                    } catch {
                      driversLicenseUrlsArray = [];
                    }
-                 } else if (Array.isArray(submissionDetails.data.driversLicenseUrls)) {
+                 } else, if(Array.isArray(submissionDetails.data.driversLicenseUrls)) {
                    driversLicenseUrlsArray = submissionDetails.data.driversLicenseUrls;
                  }
                }
@@ -2660,7 +2651,7 @@ export default function FormsPage() {
                ) : null;
              })()}
 
-            {/* Navigation Buttons (for multiple drivers licenses) */}
+            {/* Navigation, Buttons(for multiple drivers licenses) */}
             {fullScreenDocument.type === 'license' && 
              submissionDetails?.data?.driversLicenseUrls && 
              fullScreenDocument.index !== undefined && (() => {
@@ -2673,7 +2664,7 @@ export default function FormsPage() {
                    } catch {
                      driversLicenseUrlsArray = [];
                    }
-                 } else if (Array.isArray(submissionDetails.data.driversLicenseUrls)) {
+                 } else, if(Array.isArray(submissionDetails.data.driversLicenseUrls)) {
                    driversLicenseUrlsArray = submissionDetails.data.driversLicenseUrls;
                  }
                }
@@ -2697,7 +2688,7 @@ export default function FormsPage() {
                            isPdf
                          });
                        }}
-                       className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90 hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+                       className="fixed left-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90, hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all, hover:scale-110"
                        aria-label="Previous image"
                      >
                        <ChevronLeft className="w-6 h-6" />
@@ -2722,7 +2713,7 @@ export default function FormsPage() {
                            isPdf
                          });
                        }}
-                       className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90 hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all hover:scale-110"
+                       className="fixed right-6 top-1/2 -translate-y-1/2 z-[200] h-14 w-14 bg-background/90, hover:bg-muted/50EAEB80]/20 text-foreground border-2 border-white/60 rounded-full shadow-2xl backdrop-blur-sm transition-all, hover:scale-110"
                        aria-label="Next image"
                      >
                        <ChevronRight className="w-6 h-6" />
@@ -2736,7 +2727,7 @@ export default function FormsPage() {
             {fullScreenDocument.isPdf ? (
               <iframe
                 src={fullScreenDocument.url}
-                className="w-full h-full border-0"
+                className="w-full h-full border-0`
                 style={{
                   maxWidth: '100vw',
                   maxHeight: '100vh',
@@ -2748,14 +2739,14 @@ export default function FormsPage() {
               <img
                 src={fullScreenDocument.url}
                 alt={fullScreenDocument.type === 'insurance' ? 'Insurance Card' : `Driver's License ${fullScreenDocument.index !== undefined ? fullScreenDocument.index + 1 : ''}`}
-                className="w-full h-full object-contain"
+                className=`w-full h-full object-contain"
                 onClick={(e) => e.stopPropagation()}
                 style={{
                   maxWidth: '100vw',
                   maxHeight: '100vh',
                 }}
                 onError={(e) => {
-                  console.error('Failed to load image in full screen viewer:', fullScreenDocument.url);
+                  console.error('Failed to load image in full screen, viewer:', fullScreenDocument.url);
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />

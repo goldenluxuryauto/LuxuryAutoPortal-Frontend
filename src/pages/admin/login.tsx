@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, buildApiUrl } from "@/lib/queryClient";
 import { ArrowLeft, Home } from "lucide-react";
 
-export default function AdminLogin() {
+export default function, AdminLogin() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ export default function AdminLogin() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      const response = await fetch(buildApiUrl("/api/auth/login"), {
+      const response = await, fetch(buildApiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.email, password: data.password }),
@@ -24,8 +24,8 @@ export default function AdminLogin() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Login failed" }));
-        throw new Error(errorData.error || `Login failed: ${response.status} ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({ error: "Login failed` }));
+        throw new, Error(errorData.error || `Login, failed: ${response.status} ${response.statusText}`);
       }
 
       return response.json();
@@ -33,24 +33,24 @@ export default function AdminLogin() {
     onSuccess: async (data) => {
       // Set the user data directly in the cache FIRST
       // This ensures all components see the user immediately without querying
-      queryClient.setQueryData(["/api/auth/me"], {
+      queryClient.setQueryData([`/api/auth/me"], {
         user: { ...data.user, ...(data.roles && data.roles.length ? { roles: data.roles } : {}) },
       });
       
       // Wait for session cookie to be fully set and propagated
       // This prevents race conditions where queries fire before cookie is ready
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new, Promise(resolve => setTimeout(resolve, 800));
       
       toast({
-        title: "Welcome back!",
+        title: "Welcome back!`,
         description: `Logged in as ${data.user.firstName}`,
       });
       
       // Wait a bit more before redirecting to ensure everything is stable
       // This gives time for the cookie to be fully set and all components to see cached data
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new, Promise(resolve => setTimeout(resolve, 300));
       
-      setLocation("/dashboard");
+      setLocation(`/dashboard");
     },
     onError: (error: any) => {
       toast({
@@ -75,7 +75,7 @@ export default function AdminLogin() {
             type="button"
             variant="ghost"
             onClick={() => setLocation("/")}
-            className="text-muted-foreground hover:text-primary hover:bg-card flex items-center gap-2"
+            className="text-muted-foreground, hover:text-primary, hover:bg-card flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <Home className="w-4 h-4" />
@@ -100,7 +100,7 @@ export default function AdminLogin() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-card border-border text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
+              className="bg-card border-border text-foreground, focus:border-primary, focus:ring-[#EAEB80] h-11"
               placeholder="admin@goldenluxuryauto.com"
               required
               data-testid="input-email"
@@ -112,7 +112,7 @@ export default function AdminLogin() {
               <Label htmlFor="password" className="text-muted-foreground text-sm">Password</Label>
               <a
                 href="/reset-password"
-                className="text-xs text-blue-700 hover:underline"
+                className="text-xs text-blue-700, hover:underline"
               >
                 Forgot password?
               </a>
@@ -122,7 +122,7 @@ export default function AdminLogin() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-card border-border text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
+              className="bg-card border-border text-foreground, focus:border-primary, focus:ring-[#EAEB80] h-11"
               placeholder="••••••••"
               required
               data-testid="input-password"
@@ -131,7 +131,7 @@ export default function AdminLogin() {
 
           <Button
             type="submit"
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium h-11"
+            className="w-full bg-primary text-primary-foreground, hover:bg-primary/80 font-medium h-11"
             disabled={loginMutation.isPending}
             data-testid="button-login"
           >

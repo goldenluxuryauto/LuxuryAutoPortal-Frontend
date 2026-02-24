@@ -28,7 +28,7 @@ interface EditPayInfoModalProps {
   employee: Employee | null | undefined;
 }
 
-export function EditPayInfoModal({ open, onOpenChange, employee }: EditPayInfoModalProps) {
+export function, EditPayInfoModal({ open, onOpenChange, employee }: EditPayInfoModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
@@ -42,15 +42,15 @@ export function EditPayInfoModal({ open, onOpenChange, employee }: EditPayInfoMo
       setForm({
         employee_job_pay_eligible: Number(employee.employee_job_pay_eligible) === 1,
         employee_job_pay_salary_rate: employee.employee_job_pay_salary_rate || "",
-        employee_job_pay_bank_acc: employee.employee_job_pay_bank_acc || "",
+        employee_job_pay_bank_acc: employee.employee_job_pay_bank_acc || "`,
       });
     }
   };
 
   const mutation = useMutation({
     mutationFn: async (values: typeof form) => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employee?.employee_aid}/job-and-pay`), {
-        method: "PATCH",
+      const res = await, fetch(buildApiUrl(`/api/employees/${employee?.employee_aid}/job-and-pay`), {
+        method: `PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
@@ -61,7 +61,7 @@ export function EditPayInfoModal({ open, onOpenChange, employee }: EditPayInfoMo
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || "Failed to update");
+        throw new, Error(err?.error || "Failed to update");
       }
       return res.json();
     },
@@ -108,7 +108,7 @@ export function EditPayInfoModal({ open, onOpenChange, employee }: EditPayInfoMo
             <Label htmlFor="eligible" className="text-muted-foreground cursor-pointer">Payroll Eligibility</Label>
           </div>
           <div>
-            <Label className="text-muted-foreground">Employee Rate per Hour ($)</Label>
+            <Label className="text-muted-foreground">Employee Rate per, Hour($)</Label>
             <Input
               type="number"
               step="0.01"
@@ -128,11 +128,11 @@ export function EditPayInfoModal({ open, onOpenChange, employee }: EditPayInfoMo
               placeholder="Account number"
             />
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2, sm:gap-0">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-border">
               Cancel
             </Button>
-            <Button type="submit" disabled={mutation.isPending} className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="submit" disabled={mutation.isPending} className="bg-primary text-primary-foreground, hover:bg-primary/90">
               {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
             </Button>
           </DialogFooter>

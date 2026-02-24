@@ -26,14 +26,14 @@ const categoryColors: Record<string, string> = {
   "Forms Center": "text-purple-400",
 };
 
-export default function QuickLinks() {
+export default function, QuickLinks() {
   const { data: quickLinks, isLoading } = useQuery<QuickLink[]>({
     queryKey: ["/api/quick-links"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/quick-links"), {
+      const response = await, fetch(buildApiUrl("/api/quick-links"), {
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to fetch quick links");
+      if (!response.ok) throw new, Error("Failed to fetch quick links");
       return response.json();
     },
     retry: false,
@@ -65,35 +65,34 @@ export default function QuickLinks() {
     (category) => groupedLinks[category].length > 0
   );
 
-  // If no categories have links, show nothing
-  if (categoriesWithLinks.length === 0) {
+  // If no categories have links, show nothing, if(categoriesWithLinks.length === 0) {
     return null;
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1, md:grid-cols-3 gap-4">
       {categoriesWithLinks.map((category) => {
         const links = groupedLinks[category];
         const Icon = categoryIcons[category] || ExternalLink;
         const iconColor = categoryColors[category] || "text-[#EAEB80]";
 
         return (
-          <Card key={category} className="bg-card border-border hover:border-primary/40 transition-colors">
+          <Card key={category} className="bg-card border-border, hover:border-primary/40 transition-colors">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground text-base">
+              <CardTitle className="flex items-center gap-2 text-foreground text-base`>
                 <Icon className={`w-5 h-5 ${iconColor}`} />
                 {category}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
+              <ul className=`space-y-2">
                 {links.map((link) => (
                   <li key={link.id}>
                     <a
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-[#EAEB80] transition-colors group"
+                      className="flex items-center gap-2 text-sm text-muted-foreground, hover:text-[#EAEB80] transition-colors group"
                     >
                       <span className="flex-1 truncate">{link.title}</span>
                       <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />

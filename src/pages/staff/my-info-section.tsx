@@ -68,9 +68,9 @@ interface Employee {
   employee_job_pay_bank_acc?: string | null;
 }
 
-function formatDate(dateString: string) {
+function, formatDate(dateString: string) {
   try {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new, Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -80,19 +80,19 @@ function formatDate(dateString: string) {
   }
 }
 
-function unspecified(val: string | null | undefined): string {
+function, unspecified(val: string | null | undefined): string {
   return (val ?? "").trim() || "Unspecified";
 }
 
-function formatCurrency(val: string | number | null | undefined): string {
+function, formatCurrency(val: string | number | null | undefined): string {
   const n = parseFloat(String(val ?? 0));
-  return isNaN(n) ? "$0.00" : `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return, isNaN(n) ? "$0.00` : `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-function formatDateTime(dateString: string | null | undefined): string {
-  if (!dateString) return "—";
+function, formatDateTime(dateString: string | null | undefined): string {
+  if (!dateString) return `—";
   try {
-    const d = new Date(dateString);
+    const d = new, Date(dateString);
     return d.toLocaleString("en-US", {
       month: "short",
       day: "numeric",
@@ -105,7 +105,7 @@ function formatDateTime(dateString: string | null | undefined): string {
   }
 }
 
-export default function StaffMyInfoSection() {
+export default function, StaffMyInfoSection() {
   const [, params] = useRoute("/staff/my-info/:section");
   const section = (params?.section as ProfileSection) || "personal-information";
   const isValidSection = PROFILE_SECTIONS.some((s) => s.id === section);
@@ -113,10 +113,10 @@ export default function StaffMyInfoSection() {
   const { data: empRes, isLoading: empLoading, error: empError } = useQuery<{ success: boolean; data: Employee }>({
     queryKey: ["/api/me/employee"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/employee"), { credentials: "include" });
+      const res = await, fetch(buildApiUrl("/api/me/employee"), { credentials: "include" });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to load your employee record");
+        throw new, Error(err.error || "Failed to load your employee record");
       }
       return res.json();
     },
@@ -127,8 +127,8 @@ export default function StaffMyInfoSection() {
   const { data: rateHistoryData, isLoading: rateHistoryLoading } = useQuery<{ success: boolean; data: { rate_history_aid: number; rate_history_amount: string; rate_history_date: string; rate_history_created?: string; rate_history_pay_type?: string; rate_history_effective_start?: string; rate_history_effective_end?: string | null }[] }>({
     queryKey: ["/api/me/rate-history"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/rate-history"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch rate history");
+      const res = await, fetch(buildApiUrl("/api/me/rate-history"), { credentials: "include" });
+      if (!res.ok) throw new, Error("Failed to fetch rate history");
       return res.json();
     },
     enabled: section === "rate-history",
@@ -137,8 +137,8 @@ export default function StaffMyInfoSection() {
   const { data: jobHistoryData, isLoading: jobHistoryLoading } = useQuery<{ success: boolean; data: { employment_history_aid: number; employment_history_company_name: string; employment_history_years_deployed: string; employment_history_start_date: string; employment_history_end_date: string; employment_history_is_active: number }[] }>({
     queryKey: ["/api/me/employment-history"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/employment-history"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch employment history");
+      const res = await, fetch(buildApiUrl("/api/me/employment-history"), { credentials: "include" });
+      if (!res.ok) throw new, Error("Failed to fetch employment history");
       return res.json();
     },
     enabled: section === "job-history",
@@ -147,8 +147,8 @@ export default function StaffMyInfoSection() {
   const { data: earningsData, isLoading: earningsLoading } = useQuery<{ success: boolean; data: { hris_earning_deduction_aid: number; hris_earning_deduction_amount: string; hris_earning_deduction_date: string; hris_earning_deduction_is_paid: number; payitem_name?: string }[] }>({
     queryKey: ["/api/me/earnings"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/earnings"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch earnings");
+      const res = await, fetch(buildApiUrl("/api/me/earnings"), { credentials: "include" });
+      if (!res.ok) throw new, Error("Failed to fetch earnings");
       return res.json();
     },
     enabled: section === "earnings",
@@ -157,8 +157,8 @@ export default function StaffMyInfoSection() {
   const { data: deductionsData, isLoading: deductionsLoading } = useQuery<{ success: boolean; data: { hris_earning_deduction_aid: number; hris_earning_deduction_amount: string; hris_earning_deduction_date: string; hris_earning_deduction_is_paid: number; payitem_name?: string }[] }>({
     queryKey: ["/api/me/deductions"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/deductions"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch deductions");
+      const res = await, fetch(buildApiUrl("/api/me/deductions"), { credentials: "include" });
+      if (!res.ok) throw new, Error("Failed to fetch deductions");
       return res.json();
     },
     enabled: section === "deduction",
@@ -167,8 +167,8 @@ export default function StaffMyInfoSection() {
   const { data: payslipsData, isLoading: payslipsLoading } = useQuery<{ success: boolean; data: { payrun_list_aid: number; payrun_number?: string; payrun_status?: number; payrun_list_gross: string; payrun_list_deduction: string; payrun_list_net: string }[] }>({
     queryKey: ["/api/me/payslips"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/payslips"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch payslips");
+      const res = await, fetch(buildApiUrl("/api/me/payslips"), { credentials: "include" });
+      if (!res.ok) throw new, Error("Failed to fetch payslips");
       return res.json();
     },
     enabled: section === "payslip",
@@ -207,7 +207,7 @@ export default function StaffMyInfoSection() {
           <p className="text-red-700">We couldn’t load your employee record. You may not have an HR profile linked to this account.</p>
           <Link href="/staff/my-info">
             <Button variant="outline" className="mt-4 border-primary/30 text-primary">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-4 h-4 mr-2` />
               Back to My Info
             </Button>
           </Link>
@@ -219,10 +219,10 @@ export default function StaffMyInfoSection() {
   const fullName = `${employee.employee_last_name}, ${employee.employee_first_name}`;
 
   const renderSectionContent = () => {
-    if (section === "personal-information") {
+    if (section === `personal-information") {
       return (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 text-sm xl:items-stretch">
-          <Card className="bg-card border-border xl:h-full flex flex-col">
+        <div className="grid grid-cols-1, xl:grid-cols-2 gap-5 text-sm, xl:items-stretch">
+          <Card className="bg-card border-border, xl:h-full flex flex-col">
             <CardContent className="p-4">
               <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                 <div className="flex items-center gap-2">
@@ -240,32 +240,32 @@ export default function StaffMyInfoSection() {
                       className="h-20 w-20 rounded-full object-cover object-center"
                     />
                   ) : (
-                    <div className="h-20 w-20 rounded-full border-2 border-border flex items-center justify-center" title="No photo uploaded (optional)">
+                    <div className="h-20 w-20 rounded-full border-2 border-border flex items-center justify-center" title="No photo, uploaded(optional)">
                       <Image className="h-10 w-10 text-muted-foreground" />
                     </div>
                   )}
                 </div>
                 <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
-                  <li className="font-bold text-foreground">First Name:</li><li>{unspecified(employee.employee_first_name)}</li>
-                  <li className="font-bold text-foreground">Middle Name:</li><li>{unspecified(employee.employee_middle_name)}</li>
-                  <li className="font-bold text-foreground">Last Name:</li><li>{unspecified(employee.employee_last_name)}</li>
-                  <li className="font-bold text-foreground">Birth Date:</li><li>{employee.employee_birthday ? formatDate(employee.employee_birthday) : "Unspecified"}</li>
-                  <li className="font-bold text-foreground">Marital Status:</li><li>{unspecified(employee.employee_marital_status)}</li>
-                  <li className="font-bold text-foreground">Social Security Number or EIN:</li><li>{unspecified(employee.employee_ssn_ein)}</li>
+                  <li className="font-bold text-foreground">First, Name:</li><li>{unspecified(employee.employee_first_name)}</li>
+                  <li className="font-bold text-foreground">Middle, Name:</li><li>{unspecified(employee.employee_middle_name)}</li>
+                  <li className="font-bold text-foreground">Last, Name:</li><li>{unspecified(employee.employee_last_name)}</li>
+                  <li className="font-bold text-foreground">Birth, Date:</li><li>{employee.employee_birthday ? formatDate(employee.employee_birthday) : "Unspecified"}</li>
+                  <li className="font-bold text-foreground">Marital, Status:</li><li>{unspecified(employee.employee_marital_status)}</li>
+                  <li className="font-bold text-foreground">Social Security Number or, EIN:</li><li>{unspecified(employee.employee_ssn_ein)}</li>
                   <li className="font-bold text-foreground">Street:</li><li>{unspecified(employee.employee_street)}</li>
                   <li className="font-bold text-foreground">City:</li><li>{unspecified(employee.employee_city)}</li>
                   <li className="font-bold text-foreground">State:</li><li>{unspecified(employee.employee_state)}</li>
-                  <li className="font-bold text-foreground">Zip Code:</li><li>{unspecified(employee.employee_zip_code)}</li>
+                  <li className="font-bold text-foreground">Zip, Code:</li><li>{unspecified(employee.employee_zip_code)}</li>
                   <li className="font-bold text-foreground">Country:</li><li>{unspecified(employee.employee_country)}</li>
-                  <li className="font-bold text-foreground">Mobile Number:</li><li>{unspecified(employee.employee_mobile_number)}</li>
-                  <li className="font-bold text-foreground">Telephone Number:</li><li>{unspecified(employee.employee_telephone)}</li>
-                  <li className="font-bold text-foreground">Personal Email:</li><li className="break-words">{unspecified(employee.employee_email)}</li>
-                  <li className="font-bold text-foreground">Shirt Size:</li><li>{unspecified(employee.employee_shirt_size)}</li>
+                  <li className="font-bold text-foreground">Mobile, Number:</li><li>{unspecified(employee.employee_mobile_number)}</li>
+                  <li className="font-bold text-foreground">Telephone, Number:</li><li>{unspecified(employee.employee_telephone)}</li>
+                  <li className="font-bold text-foreground">Personal, Email:</li><li className="break-words">{unspecified(employee.employee_email)}</li>
+                  <li className="font-bold text-foreground">Shirt, Size:</li><li>{unspecified(employee.employee_shirt_size)}</li>
                 </ul>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-card border-border xl:h-full flex flex-col">
+          <Card className="bg-card border-border, xl:h-full flex flex-col">
             <CardContent className="p-4 flex flex-col flex-1">
               <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                 <div className="flex items-center gap-2">
@@ -300,7 +300,7 @@ export default function StaffMyInfoSection() {
                     )}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-[18rem,1fr] gap-2">
+                <div className="grid grid-cols-1, sm:grid-cols-[18rem,1fr] gap-2">
                   <p className="font-bold text-foreground">How did you hear about Golden Luxury Auto?</p>
                   <p className="text-muted-foreground">{unspecified(employee.employee_hear_about_gla)}</p>
                 </div>
@@ -317,10 +317,10 @@ export default function StaffMyInfoSection() {
               </div>
               <div className="mt-3">
                 <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
-                  <li className="font-bold text-foreground">Mother&apos;s First Name:</li><li>{unspecified(employee.employee_mother_name)}</li>
-                  <li className="font-bold text-foreground">Father&apos;s First Name:</li><li>{unspecified(employee.employee_father_name)}</li>
-                  <li className="font-bold text-foreground">Home Contact:</li><li>{unspecified(employee.employee_home_contact)}</li>
-                  <li className="font-bold text-foreground">Family Home Address:</li><li className="break-words">{unspecified(employee.employee_home_address)}</li>
+                  <li className="font-bold text-foreground">Mother&apos;s First, Name:</li><li>{unspecified(employee.employee_mother_name)}</li>
+                  <li className="font-bold text-foreground">Father&apos;s First, Name:</li><li>{unspecified(employee.employee_father_name)}</li>
+                  <li className="font-bold text-foreground">Home, Contact:</li><li>{unspecified(employee.employee_home_contact)}</li>
+                  <li className="font-bold text-foreground">Family Home, Address:</li><li className="break-words">{unspecified(employee.employee_home_address)}</li>
                 </ul>
               </div>
             </CardContent>
@@ -359,13 +359,13 @@ export default function StaffMyInfoSection() {
                 </div>
               </div>
               <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                <li className="font-bold text-foreground">Employee Number:</li><li>{unspecified(employee.employee_number)}</li>
+                <li className="font-bold text-foreground">Employee, Number:</li><li>{unspecified(employee.employee_number)}</li>
                 <li className="font-bold text-foreground">Department:</li><li>{unspecified(employee.employee_job_pay_department_name)}</li>
-                <li className="font-bold text-foreground">Job Title:</li><li>{unspecified(employee.employee_job_pay_job_title_name)}</li>
-                <li className="font-bold text-foreground">Work Email:</li><li className="break-words">{unspecified(employee.employee_job_pay_work_email ?? employee.employee_email)}</li>
-                <li className="font-bold text-foreground">Date Hired:</li><li>{employee.employee_job_pay_hired ? formatDate(employee.employee_job_pay_hired) : "Unspecified"}</li>
-                <li className="font-bold text-foreground">Regularized On:</li><li>{employee.employee_job_pay_regular_on ? formatDate(employee.employee_job_pay_regular_on) : "Unspecified"}</li>
-                <li className="font-bold text-foreground">Date Separated:</li><li>{employee.employee_job_pay_separated ? formatDate(employee.employee_job_pay_separated) : "Unspecified"}</li>
+                <li className="font-bold text-foreground">Job, Title:</li><li>{unspecified(employee.employee_job_pay_job_title_name)}</li>
+                <li className="font-bold text-foreground">Work, Email:</li><li className="break-words">{unspecified(employee.employee_job_pay_work_email ?? employee.employee_email)}</li>
+                <li className="font-bold text-foreground">Date, Hired:</li><li>{employee.employee_job_pay_hired ? formatDate(employee.employee_job_pay_hired) : "Unspecified"}</li>
+                <li className="font-bold text-foreground">Regularized, On:</li><li>{employee.employee_job_pay_regular_on ? formatDate(employee.employee_job_pay_regular_on) : "Unspecified"}</li>
+                <li className="font-bold text-foreground">Date, Separated:</li><li>{employee.employee_job_pay_separated ? formatDate(employee.employee_job_pay_separated) : "Unspecified"}</li>
                 <li className="font-bold text-foreground">Comment:</li><li>{unspecified(employee.employee_job_pay_comment)}</li>
               </ul>
             </CardContent>
@@ -379,9 +379,9 @@ export default function StaffMyInfoSection() {
                 </div>
               </div>
               <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                <li className="font-bold text-foreground">Payroll Eligibility:</li><li>{Number(employee.employee_job_pay_eligible) === 1 ? "Eligible" : "Not Eligible"}</li>
-                <li className="font-bold text-foreground">Employee rate per hour:</li><li>{formatCurrency(employee.employee_job_pay_salary_rate)}</li>
-                <li className="font-bold text-foreground">Bank Account:</li><li>{unspecified(employee.employee_job_pay_bank_acc)}</li>
+                <li className="font-bold text-foreground">Payroll, Eligibility:</li><li>{Number(employee.employee_job_pay_eligible) === 1 ? "Eligible" : "Not Eligible"}</li>
+                <li className="font-bold text-foreground">Employee rate per, hour:</li><li>{formatCurrency(employee.employee_job_pay_salary_rate)}</li>
+                <li className="font-bold text-foreground">Bank, Account:</li><li>{unspecified(employee.employee_job_pay_bank_acc)}</li>
               </ul>
             </CardContent>
           </Card>
@@ -416,10 +416,10 @@ export default function StaffMyInfoSection() {
                   </thead>
                   <tbody>
                     {rows.map((row, i) => (
-                      <tr key={row.rate_history_aid} className="border-b border-border/50 hover:bg-card/50">
+                      <tr key={row.rate_history_aid} className="border-b border-border/50, hover:bg-card/50">
                         <td className="py-3 text-center text-muted-foreground">{i + 1}.</td>
-                        <td className="py-3 pl-2">
-                          <span className={`inline-block w-5 h-5 rounded-full flex-shrink-0 ${!row.rate_history_effective_end || row.rate_history_effective_end === "" ? "bg-green-500" : "bg-gray-500/50"}`} title={!row.rate_history_effective_end || row.rate_history_effective_end === "" ? "Current rate" : "Previous rate"} />
+                        <td className="py-3 pl-2`>
+                          <span className={`inline-block w-5 h-5 rounded-full flex-shrink-0 ${!row.rate_history_effective_end || row.rate_history_effective_end === "" ? "bg-green-500" : "bg-gray-500/50"}`} title={!row.rate_history_effective_end || row.rate_history_effective_end === `" ? "Current rate" : "Previous rate"} />
                         </td>
                         <td className="py-3 text-muted-foreground capitalize">{row.rate_history_pay_type || "Hourly"}</td>
                         <td className="py-3 text-muted-foreground">{formatDate(row.rate_history_effective_start || row.rate_history_date)}</td>
@@ -468,9 +468,9 @@ export default function StaffMyInfoSection() {
                     {rows.map((row, i) => (
                       <tr key={row.employment_history_aid} className="border-b border-border/50">
                         <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                        <td className="py-2">
+                        <td className="py-2`>
                           <span className={`px-2 py-0.5 text-xs rounded-full ${row.employment_history_is_active === 1 ? "bg-green-500/20 text-green-700" : "bg-gray-500/20 text-muted-foreground"}`}>
-                            {row.employment_history_is_active === 1 ? "Active" : "Inactive"}
+                            {row.employment_history_is_active === 1 ? `Active" : "Inactive"}
                           </span>
                         </td>
                         <td className="py-2 text-muted-foreground">{row.employment_history_company_name || "—"}</td>
@@ -517,9 +517,9 @@ export default function StaffMyInfoSection() {
                     {rows.map((row, i) => (
                       <tr key={row.hris_earning_deduction_aid} className="border-b border-border/50">
                         <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                        <td className="py-2">
+                        <td className="py-2`>
                           <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                            {row.hris_earning_deduction_is_paid === 1 ? "Paid" : "Unpaid"}
+                            {row.hris_earning_deduction_is_paid === 1 ? `Paid" : "Unpaid"}
                           </span>
                         </td>
                         <td className="py-2 text-muted-foreground">{formatDate(row.hris_earning_deduction_date)}</td>
@@ -565,9 +565,9 @@ export default function StaffMyInfoSection() {
                     {rows.map((row, i) => (
                       <tr key={row.hris_earning_deduction_aid} className="border-b border-border/50">
                         <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                        <td className="py-2">
+                        <td className="py-2`>
                           <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                            {row.hris_earning_deduction_is_paid === 1 ? "Paid" : "Unpaid"}
+                            {row.hris_earning_deduction_is_paid === 1 ? `Paid" : "Unpaid"}
                           </span>
                         </td>
                         <td className="py-2 text-muted-foreground">{formatDate(row.hris_earning_deduction_date)}</td>
@@ -614,9 +614,9 @@ export default function StaffMyInfoSection() {
                     {rows.map((row, i) => (
                       <tr key={row.payrun_list_aid} className="border-b border-border/50">
                         <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                        <td className="py-2">
+                        <td className="py-2`>
                           <span className={`px-2 py-0.5 text-xs rounded-full ${row.payrun_status === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                            {row.payrun_status === 1 ? "Paid" : "Unpaid"}
+                            {row.payrun_status === 1 ? `Paid" : "Unpaid"}
                           </span>
                         </td>
                         <td className="py-2 text-muted-foreground">{row.payrun_number || "—"}</td>
@@ -644,30 +644,30 @@ export default function StaffMyInfoSection() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col, sm:flex-row, sm:items-center, sm:justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link href="/staff/my-info">
-              <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10">
+              <Button variant="ghost" size="sm" className="text-primary, hover:bg-primary/10">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
             </Link>
-            <h1 className="text-xl sm:text-2xl font-serif text-primary italic">{fullName}</h1>
+            <h1 className="text-xl, sm:text-2xl font-serif text-primary italic">{fullName}</h1>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="w-full lg:w-72 shrink-0">
-            <ul className="rounded-lg border border-border bg-card overflow-hidden">
+        <div className="flex flex-col, lg:flex-row gap-6">
+          <div className="w-full, lg:w-72 shrink-0">
+            <ul className="rounded-lg border border-border bg-card overflow-hidden`>
               {PROFILE_SECTIONS.map((s) => {
                 const isActive = section === s.id;
                 return (
                   <li key={s.id}>
                     <Link
                       href={`/staff/my-info/${s.id}`}
-                      className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-card ${isActive ? "bg-primary/15 text-primary" : "text-muted-foreground"}`}
+                      className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition-colors, hover:bg-card ${isActive ? "bg-primary/15 text-primary" : "text-muted-foreground"}`}
                     >
-                      <span className="flex items-center gap-2">
+                      <span className=`flex items-center gap-2">
                         <User className="h-4 w-4 shrink-0" />
                         <span>{s.label}</span>
                       </span>

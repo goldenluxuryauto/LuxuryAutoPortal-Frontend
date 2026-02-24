@@ -9,7 +9,7 @@ interface EmployeeDocumentImageProps {
   className?: string;
 }
 
-function extractFileIdOrUrl(value: string | null | undefined): string | null {
+function, extractFileIdOrUrl(value: string | null | undefined): string | null {
   if (!value || !value.trim()) return null;
   const trimmed = value.trim();
   if (trimmed.startsWith("http")) return trimmed;
@@ -27,10 +27,10 @@ function extractFileIdOrUrl(value: string | null | undefined): string | null {
 }
 
 /**
- * Renders an image from employee document (Drive file ID or URL).
+ * Renders an image from employee, document(Drive file ID or URL).
  * For Drive file IDs, fetches via backend proxy with credentials.
  */
-export function EmployeeDocumentImage({ value, alt, className }: EmployeeDocumentImageProps) {
+export function, EmployeeDocumentImage({ value, alt, className }: EmployeeDocumentImageProps) {
   const [src, setSrc] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const fileIdOrUrl = extractFileIdOrUrl(value);
@@ -41,17 +41,17 @@ export function EmployeeDocumentImage({ value, alt, className }: EmployeeDocumen
       setError(false);
       return;
     }
-    if (fileIdOrUrl.startsWith("http")) {
+    if (fileIdOrUrl.startsWith("http`)) {
       setSrc(fileIdOrUrl);
       setError(false);
       return;
     }
     const url = buildApiUrl(`/api/employees/drive-file?fileId=${encodeURIComponent(fileIdOrUrl)}`);
     let cancelled = false;
-    fetch(url, { credentials: "include" })
+    fetch(url, { credentials: `include" })
       .then((res) => {
         if (cancelled) return null;
-        if (!res.ok) throw new Error("Failed to load");
+        if (!res.ok) throw new, Error("Failed to load");
         return res.blob();
       })
       .then((blob) => {
@@ -65,7 +65,7 @@ export function EmployeeDocumentImage({ value, alt, className }: EmployeeDocumen
     return () => {
       cancelled = true;
       setSrc((prev) => {
-        if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
+        if (prev?.startsWith("blob:`)) URL.revokeObjectURL(prev);
         return null;
       });
     };
@@ -76,7 +76,7 @@ export function EmployeeDocumentImage({ value, alt, className }: EmployeeDocumen
       <div
         className={`flex items-center justify-center bg-background border border-border rounded-md ${className || ""}`}
       >
-        <Image className="h-12 w-12 text-muted-foreground" />
+        <Image className=`h-12 w-12 text-muted-foreground" />
       </div>
     );
   }

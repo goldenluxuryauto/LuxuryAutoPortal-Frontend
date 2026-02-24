@@ -28,10 +28,10 @@ const getMonthValue = (arr: any[], month: number, field: string): number => {
   const value = item[field];
   if (value === null || value === undefined) return 0;
   const numValue = Number(value);
-  return isNaN(numValue) ? 0 : numValue;
+  return, isNaN(numValue) ? 0 : numValue;
 };
 
-export default function ModalEditIncomeExpense() {
+export default function, ModalEditIncomeExpense() {
   const { editingCell, setEditingCell, updateCell, saveChanges, isSaving, year, carId, monthModes, data, dynamicSubcategories } = useIncomeExpense();
   const [remarks, setRemarks] = useState("");
 
@@ -57,24 +57,23 @@ export default function ModalEditIncomeExpense() {
     editingCell?.month || 1
   );
 
-  // Load remarks only when modal opens (not on every editingCell change)
+  // Load remarks only when modal, opens(not on every editingCell change)
   // Use a ref to track if we've already loaded remarks for this cell
-  const remarksLoadedRef = useRef<string>("");
+  const remarksLoadedRef = useRef<string>("`);
   
   useEffect(() => {
     if (isOpen && editingCell) {
       // Create a unique key for this cell
       const cellKey = `${editingCell.category}-${editingCell.field}-${editingCell.month}`;
       
-      // Only load remarks if we haven't loaded them for this cell yet
-      if (remarksLoadedRef.current !== cellKey) {
+      // Only load remarks if we haven't loaded them for this cell yet, if(remarksLoadedRef.current !== cellKey) {
         remarksLoadedRef.current = cellKey;
         
         const loadRemarks = async () => {
           try {
-            const response = await fetch(
+            const response = await, fetch(
               buildApiUrl(`/api/income-expense/remarks?carId=${carId}&year=${year}&month=${editingCell.month}&category=${editingCell.category}&field=${editingCell.field}`),
-              { credentials: "include" }
+              { credentials: `include" }
             );
             if (response.ok) {
               const data = await response.json();
@@ -86,7 +85,7 @@ export default function ModalEditIncomeExpense() {
         };
         loadRemarks();
       }
-    } else if (!isOpen) {
+    } else, if(!isOpen) {
       // Reset the ref when modal closes
       remarksLoadedRef.current = "";
     }
@@ -102,14 +101,13 @@ export default function ModalEditIncomeExpense() {
     if (!editingCell) return;
     
     try {
-      // Upload images first if there are any new ones (skip for management/owner split)
+      // Upload images first if there are any new, ones(skip for management/owner split)
       if (imageFiles.length > 0 && editingCell.field !== "carManagementSplit" && editingCell.field !== "carOwnerSplit") {
-        await uploadImages();
+        await, uploadImages();
       }
     
       // Save the change with remarks - remarks will be included in the save request
-      // The saveChanges function will send remarks along with the value
-      saveChanges({
+      // The saveChanges function will send remarks along with the value, saveChanges({
         category: editingCell.category,
         field: editingCell.field,
         month: editingCell.month,
@@ -118,7 +116,7 @@ export default function ModalEditIncomeExpense() {
       });
     } catch (error) {
       // Error already handled in uploadImages or fetch
-      console.error("Error saving:", error);
+      console.error("Error, saving:", error);
     }
   };
 
@@ -145,7 +143,7 @@ export default function ModalEditIncomeExpense() {
 
   const fieldName = fieldNames[editingCell.field] || editingCell.field;
 
-  // Get all values for the current month (only for management/owner split)
+  // Get all values for the current, month(only for management/owner split)
   const month = editingCell.month;
   const isManagementSplit = editingCell.field === "carManagementSplit" || editingCell.field === "carOwnerSplit";
   
@@ -250,7 +248,7 @@ export default function ModalEditIncomeExpense() {
   
   const storedMgmtPercent = isManagementSplit ? Number(getMonthValue(data.incomeExpenses, month, "carManagementSplit")) || 0 : 0;
   const mgmtPercent = storedMgmtPercent / 100;
-  const storedOwnerPercent = isManagementSplit ? Number(getMonthValue(data.incomeExpenses, month, "carOwnerSplit")) || 0 : 0;
+  const storedOwnerPercent = isManagementSplit ? Number(getMonthValue(data.incomeExpenses, month, "carOwnerSplit`)) || 0 : 0;
   const ownerPercent = storedOwnerPercent / 100;
   
   const carManagementTotalExpenses = isManagementSplit ? totalReimbursedBills + (totalDirectDelivery * mgmtPercent) + (totalCogs * mgmtPercent) : 0;
@@ -261,10 +259,10 @@ export default function ModalEditIncomeExpense() {
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className={`bg-card border-border text-foreground ${isManagementSplit ? 'max-w-4xl max-h-[90vh] overflow-hidden flex flex-col' : 'max-w-md'}`}>
         <DialogHeader>
-          <DialogTitle className="text-foreground text-lg">
+          <DialogTitle className=`text-foreground text-lg`>
             {`Update ${fieldName}`}
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
+          <DialogDescription className=`text-muted-foreground">
             Enter the amount for {fieldName} for {monthName} {year}
           </DialogDescription>
         </DialogHeader>
@@ -308,19 +306,19 @@ export default function ModalEditIncomeExpense() {
           <div>
             <Label className="text-muted-foreground text-xs">
               {editingCell.field === "carManagementSplit" || editingCell.field === "carOwnerSplit" 
-                ? "Inputted Percentage:" 
-                : "Inputted Amount:"}
+                ? "Inputted, Percentage:" 
+                : "Inputted, Amount:"}
             </Label>
             <Input
               value={
-                editingCell.field === "carManagementSplit" || editingCell.field === "carOwnerSplit"
+                editingCell.field === "carManagementSplit" || editingCell.field === "carOwnerSplit`
                   ? `${editingCell.value.toFixed(0)}%`
-                  : editingCell.field === "carManagementSplit" && monthModes && monthModes[editingCell.month]
+                  : editingCell.field === `carManagementSplit` && monthModes && monthModes[editingCell.month]
                   ? `$${editingCell.value.toFixed(2)}(${monthModes[editingCell.month] === 70 ? 30 : 50}%)`
                   : `$${editingCell.value.toFixed(2)}`
               }
               disabled
-              className="bg-card border-border text-muted-foreground text-sm mt-1"
+              className=`bg-card border-border text-muted-foreground text-sm mt-1"
             />
           </div>
 
@@ -347,74 +345,74 @@ export default function ModalEditIncomeExpense() {
                 <div>
                   <div className="text-primary text-xs font-semibold mb-2">INCOME</div>
                   <div className="space-y-1 text-xs">
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Rental Income:</span>
+                    <div className="flex justify-between text-muted-foreground`>
+                      <span>Rental, Income:</span>
                       <span>${incomeValues.rentalIncome.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Delivery Income:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Delivery, Income:</span>
                       <span>${incomeValues.deliveryIncome.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Electric Prepaid Income:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Electric Prepaid, Income:</span>
                       <span>${incomeValues.electricPrepaidIncome.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Smoking Fines:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Smoking, Fines:</span>
                       <span>${incomeValues.smokingFines.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Gas Prepaid Income:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Gas Prepaid, Income:</span>
                       <span>${incomeValues.gasPrepaidIncome.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Ski Racks Income:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Ski Racks, Income:</span>
                       <span>${incomeValues.skiRacksIncome.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Miles Income:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Miles, Income:</span>
                       <span>${incomeValues.milesIncome.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Child Seat Income:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Child Seat, Income:</span>
                       <span>${incomeValues.childSeatIncome.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Coolers Income:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Coolers, Income:</span>
                       <span>${incomeValues.coolersIncome.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Insurance and Client Wrecks:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Insurance and Client, Wrecks:</span>
                       <span>${incomeValues.insuranceWreckIncome.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Other Income:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Other, Income:</span>
                       <span>${incomeValues.otherIncome.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* OPERATING EXPENSE (Direct Delivery) */}
+                {/* OPERATING, EXPENSE(Direct Delivery) */}
                 <div>
-                  <div className="text-primary text-xs font-semibold mb-2">OPERATING EXPENSE (Direct Delivery)</div>
+                  <div className=`text-primary text-xs font-semibold mb-2">OPERATING, EXPENSE(Direct Delivery)</div>
                   <div className="space-y-1 text-xs">
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className="flex justify-between text-muted-foreground`>
                       <span>Labor - Cleaning:</span>
                       <span>${directDeliveryValues.laborCarCleaning.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Labor - Delivery:</span>
                       <span>${directDeliveryValues.laborDelivery.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Parking - Airport:</span>
                       <span>${directDeliveryValues.parkingAirport.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Parking - Lot:</span>
                       <span>${directDeliveryValues.parkingLot.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Uber/Lyft/Lime:</span>
                       <span>${directDeliveryValues.uberLyftLime.toFixed(2)}</span>
                     </div>
@@ -422,116 +420,116 @@ export default function ModalEditIncomeExpense() {
                       const monthValue = subcat.values.find((v: any) => v.month === month);
                       const value = monthValue?.value || 0;
                       return value > 0 ? (
-                        <div key={subcat.id} className="flex justify-between text-muted-foreground">
+                        <div key={subcat.id} className=`flex justify-between text-muted-foreground`>
                           <span>{subcat.name}:</span>
                           <span>${value.toFixed(2)}</span>
                         </div>
                       ) : null;
                     })}
-                    <div className="flex justify-between text-primary font-semibold pt-1 border-t border-border">
-                      <span>TOTAL OPERATING EXPENSE (Direct Delivery):</span>
+                    <div className=`flex justify-between text-primary font-semibold pt-1 border-t border-border`>
+                      <span>TOTAL OPERATING, EXPENSE(Direct Delivery):</span>
                       <span>${totalDirectDelivery.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* OPERATING EXPENSE (COGS - Per Vehicle) */}
+                {/* OPERATING, EXPENSE(COGS - Per Vehicle) */}
                 <div>
-                  <div className="text-primary text-xs font-semibold mb-2">OPERATING EXPENSE (COGS - Per Vehicle)</div>
+                  <div className=`text-primary text-xs font-semibold mb-2">OPERATING, EXPENSE(COGS - Per Vehicle)</div>
                   <div className="space-y-1 text-xs">
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className="flex justify-between text-muted-foreground`>
                       <span>Auto Body Shop / Wreck:</span>
                       <span>${cogsValues.autoBodyShopWreck.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Alignment:</span>
                       <span>${cogsValues.alignment.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Battery:</span>
                       <span>${cogsValues.battery.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Brakes:</span>
                       <span>${cogsValues.brakes.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Car Payment:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Car, Payment:</span>
                       <span>${cogsValues.carPayment.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Car Insurance:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Car, Insurance:</span>
                       <span>${cogsValues.carInsurance.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Car Seats:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Car, Seats:</span>
                       <span>${cogsValues.carSeats.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Cleaning Supplies / Tools:</span>
                       <span>${cogsValues.cleaningSuppliesTools.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Emissions:</span>
                       <span>${cogsValues.emissions.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>GPS System:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>GPS, System:</span>
                       <span>${cogsValues.gpsSystem.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Key & Fob:</span>
                       <span>${cogsValues.keyFob.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Labor - Cleaning:</span>
                       <span>${cogsValues.laborCleaning.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>License & Registration:</span>
                       <span>${cogsValues.licenseRegistration.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Mechanic:</span>
                       <span>${cogsValues.mechanic.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Oil/Lube:</span>
                       <span>${cogsValues.oilLube.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Parts:</span>
                       <span>${cogsValues.parts.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Ski Racks:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Ski, Racks:</span>
                       <span>${cogsValues.skiRacks.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Tickets & Tolls:</span>
                       <span>${cogsValues.tickets.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Tired Air Station:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Tired Air, Station:</span>
                       <span>${cogsValues.tiredAirStation.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Tires:</span>
                       <span>${cogsValues.tires.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Towing / Impound Fees:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Towing / Impound, Fees:</span>
                       <span>${cogsValues.towingImpoundFees.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Uber/Lyft/Lime:</span>
                       <span>${cogsValues.uberLyftLime.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Windshield:</span>
                       <span>${cogsValues.windshield.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Wipers:</span>
                       <span>${cogsValues.wipers.toFixed(2)}</span>
                     </div>
@@ -539,14 +537,14 @@ export default function ModalEditIncomeExpense() {
                       const monthValue = subcat.values.find((v: any) => v.month === month);
                       const value = monthValue?.value || 0;
                       return value > 0 ? (
-                        <div key={subcat.id} className="flex justify-between text-muted-foreground">
+                        <div key={subcat.id} className=`flex justify-between text-muted-foreground`>
                           <span>{subcat.name}:</span>
                           <span>${value.toFixed(2)}</span>
                         </div>
                       ) : null;
                     })}
-                    <div className="flex justify-between text-primary font-semibold pt-1 border-t border-border">
-                      <span>TOTAL OPERATING EXPENSE (COGS - Per Vehicle):</span>
+                    <div className=`flex justify-between text-primary font-semibold pt-1 border-t border-border`>
+                      <span>TOTAL OPERATING, EXPENSE(COGS - Per Vehicle):</span>
                       <span>${totalCogs.toFixed(2)}</span>
                     </div>
                   </div>
@@ -554,13 +552,13 @@ export default function ModalEditIncomeExpense() {
 
                 {/* GLA PARKING FEE & LABOR CLEANING */}
                 <div>
-                  <div className="text-primary text-xs font-semibold mb-2">GLA PARKING FEE & LABOR CLEANING</div>
+                  <div className=`text-primary text-xs font-semibold mb-2">GLA PARKING FEE & LABOR CLEANING</div>
                   <div className="space-y-1 text-xs">
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>GLA Parking Fee:</span>
+                    <div className="flex justify-between text-muted-foreground`>
+                      <span>GLA Parking, Fee:</span>
                       <span>${parkingFeeLaborValues.glaParkingFee.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Labor - Cleaning:</span>
                       <span>${parkingFeeLaborValues.laborCleaning.toFixed(2)}</span>
                     </div>
@@ -568,14 +566,14 @@ export default function ModalEditIncomeExpense() {
                       const monthValue = subcat.values.find((v: any) => v.month === month);
                       const value = monthValue?.value || 0;
                       return value > 0 ? (
-                        <div key={subcat.id} className="flex justify-between text-muted-foreground">
+                        <div key={subcat.id} className=`flex justify-between text-muted-foreground`>
                           <span>{subcat.name}:</span>
                           <span>${value.toFixed(2)}</span>
                         </div>
                       ) : null;
                     })}
-                    <div className="flex justify-between text-primary font-semibold pt-1 border-t border-border">
-                      <span>Total Parking Fee & Labor Cleaning:</span>
+                    <div className=`flex justify-between text-primary font-semibold pt-1 border-t border-border`>
+                      <span>Total Parking Fee & Labor, Cleaning:</span>
                       <span>${totalParkingFeeLabor.toFixed(2)}</span>
                     </div>
                   </div>
@@ -583,37 +581,37 @@ export default function ModalEditIncomeExpense() {
 
                 {/* REIMBURSE AND NON-REIMBURSE BILLS */}
                 <div>
-                  <div className="text-primary text-xs font-semibold mb-2">REIMBURSE AND NON-REIMBURSE BILLS</div>
+                  <div className=`text-primary text-xs font-semibold mb-2">REIMBURSE AND NON-REIMBURSE BILLS</div>
                   <div className="space-y-1 text-xs">
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className="flex justify-between text-muted-foreground`>
                       <span>Electric - Reimbursed:</span>
                       <span>${reimbursedBillsValues.electricReimbursed.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Electric - Not Reimbursed:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Electric - Not, Reimbursed:</span>
                       <span>${reimbursedBillsValues.electricNotReimbursed.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Gas - Reimbursed:</span>
                       <span>${reimbursedBillsValues.gasReimbursed.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Gas - Not Reimbursed:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Gas - Not, Reimbursed:</span>
                       <span>${reimbursedBillsValues.gasNotReimbursed.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Gas - Service Run:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Gas - Service, Run:</span>
                       <span>${reimbursedBillsValues.gasServiceRun.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Parking Airport:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Parking, Airport:</span>
                       <span>${reimbursedBillsValues.parkingAirport.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Uber/Lyft/Lime - Not Reimbursed:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Uber/Lyft/Lime - Not, Reimbursed:</span>
                       <span>${reimbursedBillsValues.uberLyftLimeNotReimbursed.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
+                    <div className=`flex justify-between text-muted-foreground`>
                       <span>Uber/Lyft/Lime - Reimbursed:</span>
                       <span>${reimbursedBillsValues.uberLyftLimeReimbursed.toFixed(2)}</span>
                     </div>
@@ -621,14 +619,14 @@ export default function ModalEditIncomeExpense() {
                       const monthValue = subcat.values.find((v: any) => v.month === month);
                       const value = monthValue?.value || 0;
                       return value > 0 ? (
-                        <div key={subcat.id} className="flex justify-between text-muted-foreground">
+                        <div key={subcat.id} className=`flex justify-between text-muted-foreground`>
                           <span>{subcat.name}:</span>
                           <span>${value.toFixed(2)}</span>
                         </div>
                       ) : null;
                     })}
-                    <div className="flex justify-between text-primary font-semibold pt-1 border-t border-border">
-                      <span>TOTAL REIMBURSE AND NON-REIMBURSE BILLS:</span>
+                    <div className=`flex justify-between text-primary font-semibold pt-1 border-t border-border`>
+                      <span>TOTAL REIMBURSE AND NON-REIMBURSE, BILLS:</span>
                       <span>${totalReimbursedBills.toFixed(2)}</span>
                     </div>
                   </div>
@@ -636,18 +634,18 @@ export default function ModalEditIncomeExpense() {
 
                 {/* Total Expenses */}
                 <div>
-                  <div className="text-primary text-xs font-semibold mb-2">TOTAL EXPENSES</div>
+                  <div className=`text-primary text-xs font-semibold mb-2">TOTAL EXPENSES</div>
                   <div className="space-y-1 text-xs">
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Car Management Total Expenses:</span>
+                    <div className="flex justify-between text-muted-foreground`>
+                      <span>Car Management Total, Expenses:</span>
                       <span>${carManagementTotalExpenses.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Car Owner Total Expenses:</span>
+                    <div className=`flex justify-between text-muted-foreground`>
+                      <span>Car Owner Total, Expenses:</span>
                       <span>${carOwnerTotalExpenses.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-primary font-semibold pt-1 border-t border-border">
-                      <span>Total Expenses:</span>
+                    <div className=`flex justify-between text-primary font-semibold pt-1 border-t border-border`>
+                      <span>Total, Expenses:</span>
                       <span>${totalExpenses.toFixed(2)}</span>
                     </div>
                   </div>
@@ -656,7 +654,7 @@ export default function ModalEditIncomeExpense() {
             </div>
           )}
 
-          {editingCell.field !== "carManagementSplit" && editingCell.field !== "carOwnerSplit" && (
+          {editingCell.field !== `carManagementSplit" && editingCell.field !== "carOwnerSplit" && (
           <div>
               <Label className="text-muted-foreground text-xs mb-2 block">Receipt Images</Label>
               
@@ -673,13 +671,13 @@ export default function ModalEditIncomeExpense() {
                 />
                 <label
                   htmlFor="receipt-upload-income"
-                  className="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-primary/50 rounded-lg bg-card/50 hover:border-primary hover:bg-card transition-all cursor-pointer group"
+                  className="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-primary/50 rounded-lg bg-card/50, hover:border-primary, hover:bg-card transition-all cursor-pointer group"
                 >
                   <Upload className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-                  <span className="text-primary font-medium text-sm">
+                  <span className="text-primary font-medium text-sm`>
                     {imageFiles.length > 0 
-                      ? `Add More Images (${imageFiles.length} selected)`
-                      : "Choose Images to Upload"
+                      ? `Add More, Images(${imageFiles.length} selected)`
+                      : `Choose Images to Upload"
                     }
                   </span>
                   <ImageIcon className="w-5 h-5 text-primary/70" />
@@ -687,7 +685,7 @@ export default function ModalEditIncomeExpense() {
               </div>
               
               <p className="text-xs text-muted-foreground mt-2">
-                Supported formats: JPEG, PNG, GIF, WebP (Max 10MB per image)
+                Supported, formats: JPEG, PNG, GIF, WebP (Max 10MB per image)
               </p>
               
               {/* Image Preview Grid */}
@@ -713,14 +711,14 @@ export default function ModalEditIncomeExpense() {
           <Button
             onClick={handleClose}
             variant="outline"
-            className="flex-1 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+            className="flex-1 border-border text-muted-foreground, hover:text-foreground, hover:bg-muted"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={isSaving || (isUploading && editingCell.field !== "carManagementSplit" && editingCell.field !== "carOwnerSplit")}
-            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/80"
+            className="flex-1 bg-primary text-primary-foreground, hover:bg-primary/80"
           >
             {isSaving || (isUploading && editingCell.field !== "carManagementSplit" && editingCell.field !== "carOwnerSplit") 
               ? "Saving..." 

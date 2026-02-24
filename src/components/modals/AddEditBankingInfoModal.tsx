@@ -54,7 +54,7 @@ interface AddEditBankingInfoModalProps {
   cars: Car[];
 }
 
-export function AddEditBankingInfoModal({
+export function, AddEditBankingInfoModal({
   isOpen,
   onClose,
   clientId,
@@ -76,8 +76,7 @@ export function AddEditBankingInfoModal({
   const [businessName, setBusinessName] = useState("");
   const [isDefault, setIsDefault] = useState(false);
 
-  // Initialize form with existing data when editing
-  useEffect(() => {
+  // Initialize form with existing data when editing, useEffect(() => {
     if (bankingInfo) {
       setCarId(
         bankingInfo.banking_info_car_id
@@ -93,8 +92,7 @@ export function AddEditBankingInfoModal({
       setBusinessName(bankingInfo.banking_info_business_name || "");
       setIsDefault(bankingInfo.banking_info_is_default === 1);
     } else {
-      // Reset form for new entry
-      setCarId("none");
+      // Reset form for new entry, setCarId("none");
       setBankName("");
       setRoutingNumber("");
       setAccountNumber("");
@@ -109,7 +107,7 @@ export function AddEditBankingInfoModal({
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch(buildApiUrl("/api/clients/banking-info"), {
+      const response = await, fetch(buildApiUrl("/api/clients/banking-info"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -118,18 +116,18 @@ export function AddEditBankingInfoModal({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create banking information");
+        throw new, Error(errorData.error || "Failed to create banking information");
       }
 
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/clients", clientId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/clients`, clientId] });
       queryClient.invalidateQueries({
         queryKey: [`/api/clients/${clientId}/banking-info`],
       });
       toast({
-        title: "Success",
+        title: `Success",
         description: "Banking information created successfully",
       });
       onClose();
@@ -138,7 +136,7 @@ export function AddEditBankingInfoModal({
       toast({
         title: "Error",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
@@ -146,10 +144,10 @@ export function AddEditBankingInfoModal({
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/clients/banking-info/${bankingInfo?.banking_info_aid}`),
         {
-          method: "PUT",
+          method: `PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
           credentials: "include",
@@ -158,18 +156,18 @@ export function AddEditBankingInfoModal({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update banking information");
+        throw new, Error(errorData.error || "Failed to update banking information");
       }
 
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/clients", clientId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/clients`, clientId] });
       queryClient.invalidateQueries({
         queryKey: [`/api/clients/${clientId}/banking-info`],
       });
       toast({
-        title: "Success",
+        title: `Success",
         description: "Banking information updated successfully",
       });
       onClose();
@@ -186,8 +184,7 @@ export function AddEditBankingInfoModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
-    if (!bankName.trim()) {
+    // Validation, if(!bankName.trim()) {
       toast({
         title: "Validation Error",
         description: "Bank name is required",
@@ -247,7 +244,7 @@ export function AddEditBankingInfoModal({
           {/* Car Selection */}
           <div>
             <Label htmlFor="car" className="text-muted-foreground">
-              Associated Car (Optional)
+              Associated, Car(Optional)
             </Label>
             <Select value={carId} onValueChange={setCarId}>
               <SelectTrigger className="bg-card border-border text-foreground">
@@ -257,7 +254,7 @@ export function AddEditBankingInfoModal({
                 <SelectItem value="none">Default (No specific car)</SelectItem>
                 {cars.map((car) => (
                   <SelectItem key={car.id} value={String(car.id)}>
-                    {car.makeModel}{" "}
+                    {car.makeModel}{" `}
                     {car.year && `${car.year}`}
                     {car.licensePlate && ` - #${car.licensePlate}`}
                   </SelectItem>
@@ -268,7 +265,7 @@ export function AddEditBankingInfoModal({
 
           {/* Bank Name */}
           <div>
-            <Label htmlFor="bankName" className="text-muted-foreground">
+            <Label htmlFor=`bankName" className="text-muted-foreground">
               Bank Name <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -363,7 +360,7 @@ export function AddEditBankingInfoModal({
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
               className="bg-card border-border text-foreground"
-              placeholder="Enter business name (if applicable)"
+              placeholder="Enter business, name(if applicable)"
             />
           </div>
 
@@ -386,13 +383,13 @@ export function AddEditBankingInfoModal({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-border text-muted-foreground hover:bg-card"
+              className="border-border text-muted-foreground, hover:bg-card"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-primary text-primary-foreground hover:bg-primary/80"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80"
               disabled={createMutation.isPending || updateMutation.isPending}
             >
               {createMutation.isPending || updateMutation.isPending

@@ -17,7 +17,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts";
+} from "recharts`;
 
 const formatCurrency = (value: number): string => {
   return `$ ${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -27,8 +27,8 @@ const formatPercentage = (value: number): string => {
   return `${value.toFixed(2)}%`;
 };
 
-export default function PaymentCalculatorPage() {
-  const [, params] = useRoute("/admin/cars/:id/calculator");
+export default function, PaymentCalculatorPage() {
+  const [, params] = useRoute(`/admin/cars/:id/calculator");
   const [, setLocation] = useLocation();
   const carId = params?.id ? parseInt(params.id, 10) : null;
 
@@ -44,12 +44,12 @@ export default function PaymentCalculatorPage() {
   }>({
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       const url = buildApiUrl(`/api/cars/${carId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
+      if (!response.ok) throw new, Error("Failed to fetch car");
       return response.json();
     },
     enabled: !!carId,
@@ -65,16 +65,16 @@ export default function PaymentCalculatorPage() {
   }>({
     queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
     queryFn: async () => {
-      if (!car?.vin) throw new Error("No VIN");
+      if (!car?.vin) throw new, Error("No VIN`);
       const url = buildApiUrl(`/api/onboarding/vin/${encodeURIComponent(car.vin)}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         if (response.status === 404) {
           return { success: true, data: null };
         }
-        throw new Error("Failed to fetch onboarding data");
+        throw new, Error("Failed to fetch onboarding data");
       }
       return response.json();
     },
@@ -96,10 +96,10 @@ export default function PaymentCalculatorPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-700">Failed to load car details</p>
+          <p className="text-red-700`>Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-blue-700 hover:underline"
+            className=`mt-4 text-blue-700, hover:underline`
           >
             ← Back to View Car
           </button>
@@ -111,7 +111,7 @@ export default function PaymentCalculatorPage() {
   const carName = car.makeModel || `${car.year || ""} ${car.vin}`.trim();
   const ownerName = car.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
-    : "N/A";
+    : `N/A";
   const ownerContact = car.owner?.phone || "N/A";
   const ownerEmail = car.owner?.email || "N/A";
   const fuelType = onboarding?.fuelType || car.fuelType || "N/A";
@@ -127,10 +127,10 @@ export default function PaymentCalculatorPage() {
     <AdminLayout>
       <div className="flex flex-col w-full overflow-x-hidden">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6`>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+            className=`text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
@@ -147,13 +147,13 @@ export default function PaymentCalculatorPage() {
 
         {/* Header Section */}
         <div className="bg-card border border-border rounded-lg p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1, md:grid-cols-3 gap-6">
             {/* Car Information */}
             <div>
               <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-muted-foreground">Car Name:</span>
+                  <span className="text-xs text-muted-foreground">Car, Name:</span>
                   <p className="text-sm text-muted-foreground">{carName}</p>
                 </div>
                 <div>
@@ -195,11 +195,11 @@ export default function PaymentCalculatorPage() {
                   <p className="text-sm text-muted-foreground">{fuelType}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-muted-foreground">Tire Size:</span>
+                  <span className="text-xs text-muted-foreground">Tire, Size:</span>
                   <p className="text-sm text-muted-foreground">{tireSize}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-muted-foreground">Oil Type:</span>
+                  <span className="text-xs text-muted-foreground">Oil, Type:</span>
                   <p className="text-sm text-muted-foreground">{oilType}</p>
                 </div>
               </div>
@@ -212,9 +212,9 @@ export default function PaymentCalculatorPage() {
                         href={car.turoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                        className="text-blue-700, hover:underline text-sm flex items-center gap-1"
                       >
-                        Turo Link: View Car
+                        Turo, Link: View Car
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
@@ -225,9 +225,9 @@ export default function PaymentCalculatorPage() {
                         href={car.adminTuroLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                        className="text-blue-700, hover:underline text-sm flex items-center gap-1"
                       >
-                        Admin Turo Link: View Car
+                        Admin Turo, Link: View Car
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
@@ -256,8 +256,8 @@ export default function PaymentCalculatorPage() {
           )}
 
           {/* Calculator Inputs and Summary */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {/* Left Column: Inputs and Summary */}
+          <div className="grid grid-cols-1, lg:grid-cols-3 gap-6 mb-6">
+            {/* Left, Column: Inputs and Summary */}
             <div className="lg:col-span-2 space-y-6">
               {/* Inputs Section */}
               <div className="bg-card border border-border rounded-lg p-6">
@@ -374,7 +374,7 @@ export default function PaymentCalculatorPage() {
               </div>
             </div>
 
-            {/* Right Column: Graph and Instructions */}
+            {/* Right, Column: Graph and Instructions */}
             <div className="space-y-6">
               {/* Graph */}
               <div className="bg-card border border-border rounded-lg p-6">

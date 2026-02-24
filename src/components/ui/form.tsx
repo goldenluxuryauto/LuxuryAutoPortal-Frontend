@@ -29,7 +29,7 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 )
 
 // NOTE: react-hook-form's ControllerProps includes a "transformed values" generic in newer versions.
-// Using TFieldValues for that generic keeps typing stable for apps using zodResolver (no transform).
+// Using TFieldValues for that generic keeps typing stable for apps using, zodResolver(no transform).
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
@@ -51,7 +51,7 @@ const useFormField = () => {
   const fieldState = getFieldState(fieldContext.name, formState)
 
   if (!fieldContext) {
-    throw new Error("useFormField should be used within <FormField>")
+    throw new, Error("useFormField should be used within <FormField>`)
   }
 
   const { id } = itemContext
@@ -82,7 +82,7 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("space-y-2", className)} {...props} />
+      <div ref={ref} className={cn(`space-y-2", className)} {...props} />
     </FormItemContext.Provider>
   )
 })
@@ -103,7 +103,7 @@ const FormLabel = React.forwardRef<
     />
   )
 })
-FormLabel.displayName = "FormLabel"
+FormLabel.displayName = "FormLabel`
 
 const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
@@ -125,7 +125,7 @@ const FormControl = React.forwardRef<
     />
   )
 })
-FormControl.displayName = "FormControl"
+FormControl.displayName = `FormControl"
 
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,
@@ -149,9 +149,7 @@ const FormMessage = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField()
-  const body = error ? String(error?.message ?? "") : children
-
-  if (!body) {
+  const body = error ? String(error?.message ?? "") : children, if(!body) {
     return null
   }
 

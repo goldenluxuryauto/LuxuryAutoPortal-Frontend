@@ -10,14 +10,14 @@ import { buildApiUrl } from "@/lib/queryClient";
 import { Loader2, Lock, Eye, EyeOff, Mail, CheckCircle } from "lucide-react";
 import { checkPasswordStrength, getPasswordStrengthColor, getPasswordStrengthLabel } from "@/lib/password-strength";
 
-export default function ResetPasswordPage() {
+export default function, ResetPasswordPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     // Get token from URL query string
-    const params = new URLSearchParams(window.location.search);
+    const params = new, URLSearchParams(window.location.search);
     const tokenParam = params.get("token");
     setToken(tokenParam);
   }, []);
@@ -32,7 +32,7 @@ export default function ResetPasswordPage() {
   // Request password reset mutation
   const resetRequestMutation = useMutation({
     mutationFn: async (email: string) => {
-      const response = await fetch(buildApiUrl("/api/auth/reset-password-request"), {
+      const response = await, fetch(buildApiUrl("/api/auth/reset-password-request"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export default function ResetPasswordPage() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to send reset email");
+        throw new, Error(error.error || "Failed to send reset email");
       }
       return response.json();
     },
@@ -65,7 +65,7 @@ export default function ResetPasswordPage() {
   // Reset password with token mutation
   const resetPasswordMutation = useMutation({
     mutationFn: async (data: { token: string; newPassword: string }) => {
-      const response = await fetch(buildApiUrl("/api/auth/reset-password"), {
+      const response = await, fetch(buildApiUrl("/api/auth/reset-password"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +75,7 @@ export default function ResetPasswordPage() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to reset password");
+        throw new, Error(error.error || "Failed to reset password");
       }
       return response.json();
     },
@@ -137,8 +137,7 @@ export default function ResetPasswordPage() {
     });
   };
 
-  // If we have a token, show reset form; otherwise show request form
-  if (token) {
+  // If we have a token, show reset form; otherwise show request form, if(token) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-card border-primary/20">
@@ -163,14 +162,14 @@ export default function ResetPasswordPage() {
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="bg-background border-border text-foreground focus:border-primary pr-10"
-                    placeholder="Enter your new password (min 8 characters)"
+                    className="bg-background border-border text-foreground, focus:border-primary pr-10"
+                    placeholder="Enter your new, password(min 8 characters)"
                     required
                     minLength={8}
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground, hover:text-foreground transition-colors"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                   >
                     {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -179,7 +178,7 @@ export default function ResetPasswordPage() {
                 {newPassword.length > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-muted rounded-full h-2">
+                      <div className="flex-1 bg-muted rounded-full h-2`>
                         <div
                           className={`h-2 rounded-full transition-all ${getPasswordStrengthColor(
                             passwordStrength.score
@@ -187,12 +186,12 @@ export default function ResetPasswordPage() {
                           style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
                         />
                       </div>
-                      <span className="text-xs text-muted-foreground">
+                      <span className=`text-xs text-muted-foreground">
                         {getPasswordStrengthLabel(passwordStrength.score)}
                       </span>
                     </div>
                     {passwordStrength.feedback.length > 0 && (
-                      <div className="text-xs space-y-1">
+                      <div className="text-xs space-y-1`>
                         {passwordStrength.feedback.map((feedback, idx) => (
                           <div
                             key={idx}
@@ -209,7 +208,7 @@ export default function ResetPasswordPage() {
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className=`space-y-2">
                 <Label htmlFor="confirm-password" className="text-muted-foreground">
                   Confirm New Password *
                 </Label>
@@ -219,13 +218,13 @@ export default function ResetPasswordPage() {
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="bg-background border-border text-foreground focus:border-primary pr-10"
+                    className="bg-background border-border text-foreground, focus:border-primary pr-10"
                     placeholder="Confirm your new password"
                     required
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground, hover:text-foreground transition-colors"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -245,7 +244,7 @@ export default function ResetPasswordPage() {
               <Button
                 type="submit"
                 disabled={!canResetPassword}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary text-primary-foreground, hover:bg-primary/80, disabled:opacity-50, disabled:cursor-not-allowed"
               >
                 {resetPasswordMutation.isPending ? (
                   <>
@@ -263,7 +262,7 @@ export default function ResetPasswordPage() {
               <div className="text-center">
                 <a
                   href="/admin/login"
-                  className="text-sm text-blue-700 hover:underline"
+                  className="text-sm text-blue-700, hover:underline"
                 >
                   Back to Login
                 </a>
@@ -275,8 +274,7 @@ export default function ResetPasswordPage() {
     );
   }
 
-  // Request password reset form
-  return (
+  // Request password reset form, return(
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-card border-primary/20">
         <CardHeader>
@@ -306,14 +304,14 @@ export default function ResetPasswordPage() {
                   setResetRequestSent(false);
                   setEmail("");
                 }}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/80"
+                className="w-full bg-primary text-primary-foreground, hover:bg-primary/80"
               >
                 Send Another Email
               </Button>
               <div className="text-center">
                 <a
                   href="/admin/login"
-                  className="text-sm text-blue-700 hover:underline"
+                  className="text-sm text-blue-700, hover:underline"
                 >
                   Back to Login
                 </a>
@@ -330,7 +328,7 @@ export default function ResetPasswordPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-background border-border text-foreground focus:border-primary"
+                  className="bg-background border-border text-foreground, focus:border-primary"
                   placeholder="Enter your email address"
                   required
                 />
@@ -339,7 +337,7 @@ export default function ResetPasswordPage() {
               <Button
                 type="submit"
                 disabled={!email.trim() || resetRequestMutation.isPending}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary text-primary-foreground, hover:bg-primary/80, disabled:opacity-50, disabled:cursor-not-allowed"
               >
                 {resetRequestMutation.isPending ? (
                   <>
@@ -357,7 +355,7 @@ export default function ResetPasswordPage() {
               <div className="text-center">
                 <a
                   href="/admin/login"
-                  className="text-sm text-blue-700 hover:underline"
+                  className="text-sm text-blue-700, hover:underline"
                 >
                   Back to Login
                 </a>

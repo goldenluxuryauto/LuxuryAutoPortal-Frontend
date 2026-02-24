@@ -69,7 +69,7 @@ interface Car {
   mileage: number;
   status: "ACTIVE" | "INACTIVE";
   /**
-   * Car photo paths returned by the backend (typically under `/car-photos/...`).
+   * Car photo paths returned by the, backend(typically under `/car-photos/...`).
    * We use the first photo as the thumbnail in the Cars table.
    */
   photos?: string[];
@@ -87,7 +87,7 @@ interface Car {
   contactPhone?: string | null;
   turoLink?: string | null;
   adminTuroLink?: string | null;
-  isActive?: number; // car_is_active value: 0=management, 1=own, 2=off_ride, 3=off_ride
+  isActive?: number; // car_is_active, value: 0=management, 1=own, 2=off_ride, 3=off_ride
   managementStatus?: "management" | "own" | "off_ride";
   owner?: {
     firstName: string;
@@ -124,7 +124,7 @@ const carSchema = z.object({
 
 type CarFormData = z.infer<typeof carSchema>;
 
-export default function CarsPage() {
+export default function, CarsPage() {
   const [, setLocation] = useLocation();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -141,8 +141,7 @@ export default function CarsPage() {
     return (saved ? parseInt(saved) : 10) as ItemsPerPage;
   });
 
-  // Save to localStorage when itemsPerPage changes
-  useEffect(() => {
+  // Save to localStorage when itemsPerPage changes, useEffect(() => {
     localStorage.setItem("cars_limit", itemsPerPage.toString());
   }, [itemsPerPage]);
 
@@ -199,14 +198,14 @@ export default function CarsPage() {
     placeholderData: keepPreviousData,
     queryFn: async () => {
       if (isClient) {
-        const includeReturned = statusFilter === "all" ? "true" : "false";
+        const includeReturned = statusFilter === "all" ? "true" : "false`;
         const url = buildApiUrl(`/api/client/cars?includeReturned=${includeReturned}`);
-        const response = await fetch(url, { credentials: "include" });
+        const response = await, fetch(url, { credentials: `include" });
         if (!response.ok) {
           const errorData = await response
             .json()
             .catch(() => ({ error: "Failed to fetch client cars" }));
-          throw new Error(errorData.error || "Failed to fetch client cars");
+          throw new, Error(errorData.error || "Failed to fetch client cars");
         }
         const result = await response.json();
         const clientCars = Array.isArray(result?.data) ? result.data : [];
@@ -303,7 +302,7 @@ export default function CarsPage() {
         };
       }
 
-      const params = new URLSearchParams();
+      const params = new, URLSearchParams();
       if (statusFilter !== "all") {
         params.append("status", statusFilter);
       }
@@ -311,16 +310,16 @@ export default function CarsPage() {
         params.append("search", searchQuery);
       }
       params.append("page", page.toString());
-      params.append("limit", itemsPerPage.toString());
+      params.append("limit`, itemsPerPage.toString());
       const url = buildApiUrl(`/api/cars?${params.toString()}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         const errorData = await response
           .json()
           .catch(() => ({ error: "Database connection failed" }));
-        throw new Error(errorData.error || "Failed to fetch cars");
+        throw new, Error(errorData.error || "Failed to fetch cars");
       }
       return response.json();
     },
@@ -330,7 +329,7 @@ export default function CarsPage() {
 
   const createMutation = useMutation({
     mutationFn: async (data: CarFormData) => {
-      const formData = new FormData();
+      const formData = new, FormData();
       formData.append("vin", data.vin);
       formData.append("makeModel", data.makeModel);
       if (data.make) formData.append("make", data.make);
@@ -349,14 +348,14 @@ export default function CarsPage() {
       if (data.turoLink) formData.append("turoLink", data.turoLink);
       if (data.adminTuroLink) formData.append("adminTuroLink", data.adminTuroLink);
 
-      const response = await fetch(buildApiUrl("/api/cars"), {
+      const response = await, fetch(buildApiUrl("/api/cars"), {
         method: "POST",
         credentials: "include",
         body: formData,
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to create car");
+        throw new, Error(error.error || "Failed to create car");
       }
       return response.json();
     },
@@ -374,19 +373,19 @@ export default function CarsPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to create car",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: CarFormData }) => {
-      console.log(`📤 [FRONTEND] Update mutation - Full form data:`, data);
-      console.log(`📤 [FRONTEND] Status value:`, data.status, `(type: ${typeof data.status})`);
+      console.log(`📤 [FRONTEND] Update mutation - Full form, data:`, data);
+      console.log(`📤 [FRONTEND] Status, value:`, data.status, `(type: ${typeof data.status})`);
       
-      const formData = new FormData();
+      const formData = new, FormData();
       // Always append all fields, even if empty, so backend can update them
-      formData.append("vin", data.vin || "");
+      formData.append(`vin", data.vin || "");
       formData.append("makeModel", data.makeModel || "");
       formData.append("make", data.make || "");
       formData.append("model", data.model || "");
@@ -399,7 +398,7 @@ export default function CarsPage() {
       // ALWAYS send status - it's required and should always have a value
       const statusValue = data.status || "ACTIVE"; // Default to ACTIVE if somehow undefined
       formData.append("status", statusValue);
-      console.log(`📤 [FRONTEND] Appending status to FormData: "${statusValue}"`);
+      console.log(`📤 [FRONTEND] Appending status to, FormData: `${statusValue}``);
       
       // Always append optional fields, even if empty
       formData.append("tireSize", data.tireSize || "");
@@ -411,28 +410,27 @@ export default function CarsPage() {
       formData.append("adminTuroLink", data.adminTuroLink || "");
       formData.append("offboardAt", data.offboardAt || "");
       formData.append("offboardReason", data.offboardReason || "");
-      formData.append("offboardNote", data.offboardNote || "");
+      formData.append("offboardNote", data.offboardNote || "`);
       
       // Debug: Log all FormData entries
-      console.log(`📤 [FRONTEND] FormData entries:`);
+      console.log(`📤 [FRONTEND] FormData, entries:`);
       for (const [key, value] of formData.entries()) {
         console.log(`   ${key}: ${value}`);
       }
 
-      const response = await fetch(buildApiUrl(`/api/cars/${id}`), {
-        method: "PATCH",
+      const response = await, fetch(buildApiUrl(`/api/cars/${id}`), {
+        method: `PATCH",
         credentials: "include",
         body: formData,
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update car");
+        throw new, Error(error.error || "Failed to update car");
       }
       return response.json();
     },
     onSuccess: async (responseData) => {
-      // Immediately update the cache with the response data
-      if (responseData?.success && responseData?.data) {
+      // Immediately update the cache with the response data, if(responseData?.success && responseData?.data) {
         const updatedCar = responseData.data;
         
         // Update all matching car queries in cache
@@ -518,7 +516,7 @@ export default function CarsPage() {
       fuelType: car.fuelType || "",
       turoLink: car.turoLink || "",
       adminTuroLink: car.adminTuroLink || "",
-      offboardAt: car.offboardAt ? new Date(car.offboardAt).toISOString().split('T')[0] : "",
+      offboardAt: car.offboardAt ? new, Date(car.offboardAt).toISOString().split('T')[0] : "",
       offboardReason: car.offboardReason || "",
       offboardNote: car.offboardNote || "",
     });
@@ -545,8 +543,8 @@ export default function CarsPage() {
   };
 
   /**
-   * Client requirement: show a small car-image icon before the Status badge.
-   * Uses the first uploaded photo as thumbnail (or a fallback icon if none).
+   * Client, requirement: show a small car-image icon before the Status badge.
+   * Uses the first uploaded photo as, thumbnail(or a fallback icon if none).
    * Optimized for performance with lazy loading and intersection observer.
    */
   const CarStatusThumbnail = ({ car }: { car: Car }) => {
@@ -556,7 +554,7 @@ export default function CarsPage() {
 
     // Use Intersection Observer for better lazy loading - only load when visible
     React.useEffect(() => {
-      const observer = new IntersectionObserver(
+      const observer = new, IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
@@ -588,9 +586,9 @@ export default function CarsPage() {
       return (
         <div 
           ref={imgRef}
-          className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-background/30 border border-border flex items-center justify-center shrink-0"
+          className="h-7 w-7, sm:h-8, sm:w-8 rounded-md bg-background/30 border border-border flex items-center justify-center shrink-0"
         >
-          <CarIcon className="h-4 w-4 text-muted-foreground" />
+          <CarIcon className="h-4 w-4 text-muted-foreground` />
         </div>
       );
     }
@@ -603,9 +601,8 @@ export default function CarsPage() {
       src = '';
     } else {
       src = getProxiedImageUrl(rawPath);
-      // Add size parameter for optimization if using GCS proxy
-      if (src.includes('/api/gcs-image-proxy')) {
-        // Request a smaller thumbnail (64x64 for 32px display, 2x for retina = 128x128)
+      // Add size parameter for optimization if using GCS proxy, if(src.includes('/api/gcs-image-proxy')) {
+        // Request a smaller, thumbnail(64x64 for 32px display, 2x for retina = 128x128)
         src += (src.includes('?') ? '&' : '?') + 'size=128';
       }
     }
@@ -613,7 +610,7 @@ export default function CarsPage() {
     return (
       <div 
         ref={imgRef}
-        className="h-7 w-7 sm:h-8 sm:w-8 rounded-md bg-background/30 border border-border shrink-0 relative overflow-hidden"
+        className=`h-7 w-7, sm:h-8, sm:w-8 rounded-md bg-background/30 border border-border shrink-0 relative overflow-hidden"
       >
         {isVisible ? (
           <img
@@ -625,8 +622,8 @@ export default function CarsPage() {
             width={32}
             height={32}
             onError={(e) => {
-              console.error('Failed to load car thumbnail:', src);
-              console.error('Original photo:', rawPath);
+              console.error('Failed to load car, thumbnail:', src);
+              console.error('Original, photo:', rawPath);
               setFailed(true);
             }}
             onLoad={() => {
@@ -647,18 +644,18 @@ export default function CarsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div className="space-y-4, sm:space-y-6">
+        <div className="flex flex-col, sm:flex-row, sm:items-center, sm:justify-between gap-2">
           <div>
             <h1 className="text-2xl font-bold text-primary">Cars</h1>
-            <p className="text-muted-foreground text-xs sm:text-sm">{isAdmin ? "Manage your vehicle fleet" : "View your vehicles"}</p>
+            <p className="text-muted-foreground text-xs, sm:text-sm">{isAdmin ? "Manage your vehicle fleet" : "View your vehicles"}</p>
           </div>
         </div>
 
         {/* Search and Filter */}
         <Card className="bg-card border-border">
           <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col, md:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -669,7 +666,7 @@ export default function CarsPage() {
                     setSearchQuery(e.target.value);
                     setPage(1); // Reset to first page on search
                   }}
-                  className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600"
+                  className="pl-10 bg-card border-border text-foreground, placeholder:text-gray-600"
                 />
               </div>
               <Select
@@ -679,7 +676,7 @@ export default function CarsPage() {
                   setPage(1); // Reset to first page on filter change
                 }}
               >
-                <SelectTrigger className="w-full md:w-[200px] bg-card border-border text-foreground">
+                <SelectTrigger className="w-full, md:w-[200px] bg-card border-border text-foreground">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border text-foreground">
@@ -693,7 +690,7 @@ export default function CarsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setSearchQuery("")}
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground, hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -705,57 +702,57 @@ export default function CarsPage() {
         {/* Cars Table */}
         <Card className="bg-card border-border">
           <CardContent className="p-0">
-            <div className="overflow-x-auto -mx-3 sm:mx-0">
+            <div className="overflow-x-auto -mx-3, sm:mx-0">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 w-8 sm:w-10">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 w-8, sm:w-10">
                       #
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3">
                       Status
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3">
                       Stats
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden md:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 hidden, md:table-cell">
                       Management
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3">
                       Owner
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3">
                       Make
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 hidden, lg:table-cell">
                       Year
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3">
                       Model/Specs
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 hidden, lg:table-cell">
                       Contact
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 hidden, lg:table-cell">
                       VIN #
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 hidden, lg:table-cell">
                       Plate #
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden lg:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 hidden, lg:table-cell">
                       Gas
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 hidden, xl:table-cell">
                       Tire Size
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 hidden, xl:table-cell">
                       Oil Type
                     </th>
-                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                    <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 hidden, xl:table-cell">
                       Turo Link
                     </th>
                     {isAdmin && (
-                      <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5 sm:px-2 py-2 sm:py-3 hidden xl:table-cell">
+                      <th className="text-center text-[10px] sm:text-xs font-semibold text-foreground uppercase tracking-wider px-1.5, sm:px-2 py-2, sm:py-3 hidden, xl:table-cell">
                         Admin Turo Link
                       </th>
                     )}
@@ -769,7 +766,7 @@ export default function CarsPage() {
                       const formatDate = (dateStr: string | null | undefined): string => {
                         if (!dateStr) return "N/A";
                         try {
-                          return new Date(dateStr).toLocaleDateString("en-US", {
+                          return new, Date(dateStr).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "short",
                             day: "numeric",
@@ -782,8 +779,7 @@ export default function CarsPage() {
                       // Get Management status from car_is_active value
                       // Mapping: 0 = management, 1 = own, 2 = off_ride, 3 = off_ride
                       const getManagementStatusFromIsActive = (isActive?: number): "management" | "own" | "off_ride" => {
-                        if (isActive === undefined || isActive === null) return "own"; // Default fallback
-                        if (isActive === 0) return "own";
+                        if (isActive === undefined || isActive === null) return "own"; // Default fallback, if(isActive === 0) return "own";
                         if (isActive === 1) return "management";
                         if (isActive === 2 || isActive === 3) return "off_ride";
                         return "own"; // Default fallback
@@ -798,7 +794,7 @@ export default function CarsPage() {
                           case "off_ride":
                             return "Off Ride";
                           default:
-                            return "Own";
+                            return "Own`;
                         }
                       };
                       
@@ -816,12 +812,12 @@ export default function CarsPage() {
                       return (
                         <tr
                           key={uniqueKey}
-                          className="hover:bg-muted/50 transition-colors group border-b border-border"
+                          className=`hover:bg-muted/50 transition-colors group border-b border-border"
                         >
-                          <td className="text-center text-primary text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
+                          <td className="text-center text-primary text-xs, sm:text-sm px-1.5, sm:px-2 py-2, sm:py-3 align-middle">
                             {globalRowNumber}
                           </td>
-                          <td className="text-center px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
+                          <td className="text-center px-1.5, sm:px-2 py-2, sm:py-3 align-middle">
                             <div className="flex items-center justify-center gap-1.5">
                               <CarStatusThumbnail car={car} />
                               <Badge
@@ -836,19 +832,19 @@ export default function CarsPage() {
                               </Badge>
                             </div>
                           </td>
-                          <td className="text-center px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
+                          <td className="text-center px-1.5, sm:px-2 py-2, sm:py-3 align-middle`>
                             <a
                               href={`/admin/view-car/${car.id}`}
                               onClick={(e) => {
                                 e.preventDefault();
                                 setLocation(`/admin/view-car/${car.id}`);
                               }}
-                              className="text-[#B8860B] hover:text-[#9A7209] hover:underline font-semibold text-xs sm:text-sm transition-colors duration-200"
+                              className=`text-[#B8860B] hover:text-[#9A7209] hover:underline font-semibold text-xs, sm:text-sm transition-colors duration-200"
                             >
                               View Stats
                             </a>
                           </td>
-                          <td className="text-center px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden md:table-cell">
+                          <td className="text-center px-1.5, sm:px-2 py-2, sm:py-3 align-middle hidden, md:table-cell">
                             <Badge
                               variant="outline"
                               className={cn(
@@ -863,7 +859,7 @@ export default function CarsPage() {
                             {managementValue}
                             </Badge>
                           </td>
-                          <td className="text-center px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
+                          <td className="text-center px-1.5, sm:px-2 py-2, sm:py-3 align-middle`>
                             {car.owner ? (
                               <div>
                                 {car.clientId ? (
@@ -874,7 +870,7 @@ export default function CarsPage() {
                                         e.preventDefault();
                                         setLocation(`/admin/clients/${car.clientId}`);
                                       }}
-                                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline font-semibold text-xs sm:text-sm cursor-pointer block transition-colors duration-200"
+                                      className=`text-[#B8860B] hover:text-[#9A7209] hover:underline font-semibold text-xs, sm:text-sm cursor-pointer block transition-colors duration-200`
                                     >
                                       {car.owner.firstName} {car.owner.lastName}
                                     </a>
@@ -885,7 +881,7 @@ export default function CarsPage() {
                                           e.preventDefault();
                                           setLocation(`/admin/clients/${car.clientId}`);
                                         }}
-                                        className="text-[#8B6914] hover:text-[#B8860B] hover:underline text-[10px] sm:text-xs cursor-pointer block mt-0.5 transition-colors duration-200 font-medium"
+                                        className=`text-[#8B6914] hover:text-[#B8860B] hover:underline text-[10px] sm:text-xs cursor-pointer block mt-0.5 transition-colors duration-200 font-medium"
                                       >
                                         {car.owner.email}
                                       </a>
@@ -893,7 +889,7 @@ export default function CarsPage() {
                                   </>
                                 ) : (
                                   <>
-                                    <div className="text-foreground text-xs sm:text-sm">
+                                    <div className="text-foreground text-xs, sm:text-sm">
                                       {car.owner.firstName} {car.owner.lastName}
                                     </div>
                                     {car.owner.email && (
@@ -905,39 +901,39 @@ export default function CarsPage() {
                                 )}
                               </div>
                             ) : (
-                              <span className="text-muted-foreground text-xs sm:text-sm">
+                              <span className="text-muted-foreground text-xs, sm:text-sm">
                                 Unassigned
                               </span>
                             )}
                           </td>
-                          <td className="text-center text-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
+                          <td className="text-center text-foreground text-xs, sm:text-sm px-1.5, sm:px-2 py-2, sm:py-3 align-middle">
                             {car.make || "N/A"}
                           </td>
-                          <td className="text-center text-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-center text-foreground text-xs, sm:text-sm px-1.5, sm:px-2 py-2, sm:py-3 align-middle hidden, lg:table-cell">
                             {car.year || "N/A"}
                           </td>
-                          <td className="text-center text-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle">
+                          <td className="text-center text-foreground text-xs, sm:text-sm px-1.5, sm:px-2 py-2, sm:py-3 align-middle">
                             {car.model || "N/A"}
                           </td>
-                          <td className="text-center text-muted-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-center text-muted-foreground text-xs, sm:text-sm px-1.5, sm:px-2 py-2, sm:py-3 align-middle hidden, lg:table-cell">
                             {car.contactPhone || car.owner?.phone || "N/A"}
                           </td>
-                          <td className="text-center text-foreground font-mono text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-center text-foreground font-mono text-xs, sm:text-sm px-1.5, sm:px-2 py-2, sm:py-3 align-middle hidden, lg:table-cell">
                             {car.vin || "N/A"}
                           </td>
-                          <td className="text-center text-muted-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-center text-muted-foreground text-xs, sm:text-sm px-1.5, sm:px-2 py-2, sm:py-3 align-middle hidden, lg:table-cell">
                             {car.licensePlate || "N/A"}
                           </td>
-                          <td className="text-center text-muted-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden lg:table-cell">
+                          <td className="text-center text-muted-foreground text-xs, sm:text-sm px-1.5, sm:px-2 py-2, sm:py-3 align-middle hidden, lg:table-cell">
                             {car.fuelType || "N/A"}
                           </td>
-                          <td className="text-center text-muted-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
+                          <td className="text-center text-muted-foreground text-xs, sm:text-sm px-1.5, sm:px-2 py-2, sm:py-3 align-middle hidden, xl:table-cell">
                             {car.tireSize || "N/A"}
                           </td>
-                          <td className="text-center text-muted-foreground text-xs sm:text-sm px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
+                          <td className="text-center text-muted-foreground text-xs, sm:text-sm px-1.5, sm:px-2 py-2, sm:py-3 align-middle hidden, xl:table-cell">
                             {car.oilType || "N/A"}
                           </td>
-                          <td className="text-center px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
+                          <td className="text-center px-1.5, sm:px-2 py-2, sm:py-3 align-middle hidden, xl:table-cell">
                             {car.turoLink ? (
                               <a
                                 href={car.turoLink}
@@ -946,26 +942,26 @@ export default function CarsPage() {
                                 onClick={(e) => e.stopPropagation()}
                                 className="text-[#B8860B] hover:text-[#9A7209] hover:underline inline-flex items-center justify-center transition-colors duration-200"
                               >
-                                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <ExternalLink className="w-3 h-3, sm:w-4, sm:h-4" />
                               </a>
                             ) : (
-                              <span className="text-gray-600 text-xs sm:text-sm">N/A</span>
+                              <span className="text-gray-600 text-xs, sm:text-sm">N/A</span>
                             )}
                           </td>
                           {isAdmin && (
-                            <td className="text-center px-1.5 sm:px-2 py-2 sm:py-3 align-middle hidden xl:table-cell">
+                            <td className="text-center px-1.5, sm:px-2 py-2, sm:py-3 align-middle hidden, xl:table-cell">
                               {car.adminTuroLink ? (
                                 <a
                                   href={car.adminTuroLink}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="text-blue-700 hover:underline inline-flex items-center justify-center"
+                                  className="text-blue-700, hover:underline inline-flex items-center justify-center"
                                 >
-                                  <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                                  <ExternalLink className="w-3 h-3, sm:w-4, sm:h-4" />
                                 </a>
                               ) : (
-                                <span className="text-gray-600 text-xs sm:text-sm">N/A</span>
+                                <span className="text-gray-600 text-xs, sm:text-sm">N/A</span>
                               )}
                             </td>
                           )}
@@ -1046,7 +1042,7 @@ export default function CarsPage() {
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="1HGBH41JXMN109186"
                           maxLength={17}
                         />
@@ -1067,7 +1063,7 @@ export default function CarsPage() {
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="2024 Mercedes S580"
                         />
                       </FormControl>
@@ -1086,7 +1082,7 @@ export default function CarsPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="Mercedes"
                           />
                         </FormControl>
@@ -1104,7 +1100,7 @@ export default function CarsPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="S580"
                           />
                         </FormControl>
@@ -1126,7 +1122,7 @@ export default function CarsPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="ABC-1234"
                           />
                         </FormControl>
@@ -1145,7 +1141,7 @@ export default function CarsPage() {
                           <Input
                             {...field}
                             type="number"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="2024"
                           />
                         </FormControl>
@@ -1165,7 +1161,7 @@ export default function CarsPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="Black"
                           />
                         </FormControl>
@@ -1183,7 +1179,7 @@ export default function CarsPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="Black"
                           />
                         </FormControl>
@@ -1206,7 +1202,7 @@ export default function CarsPage() {
                           <Input
                             {...field}
                             type="number"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="0"
                           />
                         </FormControl>
@@ -1220,17 +1216,16 @@ export default function CarsPage() {
                     name="status"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-muted-foreground">Status *</FormLabel>
+                        <FormLabel className="text-muted-foreground`>Status *</FormLabel>
                         <Select
                           onValueChange={async (value) => {
-                            console.log(`📝 [FRONTEND] Status changed to: ${value}`);
+                            console.log(`📝 [FRONTEND] Status changed, to: ${value}`);
                             
-                            // If changing to INACTIVE and editing an existing car, check if it's the last active car
-                            if (value === "INACTIVE" && selectedCar && selectedCar.userId) {
+                            // If changing to INACTIVE and editing an existing car, check if it's the last active car, if(value === `INACTIVE` && selectedCar && selectedCar.userId) {
                               try {
-                                const response = await fetch(
+                                const response = await, fetch(
                                   buildApiUrl(`/api/cars/check-last-active?carId=${selectedCar.id}&userId=${selectedCar.userId}`),
-                                  { credentials: "include" }
+                                  { credentials: `include" }
                                 );
                                 if (response.ok) {
                                   const result = await response.json();
@@ -1241,7 +1236,7 @@ export default function CarsPage() {
                                   }
                                 }
                               } catch (error) {
-                                console.error("Error checking last active car:", error);
+                                console.error("Error checking last active, car:", error);
                               }
                             }
                             
@@ -1250,7 +1245,7 @@ export default function CarsPage() {
                           value={field.value || "ACTIVE"}
                         >
                           <FormControl>
-                            <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                            <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                           </FormControl>
@@ -1275,7 +1270,7 @@ export default function CarsPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="225/50R17"
                           />
                         </FormControl>
@@ -1293,7 +1288,7 @@ export default function CarsPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="5W-30"
                           />
                         </FormControl>
@@ -1314,7 +1309,7 @@ export default function CarsPage() {
                           <Input
                             {...field}
                             type="date"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -1333,7 +1328,7 @@ export default function CarsPage() {
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                            <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                               <SelectValue placeholder="Select fuel type" />
                             </SelectTrigger>
                           </FormControl>
@@ -1364,7 +1359,7 @@ export default function CarsPage() {
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="Enter title type"
                         />
                       </FormControl>
@@ -1384,7 +1379,7 @@ export default function CarsPage() {
                           <Input
                             {...field}
                             type="url"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="https://turo.com/us/en/car/..."
                           />
                         </FormControl>
@@ -1403,7 +1398,7 @@ export default function CarsPage() {
                           <Input
                             {...field}
                             type="url"
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="https://turo.com/us/en/car/..."
                           />
                         </FormControl>
@@ -1423,13 +1418,13 @@ export default function CarsPage() {
                       setSelectedCar(null);
                       form.reset();
                     }}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground, hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                     disabled={
                       createMutation.isPending || updateMutation.isPending
                     }
@@ -1458,12 +1453,11 @@ export default function CarsPage() {
                 onClick={() => {
                   setIsLastActiveCarDialogOpen(false);
                   setPendingStatusChange(null);
-                  // Reset status to previous value
-                  if (selectedCar) {
+                  // Reset status to previous value, if(selectedCar) {
                     form.setValue("status", selectedCar.status);
                   }
                 }}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground, hover:text-foreground"
               >
                 Cancel
               </AlertDialogCancel>
@@ -1475,7 +1469,7 @@ export default function CarsPage() {
                     setPendingStatusChange(null);
                   }
                 }}
-                className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
               >
                 Continue
               </AlertDialogAction>

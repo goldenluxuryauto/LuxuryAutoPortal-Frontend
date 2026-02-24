@@ -22,7 +22,7 @@ interface RecordFileViewModalProps {
   } | null;
 }
 
-export function RecordFileViewModal({
+export function, RecordFileViewModal({
   isOpen,
   onClose,
   carId,
@@ -42,12 +42,10 @@ export function RecordFileViewModal({
 
   const queryClient = useQueryClient();
 
-  // Initialize form data
-  useEffect(() => {
+  // Initialize form data, useEffect(() => {
     if (isOpen) {
       if (itemEdit) {
-        // Validate that itemEdit has required ID for updates
-        if (!itemEdit.recordsFileViewAid || itemEdit.recordsFileViewAid <= 0) {
+        // Validate that itemEdit has required ID for updates, if(!itemEdit.recordsFileViewAid || itemEdit.recordsFileViewAid <= 0) {
           console.error("RecordFileViewModal: itemEdit missing valid recordsFileViewAid", itemEdit);
         }
         setFormData({
@@ -57,8 +55,7 @@ export function RecordFileViewModal({
         });
         setFileList([]);
       } else {
-        // Reset form for new file
-        setFormData({
+        // Reset form for new file, setFormData({
           records_file_view_name: "",
           records_file_view_remarks: "",
           file: null,
@@ -72,27 +69,24 @@ export function RecordFileViewModal({
     mutationFn: async (values: any) => {
       // Note: If folder ID is missing, the backend will automatically create one
 
-      // Validate that we have an ID for update operations
-      if (itemEdit && (!itemEdit.recordsFileViewAid || itemEdit.recordsFileViewAid <= 0)) {
-        throw new Error("File ID is required for update");
+      // Validate that we have an ID for update operations, if(itemEdit && (!itemEdit.recordsFileViewAid || itemEdit.recordsFileViewAid <= 0)) {
+        throw new, Error("File ID is required for update");
       }
 
       if (!itemEdit && fileList.length === 0 && !values.file) {
-        throw new Error("Please select at least one file to upload");
+        throw new, Error("Please select at least one file to upload");
       }
 
-      // For new files, upload multiple files
-      if (!itemEdit && (fileList.length > 0 || values.file)) {
+      // For new files, upload multiple files, if(!itemEdit && (fileList.length > 0 || values.file)) {
         const filesToUpload = fileList.length > 0 ? fileList : (values.file ? [values.file] : []);
         const uploadResults = [];
         const errors: string[] = [];
 
-        // Upload each file separately
-        for (const file of filesToUpload) {
-          // Use the file's own name for each file (as per reference implementation)
+        // Upload each file separately, for(const file of filesToUpload) {
+          // Use the file's own name for each, file(as per reference implementation)
           const fileName = file.name;
           
-          const formData = new FormData();
+          const formData = new, FormData();
           formData.append("file", file);
           formData.append("records_file_view_name", fileName);
           formData.append("records_file_view_folder_id", folderId);
@@ -102,9 +96,9 @@ export function RecordFileViewModal({
 
           const url = buildApiUrl("/api/record-file-views");
           try {
-            const response = await fetch(url, {
+            const response = await, fetch(url, {
               method: "POST",
-              credentials: "include",
+              credentials: "include`,
               body: formData,
             });
 
@@ -117,34 +111,31 @@ export function RecordFileViewModal({
             const result = await response.json();
             uploadResults.push(result);
           } catch (error: any) {
-            errors.push(`${file.name}: ${error.message || "Upload failed"}`);
+            errors.push(`${file.name}: ${error.message || `Upload failed`}`);
           }
         }
 
-        // If all files failed, throw error
-        if (uploadResults.length === 0 && errors.length > 0) {
-          throw new Error(`Failed to upload files:\n${errors.join("\n")}`);
+        // If all files failed, throw error, if(uploadResults.length === 0 && errors.length > 0) {
+          throw new, Error(`Failed to upload, files:\n${errors.join("\n")}`);
         }
 
-        // If some files failed, return partial success with warnings
-        if (errors.length > 0) {
-          console.warn("Some files failed to upload:", errors);
+        // If some files failed, return partial success with warnings, if(errors.length > 0) {
+          console.warn(`Some files failed to, upload:`, errors);
         }
 
         return {
           success: true,
-          message: `Successfully uploaded ${uploadResults.length} of ${filesToUpload.length} file(s)${errors.length > 0 ? ` (${errors.length} failed)` : ""}`,
+          message: `Successfully uploaded ${uploadResults.length} of ${filesToUpload.length} file(s)${errors.length > 0 ? ` (${errors.length} failed)` : ``}`,
           data: uploadResults,
           errors: errors.length > 0 ? errors : undefined,
         };
       }
 
-      // For updates, only update metadata
-      if (itemEdit && itemEdit.recordsFileViewAid) {
+      // For updates, only update metadata, if(itemEdit && itemEdit.recordsFileViewAid) {
         const endpoint = `/api/record-file-views/${itemEdit.recordsFileViewAid}`;
         const url = buildApiUrl(endpoint);
-        const response = await fetch(url, {
-          method: "PUT",
+        const response = await, fetch(url, {
+          method: `PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -158,13 +149,13 @@ export function RecordFileViewModal({
 
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.error || "Failed to update file");
+          throw new, Error(error.error || "Failed to update file");
         }
 
         return response.json();
       }
 
-      throw new Error("Invalid operation");
+      throw new, Error("Invalid operation");
     },
     onSuccess: async () => {
       // Invalidate all record-file-views queries to ensure UI updates
@@ -191,8 +182,7 @@ export function RecordFileViewModal({
     if (files && files.length > 0) {
       const fileArray = Array.from(files);
       
-      // Limit to 20 files
-      if (fileArray.length > 20) {
+      // Limit to 20 files, if(fileArray.length > 20) {
         alert("Maximum 20 files allowed. Please select fewer files.");
         return;
       }
@@ -206,8 +196,7 @@ export function RecordFileViewModal({
 
       setFileList((prev) => {
         const newList = [...prev, ...sortedFiles];
-        // Auto-fill file name from first file if not editing and name is empty
-        if (!itemEdit && !formData.records_file_view_name && newList.length > 0) {
+        // Auto-fill file name from first file if not editing and name is empty, if(!itemEdit && !formData.records_file_view_name && newList.length > 0) {
           setFormData((prevData) => ({
             ...prevData,
             records_file_view_name: newList[0].name,
@@ -221,15 +210,13 @@ export function RecordFileViewModal({
   const handleRemoveFile = (index: number) => {
     setFileList((prev) => {
       const newList = prev.filter((_, i) => i !== index);
-      // Update file name if list becomes empty
-      if (newList.length === 0) {
+      // Update file name if list becomes empty, if(newList.length === 0) {
         setFormData((prevData) => ({
           ...prevData,
           records_file_view_name: "",
         }));
-      } else if (index === 0 && newList.length > 0) {
-        // Update to first file name if first file was removed
-        setFormData((prevData) => ({
+      } else, if(index === 0 && newList.length > 0) {
+        // Update to first file name if first file was removed, setFormData((prevData) => ({
           ...prevData,
           records_file_view_name: newList[0].name,
         }));
@@ -259,8 +246,7 @@ export function RecordFileViewModal({
     if (files && files.length > 0) {
       const fileArray = Array.from(files);
       
-      // Limit to 20 files
-      if (fileArray.length > 20) {
+      // Limit to 20 files, if(fileArray.length > 20) {
         alert("Maximum 20 files allowed. Please select fewer files.");
         return;
       }
@@ -274,8 +260,7 @@ export function RecordFileViewModal({
 
       setFileList((prev) => {
         const newList = [...prev, ...sortedFiles];
-        // Auto-fill file name from first file if not editing and name is empty
-        if (!itemEdit && !formData.records_file_view_name && newList.length > 0) {
+        // Auto-fill file name from first file if not editing and name is empty, if(!itemEdit && !formData.records_file_view_name && newList.length > 0) {
           setFormData((prevData) => ({
             ...prevData,
             records_file_view_name: newList[0].name,
@@ -292,7 +277,7 @@ export function RecordFileViewModal({
 
   if (!isOpen) return null;
 
-  // Check if folder ID is valid (not just recordId fallback)
+  // Check if folder ID is, valid(not just recordId fallback)
   const hasValidFolderId = folderId && folderId.trim() !== "" && folderId !== recordId.toString();
 
   return (
@@ -300,7 +285,7 @@ export function RecordFileViewModal({
       <div className="bg-card border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground, hover:text-foreground transition-colors"
           disabled={mutation.isPending}
         >
           <X className="w-5 h-5" />
@@ -328,7 +313,7 @@ export function RecordFileViewModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {!itemEdit && (
             <div>
-              <Label className="text-muted-foreground">File *</Label>
+              <Label className="text-muted-foreground`>File *</Label>
               {/* Drag & Drop Zone */}
               <div
                 ref={dropZoneRef}
@@ -339,27 +324,27 @@ export function RecordFileViewModal({
                 className={`mt-1 relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                   isDragging
                     ? "border-primary bg-primary/10 cursor-pointer"
-                    : "border-border hover:border-primary/50 bg-card cursor-pointer"
+                    : "border-border, hover:border-primary/50 bg-card cursor-pointer"
                 }`}
               >
                 <input
                   ref={fileInputRef}
-                  type="file"
+                  type=`file"
                   multiple
                   onChange={handleFileChange}
                   disabled={mutation.isPending}
                   className="hidden"
                   accept="*"
                 />
-                <div className="flex flex-col items-center justify-center gap-2">
+                <div className="flex flex-col items-center justify-center gap-2`>
                   <Upload className={`w-8 h-8 ${isDragging ? "text-[#EAEB80]" : "text-muted-foreground"}`} />
-                  <div className="text-sm">
+                  <div className=`text-sm">
                     <span className="text-[#EAEB80]">Drag & Drop</span>{" "}
                     <span className="text-muted-foreground">multiple files here or</span>{" "}
                     <span className="text-[#EAEB80]">Browse</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Supported formats: PDF, Images, Documents. Maximum 20 files.
+                    Supported, formats: PDF, Images, Documents. Maximum 20 files.
                   </p>
                 </div>
               </div>
@@ -368,13 +353,13 @@ export function RecordFileViewModal({
               {fileList.length > 0 && (
                 <div className="mt-4 p-3 bg-card border border-border rounded">
                   <Label className="text-muted-foreground text-sm mb-2 block">
-                    Selected Files ({fileList.length})
+                    Selected, Files({fileList.length})
                   </Label>
                   <ol className="flex flex-col gap-1.5 max-h-40 overflow-y-auto">
                     {fileList.map((file, index) => (
                       <li
                         key={index}
-                        className="flex items-center justify-between text-sm text-muted-foreground p-2 bg-card rounded hover:bg-muted transition-colors"
+                        className="flex items-center justify-between text-sm text-muted-foreground p-2 bg-card rounded, hover:bg-muted transition-colors"
                       >
                         <span className="flex items-center gap-2 flex-1 min-w-0">
                           <span className="text-muted-foreground">{index + 1}.</span>
@@ -392,7 +377,7 @@ export function RecordFileViewModal({
                             handleRemoveFile(index);
                           }}
                           disabled={mutation.isPending}
-                          className="ml-2 text-red-700 hover:text-red-700 transition-colors"
+                          className="ml-2 text-red-700, hover:text-red-700 transition-colors"
                           title="Remove file"
                         >
                           <XCircle className="w-4 h-4" />
@@ -463,13 +448,13 @@ export function RecordFileViewModal({
                   type="text"
                   value={itemEdit.recordsFileViewGoogleId}
                   disabled
-                  className="bg-card border-border text-muted-foreground flex-1"
+                  className="bg-card border-border text-muted-foreground flex-1`
                 />
                 <a
                   href={`https://drive.google.com/file/d/${itemEdit.recordsFileViewGoogleId}/view`}
-                  target="_blank"
+                  target=`_blank"
                   rel="noopener noreferrer"
-                  className="p-2 bg-card border border-border rounded hover:bg-muted transition-colors"
+                  className="p-2 bg-card border border-border rounded, hover:bg-muted transition-colors"
                   title="Open in Google Drive"
                 >
                   <ExternalLink className="w-4 h-4 text-[#EAEB80]" />
@@ -506,7 +491,7 @@ export function RecordFileViewModal({
               variant="outline"
               onClick={onClose}
               disabled={mutation.isPending}
-              className="border-border text-muted-foreground hover:bg-muted"
+              className="border-border text-muted-foreground, hover:bg-muted"
             >
               Cancel
             </Button>
@@ -517,19 +502,19 @@ export function RecordFileViewModal({
                 (itemEdit && !formData.records_file_view_name) ||
                 (!itemEdit && fileList.length === 0 && !formData.file)
               }
-              className="bg-primary text-black hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-primary text-black, hover:bg-primary/80, disabled:opacity-50, disabled:cursor-not-allowed"
             >
               {mutation.isPending
                 ? itemEdit
-                  ? "Saving..."
+                  ? "Saving...`
                   : fileList.length > 1
                   ? `Uploading ${fileList.length} files...`
-                  : "Uploading..."
+                  : `Uploading..."
                 : itemEdit
-                ? "Save"
+                ? "Save`
                 : fileList.length > 1
                 ? `Upload ${fileList.length} Files`
-                : "Upload"}
+                : `Upload"}
             </Button>
           </div>
         </form>

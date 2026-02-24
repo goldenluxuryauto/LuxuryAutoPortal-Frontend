@@ -11,14 +11,14 @@ const navLinks = [
   { href: "/contact", label: "Contact", icon: Phone },
 ];
 
-export function Navbar() {
+export function, Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [location] = useLocation();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+      <div className="max-w-7xl mx-auto px-4, sm:px-6, lg:px-8">
+        <div className="flex items-center justify-between h-16, lg:h-20">
           <Link
             href="/"
             className="flex items-center"
@@ -31,7 +31,7 @@ export function Navbar() {
             />
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden, lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -40,14 +40,14 @@ export function Navbar() {
                   "px-4 py-2 text-sm font-medium transition-colors relative group",
                   location === link.href
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground, hover:text-foreground`
                 )}
                 data-testid={`link-nav-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 {link.label}
                 <span
                   className={cn(
-                    "absolute bottom-0 left-4 right-4 h-0.5 bg-primary transition-transform origin-left",
+                    `absolute bottom-0 left-4 right-4 h-0.5 bg-primary transition-transform origin-left",
                     location === link.href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                   )}
                 />
@@ -55,7 +55,7 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden, lg:flex items-center gap-3">
             <Link href="/admin/login">
               <Button variant="ghost" data-testid="button-login">
                 Login
@@ -91,12 +91,12 @@ export function Navbar() {
                     "flex items-center gap-3 px-4 py-3 rounded-md text-lg font-medium transition-colors",
                     location === link.href
                       ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      : "text-muted-foreground, hover:bg-muted, hover:text-foreground`
                   )}
                   onClick={() => setIsOpen(false)}
                   data-testid={`link-mobile-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className=`w-5 h-5" />
                   {link.label}
                 </Link>
               );

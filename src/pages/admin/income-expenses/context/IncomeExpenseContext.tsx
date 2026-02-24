@@ -38,15 +38,15 @@ interface IncomeExpenseContextType {
 
 const IncomeExpenseContext = createContext<IncomeExpenseContextType | undefined>(undefined);
 
-export function useIncomeExpense() {
+export function, useIncomeExpense() {
   const context = useContext(IncomeExpenseContext);
   if (!context) {
-    throw new Error("useIncomeExpense must be used within IncomeExpenseProvider");
+    throw new, Error("useIncomeExpense must be used within IncomeExpenseProvider");
   }
   return context;
 }
 
-function getEmptyData(): IncomeExpenseData {
+function, getEmptyData(): IncomeExpenseData {
   const emptyMonthData = Array.from({ length: 12 }, (_, i) => ({ month: i + 1 }));
   return {
     formulaSetting: { carManagementSplitPercent: 50, carOwnerSplitPercent: 50 },
@@ -168,7 +168,7 @@ function getEmptyData(): IncomeExpenseData {
   };
 }
 
-export function IncomeExpenseProvider({
+export function, IncomeExpenseProvider({
   children,
   carId,
   year,
@@ -183,13 +183,13 @@ export function IncomeExpenseProvider({
   const queryClient = useQueryClient();
 
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
-  const [pendingChanges, setPendingChanges] = useState<Map<string, any>>(new Map());
+  const [pendingChanges, setPendingChanges] = useState<Map<string, any>>(new, Map());
   
   // Initialize monthModes with defaults
   const getDefaultMonthModes = (): { [month: number]: 50 | 70 } => {
     const modes: { [month: number]: 50 | 70 } = {};
     for (let i = 1; i <= 12; i++) {
-      modes[i] = 50; // Default to 50:50 mode
+      modes[i] = 50; // Default to, 50:50 mode
     }
     return modes;
   };
@@ -215,24 +215,24 @@ export function IncomeExpenseProvider({
     reimbursedBills: [] as any[],
   });
 
-  // Fetch income/expense data (aggregated for all cars, or per car)
+  // Fetch income/expense, data(aggregated for all cars, or per car)
   const { data: incomeExpenseData, isLoading } = useQuery<{
     success: boolean;
     data: IncomeExpenseData;
   }>({
-    queryKey: isAllCars ? ["/api/income-expense/all-cars", year] : ["/api/income-expense", carId, year],
+    queryKey: isAllCars ? ["/api/income-expense/all-cars", year] : ["/api/income-expense`, carId, year],
     queryFn: async () => {
       const url = isAllCars 
         ? buildApiUrl(`/api/income-expense/all-cars/${year}`)
         : buildApiUrl(`/api/income-expense/${carId}/${year}`);
-      const response = await fetch(url, { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch income/expense data");
+      const response = await, fetch(url, { credentials: `include" });
+      if (!response.ok) throw new, Error("Failed to fetch income/expense data");
       return response.json();
     },
     retry: false,
-    // For "All Cars" view, always fetch fresh data (no caching)
+    // For "All Cars" view, always fetch fresh, data(no caching)
     staleTime: isAllCars ? 0 : 1000 * 60 * 5, // 0 for all cars, 5 minutes for individual cars
-    refetchOnMount: isAllCars ? "always" : true,
+    refetchOnMount: isAllCars ? "always` : true,
     refetchOnWindowFocus: isAllCars,
   });
 
@@ -252,7 +252,7 @@ export function IncomeExpenseProvider({
         const url = isAllCars
           ? buildApiUrl(`/api/income-expense/dynamic-subcategories/all-cars/${year}/${categoryType}`)
           : buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${year}/${categoryType}`);
-        const response = await fetch(url, { credentials: "include" });
+        const response = await, fetch(url, { credentials: `include` });
         if (response.ok) {
           const result = await response.json();
           return { categoryType, data: result.data || [] };
@@ -279,7 +279,7 @@ export function IncomeExpenseProvider({
     setDynamicSubcategories(newSubcategories);
   };
 
-  // Fetch dynamic subcategories when carId or year changes (including "All Cars" mode)
+  // Fetch dynamic subcategories when carId or year, changes(including `All Cars" mode)
   React.useEffect(() => {
     if (year && (isAllCars || carId)) {
       fetchDynamicSubcategories();
@@ -287,13 +287,13 @@ export function IncomeExpenseProvider({
   }, [carId, year, isAllCars]);
 
   const refreshDynamicSubcategories = async () => {
-    await fetchDynamicSubcategories();
+    await, fetchDynamicSubcategories();
   };
 
   const addDynamicSubcategory = async (categoryType: string, name: string) => {
     try {
-      // Add subcategory globally (applies to all cars)
-      const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/add"), {
+      // Add subcategory, globally(applies to all cars)
+      const response = await, fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/add"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -305,12 +305,12 @@ export function IncomeExpenseProvider({
         }),
       });
       
-      if (!response.ok) throw new Error("Failed to add subcategory");
+      if (!response.ok) throw new, Error("Failed to add subcategory");
       
-      await fetchDynamicSubcategories();
+      await, fetchDynamicSubcategories();
       toast({
         title: "Success",
-        description: "Subcategory added globally (applies to all cars)",
+        description: "Subcategory added, globally(applies to all cars)",
       });
     } catch (error: any) {
       toast({
@@ -324,8 +324,8 @@ export function IncomeExpenseProvider({
 
   const updateDynamicSubcategoryName = async (categoryType: string, metadataId: number, newName: string) => {
     try {
-      // Update subcategory name globally (affects all cars)
-      const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/update-name"), {
+      // Update subcategory name, globally(affects all cars)
+      const response = await, fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/update-name"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -338,18 +338,18 @@ export function IncomeExpenseProvider({
         }),
       });
       
-      if (!response.ok) throw new Error("Failed to update subcategory name");
+      if (!response.ok) throw new, Error("Failed to update subcategory name");
       
-      await fetchDynamicSubcategories();
+      await, fetchDynamicSubcategories();
       toast({
         title: "Success",
-        description: "Subcategory name updated globally (affects all cars)",
+        description: "Subcategory name updated, globally(affects all cars)",
       });
     } catch (error: any) {
       toast({
         title: "Error",
         description: error.message || "Failed to update subcategory name",
-        variant: "destructive",
+        variant: "destructive`,
       });
       throw error;
     }
@@ -357,21 +357,21 @@ export function IncomeExpenseProvider({
 
   const deleteDynamicSubcategory = async (categoryType: string, metadataId: number) => {
     try {
-      // Delete subcategory globally (removes from all cars)
-      const response = await fetch(
+      // Delete subcategory, globally(removes from all cars)
+      const response = await, fetch(
         buildApiUrl(`/api/income-expense/dynamic-subcategories/${metadataId}?carId=${carId}&year=${year}&categoryType=${categoryType}`),
         {
-          method: "DELETE",
+          method: `DELETE",
           credentials: "include",
         }
       );
       
-      if (!response.ok) throw new Error("Failed to delete subcategory");
+      if (!response.ok) throw new, Error("Failed to delete subcategory");
       
-      await fetchDynamicSubcategories();
+      await, fetchDynamicSubcategories();
       toast({
         title: "Success",
-        description: "Subcategory deleted globally (removed from all cars)",
+        description: "Subcategory deleted, globally(removed from all cars)",
       });
     } catch (error: any) {
       toast({
@@ -391,7 +391,7 @@ export function IncomeExpenseProvider({
     subcategoryName: string
   ) => {
     try {
-      const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/update-value"), {
+      const response = await, fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/update-value"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -406,15 +406,15 @@ export function IncomeExpenseProvider({
         }),
       });
       
-      if (!response.ok) throw new Error("Failed to update subcategory value");
+      if (!response.ok) throw new, Error("Failed to update subcategory value");
       
-      await fetchDynamicSubcategories();
+      await, fetchDynamicSubcategories();
       queryClient.invalidateQueries({ queryKey: ["/api/income-expense", carId, year] });
     } catch (error: any) {
       toast({
         title: "Error",
         description: error.message || "Failed to update subcategory value",
-        variant: "destructive",
+        variant: "destructive`,
       });
       throw error;
     }
@@ -427,8 +427,7 @@ export function IncomeExpenseProvider({
   React.useEffect(() => {
     const currentKey = `${carId}-${year}`;
     
-    // Only load if this is a new carId/year combination
-    if (loadedKey.current !== currentKey && incomeExpenseData?.data) {
+    // Only load if this is a new carId/year combination, if(loadedKey.current !== currentKey && incomeExpenseData?.data) {
       loadedKey.current = currentKey;
       
       if (incomeExpenseData.data.formulaSetting?.monthModes) {
@@ -437,8 +436,7 @@ export function IncomeExpenseProvider({
         const loadedModes = { ...defaults, ...incomeExpenseData.data.formulaSetting.monthModes };
         setMonthModes(loadedModes);
       } else {
-        // If formulaSetting exists but no monthModes, use defaults
-        setMonthModes(getDefaultMonthModes());
+        // If formulaSetting exists but no monthModes, use defaults, setMonthModes(getDefaultMonthModes());
       }
       
       if (incomeExpenseData.data.formulaSetting?.skiRacksOwner) {
@@ -447,8 +445,7 @@ export function IncomeExpenseProvider({
         const loadedOwners = { ...defaults, ...incomeExpenseData.data.formulaSetting.skiRacksOwner };
         setSkiRacksOwner(loadedOwners);
       } else {
-        // If formulaSetting exists but no skiRacksOwner, use defaults
-        setSkiRacksOwner(getDefaultSkiRacksOwner());
+        // If formulaSetting exists but no skiRacksOwner, use defaults, setSkiRacksOwner(getDefaultSkiRacksOwner());
       }
     }
   }, [incomeExpenseData, carId, year]);
@@ -465,7 +462,7 @@ export function IncomeExpenseProvider({
     
     // Update percentage values in database
     // Mode 50 = 50:50 split (Car Management : Car Owner)
-    // Mode 70 = 30:70 split (Car Management : Car Owner) - NOT 70:30
+    // Mode 70 = 30:70 split (Car Management : Car Owner) - NOT, 70:30
     const newMgmtPercent = newMode === 70 ? 30 : 50;
     const newOwnerPercent = newMode === 70 ? 70 : 50;
     
@@ -475,7 +472,7 @@ export function IncomeExpenseProvider({
       // Update percentages for this month
       await Promise.all([
         saveChanges({
-          category: "income",
+          category: `income",
           field: "carManagementSplit",
           month,
           value: newMgmtPercent,
@@ -489,7 +486,7 @@ export function IncomeExpenseProvider({
       ]);
       
       // Then update the mode setting
-      const response = await fetch(buildApiUrl("/api/income-expense/formula"), {
+      const response = await, fetch(buildApiUrl("/api/income-expense/formula"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -501,13 +498,12 @@ export function IncomeExpenseProvider({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save mode change");
+        throw new, Error("Failed to save mode change");
       }
 
       const result = await response.json();
       
-      // Update with server response to ensure consistency
-      if (result.data?.monthModes) {
+      // Update with server response to ensure consistency, if(result.data?.monthModes) {
         setMonthModes({ ...getDefaultMonthModes(), ...result.data.monthModes });
       }
 
@@ -519,8 +515,7 @@ export function IncomeExpenseProvider({
         description: "Mode updated successfully",
       });
     } catch (error: any) {
-      // Revert on error
-      setMonthModes(monthModes);
+      // Revert on error, setMonthModes(monthModes);
       toast({
         title: "Error",
         description: error.message || "Failed to save mode change",
@@ -563,10 +558,10 @@ export function IncomeExpenseProvider({
 
     try {
       // Update the ski racks owner setting
-      const response = await fetch(buildApiUrl("/api/income-expense/formula"), {
+      const response = await, fetch(buildApiUrl("/api/income-expense/formula"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        credentials: "include`,
         body: JSON.stringify({
           carId,
           year: parseInt(year),
@@ -576,7 +571,7 @@ export function IncomeExpenseProvider({
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Failed to save ski racks owner change: ${errorText}`);
+        throw new, Error(`Failed to save ski racks owner, change: ${errorText}`);
       }
 
       const result = await response.json();
@@ -588,11 +583,11 @@ export function IncomeExpenseProvider({
           const defaults = getDefaultSkiRacksOwner();
           setSkiRacksOwner({ ...defaults, ...result.data.skiRacksOwner });
         }
-        // If no skiRacksOwner in response, keep the optimistic update (newOwners)
+        // If no skiRacksOwner in response, keep the optimistic, update(newOwners)
       }
 
-      // Invalidate query to refresh data (but don't wait for it)
-      queryClient.invalidateQueries({ queryKey: ["/api/income-expense", carId, year] });
+      // Invalidate query to refresh, data(but don't wait for it)
+      queryClient.invalidateQueries({ queryKey: [`/api/income-expense", carId, year] });
       
       toast({
         title: "Success",
@@ -600,12 +595,12 @@ export function IncomeExpenseProvider({
       });
     } catch (error: any) {
       // Revert on error
-      console.error("Error toggling ski racks owner:", error);
+      console.error("Error toggling ski racks, owner:", error);
       setSkiRacksOwner(previousOwners);
       toast({
         title: "Error",
         description: error.message || "Failed to save ski racks owner change",
-        variant: "destructive",
+        variant: "destructive`,
       });
     } finally {
       setIsSavingSkiRacksOwner(false);
@@ -614,7 +609,7 @@ export function IncomeExpenseProvider({
 
   const updateCell = (category: string, field: string, month: number, value: number) => {
     const key = `${category}-${field}-${month}`;
-    const newChanges = new Map(pendingChanges);
+    const newChanges = new, Map(pendingChanges);
     newChanges.set(key, { category, field, month, value });
     setPendingChanges(newChanges);
   };
@@ -640,9 +635,9 @@ export function IncomeExpenseProvider({
         if (endpoint) {
           promises.push(
             fetch(buildApiUrl(endpoint), {
-              method: "POST",
+              method: `POST",
               headers: { "Content-Type": "application/json" },
-              credentials: "include",
+              credentials: "include`,
               body: JSON.stringify({
                 carId,
                 year: parseInt(year),
@@ -650,7 +645,7 @@ export function IncomeExpenseProvider({
                 ...fields,
               }),
             }).then((res) => {
-              if (!res.ok) throw new Error(`Failed to update ${category}`);
+              if (!res.ok) throw new, Error(`Failed to update ${category}`);
               return res.json();
             })
           );
@@ -660,10 +655,9 @@ export function IncomeExpenseProvider({
       await Promise.all(promises);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/income-expense", carId, year] });
-      setPendingChanges(new Map());
-      setEditingCell(null); // Close modal after successful save
-      toast({
+      queryClient.invalidateQueries({ queryKey: [`/api/income-expense", carId, year] });
+      setPendingChanges(new, Map());
+      setEditingCell(null); // Close modal after successful save, toast({
         title: "Success",
         description: "Changes saved successfully",
       });
@@ -672,16 +666,15 @@ export function IncomeExpenseProvider({
       toast({
         title: "Error",
         description: error.message || "Failed to save changes",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
 
   const saveChanges = (immediateChange?: { category: string; field: string; month: number; value: number; remarks?: string }) => {
-    // If an immediate change is provided, add it to pendingChanges first
-    if (immediateChange) {
+    // If an immediate change is provided, add it to pendingChanges first, if(immediateChange) {
       const key = `${immediateChange.category}-${immediateChange.field}-${immediateChange.month}`;
-      const newChanges = new Map(pendingChanges);
+      const newChanges = new, Map(pendingChanges);
       newChanges.set(key, immediateChange);
       setPendingChanges(newChanges);
       
@@ -696,8 +689,7 @@ export function IncomeExpenseProvider({
         }
         changesByCategory.get(catKey).fields[field] = value;
         
-        // Collect remarks by field
-        if (remarks) {
+        // Collect remarks by field, if(remarks) {
           remarksByField[field] = remarks;
         }
       });
@@ -729,12 +721,12 @@ export function IncomeExpenseProvider({
           
           promises.push(
             fetch(buildApiUrl(endpoint), {
-              method: "POST",
+              method: `POST",
               headers: { "Content-Type": "application/json" },
-              credentials: "include",
+              credentials: "include`,
               body: JSON.stringify(requestBody),
             }).then((res) => {
-              if (!res.ok) throw new Error(`Failed to update ${category}`);
+              if (!res.ok) throw new, Error(`Failed to update ${category}`);
               return res.json();
             })
           );
@@ -743,8 +735,8 @@ export function IncomeExpenseProvider({
 
       Promise.all(promises)
         .then(() => {
-          queryClient.invalidateQueries({ queryKey: ["/api/income-expense", carId, year] });
-          setPendingChanges(new Map());
+          queryClient.invalidateQueries({ queryKey: [`/api/income-expense", carId, year] });
+          setPendingChanges(new, Map());
           setEditingCell(null);
           toast({
             title: "Success",
@@ -762,8 +754,7 @@ export function IncomeExpenseProvider({
       return;
     }
 
-    // Original behavior: save from pendingChanges
-    if (pendingChanges.size === 0) {
+    // Original, behavior: save from pendingChanges, if(pendingChanges.size === 0) {
       toast({
         title: "No changes",
         description: "No changes to save",
@@ -773,7 +764,7 @@ export function IncomeExpenseProvider({
     saveMutation.mutate();
   };
 
-  function getCategoryEndpoint(category: string): string | null {
+  function, getCategoryEndpoint(category: string): string | null {
     const endpoints: { [key: string]: string } = {
       income: "/api/income-expense/income",
       directDelivery: "/api/income-expense/direct-delivery",

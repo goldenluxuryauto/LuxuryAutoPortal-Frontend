@@ -141,16 +141,16 @@ interface ClientDetail {
 
 type Section = "profile" | "cars" | "totals" | "maintenance";
 
-export default function ClientDetailPage() {
+export default function, ClientDetailPage() {
   const [, params] = useRoute("/admin/clients/:id");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const clientId = params?.id ? parseInt(params.id, 10) : null;
   const [activeSection, setActiveSection] = useState<Section>("profile");
   const [expandedSections, setExpandedSections] = useState<Set<Section>>(
-    new Set(["profile"])
+    new, Set(["profile"])
   );
-  const [expandedTotals, setExpandedTotals] = useState<Set<string>>(new Set());
+  const [expandedTotals, setExpandedTotals] = useState<Set<string>>(new, Set());
   const [quickLinksExpanded, setQuickLinksExpanded] = useState(true);
   const [viewMyCarExpanded, setViewMyCarExpanded] = useState(true);
   const [maintenanceTypeFilter, setMaintenanceTypeFilter] = useState<string>("all");
@@ -241,18 +241,18 @@ export default function ClientDetailPage() {
   }>({
     queryKey: ["/api/clients", clientId],
     queryFn: async () => {
-      if (!clientId) throw new Error("Invalid client ID");
+      if (!clientId) throw new, Error("Invalid client ID`);
       const url = buildApiUrl(`/api/clients/${clientId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include`,
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to fetch client: ${response.statusText}`);
+        throw new, Error(errorData.error || `Failed to fetch, client: ${response.statusText}`);
       }
       const result = await response.json();
       // Log summary including lastLoginAt and lastLogoutAt for debugging
-      console.log("✅ [CLIENT DETAIL] Fetched client data:", {
+      console.log(`✅ [CLIENT DETAIL] Fetched client, data:", {
         id: result.data?.id,
         email: result.data?.email,
         name: result.data?.firstName + " " + result.data?.lastName,
@@ -282,18 +282,17 @@ export default function ClientDetailPage() {
   }>({
     queryKey: ["/api/clients", clientId, "onboarding"],
     queryFn: async () => {
-      if (!clientId) throw new Error("Invalid client ID");
+      if (!clientId) throw new, Error("Invalid client ID`);
       const url = buildApiUrl(`/api/clients/${clientId}/onboarding`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include`,
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        // Return null if no onboarding found (404) instead of throwing
-        if (response.status === 404) {
+        // Return null if no onboarding, found(404) instead of throwing, if(response.status === 404) {
           return { success: false, data: null };
         }
-        throw new Error(errorData.error || `Failed to fetch onboarding: ${response.statusText}`);
+        throw new, Error(errorData.error || `Failed to fetch, onboarding: ${response.statusText}`);
       }
       const result = await response.json();
       return result;
@@ -308,8 +307,8 @@ export default function ClientDetailPage() {
     queryFn: async () => {
       if (!clientId) return [];
       const url = buildApiUrl(`/api/clients/${clientId}/banking-info`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         console.error("Failed to fetch banking info");
@@ -322,10 +321,9 @@ export default function ClientDetailPage() {
     retry: false,
   });
 
-  // Show error toast when query fails
-  useEffect(() => {
+  // Show error toast when query fails, useEffect(() => {
     if (error) {
-      console.error("❌ [CLIENT DETAIL] Error fetching client:", error);
+      console.error("❌ [CLIENT DETAIL] Error fetching, client:", error);
       toast({
         title: "Error loading client",
         description: error instanceof Error ? error.message : "Failed to load client details",
@@ -336,7 +334,7 @@ export default function ClientDetailPage() {
 
   const client = data?.data;
 
-  // Calculate online status badge (moved to top level to avoid hooks violation)
+  // Calculate online status, badge(moved to top level to avoid hooks violation)
   const onlineStatusBadge = useMemo(() => {
     if (!client) {
       return null;
@@ -359,10 +357,10 @@ export default function ClientDetailPage() {
   }>({
     queryKey: ["/api/clients", clientId, "totals", selectedCar, selectedYear, fromYear, toYear],
     queryFn: async () => {
-      if (!clientId) throw new Error("Invalid client ID");
+      if (!clientId) throw new, Error("Invalid client ID`);
       const url = buildApiUrl(`/api/clients/${clientId}/totals?car=${selectedCar}&year=${selectedYear}&from=${fromYear}&to=${toYear}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         // Return empty data if endpoint doesn't exist yet
@@ -378,7 +376,7 @@ export default function ClientDetailPage() {
 
   const toggleSection = (section: Section) => {
     setExpandedSections((prev) => {
-      const newSet = new Set(prev);
+      const newSet = new, Set(prev);
       if (newSet.has(section)) {
         newSet.delete(section);
       } else {
@@ -390,7 +388,7 @@ export default function ClientDetailPage() {
 
   const toggleTotalsCategory = (category: string) => {
     setExpandedTotals((prev) => {
-      const newSet = new Set(prev);
+      const newSet = new, Set(prev);
       if (newSet.has(category)) {
         newSet.delete(category);
       } else {
@@ -403,7 +401,7 @@ export default function ClientDetailPage() {
   // Update mutation for editing onboarding data
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      if (!clientId) throw new Error("Invalid client ID");
+      if (!clientId) throw new, Error("Invalid client ID`);
       
       // Determine which endpoint to use based on whether onboarding data exists
       const hasOnboardingData = onboardingData?.success && onboardingData?.data;
@@ -460,8 +458,8 @@ export default function ClientDetailPage() {
         status: data.status,
       };
       
-      const response = await fetch(buildApiUrl(endpoint), {
-        method: "PUT",
+      const response = await, fetch(buildApiUrl(endpoint), {
+        method: `PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -470,7 +468,7 @@ export default function ClientDetailPage() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update client data");
+        throw new, Error(error.error || "Failed to update client data");
       }
       return response.json();
     },
@@ -497,15 +495,15 @@ export default function ClientDetailPage() {
   // Upload contract mutation
   const uploadContractMutation = useMutation({
     mutationFn: async (formData: typeof uploadContractForm) => {
-      if (!clientId) throw new Error("Invalid client ID");
-      if (!formData.contractFile) throw new Error("Please select a PDF file to upload");
+      if (!clientId) throw new, Error("Invalid client ID");
+      if (!formData.contractFile) throw new, Error("Please select a PDF file to upload");
       if (formData.contractFile.size > CONTRACT_MAX_SIZE_BYTES) {
         setUploadContractFormErrors({ contractFile: "You can upload files under 10MB" });
-        throw new Error("You can upload files under 10MB");
+        throw new, Error("You can upload files under 10MB");
       }
       if (!formData.selectedCarId) {
         setUploadContractFormErrors({ selectedCarId: "Please select a car" });
-        throw new Error("Please select a car");
+        throw new, Error("Please select a car");
       }
       
       setUploadContractFormErrors({});
@@ -519,7 +517,7 @@ export default function ClientDetailPage() {
       const client = clientQueryData?.data;
       
       // Check if the selected car has already been onboarded
-      const onboardedVins = new Set(
+      const onboardedVins = new, Set(
         (client?.signedContracts || [])
           .map((contract: any) => contract.vinNumber?.toUpperCase().trim())
           .filter((vin: string) => vin)
@@ -531,21 +529,20 @@ export default function ClientDetailPage() {
 
       if (!selectedCar) {
         setUploadContractFormErrors({ selectedCarId: "Selected car not found" });
-        throw new Error("Selected car not found");
+        throw new, Error("Selected car not found");
       }
       
       // Verify the selected car is not already onboarded
       const carVin = selectedCar.vin?.toUpperCase().trim();
       if (carVin && onboardedVins.has(carVin)) {
         setUploadContractFormErrors({ selectedCarId: "This car has already been onboarded" });
-        throw new Error("This car has already been onboarded. Please select a different car.");
+        throw new, Error("This car has already been onboarded. Please select a different car.");
       }
 
-      const requestFormData = new FormData();
+      const requestFormData = new, FormData();
       requestFormData.append("contract", formData.contractFile);
       
-      // Append vehicle information from selected car
-      if (selectedCar.vin) {
+      // Append vehicle information from selected car, if(selectedCar.vin) {
         requestFormData.append("vinNumber", selectedCar.vin);
       }
       if (selectedCar.year) {
@@ -558,17 +555,17 @@ export default function ClientDetailPage() {
         requestFormData.append("vehicleModel", selectedCar.model);
       }
       if (selectedCar.licensePlate) {
-        requestFormData.append("licensePlate", selectedCar.licensePlate);
+        requestFormData.append("licensePlate`, selectedCar.licensePlate);
       }
 
-      const response = await fetch(buildApiUrl(`/api/clients/${clientId}/contracts`), {
-        method: "POST",
+      const response = await, fetch(buildApiUrl(`/api/clients/${clientId}/contracts`), {
+        method: `POST",
         credentials: "include",
         body: requestFormData,
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to upload contract");
+        throw new, Error(error.error || "Failed to upload contract");
       }
       return response.json();
     },
@@ -594,14 +591,14 @@ export default function ClientDetailPage() {
   // Resend password email mutation
   const resendPasswordEmailMutation = useMutation({
     mutationFn: async () => {
-      if (!clientId) throw new Error("Invalid client ID");
-      const response = await fetch(buildApiUrl(`/api/clients/${clientId}/resend-password-email`), {
-        method: "POST",
+      if (!clientId) throw new, Error("Invalid client ID`);
+      const response = await, fetch(buildApiUrl(`/api/clients/${clientId}/resend-password-email`), {
+        method: `POST",
         credentials: "include",
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to send password email");
+        throw new, Error(error.error || "Failed to send password email");
       }
       return response.json();
     },
@@ -627,28 +624,28 @@ export default function ClientDetailPage() {
   // Add car mutation
   const addCarMutation = useMutation({
     mutationFn: async (data: typeof addCarForm) => {
-      if (!clientId) throw new Error("Invalid client ID");
+      if (!clientId) throw new, Error("Invalid client ID");
       
       // Validate VIN number
       const vinErrors: { vin?: string } = {};
       if (!data.vin || data.vin.trim().length === 0) {
         vinErrors.vin = "VIN number is required";
-      } else if (data.vin.trim().length !== 17) {
+      } else, if(data.vin.trim().length !== 17) {
         vinErrors.vin = "VIN number must be exactly 17 characters";
       }
       
       if (Object.keys(vinErrors).length > 0) {
         setAddCarFormErrors(vinErrors);
-        throw new Error(vinErrors.vin || "VIN validation failed");
+        throw new, Error(vinErrors.vin || "VIN validation failed");
       }
       
       setAddCarFormErrors({});
       
-      const formData = new FormData();
+      const formData = new, FormData();
       // Vehicle Information
       formData.append("vin", data.vin);
-      formData.append("makeModel", `${data.make} ${data.model}`.trim());
-      if (data.make) formData.append("make", data.make);
+      formData.append("makeModel`, `${data.make} ${data.model}`.trim());
+      if (data.make) formData.append(`make", data.make);
       if (data.model) formData.append("model", data.model);
       if (data.licensePlate) formData.append("licensePlate", data.licensePlate);
       if (data.year) formData.append("year", data.year);
@@ -656,8 +653,7 @@ export default function ClientDetailPage() {
       if (data.interiorColor) formData.append("interiorColor", data.interiorColor);
       if (data.mileage) formData.append("mileage", data.mileage);
       formData.append("status", data.status || "ACTIVE");
-      // Extended Vehicle Information
-      if (data.vehicleTrim) formData.append("vehicleTrim", data.vehicleTrim);
+      // Extended Vehicle Information, if(data.vehicleTrim) formData.append("vehicleTrim", data.vehicleTrim);
       if (data.registrationExpiration) formData.append("registrationExpiration", data.registrationExpiration);
       if (data.titleType) formData.append("titleType", data.titleType);
       if (data.vehicleRecall) formData.append("vehicleRecall", data.vehicleRecall);
@@ -676,34 +672,30 @@ export default function ClientDetailPage() {
       if (data.vehicleFeatures && Array.isArray(data.vehicleFeatures) && data.vehicleFeatures.length > 0) {
         formData.append("vehicleFeatures", data.vehicleFeatures.join(", "));
       }
-      // Financial Information
-      if (data.purchasePrice) formData.append("purchasePrice", data.purchasePrice);
+      // Financial Information, if(data.purchasePrice) formData.append("purchasePrice", data.purchasePrice);
       if (data.downPayment) formData.append("downPayment", data.downPayment);
       if (data.monthlyPayment) formData.append("monthlyPayment", data.monthlyPayment);
       if (data.interestRate) formData.append("interestRate", data.interestRate);
       if (data.transportCityToCity) formData.append("transportCityToCity", data.transportCityToCity);
       if (data.ultimateGoal) formData.append("ultimateGoal", data.ultimateGoal);
-      // Insurance Information
-      if (data.insuranceProvider) formData.append("insuranceProvider", data.insuranceProvider);
+      // Insurance Information, if(data.insuranceProvider) formData.append("insuranceProvider", data.insuranceProvider);
       if (data.insurancePhone) formData.append("insurancePhone", data.insurancePhone);
       if (data.policyNumber) formData.append("policyNumber", data.policyNumber);
       if (data.insuranceExpiration) formData.append("insuranceExpiration", data.insuranceExpiration);
-      // Car Login Information
-      if (data.carManufacturerWebsite) formData.append("carManufacturerWebsite", data.carManufacturerWebsite);
+      // Car Login Information, if(data.carManufacturerWebsite) formData.append("carManufacturerWebsite", data.carManufacturerWebsite);
       if (data.carManufacturerUsername) formData.append("carManufacturerUsername", data.carManufacturerUsername);
       if (data.password) formData.append("password", data.password);
-      // Car Links
-      if (data.turoLink) formData.append("turoLink", data.turoLink);
-      if (data.adminTuroLink) formData.append("adminTuroLink", data.adminTuroLink);
+      // Car Links, if(data.turoLink) formData.append("turoLink", data.turoLink);
+      if (data.adminTuroLink) formData.append("adminTuroLink`, data.adminTuroLink);
 
-      const response = await fetch(buildApiUrl(`/api/clients/${clientId}/cars`), {
-        method: "POST",
+      const response = await, fetch(buildApiUrl(`/api/clients/${clientId}/cars`), {
+        method: `POST",
         credentials: "include",
         body: formData,
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to add car");
+        throw new, Error(error.error || "Failed to add car");
       }
       return response.json();
     },
@@ -761,7 +753,7 @@ export default function ClientDetailPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to add car",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
@@ -769,28 +761,28 @@ export default function ClientDetailPage() {
   // Delete banking info mutation
   const deleteBankingInfoMutation = useMutation({
     mutationFn: async (bankingInfoId: number) => {
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/clients/banking-info/${bankingInfoId}`),
         {
-          method: "DELETE",
+          method: `DELETE",
           credentials: "include",
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete banking information");
+        throw new, Error(errorData.error || "Failed to delete banking information");
       }
 
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/clients", clientId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/clients`, clientId] });
       queryClient.invalidateQueries({
         queryKey: [`/api/clients/${clientId}/banking-info`],
       });
       toast({
-        title: "Success",
+        title: `Success",
         description: "Banking information deleted successfully",
       });
       setDeletingBankingId(null);
@@ -854,9 +846,8 @@ export default function ClientDetailPage() {
         carManufacturerWebsite: data.carManufacturerWebsite || "",
         carManufacturerUsername: data.carManufacturerUsername || "",
       });
-    } else if (client) {
-      // Manually created client - use client data
-      setEditFormData({
+    } else, if(client) {
+      // Manually created client - use client data, setEditFormData({
         firstNameOwner: client?.firstName || "",
         lastNameOwner: client?.lastName || "",
         emailOwner: client?.email || "",
@@ -914,13 +905,13 @@ export default function ClientDetailPage() {
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return "N/A";
     try {
-      return new Date(dateString).toLocaleDateString("en-US", {
+      return new, Date(dateString).toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
       });
     } catch {
-      return "N/A";
+      return "N/A`;
     }
   };
 
@@ -935,8 +926,8 @@ export default function ClientDetailPage() {
   // Test DB connection handler
   const handleTestDB = async () => {
     try {
-      const response = await fetch(buildApiUrl(`/api/test-db?clientId=${clientId}`), {
-        credentials: "include",
+      const response = await, fetch(buildApiUrl(`/api/test-db?clientId=${clientId}`), {
+        credentials: `include",
       });
       const result = await response.json();
       if (result.success) {
@@ -964,20 +955,20 @@ export default function ClientDetailPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-          <p className="text-red-700 mb-4">
-            {error ? `Failed to load client details: ${error.message}` : "Client not found"}
+          <p className="text-red-700 mb-4`>
+            {error ? `Failed to load client, details: ${error.message}` : `Client not found"}
           </p>
           {clientId && (
             <Button
               onClick={handleTestDB}
-              className="bg-blue-500 text-foreground hover:bg-blue-600 mb-2"
+              className="bg-blue-500 text-foreground, hover:bg-blue-600 mb-2"
             >
               Test DB Connection
             </Button>
           )}
           <Button
             onClick={() => setLocation("/admin/clients")}
-            className="bg-primary text-primary-foreground hover:bg-primary/80"
+            className="bg-primary text-primary-foreground, hover:bg-primary/80"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Clients
@@ -1003,7 +994,7 @@ export default function ClientDetailPage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation("/admin/clients")}
-            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Clients</span>
@@ -1018,8 +1009,8 @@ export default function ClientDetailPage() {
           </div>
         </div>
 
-        {/* Main Layout: Sidebar + Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Main, Layout: Sidebar + Content */}
+        <div className="grid grid-cols-1, lg:grid-cols-4 gap-6">
           {/* Left Sidebar */}
           <div className="lg:col-span-1">
             <Card className="bg-background border-border">
@@ -1041,7 +1032,7 @@ export default function ClientDetailPage() {
                             "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors",
                             isActive
                               ? "bg-[#EAEB80]/10 text-black"
-                              : "text-muted-foreground hover:bg-card hover:text-primary"
+                              : "text-muted-foreground, hover:bg-card, hover:text-primary"
                           )}
                         >
                           <div className="flex items-center gap-3">
@@ -1074,7 +1065,7 @@ export default function ClientDetailPage() {
                         onClick={handleResendPasswordEmail}
                         variant="outline"
                         size="sm"
-                        className="text-primary border-primary/30 hover:bg-primary/10"
+                        className="text-primary border-primary/30, hover:bg-primary/10"
                         disabled={resendPasswordEmailMutation.isPending}
                       >
                         <Mail className="w-4 h-4 mr-2" />
@@ -1084,7 +1075,7 @@ export default function ClientDetailPage() {
                         onClick={handleEditClick}
                         variant="outline"
                         size="sm"
-                        className="text-primary border-primary/30 hover:bg-primary/10"
+                        className="text-primary border-primary/30, hover:bg-primary/10"
                       >
                         <Edit className="w-4 h-4 mr-2" />
                         Edit
@@ -1104,20 +1095,20 @@ export default function ClientDetailPage() {
                       const formatValue = (value: any): string => {
                         if (value === null || value === undefined || value === "")
                           return "Not provided";
-                        return String(value);
+                        return, String(value);
                       };
 
                       const formatDate = (dateStr: string | null | undefined): string => {
                         if (!dateStr) return "Not provided";
                         try {
-                          return new Date(dateStr).toLocaleString();
+                          return new, Date(dateStr).toLocaleString();
                         } catch {
-                          return String(dateStr);
+                          return, String(dateStr);
                         }
                       };
 
                       const formatCurrency = (value: string | null): string => {
-                        if (!value) return "Not provided";
+                        if (!value) return "Not provided`;
                         const num = parseFloat(value);
                         if (isNaN(num)) return value;
                         return `$${num.toLocaleString("en-US", {
@@ -1135,7 +1126,7 @@ export default function ClientDetailPage() {
                         if (city) parts.push(city);
                         if (state) parts.push(state);
                         if (zipCode) parts.push(zipCode);
-                        return parts.length > 0 ? parts.join(", ") : "Not provided";
+                        return parts.length > 0 ? parts.join(`, ") : "Not provided";
                       };
 
                       const data = onboardingData.data;
@@ -1147,9 +1138,9 @@ export default function ClientDetailPage() {
                             <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                               Personal Information
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                               <div>
-                                <span className="text-muted-foreground block mb-1">Full Name:</span>
+                                <span className="text-muted-foreground block mb-1">Full, Name:</span>
                                 <span className="text-foreground font-medium">
                                   {formatValue(data.firstNameOwner)} {formatValue(data.lastNameOwner)}
                                 </span>
@@ -1159,11 +1150,11 @@ export default function ClientDetailPage() {
                                 <span className="text-foreground">{formatValue(data.emailOwner)}</span>
                               </div>
                               <div>
-                                <span className="text-muted-foreground block mb-1">Last Login:</span>
+                                <span className="text-muted-foreground block mb-1">Last, Login:</span>
                                 <span className="text-foreground">{formatLastLogin(client?.lastLoginAt)}</span>
                               </div>
                               <div>
-                                <span className="text-muted-foreground block mb-1">Online Status:</span>
+                                <span className="text-muted-foreground block mb-1">Online, Status:</span>
                                 <Badge
                                   variant="outline"
                                   className={getOnlineStatusBadge(
@@ -1182,11 +1173,11 @@ export default function ClientDetailPage() {
                                 <span className="text-foreground">{formatValue(data.phoneOwner)}</span>
                               </div>
                               <div>
-                                <span className="text-muted-foreground block mb-1">Date of Birth:</span>
+                                <span className="text-muted-foreground block mb-1">Date of, Birth:</span>
                                 <span className="text-foreground">{formatValue(data.birthday)}</span>
                               </div>
                               <div>
-                                <span className="text-muted-foreground block mb-1">T-Shirt Size:</span>
+                                <span className="text-muted-foreground block mb-1">T-Shirt, Size:</span>
                                 <span className="text-foreground">{formatValue(data.tshirtSize)}</span>
                               </div>
                               <div>
@@ -1198,15 +1189,15 @@ export default function ClientDetailPage() {
                                 <span className="text-foreground">{formatValue(data.representative)}</span>
                               </div>
                               <div>
-                                <span className="text-muted-foreground block mb-1">How Did You Hear About Us:</span>
+                                <span className="text-muted-foreground block mb-1">How Did You Hear About, Us:</span>
                                 <span className="text-foreground">{formatValue(data.heardAboutUs)}</span>
                               </div>
                               <div>
-                                <span className="text-muted-foreground block mb-1">Emergency Contact Name:</span>
+                                <span className="text-muted-foreground block mb-1">Emergency Contact, Name:</span>
                                 <span className="text-foreground">{formatValue(data.emergencyContactName)}</span>
                               </div>
                               <div>
-                                <span className="text-muted-foreground block mb-1">Emergency Contact Phone:</span>
+                                <span className="text-muted-foreground block mb-1">Emergency Contact, Phone:</span>
                                 <span className="text-foreground">{formatValue(data.emergencyContactPhone)}</span>
                               </div>
                             </div>
@@ -1217,9 +1208,9 @@ export default function ClientDetailPage() {
                             <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                               Address Information
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                               <div className="md:col-span-2">
-                                <span className="text-muted-foreground block mb-1">Street Address:</span>
+                                <span className="text-muted-foreground block mb-1">Street, Address:</span>
                                 <span className="text-foreground">{formatValue(data.streetAddress)}</span>
                               </div>
                               <div>
@@ -1231,11 +1222,11 @@ export default function ClientDetailPage() {
                                 <span className="text-foreground">{formatValue(data.state)}</span>
                               </div>
                               <div>
-                                <span className="text-muted-foreground block mb-1">Zip Code:</span>
+                                <span className="text-muted-foreground block mb-1">Zip, Code:</span>
                                 <span className="text-foreground">{formatValue(data.zipCode)}</span>
                               </div>
                               <div className="md:col-span-2">
-                                <span className="text-muted-foreground block mb-1">Full Address:</span>
+                                <span className="text-muted-foreground block mb-1">Full, Address:</span>
                                 <span className="text-foreground">
                                   {formatAddress(data.city, data.state, data.zipCode)}
                                 </span>
@@ -1247,12 +1238,12 @@ export default function ClientDetailPage() {
                           <div className="bg-card p-4 rounded-lg border border-primary/20">
                             <div className="flex items-center justify-between mb-4 pb-2 border-b border-primary/30">
                               <h3 className="text-lg font-semibold text-primary">
-                                Banking Information (ACH)
+                                Banking, Information(ACH)
                               </h3>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="text-primary border-primary/30 hover:bg-primary/10"
+                                className="text-primary border-primary/30, hover:bg-primary/10"
                                 onClick={() => {
                                   setEditingBankingInfo(null);
                                   setIsBankingModalOpen(true);
@@ -1273,14 +1264,14 @@ export default function ClientDetailPage() {
                                   >
                                     <div className="flex items-start justify-between mb-3">
                                       <div className="flex items-center gap-2">
-                                        <h4 className="text-foreground font-medium">
+                                        <h4 className="text-foreground font-medium`>
                                           {bankInfo.banking_info_car_id && (bankInfo.car_make || bankInfo.car_specs)
                                             ? `${[bankInfo.car_make, bankInfo.car_specs].filter(Boolean).join(" ")}${
-                                                bankInfo.car_year ? ` ${bankInfo.car_year}` : ""
+                                                bankInfo.car_year ? ` ${bankInfo.car_year}` : ``
                                               }${
                                                 bankInfo.car_plate_number
                                                   ? ` - #${bankInfo.car_plate_number}`
-                                                  : ""
+                                                  : `"
                                               }`
                                             : "Default Banking Info"}
                                         </h4>
@@ -1297,7 +1288,7 @@ export default function ClientDetailPage() {
                                         <Button
                                           size="sm"
                                           variant="ghost"
-                                          className="text-muted-foreground hover:text-primary h-8 w-8 p-0"
+                                          className="text-muted-foreground, hover:text-primary h-8 w-8 p-0"
                                           onClick={() => {
                                             setEditingBankingInfo(bankInfo);
                                             setIsBankingModalOpen(true);
@@ -1308,7 +1299,7 @@ export default function ClientDetailPage() {
                                         <Button
                                           size="sm"
                                           variant="ghost"
-                                          className="text-muted-foreground hover:text-red-700 h-8 w-8 p-0"
+                                          className="text-muted-foreground, hover:text-red-700 h-8 w-8 p-0"
                                           onClick={() =>
                                             setDeletingBankingId(bankInfo.banking_info_aid)
                                           }
@@ -1317,34 +1308,34 @@ export default function ClientDetailPage() {
                                         </Button>
                                       </div>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                    <div className="grid grid-cols-1, md:grid-cols-2 gap-3 text-sm">
                                       <div>
-                                        <span className="text-muted-foreground block mb-1">Bank Name:</span>
+                                        <span className="text-muted-foreground block mb-1">Bank, Name:</span>
                                         <span className="text-foreground">
                                           {formatValue(bankInfo.banking_info_bank_name)}
                                         </span>
                                       </div>
                                       <div>
-                                        <span className="text-muted-foreground block mb-1">Tax Classification:</span>
+                                        <span className="text-muted-foreground block mb-1">Tax, Classification:</span>
                                         <span className="text-foreground">
                                           {formatValue(bankInfo.banking_info_tax_classification)}
                                         </span>
                                       </div>
                                       <div>
-                                        <span className="text-muted-foreground block mb-1">Routing Number:</span>
+                                        <span className="text-muted-foreground block mb-1">Routing, Number:</span>
                                         <span className="text-foreground font-mono">
                                           {formatValue(bankInfo.banking_info_routing_number)}
                                         </span>
                                       </div>
                                       <div>
-                                        <span className="text-muted-foreground block mb-1">Account Number:</span>
+                                        <span className="text-muted-foreground block mb-1">Account, Number:</span>
                                         <span className="text-foreground font-mono">
                                           {formatValue(bankInfo.banking_info_account_number)}
                                         </span>
                                       </div>
                                       {bankInfo.banking_info_business_name && (
                                         <div>
-                                          <span className="text-muted-foreground block mb-1">Business Name:</span>
+                                          <span className="text-muted-foreground block mb-1">Business, Name:</span>
                                           <span className="text-foreground">
                                             {formatValue(bankInfo.banking_info_business_name)}
                                           </span>
@@ -1387,7 +1378,7 @@ export default function ClientDetailPage() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="text-primary border-primary/30 hover:bg-primary/10"
+                                className="text-primary border-primary/30, hover:bg-primary/10"
                                 onClick={() => setIsUploadContractOpen(true)}
                               >
                                 <Upload className="w-4 h-4 mr-2" />
@@ -1399,7 +1390,7 @@ export default function ClientDetailPage() {
                                 {client.signedContracts.map((contract, index) => (
                                   <div
                                     key={contract.id ?? index}
-                                    className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card border border-primary/10 rounded-lg p-4"
+                                    className="flex flex-col, md:flex-row, md:items-center justify-between gap-4 bg-card border border-primary/10 rounded-lg p-4"
                                   >
                                     <div className="space-y-1 text-sm">
                                       <div className="text-foreground font-medium">
@@ -1419,7 +1410,7 @@ export default function ClientDetailPage() {
                                         </span>
                                       </div>
                                       <div className="text-muted-foreground">
-                                        Signed on:{" "}
+                                        Signed, on:{" "}
                                         <span className="text-foreground">
                                           {formatDate(contract.contractSignedAt || contract.createdAt)}
                                         </span>
@@ -1428,16 +1419,16 @@ export default function ClientDetailPage() {
                                     <div className="flex items-center gap-3">
                                       <Badge
                                         variant="outline"
-                                        className="border-green-500/50 text-green-700 bg-green-500/10"
+                                        className="border-green-500/50 text-green-700 bg-green-500/10`
                                       >
                                         Signed
                                       </Badge>
                                       {contract.signedContractUrl && (
                                         <a
                                           href={buildApiUrl(`/api/contracts/${contract.id}/view`)}
-                                          target="_blank"
+                                          target=`_blank"
                                           rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/80 transition-colors"
+                                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground, hover:bg-primary/80 transition-colors"
                                         >
                                           <Eye className="w-4 h-4" />
                                           View
@@ -1458,16 +1449,16 @@ export default function ClientDetailPage() {
                       );
                     })()
                   ) : (
-                    // Show basic client info when no onboarding data exists (manually created client)
+                    // Show basic client info when no onboarding data, exists(manually created client)
                     <>
                       {/* Basic Client Information */}
                       <div className="bg-card p-4 rounded-lg border border-primary/20">
                         <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                           Personal Information
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                           <div>
-                            <span className="text-muted-foreground block mb-1">Full Name:</span>
+                            <span className="text-muted-foreground block mb-1">Full, Name:</span>
                             <span className="text-foreground font-medium">
                               {client.firstName} {client.lastName}
                             </span>
@@ -1498,17 +1489,17 @@ export default function ClientDetailPage() {
                           <div>
                             <span className="text-muted-foreground block mb-1">Created:</span>
                             <span className="text-foreground">
-                              {new Date(client.createdAt).toLocaleDateString()}
+                              {new, Date(client.createdAt).toLocaleDateString()}
                             </span>
                           </div>
                           <div>
-                            <span className="text-muted-foreground block mb-1">Last Login:</span>
+                            <span className="text-muted-foreground block mb-1">Last, Login:</span>
                             <span className="text-foreground">
                               {formatLastLogin(client.lastLoginAt)}
                             </span>
                           </div>
                           <div>
-                            <span className="text-muted-foreground block mb-1">Online Status:</span>
+                            <span className="text-muted-foreground block mb-1">Online, Status:</span>
                             {!client ? (
                               <span className="text-muted-foreground">N/A</span>
                             ) : onlineStatusBadge ? (
@@ -1525,29 +1516,29 @@ export default function ClientDetailPage() {
                         </div>
                       </div>
 
-                      {/* Banking Information (legacy fallback, only if no ACH records) */}
+                      {/* Banking, Information(legacy fallback, only if no ACH records) */}
                       {(!bankingInfoData || bankingInfoData.length === 0) &&
                         (client.bankName || client.bankRoutingNumber || client.bankAccountNumber) && (
                           <div className="bg-card p-4 rounded-lg border border-primary/20">
                             <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                               Banking Information
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                               {client.bankName && (
                                 <div>
-                                  <span className="text-muted-foreground block mb-1">Bank Name:</span>
+                                  <span className="text-muted-foreground block mb-1">Bank, Name:</span>
                                   <span className="text-foreground">{client.bankName}</span>
                                 </div>
                               )}
                               {client.bankRoutingNumber && (
                                 <div>
-                                  <span className="text-muted-foreground block mb-1">Routing Number:</span>
+                                  <span className="text-muted-foreground block mb-1">Routing, Number:</span>
                                   <span className="text-foreground font-mono">{client.bankRoutingNumber}</span>
                                 </div>
                               )}
                               {client.bankAccountNumber && (
                                 <div>
-                                  <span className="text-muted-foreground block mb-1">Account Number:</span>
+                                  <span className="text-muted-foreground block mb-1">Account, Number:</span>
                                   <span className="text-foreground font-mono">{client.bankAccountNumber}</span>
                                 </div>
                               )}
@@ -1564,7 +1555,7 @@ export default function ClientDetailPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="text-primary border-primary/30 hover:bg-primary/10"
+                            className="text-primary border-primary/30, hover:bg-primary/10"
                             onClick={() => setIsUploadContractOpen(true)}
                           >
                             <Upload className="w-4 h-4 mr-2" />
@@ -1576,7 +1567,7 @@ export default function ClientDetailPage() {
                             {client.signedContracts.map((contract, index) => (
                               <div
                                 key={contract.id ?? index}
-                                className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card border border-primary/10 rounded-lg p-4"
+                                className="flex flex-col, md:flex-row, md:items-center justify-between gap-4 bg-card border border-primary/10 rounded-lg p-4"
                               >
                                 <div className="space-y-1 text-sm">
                                   <div className="text-foreground font-medium">
@@ -1590,10 +1581,10 @@ export default function ClientDetailPage() {
                                     VIN: <span className="text-foreground font-mono text-xs">{contract.vinNumber || "N/A"}</span>
                                   </div>
                                   <div className="text-muted-foreground">
-                                    Signed on:{" "}
+                                    Signed, on:{" "}
                                     <span className="text-foreground">
                                       {contract.contractSignedAt
-                                        ? new Date(contract.contractSignedAt).toLocaleString()
+                                        ? new, Date(contract.contractSignedAt).toLocaleString()
                                         : "N/A"}
                                     </span>
                                   </div>
@@ -1601,16 +1592,16 @@ export default function ClientDetailPage() {
                                 <div className="flex items-center gap-3">
                                   <Badge
                                     variant="outline"
-                                    className="border-green-500/50 text-green-700 bg-green-500/10"
+                                    className="border-green-500/50 text-green-700 bg-green-500/10`
                                   >
                                     Signed
                                   </Badge>
                                   {contract.signedContractUrl && (
                                     <a
                                       href={buildApiUrl(`/api/contracts/${contract.id}/view`)}
-                                      target="_blank"
+                                      target=`_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/80 transition-colors"
+                                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground, hover:bg-primary/80 transition-colors"
                                     >
                                       <Eye className="w-4 h-4" />
                                       View
@@ -1644,13 +1635,13 @@ export default function ClientDetailPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-primary text-xl">
-                      Assigned Cars ({client.cars.length})
+                      Assigned, Cars({client.cars.length})
                     </CardTitle>
                     <Button
                       onClick={() => setIsAddCarOpen(true)}
                       variant="outline"
                       size="sm"
-                      className="text-primary border-primary/30 hover:bg-primary/10"
+                      className="text-primary border-primary/30, hover:bg-primary/10"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Add Car
@@ -1667,7 +1658,7 @@ export default function ClientDetailPage() {
                     <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
-                          <TableRow className="border-border hover:bg-transparent">
+                          <TableRow className="border-border, hover:bg-transparent">
                             <TableHead className="text-center text-foreground font-medium px-4 py-3 w-12">#</TableHead>
                             <TableHead className="text-center text-foreground font-medium px-4 py-3">Status</TableHead>
                             <TableHead className="text-center text-foreground font-medium px-4 py-3">Stats</TableHead>
@@ -1682,7 +1673,7 @@ export default function ClientDetailPage() {
                             <TableHead className="text-center text-foreground font-medium px-4 py-3">Tire Size</TableHead>
                             <TableHead className="text-center text-foreground font-medium px-4 py-3">Oil Type</TableHead>
                             <TableHead className="text-center text-foreground font-medium px-4 py-3">Turo Link</TableHead>
-                            <TableHead className="text-center text-foreground font-medium px-4 py-3">Admin Turo Link</TableHead>
+                            <TableHead className="text-center text-foreground font-medium px-4 py-3`>Admin Turo Link</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -1691,12 +1682,12 @@ export default function ClientDetailPage() {
                             const ownerFullName = car.owner 
                               ? `${car.owner.firstName || ''} ${car.owner.lastName || ''}`.trim()
                               : '';
-                            const managementValue = ownerFullName === "Jay Barton" ? "Own" : "Manage";
+                            const managementValue = ownerFullName === `Jay Barton" ? "Own" : "Manage";
 
                             return (
                             <TableRow
                               key={car.id}
-                              className="border-border hover:bg-muted/50/50 transition-colors"
+                              className="border-border, hover:bg-muted/50/50 transition-colors"
                             >
                               <TableCell className="text-center text-primary px-4 py-3 align-middle">
                                 {index + 1}
@@ -1715,14 +1706,14 @@ export default function ClientDetailPage() {
                                   </Badge>
                                 </div>
                               </TableCell>
-                              <TableCell className="text-center px-4 py-3 align-middle">
+                              <TableCell className="text-center px-4 py-3 align-middle`>
                                 <a
                                   href={`/admin/view-car/${car.id}`}
                                   onClick={(e) => {
                                     e.preventDefault();
                                     setLocation(`/admin/view-car/${car.id}`);
                                   }}
-                                  className="text-blue-700 hover:underline"
+                                  className=`text-blue-700, hover:underline"
                                 >
                                   View Stats
                                 </a>
@@ -1762,7 +1753,7 @@ export default function ClientDetailPage() {
                                   <a
                                     href="#"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="text-blue-700 hover:underline"
+                                    className="text-blue-700, hover:underline"
                                   >
                                     <ExternalLink className="w-4 h-4" />
                                   </a>
@@ -1772,7 +1763,7 @@ export default function ClientDetailPage() {
                                 <a
                                   href="#"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="text-blue-700 hover:underline"
+                                  className="text-blue-700, hover:underline"
                                 >
                                   <ExternalLink className="w-4 h-4" />
                                 </a>
@@ -1796,7 +1787,7 @@ export default function ClientDetailPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:bg-muted/50EAEB80]/20"
+                      className="text-primary, hover:bg-muted/50EAEB80]/20"
                       onClick={() => {
                         // Export functionality
                         console.log("Export totals");
@@ -1808,7 +1799,7 @@ export default function ClientDetailPage() {
                   </div>
                   
                   {/* Filters */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                  <div className="grid grid-cols-1, md:grid-cols-4 gap-4 mt-4">
                     <Select value={selectedCar} onValueChange={setSelectedCar}>
                       <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="Car" />
@@ -1876,7 +1867,7 @@ export default function ClientDetailPage() {
                     <Accordion type="multiple" className="w-full space-y-2">
                   {/* CAR MANAGEMENT AND CAR OWNER SPLIT */}
                       <AccordionItem value="split" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
+                        <AccordionTrigger className="px-4 py-3, hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
@@ -1887,13 +1878,13 @@ export default function ClientDetailPage() {
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Car Management Split</span>
-                              <span className="text-foreground font-medium">
+                              <span className="text-foreground font-medium`>
                                 ${totals?.carManagementSplit?.toFixed(2) || "0.00"}
                               </span>
                   </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Car Owner Split</span>
-                              <span className="text-foreground font-medium">
+                              <span className="text-foreground font-medium`>
                                 ${totals?.carOwnerSplit?.toFixed(2) || "0.00"}
                               </span>
                             </div>
@@ -1902,8 +1893,8 @@ export default function ClientDetailPage() {
                       </AccordionItem>
 
                   {/* INCOME */}
-                      <AccordionItem value="income" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
+                      <AccordionItem value=`income" className="border border-border rounded-lg overflow-hidden bg-card">
+                        <AccordionTrigger className="px-4 py-3, hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
@@ -1914,71 +1905,71 @@ export default function ClientDetailPage() {
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Rental Income</span>
-                              <span className="text-foreground">${totals?.income?.rentalIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.rentalIncome?.toFixed(2) || "0.00"}</span>
                       </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Delivery Income</span>
-                              <span className="text-foreground">${totals?.income?.deliveryIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.deliveryIncome?.toFixed(2) || "0.00"}</span>
                   </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Electric Prepaid Income</span>
-                              <span className="text-foreground">${totals?.income?.electricPrepaidIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.electricPrepaidIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Smoking Fines</span>
-                              <span className="text-foreground">${totals?.income?.smokingFines?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.smokingFines?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Gas Prepaid Income</span>
-                              <span className="text-foreground">${totals?.income?.gasPrepaidIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.gasPrepaidIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Miles Income</span>
-                              <span className="text-foreground">${totals?.income?.milesIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.milesIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Ski Racks Income</span>
-                              <span className="text-foreground">${totals?.income?.skiRacksIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.skiRacksIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Child Seat Income</span>
-                              <span className="text-foreground">${totals?.income?.childSeatIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.childSeatIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Coolers Income</span>
-                              <span className="text-foreground">${totals?.income?.coolersIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.coolersIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Income Insurance and Client Wrecks</span>
-                              <span className="text-foreground">${totals?.income?.incomeInsurance?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.incomeInsurance?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Other Income</span>
-                              <span className="text-foreground">${totals?.income?.otherIncome?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.otherIncome?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Negative Balance Carry Over</span>
-                              <span className="text-foreground">${totals?.income?.negativeBalance?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.income?.negativeBalance?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm pt-2 border-t border-border">
+                            <div className=`flex justify-between text-muted-foreground text-sm pt-2 border-t border-border">
                               <span className="font-medium">Car Management Total Expenses</span>
-                              <span className="text-foreground font-semibold">
+                              <span className="text-foreground font-semibold`>
                                 ${totals?.income?.carManagementTotalExpenses?.toFixed(2) || "0.00"}
                               </span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span className="font-medium">Car Owner Total Expenses</span>
-                              <span className="text-foreground font-semibold">
+                              <span className="text-foreground font-semibold`>
                                 ${totals?.income?.carOwnerTotalExpenses?.toFixed(2) || "0.00"}
                               </span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span className="font-medium">Car Payment</span>
-                              <span className="text-foreground font-semibold">
+                              <span className="text-foreground font-semibold`>
                                 ${totals?.income?.carPayment?.toFixed(2) || "0.00"}
                               </span>
                             </div>
-                            <div className="flex justify-between text-primary text-sm font-bold pt-2 border-t border-border">
+                            <div className=`flex justify-between text-primary text-sm font-bold pt-2 border-t border-border`>
                               <span>Total Expenses</span>
                               <span>${totals?.income?.totalExpenses?.toFixed(2) || "0.00"}</span>
                             </div>
@@ -1987,82 +1978,82 @@ export default function ClientDetailPage() {
                       </AccordionItem>
 
                   {/* OPERATING EXPENSES */}
-                      <AccordionItem value="expenses" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
+                      <AccordionItem value=`expenses" className="border border-border rounded-lg overflow-hidden bg-card">
+                        <AccordionTrigger className="px-4 py-3, hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                            <span className="text-foreground font-medium">OPERATING EXPENSES (COGS - Per Vehicle)</span>
+                            <span className="text-foreground font-medium">OPERATING, EXPENSES(COGS - Per Vehicle)</span>
                         </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 bg-background">
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-muted-foreground text-sm">
                               <span>Auto Body Shop / Wreck</span>
-                              <span className="text-foreground">${totals?.expenses?.autoBodyShop?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.autoBodyShop?.toFixed(2) || "0.00"}</span>
                       </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Alignment</span>
-                              <span className="text-foreground">${totals?.expenses?.alignment?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.alignment?.toFixed(2) || "0.00"}</span>
                   </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Battery</span>
-                              <span className="text-foreground">${totals?.expenses?.battery?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.battery?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Brakes</span>
-                              <span className="text-foreground">${totals?.expenses?.brakes?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.brakes?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Car Payment</span>
-                              <span className="text-foreground">${totals?.expenses?.carPayment?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.carPayment?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Car Insurance</span>
-                              <span className="text-foreground">${totals?.expenses?.carInsurance?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.carInsurance?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Car Seats</span>
-                              <span className="text-foreground">${totals?.expenses?.carSeats?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.carSeats?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Cleaning Supplies / Tools</span>
-                              <span className="text-foreground">${totals?.expenses?.cleaningSupplies?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.cleaningSupplies?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Emissions</span>
-                              <span className="text-foreground">${totals?.expenses?.emissions?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.emissions?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>GPS System</span>
-                              <span className="text-foreground">${totals?.expenses?.gpsSystem?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.gpsSystem?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Keys & Fob</span>
-                              <span className="text-foreground">${totals?.expenses?.keysFob?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.keysFob?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Labor - Cleaning</span>
-                              <span className="text-foreground">${totals?.expenses?.laborDetailing?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.laborDetailing?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Parking Airport (Reimbursed - GLA - Client Owner Rentals)</span>
-                              <span className="text-foreground">${totals?.expenses?.parkingAirport?.toFixed(2) || "0.00"}</span>
+                            <div className=`flex justify-between text-muted-foreground text-sm">
+                              <span>Parking, Airport(Reimbursed - GLA - Client Owner Rentals)</span>
+                              <span className="text-foreground`>${totals?.expenses?.parkingAirport?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Uber/Lyft/Lime - Not Reimbursed</span>
-                              <span className="text-foreground">${totals?.expenses?.uberNotReimbursed?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.uberNotReimbursed?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Uber/Lyft/Lime - Reimbursed</span>
-                              <span className="text-foreground">${totals?.expenses?.uberReimbursed?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.uberReimbursed?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>Gas - Service Run</span>
-                              <span className="text-foreground">${totals?.expenses?.gasServiceRun?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.expenses?.gasServiceRun?.toFixed(2) || "0.00"}</span>
                             </div>
-                            <div className="flex justify-between text-primary text-sm font-bold pt-2 border-t border-border">
-                              <span>Total Operating Expenses (COGS - Per Vehicle)</span>
+                            <div className=`flex justify-between text-primary text-sm font-bold pt-2 border-t border-border`>
+                              <span>Total Operating, Expenses(COGS - Per Vehicle)</span>
                               <span>${totals?.expenses?.totalOperatingExpenses?.toFixed(2) || "0.00"}</span>
                             </div>
                           </div>
@@ -2070,8 +2061,8 @@ export default function ClientDetailPage() {
                       </AccordionItem>
 
                   {/* GLA PARKING FEE & LABOR CLEANING */}
-                      <AccordionItem value="gla" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
+                      <AccordionItem value=`gla" className="border border-border rounded-lg overflow-hidden bg-card">
+                        <AccordionTrigger className="px-4 py-3, hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
@@ -2082,13 +2073,13 @@ export default function ClientDetailPage() {
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-muted-foreground text-sm">
                               <span>GLA Labor - Cleaning</span>
-                              <span className="text-foreground">${totals?.gla?.laborCleaning?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.gla?.laborCleaning?.toFixed(2) || "0.00"}</span>
                       </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
+                            <div className=`flex justify-between text-muted-foreground text-sm">
                               <span>GLA Parking Fee</span>
-                              <span className="text-foreground">${totals?.gla?.parkingFee?.toFixed(2) || "0.00"}</span>
+                              <span className="text-foreground`>${totals?.gla?.parkingFee?.toFixed(2) || "0.00"}</span>
                   </div>
-                            <div className="flex justify-between text-primary text-sm font-bold pt-2 border-t border-border">
+                            <div className=`flex justify-between text-primary text-sm font-bold pt-2 border-t border-border`>
                               <span>Total GLA Parking Fee & Labor Cleaning</span>
                               <span>${totals?.gla?.total?.toFixed(2) || "0.00"}</span>
                             </div>
@@ -2097,8 +2088,8 @@ export default function ClientDetailPage() {
                       </AccordionItem>
 
                   {/* HISTORY OF THE CARS */}
-                      <AccordionItem value="history" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
+                      <AccordionItem value=`history" className="border border-border rounded-lg overflow-hidden bg-card">
+                        <AccordionTrigger className="px-4 py-3, hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
@@ -2121,7 +2112,7 @@ export default function ClientDetailPage() {
 
                   {/* PAYMENT HISTORY */}
                       <AccordionItem value="payments" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
+                        <AccordionTrigger className="px-4 py-3, hover:bg-muted transition-colors [&>svg]:hidden">
                           <div className="flex items-center gap-2 w-full">
                             <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                             <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
@@ -2132,7 +2123,7 @@ export default function ClientDetailPage() {
                           <div className="space-y-2 pt-2">
                             <div className="flex justify-between text-muted-foreground text-sm">
                               <span>{fromYear} - {toYear}</span>
-                              <span className="text-foreground font-semibold">
+                              <span className="text-foreground font-semibold`>
                                 ${totals?.payments?.total?.toFixed(2) || "0.00"}
                               </span>
                       </div>
@@ -2145,14 +2136,14 @@ export default function ClientDetailPage() {
               </Card>
             )}
 
-            {activeSection === "maintenance" && (
+            {activeSection === `maintenance" && (
               <Card className="bg-background border-border">
                 <CardHeader>
                   <CardTitle className="text-primary text-xl">Car Maintenance</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Filters */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1, md:grid-cols-3 gap-4">
                     <Select value={maintenanceTypeFilter} onValueChange={setMaintenanceTypeFilter}>
                       <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue placeholder="Select a Type" />
@@ -2190,7 +2181,7 @@ export default function ClientDetailPage() {
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
-                        <TableRow className="border-border hover:bg-transparent">
+                        <TableRow className="border-border, hover:bg-transparent">
                           <TableHead className="text-center text-foreground font-medium px-4 py-3 w-12">#</TableHead>
                           <TableHead className="text-left text-foreground font-medium px-4 py-3">Make</TableHead>
                           <TableHead className="text-left text-foreground font-medium px-4 py-3">Model</TableHead>
@@ -2241,7 +2232,7 @@ export default function ClientDetailPage() {
               <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
                 Personal Information
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                 <div>
                   <Label className="text-muted-foreground">First Name</Label>
                   <Input
@@ -2375,7 +2366,7 @@ export default function ClientDetailPage() {
               <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
                 Address Information
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <Label className="text-muted-foreground">Street Address</Label>
                   <Input
@@ -2411,12 +2402,12 @@ export default function ClientDetailPage() {
               </div>
             </div>
 
-            {/* Banking Information (ACH) */}
+            {/* Banking, Information(ACH) */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
-                Banking Information (ACH)
+                Banking, Information(ACH)
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                 <div>
                   <Label className="text-muted-foreground">Bank Name</Label>
                   <Input
@@ -2490,14 +2481,14 @@ export default function ClientDetailPage() {
                 type="button"
                 variant="outline"
                 onClick={() => setIsEditModalOpen(false)}
-                className="border-border text-muted-foreground hover:bg-muted/50"
+                className="border-border text-muted-foreground, hover:bg-muted/50"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={updateMutation.isPending}
-                className="bg-primary text-primary-foreground hover:bg-primary/80"
+                className="bg-primary text-primary-foreground, hover:bg-primary/80"
               >
                 {updateMutation.isPending ? "Saving..." : "Save Changes"}
               </Button>
@@ -2534,8 +2525,8 @@ export default function ClientDetailPage() {
             <div>
               <Label className="text-muted-foreground">Select Car *</Label>
               {(() => {
-                // Filter out cars that have already been onboarded (have a signed contract)
-                const onboardedVins = new Set(
+                // Filter out cars that have already been, onboarded(have a signed contract)
+                const onboardedVins = new, Set(
                   (data?.data?.signedContracts || [])
                     .map((contract: any) => contract.vinNumber?.toUpperCase().trim())
                     .filter((vin: string) => vin)
@@ -2572,7 +2563,7 @@ export default function ClientDetailPage() {
                       <SelectContent className="bg-card border-border text-foreground">
                         {nonOnboardedCars.map((car: any) => (
                           <SelectItem key={car.id} value={car.id.toString()}>
-                            {car.make || "N/A"} {car.model || ""} {car.year ? `(${car.year})` : ""} - VIN: {car.vin || "N/A"}
+                            {car.make || "N/A"} {car.model || "`} {car.year ? `(${car.year})` : `"} - VIN: {car.vin || "N/A"}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -2603,10 +2594,10 @@ export default function ClientDetailPage() {
                     }
                   }}
                   className="block w-full text-sm text-muted-foreground
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-md file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-primary file:text-primary-foreground
+                    file:mr-4, file:py-2, file:px-4
+                    file:rounded-md, file:border-0
+                    file:text-sm, file:font-semibold
+                    file:bg-primary, file:text-primary-foreground
                     hover:file:bg-primary/90
                     file:cursor-pointer
                     cursor-pointer
@@ -2621,7 +2612,7 @@ export default function ClientDetailPage() {
                 {uploadContractFormErrors.contractFile && (
                   <p className="text-xs text-muted-foreground mt-1">{uploadContractFormErrors.contractFile}</p>
                 )}
-                <p className="text-xs text-gray-500 mt-1">Upload a PDF file from your local device (max 10MB)</p>
+                <p className="text-xs text-gray-500 mt-1">Upload a PDF file from your local, device(max 10MB)</p>
               </div>
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-border">
@@ -2629,14 +2620,14 @@ export default function ClientDetailPage() {
                 type="button"
                 variant="outline"
                 onClick={() => setIsUploadContractOpen(false)}
-                className="border-border text-muted-foreground hover:bg-muted/50"
+                className="border-border text-muted-foreground, hover:bg-muted/50"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={uploadContractMutation.isPending}
-                className="bg-primary text-primary-foreground hover:bg-primary/80"
+                className="bg-primary text-primary-foreground, hover:bg-primary/80"
               >
                 {uploadContractMutation.isPending ? "Uploading..." : "Upload Contract"}
               </Button>
@@ -2678,8 +2669,7 @@ export default function ClientDetailPage() {
                   onChange={(e) => {
                     const value = e.target.value.toUpperCase().slice(0, 17);
                     setAddCarForm({ ...addCarForm, vin: value });
-                    // Clear error when user types
-                    if (addCarFormErrors.vin) {
+                    // Clear error when user types, if(addCarFormErrors.vin) {
                       setAddCarFormErrors({ ...addCarFormErrors, vin: undefined });
                     }
                   }}
@@ -3016,7 +3006,7 @@ export default function ClientDetailPage() {
                       "Toll Pass",
                       "Wheelchair Accessible",
                     ].map((feature) => (
-                      <div key={feature} className="flex items-center space-x-3">
+                      <div key={feature} className="flex items-center space-x-3`>
                         <Checkbox
                           id={`feature-${feature}`}
                           checked={addCarForm.vehicleFeatures.includes(feature)}
@@ -3028,11 +3018,11 @@ export default function ClientDetailPage() {
                               setAddCarForm({ ...addCarForm, vehicleFeatures: currentValue.filter((f) => f !== feature) });
                             }
                           }}
-                          className="border-border"
+                          className=`border-border`
                         />
                         <Label
                           htmlFor={`feature-${feature}`}
-                          className="text-muted-foreground text-sm font-normal cursor-pointer"
+                          className=`text-muted-foreground text-sm font-normal cursor-pointer"
                         >
                           {feature}
                         </Label>
@@ -3100,7 +3090,7 @@ export default function ClientDetailPage() {
                   />
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">Interest Rate (%)</Label>
+                  <Label className="text-muted-foreground">Interest, Rate(%)</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -3243,14 +3233,14 @@ export default function ClientDetailPage() {
                 type="button"
                 variant="outline"
                 onClick={() => setIsAddCarOpen(false)}
-                className="border-border text-muted-foreground hover:bg-muted/50"
+                className="border-border text-muted-foreground, hover:bg-muted/50"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={addCarMutation.isPending}
-                className="bg-primary text-primary-foreground hover:bg-primary/80"
+                className="bg-primary text-primary-foreground, hover:bg-primary/80"
               >
                 {addCarMutation.isPending ? "Adding..." : "Add Car"}
               </Button>
@@ -3287,7 +3277,7 @@ export default function ClientDetailPage() {
             <Button
               variant="outline"
               onClick={() => setDeletingBankingId(null)}
-              className="border-border text-muted-foreground hover:bg-card"
+              className="border-border text-muted-foreground, hover:bg-card"
             >
               Cancel
             </Button>
@@ -3298,7 +3288,7 @@ export default function ClientDetailPage() {
                 }
               }}
               disabled={deleteBankingInfoMutation.isPending}
-              className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground hover:bg-red-500/30 text-red-700"
+              className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground, hover:bg-red-500/30 text-red-700"
             >
               {deleteBankingInfoMutation.isPending ? "Deleting..." : "Delete"}
             </Button>

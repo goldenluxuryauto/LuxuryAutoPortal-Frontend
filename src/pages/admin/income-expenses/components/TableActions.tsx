@@ -25,7 +25,7 @@ interface TableActionsProps {
   car: any;
 }
 
-export default function TableActions({
+export default function, TableActions({
   selectedYear,
   setSelectedYear,
   carId,
@@ -37,8 +37,8 @@ export default function TableActions({
   const { data, monthModes, year, dynamicSubcategories, skiRacksOwner } = useIncomeExpense();
   const queryClient = useQueryClient();
   
-  // Get current year and generate year options (from 2019 to current year + 2 years)
-  const currentYear = new Date().getFullYear();
+  // Get current year and generate year, options(from 2019 to current year + 2 years)
+  const currentYear = new, Date().getFullYear();
   const startYear = 2019;
   const endYear = currentYear + 2;
   const yearOptions = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
@@ -53,11 +53,11 @@ export default function TableActions({
     success: boolean;
     data: IncomeExpenseData;
   }>({
-    queryKey: ["/api/income-expense", carId, previousYear],
+    queryKey: ["/api/income-expense`, carId, previousYear],
     queryFn: async () => {
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/income-expense/${carId}/${previousYear}`),
-        { credentials: "include" }
+        { credentials: `include" }
       );
       if (!response.ok) {
         return { success: true, data: null as any };
@@ -68,14 +68,14 @@ export default function TableActions({
     enabled: !!carId && !!selectedYear,
   });
 
-  // Fetch previous year's dynamic subcategories separately (they might not be in the main API response)
+  // Fetch previous year's dynamic subcategories, separately(they might not be in the main API response)
   const { data: prevYearDynamicSubcategories } = useQuery<{
     directDelivery: any[];
     cogs: any[];
     parkingFeeLabor: any[];
     reimbursedBills: any[];
   }>({
-    queryKey: ["/api/income-expense/dynamic-subcategories", carId, previousYear],
+    queryKey: ["/api/income-expense/dynamic-subcategories`, carId, previousYear],
     queryFn: async () => {
       if (!carId || !previousYear) return { directDelivery: [], cogs: [], parkingFeeLabor: [], reimbursedBills: [] };
       
@@ -88,9 +88,9 @@ export default function TableActions({
       
       const promises = categories.map(async (categoryType) => {
         try {
-          const response = await fetch(
+          const response = await, fetch(
             buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${previousYear}/${categoryType}`),
-            { credentials: "include" }
+            { credentials: `include` }
           );
           if (response.ok) {
             const result = await response.json();
@@ -132,7 +132,7 @@ export default function TableActions({
     }
     exportAllIncomeExpenseData(data, car, selectedYear, monthModes, dynamicSubcategories, prevYearDataForExport, skiRacksOwner);
     toast({
-      title: "Export Successful",
+      title: `Export Successful`,
       description: `CSV file downloaded for ${car?.makeModel || 'car'} (${selectedYear})`,
     });
   };
@@ -140,7 +140,7 @@ export default function TableActions({
   const handleImportFile = async () => {
     if (!importFile) {
       toast({
-        title: "No File Selected",
+        title: `No File Selected",
         description: "Please select a CSV file to import",
         variant: "destructive",
       });
@@ -154,11 +154,11 @@ export default function TableActions({
       const parsed = parseImportedCSV(fileContent);
 
       if (!parsed.success) {
-        throw new Error(parsed.error || "Failed to parse CSV");
+        throw new, Error(parsed.error || "Failed to parse CSV");
       }
 
       // Send parsed data to backend
-      const response = await fetch(buildApiUrl("/api/income-expense/import"), {
+      const response = await, fetch(buildApiUrl("/api/income-expense/import"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -171,7 +171,7 @@ export default function TableActions({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Import failed");
+        throw new, Error(error.message || "Import failed");
       }
 
       // Refresh data
@@ -188,7 +188,7 @@ export default function TableActions({
       toast({
         title: "Import Failed",
         description: error.message || "Failed to import data",
-        variant: "destructive",
+        variant: "destructive`,
       });
     } finally {
       setIsImporting(false);
@@ -214,7 +214,7 @@ Coolers Income,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Income insurance and Client Wrecks,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Other Income,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 ,,,,,,,,,,,,
-OPERATING EXPENSE (Direct Delivery),,,,,,,,,,,,
+OPERATING, EXPENSE(Direct Delivery),,,,,,,,,,,,
 Category,Jan-${selectedYear.slice(-2)},Feb-${selectedYear.slice(-2)},Mar-${selectedYear.slice(-2)},Apr-${selectedYear.slice(-2)},May-${selectedYear.slice(-2)},Jun-${selectedYear.slice(-2)},Jul-${selectedYear.slice(-2)},Aug-${selectedYear.slice(-2)},Sep-${selectedYear.slice(-2)},Oct-${selectedYear.slice(-2)},Nov-${selectedYear.slice(-2)},Dec-${selectedYear.slice(-2)}
 Labor - Cleaning,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Labor - Delivery,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
@@ -222,7 +222,7 @@ Parking - Airport,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0
 Parking - Lot,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Uber/Lyft/Lime,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 ,,,,,,,,,,,,
-OPERATING EXPENSE (COGS - Per Vehicle),Jan-${selectedYear.slice(-2)},Feb-${selectedYear.slice(-2)},Mar-${selectedYear.slice(-2)},Apr-${selectedYear.slice(-2)},May-${selectedYear.slice(-2)},Jun-${selectedYear.slice(-2)},Jul-${selectedYear.slice(-2)},Aug-${selectedYear.slice(-2)},Sep-${selectedYear.slice(-2)},Oct-${selectedYear.slice(-2)},Nov-${selectedYear.slice(-2)},Dec-${selectedYear.slice(-2)}
+OPERATING, EXPENSE(COGS - Per Vehicle),Jan-${selectedYear.slice(-2)},Feb-${selectedYear.slice(-2)},Mar-${selectedYear.slice(-2)},Apr-${selectedYear.slice(-2)},May-${selectedYear.slice(-2)},Jun-${selectedYear.slice(-2)},Jul-${selectedYear.slice(-2)},Aug-${selectedYear.slice(-2)},Sep-${selectedYear.slice(-2)},Oct-${selectedYear.slice(-2)},Nov-${selectedYear.slice(-2)},Dec-${selectedYear.slice(-2)}
 Auto Body Shop / Wreck,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Alignment,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
 Battery,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00,$0.00
@@ -267,7 +267,7 @@ Days Rented,0,0,0,0,0,0,0,0,0,0,0,0
 Cars Available For Rent,10,1,1,1,1,1,1,1,1,1,1,1
 Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
 
-    const blob = new Blob([templateContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new, Blob([templateContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     const fileName = `Income and Expenses Import Template ${selectedYear}.csv`;
@@ -281,14 +281,14 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
     URL.revokeObjectURL(url);
     
     toast({
-      title: "Template Downloaded",
+      title: `Template Downloaded`,
       description: `Template file downloaded for ${selectedYear}`,
     });
   };
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className=`flex items-center gap-2">
         {/* Year Selector */}
         <Select value={selectedYear} onValueChange={setSelectedYear}>
           <SelectTrigger className="w-[120px] bg-card border-border text-foreground text-sm">
@@ -309,7 +309,7 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
             onClick={() => setIsImportModalOpen(true)}
             variant="outline"
             size="sm"
-            className="border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+            className="border-border text-muted-foreground, hover:text-foreground, hover:bg-muted"
           >
             <Upload className="w-4 h-4 mr-2" />
             Import
@@ -322,7 +322,7 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
             onClick={handleDownloadTemplate}
             variant="outline"
             size="sm"
-            className="border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+            className="border-border text-muted-foreground, hover:text-foreground, hover:bg-muted"
           >
             <FileText className="w-4 h-4 mr-2" />
             Download Template
@@ -334,7 +334,7 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
           onClick={handleExportCSV}
           variant="outline"
           size="sm"
-          className="border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+          className="border-border text-muted-foreground, hover:text-foreground, hover:bg-muted"
         >
           <Download className="w-4 h-4 mr-2" />
           Export CSV
@@ -345,7 +345,7 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
           onClick={handleViewLog}
           variant="outline"
           size="sm"
-          className="border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+          className="border-border text-muted-foreground, hover:text-foreground, hover:bg-muted"
         >
           <History className="w-4 h-4 mr-2" />
           Log
@@ -371,11 +371,11 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
                 accept=".csv"
                 onChange={(e) => setImportFile(e.target.files?.[0] || null)}
                 className="w-full text-sm text-muted-foreground
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-md file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-primary file:text-primary-foreground
-                  hover:file:bg-primary/90 file:cursor-pointer"
+                  file:mr-4, file:py-2, file:px-4
+                  file:rounded-md, file:border-0
+                  file:text-sm, file:font-semibold
+                  file:bg-primary, file:text-primary-foreground
+                  hover:file:bg-primary/90, file:cursor-pointer"
               />
               {importFile && (
                 <p className="text-sm text-muted-foreground mt-2">
@@ -385,12 +385,12 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
             </div>
 
             <div className="bg-card border border-border rounded-lg p-4">
-              <h4 className="text-foreground font-medium mb-2">What will be imported:</h4>
+              <h4 className="text-foreground font-medium mb-2">What will be, imported:</h4>
               <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                <li>Car Management Owner Split (with mode settings)</li>
+                <li>Car Management Owner, Split(with mode settings)</li>
                 <li>Income & Expenses (all income categories)</li>
-                <li>Operating Expense (Direct Delivery)</li>
-                <li>Operating Expense (COGS – Per Vehicle)</li>
+                <li>Operating, Expense(Direct Delivery)</li>
+                <li>Operating, Expense(COGS – Per Vehicle)</li>
                 <li>Parking Fee & Labor Cleaning</li>
                 <li>Reimburse and Non-Reimburse Bills</li>
                 <li>History (days rented, trips, etc.)</li>
@@ -408,14 +408,14 @@ Trips Taken,0,0,0,0,0,0,0,0,0,0,0,0`;
                 setImportFile(null);
               }}
               variant="outline"
-              className="flex-1 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+              className="flex-1 border-border text-muted-foreground, hover:text-foreground, hover:bg-muted"
               disabled={isImporting}
             >
               Cancel
             </Button>
             <Button
               onClick={handleImportFile}
-              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/80"
+              className="flex-1 bg-primary text-primary-foreground, hover:bg-primary/80"
               disabled={!importFile || isImporting}
             >
               {isImporting ? "Importing..." : "Import Data"}

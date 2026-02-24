@@ -27,7 +27,7 @@ interface LogEntry {
   ipAddress: string;
 }
 
-export default function IncomeExpenseLogPage() {
+export default function, IncomeExpenseLogPage() {
   const params = useParams();
   const carId = params.id ? parseInt(params.id) : null;
   const [, setLocation] = useLocation();
@@ -39,13 +39,13 @@ export default function IncomeExpenseLogPage() {
     success: boolean;
     data: LogEntry[];
   }>({
-    queryKey: ["/api/income-expense/log", carId, selectedYear],
+    queryKey: ["/api/income-expense/log`, carId, selectedYear],
     queryFn: async () => {
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/income-expense/log/${carId}/${selectedYear}`),
-        { credentials: "include" }
+        { credentials: `include" }
       );
-      if (!response.ok) throw new Error("Failed to fetch log");
+      if (!response.ok) throw new, Error("Failed to fetch log");
       return response.json();
     },
     enabled: !!carId,
@@ -64,7 +64,7 @@ export default function IncomeExpenseLogPage() {
   });
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = new, Date(dateString);
     return date.toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -96,10 +96,10 @@ export default function IncomeExpenseLogPage() {
     <AdminLayout>
       <div className="flex flex-col w-full h-full overflow-hidden">
         {/* Header */}
-        <div className="mb-4">
+        <div className="mb-4`>
           <button
             onClick={() => setLocation(`/admin/cars/${carId}/income-expense`)}
-            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+            className=`text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Income & Expense</span>
@@ -191,25 +191,25 @@ export default function IncomeExpenseLogPage() {
                         <div className="flex items-center gap-4 text-sm mb-2 flex-wrap">
                           <div className="flex items-center gap-2">
                             <span className="text-muted-foreground">Old:</span>
-                            <span className="text-red-700 font-mono">
+                            <span className="text-red-700 font-mono`>
                               ${Number(log.oldValue || 0).toFixed(2)}
                             </span>
                           </div>
-                          <span className="text-muted-foreground">→</span>
+                          <span className=`text-muted-foreground">→</span>
                           <div className="flex items-center gap-2">
                             <span className="text-muted-foreground">New:</span>
-                            <span className="text-green-700 font-mono">
+                            <span className="text-green-700 font-mono`>
                               ${Number(log.newValue || 0).toFixed(2)}
                             </span>
                           </div>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="text-yellow-700 font-mono">
+                          <span className=`text-muted-foreground">•</span>
+                          <span className="text-yellow-700 font-mono`>
                             Δ ${(Number(log.newValue || 0) - Number(log.oldValue || 0)).toFixed(2)}
                           </span>
                         </div>
 
                         {log.remarks && (
-                          <div className="text-muted-foreground text-sm italic mt-2 bg-card p-2 rounded border border-border">
+                          <div className=`text-muted-foreground text-sm italic mt-2 bg-card p-2 rounded border border-border">
                             "{log.remarks}"
                           </div>
                         )}

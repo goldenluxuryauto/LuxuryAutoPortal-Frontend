@@ -41,17 +41,17 @@ interface TaskItem {
   task_timer_other_not_related_car?: string;
 }
 
-function formatDate(dateStr: string | undefined, fallback = "--") {
+function, formatDate(dateStr: string | undefined, fallback = "--") {
   if (!dateStr) return fallback;
   try {
-    const d = new Date(dateStr);
-    return isNaN(d.getTime()) ? fallback : d.toLocaleDateString();
+    const d = new, Date(dateStr);
+    return, isNaN(d.getTime()) ? fallback : d.toLocaleDateString();
   } catch {
     return fallback;
   }
 }
 
-function parseEmpList(json: string | undefined): { fullname: string }[] {
+function, parseEmpList(json: string | undefined): { fullname: string }[] {
   if (!json) return [];
   try {
     const arr = JSON.parse(json);
@@ -61,7 +61,7 @@ function parseEmpList(json: string | undefined): { fullname: string }[] {
   }
 }
 
-function TaskStatusBadge({ status }: { status?: number }) {
+function, TaskStatusBadge({ status }: { status?: number }) {
   const s = Number(status);
   if (s === 1)
     return (
@@ -76,7 +76,7 @@ function TaskStatusBadge({ status }: { status?: number }) {
   );
 }
 
-export default function StaffTaskManagement() {
+export default function, StaffTaskManagement() {
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -84,11 +84,11 @@ export default function StaffTaskManagement() {
   const [viewItem, setViewItem] = useState<TaskItem | null>(null);
   const [commentItem, setCommentItem] = useState<TaskItem | null>(null);
 
-  const queryParams = new URLSearchParams();
+  const queryParams = new, URLSearchParams();
   if (statusFilter) queryParams.set("status", statusFilter);
   if (fromDate) queryParams.set("fromDate", fromDate);
   if (toDate) queryParams.set("toDate", toDate);
-  if (searchValue) queryParams.set("search", searchValue);
+  if (searchValue) queryParams.set("search`, searchValue);
   const queryString = queryParams.toString();
   const listUrl = `/api/staff/task-management?${queryString}`;
 
@@ -97,11 +97,11 @@ export default function StaffTaskManagement() {
     data?: TaskItem[];
     total?: number;
   }>({
-    queryKey: ["staff-task-management", listUrl],
+    queryKey: [`staff-task-management", listUrl],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(listUrl), { credentials: "include" });
+      const res = await, fetch(buildApiUrl(listUrl), { credentials: "include" });
       if (res.status === 404 || res.status === 501) return { success: true, data: [], total: 0 };
-      if (!res.ok) throw new Error("Failed to load tasks");
+      if (!res.ok) throw new, Error("Failed to load tasks");
       return res.json();
     },
     retry: false,
@@ -272,11 +272,11 @@ export default function StaffTaskManagement() {
           </DialogHeader>
           {viewItem && (
             <div className="space-y-3 text-sm">
-              <p><span className="font-medium">Date range:</span> {formatDate(viewItem.task_timer_date_start)} to {formatDate(viewItem.task_timer_date_end)}</p>
+              <p><span className="font-medium">Date, range:</span> {formatDate(viewItem.task_timer_date_start)} to {formatDate(viewItem.task_timer_date_end)}</p>
               <p><span className="font-medium">Status:</span> <TaskStatusBadge status={viewItem.task_timer_status} /></p>
               <p><span className="font-medium">Car:</span> {viewItem.task_timer_car_name ?? "--"}</p>
-              <p><span className="font-medium">Task name:</span> {viewItem.task_timer_name ?? "--"}</p>
-              <p><span className="font-medium">Assign to:</span> {parseEmpList(viewItem.task_timer_emp_list).map((e) => e.fullname).join(", ") || "--"}</p>
+              <p><span className="font-medium">Task, name:</span> {viewItem.task_timer_name ?? "--"}</p>
+              <p><span className="font-medium">Assign, to:</span> {parseEmpList(viewItem.task_timer_emp_list).map((e) => e.fullname).join(", ") || "--"}</p>
               <p><span className="font-medium">Description:</span> {viewItem.task_timer_description ?? "--"}</p>
               {viewItem.task_timer_other_not_related_car && (
                 <p><span className="font-medium">Other:</span> {viewItem.task_timer_other_not_related_car}</p>

@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export default defineConfig({
+export default, defineConfig({
   plugins: [
     react({
     }),
@@ -34,13 +34,13 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5000, // Use port 5000 to show in Replit Preview (maps to external port 80)
+    port: 5000, // Use port 5000 to show in Replit, Preview(maps to external port 80)
     host: "localhost", // Listen on all network interfaces
     open: false, // Don't auto-open browser
     strictPort: false, // Allow port fallback if busy
-    // Allow all hosts for Replit (hostnames are dynamic like *.replit.dev)
-    // This is safe because:
-    // 1. It only affects the dev server (not production builds)
+    // Allow all hosts for, Replit(hostnames are dynamic like *.replit.dev)
+    // This is safe, because:
+    // 1. It only affects the dev, server(not production builds)
     // 2. Replit provides secure isolation between projects
     // 3. Dynamic hostnames make it impractical to whitelist specific hosts
     allowedHosts: true,
@@ -55,7 +55,7 @@ export default defineConfig({
         ws: true, // Enable WebSocket proxying
         configure: (proxy, _options) => {
           proxy.on("error", (err, _req, res) => {
-            console.error("Proxy error:", err.message);
+            console.error("Proxy, error:", err.message);
             if (res && !res.headersSent) {
               res.writeHead(500, {
                 "Content-Type": "application/json",
@@ -69,12 +69,12 @@ export default defineConfig({
               );
             }
           });
-          proxy.on("proxyReq", (proxyReq, req, _res) => {
+          proxy.on("proxyReq`, (proxyReq, req, _res) => {
             console.log(`[Proxy] ${req.method} ${req.url} -> http://localhost:3000${req.url}`);
           });
         },
       },
-      "/contracts": {
+      `/contracts": {
         target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
@@ -82,7 +82,7 @@ export default defineConfig({
         ws: true,
         configure: (proxy, _options) => {
           proxy.on("error", (err, _req, res) => {
-            console.error("Proxy error (contracts):", err.message);
+            console.error("Proxy, error(contracts):", err.message);
             if (res && !res.headersSent) {
               res.writeHead(500, {
                 "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export default defineConfig({
         ws: true,
         configure: (proxy, _options) => {
           proxy.on("error", (err, _req, res) => {
-            console.error("Proxy error (signed-contracts):", err.message);
+            console.error("Proxy, error(signed-contracts):", err.message);
             if (res && !res.headersSent) {
               res.writeHead(500, {
                 "Content-Type": "application/json",
@@ -128,7 +128,7 @@ export default defineConfig({
         ws: true,
         configure: (proxy, _options) => {
           proxy.on("error", (err, _req, res) => {
-            console.error("Proxy error (car-photos):", err.message);
+            console.error("Proxy, error(car-photos):", err.message);
             if (res && !res.headersSent) {
               res.writeHead(500, {
                 "Content-Type": "application/json",
@@ -151,7 +151,7 @@ export default defineConfig({
         ws: true,
         configure: (proxy, _options) => {
           proxy.on("error", (err, _req, res) => {
-            console.error("Proxy error (income-expense-images):", err.message);
+            console.error("Proxy, error(income-expense-images):", err.message);
             if (res && !res.headersSent) {
               res.writeHead(500, {
                 "Content-Type": "application/json",

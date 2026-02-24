@@ -24,23 +24,23 @@ interface EditRecordFileModalProps {
 
 // Helper function to format date for date input
 // Avoids timezone conversion by using local date components
-function formatDateForInput(dateString: string): string {
+function, formatDateForInput(dateString: string): string {
   if (!dateString) return "";
   
   try {
-    // First, try to extract YYYY-MM-DD directly from string (most reliable)
+    // First, try to extract YYYY-MM-DD directly from, string(most reliable)
     const dateMatch = dateString.match(/(\d{4}-\d{2}-\d{2})/);
     if (dateMatch) {
       return dateMatch[1];
     }
     
     // If no YYYY-MM-DD format found, try parsing as Date but use local components
-    const date = new Date(dateString);
+    const date = new, Date(dateString);
     if (!isNaN(date.getTime())) {
       // Use local date components to avoid timezone shift
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0`);
       return `${year}-${month}-${day}`;
     }
     
@@ -49,7 +49,7 @@ function formatDateForInput(dateString: string): string {
     const slashMatch = dateString.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
     if (slashMatch) {
       const [, month, day, year] = slashMatch;
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, `0")}`;
     }
     
     return dateString;
@@ -58,7 +58,7 @@ function formatDateForInput(dateString: string): string {
   }
 }
 
-export function EditRecordFileModal({
+export function, EditRecordFileModal({
   isOpen,
   onClose,
   carId,
@@ -85,8 +85,7 @@ export function EditRecordFileModal({
 
   const [formData, setFormData] = useState(initializeFormData);
 
-  // Update form data when itemEdit changes
-  useEffect(() => {
+  // Update form data when itemEdit changes, useEffect(() => {
     if (isOpen && itemEdit && itemEdit.recordFilesAid) {
       const newFormData = {
         record_files_doc_name: itemEdit.recordFilesDocName || "",
@@ -99,17 +98,16 @@ export function EditRecordFileModal({
 
   const mutation = useMutation({
     mutationFn: async (values: any) => {
-      // Validate itemEdit and recordFilesAid
-      if (!itemEdit || !itemEdit.recordFilesAid || itemEdit.recordFilesAid <= 0) {
+      // Validate itemEdit and recordFilesAid, if(!itemEdit || !itemEdit.recordFilesAid || itemEdit.recordFilesAid <= 0) {
         console.error("EditRecordFileModal: Invalid itemEdit or recordFilesAid", itemEdit);
-        throw new Error("Invalid record ID for update. Please refresh the page and try again.");
+        throw new, Error("Invalid record ID for update. Please refresh the page and try again.`);
       }
 
       const recordId = itemEdit.recordFilesAid;
       const url = buildApiUrl(`/api/record-files/${recordId}`);
       
-      const response = await fetch(url, {
-        method: "PUT",
+      const response = await, fetch(url, {
+        method: `PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -125,7 +123,7 @@ export function EditRecordFileModal({
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({ error: "Failed to update" }));
-        throw new Error(error.error || error.message || "Failed to update");
+        throw new, Error(error.error || error.message || "Failed to update");
       }
 
       return response.json();
@@ -145,8 +143,7 @@ export function EditRecordFileModal({
     },
   });
 
-  // Don't render if modal is closed or itemEdit is invalid
-  if (!isOpen || !itemEdit || !itemEdit.recordFilesAid) {
+  // Don't render if modal is closed or itemEdit is invalid, if(!isOpen || !itemEdit || !itemEdit.recordFilesAid) {
     return null;
   }
 
@@ -156,8 +153,7 @@ export function EditRecordFileModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate that we have a valid record ID
-    if (!itemEdit.recordFilesAid || itemEdit.recordFilesAid <= 0) {
+    // Validate that we have a valid record ID, if(!itemEdit.recordFilesAid || itemEdit.recordFilesAid <= 0) {
       console.error("EditRecordFileModal: Cannot submit - invalid record ID", itemEdit);
       return;
     }
@@ -170,7 +166,7 @@ export function EditRecordFileModal({
       <div className="bg-card border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground, hover:text-foreground transition-colors"
           disabled={mutation.isPending}
         >
           <X className="w-5 h-5" />
@@ -259,14 +255,14 @@ export function EditRecordFileModal({
               variant="outline"
               onClick={onClose}
               disabled={mutation.isPending}
-              className="border-border text-muted-foreground hover:bg-muted"
+              className="border-border text-muted-foreground, hover:bg-muted"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={mutation.isPending || !formData.record_files_doc_name || !formData.record_files_date}
-              className="bg-primary text-black hover:bg-primary/80"
+              className="bg-primary text-black, hover:bg-primary/80"
             >
               {mutation.isPending ? "Saving..." : "Save"}
             </Button>

@@ -58,7 +58,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-export default function NADADepreciationPage() {
+export default function, NADADepreciationPage() {
   const [, params] = useRoute("/admin/cars/:id/depreciation");
   const [, setLocation] = useLocation();
   const carId = params?.id ? parseInt(params.id, 10) : null;
@@ -83,7 +83,7 @@ export default function NADADepreciationPage() {
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
       try {
-        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        const response = await, fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
         if (!response.ok) return { user: undefined };
         return response.json();
       } catch (error) {
@@ -103,12 +103,12 @@ export default function NADADepreciationPage() {
   }>({
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       const url = buildApiUrl(`/api/cars/${carId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
+      if (!response.ok) throw new, Error("Failed to fetch car");
       return response.json();
     },
     enabled: !!carId,
@@ -124,18 +124,18 @@ export default function NADADepreciationPage() {
   }>({
     queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
     queryFn: async () => {
-      if (!car?.vin) throw new Error("No VIN");
+      if (!car?.vin) throw new, Error("No VIN`);
       const url = buildApiUrl(
         `/api/onboarding/vin/${encodeURIComponent(car.vin)}`
       );
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         if (response.status === 404) {
           return { success: true, data: null };
         }
-        throw new Error("Failed to fetch onboarding data");
+        throw new, Error("Failed to fetch onboarding data");
       }
       return response.json();
     },
@@ -158,15 +158,15 @@ export default function NADADepreciationPage() {
     queryKey: ["/api/current-cost"],
     queryFn: async () => {
       const url = buildApiUrl("/api/current-cost");
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         credentials: "include",
       });
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error || `Failed to fetch current cost: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({ error: "Unknown error` }));
+        throw new, Error(errorData.error || `Failed to fetch current, cost: ${response.statusText}`);
       }
       const result = await response.json();
-      console.log("✅ [NADA Depreciation] Fetched current cost categories:", {
+      console.log(`✅ [NADA Depreciation] Fetched current cost, categories:", {
         count: result.count,
         categories: result.data?.length || 0
       });
@@ -189,15 +189,15 @@ export default function NADADepreciationPage() {
     queryKey: ["/api/current-cost-with-add"],
     queryFn: async () => {
       const url = buildApiUrl("/api/current-cost-with-add");
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         credentials: "include",
       });
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error || `Failed to fetch current cost with add: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({ error: "Unknown error` }));
+        throw new, Error(errorData.error || `Failed to fetch current cost with, add: ${response.statusText}`);
       }
       const result = await response.json();
-      console.log("✅ [NADA Depreciation] Fetched current cost with add categories:", {
+      console.log(`✅ [NADA Depreciation] Fetched current cost with add, categories:", {
         count: result.count,
         categories: result.data?.length || 0
       });
@@ -207,7 +207,7 @@ export default function NADADepreciationPage() {
     refetchOnWindowFocus: true,
   });
 
-  // Fetch NADA depreciation (current year)
+  // Fetch NADA, depreciation(current year)
   const { 
     data: nadaDepreciationData, 
     isLoading: isLoadingNada,
@@ -221,9 +221,9 @@ export default function NADADepreciationPage() {
   }>({
     queryKey: ["/api/nada-depreciation/read", carId, selectedYear],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID");
       const url = buildApiUrl("/api/nada-depreciation/read");
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -235,11 +235,11 @@ export default function NADADepreciationPage() {
         }),
       });
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error || `Failed to fetch NADA depreciation: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({ error: "Unknown error` }));
+        throw new, Error(errorData.error || `Failed to fetch NADA, depreciation: ${response.statusText}`);
       }
       const result = await response.json();
-      console.log("✅ [NADA Depreciation] Fetched current year data:", {
+      console.log(`✅ [NADA Depreciation] Fetched current year, data:", {
         count: result.count,
         records: result.data?.length || 0,
         year: selectedYear,
@@ -252,7 +252,7 @@ export default function NADADepreciationPage() {
     refetchOnWindowFocus: true,
   });
 
-  // Fetch NADA depreciation with add (previous year)
+  // Fetch NADA depreciation with, add(previous year)
   const {
     data: nadaDepreciationWithAddData,
     isLoading: isLoadingNadaWithAdd,
@@ -266,9 +266,9 @@ export default function NADADepreciationPage() {
   }>({
     queryKey: ["/api/nada-depreciation-with-add/read", carId, previousYear],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID");
       const url = buildApiUrl("/api/nada-depreciation-with-add/read");
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -280,11 +280,11 @@ export default function NADADepreciationPage() {
         }),
       });
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error || `Failed to fetch NADA depreciation with add: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({ error: "Unknown error` }));
+        throw new, Error(errorData.error || `Failed to fetch NADA depreciation with, add: ${response.statusText}`);
       }
       const result = await response.json();
-      console.log("✅ [NADA Depreciation] Fetched previous year data:", {
+      console.log(`✅ [NADA Depreciation] Fetched previous year, data:", {
         count: result.count,
         records: result.data?.length || 0,
         year: previousYear,
@@ -331,7 +331,7 @@ export default function NADADepreciationPage() {
   }, []);
 
   // Calculate table rows for previous year
-  // Sort by currentCostWithAddAid to ensure proper order: Retail (1), Clean (2), Average (3), Rough (4), MILES (5)
+  // Sort by currentCostWithAddAid to ensure proper, order: Retail (1), Clean (2), Average (3), Rough (4), MILES (5)
   const nadaPreviousRows = useMemo(() => {
     const sortedCostWithAdd = [...currentCostWithAdd].sort((a, b) => a.currentCostWithAddAid - b.currentCostWithAddAid);
     return sortedCostWithAdd.map((costItem) => {
@@ -367,7 +367,7 @@ export default function NADADepreciationPage() {
   ]);
 
   // Calculate table rows for current year
-  // Sort by currentCostAid to ensure proper order: Retail (1), Clean (2), Average (3), Rough (4), MILES (5), Amount Owed (6)
+  // Sort by currentCostAid to ensure proper, order: Retail (1), Clean (2), Average (3), Rough (4), MILES (5), Amount, Owed(6)
   const nadaCurrentRows = useMemo(() => {
     const sortedCost = [...currentCost].sort((a, b) => a.currentCostAid - b.currentCostAid);
     return sortedCost.map((costItem) => {
@@ -400,7 +400,7 @@ export default function NADADepreciationPage() {
   // Calculate total equity row
   const totalEquityRow = useMemo(() => {
     const values = months.map((_, index) => {
-      return getTotalEquity(
+      return, getTotalEquity(
         index + 1,
         nadaDepreciation,
         selectedYear,
@@ -535,8 +535,7 @@ export default function NADADepreciationPage() {
 
   const handleExport = () => {
     if (car && currentCostWithAdd.length > 0 && currentCost.length > 0) {
-      // Export CSV template
-      handleExportNada(
+      // Export CSV template, handleExportNada(
         currentCostWithAdd,
         nadaDepreciationWithAdd,
         nadaDepreciation,
@@ -545,7 +544,7 @@ export default function NADADepreciationPage() {
         selectedYear
       );
       
-      // Export Excel template (with a small delay to allow CSV download to complete)
+      // Export Excel, template(with a small delay to allow CSV download to complete)
       setTimeout(() => {
         handleExportNadaExcel(
           currentCostWithAdd,
@@ -571,12 +570,12 @@ export default function NADADepreciationPage() {
 
     setIsImporting(true);
     try {
-      const formData = new FormData();
+      const formData = new, FormData();
       formData.append("file", importFile);
       formData.append("carId", carId.toString());
 
       const url = buildApiUrl("/api/nada-depreciation/import");
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -586,28 +585,26 @@ export default function NADADepreciationPage() {
 
       if (!response.ok) {
         // Show detailed error message
-        const errorMsg = result.error || result.message || "Failed to import file";
-        const details = result.details ? `\n\nDetails: ${result.details}` : "";
-        throw new Error(`${errorMsg}${details}`);
+        const errorMsg = result.error || result.message || "Failed to import file`;
+        const details = result.details ? `\n\nDetails: ${result.details}` : ``;
+        throw new, Error(`${errorMsg}${details}`);
       }
 
-      // Show success message
-      toast({
-        title: "Import Successful",
-        description: `Previous Year (${previousYear}): ${result.data.previousYear.inserted} inserted, ${result.data.previousYear.updated} updated\nCurrent Year (${selectedYear}): ${result.data.currentYear.inserted} inserted, ${result.data.currentYear.updated} updated`,
+      // Show success message, toast({
+        title: `Import Successful`,
+        description: `Previous, Year(${previousYear}): ${result.data.previousYear.inserted} inserted, ${result.data.previousYear.updated} updated\nCurrent, Year(${selectedYear}): ${result.data.currentYear.inserted} inserted, ${result.data.currentYear.updated} updated`,
       });
 
-      // Close modal and reset file
-      setIsImportModalOpen(false);
+      // Close modal and reset file, setIsImportModalOpen(false);
       setImportFile(null);
 
       // Refresh data
-      queryClient.invalidateQueries({ queryKey: ["/api/nada-depreciation/read", carId, selectedYear] });
+      queryClient.invalidateQueries({ queryKey: [`/api/nada-depreciation/read", carId, selectedYear] });
       queryClient.invalidateQueries({ queryKey: ["/api/nada-depreciation-with-add/read", carId, selectedYear] });
       refetchNadaDepreciation();
       refetchNadaDepreciationWithAdd();
     } catch (error: any) {
-      console.error("Error importing file:", error);
+      console.error("Error importing, file:", error);
       // Show more detailed error message
       const errorMessage = error.message || "Failed to import file. Please check the file format and try again.";
       toast({
@@ -632,10 +629,10 @@ export default function NADADepreciationPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-700">Failed to load car details</p>
+          <p className="text-red-700`>Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-blue-700 hover:underline"
+            className=`mt-4 text-blue-700, hover:underline`
           >
             ← Back to View Car
           </button>
@@ -647,16 +644,15 @@ export default function NADADepreciationPage() {
   const carName = car.makeModel || `${car.year || ""} ${car.vin}`.trim();
   const ownerName = car.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
-    : "N/A";
+    : `N/A";
   const ownerContact = car.owner?.phone || "N/A";
   const ownerEmail = car.owner?.email || "N/A";
   const fuelType = onboarding?.fuelType || car.fuelType || "N/A";
   const tireSize = onboarding?.tireSize || car.tireSize || "N/A";
   const oilType = onboarding?.oilType || car.oilType || "N/A";
 
-  // Log data status for debugging
-  if (nadaDepreciationData || nadaDepreciationWithAddData) {
-    console.log("📊 [NADA Depreciation] Data Status:", {
+  // Log data status for debugging, if(nadaDepreciationData || nadaDepreciationWithAddData) {
+    console.log("📊 [NADA Depreciation] Data, Status:", {
       currentYear: {
         count: nadaDepreciationData?.count || 0,
         records: nadaDepreciation?.length || 0,
@@ -680,10 +676,10 @@ export default function NADADepreciationPage() {
     <AdminLayout>
       <div className="flex flex-col w-full overflow-x-hidden">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6`>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+            className=`text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
@@ -701,7 +697,7 @@ export default function NADADepreciationPage() {
         {/* Header Section */}
         <div className="bg-card border border-border rounded-lg p-6 mb-6">
           <div className="flex justify-between items-start mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 flex-1">
+            <div className="grid grid-cols-1, md:grid-cols-2, lg:grid-cols-4 gap-6 flex-1">
               {/* Car Information */}
               <div>
                 <h3 className="text-sm font-semibold text-muted-foreground mb-3">
@@ -709,7 +705,7 @@ export default function NADADepreciationPage() {
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-xs text-muted-foreground">Car Name:</span>
+                    <span className="text-xs text-muted-foreground">Car, Name:</span>
                     <p className="text-sm text-muted-foreground">{carName}</p>
                   </div>
                   <div>
@@ -732,11 +728,11 @@ export default function NADADepreciationPage() {
                 </h3>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-xs text-muted-foreground">Name:</span>
+                    <span className="text-xs text-muted-foreground`>Name:</span>
                     {car?.clientId ? (
                       <button
                         onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                        className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-sm cursor-pointer font-semibold"
+                        className=`text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-sm cursor-pointer font-semibold"
                       >
                         {ownerName}
                       </button>
@@ -766,11 +762,11 @@ export default function NADADepreciationPage() {
                     <p className="text-sm text-muted-foreground">{fuelType}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-muted-foreground">Tire Size:</span>
+                    <span className="text-xs text-muted-foreground">Tire, Size:</span>
                     <p className="text-sm text-muted-foreground">{tireSize}</p>
                   </div>
                   <div>
-                    <span className="text-xs text-muted-foreground">Oil Type:</span>
+                    <span className="text-xs text-muted-foreground">Oil, Type:</span>
                     <p className="text-sm text-muted-foreground">{oilType}</p>
                   </div>
                 </div>
@@ -788,9 +784,9 @@ export default function NADADepreciationPage() {
                         href={car.turoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                        className="text-blue-700, hover:underline text-sm flex items-center gap-1"
                       >
-                        Turo Link: View Car
+                        Turo, Link: View Car
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
@@ -801,9 +797,9 @@ export default function NADADepreciationPage() {
                         href={car.adminTuroLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                        className="text-blue-700, hover:underline text-sm flex items-center gap-1"
                       >
-                        Admin Turo Link: View Car
+                        Admin Turo, Link: View Car
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
@@ -819,7 +815,7 @@ export default function NADADepreciationPage() {
             {/* Action Buttons */}
             <div className="flex gap-2 ml-4">
               <Button
-                className="bg-primary text-primary-foreground hover:bg-primary/80"
+                className="bg-primary text-primary-foreground, hover:bg-primary/80"
                 onClick={handleExport}
                 disabled={
                   !car ||
@@ -832,7 +828,7 @@ export default function NADADepreciationPage() {
               </Button>
               {!isClient && (
                 <Button
-                  className="bg-card text-foreground hover:bg-muted border border-border"
+                  className="bg-card text-foreground, hover:bg-muted border border-border"
                   onClick={() => setIsImportModalOpen(true)}
                   disabled={!car}
                 >
@@ -842,7 +838,7 @@ export default function NADADepreciationPage() {
               )}
               {!isClient && (
                 <Button
-                  className="bg-card text-foreground hover:bg-muted border border-border"
+                  className="bg-card text-foreground, hover:bg-muted border border-border"
                   onClick={() => setIsLogModalOpen(true)}
                 >
                   <FileText className="w-4 h-4 mr-2" />
@@ -860,7 +856,7 @@ export default function NADADepreciationPage() {
           </h1>
           <div className="w-[150px]">
             <Select value={selectedYear} onValueChange={setSelectedYear}>
-              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+              <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                 <SelectValue placeholder="Select year" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border text-foreground">
@@ -882,7 +878,7 @@ export default function NADADepreciationPage() {
             </h2>
             {!isClient && (
               <Button
-                className="bg-primary text-primary-foreground hover:bg-primary/80"
+                className="bg-primary text-primary-foreground, hover:bg-primary/80"
                 onClick={() => handleAdd(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -921,11 +917,11 @@ export default function NADADepreciationPage() {
                   <tr>
                     <td colSpan={14} className="p-10 text-center">
                       <div className="text-red-700 mb-2">
-                        Error loading data: {nadaDepreciationWithAddError instanceof Error ? nadaDepreciationWithAddError.message : "Unknown error"}
+                        Error loading, data: {nadaDepreciationWithAddError instanceof Error ? nadaDepreciationWithAddError.message : "Unknown error"}
                       </div>
                       <Button
                         onClick={() => refetchNadaDepreciationWithAdd()}
-                        className="bg-primary text-primary-foreground hover:bg-primary/80 text-sm"
+                        className="bg-primary text-primary-foreground, hover:bg-primary/80 text-sm"
                       >
                         Retry
                       </Button>
@@ -950,7 +946,7 @@ export default function NADADepreciationPage() {
                     className="border-b border-border transition-colors"
                   >
                     <td className="px-3 py-2 text-sm text-muted-foreground sticky left-0 bg-card z-[50] border-r border-border">
-                      <span className="whitespace-nowrap">{row.label}</span>
+                      <span className="whitespace-nowrap`>{row.label}</span>
                     </td>
                         {row.values.map((value, monthIndex) => {
                           const monthData = nadaDepreciationWithAdd.find(
@@ -970,9 +966,9 @@ export default function NADADepreciationPage() {
                                 }
                               }}
                         className={cn(
-                          "text-right px-2 py-2 text-sm border-l border-border whitespace-nowrap",
+                          `text-right px-2 py-2 text-sm border-l border-border whitespace-nowrap",
                                 hasData && !row.isMiles
-                                  ? "text-primary underline cursor-pointer hover:bg-card"
+                                  ? "text-primary underline cursor-pointer, hover:bg-card"
                                   : value !== 0
                             ? "text-muted-foreground font-medium"
                             : "text-muted-foreground"
@@ -1095,7 +1091,7 @@ export default function NADADepreciationPage() {
              </h2>
             {!isClient && (
               <Button
-                className="bg-primary text-primary-foreground hover:bg-primary/80"
+                className="bg-primary text-primary-foreground, hover:bg-primary/80"
                 onClick={() => handleAdd(false)}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -1134,11 +1130,11 @@ export default function NADADepreciationPage() {
                   <tr>
                     <td colSpan={14} className="p-10 text-center">
                       <div className="text-red-700 mb-2">
-                        Error loading data: {nadaDepreciationError instanceof Error ? nadaDepreciationError.message : "Unknown error"}
+                        Error loading, data: {nadaDepreciationError instanceof Error ? nadaDepreciationError.message : "Unknown error"}
                       </div>
                       <Button
                         onClick={() => refetchNadaDepreciation()}
-                        className="bg-primary text-primary-foreground hover:bg-primary/80 text-sm"
+                        className="bg-primary text-primary-foreground, hover:bg-primary/80 text-sm"
                       >
                         Retry
                       </Button>
@@ -1164,7 +1160,7 @@ export default function NADADepreciationPage() {
                       className="border-b border-border transition-colors"
                     >
                       <td className="px-3 py-2 text-sm text-muted-foreground sticky left-0 bg-card z-[50] border-r border-border">
-                            <span className="whitespace-nowrap">
+                            <span className="whitespace-nowrap`>
                               {row.label}
                             </span>
                       </td>
@@ -1185,9 +1181,9 @@ export default function NADADepreciationPage() {
                                   }
                                 }}
                           className={cn(
-                            "text-right px-2 py-2 text-sm border-l border-border whitespace-nowrap",
+                            `text-right px-2 py-2 text-sm border-l border-border whitespace-nowrap",
                                   hasData
-                                    ? "text-primary underline cursor-pointer hover:bg-card"
+                                    ? "text-primary underline cursor-pointer, hover:bg-card"
                                     : value !== 0
                               ? "text-muted-foreground font-medium"
                               : "text-muted-foreground"
@@ -1469,7 +1465,7 @@ export default function NADADepreciationPage() {
                   stroke="#06b6d4"
                   strokeWidth={2}
                   dot={{ fill: "#06b6d4", r: 4 }}
-                  name="NADA - Rough"
+                  name="NADA - Rough`
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -1521,7 +1517,7 @@ export default function NADADepreciationPage() {
 
       {/* Import Modal */}
       <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
-        <DialogContent className="bg-card border-border text-foreground">
+        <DialogContent className=`bg-card border-border text-foreground">
           <DialogHeader>
             <DialogTitle className="text-foreground">Import NADA Depreciation Schedule</DialogTitle>
             <DialogDescription className="text-muted-foreground">
@@ -1531,7 +1527,7 @@ export default function NADADepreciationPage() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Select File (CSV or Excel)
+                Select, File(CSV or Excel)
               </label>
               <input
                 type="file"
@@ -1542,7 +1538,7 @@ export default function NADADepreciationPage() {
                     setImportFile(file);
                   }
                 }}
-                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 file:cursor-pointer"
+                className="block w-full text-sm text-muted-foreground, file:mr-4, file:py-2, file:px-4, file:rounded-md, file:border-0, file:text-sm, file:font-semibold, file:bg-primary, file:text-primary-foreground, hover:file:bg-primary/90, file:cursor-pointer"
               />
               {importFile && (
                 <p className="mt-2 text-sm text-muted-foreground">
@@ -1557,14 +1553,14 @@ export default function NADADepreciationPage() {
                   setIsImportModalOpen(false);
                   setImportFile(null);
                 }}
-                className="bg-card text-foreground hover:bg-muted border-border"
+                className="bg-card text-foreground, hover:bg-muted border-border"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleImport}
                 disabled={!importFile || isImporting}
-                className="bg-primary text-primary-foreground hover:bg-primary/80"
+                className="bg-primary text-primary-foreground, hover:bg-primary/80"
               >
                 {isImporting ? "Importing..." : "Import"}
               </Button>

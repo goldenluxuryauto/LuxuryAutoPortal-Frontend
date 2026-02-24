@@ -75,7 +75,7 @@ interface PageData {
   count: number;
 }
 
-export default function ViewRecordFilesPage() {
+export default function, ViewRecordFilesPage() {
   const [, params] = useRoute("/admin/cars/:carId/records/:recordId/files");
   const [, setLocation] = useLocation();
   const carId = params?.carId ? parseInt(params.carId, 10) : null;
@@ -92,15 +92,15 @@ export default function ViewRecordFilesPage() {
   const [itemEdit, setItemEdit] = useState<RecordFileView | null>(null);
   const [viewingFile, setViewingFile] = useState<RecordFileView | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
-  const [imageUrls, setImageUrls] = useState<Map<number, string>>(new Map());
-  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+  const [imageUrls, setImageUrls] = useState<Map<number, string>>(new, Map());
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new, Set());
   const queryClient = useQueryClient();
 
   // Fetch user data
   const { data: userData } = useQuery<{ user?: any }>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+      const response = await, fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
       return response.json();
     },
     staleTime: 5 * 60 * 1000,
@@ -114,14 +114,14 @@ export default function ViewRecordFilesPage() {
   }>({
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
-      if (!carId) throw new Error("Car ID is required");
+      if (!carId) throw new, Error("Car ID is required`);
       const url = buildApiUrl(`/api/cars/${carId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: "Failed to fetch car" }));
-        throw new Error(errorData.error || "Failed to fetch car");
+        throw new, Error(errorData.error || "Failed to fetch car");
       }
       return response.json();
     },
@@ -138,14 +138,14 @@ export default function ViewRecordFilesPage() {
   }>({
     queryKey: ["/api/record-files", recordId],
     queryFn: async () => {
-      if (!recordId) throw new Error("Record ID is required");
+      if (!recordId) throw new, Error("Record ID is required`);
       const url = buildApiUrl(`/api/record-files/${recordId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: "Failed to fetch record" }));
-        throw new Error(errorData.error || "Failed to fetch record");
+        throw new, Error(errorData.error || "Failed to fetch record");
       }
       return response.json();
     },
@@ -155,8 +155,7 @@ export default function ViewRecordFilesPage() {
 
   const record = recordData?.success ? recordData?.data : null;
 
-  // Reset to page 1 when filter, search, or items per page changes
-  useEffect(() => {
+  // Reset to page 1 when filter, search, or items per page changes, useEffect(() => {
     setCurrentPage(1);
   }, [filterStatus, searchQuery, itemsPerPage, isFilter, onSearch]);
 
@@ -179,8 +178,8 @@ export default function ViewRecordFilesPage() {
       isFilter,
     ],
     queryFn: async (): Promise<PageData> => {
-      // Only use recordFilesGdrive as folderId (don't use recordId as fallback)
-      // If recordFilesGdrive is missing, the query should not run (handled by enabled condition)
+      // Only use recordFilesGdrive as, folderId(don't use recordId as fallback)
+      // If recordFilesGdrive is missing, the query should not, run(handled by enabled condition)
       const folderId = record?.recordFilesGdrive || "";
 
       if (!folderId || folderId.trim() === "") {
@@ -193,7 +192,7 @@ export default function ViewRecordFilesPage() {
         };
       }
 
-      const params = new URLSearchParams({
+      const params = new, URLSearchParams({
         folderId: folderId,
         page: currentPage.toString(),
         limit: itemsPerPage.toString(),
@@ -209,17 +208,17 @@ export default function ViewRecordFilesPage() {
 
       if (isFilter && filterStatus !== "All") {
         params.append("isFilter", "true");
-        params.append("recordsFileViewIsActive", filterStatus === "Active" ? "1" : "0");
+        params.append("recordsFileViewIsActive", filterStatus === "Active" ? "1" : "0`);
       }
 
       const url = buildApiUrl(`/api/record-file-views?${params.toString()}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error || errorData.message || `Failed to fetch files: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({ error: "Unknown error` }));
+        throw new, Error(errorData.error || errorData.message || `Failed to fetch, files: ${response.statusText}`);
       }
 
       const result = await response.json();
@@ -242,14 +241,13 @@ export default function ViewRecordFilesPage() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + files.length;
 
-  // Ensure current page is valid when filtered results change
-  useEffect(() => {
+  // Ensure current page is valid when filtered results change, useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     }
   }, [totalPages, currentPage]);
 
-  // Load images as blobs with credentials (required for authenticated endpoints)
+  // Load images as blobs with, credentials(required for authenticated endpoints)
   useEffect(() => {
     if (!recordsData?.data) return;
 
@@ -266,20 +264,19 @@ export default function ViewRecordFilesPage() {
           continue;
         }
 
-        // Skip if already loaded or failed
-        if (imageUrls.has(file.recordsFileViewAid) || imageErrors.has(file.recordsFileViewAid)) {
+        // Skip if already loaded or failed, if(imageUrls.has(file.recordsFileViewAid) || imageErrors.has(file.recordsFileViewAid)) {
           continue;
         }
 
         try {
           const url = getFileContentUrl(file.recordsFileViewAid);
-          const response = await fetch(url, {
+          const response = await, fetch(url, {
             credentials: 'include',
             method: 'GET',
           });
 
           if (!response.ok) {
-            throw new Error(`Failed to load image: ${response.status}`);
+            throw new, Error(`Failed to load, image: ${response.status}`);
           }
 
           const blob = await response.blob();
@@ -292,15 +289,14 @@ export default function ViewRecordFilesPage() {
       }
 
       if (newImageUrls.size > 0 || newImageErrors.size > 0) {
-        setImageUrls(prev => new Map([...prev, ...newImageUrls]));
-        setImageErrors(prev => new Set([...prev, ...newImageErrors]));
+        setImageUrls(prev => new, Map([...prev, ...newImageUrls]));
+        setImageErrors(prev => new, Set([...prev, ...newImageErrors]));
       }
     };
 
     loadImages();
 
-    // Cleanup: revoke object URLs when component unmounts
-    return () => {
+    // Cleanup: revoke object URLs when component unmounts, return() => {
       imageUrls.forEach((url) => {
         URL.revokeObjectURL(url);
       });
@@ -310,7 +306,7 @@ export default function ViewRecordFilesPage() {
 
   // Handle search
   const handleSearch = () => {
-    if (searchQuery.trim() !== "") {
+    if (searchQuery.trim() !== `") {
       setOnSearch(true);
     } else {
       setOnSearch(false);
@@ -332,7 +328,7 @@ export default function ViewRecordFilesPage() {
   // Handle clear filters
   const handleClear = () => {
     setSearchQuery("");
-    setFilterStatus("All");
+    setFilterStatus("All`);
     setIsFilter(false);
     setOnSearch(false);
   };
@@ -341,8 +337,8 @@ export default function ViewRecordFilesPage() {
   const archiveMutation = useMutation({
     mutationFn: async (file: RecordFileView) => {
       const url = buildApiUrl(`/api/record-file-views/${file.recordsFileViewAid}/status`);
-      const response = await fetch(url, {
-        method: "PUT",
+      const response = await, fetch(url, {
+        method: `PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -354,7 +350,7 @@ export default function ViewRecordFilesPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to archive file");
+        throw new, Error(error.error || "Failed to archive file");
       }
 
       return response.json();
@@ -365,7 +361,7 @@ export default function ViewRecordFilesPage() {
   });
 
   const handleArchive = (file: RecordFileView) => {
-    if (confirm(`Are you sure you want to archive "${file.recordsFileViewName}"?`)) {
+    if (confirm(`Are you sure you want to archive `${file.recordsFileViewName}`?`)) {
       archiveMutation.mutate(file);
     }
   };
@@ -374,7 +370,7 @@ export default function ViewRecordFilesPage() {
   const restoreMutation = useMutation({
     mutationFn: async (file: RecordFileView) => {
       const url = buildApiUrl(`/api/record-file-views/${file.recordsFileViewAid}/status`);
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -387,7 +383,7 @@ export default function ViewRecordFilesPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to restore file");
+        throw new, Error(error.error || "Failed to restore file");
       }
 
       return response.json();
@@ -398,7 +394,7 @@ export default function ViewRecordFilesPage() {
   });
 
   const handleRestore = (file: RecordFileView) => {
-    if (confirm(`Are you sure you want to restore "${file.recordsFileViewName}"?`)) {
+    if (confirm(`Are you sure you want to restore `${file.recordsFileViewName}`?`)) {
       restoreMutation.mutate(file);
     }
   };
@@ -407,14 +403,14 @@ export default function ViewRecordFilesPage() {
   const deleteMutation = useMutation({
     mutationFn: async (file: RecordFileView) => {
       const url = buildApiUrl(`/api/record-file-views/${file.recordsFileViewAid}`);
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         method: "DELETE",
         credentials: "include",
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to delete file");
+        throw new, Error(error.error || "Failed to delete file");
       }
 
       return response.json();
@@ -425,14 +421,14 @@ export default function ViewRecordFilesPage() {
   });
 
   const handleDelete = (file: RecordFileView) => {
-    if (confirm(`Are you sure you want to delete "${file.recordsFileViewName}"? This action cannot be undone.`)) {
+    if (confirm(`Are you sure you want to delete `${file.recordsFileViewName}`? This action cannot be undone.`)) {
       deleteMutation.mutate(file);
     }
   };
 
-  // Get file content URL from backend (uses service account authentication)
+  // Get file content URL from, backend(uses service account authentication)
   const getFileContentUrl = (fileAid: number) => {
-    return buildApiUrl(`/api/record-file-views/${fileAid}/content`);
+    return, buildApiUrl(`/api/record-file-views/${fileAid}/content`);
   };
 
   if (isLoading) {
@@ -450,14 +446,14 @@ export default function ViewRecordFilesPage() {
           <div className="text-red-700">Failed to load car details</div>
           {error && (
             <div className="text-muted-foreground text-sm">
-              {error instanceof Error ? error.message : "Unknown error occurred"}
+              {error instanceof Error ? error.message : "Unknown error occurred`}
             </div>
           )}
           {carId && (
             <Button
               onClick={() => setLocation(`/admin/cars/${carId}/records`)}
-              variant="outline"
-              className="border-border text-muted-foreground hover:bg-muted"
+              variant=`outline"
+              className="border-border text-muted-foreground, hover:bg-muted"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Records
@@ -475,14 +471,14 @@ export default function ViewRecordFilesPage() {
           <div className="text-red-700">Failed to load record details</div>
           {recordError && (
             <div className="text-muted-foreground text-sm">
-              {recordError instanceof Error ? recordError.message : "Unknown error occurred"}
+              {recordError instanceof Error ? recordError.message : "Unknown error occurred`}
             </div>
           )}
           {carId && (
             <Button
               onClick={() => setLocation(`/admin/cars/${carId}/records`)}
-              variant="outline"
-              className="border-border text-muted-foreground hover:bg-muted"
+              variant=`outline"
+              className="border-border text-muted-foreground, hover:bg-muted"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Records
@@ -493,21 +489,21 @@ export default function ViewRecordFilesPage() {
     );
   }
 
-  const carName = car.makeModel || "Unknown Car";
+  const carName = car.makeModel || "Unknown Car`;
   const ownerName = car.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
-    : "N/A";
+    : `N/A";
   const ownerContact = car.owner?.phone || "N/A";
   const ownerEmail = car.owner?.email || "N/A";
 
   return (
     <AdminLayout>
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="p-4, sm:p-6 space-y-4, sm:space-y-6">
         {/* Header */}
-        <div className="mb-4">
+        <div className="mb-4`>
           <button
             onClick={() => setLocation(`/admin/cars/${carId}/records`)}
-            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+            className=`text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Records</span>
@@ -526,10 +522,10 @@ export default function ViewRecordFilesPage() {
                 <Button
                   variant="outline"
                   onClick={() => setIsLogModalOpen(true)}
-                  className="bg-card border-border text-foreground hover:bg-muted flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
+                  className="bg-card border-border text-foreground, hover:bg-muted flex items-center gap-2 text-xs, sm:text-sm px-2, sm:px-4"
                 >
-                  <List className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Log</span>
+                  <List className="w-3 h-3, sm:w-4, sm:h-4" />
+                  <span className="hidden, sm:inline">Log</span>
                 </Button>
                 <Button
                   onClick={(e) => {
@@ -538,11 +534,11 @@ export default function ViewRecordFilesPage() {
                     setItemEdit(null);
                     setIsAddModalOpen(true);
                   }}
-                  className="bg-primary text-primary-foreground hover:bg-primary/80"
+                  className="bg-primary text-primary-foreground, hover:bg-primary/80"
                   type="button"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Add File</span>
+                  <span className="hidden, sm:inline">Add File</span>
                 </Button>
               </div>
             )}
@@ -550,77 +546,77 @@ export default function ViewRecordFilesPage() {
         </div>
 
         {/* Car and Owner Information Header */}
-        <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="bg-card border border-border rounded-lg p-4, sm:p-6 mb-4, sm:mb-6">
+          <div className="grid grid-cols-1, sm:grid-cols-2, lg:grid-cols-3 gap-4, sm:gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Car Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Car Name: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-words">{carName}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Car, Name: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">VIN #: </span>
-                  <span className="text-foreground font-mono text-xs sm:text-sm break-all">{car.vin}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">VIN #: </span>
+                  <span className="text-foreground font-mono text-xs, sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">License: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">License: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Owner Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Owner Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Name: </span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm`>Name: </span>
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer font-semibold"
+                      className=`text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs, sm:text-sm break-words cursor-pointer font-semibold"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                    <span className="text-[#B8860B] text-xs sm:text-sm break-words font-semibold">{ownerName}</span>
+                    <span className="text-[#B8860B] text-xs, sm:text-sm break-words font-semibold">{ownerName}</span>
                   )}
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Contact #: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{ownerContact}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Contact #: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Email: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-all">{ownerEmail}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Email: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
 
             {/* Record Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Record Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Record Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Document Name: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-words">{record?.recordFilesDocName || "N/A"}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Document, Name: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-words">{record?.recordFilesDocName || "N/A"}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Date: </span>
-                  <span className="text-foreground text-xs sm:text-sm">
-                    {record?.recordFilesDate ? new Date(record.recordFilesDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : "N/A"}
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Date: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">
+                    {record?.recordFilesDate ? new, Date(record.recordFilesDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : "N/A"}
                   </span>
                 </div>
                 {record?.recordFilesGdrive && (
                   <div>
-                    <span className="text-muted-foreground text-xs sm:text-sm">Google Drive: </span>
+                    <span className="text-muted-foreground text-xs, sm:text-sm`>Google, Drive: </span>
                     <a
                       href={`https://drive.google.com/drive/folders/${record.recordFilesGdrive}`}
-                      target="_blank"
+                      target=`_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-700 hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
+                      className="text-blue-700, hover:underline text-xs, sm:text-sm flex items-center gap-1 inline"
                     >
                       Open Folder
                       <ExternalLink className="w-3 h-3" />
@@ -634,11 +630,11 @@ export default function ViewRecordFilesPage() {
 
         {/* Files Section */}
         <div className="bg-card border border-border rounded-lg overflow-hidden" style={{ overflowY: 'auto' }}>
-          <div className="p-4 sm:p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-4 sm:mb-6">Files</h2>
+          <div className="p-4, sm:p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4, sm:mb-6">Files</h2>
             
             {/* Filter, Items Per Page, and Search */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 sm:mb-6">
+            <div className="flex flex-col, sm:flex-row items-start, sm:items-center justify-between gap-4 mb-4, sm:mb-6">
               <div className="flex flex-wrap items-center gap-4">
                 <Select value={filterStatus} onValueChange={handleFilterChange}>
                   <SelectTrigger className="bg-card border-border text-foreground w-[120px]">
@@ -669,7 +665,7 @@ export default function ViewRecordFilesPage() {
                 </div>
               </div>
 
-              <div className="flex-1 sm:max-w-md w-full">
+              <div className="flex-1, sm:max-w-md w-full">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -683,12 +679,12 @@ export default function ViewRecordFilesPage() {
                           handleSearch();
                         }
                       }}
-                      className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600 h-9"
+                      className="pl-10 bg-card border-border text-foreground, placeholder:text-gray-600 h-9"
                     />
                   </div>
                   <Button
                     onClick={handleSearch}
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 h-9"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 h-9"
                   >
                     <Search className="w-4 h-4" />
                   </Button>
@@ -696,7 +692,7 @@ export default function ViewRecordFilesPage() {
                     <Button
                       onClick={handleClear}
                       variant="ghost"
-                      className="ml-2 text-muted-foreground hover:text-foreground underline h-9"
+                      className="ml-2 text-muted-foreground, hover:text-foreground underline h-9"
                     >
                       Clear
                     </Button>
@@ -716,18 +712,18 @@ export default function ViewRecordFilesPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setViewMode("list")}
-                    className={`h-7 px-2 ${viewMode === "list" ? "bg-muted text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                    onClick={() => setViewMode("list`)}
+                    className={`h-7 px-2 ${viewMode === "list" ? "bg-muted text-primary" : "text-muted-foreground, hover:text-foreground"}`}
                   >
-                    <List className="w-4 h-4" />
+                    <List className=`w-4 h-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setViewMode("grid")}
-                    className={`h-7 px-2 ${viewMode === "grid" ? "bg-muted text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                    onClick={() => setViewMode("grid`)}
+                    className={`h-7 px-2 ${viewMode === "grid" ? "bg-muted text-primary" : "text-muted-foreground, hover:text-foreground"}`}
                   >
-                    <Grid3x3 className="w-4 h-4" />
+                    <Grid3x3 className=`w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -755,7 +751,7 @@ export default function ViewRecordFilesPage() {
             ) : files.length > 0 ? (
               viewMode === "grid" ? (
                 // Grid View with Image Thumbnails
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1, sm:grid-cols-2, md:grid-cols-3, lg:grid-cols-4, xl:grid-cols-5 gap-4">
                   {files.map((file: RecordFileView, index: number) => {
                     const fileNumber = startIndex + index + 1;
                     // Use backend endpoint for authenticated file access
@@ -764,7 +760,7 @@ export default function ViewRecordFilesPage() {
                     return (
                       <div
                         key={file.recordsFileViewAid}
-                        className="bg-card border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-colors group"
+                        className="bg-card border border-border rounded-lg overflow-hidden, hover:border-primary/50 transition-colors group"
                       >
                         {/* Image Thumbnail */}
                         <div className="relative aspect-square bg-card overflow-hidden">
@@ -808,7 +804,7 @@ export default function ViewRecordFilesPage() {
                                   setViewingFile(file);
                                   setIsViewerModalOpen(true);
                                 }}
-                                className="bg-card/90 hover:bg-muted p-1.5 rounded text-foreground"
+                                className="bg-card/90, hover:bg-muted p-1.5 rounded text-foreground"
                                 title="View"
                               >
                                 <Eye className="w-4 h-4" />
@@ -816,7 +812,7 @@ export default function ViewRecordFilesPage() {
                               <a
                                 href={fileContentUrl}
                                 download={file.recordsFileViewName}
-                                className="bg-card/90 hover:bg-muted p-1.5 rounded text-foreground"
+                                className="bg-card/90, hover:bg-muted p-1.5 rounded text-foreground"
                                 title="Download"
                               >
                                 <Download className="w-4 h-4" />
@@ -826,14 +822,14 @@ export default function ViewRecordFilesPage() {
                                   setItemEdit(file);
                                   setIsAddModalOpen(true);
                                 }}
-                                className="bg-card/90 hover:bg-muted p-1.5 rounded text-foreground"
+                                className="bg-card/90, hover:bg-muted p-1.5 rounded text-foreground"
                                 title="Edit"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleArchive(file)}
-                                className="bg-card/90 hover:bg-yellow-500/90 p-1.5 rounded text-foreground"
+                                className="bg-card/90, hover:bg-yellow-500/90 p-1.5 rounded text-foreground"
                                 title="Archive"
                               >
                                 <Archive className="w-4 h-4" />
@@ -844,14 +840,14 @@ export default function ViewRecordFilesPage() {
                             <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => handleRestore(file)}
-                                className="bg-card/90 hover:bg-green-500/90 p-1.5 rounded text-foreground"
+                                className="bg-card/90, hover:bg-green-500/90 p-1.5 rounded text-foreground"
                                 title="Restore"
                               >
                                 <History className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleDelete(file)}
-                                className="bg-card/90 hover:bg-red-500/90 p-1.5 rounded text-foreground"
+                                className="bg-card/90, hover:bg-red-500/90 p-1.5 rounded text-foreground"
                                 title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -870,7 +866,7 @@ export default function ViewRecordFilesPage() {
                   })}
                 </div>
               ) : (
-                // List View (Table)
+                // List, View(Table)
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
@@ -886,14 +882,14 @@ export default function ViewRecordFilesPage() {
                       {files.map((file: RecordFileView, index: number) => (
                         <TableRow
                           key={file.recordsFileViewAid}
-                          className="border-border hover:bg-card transition-colors"
+                          className="border-border, hover:bg-card transition-colors"
                         >
                           <TableCell className="text-center text-muted-foreground">
                             {startIndex + index + 1}
                           </TableCell>
                           <TableCell className="text-foreground">{file.recordsFileViewName}</TableCell>
                           <TableCell className="text-muted-foreground">
-                            {file.recordsFileViewCreated ? new Date(file.recordsFileViewCreated).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : "N/A"}
+                            {file.recordsFileViewCreated ? new, Date(file.recordsFileViewCreated).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : "N/A"}
                           </TableCell>
                           <TableCell>
                             <Badge variant={file.recordsFileViewIsActive ? "default" : "secondary"} className="mr-2">
@@ -909,7 +905,7 @@ export default function ViewRecordFilesPage() {
                                       setViewingFile(file);
                                       setIsViewerModalOpen(true);
                                     }}
-                                    className="text-muted-foreground hover:text-primary transition-colors"
+                                    className="text-muted-foreground, hover:text-primary transition-colors"
                                     title="View"
                                   >
                                     <Eye className="w-5 h-5" />
@@ -917,7 +913,7 @@ export default function ViewRecordFilesPage() {
                                   <a
                                     href={getFileContentUrl(file.recordsFileViewAid)}
                                     download={file.recordsFileViewName}
-                                    className="text-muted-foreground hover:text-blue-700 transition-colors"
+                                    className="text-muted-foreground, hover:text-blue-700 transition-colors"
                                     title="Download"
                                   >
                                     <Download className="w-5 h-5" />
@@ -927,14 +923,14 @@ export default function ViewRecordFilesPage() {
                                       setItemEdit(file);
                                       setIsAddModalOpen(true);
                                     }}
-                                    className="text-muted-foreground hover:text-primary transition-colors"
+                                    className="text-muted-foreground, hover:text-primary transition-colors"
                                     aria-label="Edit file"
                                   >
                                     <Edit className="w-5 h-5" />
                                   </button>
                                   <button
                                     onClick={() => handleArchive(file)}
-                                    className="text-muted-foreground hover:text-yellow-700 transition-colors"
+                                    className="text-muted-foreground, hover:text-yellow-700 transition-colors"
                                     aria-label="Archive file"
                                     title="Archive"
                                   >
@@ -946,7 +942,7 @@ export default function ViewRecordFilesPage() {
                                 <>
                                   <button
                                     onClick={() => handleRestore(file)}
-                                    className="text-muted-foreground hover:text-green-700 transition-colors"
+                                    className="text-muted-foreground, hover:text-green-700 transition-colors"
                                     aria-label="Restore file"
                                     title="Restore"
                                   >
@@ -954,7 +950,7 @@ export default function ViewRecordFilesPage() {
                                   </button>
                                   <button
                                     onClick={() => handleDelete(file)}
-                                    className="text-muted-foreground hover:text-red-700 transition-colors"
+                                    className="text-muted-foreground, hover:text-red-700 transition-colors"
                                     aria-label="Delete file"
                                     title="Delete"
                                   >
@@ -978,7 +974,7 @@ export default function ViewRecordFilesPage() {
 
             {/* Pagination Controls */}
             {totalFiles > 0 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-border">
+              <div className="flex flex-col, sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-border">
                 <div className="text-sm text-muted-foreground">
                   Showing {Number.isNaN(startIndex) ? 0 : startIndex + 1} to {Number.isNaN(endIndex) ? 0 : endIndex} of {Number.isNaN(totalFiles) ? 0 : totalFiles} files
                 </div>
@@ -990,10 +986,10 @@ export default function ViewRecordFilesPage() {
                       size="sm"
                       onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                       disabled={currentPage === 1 || isFetching}
-                      className="bg-card border-border text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-card border-border text-foreground, hover:bg-muted, disabled:opacity-50, disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
-                      <span className="hidden sm:inline">Previous</span>
+                      <span className="hidden, sm:inline">Previous</span>
                     </Button>
 
                     <div className="flex items-center gap-1">
@@ -1023,8 +1019,8 @@ export default function ViewRecordFilesPage() {
                             disabled={isFetching}
                             className={
                               currentPage === page
-                                ? "bg-primary text-primary-foreground hover:bg-primary/80"
-                                : "bg-card border-border text-foreground hover:bg-muted"
+                                ? "bg-primary text-primary-foreground, hover:bg-primary/80"
+                                : "bg-card border-border text-foreground, hover:bg-muted"
                             }
                           >
                             {page}
@@ -1038,9 +1034,9 @@ export default function ViewRecordFilesPage() {
                       size="sm"
                       onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                       disabled={currentPage === totalPages || isFetching}
-                      className="bg-card border-border text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-card border-border text-foreground, hover:bg-muted, disabled:opacity-50, disabled:cursor-not-allowed"
                     >
-                      <span className="hidden sm:inline">Next</span>
+                      <span className="hidden, sm:inline">Next</span>
                       <ChevronRight className="w-4 h-4" />
                     </Button>
                   </div>

@@ -5,9 +5,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // PDF worker is configured in pdf-config.ts - import it to ensure it runs
 // Use dynamic import to prevent blocking app initialization if PDF config fails
-// This is non-critical - PDF features will work when needed, just may need to configure worker then
-import("@/lib/pdf-config").catch((error) => {
-  console.warn("⚠️ [MAIN] Failed to load PDF config (non-critical, app will continue):", error);
+// This is non-critical - PDF features will work when needed, just may need to configure worker then, import("@/lib/pdf-config").catch((error) => {
+  console.warn("⚠️ [MAIN] Failed to load PDF, config(non-critical, app will continue):", error);
   // PDF config is not critical for app initialization, continue anyway
   // PDF components will handle worker configuration when they load
 });
@@ -25,7 +24,7 @@ if (!rootElement) {
       </div>
     </div>
   `;
-  throw new Error("Root element not found. Make sure there's a div with id='root' in index.html");
+  throw new, Error("Root element not found. Make sure there's a div with id='root' in index.html");
 }
 
 // Clear the loading fallback immediately
@@ -34,7 +33,7 @@ if (loadingFallback) {
   rootElement.innerHTML = '';
 }
 
-// Set a timeout to detect if app is stuck loading (10 seconds)
+// Set a timeout to detect if app is stuck, loading(10 seconds)
 const loadingTimeout = setTimeout(() => {
   if (rootElement.innerHTML === '' || rootElement.querySelector('#root-loading-timeout')) {
     console.error("⚠️ [MAIN] App initialization timeout - showing error message");
@@ -67,13 +66,12 @@ try {
     </ErrorBoundary>
   );
   
-  // Clear timeout once app renders
-  clearTimeout(loadingTimeout);
+  // Clear timeout once app renders, clearTimeout(loadingTimeout);
   console.log("✅ [MAIN] App rendered successfully");
 } catch (error) {
   clearTimeout(loadingTimeout);
-  console.error("❌ [MAIN] Failed to initialize React app:", error);
-  console.error("❌ [MAIN] Error details:", {
+  console.error("❌ [MAIN] Failed to initialize React, app:", error);
+  console.error("❌ [MAIN] Error, details:", {
     message: error instanceof Error ? error.message : String(error),
     stack: error instanceof Error ? error.stack : undefined,
     name: error instanceof Error ? error.name : undefined,
@@ -91,10 +89,10 @@ try {
         >
           Reload Page
         </button>
-        <div style="margin-top: 24px; padding: 16px; background: #f5f5f5; border: 1px solid #e5e5e5; border-radius: 6px; text-align: left; font-size: 12px; color: #525252;">
+        <div style="margin-top: 24px; padding: 16px; background: #f5f5f5; border: 1px solid #e5e5e5; border-radius: 6px; text-align: left; font-size: 12px; color: #525252;`>
           <p><strong>Error:</strong> ${error instanceof Error ? error.message : String(error)}</p>
-          <p style="margin-top: 8px;"><strong>User Agent:</strong> ${navigator.userAgent}</p>
-          ${error instanceof Error && error.stack ? `<p style="margin-top: 8px;"><strong>Stack:</strong><br><pre style="font-size: 10px; overflow: auto; max-height: 200px;">${error.stack}</pre></p>` : ''}
+          <p style=`margin-top: 8px;`><strong>User, Agent:</strong> ${navigator.userAgent}</p>
+          ${error instanceof Error && error.stack ? `<p style=`margin-top: 8px;"><strong>Stack:</strong><br><pre style="font-size: 10px; overflow: auto; max-height: 200px;">${error.stack}</pre></p>` : ''}
         </div>
       </div>
     </div>

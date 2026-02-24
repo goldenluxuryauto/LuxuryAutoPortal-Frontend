@@ -20,7 +20,7 @@ interface SlackChannelConfig {
 }
 
 const formTypeLabels: Record<string, string> = {
-  lyc: "Client Onboarding Form (LYC)",
+  lyc: "Client Onboarding, Form(LYC)",
   car_onboarding: "Car On-boarding",
   car_offboarding: "Car Off-boarding",
   employee_onboarding: "Employee Onboarding",
@@ -30,7 +30,7 @@ const formTypeLabels: Record<string, string> = {
   expense_reimbursed_bills: "Reimbursed & Non-Reimbursed Bills",
 };
 
-export default function SettingsPage() {
+export default function, SettingsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
@@ -55,7 +55,7 @@ export default function SettingsPage() {
   });
   const isAdmin = userData?.user?.isAdmin === true;
 
-  // Fetch Slack channel configurations and bot token status (only for admins)
+  // Fetch Slack channel configurations and bot token, status(only for admins)
   const { data: channelsData, isLoading } = useQuery<{
     success: boolean;
     data: SlackChannelConfig[];
@@ -65,11 +65,11 @@ export default function SettingsPage() {
   }>({
     queryKey: ["/api/settings/slack-channels"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/settings/slack-channels"), {
+      const response = await, fetch(buildApiUrl("/api/settings/slack-channels"), {
         credentials: "include",
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch Slack channel configurations");
+        throw new, Error("Failed to fetch Slack channel configurations");
       }
       return response.json();
     },
@@ -83,7 +83,7 @@ export default function SettingsPage() {
 
   const saveSlackBotTokenMutation = useMutation({
     mutationFn: async (token: string) => {
-      const response = await fetch(buildApiUrl("/api/settings/slack-bot-token"), {
+      const response = await, fetch(buildApiUrl("/api/settings/slack-bot-token"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -91,7 +91,7 @@ export default function SettingsPage() {
       });
       if (!response.ok) {
         const err = await response.json();
-        throw new Error(err.error || "Failed to save Slack bot token");
+        throw new, Error(err.error || "Failed to save Slack bot token");
       }
       return response.json();
     },
@@ -121,7 +121,7 @@ export default function SettingsPage() {
   // Update channel mutation
   const updateMutation = useMutation({
     mutationFn: async (data: { formType: string; channelId: string; channelName?: string }) => {
-      const response = await fetch(buildApiUrl("/api/settings/slack-channels"), {
+      const response = await, fetch(buildApiUrl("/api/settings/slack-channels"), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -131,7 +131,7 @@ export default function SettingsPage() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update Slack channel");
+        throw new, Error(error.error || "Failed to update Slack channel");
       }
       return response.json();
     },
@@ -187,7 +187,7 @@ export default function SettingsPage() {
   // Password change mutation
   const passwordUpdateMutation = useMutation({
     mutationFn: async (data: { oldPassword: string; newPassword: string }) => {
-      const response = await fetch(buildApiUrl("/api/auth/update-password"), {
+      const response = await, fetch(buildApiUrl("/api/auth/update-password"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -197,7 +197,7 @@ export default function SettingsPage() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update password");
+        throw new, Error(error.error || "Failed to update password");
       }
       return response.json();
     },
@@ -206,12 +206,10 @@ export default function SettingsPage() {
         title: "Success",
         description: "Password updated successfully. Please log in again.",
       });
-      // Reset form
-      setOldPassword("");
+      // Reset form, setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      // Redirect to login after a delay
-      setTimeout(() => {
+      // Redirect to login after a delay, setTimeout(() => {
         setLocation("/admin/login");
       }, 2000);
     },
@@ -294,13 +292,13 @@ export default function SettingsPage() {
                     type={showOldPassword ? "text" : "password"}
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
-                    className="bg-background border-border text-foreground focus:border-primary pr-10"
+                    className="bg-background border-border text-foreground, focus:border-primary pr-10"
                     placeholder="Enter your current password"
                     required
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground, hover:text-foreground transition-colors"
                     onClick={() => setShowOldPassword(!showOldPassword)}
                   >
                     {showOldPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -318,14 +316,14 @@ export default function SettingsPage() {
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="bg-background border-border text-foreground focus:border-primary pr-10"
-                    placeholder="Enter your new password (min 8 characters)"
+                    className="bg-background border-border text-foreground, focus:border-primary pr-10"
+                    placeholder="Enter your new, password(min 8 characters)"
                     required
                     minLength={8}
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground, hover:text-foreground transition-colors"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                   >
                     {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -334,7 +332,7 @@ export default function SettingsPage() {
                 {newPassword.length > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-muted rounded-full h-2">
+                      <div className="flex-1 bg-muted rounded-full h-2`>
                         <div
                           className={`h-2 rounded-full transition-all ${getPasswordStrengthColor(
                             passwordStrength.score
@@ -342,12 +340,12 @@ export default function SettingsPage() {
                           style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
                         />
                       </div>
-                      <span className="text-xs text-muted-foreground">
+                      <span className=`text-xs text-muted-foreground">
                         {getPasswordStrengthLabel(passwordStrength.score)}
                       </span>
                     </div>
                     {passwordStrength.feedback.length > 0 && (
-                      <div className="text-xs space-y-1">
+                      <div className="text-xs space-y-1`>
                         {passwordStrength.feedback.map((feedback, idx) => (
                           <div
                             key={idx}
@@ -355,7 +353,7 @@ export default function SettingsPage() {
                               passwordStrength.isValid ? "text-green-700" : "text-yellow-700"
                             }`}
                           >
-                            <AlertCircle className="w-3 h-3" />
+                            <AlertCircle className=`w-3 h-3" />
                             {feedback}
                           </div>
                         ))}
@@ -375,13 +373,13 @@ export default function SettingsPage() {
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="bg-background border-border text-foreground focus:border-primary pr-10"
+                    className="bg-background border-border text-foreground, focus:border-primary pr-10"
                     placeholder="Confirm your new password"
                     required
                   />
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground, hover:text-foreground transition-colors"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -402,7 +400,7 @@ export default function SettingsPage() {
                 <Button
                   type="submit"
                   disabled={!canSubmitPassword}
-                  className="bg-primary text-primary-foreground hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-primary text-primary-foreground, hover:bg-primary/80, disabled:opacity-50, disabled:cursor-not-allowed"
                 >
                   {passwordUpdateMutation.isPending ? (
                     <>
@@ -418,7 +416,7 @@ export default function SettingsPage() {
                 </Button>
                 <a
                   href="/reset-password"
-                  className="text-sm text-blue-700 hover:underline"
+                  className="text-sm text-blue-700, hover:underline"
                 >
                   Forgot your password?
                 </a>
@@ -450,7 +448,7 @@ export default function SettingsPage() {
                     Slack Bot Token
                   </Label>
                   <p className="text-sm text-muted-foreground mt-1">
-                    All Slack notifications use this token. Get a Bot User OAuth Token from your Slack app (starts with <code className="bg-muted px-1 rounded">xoxb-</code>).
+                    All Slack notifications use this token. Get a Bot User OAuth Token from your Slack, app(starts with <code className="bg-muted px-1 rounded">xoxb-</code>).
                   </p>
                 </div>
               </div>
@@ -467,7 +465,7 @@ export default function SettingsPage() {
                         value={slackBotToken}
                         onChange={(e) => setSlackBotToken(e.target.value)}
                         placeholder="e.g. xoxb-..."
-                        className="max-w-md bg-background border-border text-foreground focus:border-primary font-mono text-sm"
+                        className="max-w-md bg-background border-border text-foreground, focus:border-primary font-mono text-sm"
                         autoComplete="off"
                       />
                       <Button
@@ -484,7 +482,7 @@ export default function SettingsPage() {
                           saveSlackBotTokenMutation.mutate(t);
                         }}
                         disabled={saveSlackBotTokenMutation.isPending || !slackBotToken.trim()}
-                        className="bg-primary text-primary-foreground hover:bg-primary/80"
+                        className="bg-primary text-primary-foreground, hover:bg-primary/80"
                         size="sm"
                       >
                         {saveSlackBotTokenMutation.isPending ? (
@@ -497,7 +495,7 @@ export default function SettingsPage() {
                         onClick={handleCancelBotToken}
                         variant="outline"
                         size="sm"
-                        className="border-border text-muted-foreground hover:bg-muted"
+                        className="border-border text-muted-foreground, hover:bg-muted"
                       >
                         Cancel
                       </Button>
@@ -511,13 +509,13 @@ export default function SettingsPage() {
                         readOnly
                         placeholder="Not set"
                         className="max-w-md bg-background border-border text-foreground font-mono text-sm"
-                        title="Slack bot token (exact value)"
+                        title="Slack bot, token(exact value)"
                       />
                       <Button
                         onClick={() => setEditingBotToken(true)}
                         variant="outline"
                         size="sm"
-                        className="border-border text-muted-foreground hover:bg-muted"
+                        className="border-border text-muted-foreground, hover:bg-muted"
                       >
                         Edit
                       </Button>
@@ -526,7 +524,7 @@ export default function SettingsPage() {
                 </div>
                 {slackBotTokenConfigured && channelsData?.slackBotTokenUpdatedAt && (
                   <p className="text-xs text-muted-foreground mt-2">
-                    Last updated: {new Date(channelsData.slackBotTokenUpdatedAt).toLocaleString()}
+                    Last, updated: {new, Date(channelsData.slackBotTokenUpdatedAt).toLocaleString()}
                   </p>
                 )}
               </div>
@@ -552,13 +550,13 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-3`>
                     <div>
-                      <Label htmlFor={`channel-${config.formType}`} className="text-muted-foreground text-sm">
+                      <Label htmlFor={`channel-${config.formType}`} className=`text-muted-foreground text-sm">
                         Slack Channel ID
                       </Label>
                       {isEditing ? (
-                        <div className="flex gap-2 mt-2">
+                        <div className="flex gap-2 mt-2`>
                           <Input
                             id={`channel-${config.formType}`}
                             value={editingValue}
@@ -568,13 +566,13 @@ export default function SettingsPage() {
                                 [config.formType]: e.target.value,
                               }))
                             }
-                            className="bg-background border-border text-foreground focus:border-primary"
+                            className=`bg-background border-border text-foreground, focus:border-primary"
                             placeholder="C08N5U77HSS or paste full Slack channel URL"
                           />
                           <Button
                             onClick={() => handleSave(config)}
                             disabled={updateMutation.isPending}
-                            className="bg-primary text-primary-foreground hover:bg-primary/80"
+                            className="bg-primary text-primary-foreground, hover:bg-primary/80"
                             size="sm"
                           >
                             {updateMutation.isPending ? (
@@ -587,7 +585,7 @@ export default function SettingsPage() {
                             onClick={() => handleCancel(config.formType)}
                             variant="outline"
                             size="sm"
-                            className="border-border text-muted-foreground hover:bg-muted"
+                            className="border-border text-muted-foreground, hover:bg-muted"
                           >
                             Cancel
                           </Button>
@@ -603,7 +601,7 @@ export default function SettingsPage() {
                             onClick={() => handleEdit(config.formType, config.channelId)}
                             variant="outline"
                             size="sm"
-                            className="border-border text-muted-foreground hover:bg-muted"
+                            className="border-border text-muted-foreground, hover:bg-muted"
                           >
                             Edit
                           </Button>
@@ -611,7 +609,7 @@ export default function SettingsPage() {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Last updated: {new Date(config.updatedAt).toLocaleString()}
+                      Last, updated: {new, Date(config.updatedAt).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -636,7 +634,7 @@ export default function SettingsPage() {
                 <li>Open Slack and navigate to the channel you want to use</li>
                 <li>Click on the channel name at the top</li>
                 <li>Scroll down to find the &quot;Channel ID&quot; (starts with &quot;C&quot;) or copy the channel URL from the browser</li>
-                <li>Paste the Channel ID (e.g. C08N5U77HSS) or the full URL in the field above—both work</li>
+                <li>Paste the Channel, ID(e.g. C08N5U77HSS) or the full URL in the field above—both work</li>
               </ol>
               <p className="text-sm text-muted-foreground mt-4">
                 Note: Make sure your Slack bot has been invited to the channel before notifications can be sent.

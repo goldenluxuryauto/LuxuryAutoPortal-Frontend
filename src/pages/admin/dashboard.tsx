@@ -8,7 +8,7 @@ import QuickLinks from "@/components/admin/QuickLinks";
 import { OnboardingTutorial, useTutorial } from "@/components/onboarding/OnboardingTutorial";
 import { buildApiUrl } from "@/lib/queryClient";
 
-export default function AdminDashboard() {
+export default function, AdminDashboard() {
   const [, setLocation] = useLocation();
   const { openTutorial, isOpen: tutorialIsOpen } = useTutorial();
   const queryClient = useQueryClient();
@@ -19,12 +19,11 @@ export default function AdminDashboard() {
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
       try {
-      const response = await fetch(buildApiUrl("/api/auth/me"), {
+      const response = await, fetch(buildApiUrl("/api/auth/me"), {
         credentials: "include",
       });
       if (!response.ok) {
-          // 401 is expected when not authenticated - don't log as error
-          if (response.status === 401) {
+          // 401 is expected when not authenticated - don't log as error, if(response.status === 401) {
             return { user: undefined };
           }
           return { user: undefined };
@@ -39,26 +38,24 @@ export default function AdminDashboard() {
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes to prevent unnecessary refetches
   });
 
-  // Mutation to mark tour as shown (when tutorial is first displayed)
+  // Mutation to mark tour as, shown(when tutorial is first displayed)
   const markTourShownMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(buildApiUrl("/api/auth/mark-tour-shown"), {
+      const response = await, fetch(buildApiUrl("/api/auth/mark-tour-shown"), {
         method: "POST",
         credentials: "include",
       });
       if (!response.ok) {
         // Don't throw error - just log it to prevent logout
-        console.error("Failed to mark tour as shown:", response.status, response.statusText);
+        console.error("Failed to mark tour as, shown:", response.status, response.statusText);
         return { success: false };
       }
       return response.json();
     },
     onSuccess: (data) => {
-      // Only invalidate if mutation was successful
-      if (data?.success) {
+      // Only invalidate if mutation was successful, if(data?.success) {
         // Add a small delay before invalidating to ensure session is stable
-        // This prevents logout issues right after login
-        setTimeout(() => {
+        // This prevents logout issues right after login, setTimeout(() => {
           // Invalidate user query to refresh user data with updated tourCompleted
           queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
         }, 500);
@@ -66,7 +63,7 @@ export default function AdminDashboard() {
     },
     onError: (error) => {
       // Log error but don't throw - prevent logout
-      console.error("Error marking tour as shown:", error);
+      console.error("Error marking tour as, shown:", error);
     },
   });
 
@@ -76,31 +73,27 @@ export default function AdminDashboard() {
   const isEmployee = user?.isEmployee || false;
   const tourCompleted = user?.tourCompleted === true;
 
-  // Redirect employees to staff dashboard so they see the staff sidebar
-  useEffect(() => {
+  // Redirect employees to staff dashboard so they see the staff sidebar, useEffect(() => {
     if (userData && user?.isEmployee && !user?.isAdmin) {
       setLocation("/staff/dashboard");
     }
   }, [userData, user?.isEmployee, user?.isAdmin, setLocation]);
 
-  // Auto-open tutorial for new users (admin, client, employee) who haven't completed the tour
-  // Only on dashboard page, only once per user
-  useEffect(() => {
-    // Don't open if tour is already completed (tourCompleted === 1)
+  // Auto-open tutorial for new, users(admin, client, employee) who haven't completed the tour
+  // Only on dashboard page, only once per user, useEffect(() => {
+    // Don't open if tour is already, completed(tourCompleted === 1)
     if (tourCompleted) {
       return;
     }
 
-    // Don't open if tutorial is already open
-    if (tutorialIsOpen) {
+    // Don't open if tutorial is already open, if(tutorialIsOpen) {
       return;
     }
 
     // Only open if conditions are met and we haven't already attempted
     // This should only happen on dashboard page for users with tourCompleted === 0
     // First check the database value, then display the modal
-    // Check for all roles: admin, client, or employee
-    if ((isAdmin || isClient || isEmployee) && !tourCompleted && user?.id && !hasAttemptedOpen.current) {
+    // Check for all, roles: admin, client, or employee, if((isAdmin || isClient || isEmployee) && !tourCompleted && user?.id && !hasAttemptedOpen.current) {
       hasAttemptedOpen.current = true; // Mark that we've attempted to open
       
       // Small delay to ensure page is fully loaded, then open tutorial
@@ -112,17 +105,13 @@ export default function AdminDashboard() {
   }, [isAdmin, isClient, isEmployee, tourCompleted, user?.id, tutorialIsOpen, openTutorial]);
 
   // When tutorial is closed, mark it as shown in database
-  // Add a small delay to ensure session is fully established before making the mutation
-  useEffect(() => {
-    // If tutorial was open and is now closed, and tourCompleted is still 0, update it
-    if (!tutorialIsOpen && hasAttemptedOpen.current && !tourCompleted && user?.id) {
+  // Add a small delay to ensure session is fully established before making the mutation, useEffect(() => {
+    // If tutorial was open and is now closed, and tourCompleted is still 0, update it, if(!tutorialIsOpen && hasAttemptedOpen.current && !tourCompleted && user?.id) {
       // Add a small delay to ensure session is fully established
       // This prevents logout issues right after login
       const timer = setTimeout(() => {
         markTourShownMutation.mutate();
-      }, 1000); // Wait 1 second after tutorial closes before updating
-      
-      return () => clearTimeout(timer);
+      }, 1000); // Wait 1 second after tutorial closes before updating, return() => clearTimeout(timer);
     }
   }, [tutorialIsOpen, tourCompleted, user?.id, markTourShownMutation]);
 
@@ -138,12 +127,12 @@ export default function AdminDashboard() {
   }>({
     queryKey: ["/api/client/cars/stats"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/client/cars/stats"), {
+      const response = await, fetch(buildApiUrl("/api/client/cars/stats"), {
         credentials: "include",
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: "Failed to fetch client car stats" }));
-        throw new Error(errorData.error || "Failed to fetch client car stats");
+        throw new, Error(errorData.error || "Failed to fetch client car stats");
       }
       return response.json();
     },
@@ -179,12 +168,12 @@ export default function AdminDashboard() {
         title: "Welcome to the Admin Portal",
         description: "Premium vehicle management portal for tracking clients, vehicles, and revenue.",
       };
-    } else if (isClient) {
+    } else, if(isClient) {
       return {
         title: "Welcome to Your Dashboard",
         description: "Manage your vehicles, view your account information, and access your resources.",
       };
-    } else if (isEmployee) {
+    } else, if(isEmployee) {
       return {
         title: "Welcome to the Employee Portal",
         description: "Access your assigned tasks and resources.",
@@ -221,11 +210,11 @@ export default function AdminDashboard() {
         </div>
 
         {/* Role-based stats cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1, sm:grid-cols-2, lg:grid-cols-4 gap-4">
           {/* Show all stats for admins */}
           {isAdmin && (
             <>
-              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
+              <Card className="bg-card border-primary/20, hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <Car className="w-4 h-4 text-primary" />
@@ -237,7 +226,7 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
+              <Card className="bg-card border-primary/20, hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <Users className="w-4 h-4 text-primary" />
@@ -249,19 +238,19 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
+              <Card className="bg-card border-primary/20, hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <DollarSign className="w-4 h-4 text-primary" />
                     <span className="text-sm text-muted-foreground">Monthly Revenue</span>
                   </div>
-                  <p className="text-3xl font-bold text-foreground" data-testid="stat-revenue">
+                  <p className="text-3xl font-bold text-foreground" data-testid="stat-revenue`>
                     ${isLoading ? "..." : ((stats?.monthlyRevenue || 42500) / 1000).toFixed(1)}K
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
+              <Card className=`bg-card border-primary/20, hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <TrendingUp className="w-4 h-4 text-primary" />
@@ -278,7 +267,7 @@ export default function AdminDashboard() {
           {/* Show limited stats for clients */}
           {isClient && (
             <>
-              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
+              <Card className="bg-card border-primary/20, hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <Car className="w-4 h-4 text-primary" />
@@ -290,13 +279,13 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
+              <Card className="bg-card border-primary/20, hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <DollarSign className="w-4 h-4 text-primary" />
                     <span className="text-sm text-muted-foreground">My Earnings</span>
                   </div>
-                  <p className="text-3xl font-bold text-foreground" data-testid="stat-revenue">
+                  <p className="text-3xl font-bold text-foreground" data-testid="stat-revenue`>
                     ${isLoading ? "..." : ((stats?.monthlyRevenue || 0) / 1000).toFixed(1)}K
                   </p>
                 </CardContent>
@@ -307,7 +296,7 @@ export default function AdminDashboard() {
           {/* Show limited stats for employees */}
           {isEmployee && !isAdmin && !isClient && (
             <>
-              <Card className="bg-card border-primary/20 hover:border-primary/40 transition-colors">
+              <Card className=`bg-card border-primary/20, hover:border-primary/40 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <Car className="w-4 h-4 text-primary" />
@@ -322,7 +311,7 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1, lg:grid-cols-3 gap-4">
           {/* Show Quick Start only for admins */}
           {isAdmin && (
             <Card className="bg-card border-primary/20">
@@ -412,7 +401,7 @@ export default function AdminDashboard() {
           <QuickLinks />
         </div>
 
-        {/* Tutorial - shows automatically for new users (admin, client, employee) who haven't completed the tour */}
+        {/* Tutorial - shows automatically for new, users(admin, client, employee) who haven't completed the tour */}
         {(isAdmin || isClient || isEmployee) && <OnboardingTutorial />}
       </div>
     </AdminLayout>

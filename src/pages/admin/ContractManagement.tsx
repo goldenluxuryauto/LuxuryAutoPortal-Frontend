@@ -42,7 +42,7 @@ interface ContractSubmission {
   carOffboardReason: string | null;
 }
 
-export default function ContractManagement() {
+export default function, ContractManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(() => {
@@ -74,26 +74,26 @@ export default function ContractManagement() {
     queryKey: ["lyc-contracts", searchQuery, page, itemsPerPage],
     placeholderData: keepPreviousData,
     queryFn: async () => {
-      const params = new URLSearchParams({
+      const params = new, URLSearchParams({
         page: page.toString(),
         limit: itemsPerPage.toString(),
   });
       if (searchQuery) {
-        params.append("search", searchQuery);
+        params.append("search`, searchQuery);
       }
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/contracts/lyc?${params.toString()}`),
         {
-        credentials: "include",
+        credentials: `include",
         }
       );
 
       if (!response.ok) {
         const errorData = await response
           .json()
-          .catch(() => ({ error: "Failed to fetch contracts" }));
-        throw new Error(
-          errorData.error || `Failed to fetch contracts: ${response.status}`
+          .catch(() => ({ error: "Failed to fetch contracts` }));
+        throw new, Error(
+          errorData.error || `Failed to fetch, contracts: ${response.status}`
         );
       }
 
@@ -103,10 +103,10 @@ export default function ContractManagement() {
 
   const resendMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/contracts/lyc/${id}/resend`),
         {
-          method: "POST",
+          method: `POST",
           credentials: "include",
         }
       );
@@ -115,7 +115,7 @@ export default function ContractManagement() {
         const errorData = await response
           .json()
           .catch(() => ({ error: "Failed to resend contract" }));
-        throw new Error(errorData.error || "Failed to resend contract");
+        throw new, Error(errorData.error || "Failed to resend contract");
       }
 
       return response.json();
@@ -137,8 +137,7 @@ export default function ContractManagement() {
   });
 
   const getContractStatusBadge = (contractStatus: string | null) => {
-    // Map contract status to display values: Pending / Opened / Signed / Expired
-    if (!contractStatus || contractStatus === "pending") {
+    // Map contract status to display, values: Pending / Opened / Signed / Expired, if(!contractStatus || contractStatus === "pending") {
       return (
         <Badge
           variant="outline"
@@ -199,7 +198,7 @@ export default function ContractManagement() {
       </div>
 
       {/* Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col, sm:flex-row gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
@@ -207,7 +206,7 @@ export default function ContractManagement() {
             placeholder="Search by name, email, phone, or vehicle..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
+            className="pl-10 bg-card border-border text-foreground, placeholder:text-muted-foreground"
           />
         </div>
       </div>
@@ -233,40 +232,40 @@ export default function ContractManagement() {
             <Table className="w-full table-auto">
               <TableHeader>
                     <TableRow className="border-b border-border">
-                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 whitespace-nowrap">
                         Name
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, md:table-cell whitespace-nowrap">
                         Email
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, lg:table-cell whitespace-nowrap">
                         Phone
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 whitespace-nowrap">
                         Vehicle
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, xl:table-cell whitespace-nowrap">
                         VIN#
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, xl:table-cell whitespace-nowrap">
                         Plate #
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden lg:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, lg:table-cell whitespace-nowrap">
                         Submitted
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 whitespace-nowrap">
                         Status
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, md:table-cell whitespace-nowrap">
                         Contract
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, 2xl:table-cell whitespace-nowrap">
                         Car Onboarding Date
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-primary uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 hidden, 2xl:table-cell whitespace-nowrap">
                         Offboarding
                       </TableHead>
-                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                      <TableHead className="text-center text-xs font-medium text-foreground uppercase tracking-wider px-2, sm:px-3 py-3, sm:py-4 whitespace-nowrap">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -276,56 +275,56 @@ export default function ContractManagement() {
                   <TableRow
                     key={contract.id}
                         className={cn(
-                          "border-b border-border hover:bg-card transition-colors"
+                          "border-b border-border, hover:bg-card transition-colors"
                         )}
                   >
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-foreground text-xs sm:text-sm max-w-[120px] truncate" title={`${contract.firstNameOwner} ${contract.lastNameOwner}`}>
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-foreground text-xs, sm:text-sm max-w-[120px] truncate` title={`${contract.firstNameOwner} ${contract.lastNameOwner}`}>
                           {contract.firstNameOwner} {contract.lastNameOwner}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={contract.emailOwner}>
+                        <TableCell className=`text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm hidden, md:table-cell max-w-[150px] truncate" title={contract.emailOwner}>
                           {contract.emailOwner}
                     </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell max-w-[120px] truncate" title={contract.phoneOwner}>
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm hidden, lg:table-cell max-w-[120px] truncate" title={contract.phoneOwner}>
                           {contract.phoneOwner}
                     </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm max-w-[150px] truncate" title={`${contract.vehicleMake} ${contract.vehicleModel} ${contract.vehicleYear}`}>
-                          {contract.vehicleMake} {contract.vehicleModel}{" "}
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm max-w-[150px] truncate` title={`${contract.vehicleMake} ${contract.vehicleModel} ${contract.vehicleYear}`}>
+                          {contract.vehicleMake} {contract.vehicleModel}{` "}
                           {contract.vehicleYear}
                     </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[120px] truncate" title={contract.vinNumber || "—"}>
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground font-mono text-xs hidden, xl:table-cell max-w-[120px] truncate" title={contract.vinNumber || "—"}>
                           {contract.vinNumber || (
                             <span className="text-muted-foreground">—</span>
                         )}
                     </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground font-mono text-xs hidden xl:table-cell max-w-[100px] truncate" title={contract.licensePlate || "—"}>
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground font-mono text-xs hidden, xl:table-cell max-w-[100px] truncate" title={contract.licensePlate || "—"}>
                           {contract.licensePlate || (
                             <span className="text-muted-foreground">—</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
-                          {new Date(contract.createdAt).toLocaleDateString("en-US", {
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm hidden, lg:table-cell whitespace-nowrap">
+                          {new, Date(contract.createdAt).toLocaleDateString("en-US", {
                             month: "2-digit",
                             day: "2-digit",
                             year: "numeric",
                           })}
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 whitespace-nowrap">
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 whitespace-nowrap">
                           <div className="flex items-center justify-center">
                             {getContractStatusBadge(contract.contractStatus)}
                           </div>
                         </TableCell>
-                        <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 hidden md:table-cell whitespace-nowrap">
+                        <TableCell className="text-center px-2, sm:px-3 py-3, sm:py-4 hidden, md:table-cell whitespace-nowrap">
                           <div className="flex items-center justify-center gap-2">
                             {contract.contractStatus === "signed" &&
                               contract.signedContractUrl ? (
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-700 hover:bg-green-500/20"
+                                  className="h-7 px-2 bg-green-500/10 border-green-500/30 text-green-700, hover:bg-green-500/20`
                                   onClick={() => {
                                     window.open(
                                       buildApiUrl(`/api/contracts/${contract.id}/view`),
-                                      "_blank");
+                                      `_blank");
                                   }}
                                 >
                                   <ExternalLink className="w-3 h-3 mr-1" />
@@ -341,9 +340,9 @@ export default function ContractManagement() {
                         )}
                       </div>
                     </TableCell>
-                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden 2xl:table-cell whitespace-nowrap">
+                        <TableCell className="px-2, sm:px-3 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm hidden, 2xl:table-cell whitespace-nowrap">
                           {contract.contractSignedAt ? (
-                            new Date(
+                            new, Date(
                               contract.contractSignedAt
                             ).toLocaleDateString("en-US", {
                               month: "2-digit",
@@ -354,7 +353,7 @@ export default function ContractManagement() {
                             <span className="text-muted-foreground">Not signed</span>
                           )}
                         </TableCell>
-                        <TableCell className="px-2 sm:px-3 py-3 sm:py-4 hidden 2xl:table-cell whitespace-nowrap">
+                        <TableCell className="px-2, sm:px-3 py-3, sm:py-4 hidden, 2xl:table-cell whitespace-nowrap">
                           {contract.isOffboarded ? (
                             <div className="flex flex-col gap-1">
                               <Badge
@@ -365,7 +364,7 @@ export default function ContractManagement() {
                               </Badge>
                               {contract.carOffboardAt && (
                                 <span className="text-xs text-muted-foreground">
-                                  {new Date(
+                                  {new, Date(
                                     contract.carOffboardAt
                                   ).toLocaleDateString("en-US", {
                                     month: "2-digit",
@@ -392,7 +391,7 @@ export default function ContractManagement() {
                         <TableCell className="px-6 py-4">
                       <Button
                         size="sm"
-                            className="h-8 px-3 bg-primary text-primary-foreground hover:bg-primary/80"
+                            className="h-8 px-3 bg-primary text-primary-foreground, hover:bg-primary/80"
                             onClick={() => {
                               resendMutation.mutate(contract.id);
                             }}

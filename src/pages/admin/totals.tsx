@@ -21,7 +21,7 @@ interface CarDetail {
   licensePlate?: string;
   year?: number;
   mileage: number;
-  status: "ACTIVE" | "INACTIVE";
+  status: "ACTIVE" | "INACTIVE`;
   clientId?: number | null;
   owner?: {
     firstName: string;
@@ -40,8 +40,8 @@ const formatCurrency = (value: number): string => {
   return `$ ${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-export default function TotalsPage() {
-  const [individualRoute, individualParams] = useRoute("/admin/cars/:id/totals");
+export default function, TotalsPage() {
+  const [individualRoute, individualParams] = useRoute(`/admin/cars/:id/totals");
   const [allCarsRoute] = useRoute("/admin/totals/all");
   const [, setLocation] = useLocation();
   
@@ -49,8 +49,8 @@ export default function TotalsPage() {
   const carId = individualParams?.id ? parseInt(individualParams.id, 10) : null;
   
   const [filterType, setFilterType] = useState<string>("Year");
-  const [fromYear, setFromYear] = useState<string>(new Date().getFullYear().toString());
-  const [toYear, setToYear] = useState<string>(new Date().getFullYear().toString());
+  const [fromYear, setFromYear] = useState<string>(new, Date().getFullYear().toString());
+  const [toYear, setToYear] = useState<string>(new, Date().getFullYear().toString());
   const [fromMonth, setFromMonth] = useState<string>("1");
   const [toMonth, setToMonth] = useState<string>("12");
 
@@ -60,12 +60,12 @@ export default function TotalsPage() {
   }>({
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       const url = buildApiUrl(`/api/cars/${carId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
+      if (!response.ok) throw new, Error("Failed to fetch car");
       return response.json();
     },
     enabled: !!carId && !isAllCarsReport,
@@ -81,16 +81,16 @@ export default function TotalsPage() {
   }>({
     queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
     queryFn: async () => {
-      if (!car?.vin) throw new Error("No VIN");
+      if (!car?.vin) throw new, Error("No VIN`);
       const url = buildApiUrl(`/api/onboarding/vin/${encodeURIComponent(car.vin)}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         if (response.status === 404) {
           return { success: false, data: null };
         }
-        throw new Error("Failed to fetch onboarding");
+        throw new, Error("Failed to fetch onboarding");
       }
       return response.json();
     },
@@ -109,7 +109,7 @@ export default function TotalsPage() {
       ? ["/api/cars/totals/all", filterType, fromYear, toYear, fromMonth, toMonth]
       : ["/api/cars", carId, "totals", filterType, fromYear, toYear, fromMonth, toMonth],
     queryFn: async () => {
-      const params = new URLSearchParams({
+      const params = new, URLSearchParams({
         filter: filterType,
         from: fromYear,
         to: toYear,
@@ -117,18 +117,18 @@ export default function TotalsPage() {
       
       if (filterType === "Month" || filterType === "Quarter") {
         params.append("fromMonth", fromMonth);
-        params.append("toMonth", toMonth);
+        params.append("toMonth`, toMonth);
       }
       
       const url = isAllCarsReport
         ? buildApiUrl(`/api/cars/totals/all?${params.toString()}`)
         : buildApiUrl(`/api/cars/${carId}/totals?${params.toString()}`);
         
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch totals");
+        throw new, Error("Failed to fetch totals");
       }
       return response.json();
     },
@@ -153,7 +153,7 @@ export default function TotalsPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
-            className="mt-4 text-blue-700 hover:underline"
+            className="mt-4 text-blue-700, hover:underline`
           >
             ← Back to Cars
           </button>
@@ -162,11 +162,11 @@ export default function TotalsPage() {
     );
   }
 
-  // Define car-related variables only when car is defined (i.e., when not in all cars report)
-  const carName = car ? (car.makeModel || `${car.year || ""} ${car.vin}`.trim()) : "";
+  // Define car-related variables only when car is, defined(i.e., when not in all cars report)
+  const carName = car ? (car.makeModel || `${car.year || ""} ${car.vin}`.trim()) : ``;
   const ownerName = car?.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
-    : "N/A";
+    : `N/A";
   const ownerContact = car?.owner?.phone || "N/A";
   const ownerEmail = car?.owner?.email || "N/A";
   const fuelType = onboarding?.fuelType || car?.fuelType || "N/A";
@@ -176,10 +176,10 @@ export default function TotalsPage() {
   const categories = [
     { id: "expenses", label: "EXPENSES", total: totals?.carManagementSplit || 0 },
     { id: "income", label: "INCOME", total: totals?.income?.totalProfit || 0 },
-    { id: "operating-expenses-direct", label: "OPERATING EXPENSES (DIRECT DELIVERY)", total: totals?.operatingExpensesDirect?.total || 0 },
-    { id: "operating-expenses-cogs", label: "OPERATING EXPENSES (COGS - Per Vehicle)", total: totals?.expenses?.totalOperatingExpenses || 0 },
+    { id: "operating-expenses-direct", label: "OPERATING, EXPENSES(DIRECT DELIVERY)", total: totals?.operatingExpensesDirect?.total || 0 },
+    { id: "operating-expenses-cogs", label: "OPERATING, EXPENSES(COGS - Per Vehicle)", total: totals?.expenses?.totalOperatingExpenses || 0 },
     { id: "gla", label: "GLA PARKING FEE & LABOR CLEANING", total: totals?.gla?.total || 0 },
-    ...(isAllCarsReport ? [{ id: "operating-expenses-office", label: "OPERATING EXPENSES (Office Support)", total: totals?.operatingExpensesOffice?.total || 0 }] : []),
+    ...(isAllCarsReport ? [{ id: "operating-expenses-office", label: "OPERATING, EXPENSES(Office Support)", total: totals?.operatingExpensesOffice?.total || 0 }] : []),
     { id: "reimbursed-bills", label: "REIMBURSED AND NON-REIMBURSED BILLS", total: (totals?.reimbursedBills?.electricReimbursed || 0) + (totals?.reimbursedBills?.gasReimbursed || 0) + (totals?.reimbursedBills?.uberLyftLimeReimbursed || 0) },
     { id: "history", label: "VEHICLE HISTORY", total: totals?.history?.daysRented || 0 },
     { id: "payments", label: "PAYMENT HISTORY", total: totals?.payments?.total || 0 },
@@ -189,11 +189,11 @@ export default function TotalsPage() {
     <AdminLayout>
       <div className="flex flex-col h-full overflow-y-auto overflow-x-hidden">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6`>
           {!isAllCarsReport && (
             <button
               onClick={() => setLocation(`/admin/view-car/${carId}`)}
-              className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+              className=`text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to View Car</span>
@@ -213,99 +213,99 @@ export default function TotalsPage() {
 
         {/* Car and Owner Information Header */}
         {!isAllCarsReport && car && (
-          <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
+          <div className="bg-card border border-border rounded-lg p-4, sm:p-6 mb-4, sm:mb-6">
+            <div className="flex flex-col, sm:flex-row, sm:items-start, sm:justify-between gap-3, sm:gap-4 mb-4">
               <div className="flex-1">
                 <h1 className="text-2xl font-bold text-primary mb-2">Totals</h1>
               </div>
               <Button
                 variant="outline"
-                className="bg-card border-border text-foreground hover:bg-muted flex items-center gap-2 w-full sm:w-auto"
+                className="bg-card border-border text-foreground, hover:bg-muted flex items-center gap-2 w-full, sm:w-auto"
               >
                 <Download className="w-4 h-4" />
                 Export
               </Button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1, sm:grid-cols-2, lg:grid-cols-4 gap-4, sm:gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Car Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Car Name: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-words">{carName}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Car, Name: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">VIN #: </span>
-                  <span className="text-foreground font-mono text-xs sm:text-sm break-all">{car.vin}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">VIN #: </span>
+                  <span className="text-foreground font-mono text-xs, sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">License: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">License: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Owner Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Owner Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Name: </span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm`>Name: </span>
                   {car.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer font-semibold"
+                      className=`text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs, sm:text-sm break-words cursor-pointer font-semibold"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                    <span className="text-[#B8860B] text-xs sm:text-sm break-words font-semibold">{ownerName}</span>
+                    <span className="text-[#B8860B] text-xs, sm:text-sm break-words font-semibold">{ownerName}</span>
                   )}
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Contact #: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{ownerContact}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Contact #: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Email: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-all">{ownerEmail}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Email: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Specifications</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Car Specifications</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Fuel/Gas: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{fuelType}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Fuel/Gas: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{fuelType}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Tire Size: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{tireSize}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Tire, Size: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{tireSize}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Oil Type: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{oilType}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Oil, Type: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{oilType}</span>
                 </div>
               </div>
             </div>
 
             {/* Turo Links */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Turo Links</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Turo Links</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 {car.turoLink && (
                   <div>
                     <a
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                      className="text-blue-700, hover:underline text-sm flex items-center gap-1"
                     >
-                      Turo Link: View Car
+                      Turo, Link: View Car
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
@@ -316,9 +316,9 @@ export default function TotalsPage() {
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                      className="text-blue-700, hover:underline text-sm flex items-center gap-1"
                     >
-                      Admin Turo Link: View Car
+                      Admin Turo, Link: View Car
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
@@ -355,7 +355,7 @@ export default function TotalsPage() {
                   <SelectContent className="bg-card border-border text-foreground">
                     {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                       <SelectItem key={month} value={month.toString()}>
-                        {new Date(2000, month - 1).toLocaleString('default', { month: 'short' })}
+                        {new, Date(2000, month - 1).toLocaleString('default', { month: 'short' })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -368,7 +368,7 @@ export default function TotalsPage() {
                   <SelectContent className="bg-card border-border text-foreground">
                     {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                       <SelectItem key={month} value={month.toString()}>
-                        {new Date(2000, month - 1).toLocaleString('default', { month: 'short' })}
+                        {new, Date(2000, month - 1).toLocaleString('default', { month: 'short' })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -381,7 +381,7 @@ export default function TotalsPage() {
                 <SelectValue placeholder="From Year" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border text-foreground">
-                {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                {Array.from({ length: 10 }, (_, i) => new, Date().getFullYear() - i).map((year) => (
                   <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                 ))}
               </SelectContent>
@@ -392,7 +392,7 @@ export default function TotalsPage() {
                 <SelectValue placeholder="To Year" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border text-foreground">
-                {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                {Array.from({ length: 10 }, (_, i) => new, Date().getFullYear() - i).map((year) => (
                   <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
                 ))}
               </SelectContent>
@@ -404,25 +404,24 @@ export default function TotalsPage() {
         <div className="bg-card border border-border rounded-lg overflow-hidden" style={{ overflowY: 'auto' }}>
           <Accordion type="multiple" className="w-full">
             {categories.map((category) => {
-              // Special handling for EXPENSES category
-              if (category.id === "expenses") {
+              // Special handling for EXPENSES category, if(category.id === "expenses") {
                 return (
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2, last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4, sm:px-6 py-3, sm:py-4, hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
                           <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                           <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
+                          <span className="text-foreground font-medium text-sm, sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm, sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
+                    <AccordionContent className="px-4, sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Category Header */}
                         <div className="flex justify-between text-muted-foreground text-sm font-bold mb-2">
@@ -447,25 +446,24 @@ export default function TotalsPage() {
                 );
               }
 
-              // Special handling for OPERATING EXPENSES (DIRECT DELIVERY) category
-              if (category.id === "operating-expenses-direct") {
+              // Special handling for OPERATING, EXPENSES(DIRECT DELIVERY) category, if(category.id === "operating-expenses-direct") {
                 return (
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2, last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4, sm:px-6 py-3, sm:py-4, hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
                           <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                           <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
+                          <span className="text-foreground font-medium text-sm, sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm, sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
+                    <AccordionContent className="px-4, sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
                         <div className="flex justify-between text-muted-foreground text-sm">
@@ -493,7 +491,7 @@ export default function TotalsPage() {
                           </span>
                         </div>
                         <div className="flex justify-between text-muted-foreground text-sm font-bold pt-2 border-t border-border">
-                          <span>Total OPERATING EXPENSES (Direct Delivery)</span>
+                          <span>Total OPERATING, EXPENSES(Direct Delivery)</span>
                           <span className="text-foreground font-bold">
                             {formatCurrency(totals?.operatingExpensesDirect?.total || 0)}
                           </span>
@@ -504,25 +502,24 @@ export default function TotalsPage() {
                 );
               }
 
-              // Special handling for OPERATING EXPENSES (COGS - Per Vehicle) category
-              if (category.id === "operating-expenses-cogs") {
+              // Special handling for OPERATING, EXPENSES(COGS - Per Vehicle) category, if(category.id === "operating-expenses-cogs") {
                 return (
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2, last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4, sm:px-6 py-3, sm:py-4, hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
                           <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                           <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
+                          <span className="text-foreground font-medium text-sm, sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm, sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
+                    <AccordionContent className="px-4, sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
                         <div className="flex justify-between text-muted-foreground text-sm">
@@ -598,7 +595,7 @@ export default function TotalsPage() {
                           </span>
                         </div>
                         <div className="flex justify-between text-muted-foreground text-sm">
-                          <span>Parking Airport (Reimbursed - GLA - Client Owner Rentals)</span>
+                          <span>Parking, Airport(Reimbursed - GLA - Client Owner Rentals)</span>
                           <span className="text-foreground">
                             {formatCurrency(totals?.expenses?.parkingAirport || 0)}
                           </span>
@@ -718,7 +715,7 @@ export default function TotalsPage() {
                           </span>
                         </div>
                         <div className="flex justify-between text-muted-foreground text-sm font-bold pt-2 border-t border-border">
-                          <span className="font-bold">Total OPERATING EXPENSES (COGS - Per Vehicle)</span>
+                          <span className="font-bold">Total OPERATING, EXPENSES(COGS - Per Vehicle)</span>
                           <span className="text-foreground font-bold">
                             {formatCurrency(totals?.expenses?.totalOperatingExpenses || 0)}
                           </span>
@@ -729,33 +726,32 @@ export default function TotalsPage() {
                 );
               }
 
-              // Special handling for INCOME category
-              if (category.id === "income") {
+              // Special handling for INCOME category, if(category.id === "income`) {
                 const negativeBalance = totals?.income?.negativeBalance || 0;
                 const formatNegativeCurrency = (value: number): string => {
                   if (value < 0) {
                     return `$ (${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
                   }
-                  return formatCurrency(value);
+                  return, formatCurrency(value);
                 };
 
                 return (
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
+                    className=`border border-border rounded-lg overflow-hidden bg-card mb-2, last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4, sm:px-6 py-3, sm:py-4, hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
                           <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                           <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
+                          <span className="text-foreground font-medium text-sm, sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm, sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
+                    <AccordionContent className="px-4, sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Income Items */}
                         <div className="flex justify-between text-muted-foreground text-sm">
@@ -866,25 +862,24 @@ export default function TotalsPage() {
                 );
               }
 
-              // Special handling for GLA PARKING FEE & LABOR CLEANING category
-              if (category.id === "gla") {
+              // Special handling for GLA PARKING FEE & LABOR CLEANING category, if(category.id === "gla") {
                 return (
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2, last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4, sm:px-6 py-3, sm:py-4, hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
                           <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                           <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
+                          <span className="text-foreground font-medium text-sm, sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm, sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
+                    <AccordionContent className="px-4, sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
                         <div className="flex justify-between text-muted-foreground text-sm">
@@ -911,25 +906,24 @@ export default function TotalsPage() {
                 );
               }
 
-              // Special handling for REIMBURSED AND NON-REIMBURSED BILLS category
-              if (category.id === "reimbursed-bills") {
+              // Special handling for REIMBURSED AND NON-REIMBURSED BILLS category, if(category.id === "reimbursed-bills") {
                 return (
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2, last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4, sm:px-6 py-3, sm:py-4, hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
                           <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                           <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
+                          <span className="text-foreground font-medium text-sm, sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm, sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
+                    <AccordionContent className="px-4, sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         <div className="flex justify-between text-muted-foreground text-sm">
                           <span>Electric - Reimbursed</span>
@@ -985,25 +979,24 @@ export default function TotalsPage() {
                 );
               }
 
-              // Special handling for OPERATING EXPENSES (Office Support) category - Only for All Cars Report
-              if (category.id === "operating-expenses-office") {
+              // Special handling for OPERATING, EXPENSES(Office Support) category - Only for All Cars Report, if(category.id === "operating-expenses-office") {
                 return (
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2, last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4, sm:px-6 py-3, sm:py-4, hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
                           <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                           <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
+                          <span className="text-foreground font-medium text-sm, sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm, sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
+                    <AccordionContent className="px-4, sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
                         <div className="flex justify-between text-muted-foreground text-sm">
@@ -1061,7 +1054,7 @@ export default function TotalsPage() {
                           </span>
                         </div>
                         <div className="flex justify-between text-muted-foreground text-sm">
-                          <span>General and administrative (G&A)</span>
+                          <span>General and, administrative(G&A)</span>
                           <span className="text-foreground">
                             {formatCurrency(totals?.operatingExpensesOffice?.generalAdministrative || 0)}
                           </span>
@@ -1193,7 +1186,7 @@ export default function TotalsPage() {
                           </span>
                         </div>
                         <div className="flex justify-between text-muted-foreground text-sm font-bold pt-2 border-t border-border">
-                          <span className="font-bold">Total OPERATING EXPENSES (Office Support)</span>
+                          <span className="font-bold">Total OPERATING, EXPENSES(Office Support)</span>
                           <span className="text-foreground font-bold">
                             {formatCurrency(totals?.operatingExpensesOffice?.total || 0)}
                           </span>
@@ -1210,25 +1203,24 @@ export default function TotalsPage() {
                 );
               }
 
-              // Special handling for HISTORY OF THE CARS category
-              if (category.id === "history") {
+              // Special handling for HISTORY OF THE CARS category, if(category.id === "history") {
                 return (
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2, last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4, sm:px-6 py-3, sm:py-4, hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
                           <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                           <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
+                          <span className="text-foreground font-medium text-sm, sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm, sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
+                    <AccordionContent className="px-4, sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
                         <div className="flex justify-between text-muted-foreground text-sm">
@@ -1255,25 +1247,24 @@ export default function TotalsPage() {
                 );
               }
 
-              // Special handling for PAYMENT HISTORY category
-              if (category.id === "payments") {
+              // Special handling for PAYMENT HISTORY category, if(category.id === "payments") {
                 return (
                   <AccordionItem
                     key={category.id}
                     value={category.id}
-                    className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
+                    className="border border-border rounded-lg overflow-hidden bg-card mb-2, last:mb-0"
                   >
-                    <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
+                    <AccordionTrigger className="px-4, sm:px-6 py-3, sm:py-4, hover:bg-muted transition-colors [&>svg]:hidden">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-2">
                           <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                           <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                          <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
+                          <span className="text-foreground font-medium text-sm, sm:text-base">{category.label}</span>
                         </div>
-                        <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
+                        <span className="text-foreground font-semibold text-sm, sm:text-base">TOTALS</span>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
+                    <AccordionContent className="px-4, sm:px-6 pb-4 bg-background">
                       <div className="space-y-2 pt-2">
                         {/* Child Items */}
                         <div className="flex justify-between text-muted-foreground text-sm">
@@ -1288,24 +1279,23 @@ export default function TotalsPage() {
                 );
               }
 
-              // Default handling for other categories
-              return (
+              // Default handling for other categories, return(
                 <AccordionItem
                   key={category.id}
                   value={category.id}
-                  className="border border-border rounded-lg overflow-hidden bg-card mb-2 last:mb-0"
+                  className="border border-border rounded-lg overflow-hidden bg-card mb-2, last:mb-0"
                 >
-                  <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:bg-muted transition-colors [&>svg]:hidden">
+                  <AccordionTrigger className="px-4, sm:px-6 py-3, sm:py-4, hover:bg-muted transition-colors [&>svg]:hidden">
                     <div className="flex items-center justify-between w-full pr-4">
                       <div className="flex items-center gap-2">
                         <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
                         <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                        <span className="text-foreground font-medium text-sm sm:text-base">{category.label}</span>
+                        <span className="text-foreground font-medium text-sm, sm:text-base">{category.label}</span>
                       </div>
-                      <span className="text-foreground font-semibold text-sm sm:text-base">TOTALS</span>
+                      <span className="text-foreground font-semibold text-sm, sm:text-base">TOTALS</span>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="px-4 sm:px-6 pb-4 bg-background">
+                  <AccordionContent className="px-4, sm:px-6 pb-4 bg-background">
                     <div className="space-y-2 pt-2">
                       {/* Placeholder content - will be replaced with actual data from API */}
                       <div className="flex justify-between text-muted-foreground text-sm">

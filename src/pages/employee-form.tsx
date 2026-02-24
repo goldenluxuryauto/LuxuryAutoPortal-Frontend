@@ -73,7 +73,7 @@ const ACCEPTED_DOC_TYPES = "image/jpeg,image/jpg,image/png,image/gif,image/webp,
 const MAX_FILE_SIZE_MB = 10;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
-export default function EmployeeFormPage() {
+export default function, EmployeeFormPage() {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [driverLicenseFile, setDriverLicenseFile] = useState<File | null>(null);
@@ -114,7 +114,7 @@ export default function EmployeeFormPage() {
 
   const mutation = useMutation({
     mutationFn: async (values: FormData) => {
-      const captchaValue = shouldShowRecaptcha ? recaptchaRef.current?.getValue() || "" : "";
+      const captchaValue = shouldShowRecaptcha ? recaptchaRef.current?.getValue() || "" : "`;
       const payload = {
         ...values,
         captchaValue: captchaValue || undefined,
@@ -122,18 +122,18 @@ export default function EmployeeFormPage() {
       };
 
       if (driverLicenseFile && driverLicenseFile.size > MAX_FILE_SIZE_BYTES) {
-        throw new Error(`Driver's license must be under ${MAX_FILE_SIZE_MB}MB`);
+        throw new, Error(`Driver's license must be under ${MAX_FILE_SIZE_MB}MB`);
       }
       if (carInsuranceFile && carInsuranceFile.size > MAX_FILE_SIZE_BYTES) {
-        throw new Error(`Car insurance document must be under ${MAX_FILE_SIZE_MB}MB`);
+        throw new, Error(`Car insurance document must be under ${MAX_FILE_SIZE_MB}MB`);
       }
 
-      const formData = new FormData();
-      formData.append("data", JSON.stringify(payload));
+      const formData = new, FormData();
+      formData.append(`data", JSON.stringify(payload));
       if (driverLicenseFile) formData.append("driver_license", driverLicenseFile, driverLicenseFile.name || "driver-license");
       if (carInsuranceFile) formData.append("car_insurance", carInsuranceFile, carInsuranceFile.name || "car-insurance");
 
-      const response = await fetch(buildApiUrl("/api/employees/onboarding/submit"), {
+      const response = await, fetch(buildApiUrl("/api/employees/onboarding/submit"), {
         method: "POST",
         body: formData,
         // Do not set Content-Type; browser sets multipart/form-data with boundary
@@ -141,7 +141,7 @@ export default function EmployeeFormPage() {
 
       const json = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(json?.error || json?.message || "Failed to submit employee onboarding form");
+        throw new, Error(json?.error || json?.message || "Failed to submit employee onboarding form");
       }
       return json;
     },
@@ -196,7 +196,7 @@ export default function EmployeeFormPage() {
       <div className="w-full max-w-3xl space-y-6">
         <div className="text-center">
           <img src="/logo.png" alt="Golden Luxury Auto" className="h-10 mx-auto mb-3" />
-          <h1 className="text-2xl sm:text-3xl font-serif text-primary italic">Employee Onboarding</h1>
+          <h1 className="text-2xl, sm:text-3xl font-serif text-primary italic">Employee Onboarding</h1>
           <p className="text-muted-foreground text-sm mt-1">Please complete your personal information.</p>
         </div>
 
@@ -221,7 +221,7 @@ export default function EmployeeFormPage() {
             >
               <section className="space-y-4">
                 <h2 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">Basic Information</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <Label className="text-muted-foreground">First Name *</Label>
                     <Input {...register("firstName")} className="bg-card border-border text-foreground" />
@@ -275,8 +275,8 @@ export default function EmployeeFormPage() {
 
               <section className="space-y-4">
                 <h2 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">Address & Contact</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1 md:col-span-2">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
+                  <div className="space-y-1, md:col-span-2">
                     <Label className="text-muted-foreground">Street *</Label>
                     <Input {...register("street")} className="bg-card border-border text-foreground" />
                     {errors.street && <p className="text-red-700 text-xs">{errors.street.message}</p>}
@@ -315,7 +315,7 @@ export default function EmployeeFormPage() {
 
               <section className="space-y-4">
                 <h2 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">Family Information</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <Label className="text-muted-foreground">Mother's Name *</Label>
                     <Input {...register("motherName")} className="bg-card border-border text-foreground" />
@@ -331,7 +331,7 @@ export default function EmployeeFormPage() {
                     <Input {...register("homeContact")} className="bg-card border-border text-foreground" />
                     {errors.homeContact && <p className="text-red-700 text-xs">{errors.homeContact.message}</p>}
                   </div>
-                  <div className="space-y-1 md:col-span-2">
+                  <div className="space-y-1, md:col-span-2">
                     <Label className="text-muted-foreground">Home Address *</Label>
                     <Textarea {...register("homeAddress")} className="bg-card border-border text-foreground min-h-[80px]" />
                     {errors.homeAddress && <p className="text-red-700 text-xs">{errors.homeAddress.message}</p>}
@@ -341,7 +341,7 @@ export default function EmployeeFormPage() {
 
               <section className="space-y-4">
                 <h2 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">Emergency Contact</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <Label className="text-muted-foreground">Emergency Contact Person *</Label>
                     <Input {...register("emergencyContactPerson")} className="bg-card border-border text-foreground" />
@@ -357,7 +357,7 @@ export default function EmployeeFormPage() {
                     <Input {...register("emergencyNumber")} className="bg-card border-border text-foreground" />
                     {errors.emergencyNumber && <p className="text-red-700 text-xs">{errors.emergencyNumber.message}</p>}
                   </div>
-                  <div className="space-y-1 md:col-span-2">
+                  <div className="space-y-1, md:col-span-2">
                     <Label className="text-muted-foreground">Address *</Label>
                     <Textarea {...register("emergencyAddress")} className="bg-card border-border text-foreground min-h-[80px]" />
                     {errors.emergencyAddress && <p className="text-red-700 text-xs">{errors.emergencyAddress.message}</p>}
@@ -367,7 +367,7 @@ export default function EmployeeFormPage() {
 
               <section className="space-y-4">
                 <h2 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">Other</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <Label className="text-muted-foreground">SSN / EIN *</Label>
                     <Input {...register("ssnEin")} className="bg-card border-border text-foreground" />
@@ -393,16 +393,16 @@ export default function EmployeeFormPage() {
                     {errors.shirtSize && <p className="text-red-700 text-xs">{errors.shirtSize.message}</p>}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-4 pt-2">
                   <div className="space-y-1">
-                    <Label className="text-muted-foreground">Driver&apos;s License (optional)</Label>
+                    <Label className="text-muted-foreground">Driver&apos;s, License(optional)</Label>
                     <p className="text-xs text-muted-foreground">JPEG, PNG, GIF, WebP or PDF, max {MAX_FILE_SIZE_MB}MB</p>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Input
                         id="driver-license-upload"
                         type="file"
                         accept={ACCEPTED_DOC_TYPES}
-                        className="bg-card border-border text-foreground file:mr-2 file:rounded file:border-0 file:bg-primary  file:text-primary-foreground file:text-sm"
+                        className="bg-card border-border text-foreground, file:mr-2, file:rounded, file:border-0, file:bg-primary  file:text-primary-foreground, file:text-sm"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) setDriverLicenseFile(file);
@@ -414,7 +414,7 @@ export default function EmployeeFormPage() {
                           <button
                             type="button"
                             onClick={() => setDriverLicenseFile(null)}
-                            className="p-0.5 rounded hover:bg-muted text-muted-foreground"
+                            className="p-0.5 rounded, hover:bg-muted text-muted-foreground"
                             aria-label="Remove file"
                           >
                             <X className="w-4 h-4" />
@@ -424,14 +424,14 @@ export default function EmployeeFormPage() {
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-muted-foreground">Car Insurance (optional)</Label>
+                    <Label className="text-muted-foreground">Car, Insurance(optional)</Label>
                     <p className="text-xs text-muted-foreground">JPEG, PNG, GIF, WebP or PDF, max {MAX_FILE_SIZE_MB}MB</p>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Input
                         id="car-insurance-upload"
                         type="file"
                         accept={ACCEPTED_DOC_TYPES}
-                        className="bg-card border-border text-foreground file:mr-2 file:rounded file:border-0 file:bg-primary  file:text-primary-foreground file:text-sm"
+                        className="bg-card border-border text-foreground, file:mr-2, file:rounded, file:border-0, file:bg-primary  file:text-primary-foreground, file:text-sm"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) setCarInsuranceFile(file);
@@ -443,7 +443,7 @@ export default function EmployeeFormPage() {
                           <button
                             type="button"
                             onClick={() => setCarInsuranceFile(null)}
-                            className="p-0.5 rounded hover:bg-muted text-muted-foreground"
+                            className="p-0.5 rounded, hover:bg-muted text-muted-foreground"
                             aria-label="Remove file"
                           >
                             <X className="w-4 h-4" />
@@ -465,7 +465,7 @@ export default function EmployeeFormPage() {
               )}
               {!shouldShowRecaptcha && (
                 <p className="text-muted-foreground text-xs italic">
-                  reCAPTCHA is not configured. For production, set VITE_RECAPTCHA_SITE_KEY (frontend) and RECAPTCHA_SECRET_KEY (backend).
+                  reCAPTCHA is not configured. For production, set, VITE_RECAPTCHA_SITE_KEY(frontend) and, RECAPTCHA_SECRET_KEY(backend).
                 </p>
               )}
 
@@ -473,7 +473,7 @@ export default function EmployeeFormPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="border-border text-primary hover:bg-card hover:text-primary"
+                  className="border-border text-primary, hover:bg-card, hover:text-primary"
                   onClick={() => form.reset(sampleFormData)}
                 >
                   <Wand2 className="w-4 h-4 mr-2" />
@@ -481,7 +481,7 @@ export default function EmployeeFormPage() {
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                  className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                   disabled={mutation.isPending}
                 >
                   {mutation.isPending ? (

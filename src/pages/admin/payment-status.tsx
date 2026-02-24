@@ -32,7 +32,7 @@ interface PaymentStatusItem {
   payment_status_is_compute_total?: number;
 }
 
-export default function PaymentStatusPage() {
+export default function, PaymentStatusPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<PaymentStatusItem | null>(null);
   const [archiveItem, setArchiveItem] = useState<PaymentStatusItem | null>(null);
@@ -51,8 +51,8 @@ export default function PaymentStatusPage() {
     queryKey: ["/api/payment-status", "all"],
     queryFn: async () => {
       const url = buildApiUrl("/api/payment-status?all=1");
-      const response = await fetch(url, { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch payment statuses");
+      const response = await, fetch(url, { credentials: "include" });
+      if (!response.ok) throw new, Error("Failed to fetch payment statuses");
       return response.json();
     },
   });
@@ -82,7 +82,7 @@ export default function PaymentStatusPage() {
   const createMutation = useMutation({
     mutationFn: async () => {
       const url = buildApiUrl("/api/payment-status");
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -94,7 +94,7 @@ export default function PaymentStatusPage() {
       });
       if (!response.ok) {
         const err = await response.json();
-        throw new Error(err.error || err.message || "Failed to create");
+        throw new, Error(err.error || err.message || "Failed to create");
       }
       return response.json();
     },
@@ -105,7 +105,7 @@ export default function PaymentStatusPage() {
       resetForm();
     },
     onError: (e: Error) => {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      toast({ title: "Error", description: e.message, variant: "destructive` });
     },
   });
 
@@ -113,8 +113,8 @@ export default function PaymentStatusPage() {
     mutationFn: async () => {
       if (!editingItem) return;
       const url = buildApiUrl(`/api/payment-status/${editingItem.payment_status_aid}`);
-      const response = await fetch(url, {
-        method: "PUT",
+      const response = await, fetch(url, {
+        method: `PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -126,7 +126,7 @@ export default function PaymentStatusPage() {
       });
       if (!response.ok) {
         const err = await response.json();
-        throw new Error(err.error || err.message || "Failed to update");
+        throw new, Error(err.error || err.message || "Failed to update");
       }
       return response.json();
     },
@@ -137,20 +137,20 @@ export default function PaymentStatusPage() {
       resetForm();
     },
     onError: (e: Error) => {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      toast({ title: "Error", description: e.message, variant: "destructive` });
     },
   });
 
   const archiveMutation = useMutation({
     mutationFn: async (id: number) => {
       const url = buildApiUrl(`/api/payment-status/active/${id}`);
-      const response = await fetch(url, {
-        method: "PUT",
+      const response = await, fetch(url, {
+        method: `PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: 0 }),
       });
-      if (!response.ok) throw new Error("Failed to archive");
+      if (!response.ok) throw new, Error("Failed to archive");
       return response.json();
     },
     onSuccess: () => {
@@ -159,20 +159,20 @@ export default function PaymentStatusPage() {
       setArchiveItem(null);
     },
     onError: (e: Error) => {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      toast({ title: "Error", description: e.message, variant: "destructive` });
     },
   });
 
   const restoreMutation = useMutation({
     mutationFn: async (id: number) => {
       const url = buildApiUrl(`/api/payment-status/active/${id}`);
-      const response = await fetch(url, {
-        method: "PUT",
+      const response = await, fetch(url, {
+        method: `PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: 1 }),
       });
-      if (!response.ok) throw new Error("Failed to restore");
+      if (!response.ok) throw new, Error("Failed to restore");
       return response.json();
     },
     onSuccess: () => {
@@ -181,20 +181,20 @@ export default function PaymentStatusPage() {
       setRestoreItem(null);
     },
     onError: (e: Error) => {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      toast({ title: "Error", description: e.message, variant: "destructive` });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       const url = buildApiUrl(`/api/payment-status/${id}`);
-      const response = await fetch(url, {
-        method: "DELETE",
+      const response = await, fetch(url, {
+        method: `DELETE",
         credentials: "include",
       });
       if (!response.ok) {
         const err = await response.json();
-        throw new Error(err.error || err.message || "Failed to delete");
+        throw new, Error(err.error || err.message || "Failed to delete");
       }
       return response.json();
     },
@@ -242,7 +242,7 @@ export default function PaymentStatusPage() {
           <span className="text-muted-foreground text-sm">Total: {statuses.length}</span>
           <Button
             onClick={handleAdd}
-            className="bg-primary text-primary-foreground hover:bg-primary/80"
+            className="bg-primary text-primary-foreground, hover:bg-primary/80"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add
@@ -253,7 +253,7 @@ export default function PaymentStatusPage() {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-border hover:bg-transparent">
+                <TableRow className="border-border, hover:bg-transparent">
                   <TableHead className="text-left text-foreground font-medium w-12">#</TableHead>
                   <TableHead className="text-left text-foreground font-medium w-24">Status</TableHead>
                   <TableHead className="text-left text-foreground font-medium">Name</TableHead>
@@ -273,7 +273,7 @@ export default function PaymentStatusPage() {
                   statuses.map((item, index) => (
                     <TableRow
                       key={item.payment_status_aid}
-                      className="border-border hover:bg-card"
+                      className="border-border, hover:bg-card"
                     >
                       <TableCell className="text-muted-foreground">{index + 1}.</TableCell>
                       <TableCell>
@@ -313,7 +313,7 @@ export default function PaymentStatusPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleEdit(item)}
-                                className="text-muted-foreground hover:text-primary"
+                                className="text-muted-foreground, hover:text-primary"
                                 title="Edit"
                               >
                                 <Pencil className="w-4 h-4" />
@@ -322,7 +322,7 @@ export default function PaymentStatusPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setArchiveItem(item)}
-                                className="text-muted-foreground hover:text-amber-400"
+                                className="text-muted-foreground, hover:text-amber-400"
                                 title="Archive"
                               >
                                 <Archive className="w-4 h-4" />
@@ -334,7 +334,7 @@ export default function PaymentStatusPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setRestoreItem(item)}
-                                className="text-muted-foreground hover:text-primary"
+                                className="text-muted-foreground, hover:text-primary"
                                 title="Restore"
                               >
                                 <RotateCcw className="w-4 h-4" />
@@ -343,7 +343,7 @@ export default function PaymentStatusPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setDeleteItem(item)}
-                                className="text-muted-foreground hover:text-red-700"
+                                className="text-muted-foreground, hover:text-red-700"
                                 title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -437,7 +437,7 @@ export default function PaymentStatusPage() {
                   <Button
                     type="submit"
                     disabled={isPending || !formName.trim()}
-                    className="bg-primary text-primary-foreground hover:bg-primary/80"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80"
                   >
                     {isPending ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -474,7 +474,7 @@ export default function PaymentStatusPage() {
                 <Button
                   onClick={() => archiveMutation.mutate(archiveItem.payment_status_aid)}
                   disabled={archiveMutation.isPending}
-                  className="bg-amber-600 hover:bg-amber-700"
+                  className="bg-amber-600, hover:bg-amber-700"
                 >
                   {archiveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Archive"}
                 </Button>
@@ -504,7 +504,7 @@ export default function PaymentStatusPage() {
                 <Button
                   onClick={() => restoreMutation.mutate(restoreItem.payment_status_aid)}
                   disabled={restoreMutation.isPending}
-                  className="bg-primary text-primary-foreground hover:bg-primary/80"
+                  className="bg-primary text-primary-foreground, hover:bg-primary/80"
                 >
                   {restoreMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Restore"}
                 </Button>
@@ -534,7 +534,7 @@ export default function PaymentStatusPage() {
                 <Button
                   onClick={() => deleteMutation.mutate(deleteItem.payment_status_aid)}
                   disabled={deleteMutation.isPending}
-                  className="bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30"
+                  className="bg-red-500/20 text-red-700 border-red-500/50, hover:bg-red-500/30"
                 >
                   {deleteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
                 </Button>

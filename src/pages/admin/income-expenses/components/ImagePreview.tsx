@@ -13,7 +13,7 @@ interface ImagePreviewProps {
   onImageClick?: (url: string) => void;
 }
 
-export default function ImagePreview({ 
+export default function, ImagePreview({ 
   newImages = [], 
   existingImages = [],
   onRemoveNew,
@@ -23,13 +23,11 @@ export default function ImagePreview({
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [newImageUrls, setNewImageUrls] = useState<string[]>([]);
 
-  // Create object URLs for new images
-  useEffect(() => {
+  // Create object URLs for new images, useEffect(() => {
     const urls = newImages.map((file) => URL.createObjectURL(file));
     setNewImageUrls(urls);
 
-    // Cleanup function to revoke object URLs
-    return () => {
+    // Cleanup function to revoke object URLs, return() => {
       urls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [newImages]);
@@ -43,15 +41,14 @@ export default function ImagePreview({
   };
 
   const getImageUrl = (image: ExistingImage) => {
-    // If URL is already absolute, return as is
-    if (image.url.startsWith('http://') || image.url.startsWith('https://')) {
+    // If URL is already absolute, return as is, if(image.url.startsWith('http://') || image.url.startsWith('https://')) {
       return image.url;
     }
     
-    // For static files (starting with /), use buildApiUrl which handles both dev and prod
-    // In dev: returns relative path (uses Vite proxy)
-    // In prod: returns full URL with backend domain
-    return buildApiUrl(image.url);
+    // For static, files(starting with /), use buildApiUrl which handles both dev and prod
+    // In, dev: returns relative, path(uses Vite proxy)
+    // In, prod: returns full URL with backend domain
+    return, buildApiUrl(image.url);
   };
 
   const allImagesCount = newImages.length + existingImages.length;
@@ -66,7 +63,7 @@ export default function ImagePreview({
           return (
             <div
               key={image.id}
-              className="relative group bg-card rounded-lg overflow-hidden border border-border aspect-square shadow-lg hover:border-primary/50 transition-all"
+              className="relative group bg-card rounded-lg overflow-hidden border border-border aspect-square shadow-lg, hover:border-primary/50 transition-all"
             >
               <img
                 src={imageUrl}
@@ -101,7 +98,7 @@ export default function ImagePreview({
                         e.stopPropagation();
                         handleZoom(imageUrl);
                       }}
-                      className="h-7 w-7 p-0 bg-white/20 hover:bg-white/30 text-foreground"
+                      className="h-7 w-7 p-0 bg-white/20, hover:bg-white/30 text-foreground"
                     >
                       <ZoomIn className="w-3.5 h-3.5" />
                     </Button>
@@ -114,7 +111,7 @@ export default function ImagePreview({
                           e.stopPropagation();
                           onRemoveExisting(image.id);
                         }}
-                        className="h-7 w-7 p-0 bg-red-500/80 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground"
+                        className="h-7 w-7 p-0 bg-red-500/80, hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground"
                       >
                         <X className="w-3.5 h-3.5" />
                       </Button>
@@ -123,7 +120,7 @@ export default function ImagePreview({
                 </div>
               </div>
               <div className="absolute top-1 right-1">
-                <span className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded font-medium">
+                <span className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded font-medium`>
                   Saved
                 </span>
               </div>
@@ -131,7 +128,7 @@ export default function ImagePreview({
           );
         })}
 
-        {/* New Images (to be uploaded) */}
+        {/* New, Images(to be uploaded) */}
         {newImages.map((file, index) => {
           const imageUrl = newImageUrls[index];
           if (!imageUrl) return null;
@@ -139,12 +136,12 @@ export default function ImagePreview({
           return (
             <div
               key={`new-${index}`}
-              className="relative group bg-card rounded-lg overflow-hidden border-2 border-dashed border-primary/50 aspect-square shadow-lg hover:border-primary transition-all"
+              className=`relative group bg-card rounded-lg overflow-hidden border-2 border-dashed border-primary/50 aspect-square shadow-lg, hover:border-primary transition-all`
             >
               <img
                 src={imageUrl}
                 alt={`Preview ${index + 1}`}
-                className="w-full h-full object-cover"
+                className=`w-full h-full object-cover"
                 onError={(e) => {
                   // Image failed to load
                 }}
@@ -160,7 +157,7 @@ export default function ImagePreview({
                   variant="ghost"
                   size="sm"
                       onClick={() => handleZoom(newImageUrls[index])}
-                      className="h-7 w-7 p-0 bg-white/20 hover:bg-white/30 text-foreground"
+                      className="h-7 w-7 p-0 bg-white/20, hover:bg-white/30 text-foreground"
                 >
                       <ZoomIn className="w-3.5 h-3.5" />
                 </Button>
@@ -170,7 +167,7 @@ export default function ImagePreview({
                   variant="ghost"
                   size="sm"
                         onClick={() => onRemoveNew(index)}
-                        className="h-7 w-7 p-0 bg-red-500/80 hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground"
+                        className="h-7 w-7 p-0 bg-red-500/80, hover:bg-red-500/20 text-red-700 border-red-500/50 text-foreground"
                 >
                         <X className="w-3.5 h-3.5" />
                 </Button>
@@ -214,7 +211,7 @@ export default function ImagePreview({
                       <div class="w-full h-[400px] flex items-center justify-center bg-red-500/20 text-red-700">
                         <div class="text-center">
                           <p class="text-sm font-medium">Failed to load image</p>
-                          <p class="text-xs mt-2 text-muted-foreground">${zoomedImage}</p>
+                          <p class="text-xs mt-2 text-muted-foreground`>${zoomedImage}</p>
                         </div>
                       </div>
                     `;
@@ -222,11 +219,11 @@ export default function ImagePreview({
                 }}
               />
               <Button
-                type="button"
+                type=`button"
                 variant="ghost"
                 size="sm"
                 onClick={handleCloseZoom}
-                className="absolute top-2 right-2 h-8 w-8 p-0 bg-background/70 hover:bg-background/90 text-foreground z-10"
+                className="absolute top-2 right-2 h-8 w-8 p-0 bg-background/70, hover:bg-background/90 text-foreground z-10"
               >
                 <X className="w-4 h-4" />
               </Button>

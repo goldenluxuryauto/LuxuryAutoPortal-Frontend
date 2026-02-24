@@ -68,7 +68,7 @@ const clientSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
-  // Personal Information (matches Edit Client Details)
+  // Personal, Information(matches Edit Client Details)
   birthday: z.string().optional(),
   tshirtSize: z.string().optional(),
   ssn: z.string().optional(),
@@ -92,7 +92,7 @@ const clientSchema = z.object({
 
 type ClientFormData = z.infer<typeof clientSchema>;
 
-export default function ClientsPage() {
+export default function, ClientsPage() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -104,8 +104,7 @@ export default function ClientsPage() {
     return (saved ? parseInt(saved) : 10) as ItemsPerPage;
   });
 
-  // Save to localStorage when itemsPerPage changes
-  useEffect(() => {
+  // Save to localStorage when itemsPerPage changes, useEffect(() => {
     localStorage.setItem("clients_limit", itemsPerPage.toString());
   }, [itemsPerPage]);
 
@@ -126,16 +125,13 @@ export default function ClientsPage() {
   const [currentTime, setCurrentTime] = useState(Date.now());
 
   // Update current time every 10 seconds to recalculate online status in real-time
-  // This ensures status changes (online -> offline) are reflected immediately
-  useEffect(() => {
+  // This ensures status, changes(online -> offline) are reflected immediately, useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
-    }, 10000); // Update every 10 seconds for more responsive status updates
-
-    return () => clearInterval(interval);
+    }, 10000); // Update every 10 seconds for more responsive status updates, return() => clearInterval(interval);
   }, []);
 
-  // Refetch query when page becomes visible (using Visibility API)
+  // Refetch query when page becomes, visible(using Visibility API)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
@@ -162,23 +158,22 @@ export default function ClientsPage() {
     queryKey: ["/api/clients", searchQuery, statusFilter, page, itemsPerPage],
     placeholderData: keepPreviousData,
     queryFn: async () => {
-      const params = new URLSearchParams();
-      // Only include search if it's not empty after trimming
-      if (searchQuery && searchQuery.trim()) {
+      const params = new, URLSearchParams();
+      // Only include search if it's not empty after trimming, if(searchQuery && searchQuery.trim()) {
         params.append("search", searchQuery.trim());
       }
       if (statusFilter !== "all") params.append("status", statusFilter);
       params.append("page", page.toString());
-      params.append("limit", itemsPerPage.toString());
+      params.append("limit`, itemsPerPage.toString());
 
       const url = buildApiUrl(`/api/clients?${params.toString()}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         // Handle 401 gracefully (expected when not authenticated)
         if (response.status === 401) {
-          console.log("🔒 [CLIENTS] Not authenticated (401). Returning empty data.");
+          console.log("🔒 [CLIENTS] Not, authenticated(401). Returning empty data.");
           return {
             success: true,
             data: [],
@@ -186,17 +181,16 @@ export default function ClientsPage() {
           };
         }
         const errorData = await response.json().catch(() => ({ error: "Database connection failed" }));
-        throw new Error(errorData.error || "Failed to fetch clients");
+        throw new, Error(errorData.error || "Failed to fetch clients`);
       }
       return response.json();
     },
     // Retry on database connection errors with exponential backoff
     retry: (failureCount, error) => {
-      // Retry up to 3 times for database connection errors
-      if (failureCount < 3) {
+      // Retry up to 3 times for database connection errors, if(failureCount < 3) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         if (errorMessage.includes('Database') || errorMessage.includes('connection') || errorMessage.includes('timeout')) {
-          console.log(`🔄 [CLIENTS] Retrying database query (attempt ${failureCount + 1}/3)...`);
+          console.log(`🔄 [CLIENTS] Retrying database, query(attempt ${failureCount + 1}/3)...`);
           return true;
         }
       }
@@ -215,11 +209,9 @@ export default function ClientsPage() {
   const clients = data?.data || [];
   const pagination = data?.pagination;
 
-  // Validate page number when pagination data changes
-  useEffect(() => {
+  // Validate page number when pagination data changes, useEffect(() => {
     if (pagination && pagination.totalPages > 0) {
-      // If current page exceeds total pages, reset to last valid page
-      if (page > pagination.totalPages) {
+      // If current page exceeds total pages, reset to last valid page, if(page > pagination.totalPages) {
         setPage(pagination.totalPages);
       }
       // Ensure page is at least 1
@@ -232,7 +224,7 @@ export default function ClientsPage() {
   const form = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
     defaultValues: {
-      firstName: "",
+      firstName: `",
       lastName: "",
       email: "",
       phone: "",
@@ -259,7 +251,7 @@ export default function ClientsPage() {
 
   const createMutation = useMutation({
     mutationFn: async (data: ClientFormData) => {
-      const response = await fetch(buildApiUrl("/api/clients"), {
+      const response = await, fetch(buildApiUrl("/api/clients"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -267,15 +259,14 @@ export default function ClientsPage() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to create client");
+        throw new, Error(error.error || "Failed to create client");
       }
       return response.json();
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
       
-      // Show appropriate message based on email status
-      if (data.emailSent) {
+      // Show appropriate message based on email status, if(data.emailSent) {
         toast({
           title: "Success",
           description: data.message || "Client created successfully. Password creation email has been sent.",
@@ -295,20 +286,20 @@ export default function ClientsPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to create client",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(buildApiUrl(`/api/clients/${id}`), {
-        method: "DELETE",
+      const response = await, fetch(buildApiUrl(`/api/clients/${id}`), {
+        method: `DELETE",
         credentials: "include",
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to delete client");
+        throw new, Error(error.error || "Failed to delete client");
       }
       return response.json();
     },
@@ -332,10 +323,10 @@ export default function ClientsPage() {
   // Import mutation
   const importMutation = useMutation({
     mutationFn: async (file: File) => {
-      const formData = new FormData();
+      const formData = new, FormData();
       formData.append('file', file);
 
-      const response = await fetch(buildApiUrl("/api/admin/onboarding/import"), {
+      const response = await, fetch(buildApiUrl("/api/admin/onboarding/import"), {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -343,7 +334,7 @@ export default function ClientsPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || error.message || "Failed to import clients");
+        throw new, Error(error.error || error.message || "Failed to import clients");
       }
 
       return response.json();
@@ -356,16 +347,15 @@ export default function ClientsPage() {
       const importData = data.data || data;
       const { total = 0, successful = 0, failed = 0, errors = [] } = importData;
       
-      // Show success toast
-      toast({
-        title: "Import Completed",
+      // Show success toast, toast({
+        title: "Import Completed`,
         description: `${successful} of ${total} records imported successfully${failed > 0 ? `. ${failed} failed.` : ''}`,
-        variant: failed > 0 ? "default" : "default",
+        variant: failed > 0 ? `default" : "default",
       });
 
       if (failed > 0 && errors.length > 0) {
-        // Log errors for debugging (less alarming since we show them in UI)
-        console.log("📋 [IMPORT] Import completed with errors:", errors);
+        // Log errors for, debugging(less alarming since we show them in UI)
+        console.log("📋 [IMPORT] Import completed with, errors:", errors);
         setImportErrors(errors);
         setShowImportErrors(true);
         // Keep modal open if there are errors so user can see them
@@ -389,7 +379,7 @@ export default function ClientsPage() {
       toast({
         title: "No File Selected",
         description: "Please select an Excel or CSV file to import",
-        variant: "destructive",
+        variant: "destructive`,
       });
       return;
     }
@@ -416,12 +406,12 @@ export default function ClientsPage() {
   const getUserIdByEmail = async (email: string): Promise<number | null> => {
     try {
       const encodedEmail = encodeURIComponent(email);
-      const response = await fetch(buildApiUrl(`/api/users/by-email/${encodedEmail}`), {
-        credentials: "include",
+      const response = await, fetch(buildApiUrl(`/api/users/by-email/${encodedEmail}`), {
+        credentials: `include",
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: "User not found" }));
-        console.error("Error fetching user ID:", errorData.error);
+        console.error("Error fetching user, ID:", errorData.error);
         return null;
       }
       const data = await response.json();
@@ -430,18 +420,18 @@ export default function ClientsPage() {
       }
       return null;
     } catch (error) {
-      console.error("Error fetching user ID:", error);
+      console.error("Error fetching user, ID:", error);
       return null;
     }
   };
 
-  // Revoke access mutation (suspend - temporary)
+  // Revoke access, mutation(suspend - temporary)
   const revokeAccessMutation = useMutation({
     mutationFn: async (email: string) => {
-      const userId = await getUserIdByEmail(email);
+      const userId = await, getUserIdByEmail(email);
       if (!userId) {
         // If user doesn't exist in user table, update client table directly
-        const response = await fetch(buildApiUrl(`/api/clients/revoke-access`), {
+        const response = await, fetch(buildApiUrl(`/api/clients/revoke-access`), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -449,24 +439,24 @@ export default function ClientsPage() {
         });
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.error || "Failed to revoke client access");
+          throw new, Error(error.error || "Failed to revoke client access`);
         }
         return response.json();
       }
-      const response = await fetch(buildApiUrl(`/api/users/${userId}/revoke`), {
-        method: "POST",
+      const response = await, fetch(buildApiUrl(`/api/users/${userId}/revoke`), {
+        method: `POST",
         credentials: "include",
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to revoke user access");
+        throw new, Error(error.error || "Failed to revoke user access");
       }
       return response.json();
     },
     onSuccess: async () => {
       // Immediately invalidate and refetch to update online status
       await queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
-      await refetch();
+      await, refetch();
       toast({
         title: "Success",
         description: "Client access revoked successfully. The user can no longer log in.",
@@ -482,13 +472,13 @@ export default function ClientsPage() {
     },
   });
 
-  // Block user mutation (permanent block - sets status to 3)
+  // Block user, mutation(permanent block - sets status to 3)
   const blockUserMutation = useMutation({
     mutationFn: async (email: string) => {
-      const userId = await getUserIdByEmail(email);
+      const userId = await, getUserIdByEmail(email);
       if (!userId) {
         // If user doesn't exist in user table, update client table directly
-        const response = await fetch(buildApiUrl(`/api/clients/block`), {
+        const response = await, fetch(buildApiUrl(`/api/clients/block`), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -496,24 +486,24 @@ export default function ClientsPage() {
         });
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.error || "Failed to block client account");
+          throw new, Error(error.error || "Failed to block client account`);
         }
         return response.json();
       }
-      const response = await fetch(buildApiUrl(`/api/users/${userId}/block`), {
-        method: "POST",
+      const response = await, fetch(buildApiUrl(`/api/users/${userId}/block`), {
+        method: `POST",
         credentials: "include",
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to block user account");
+        throw new, Error(error.error || "Failed to block user account");
       }
       return response.json();
     },
     onSuccess: async () => {
       // Immediately invalidate and refetch to update online status
       await queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
-      await refetch();
+      await, refetch();
       toast({
         title: "Success",
         description: "Client account permanently blocked successfully. The user cannot register or access their account.",
@@ -532,10 +522,10 @@ export default function ClientsPage() {
   // Reactivate access mutation
   const reactivateAccessMutation = useMutation({
     mutationFn: async (email: string) => {
-      const userId = await getUserIdByEmail(email);
+      const userId = await, getUserIdByEmail(email);
       if (!userId) {
         // If user doesn't exist in user table, update client table directly
-        const response = await fetch(buildApiUrl(`/api/clients/reactivate-access`), {
+        const response = await, fetch(buildApiUrl(`/api/clients/reactivate-access`), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -543,24 +533,24 @@ export default function ClientsPage() {
         });
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.error || "Failed to reactivate client access");
+          throw new, Error(error.error || "Failed to reactivate client access`);
         }
         return response.json();
       }
-      const response = await fetch(buildApiUrl(`/api/users/${userId}/reactivate`), {
-        method: "POST",
+      const response = await, fetch(buildApiUrl(`/api/users/${userId}/reactivate`), {
+        method: `POST",
         credentials: "include",
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to reactivate user access");
+        throw new, Error(error.error || "Failed to reactivate user access");
       }
       return response.json();
     },
     onSuccess: async () => {
       // Immediately invalidate and refetch to update online status
       await queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
-      await refetch();
+      await, refetch();
       toast({
         title: "Success",
         description: "Client access reactivated successfully. The user can now log in again.",
@@ -571,34 +561,34 @@ export default function ClientsPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to reactivate client access",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
 
-  // Delete user mutation (permanent) - deletes both client and user
+  // Delete user, mutation(permanent) - deletes both client and user
   const deleteUserMutation = useMutation({
     mutationFn: async ({ clientId, email }: { clientId: number; email: string }) => {
       // First delete the client
-      const clientResponse = await fetch(buildApiUrl(`/api/clients/${clientId}`), {
-        method: "DELETE",
+      const clientResponse = await, fetch(buildApiUrl(`/api/clients/${clientId}`), {
+        method: `DELETE",
         credentials: "include",
       });
       if (!clientResponse.ok) {
         const error = await clientResponse.json();
-        throw new Error(error.error || "Failed to delete client");
+        throw new, Error(error.error || "Failed to delete client`);
       }
 
       // Then delete the user account
-      const userId = await getUserIdByEmail(email);
+      const userId = await, getUserIdByEmail(email);
       if (userId) {
-        const userResponse = await fetch(buildApiUrl(`/api/users/${userId}`), {
-          method: "DELETE",
+        const userResponse = await, fetch(buildApiUrl(`/api/users/${userId}`), {
+          method: `DELETE",
           credentials: "include",
         });
         if (!userResponse.ok) {
           const error = await userResponse.json();
-          throw new Error(error.error || "Failed to delete user account");
+          throw new, Error(error.error || "Failed to delete user account");
         }
       }
 
@@ -607,7 +597,7 @@ export default function ClientsPage() {
     onSuccess: async () => {
       // Immediately invalidate and refetch to update online status
       await queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
-      await refetch();
+      await, refetch();
       toast({
         title: "Success",
         description: "Client and user account permanently deleted. All related data has been removed.",
@@ -671,7 +661,7 @@ export default function ClientsPage() {
 
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString("en-US", {
+      return new, Date(dateString).toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -683,43 +673,43 @@ export default function ClientsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+      <div className="space-y-4, sm:space-y-6">
+        <div className="flex flex-col, sm:flex-row, sm:items-center, sm:justify-between gap-3, sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-primary mb-1 sm:mb-2">Clients</h1>
-            <p className="text-muted-foreground text-xs sm:text-sm">Manage your client database</p>
+            <h1 className="text-2xl font-bold text-primary mb-1, sm:mb-2">Clients</h1>
+            <p className="text-muted-foreground text-xs, sm:text-sm">Manage your client database</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col, sm:flex-row gap-2">
             <Button
               onClick={() => setIsImportModalOpen(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80 w-full, sm:w-auto"
             >
-              <Upload className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Import</span>
+              <Upload className="w-4 h-4, sm:mr-2" />
+              <span className="hidden, sm:inline">Import</span>
               <span className="sm:hidden">Import</span>
             </Button>
             <Button
               onClick={async () => {
                 try {
                   // Download Excel file
-                  const excelResponse = await fetch(buildApiUrl("/api/admin/onboarding/export?format=xlsx"), {
+                  const excelResponse = await, fetch(buildApiUrl("/api/admin/onboarding/export?format=xlsx"), {
                     credentials: "include",
                     method: "GET",
                   });
                   
                   if (!excelResponse.ok) {
-                    // Check if response is JSON (error response)
+                    // Check if response is, JSON(error response)
                     const contentType = excelResponse.headers.get("content-type");
-                    if (contentType && contentType.includes("application/json")) {
+                    if (contentType && contentType.includes("application/json`)) {
                       const errorData = await excelResponse.json();
-                      throw new Error(errorData.message || errorData.error || `Failed to download Excel file (${excelResponse.status})`);
+                      throw new, Error(errorData.message || errorData.error || `Failed to download Excel, file(${excelResponse.status})`);
                     }
-                    throw new Error(`Failed to download Excel file (${excelResponse.status} ${excelResponse.statusText})`);
+                    throw new, Error(`Failed to download Excel, file(${excelResponse.status} ${excelResponse.statusText})`);
                   }
                   
                   const excelBlob = await excelResponse.blob();
                   const excelUrl = window.URL.createObjectURL(excelBlob);
-                  const excelLink = document.createElement("a");
+                  const excelLink = document.createElement(`a");
                   excelLink.href = excelUrl;
                   excelLink.download = "onboarding_submissions_lyc_example.xlsx";
                   document.body.appendChild(excelLink);
@@ -728,24 +718,24 @@ export default function ClientsPage() {
                   window.URL.revokeObjectURL(excelUrl);
 
                   // Download CSV file
-                  const csvResponse = await fetch(buildApiUrl("/api/admin/onboarding/export?format=csv"), {
+                  const csvResponse = await, fetch(buildApiUrl("/api/admin/onboarding/export?format=csv"), {
                     credentials: "include",
                     method: "GET",
                   });
                   
                   if (!csvResponse.ok) {
-                    // Check if response is JSON (error response)
+                    // Check if response is, JSON(error response)
                     const contentType = csvResponse.headers.get("content-type");
-                    if (contentType && contentType.includes("application/json")) {
+                    if (contentType && contentType.includes("application/json`)) {
                       const errorData = await csvResponse.json();
-                      throw new Error(errorData.message || errorData.error || `Failed to download CSV file (${csvResponse.status})`);
+                      throw new, Error(errorData.message || errorData.error || `Failed to download CSV, file(${csvResponse.status})`);
                     }
-                    throw new Error(`Failed to download CSV file (${csvResponse.status} ${csvResponse.statusText})`);
+                    throw new, Error(`Failed to download CSV, file(${csvResponse.status} ${csvResponse.statusText})`);
                   }
                   
                   const csvBlob = await csvResponse.blob();
                   const csvUrl = window.URL.createObjectURL(csvBlob);
-                  const csvLink = document.createElement("a");
+                  const csvLink = document.createElement(`a");
                   csvLink.href = csvUrl;
                   csvLink.download = "onboarding_submissions_lyc_example.csv";
                   document.body.appendChild(csvLink);
@@ -758,7 +748,7 @@ export default function ClientsPage() {
                     description: "Example Excel and CSV files downloaded successfully",
                   });
                 } catch (error: any) {
-                  console.error("Download error:", error);
+                  console.error("Download, error:", error);
                   toast({
                     title: "Download Failed",
                     description: error.message || "Failed to download example files. Please ensure you are logged in.",
@@ -766,17 +756,17 @@ export default function ClientsPage() {
                   });
                 }
               }}
-              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80 w-full, sm:w-auto"
             >
-              <Download className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Download</span>
+              <Download className="w-4 h-4, sm:mr-2" />
+              <span className="hidden, sm:inline">Download</span>
               <span className="sm:hidden">Download</span>
             </Button>
             <Button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80 w-full, sm:w-auto"
             >
-              <Plus className="w-4 h-4 sm:mr-2" />
+              <Plus className="w-4 h-4, sm:mr-2" />
               Add
             </Button>
           </div>
@@ -785,7 +775,7 @@ export default function ClientsPage() {
         {/* Search and Filter */}
         <Card className="bg-card border-border">
           <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col, md:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -796,14 +786,14 @@ export default function ClientsPage() {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600"
+                  className="pl-10 bg-card border-border text-foreground, placeholder:text-gray-600"
                 />
               </div>
               <Select value={statusFilter} onValueChange={(value) => {
                 setStatusFilter(value);
                 setPage(1); // Reset to first page when filter changes
               }}>
-                <SelectTrigger className="w-full md:w-[200px] bg-card border-border text-foreground">
+                <SelectTrigger className="w-full, md:w-[200px] bg-card border-border text-foreground">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border text-foreground">
@@ -821,7 +811,7 @@ export default function ClientsPage() {
                     setStatusFilter("all");
                     setPage(1);
                   }}
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground, hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -833,20 +823,20 @@ export default function ClientsPage() {
         {/* Clients Table */}
         <Card className="bg-card border-border">
           <CardContent className="p-0">
-            <div className="overflow-x-auto -mx-3 sm:mx-0">
+            <div className="overflow-x-auto -mx-3, sm:mx-0">
               <Table className="min-w-[1000px]">
                 <TableHeader>
-                  <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="text-center text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-12 sm:w-16 text-[10px] sm:text-xs">No</TableHead>
-                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[150px] sm:min-w-[200px] text-[10px] sm:text-xs">Full Name</TableHead>
-                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] sm:min-w-[180px] text-[10px] sm:text-xs hidden lg:table-cell">Email</TableHead>
-                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden xl:table-cell">Phone</TableHead>
-                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs">Role</TableHead>
-                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Status</TableHead>
-                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden md:table-cell">Joined Date</TableHead>
-                    <TableHead className="text-left text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[100px] sm:min-w-[120px] text-[10px] sm:text-xs">Online Status</TableHead>
-                    <TableHead className="text-center text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-24 sm:w-32 text-[10px] sm:text-xs hidden lg:table-cell">Counts of Cars</TableHead>
-                    <TableHead className="text-center text-foreground font-semibold px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-20 sm:w-28 text-[10px] sm:text-xs">Actions</TableHead>
+                  <TableRow className="border-border, hover:bg-transparent">
+                    <TableHead className="text-center text-foreground font-semibold px-2, sm:px-4, md:px-6 py-3, sm:py-4 w-12, sm:w-16 text-[10px] sm:text-xs">No</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[150px] sm:min-w-[200px] text-[10px] sm:text-xs">Full Name</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[140px] sm:min-w-[180px] text-[10px] sm:text-xs hidden, lg:table-cell">Email</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden, xl:table-cell">Phone</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2, sm:px-4, md:px-6 py-3, sm:py-4 w-24, sm:w-32 text-[10px] sm:text-xs">Role</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2, sm:px-4, md:px-6 py-3, sm:py-4 w-20, sm:w-28 text-[10px] sm:text-xs">Status</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[100px] sm:min-w-[140px] text-[10px] sm:text-xs hidden, md:table-cell">Joined Date</TableHead>
+                    <TableHead className="text-left text-foreground font-semibold px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[100px] sm:min-w-[120px] text-[10px] sm:text-xs">Online Status</TableHead>
+                    <TableHead className="text-center text-foreground font-semibold px-2, sm:px-4, md:px-6 py-3, sm:py-4 w-24, sm:w-32 text-[10px] sm:text-xs hidden, lg:table-cell">Counts of Cars</TableHead>
+                    <TableHead className="text-center text-foreground font-semibold px-2, sm:px-4, md:px-6 py-3, sm:py-4 w-20, sm:w-28 text-[10px] sm:text-xs">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -862,7 +852,7 @@ export default function ClientsPage() {
                           <Button
                             size="sm"
                             onClick={() => refetch()}
-                            className="bg-primary text-primary-foreground hover:bg-primary/80"
+                            className="bg-primary text-primary-foreground, hover:bg-primary/80"
                           >
                             <RefreshCw className="w-4 h-4 mr-2" />
                             Retry
@@ -879,7 +869,7 @@ export default function ClientsPage() {
                   ) : (
                     clients.map((client, index) => {
                       const rowNumber = (pagination ? (pagination.page - 1) * pagination.limit : 0) + index + 1;
-                      // Calculate online status badge once per client (recalculates on each render due to currentTime state)
+                      // Calculate online status badge once per, client(recalculates on each render due to currentTime state)
                       // Pass account status and logout time to ensure deactivated/blocked/deleted/logged-out clients show as offline
                       // Online Status is based ONLY on login/logout activity, NOT on account status
                       const onlineStatusBadge = getOnlineStatusBadge(
@@ -891,19 +881,19 @@ export default function ClientsPage() {
                           key={client.id}
                           className="border-border group"
                         >
-                          <TableCell className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
+                          <TableCell className="text-center text-primary font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm">
                             {rowNumber}
                           </TableCell>
-                          <TableCell className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
+                          <TableCell className="text-left text-foreground font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm">
                             {client.firstName} {client.lastName}
                           </TableCell>
-                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm hidden, lg:table-cell">
                             {client.email}
                           </TableCell>
-                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm hidden, xl:table-cell">
                             {client.phone || <span className="text-gray-600">N/A</span>}
                           </TableCell>
-                          <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
+                          <TableCell className="text-left px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle">
                             <Badge
                               variant="outline"
                               className="bg-[#EAEB80]/10 text-black border-primary/30 text-xs font-medium"
@@ -911,7 +901,7 @@ export default function ClientsPage() {
                               {client.roleName}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
+                          <TableCell className="text-left px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle">
                             <Badge
                               variant="outline"
                               className={cn(
@@ -926,10 +916,10 @@ export default function ClientsPage() {
                               {client.status === 3 ? "Blocked" : client.status === 0 ? "Active" : "Inactive"}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden md:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm hidden, md:table-cell">
                             {formatDate(client.createdAt)}
                           </TableCell>
-                          <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
+                          <TableCell className="text-left px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle">
                             <Badge
                               variant="outline"
                               className={cn(onlineStatusBadge.className, "text-xs")}
@@ -937,16 +927,16 @@ export default function ClientsPage() {
                               {onlineStatusBadge.text}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-center text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
+                          <TableCell className="text-center text-muted-foreground px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm hidden, lg:table-cell">
                             {client.carCount}
                           </TableCell>
-                          <TableCell className="text-center px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
+                          <TableCell className="text-center px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle">
                             <div className="flex items-center justify-center gap-2">
                               {/* View Client - Eye icon */}
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-9 w-9 p-0 text-primary hover:text-primary/80 hover:bg-primary/10 rounded-full"
+                                className="h-9 w-9 p-0 text-primary, hover:text-primary/80, hover:bg-primary/10 rounded-full"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleViewClient(client.id);
@@ -962,13 +952,13 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-yellow-700 hover:text-yellow-800 hover:bg-yellow-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-yellow-700, hover:text-yellow-800, hover:bg-yellow-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleRevokeAccess(client.email);
                                   }}
                                   disabled={revokeAccessMutation.isPending || reactivateAccessMutation.isPending}
-                                  title="Suspend Access (Temporary)"
+                                  title="Suspend, Access(Temporary)"
                                 >
                                   {revokeAccessMutation.isPending && revokeClientEmail === client.email ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -981,13 +971,13 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-yellow-700 hover:text-yellow-800 hover:bg-yellow-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-yellow-700, hover:text-yellow-800, hover:bg-yellow-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleRevokeAccess(client.email);
                                   }}
                                   disabled={revokeAccessMutation.isPending || reactivateAccessMutation.isPending}
-                                  title="Suspend Access (Temporary)"
+                                  title="Suspend, Access(Temporary)"
                                 >
                                   {revokeAccessMutation.isPending && revokeClientEmail === client.email ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -1000,7 +990,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-green-700 hover:text-green-800 hover:bg-green-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-green-700, hover:text-green-800, hover:bg-green-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleReactivateAccess(client.email);
@@ -1019,21 +1009,21 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-yellow-400 hover:text-yellow-700 hover:bg-yellow-500/10 rounded-full opacity-50 cursor-not-allowed"
+                                  className="h-9 w-9 p-0 text-yellow-400, hover:text-yellow-700, hover:bg-yellow-500/10 rounded-full opacity-50 cursor-not-allowed"
                                   disabled={true}
                                   title="Account is blocked - Cannot suspend"
                                 >
                                   <Lock className="w-4 h-4" />
                                 </Button>
                               ) : null}
-                              {/* Status 3 = Inactive (Block) - Buttons shown but disabled (except view) */}
+                              {/* Status 3 = Inactive (Block) - Buttons shown but, disabled(except view) */}
                               
-                              {/* Block Account - Ban icon - Show but disable if blocked (status === 3) */}
+                              {/* Block Account - Ban icon - Show but disable if, blocked(status === 3) */}
                               {client.status === 3 ? (
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-red-400 hover:text-red-500 hover:bg-red-500/10 rounded-full opacity-50 cursor-not-allowed"
+                                  className="h-9 w-9 p-0 text-red-400, hover:text-red-500, hover:bg-red-500/10 rounded-full opacity-50 cursor-not-allowed"
                                   disabled={true}
                                   title="Account is blocked - Cannot perform actions"
                                 >
@@ -1043,7 +1033,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-red-700 hover:text-red-800 hover:bg-red-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-red-700, hover:text-red-800, hover:bg-red-500/10 rounded-full"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleBlockUser(client.email);
@@ -1089,7 +1079,7 @@ export default function ClientsPage() {
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-primary">Add New Client</DialogTitle>
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-primary">Add New Client</DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 Create a new client in the system
               </DialogDescription>
@@ -1102,7 +1092,7 @@ export default function ClientsPage() {
                   <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
                     Personal Information
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="firstName"
@@ -1110,7 +1100,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">First Name *</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1124,7 +1114,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Last Name *</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1138,7 +1128,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Email *</FormLabel>
                           <FormControl>
-                            <Input {...field} type="email" className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} type="email" className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1152,7 +1142,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Phone</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1166,7 +1156,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Date of Birth</FormLabel>
                           <FormControl>
-                            <Input {...field} type="date" className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} type="date" className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1184,7 +1174,7 @@ export default function ClientsPage() {
                             defaultValue={field.value}
                           >
                           <FormControl>
-                              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                              <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                           </FormControl>
@@ -1211,7 +1201,7 @@ export default function ClientsPage() {
                           <FormLabel className="text-muted-foreground">Representative</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value || undefined}>
                             <FormControl>
-                              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                              <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                             </FormControl>
@@ -1239,7 +1229,7 @@ export default function ClientsPage() {
                             defaultValue={field.value}
                           >
                           <FormControl>
-                              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                              <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                           </FormControl>
@@ -1261,7 +1251,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Emergency Contact Name</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1275,7 +1265,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Emergency Contact Phone</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1304,7 +1294,7 @@ export default function ClientsPage() {
 
 
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
 
                   </div>
                 </div>
@@ -1314,7 +1304,7 @@ export default function ClientsPage() {
                   <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
                     Address Information
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="streetAddress"
@@ -1322,7 +1312,7 @@ export default function ClientsPage() {
                         <FormItem className="md:col-span-2">
                           <FormLabel className="text-muted-foreground">Street Address</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1336,7 +1326,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">City</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1350,7 +1340,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">State</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1364,7 +1354,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Zip Code</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1373,12 +1363,12 @@ export default function ClientsPage() {
                   </div>
                 </div>
 
-                {/* Banking Information (ACH) */}
+                {/* Banking, Information(ACH) */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-primary border-b border-primary/30 pb-2">
-                    Banking Information (ACH)
+                    Banking, Information(ACH)
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="bankName"
@@ -1386,7 +1376,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Bank Name</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1420,7 +1410,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Routing Number</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground font-mono focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground font-mono, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1434,7 +1424,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Account Number</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground font-mono focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground font-mono, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1448,7 +1438,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Business Name</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1462,7 +1452,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">SSN</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground font-mono focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground font-mono, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1476,7 +1466,7 @@ export default function ClientsPage() {
                         <FormItem>
                           <FormLabel className="text-muted-foreground">EIN</FormLabel>
                           <FormControl>
-                            <Input {...field} className="bg-card border-border text-foreground font-mono focus:border-primary" />
+                            <Input {...field} className="bg-card border-border text-foreground font-mono, focus:border-primary" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1493,13 +1483,13 @@ export default function ClientsPage() {
                       setIsAddModalOpen(false);
                       form.reset();
                     }}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground, hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                     disabled={createMutation.isPending}
                   >
                     {createMutation.isPending ? "Saving..." : "Save"}
@@ -1514,7 +1504,7 @@ export default function ClientsPage() {
         <Dialog open={deleteClientId !== null && deleteClientEmail === null} onOpenChange={(open) => !open && setDeleteClientId(null)}>
           <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-red-400">Delete Client</DialogTitle>
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-red-400">Delete Client</DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 {deleteClientId && clients.find(c => c.id === deleteClientId) && (
                   <>Are you sure you want to delete <strong>{clients.find(c => c.id === deleteClientId)?.firstName} {clients.find(c => c.id === deleteClientId)?.lastName}</strong>? This action cannot be undone.</>
@@ -1525,14 +1515,14 @@ export default function ClientsPage() {
               <Button
                 variant="ghost"
                 onClick={() => setDeleteClientId(null)}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground, hover:text-foreground"
                 disabled={deleteMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmDelete}
-                className="bg-red-500 text-foreground hover:bg-red-500/20 text-red-700 border-red-500/50"
+                className="bg-red-500 text-foreground, hover:bg-red-500/20 text-red-700 border-red-500/50"
                 disabled={deleteMutation.isPending}
               >
                 {deleteMutation.isPending && (
@@ -1548,7 +1538,7 @@ export default function ClientsPage() {
         <Dialog open={revokeClientEmail !== null} onOpenChange={(open) => !open && setRevokeClientEmail(null)}>
           <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-yellow-400">Suspend Client Access</DialogTitle>
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-yellow-400">Suspend Client Access</DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 {revokeClientEmail && clients.find(c => c.email === revokeClientEmail) && (
                   <>
@@ -1563,14 +1553,14 @@ export default function ClientsPage() {
               <Button
                 variant="outline"
                 onClick={() => setRevokeClientEmail(null)}
-                className="border-border text-muted-foreground hover:bg-muted/50"
+                className="border-border text-muted-foreground, hover:bg-muted/50"
                 disabled={revokeAccessMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmRevoke}
-                className="bg-yellow-600 text-foreground hover:bg-yellow-700"
+                className="bg-yellow-600 text-foreground, hover:bg-yellow-700"
                 disabled={revokeAccessMutation.isPending}
               >
                 {revokeAccessMutation.isPending && (
@@ -1586,7 +1576,7 @@ export default function ClientsPage() {
         <Dialog open={blockClientEmail !== null} onOpenChange={(open) => !open && setBlockClientEmail(null)}>
           <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-red-400">Permanently Block Account</DialogTitle>
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-red-400">Permanently Block Account</DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 This will permanently block the client account. The user will not be able to register or access their account.
               </DialogDescription>
@@ -1603,14 +1593,14 @@ export default function ClientsPage() {
               <Button
                 variant="outline"
                 onClick={() => setBlockClientEmail(null)}
-                className="border-border text-muted-foreground hover:text-foreground"
+                className="border-border text-muted-foreground, hover:text-foreground"
                 disabled={blockUserMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmBlock}
-                className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground hover:bg-red-500/30 text-red-700"
+                className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground, hover:bg-red-500/30 text-red-700"
                 disabled={blockUserMutation.isPending}
               >
                 Permanently Block
@@ -1623,7 +1613,7 @@ export default function ClientsPage() {
         <Dialog open={reactivateClientEmail !== null} onOpenChange={(open) => !open && setReactivateClientEmail(null)}>
           <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-green-400">Grant Client Access</DialogTitle>
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-green-400">Grant Client Access</DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 {reactivateClientEmail && clients.find(c => c.email === reactivateClientEmail) && (
                   <>
@@ -1638,14 +1628,14 @@ export default function ClientsPage() {
               <Button
                 variant="outline"
                 onClick={() => setReactivateClientEmail(null)}
-                className="border-border text-muted-foreground hover:bg-muted/50"
+                className="border-border text-muted-foreground, hover:bg-muted/50"
                 disabled={reactivateAccessMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmReactivate}
-                className="bg-green-600 text-foreground hover:bg-green-700"
+                className="bg-green-600 text-foreground, hover:bg-green-700"
                 disabled={reactivateAccessMutation.isPending}
               >
                 Grant Access
@@ -1658,7 +1648,7 @@ export default function ClientsPage() {
         <Dialog open={deleteClientEmail !== null && deleteClientId !== null} onOpenChange={(open) => !open && (setDeleteClientEmail(null), setDeleteClientId(null))}>
           <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-red-400">Permanently Delete Client</DialogTitle>
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-red-400">Permanently Delete Client</DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 {deleteClientId && deleteClientEmail && clients.find(c => c.id === deleteClientId) && (
                   <>
@@ -1676,14 +1666,14 @@ export default function ClientsPage() {
                   setDeleteClientEmail(null);
                   setDeleteClientId(null);
                 }}
-                className="border-border text-muted-foreground hover:bg-muted/50"
+                className="border-border text-muted-foreground, hover:bg-muted/50"
                 disabled={deleteUserMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmDeleteUser}
-                className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground hover:bg-red-500/30 text-red-700"
+                className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground, hover:bg-red-500/30 text-red-700"
                 disabled={deleteUserMutation.isPending}
               >
                 Delete Permanently
@@ -1696,12 +1686,12 @@ export default function ClientsPage() {
         <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
           <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-primary flex items-center gap-2">
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-primary flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5" />
                 Import Clients and Cars
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
-                Upload an Excel (.xlsx, .xls) or CSV file to import existing clients and their cars.
+                Upload an, Excel(.xlsx, .xls) or CSV file to import existing clients and their cars.
                 The file should contain the same fields as the client onboarding form.
               </DialogDescription>
             </DialogHeader>
@@ -1710,7 +1700,7 @@ export default function ClientsPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="import-file"
-                  className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
+                  className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-primary/40 rounded-xl bg-background/50, hover:border-primary/60, hover:bg-primary/5 transition-all cursor-pointer group"
                 >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <Upload className="w-10 h-10 text-primary mb-3 group-hover:scale-110 transition-transform" />
@@ -1718,7 +1708,7 @@ export default function ClientsPage() {
                       {importFile ? importFile.name : "Click to Upload or Drag and Drop"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Excel (.xlsx, .xls) or CSV file (Max 100MB)
+                      Excel (.xlsx, .xls) or CSV, file(Max 100MB)
                     </p>
                   </div>
                   <input
@@ -1748,7 +1738,7 @@ export default function ClientsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setImportFile(null)}
-                      className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
+                      className="text-muted-foreground, hover:text-foreground h-8 w-8 p-0"
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -1758,7 +1748,7 @@ export default function ClientsPage() {
 
               <div className="bg-background p-4 rounded-lg border border-border">
                 <p className="text-sm text-muted-foreground mb-2">
-                  <strong className="text-primary">Note:</strong> The imported data will:
+                  <strong className="text-primary">Note:</strong> The imported data, will:
                 </p>
                 <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
                   <li>Create onboarding submissions with "pending" status</li>
@@ -1776,7 +1766,7 @@ export default function ClientsPage() {
                     setIsImportModalOpen(false);
                     setImportFile(null);
                   }}
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground, hover:text-foreground"
                   disabled={importMutation.isPending}
                 >
                   Cancel
@@ -1784,7 +1774,7 @@ export default function ClientsPage() {
                 <Button
                   type="button"
                   onClick={handleImport}
-                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                  className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                   disabled={!importFile || importMutation.isPending}
                 >
                   {importMutation.isPending ? (
@@ -1808,8 +1798,8 @@ export default function ClientsPage() {
         <Dialog open={showImportErrors} onOpenChange={setShowImportErrors}>
           <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-3xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-yellow-400">
-                Import Warning ({importErrors.length})
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-yellow-400">
+                Import, Warning({importErrors.length})
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 The following rows failed to import. Please review and fix the issues.
@@ -1843,7 +1833,7 @@ export default function ClientsPage() {
                   setImportFile(null);
                   setImportErrors([]);
                 }}
-                className="bg-card border-border text-foreground hover:bg-muted"
+                className="bg-card border-border text-foreground, hover:bg-muted"
               >
                 Close
               </Button>

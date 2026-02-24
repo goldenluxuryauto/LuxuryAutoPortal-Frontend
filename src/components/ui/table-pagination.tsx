@@ -13,7 +13,7 @@ interface TablePaginationProps {
   isLoading?: boolean;
 }
 
-export function TablePagination({
+export function, TablePagination({
   totalItems,
   itemsPerPage,
   currentPage,
@@ -28,11 +28,8 @@ export function TablePagination({
   // Generate page numbers to display
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
-    const maxVisible = 7; // Show up to 7 page numbers
-
-    if (totalPages <= maxVisible) {
-      // Show all pages if total is small
-      for (let i = 1; i <= totalPages; i++) {
+    const maxVisible = 7; // Show up to 7 page numbers, if(totalPages <= maxVisible) {
+      // Show all pages if total is small, for(let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
@@ -40,13 +37,12 @@ export function TablePagination({
       pages.push(1);
 
       if (currentPage <= 3) {
-        // Near the start
-        for (let i = 2; i <= 4; i++) {
+        // Near the start, for(let i = 2; i <= 4; i++) {
           pages.push(i);
         }
         pages.push("ellipsis");
         pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
+      } else, if(currentPage >= totalPages - 2) {
         // Near the end
         pages.push("ellipsis");
         for (let i = totalPages - 3; i <= totalPages; i++) {
@@ -77,12 +73,12 @@ export function TablePagination({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-card border-t border-border">
+    <div className="flex flex-col, sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-card border-t border-border">
       {/* Left: Rows per page + Info */}
-      <div className="flex flex-col sm:flex-row items-center gap-4">
+      <div className="flex flex-col, sm:flex-row items-center gap-4">
         {/* Rows per page buttons */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground hidden sm:inline">Rows per page:</span>
+          <span className="text-sm text-muted-foreground hidden, sm:inline">Rows per, page:</span>
           <div className="flex gap-1">
             {([10, 20, 50] as ItemsPerPage[]).map((limit) => (
               <button
@@ -91,10 +87,10 @@ export function TablePagination({
                 disabled={isLoading}
                 className={cn(
                   "px-3 py-1.5 text-sm font-medium rounded transition-all duration-200",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                  "disabled:opacity-50, disabled:cursor-not-allowed",
                   itemsPerPage === limit
                     ? "bg-[#EAEB80] text-[#1a1a1a] font-bold shadow-md"
-                    : "bg-card text-foreground border border-border hover:bg-[#EAEB80]/20 hover:border-[#EAEB80]/50 hover:text-[#8B6914] font-medium"
+                    : "bg-card text-foreground border border-border, hover:bg-[#EAEB80]/20, hover:border-[#EAEB80]/50, hover:text-[#8B6914] font-medium"
                 )}
               >
                 {limit}
@@ -114,14 +110,14 @@ export function TablePagination({
       {/* Right: Page navigation */}
       <div className="flex items-center gap-2">
         {/* Mobile: Only show Prev/Next + current page */}
-        <div className="flex items-center gap-1 sm:hidden">
+        <div className="flex items-center gap-1, sm:hidden">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1 || isLoading}
             className={cn(
               "p-2 rounded transition-all duration-200",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
+              "disabled:opacity-50, disabled:cursor-not-allowed",
+              "text-foreground, hover:bg-[#EAEB80]/20, hover:text-[#8B6914]"
             )}
             aria-label="Previous page"
           >
@@ -135,8 +131,8 @@ export function TablePagination({
             disabled={currentPage === totalPages || isLoading}
             className={cn(
               "p-2 rounded transition-all duration-200",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
+              "disabled:opacity-50, disabled:cursor-not-allowed",
+              "text-foreground, hover:bg-[#EAEB80]/20, hover:text-[#8B6914]"
             )}
             aria-label="Next page"
           >
@@ -145,15 +141,15 @@ export function TablePagination({
         </div>
 
         {/* Desktop: Full pagination */}
-        <div className="hidden sm:flex items-center gap-1">
+        <div className="hidden, sm:flex items-center gap-1">
           {/* First page */}
           <button
             onClick={() => handlePageChange(1)}
             disabled={currentPage === 1 || isLoading}
             className={cn(
               "p-2 rounded transition-all duration-200",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
+              "disabled:opacity-50, disabled:cursor-not-allowed",
+              "text-foreground, hover:bg-[#EAEB80]/20, hover:text-[#8B6914]"
             )}
             aria-label="First page"
           >
@@ -166,8 +162,8 @@ export function TablePagination({
             disabled={currentPage === 1 || isLoading}
             className={cn(
               "p-2 rounded transition-all duration-200",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
+              "disabled:opacity-50, disabled:cursor-not-allowed",
+              "text-foreground, hover:bg-[#EAEB80]/20, hover:text-[#8B6914]"
             )}
             aria-label="Previous page"
           >
@@ -176,11 +172,11 @@ export function TablePagination({
 
           {/* Page numbers */}
           {pageNumbers.map((page, index) => {
-            if (page === "ellipsis") {
+            if (page === "ellipsis`) {
               return (
                 <span
                   key={`ellipsis-${index}`}
-                  className="px-2 text-muted-foreground"
+                  className=`px-2 text-muted-foreground"
                 >
                   ...
                 </span>
@@ -195,13 +191,13 @@ export function TablePagination({
                 disabled={isLoading}
                 className={cn(
                   "min-w-[2.5rem] px-3 py-1.5 text-sm font-medium rounded transition-all duration-200",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                  "disabled:opacity-50, disabled:cursor-not-allowed",
                   currentPage === pageNum
                     ? "bg-[#EAEB80] text-[#1a1a1a] font-bold shadow-md"
-                    : "bg-card text-foreground border border-border hover:bg-[#EAEB80]/20 hover:border-[#EAEB80]/50 hover:text-[#8B6914] font-medium"
+                    : "bg-card text-foreground border border-border, hover:bg-[#EAEB80]/20, hover:border-[#EAEB80]/50, hover:text-[#8B6914] font-medium`
                 )}
                 aria-label={`Page ${pageNum}`}
-                aria-current={currentPage === pageNum ? "page" : undefined}
+                aria-current={currentPage === pageNum ? `page" : undefined}
               >
                 {pageNum}
               </button>
@@ -214,8 +210,8 @@ export function TablePagination({
             disabled={currentPage === totalPages || isLoading}
             className={cn(
               "p-2 rounded transition-all duration-200",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
+              "disabled:opacity-50, disabled:cursor-not-allowed",
+              "text-foreground, hover:bg-[#EAEB80]/20, hover:text-[#8B6914]"
             )}
             aria-label="Next page"
           >
@@ -228,8 +224,8 @@ export function TablePagination({
             disabled={currentPage === totalPages || isLoading}
             className={cn(
               "p-2 rounded transition-all duration-200",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "text-foreground hover:bg-[#EAEB80]/20 hover:text-[#8B6914]"
+              "disabled:opacity-50, disabled:cursor-not-allowed",
+              "text-foreground, hover:bg-[#EAEB80]/20, hover:text-[#8B6914]"
             )}
             aria-label="Last page"
           >

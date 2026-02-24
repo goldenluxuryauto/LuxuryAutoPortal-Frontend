@@ -16,13 +16,13 @@ const CAR_RENTAL_FORMS = [
   { id: "car-coming-back", name: "Car coming back from rental", category: "car-rental" },
 ] as const;
 
-export default function StaffCarRentalForms() {
+export default function, StaffCarRentalForms() {
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-semibold text-primary">Car rental – Forms</h1>
-          <p className="text-muted-foreground">Submit car rental forms (going out / coming back).</p>
+          <p className="text-muted-foreground">Submit car rental, forms(going out / coming back).</p>
         </div>
 
         <Card className="bg-card border-border">
@@ -47,10 +47,10 @@ export default function StaffCarRentalForms() {
                     <TableRow key={form.id}>
                       <TableCell>{idx + 1}.</TableCell>
                       <TableCell className="capitalize">{form.name}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right`>
                         <Link
                           href={`/staff/car-rental/forms/submit?formTypeId=${form.id}`}
-                          className="text-primary hover:underline text-sm font-medium"
+                          className=`text-primary, hover:underline text-sm font-medium"
                         >
                           Submit form
                         </Link>

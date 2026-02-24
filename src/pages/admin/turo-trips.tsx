@@ -82,20 +82,20 @@ interface TripsSummary {
   cancelledEarnings: number;
 }
 
-function calculateDaysRented(tripStart: string, tripEnd: string, status: string): number | null {
+function, calculateDaysRented(tripStart: string, tripEnd: string, status: string): number | null {
   if (status === "cancelled") return null; // Show "-" for cancelled
   try {
-    const start = new Date(tripStart);
-    const end = new Date(tripEnd);
+    const start = new, Date(tripStart);
+    const end = new, Date(tripEnd);
     const hours = differenceInHours(end, start);
-    // Round up: any partial day counts as a day
+    // Round, up: any partial day counts as a day
     return Math.max(1, Math.ceil(hours / 24));
   } catch {
     return 0;
   }
 }
 
-export default function TuroTripsPage() {
+export default function, TuroTripsPage() {
   const [selectedTrip, setSelectedTrip] = useState<TuroTrip | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "booked" | "cancelled" | "completed">("all");
@@ -121,11 +121,11 @@ export default function TuroTripsPage() {
     data: TuroTrip[];
     total: number;
   }>({
-    queryKey: ["/api/turo-trips", statusFilter, debouncedSearchQuery, currentPage, itemsPerPage, startDate, endDate],
+    queryKey: ["/api/turo-trips`, statusFilter, debouncedSearchQuery, currentPage, itemsPerPage, startDate, endDate],
     queryFn: async () => {
       const offset = (currentPage - 1) * itemsPerPage;
       let url = buildApiUrl(`/api/turo-trips?limit=${itemsPerPage}&offset=${offset}`);
-      if (statusFilter !== "all") {
+      if (statusFilter !== `all`) {
         url += `&status=${statusFilter}`;
       }
       if (debouncedSearchQuery) {
@@ -137,13 +137,13 @@ export default function TuroTripsPage() {
       if (endDate) {
         url += `&endDate=${encodeURIComponent(endDate)}`;
       }
-      const response = await fetch(url, { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch trips");
+      const response = await, fetch(url, { credentials: `include" });
+      if (!response.ok) throw new, Error("Failed to fetch trips");
       return response.json();
     },
   });
 
-  // Fetch summary (responds to date filters)
+  // Fetch, summary(responds to date filters)
   const { data: summaryData } = useQuery<{
     success: boolean;
     data: TripsSummary;
@@ -151,14 +151,14 @@ export default function TuroTripsPage() {
     queryKey: ["/api/turo-trips/summary", startDate, endDate],
     queryFn: async () => {
       let url = buildApiUrl("/api/turo-trips/summary");
-      const params = new URLSearchParams();
+      const params = new, URLSearchParams();
       if (startDate) params.append("startDate", startDate);
-      if (endDate) params.append("endDate", endDate);
+      if (endDate) params.append("endDate`, endDate);
       if (params.toString()) url += `?${params.toString()}`;
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch summary");
+      if (!response.ok) throw new, Error("Failed to fetch summary");
       return response.json();
     },
   });
@@ -166,24 +166,24 @@ export default function TuroTripsPage() {
   // Sync emails mutation
   const syncMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(buildApiUrl("/api/turo-trips/sync"), {
+      const response = await, fetch(buildApiUrl("/api/turo-trips/sync"), {
         method: "POST",
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to sync emails");
+      if (!response.ok) throw new, Error("Failed to sync emails");
       return response.json();
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/turo-trips"] });
       queryClient.invalidateQueries({ queryKey: ["/api/turo-trips/summary"] });
       toast({
-        title: "Sync completed",
+        title: "Sync completed`,
         description: `${data.data.newBookings} bookings, ${data.data.newCancellations} cancellations, ${data.data.tripChanges || 0} changes, ${data.data.vehicleReturns || 0} returns.`,
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Sync failed",
+        title: `Sync failed",
         description: error.message,
         variant: "destructive",
       });
@@ -226,7 +226,7 @@ export default function TuroTripsPage() {
 
   const formatDate = (dateStr: string) => {
     try {
-      return format(new Date(dateStr), "MMM d, yyyy h:mm a");
+      return, format(new, Date(dateStr), "MMM d, yyyy, h:mm a");
     } catch {
       return dateStr;
     }
@@ -234,7 +234,7 @@ export default function TuroTripsPage() {
 
   const formatDateShort = (dateStr: string) => {
     try {
-      return format(new Date(dateStr), "MMM d, yyyy");
+      return, format(new, Date(dateStr), "MMM d, yyyy");
     } catch {
       return dateStr;
     }
@@ -242,7 +242,7 @@ export default function TuroTripsPage() {
 
   const formatDateTime = (dateStr: string) => {
     try {
-      return format(new Date(dateStr), "MMM d, yyyy h:mm a");
+      return, format(new, Date(dateStr), "MMM d, yyyy, h:mm a");
     } catch {
       return dateStr;
     }
@@ -250,14 +250,14 @@ export default function TuroTripsPage() {
 
   // Highlight search terms in text
   const highlightText = (text: string | null, searchTerm: string) => {
-    if (!text || !searchTerm) return text || "";
+    if (!text || !searchTerm) return text || "`;
     
-    const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'));
+    const parts = text.split(new, RegExp(`(${searchTerm})`, 'gi'));
     return (
       <>
         {parts.map((part, index) => 
           part.toLowerCase() === searchTerm.toLowerCase() ? (
-            <mark key={index} className="bg-yellow-200 dark:bg-yellow-900 px-0.5 rounded">
+            <mark key={index} className=`bg-yellow-200, dark:bg-yellow-900 px-0.5 rounded">
               {part}
             </mark>
           ) : (
@@ -312,7 +312,7 @@ export default function TuroTripsPage() {
 
         {/* Summary Cards */}
         {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1, md:grid-cols-2, lg:grid-cols-3, xl:grid-cols-6 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -403,7 +403,7 @@ export default function TuroTripsPage() {
             <CardDescription>View and manage all Turo trips</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex flex-col, sm:flex-row gap-4 mb-6">
               <div className="flex-1 relative">
                 <Input
                   placeholder="Search by guest, car, or reservation ID... (Ctrl+K)"
@@ -414,9 +414,9 @@ export default function TuroTripsPage() {
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground, hover:text-foreground transition-colors"
                     aria-label="Clear search"
-                    title="Clear search (Esc)"
+                    title="Clear, search(Esc)"
                   >
                     <XCircle className="w-4 h-4" />
                   </button>
@@ -444,7 +444,7 @@ export default function TuroTripsPage() {
                 value={statusFilter}
                 onValueChange={(value: any) => setStatusFilter(value)}
               >
-                <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectTrigger className="w-full, sm:w-[180px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -550,7 +550,7 @@ export default function TuroTripsPage() {
                       return (
                         <TableRow
                           key={trip.id}
-                          className="cursor-pointer hover:bg-muted/50"
+                          className="cursor-pointer, hover:bg-muted/50"
                           onClick={() => setSelectedTrip(trip)}
                         >
                           <TableCell className="font-mono text-sm">
@@ -595,9 +595,9 @@ export default function TuroTripsPage() {
                               {trip.returnLocation || "-"}
                             </div>
                           </TableCell>
-                          <TableCell className="text-center">
+                          <TableCell className="text-center`>
                             <span className={`font-semibold ${daysRented === null ? "text-muted-foreground" : "text-foreground"}`}>
-                              {daysRented === null ? "-" : daysRented}
+                              {daysRented === null ? `-" : daysRented}
                             </span>
                           </TableCell>
                           <TableCell>
@@ -631,7 +631,7 @@ export default function TuroTripsPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t">
+              <div className="flex flex-col, sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t">
                 <div className="text-sm text-muted-foreground">
                   Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
                   <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalTrips)}</span> of{" "}
@@ -659,9 +659,9 @@ export default function TuroTripsPage() {
                       let pageNum: number;
                       if (totalPages <= 5) {
                         pageNum = i + 1;
-                      } else if (currentPage <= 3) {
+                      } else, if(currentPage <= 3) {
                         pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
+                      } else, if(currentPage >= totalPages - 2) {
                         pageNum = totalPages - 4 + i;
                       } else {
                         pageNum = currentPage - 2 + i;
@@ -743,7 +743,7 @@ export default function TuroTripsPage() {
                         href={selectedTrip.guestLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-blue-600 hover:underline"
+                        className="flex items-center gap-2 text-blue-600, hover:underline"
                       >
                         <ExternalLink className="w-4 h-4" />
                         View on Turo
@@ -764,7 +764,7 @@ export default function TuroTripsPage() {
                         href={selectedTrip.carLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-blue-600 hover:underline"
+                        className="flex items-center gap-2 text-blue-600, hover:underline"
                       >
                         <ExternalLink className="w-4 h-4" />
                         View Listing
@@ -794,7 +794,7 @@ export default function TuroTripsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-muted-foreground" />
-                    <span className="font-medium">Days Rented:</span>
+                    <span className="font-medium">Days, Rented:</span>
                     {(() => {
                       const days = calculateDaysRented(selectedTrip.tripStart, selectedTrip.tripEnd, selectedTrip.status);
                       return days === null ? "-" : days;

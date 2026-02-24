@@ -25,7 +25,7 @@ interface NadaDepreciationModalProps {
   userId?: number;
 }
 
-export function NadaDepreciationModal({
+export function, NadaDepreciationModal({
   isOpen,
   onClose,
   carId,
@@ -53,24 +53,24 @@ export function NadaDepreciationModal({
       const url = buildApiUrl(
         isWithAdd ? "/api/current-cost-with-add" : "/api/current-cost"
       );
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to fetch categories");
+      if (!response.ok) throw new, Error("Failed to fetch categories");
       return response.json();
     },
     enabled: isOpen,
   });
 
-  // Fetch previous year categories to get MILES ID (needed for current year data)
+  // Fetch previous year categories to get MILES, ID(needed for current year data)
   const { data: currentCostWithAddData } = useQuery({
     queryKey: ["/api/current-cost-with-add"],
     queryFn: async () => {
       const url = buildApiUrl("/api/current-cost-with-add");
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to fetch categories with add");
+      if (!response.ok) throw new, Error("Failed to fetch categories with add");
       return response.json();
     },
     enabled: isOpen && !isWithAdd, // Only fetch when creating current year data
@@ -103,9 +103,9 @@ export function NadaDepreciationModal({
     ? currentCostWithAddData.data
     : defaultCurrentCostWithAdd;
 
-  // Find MILES ID from previous year categories (for current year data)
+  // Find MILES ID from previous year, categories(for current year data)
   const milesId = categoriesWithAdd.find((item: any) =>
-    item.currentCostWithAddName?.includes("MILES")
+    item.currentCostWithAddName?.includes("MILES`)
   )?.currentCostWithAddAid;
 
   const mutation = useMutation({
@@ -113,15 +113,15 @@ export function NadaDepreciationModal({
       const endpoint = isWithAdd
         ? itemEdit
           ? `/api/nada-depreciation-with-add/${itemEdit.nadaDepreciationWithAddAid}`
-          : "/api/nada-depreciation-with-add"
+          : `/api/nada-depreciation-with-add`
         : itemEdit
         ? `/api/nada-depreciation/${itemEdit.nadaDepreciationAid}`
-        : "/api/nada-depreciation";
+        : `/api/nada-depreciation";
 
       const method = itemEdit ? "PUT" : "POST";
 
       const url = buildApiUrl(endpoint);
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +132,7 @@ export function NadaDepreciationModal({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to save");
+        throw new, Error(error.error || "Failed to save");
       }
 
       return response.json();
@@ -155,8 +155,7 @@ export function NadaDepreciationModal({
       queryClient.invalidateQueries({
         queryKey: ["/api/car-backlog"],
       });
-      // Reset form and close
-      setFormData({
+      // Reset form and close, setFormData({
         date: "",
         categoryId: "",
         amount: "",
@@ -166,11 +165,9 @@ export function NadaDepreciationModal({
     },
   });
 
-  // Initialize form data when modal opens or itemEdit changes
-  useEffect(() => {
+  // Initialize form data when modal opens or itemEdit changes, useEffect(() => {
     if (!isOpen) {
-      // Reset form when modal closes
-      setFormData({
+      // Reset form when modal closes, setFormData({
         date: "",
         categoryId: "",
         amount: "",
@@ -181,14 +178,13 @@ export function NadaDepreciationModal({
       return;
     }
 
-    // Check if itemEdit changed (for edit mode)
+    // Check if itemEdit, changed(for edit mode)
     const itemEditChanged = prevItemEditRef.current !== itemEdit;
     prevItemEditRef.current = itemEdit;
 
-    // Only initialize once when modal opens, or when itemEdit changes
-    if (!isInitializedRef.current || itemEditChanged) {
+    // Only initialize once when modal opens, or when itemEdit changes, if(!isInitializedRef.current || itemEditChanged) {
       if (itemEdit) {
-        // Edit mode: populate with existing data (even if categories haven't loaded yet)
+        // Edit, mode: populate with existing, data(even if categories haven't loaded yet)
         const editCategoryId = itemEdit.nadaDepreciationId || itemEdit.nadaDepreciationWithAddId;
         setFormData({
           date:
@@ -201,19 +197,19 @@ export function NadaDepreciationModal({
         });
         isInitializedRef.current = true;
       } else {
-        // Add mode: initialize with empty values (user must manually enter date)
+        // Add, mode: initialize with empty, values(user must manually enter date)
         setFormData({
           date: "",
           categoryId: "",
           amount: "",
         });
-        setCategoryName("");
+        setCategoryName("`);
         isInitializedRef.current = true;
       }
     }
   }, [itemEdit, isOpen]); // Removed categories and year from dependencies to prevent unnecessary resets
 
-  // Update category name when categories load (for edit mode)
+  // Update category name when categories, load(for edit mode)
   useEffect(() => {
     if (isOpen && itemEdit && categories.length > 0 && formData.categoryId) {
       const editCategoryId = itemEdit.nadaDepreciationId || itemEdit.nadaDepreciationWithAddId;
@@ -245,21 +241,21 @@ export function NadaDepreciationModal({
           // Backend will get clientId from car table and userId from session
           car_backlog_category_name: categoryName,
           car_backlog_old_values: itemEdit
-            ? itemEdit.nadaDepreciationWithAddAmount?.toString() || "0"
-            : "0",
+            ? itemEdit.nadaDepreciationWithAddAmount?.toString() || `0"
+            : "0`,
         }
       : {
           nada_depreciation_car_id: carId,
           nada_depreciation_id: parseInt(formData.categoryId),
           nada_depreciation_date: formData.date,
           nada_depreciation_amount: parseFloat(formData.amount),
-          // Include MILES ID from previous year (matching original implementation)
+          // Include MILES ID from previous, year(matching original implementation)
           nada_depreciation_with_add_id: milesId || undefined,
           car_backlog_item: `NADA-depreciation-schedule-${year}`,
           // Backend will get clientId from car table and userId from session
           car_backlog_category_name: categoryName,
           car_backlog_old_values: itemEdit
-            ? itemEdit.nadaDepreciationAmount?.toString() || "0"
+            ? itemEdit.nadaDepreciationAmount?.toString() || `0"
             : "0",
         };
 
@@ -271,7 +267,7 @@ export function NadaDepreciationModal({
       <div className="bg-card border border-border rounded-lg w-full max-w-md p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+          className="absolute top-4 right-4 text-muted-foreground, hover:text-foreground"
           disabled={mutation.isPending}
         >
           <X className="w-5 h-5" />
@@ -343,7 +339,7 @@ export function NadaDepreciationModal({
                   categories
                     .filter((cat: any) => {
                       if (isWithAdd) {
-                        // For "with add" modal, show only: Retail, Clean, Average, Rough (exclude MILES)
+                        // For "with add" modal, show, only: Retail, Clean, Average, Rough (exclude MILES)
                         const name = (cat.currentCostWithAddName || cat.currentCostName || "").toUpperCase();
                         return (
                           (name.includes("RETAIL") ||
@@ -353,13 +349,13 @@ export function NadaDepreciationModal({
                           !name.includes("MILES")
                         );
                       } else {
-                        // For current year, include all categories (Retail, Clean, Average, Rough, MILES, Amounted Owed)
+                        // For current year, include all, categories(Retail, Clean, Average, Rough, MILES, Amounted Owed)
                         // No filtering needed - show all categories
                         return true;
                       }
                     })
                     .sort((a: any, b: any) => {
-                      // Sort by ID to ensure proper order: Retail (1), Clean (2), Average (3), Rough (4)
+                      // Sort by ID to ensure proper, order: Retail (1), Clean (2), Average (3), Rough (4)
                       const aId = a.currentCostAid || a.currentCostWithAddAid || 0;
                       const bId = b.currentCostAid || b.currentCostWithAddAid || 0;
                       return aId - bId;
@@ -415,14 +411,14 @@ export function NadaDepreciationModal({
               variant="outline"
               onClick={onClose}
               disabled={mutation.isPending}
-              className="border-border text-muted-foreground hover:bg-muted"
+              className="border-border text-muted-foreground, hover:bg-muted"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={mutation.isPending || !formData.date || !formData.categoryId || !formData.amount}
-              className="bg-primary text-black hover:bg-primary/80"
+              className="bg-primary text-black, hover:bg-primary/80"
             >
               {mutation.isPending
                 ? "Saving..."

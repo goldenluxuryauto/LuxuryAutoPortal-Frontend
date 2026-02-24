@@ -35,7 +35,7 @@ interface MenuItem {
   external?: boolean;
 }
 
-export default function ViewCarPage() {
+export default function, ViewCarPage() {
   const [, params] = useRoute("/admin/view-car/:id");
   const [, setLocation] = useLocation();
   const carId = params?.id ? parseInt(params.id, 10) : null;
@@ -45,7 +45,7 @@ export default function ViewCarPage() {
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
       try {
-        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        const response = await, fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
         if (!response.ok) return { user: undefined };
         return response.json();
       } catch (error) {
@@ -64,12 +64,12 @@ export default function ViewCarPage() {
   }>({
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       const url = buildApiUrl(`/api/cars/${carId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
+      if (!response.ok) throw new, Error("Failed to fetch car");
       return response.json();
     },
     enabled: !!carId,
@@ -85,16 +85,16 @@ export default function ViewCarPage() {
   }>({
     queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
     queryFn: async () => {
-      if (!car?.vin) throw new Error("No VIN");
+      if (!car?.vin) throw new, Error("No VIN`);
       const url = buildApiUrl(`/api/onboarding/vin/${encodeURIComponent(car.vin)}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         if (response.status === 404) {
           return { success: false, data: null };
         }
-        throw new Error("Failed to fetch onboarding");
+        throw new, Error("Failed to fetch onboarding");
       }
       return response.json();
     },
@@ -106,17 +106,17 @@ export default function ViewCarPage() {
 
   // Filter menu items based on user role
   const allMenuItems: MenuItem[] = [
-    { label: "Car Detail", path: `/admin/cars/${carId}` },
-    { label: "Earnings", path: `/admin/cars/${carId}/earnings` },
-    { label: "Income and Expense", path: `/admin/cars/${carId}/income-expense` },
-    { label: "NADA Depreciation Schedule", path: `/admin/cars/${carId}/depreciation` },
-    { label: "Totals", path: `/admin/cars/${carId}/totals` },
-    { label: "Records and Files", path: `/admin/cars/${carId}/records` },
-    { label: "Maintenance", path: `/admin/cars/${carId}/maintenance` },
-    { label: "Payment history", path: `/admin/cars/${carId}/payments` },
+    { label: "Car Detail`, path: `/admin/cars/${carId}` },
+    { label: `Earnings`, path: `/admin/cars/${carId}/earnings` },
+    { label: `Income and Expense`, path: `/admin/cars/${carId}/income-expense` },
+    { label: `NADA Depreciation Schedule`, path: `/admin/cars/${carId}/depreciation` },
+    { label: `Totals`, path: `/admin/cars/${carId}/totals` },
+    { label: `Records and Files`, path: `/admin/cars/${carId}/records` },
+    { label: `Maintenance`, path: `/admin/cars/${carId}/maintenance` },
+    { label: `Payment history`, path: `/admin/cars/${carId}/payments` },
   ];
 
-  // Hide "Income and Expense" for clients
+  // Hide `Income and Expense" for clients
   const menuItems = isClient
     ? allMenuItems.filter(item => item.label !== "Income and Expense")
     : allMenuItems;
@@ -144,7 +144,7 @@ export default function ViewCarPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
-            className="mt-4 text-blue-700 hover:underline"
+            className="mt-4 text-blue-700, hover:underline`
           >
             ← Back to Cars
           </button>
@@ -156,7 +156,7 @@ export default function ViewCarPage() {
   const carName = car.makeModel || `${car.year || ""} ${car.vin}`.trim();
   const ownerName = car.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
-    : "N/A";
+    : `N/A";
   const ownerContact = car.owner?.phone || "N/A";
   const ownerEmail = car.owner?.email || "N/A";
   const fuelType = onboarding?.fuelType || car.fuelType || "N/A";
@@ -170,7 +170,7 @@ export default function ViewCarPage() {
         <div className="mb-6">
           <button
             onClick={() => setLocation("/cars")}
-            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Cars</span>
@@ -186,87 +186,87 @@ export default function ViewCarPage() {
         </div>
 
         {/* Car and Owner Information Header */}
-        <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-card border border-border rounded-lg p-4, sm:p-6 mb-4, sm:mb-6">
+          <div className="grid grid-cols-1, sm:grid-cols-2, lg:grid-cols-4 gap-4, sm:gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Car Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Car Name: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-words">{carName}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Car, Name: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">VIN #: </span>
-                  <span className="text-foreground font-mono text-xs sm:text-sm break-all">{car.vin}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">VIN #: </span>
+                  <span className="text-foreground font-mono text-xs, sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">License: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">License: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Owner Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Owner Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Name: </span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm`>Name: </span>
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer font-semibold"
+                      className=`text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs, sm:text-sm break-words cursor-pointer font-semibold"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                    <span className="text-[#B8860B] text-xs sm:text-sm break-words font-semibold">{ownerName}</span>
+                    <span className="text-[#B8860B] text-xs, sm:text-sm break-words font-semibold">{ownerName}</span>
                   )}
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Contact #: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{ownerContact}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Contact #: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Email: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-all">{ownerEmail}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Email: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Specifications</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Car Specifications</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Fuel/Gas: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{fuelType}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Fuel/Gas: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{fuelType}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Tire Size: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{tireSize}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Tire, Size: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{tireSize}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Oil Type: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{oilType}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Oil, Type: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{oilType}</span>
                 </div>
               </div>
             </div>
 
             {/* Turo Links */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Turo Links</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Turo Links</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 {car.turoLink && (
                   <div>
                     <a
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                      className="text-blue-700, hover:underline text-sm flex items-center gap-1"
                     >
-                      Turo Link: View Car
+                      Turo, Link: View Car
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
@@ -277,16 +277,16 @@ export default function ViewCarPage() {
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                      className="text-blue-700, hover:underline text-sm flex items-center gap-1"
                     >
-                      Admin Turo Link: View Car
+                      Admin Turo, Link: View Car
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
                 )}
                 {car.turoVehicleIds && car.turoVehicleIds.length > 0 && (
                   <div>
-                    <span className="text-muted-foreground text-xs">Turo Vehicle IDs: </span>
+                    <span className="text-muted-foreground text-xs">Turo Vehicle, IDs: </span>
                     <span className="text-foreground text-sm font-mono">{car.turoVehicleIds.join(", ")}</span>
                   </div>
                 )}
@@ -306,12 +306,12 @@ export default function ViewCarPage() {
                 key={index}
                 onClick={() => handleMenuItemClick(item)}
                 className={cn(
-                  "w-full px-4 sm:px-6 py-3 sm:py-4 text-left flex items-center justify-between",
+                  "w-full px-4, sm:px-6 py-3, sm:py-4 text-left flex items-center justify-between",
                   "hover:bg-card transition-colors",
                   "text-foreground group"
                 )}
               >
-                <span className="text-xs sm:text-sm break-words pr-2">{item.label}</span>
+                <span className="text-xs, sm:text-sm break-words pr-2">{item.label}</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
               </button>
             ))}

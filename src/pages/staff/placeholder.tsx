@@ -7,7 +7,7 @@ interface StaffPlaceholderProps {
   icon: React.ReactNode;
 }
 
-export default function StaffPlaceholder({ title, description, icon }: StaffPlaceholderProps) {
+export default function, StaffPlaceholder({ title, description, icon }: StaffPlaceholderProps) {
   return (
     <AdminLayout>
       <div className="space-y-6">

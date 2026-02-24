@@ -89,8 +89,8 @@ const userSchema = z.object({
   roleId: z.number().int().positive("Role is required"),
 });
 
-/** Section in edit-user modal: allow admin to set which roles this user can switch between (same login). */
-function SwitchableRolesSection({
+/** Section in edit-user, modal: allow admin to set which roles this user can switch, between(same login). */
+function, SwitchableRolesSection({
   userId,
   roles,
   onSaved,
@@ -104,10 +104,10 @@ function SwitchableRolesSection({
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const { data: rolesData } = useQuery({
-    queryKey: ["/api/admin/users", userId, "roles"],
+    queryKey: ["/api/admin/users", userId, "roles`],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/admin/users/${userId}/roles`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to load");
+      const res = await, fetch(buildApiUrl(`/api/admin/users/${userId}/roles`), { credentials: `include" });
+      if (!res.ok) throw new, Error("Failed to load");
       const json = await res.json();
       return json as { roles: { id: number; name: string }[] };
     },
@@ -116,15 +116,15 @@ function SwitchableRolesSection({
 
   useEffect(() => {
     if (rolesData?.roles?.length) setSelectedIds(rolesData.roles.map((r) => r.id));
-    else if (roles.length > 0) setSelectedIds([]);
+    else, if(roles.length > 0) setSelectedIds([]);
   }, [rolesData?.roles, roles.length]);
 
   const saveMutation = useMutation({
     mutationFn: async (roleIds: number[]) => {
-      const res = await apiRequest("PUT", `/api/admin/users/${userId}/roles`, { roleIds });
+      const res = await, apiRequest("PUT`, `/api/admin/users/${userId}/roles`, { roleIds });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || "Failed to save");
+        throw new, Error(err?.error || `Failed to save");
       }
       return res.json();
     },
@@ -147,11 +147,11 @@ function SwitchableRolesSection({
     <div className="rounded-md border border-border p-3 space-y-2">
       <Label className="text-muted-foreground text-sm">Switch account access</Label>
       <p className="text-xs text-muted-foreground">
-        Allow this user to switch between these roles with the same login (no separate emails).
+        Allow this user to switch between these roles with the same, login(no separate emails).
       </p>
       <div className="flex flex-wrap gap-4">
         {roles.map((role) => (
-          <div key={role.id} className="flex items-center space-x-2">
+          <div key={role.id} className="flex items-center space-x-2`>
             <Checkbox
               id={`switch-role-${role.id}`}
               checked={selectedIds.includes(role.id)}
@@ -159,7 +159,7 @@ function SwitchableRolesSection({
             />
             <label
               htmlFor={`switch-role-${role.id}`}
-              className="text-sm font-medium leading-none cursor-pointer"
+              className=`text-sm font-medium leading-none cursor-pointer"
             >
               {role.name}
             </label>
@@ -192,7 +192,7 @@ const quickLinkSchema = z.object({
 type UserFormData = z.infer<typeof userSchema>;
 type QuickLinkFormData = z.infer<typeof quickLinkSchema>;
 
-export default function AdminsPage() {
+export default function, AdminsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [isQuickLinkModalOpen, setIsQuickLinkModalOpen] = useState(false);
@@ -215,10 +215,10 @@ export default function AdminsPage() {
   const { data: quickLinks } = useQuery<QuickLink[]>({
     queryKey: ["/api/admin/quick-links"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/admin/quick-links"), {
+      const response = await, fetch(buildApiUrl("/api/admin/quick-links"), {
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to fetch quick links");
+      if (!response.ok) throw new, Error("Failed to fetch quick links");
       return response.json();
     },
     retry: false,
@@ -251,10 +251,10 @@ export default function AdminsPage() {
     mutationFn: async (data: UserFormData) => {
       const { password, ...userData } = data;
       const payload = password ? { ...userData, password } : userData;
-      const response = await apiRequest("POST", "/api/admin/users", payload);
+      const response = await, apiRequest("POST", "/api/admin/users", payload);
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to create user");
+        throw new, Error(error.error || "Failed to create user");
       }
       return response.json();
     },
@@ -283,14 +283,14 @@ export default function AdminsPage() {
       if (password && password.length > 0) {
         payload.password = password;
       }
-      const response = await apiRequest(
-        "PUT",
+      const response = await, apiRequest(
+        "PUT`,
         `/api/admin/users/${id}`,
         payload
       );
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update user");
+        throw new, Error(error.error || `Failed to update user");
       }
       return response.json();
     },
@@ -356,10 +356,10 @@ export default function AdminsPage() {
 
   const quickLinkCreateMutation = useMutation({
     mutationFn: async (data: QuickLinkFormData) => {
-      const response = await apiRequest("POST", "/api/admin/quick-links", data);
+      const response = await, apiRequest("POST", "/api/admin/quick-links", data);
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to create quick link");
+        throw new, Error(error.error || "Failed to create quick link");
       }
       return response.json();
     },
@@ -390,14 +390,14 @@ export default function AdminsPage() {
       id: number;
       data: QuickLinkFormData;
     }) => {
-      const response = await apiRequest(
-        "PUT",
+      const response = await, apiRequest(
+        "PUT`,
         `/api/admin/quick-links/${id}`,
         data
       );
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update quick link");
+        throw new, Error(error.error || `Failed to update quick link");
       }
       return response.json();
     },
@@ -423,13 +423,13 @@ export default function AdminsPage() {
 
   const quickLinkDeleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await apiRequest(
-        "DELETE",
+      const response = await, apiRequest(
+        "DELETE`,
         `/api/admin/quick-links/${id}`
       );
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to delete quick link");
+        throw new, Error(error.error || `Failed to delete quick link");
       }
       return response.json();
     },
@@ -455,7 +455,7 @@ export default function AdminsPage() {
     quickLinkForm.reset({
       category: "Reports Center",
       title: "",
-      url: "",
+      url: "`,
       visibleToAdmins: true,
       visibleToClients: true,
       visibleToEmployees: true,
@@ -493,7 +493,7 @@ export default function AdminsPage() {
   };
 
   const getRoleBadgeColor = (role: string) => {
-    if (role.toLowerCase().includes("admin")) {
+    if (role.toLowerCase().includes(`admin")) {
       return "bg-[#EAEB80]/40 text-black border-[#EAEB80]/60 font-semibold";
     }
     if (role.toLowerCase().includes("employee")) {
@@ -504,47 +504,47 @@ export default function AdminsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+      <div className="space-y-4, sm:space-y-6">
+        <div className="flex flex-col, sm:flex-row, sm:items-center, sm:justify-between gap-3, sm:gap-4">
           <div>
             <h1 className="text-2xl font-bold text-primary">Admins</h1>
-            <p className="text-muted-foreground text-xs sm:text-sm">
+            <p className="text-muted-foreground text-xs, sm:text-sm">
               Manage portal administrators
             </p>
           </div>
           <Button
             onClick={handleAddClick}
-            className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium w-full sm:w-auto"
+            className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium w-full, sm:w-auto"
             data-testid="button-add-admin"
           >
-            <Plus className="w-4 h-4 sm:mr-2" />
-            <span className="hidden sm:inline">Add New Admin</span>
+            <Plus className="w-4 h-4, sm:mr-2" />
+            <span className="hidden, sm:inline">Add New Admin</span>
             <span className="sm:hidden">Add Admin</span>
           </Button>
         </div>
 
         <Card className="bg-card border-border">
           <CardContent className="p-0">
-            <div className="overflow-x-auto -mx-3 sm:mx-0">
+            <div className="overflow-x-auto -mx-3, sm:mx-0">
               <table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3, sm:px-6 py-3, sm:py-4">
                       Name
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3, sm:px-6 py-3, sm:py-4 hidden, md:table-cell">
                       Email
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3, sm:px-6 py-3, sm:py-4">
                       Role
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3, sm:px-6 py-3, sm:py-4">
                       Status
                     </th>
-                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
+                    <th className="text-left text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider px-3, sm:px-6 py-3, sm:py-4 hidden, lg:table-cell">
                       Created
                     </th>
-                    <th className="text-right text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3 sm:px-6 py-3 sm:py-4">
+                    <th className="text-right text-[10px] sm:text-xs font-medium text-foreground uppercase tracking-wider px-3, sm:px-6 py-3, sm:py-4">
                       Actions
                     </th>
                   </tr>
@@ -563,33 +563,33 @@ export default function AdminsPage() {
                     users.map((user) => (
                       <tr
                         key={user.id}
-                        className="hover:bg-muted/50252525] transition-colors"
+                        className="hover:bg-muted/50252525] transition-colors`
                         data-testid={`row-admin-${user.id}`}
                       >
-                        <td className="px-3 sm:px-6 py-3 sm:py-4">
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <Avatar className="w-8 h-8 sm:w-10 sm:h-10 bg-[#EAEB80]/20">
-                              <AvatarFallback className="bg-[#EAEB80]/20 text-primary text-xs sm:text-sm font-medium">
+                        <td className=`px-3, sm:px-6 py-3, sm:py-4">
+                          <div className="flex items-center gap-2, sm:gap-3">
+                            <Avatar className="w-8 h-8, sm:w-10, sm:h-10 bg-[#EAEB80]/20">
+                              <AvatarFallback className="bg-[#EAEB80]/20 text-primary text-xs, sm:text-sm font-medium">
                                 {getInitials(user.firstName, user.lastName)}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col">
-                              <span className="text-foreground font-medium text-xs sm:text-sm">
+                              <span className="text-foreground font-medium text-xs, sm:text-sm">
                               {user.firstName} {user.lastName}
                             </span>
-                              <span className="text-muted-foreground text-[10px] sm:text-xs md:hidden">
+                              <span className="text-muted-foreground text-[10px] sm:text-xs, md:hidden">
                                 {user.email}
                               </span>
                             </div>
                           </div>
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
+                        <td className="px-3, sm:px-6 py-3, sm:py-4 hidden, md:table-cell">
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Mail className="w-4 h-4" />
-                            <span className="text-xs sm:text-sm">{user.email}</span>
+                            <span className="text-xs, sm:text-sm">{user.email}</span>
                           </div>
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4">
+                        <td className="px-3, sm:px-6 py-3, sm:py-4">
                           <Badge
                             variant="outline"
                             className={cn(getRoleBadgeColor(user.role), "text-[10px] sm:text-xs")}
@@ -597,7 +597,7 @@ export default function AdminsPage() {
                             {user.role}
                           </Badge>
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4">
+                        <td className="px-3, sm:px-6 py-3, sm:py-4">
                           <Badge
                             variant="outline"
                             className={cn(
@@ -610,20 +610,20 @@ export default function AdminsPage() {
                             {user.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden lg:table-cell">
-                          {format(new Date(user.createdAt), "MMM d, yyyy")}
+                        <td className="px-3, sm:px-6 py-3, sm:py-4 text-muted-foreground text-xs, sm:text-sm hidden, lg:table-cell">
+                          {format(new, Date(user.createdAt), "MMM d, yyyy")}
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
-                          <div className="flex items-center justify-end gap-1 sm:gap-2">
+                        <td className="px-3, sm:px-6 py-3, sm:py-4 text-right">
+                          <div className="flex items-center justify-end gap-1, sm:gap-2">
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-muted-foreground hover:text-foreground text-xs sm:text-sm px-2 sm:px-3"
+                            className="text-muted-foreground, hover:text-foreground text-xs, sm:text-sm px-2, sm:px-3`
                             onClick={() => handleEditClick(user)}
                             data-testid={`button-edit-admin-${user.id}`}
                           >
-                            <Pencil className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
-                            <span className="hidden sm:inline">Edit</span>
+                            <Pencil className=`w-3 h-3, sm:w-4, sm:h-4, sm:mr-1" />
+                            <span className="hidden, sm:inline">Edit</span>
                           </Button>
                           </div>
                         </td>
@@ -649,7 +649,7 @@ export default function AdminsPage() {
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold">
+              <DialogTitle className="text-lg, sm:text-xl font-semibold">
                 {editingUser ? "Edit Admin" : "Add New Admin"}
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
@@ -676,7 +676,7 @@ export default function AdminsPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="John"
                           />
                         </FormControl>
@@ -696,7 +696,7 @@ export default function AdminsPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="Doe"
                           />
                         </FormControl>
@@ -716,7 +716,7 @@ export default function AdminsPage() {
                         <Input
                           {...field}
                           type="email"
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="john.doe@example.com"
                         />
                       </FormControl>
@@ -738,7 +738,7 @@ export default function AdminsPage() {
                         <Input
                           {...field}
                           type="password"
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="••••••••"
                         />
                       </FormControl>
@@ -760,7 +760,7 @@ export default function AdminsPage() {
                         value={field.value?.toString() || ""}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                          <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                             <SelectValue placeholder="Select a role" />
                           </SelectTrigger>
                         </FormControl>
@@ -797,13 +797,13 @@ export default function AdminsPage() {
                       setEditingUser(null);
                       form.reset();
                     }}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground, hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                     disabled={
                       createMutation.isPending || updateMutation.isPending
                     }
@@ -832,7 +832,7 @@ export default function AdminsPage() {
             </div>
             <Button
               onClick={handleAddQuickLink}
-              className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Quick Link
@@ -885,12 +885,12 @@ export default function AdminsPage() {
                               href={link.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-muted-foreground hover:text-blue-700 flex items-center gap-1 text-sm"
+                              className="text-muted-foreground, hover:text-blue-700 flex items-center gap-1 text-sm`
                             >
                               {link.url.length > 40
                                 ? `${link.url.substring(0, 40)}...`
                                 : link.url}
-                              <ExternalLink className="w-3 h-3" />
+                              <ExternalLink className=`w-3 h-3" />
                             </a>
                           </td>
                           <td className="px-6 py-4">
@@ -926,7 +926,7 @@ export default function AdminsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-muted-foreground hover:text-foreground"
+                                className="text-muted-foreground, hover:text-foreground"
                                 onClick={() => handleEditQuickLink(link)}
                               >
                                 <Pencil className="w-4 h-4" />
@@ -936,7 +936,7 @@ export default function AdminsPage() {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="text-muted-foreground hover:text-red-700"
+                                    className="text-muted-foreground, hover:text-red-700"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
@@ -976,7 +976,7 @@ export default function AdminsPage() {
         >
           <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold">
+              <DialogTitle className="text-lg, sm:text-xl font-semibold">
                 {editingQuickLink ? "Edit Quick Link" : "Add Quick Link"}
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
@@ -1002,7 +1002,7 @@ export default function AdminsPage() {
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                          <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                         </FormControl>
@@ -1032,7 +1032,7 @@ export default function AdminsPage() {
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="Link title"
                         />
                       </FormControl>
@@ -1051,7 +1051,7 @@ export default function AdminsPage() {
                         <Input
                           {...field}
                           type="url"
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="https://example.com"
                         />
                       </FormControl>
@@ -1127,13 +1127,13 @@ export default function AdminsPage() {
                       setEditingQuickLink(null);
                       quickLinkForm.reset();
                     }}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground, hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                     disabled={
                       quickLinkCreateMutation.isPending ||
                       quickLinkUpdateMutation.isPending

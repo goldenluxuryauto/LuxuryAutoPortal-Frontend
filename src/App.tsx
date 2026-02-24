@@ -44,7 +44,7 @@ import WorkSchedulePage from "@/pages/admin/hr/work-schedule";
 import EmployeeFormPage from "@/pages/employee-form";
 
 // Wrapper component for IncomeExpensesPage to handle Wouter route props
-function IncomeExpensesPageWrapper() {
+function, IncomeExpensesPageWrapper() {
   return <IncomeExpensesPage />;
 }
 import ClientProfilePage from "@/pages/admin/profile";
@@ -68,7 +68,7 @@ import StaffCarRentalForms from "@/pages/staff/car-rental-forms";
 import StaffCarRentalFormSubmit from "@/pages/staff/car-rental-form-submit";
 import TuroTripsPage from "@/pages/admin/turo-trips";
 
-function Router() {
+function, Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
@@ -134,12 +134,12 @@ function Router() {
   );
 }
 
-function App() {
-  // Dev-only: log initialization (never log secrets like API keys or reCAPTCHA key)
+function, App() {
+  // Dev-only: log, initialization(never log secrets like API keys or reCAPTCHA key)
   if (import.meta.env.DEV && typeof window !== "undefined") {
     const apiBaseUrl = getApiBaseUrl();
     console.log("[APP] Environment: development");
-    console.log("[APP] API base:", apiBaseUrl || "relative (Vite proxy)");
+    console.log("[APP] API, base:", apiBaseUrl || "relative (Vite proxy)");
   }
   if (import.meta.env.PROD && typeof window !== "undefined" && !import.meta.env.VITE_API_URL) {
     console.warn("⚠️ [APP] VITE_API_URL is not set in production; API calls may fail.");

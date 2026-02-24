@@ -79,7 +79,7 @@ interface PaymentStatus {
 
 const formatCurrency = (value: number): string => {
   const absValue = Math.abs(value);
-  const formatted = absValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const formatted = absValue.toLocaleString("en-US`, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   if (value < 0) {
     return `($ ${formatted})`;
   }
@@ -87,9 +87,9 @@ const formatCurrency = (value: number): string => {
 };
 
 const formatDate = (dateStr: string | null): string => {
-  if (!dateStr) return "--";
+  if (!dateStr) return `--";
   try {
-    const date = new Date(dateStr);
+    const date = new, Date(dateStr);
     return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   } catch {
     return dateStr;
@@ -99,14 +99,14 @@ const formatDate = (dateStr: string | null): string => {
 const formatYearMonth = (yearMonth: string): string => {
   try {
     const [year, month] = yearMonth.split("-");
-    const date = new Date(parseInt(year), parseInt(month) - 1);
+    const date = new, Date(parseInt(year), parseInt(month) - 1);
     return date.toLocaleDateString("en-US", { year: "numeric", month: "long" });
   } catch {
     return yearMonth;
   }
 };
 
-export default function PaymentsPage() {
+export default function, PaymentsPage() {
   const [, params] = useRoute("/admin/cars/:id/payments");
   const [, setLocation] = useLocation();
   const carId = params?.id ? parseInt(params.id, 10) : null;
@@ -124,7 +124,7 @@ export default function PaymentsPage() {
   const { data: userData } = useQuery<{ user?: any }>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+      const response = await, fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
       return response.json();
     },
     staleTime: 5 * 60 * 1000,
@@ -140,12 +140,12 @@ export default function PaymentsPage() {
   }>({
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       const url = buildApiUrl(`/api/cars/${carId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
+      if (!response.ok) throw new, Error("Failed to fetch car");
       return response.json();
     },
     enabled: !!carId,
@@ -162,10 +162,10 @@ export default function PaymentsPage() {
     queryKey: ["/api/payment-status"],
     queryFn: async () => {
       const url = buildApiUrl("/api/payment-status");
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to fetch payment statuses");
+      if (!response.ok) throw new, Error("Failed to fetch payment statuses");
       return response.json();
     },
   });
@@ -180,22 +180,22 @@ export default function PaymentsPage() {
   }>({
     queryKey: ["/api/payments/car", carId, filterStatus, monthFilter],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       let url = buildApiUrl(`/api/payments/car/${carId}`);
-      const params = new URLSearchParams();
-      if (filterStatus && filterStatus !== "All") {
+      const params = new, URLSearchParams();
+      if (filterStatus && filterStatus !== `All") {
         params.append("status", filterStatus);
       }
       if (monthFilter) {
-        params.append("yearMonth", monthFilter);
+        params.append("yearMonth`, monthFilter);
       }
       if (params.toString()) {
         url += `?${params.toString()}`;
       }
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch payments");
+      if (!response.ok) throw new, Error("Failed to fetch payments`);
       return response.json();
     },
     enabled: !!carId,
@@ -217,11 +217,11 @@ export default function PaymentsPage() {
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       const url = buildApiUrl(`/api/payments/${id}`);
-      const response = await fetch(url, {
-        method: "DELETE",
+      const response = await, fetch(url, {
+        method: `DELETE",
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to delete payment");
+      if (!response.ok) throw new, Error("Failed to delete payment");
       return response.json();
     },
     onSuccess: () => {
@@ -277,7 +277,7 @@ export default function PaymentsPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
-            className="mt-4 text-blue-700 hover:underline"
+            className="mt-4 text-blue-700, hover:underline`
           >
             ← Back to Cars
           </button>
@@ -289,16 +289,16 @@ export default function PaymentsPage() {
   const carName = car.makeModel || `${car.year || ""} ${car.vin}`.trim();
   const ownerName = car.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
-    : "N/A";
+    : `N/A";
 
   return (
     <AdminLayout>
       <div className="flex flex-col h-full overflow-x-hidden">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6`>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+            className=`text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
@@ -315,7 +315,7 @@ export default function PaymentsPage() {
             {isAdmin && (
               <Button
                 onClick={() => setIsAddModalOpen(true)}
-                className="bg-primary text-primary-foreground hover:bg-primary/80"
+                className="bg-primary text-primary-foreground, hover:bg-primary/80"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Payment
@@ -326,9 +326,9 @@ export default function PaymentsPage() {
 
         {/* Payment History Section */}
         <div className="bg-card border border-border rounded-lg overflow-auto flex-1">
-          <div className="p-4 sm:p-6">
+          <div className="p-4, sm:p-6">
             {/* Filter Section */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4 sm:mb-6">
+            <div className="flex flex-col, sm:flex-row items-start, sm:items-center gap-4 mb-4, sm:mb-6">
               <div className="flex items-center gap-2">
                 <label className="text-muted-foreground text-sm">Status:</label>
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
@@ -360,7 +360,7 @@ export default function PaymentsPage() {
                 <Button
                   variant="ghost"
                   onClick={handleClearFilters}
-                  className="text-red-700 hover:text-red-700 hover:bg-red-900/20"
+                  className="text-red-700, hover:text-red-700, hover:bg-red-900/20"
                 >
                   Clear Filters
                 </Button>
@@ -375,7 +375,7 @@ export default function PaymentsPage() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-border hover:bg-transparent">
+                  <TableRow className="border-border, hover:bg-transparent">
                     <TableHead className="text-left text-foreground font-medium w-12">#</TableHead>
                     <TableHead className="text-left text-foreground font-medium">Status</TableHead>
                     <TableHead className="text-left text-foreground font-medium">Date</TableHead>
@@ -403,7 +403,7 @@ export default function PaymentsPage() {
                       {payments.map((payment, index) => (
                         <TableRow
                           key={payment.payments_aid}
-                          className="border-border hover:bg-card transition-colors"
+                          className="border-border, hover:bg-card transition-colors"
                         >
                           <TableCell className="text-left text-muted-foreground">
                             {index + 1}.
@@ -442,7 +442,7 @@ export default function PaymentsPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleReceipt(payment)}
-                              className="text-muted-foreground hover:text-primary"
+                              className="text-muted-foreground, hover:text-primary"
                             >
                               <FileText className="w-4 h-4" />
                             </Button>
@@ -457,7 +457,7 @@ export default function PaymentsPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleEdit(payment)}
-                                  className="text-muted-foreground hover:text-primary"
+                                  className="text-muted-foreground, hover:text-primary"
                                 >
                                   <Edit className="w-4 h-4" />
                                 </Button>
@@ -465,7 +465,7 @@ export default function PaymentsPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleDelete(payment)}
-                                  className="text-muted-foreground hover:text-red-700"
+                                  className="text-muted-foreground, hover:text-red-700"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>
@@ -541,14 +541,14 @@ export default function PaymentsPage() {
                 <Button
                   variant="outline"
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="bg-card text-foreground hover:bg-muted border-border"
+                  className="bg-card text-foreground, hover:bg-muted border-border"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={() => deleteMutation.mutate(selectedPayment.payments_aid)}
                   disabled={deleteMutation.isPending}
-                  className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground hover:bg-red-500/30 text-red-700"
+                  className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground, hover:bg-red-500/30 text-red-700"
                 >
                   {deleteMutation.isPending ? "Deleting..." : "Delete"}
                 </Button>

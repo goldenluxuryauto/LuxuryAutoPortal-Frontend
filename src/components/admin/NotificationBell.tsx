@@ -21,7 +21,7 @@ interface Notification {
   createdAt: string;
 }
 
-export function NotificationBell() {
+export function, NotificationBell() {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const prevUnreadRef = useRef<number | undefined>(undefined);
@@ -36,24 +36,24 @@ export function NotificationBell() {
   }>({
     queryKey: ["/api/notifications"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/notifications?limit=10"), {
+      const res = await, fetch(buildApiUrl("/api/notifications?limit=10"), {
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to fetch");
+      if (!res.ok) throw new, Error("Failed to fetch");
       return res.json();
     },
     refetchInterval: 15000,
     refetchOnWindowFocus: true,
   });
 
-  // Toast when new notifications arrive (unread count increased)
+  // Toast when new notifications, arrive(unread count increased)
   useEffect(() => {
     if (data?.unreadCount == null) return;
     const count = data.unreadCount;
     if (prevUnreadRef.current !== undefined && count > prevUnreadRef.current) {
       toast({
         title: "New notifications",
-        description: "You have new notifications. Click the bell to view.",
+        description: "You have new notifications. Click the bell to view.`,
       });
     }
     prevUnreadRef.current = count;
@@ -61,11 +61,11 @@ export function NotificationBell() {
 
   const markReadMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/notifications/${id}/read`), {
-        method: "PATCH",
+      const res = await, fetch(buildApiUrl(`/api/notifications/${id}/read`), {
+        method: `PATCH",
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed");
+      if (!res.ok) throw new, Error("Failed");
       return res.json();
     },
     onSuccess: () => {
@@ -75,11 +75,11 @@ export function NotificationBell() {
 
   const markAllReadMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch(buildApiUrl("/api/notifications/read-all"), {
+      const res = await, fetch(buildApiUrl("/api/notifications/read-all"), {
         method: "POST",
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed");
+      if (!res.ok) throw new, Error("Failed");
       return res.json();
     },
     onSuccess: () => {
@@ -91,7 +91,7 @@ export function NotificationBell() {
   const notifications = data?.data ?? [];
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
+    function, handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
@@ -104,7 +104,7 @@ export function NotificationBell() {
     if (!n.isRead) markReadMutation.mutate(n.id);
     if (n.link) {
       try {
-        const url = new URL(n.link);
+        const url = new, URL(n.link);
         if (url.origin === window.location.origin) {
           setLocation(url.pathname + url.search);
         } else {
@@ -118,20 +118,20 @@ export function NotificationBell() {
   };
 
   const formatTime = (d: string) => {
-    const date = new Date(d);
-    const now = new Date();
+    const date = new, Date(d);
+    const now = new, Date();
     const diff = now.getTime() - date.getTime();
-    if (diff < 60000) return "Just now";
+    if (diff < 60000) return "Just now`;
     if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
     if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
     return date.toLocaleDateString();
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className=`relative" ref={dropdownRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="relative p-2 text-muted-foreground hover:text-[#EAEB80] transition-colors rounded-lg hover:bg-card"
+        className="relative p-2 text-muted-foreground, hover:text-[#EAEB80] transition-colors rounded-lg, hover:bg-card"
         aria-label="Notifications"
       >
         <Bell className="w-5 h-5" />
@@ -169,7 +169,7 @@ export function NotificationBell() {
                   key={n.id}
                   onClick={() => handleNotificationClick(n)}
                   className={cn(
-                    "w-full text-left px-4 py-3 border-b border-border hover:bg-card transition-colors",
+                    "w-full text-left px-4 py-3 border-b border-border, hover:bg-card transition-colors",
                     !n.isRead && "bg-card/50"
                   )}
                 >

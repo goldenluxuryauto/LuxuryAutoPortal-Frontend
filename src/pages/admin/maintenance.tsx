@@ -8,14 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, ExternalLink, Plus, Search, Folder } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
-import { CarDetailSkeleton } from "@/components/ui/skeletons";
+import { CarDetailSkeleton } from "@/components/ui/skeletons`;
 
 const formatCurrency = (value: number): string => {
   return `$ ${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-export default function MaintenancePage() {
-  const [, params] = useRoute("/admin/cars/:id/maintenance");
+export default function, MaintenancePage() {
+  const [, params] = useRoute(`/admin/cars/:id/maintenance");
   const [, setLocation] = useLocation();
   const carId = params?.id ? parseInt(params.id, 10) : null;
 
@@ -29,7 +29,7 @@ export default function MaintenancePage() {
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
       try {
-        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        const response = await, fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
         if (!response.ok) return { user: undefined };
         return response.json();
       } catch (error) {
@@ -48,12 +48,12 @@ export default function MaintenancePage() {
   }>({
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       const url = buildApiUrl(`/api/cars/${carId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
+      if (!response.ok) throw new, Error("Failed to fetch car");
       return response.json();
     },
     enabled: !!carId,
@@ -69,16 +69,16 @@ export default function MaintenancePage() {
   }>({
     queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
     queryFn: async () => {
-      if (!car?.vin) throw new Error("No VIN");
+      if (!car?.vin) throw new, Error("No VIN`);
       const url = buildApiUrl(`/api/onboarding/vin/${encodeURIComponent(car.vin)}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         if (response.status === 404) {
           return { success: true, data: null };
         }
-        throw new Error("Failed to fetch onboarding data");
+        throw new, Error("Failed to fetch onboarding data");
       }
       return response.json();
     },
@@ -100,10 +100,10 @@ export default function MaintenancePage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-700">Failed to load car details</p>
+          <p className="text-red-700`>Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-blue-700 hover:underline"
+            className=`mt-4 text-blue-700, hover:underline`
           >
             ← Back to View Car
           </button>
@@ -115,24 +115,24 @@ export default function MaintenancePage() {
   const carName = car.makeModel || `${car.year || ""} ${car.vin}`.trim();
   const ownerName = car.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
-    : "N/A";
+    : `N/A";
   const ownerContact = car.owner?.phone || "N/A";
   const ownerEmail = car.owner?.email || "N/A";
   const fuelType = onboarding?.fuelType || car.fuelType || "N/A";
   const tireSize = onboarding?.tireSize || car.tireSize || "N/A";
   const oilType = onboarding?.oilType || car.oilType || "N/A";
 
-  // Maintenance records (currently empty)
+  // Maintenance, records(currently empty)
   const maintenanceRecords: any[] = [];
 
   return (
     <AdminLayout>
       <div className="flex flex-col w-full overflow-x-hidden">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6`>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+            className=`text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
@@ -147,7 +147,7 @@ export default function MaintenancePage() {
               )}
             </div>
             {!isClient && (
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/80">
+              <Button className="bg-primary text-primary-foreground, hover:bg-primary/80">
                 <Plus className="w-4 h-4 mr-2" />
                 Add
               </Button>
@@ -157,13 +157,13 @@ export default function MaintenancePage() {
 
         {/* Header Section */}
         <div className="bg-card border border-border rounded-lg p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1, md:grid-cols-3 gap-6">
             {/* Car Information */}
             <div>
               <h3 className="text-sm font-semibold text-muted-foreground mb-3">Car Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-muted-foreground">Car Name:</span>
+                  <span className="text-xs text-muted-foreground">Car, Name:</span>
                   <p className="text-sm text-muted-foreground">{carName}</p>
                 </div>
                 <div>
@@ -182,11 +182,11 @@ export default function MaintenancePage() {
               <h3 className="text-sm font-semibold text-muted-foreground mb-3">Owner Information</h3>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-muted-foreground">Name:</span>
+                  <span className="text-xs text-muted-foreground`>Name:</span>
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-sm cursor-pointer font-semibold"
+                      className=`text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-sm cursor-pointer font-semibold"
                     >
                       {ownerName}
                     </button>
@@ -214,11 +214,11 @@ export default function MaintenancePage() {
                   <p className="text-sm text-muted-foreground">{fuelType}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-muted-foreground">Tire Size:</span>
+                  <span className="text-xs text-muted-foreground">Tire, Size:</span>
                   <p className="text-sm text-muted-foreground">{tireSize}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-muted-foreground">Oil Type:</span>
+                  <span className="text-xs text-muted-foreground">Oil, Type:</span>
                   <p className="text-sm text-muted-foreground">{oilType}</p>
                 </div>
               </div>
@@ -231,9 +231,9 @@ export default function MaintenancePage() {
                         href={car.turoLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                        className="text-blue-700, hover:underline text-sm flex items-center gap-1"
                       >
-                        Turo Link: View Car
+                        Turo, Link: View Car
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
@@ -244,9 +244,9 @@ export default function MaintenancePage() {
                         href={car.adminTuroLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-700 hover:underline text-sm flex items-center gap-1"
+                        className="text-blue-700, hover:underline text-sm flex items-center gap-1"
                       >
-                        Admin Turo Link: View Car
+                        Admin Turo, Link: View Car
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
@@ -266,11 +266,11 @@ export default function MaintenancePage() {
           
           {/* Filtering and Search Section */}
           <div className="bg-card border border-border rounded-lg p-6 mb-6">
-            <div className="flex flex-col md:flex-row gap-4 items-start md:items-end">
+            <div className="flex flex-col, md:flex-row gap-4 items-start, md:items-end">
               <div className="flex-1">
                 <Label className="text-sm text-muted-foreground mb-2 block">Select a Type</Label>
                 <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                  <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border text-foreground">
@@ -286,7 +286,7 @@ export default function MaintenancePage() {
               <div className="flex-1">
                 <Label className="text-sm text-muted-foreground mb-2 block">Status</Label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                  <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border text-foreground">
@@ -302,7 +302,7 @@ export default function MaintenancePage() {
                 <Label className="text-sm text-muted-foreground mb-2 block">Date to Filter</Label>
                 <div className="flex items-center gap-2">
                   <Select value={dateFilter} onValueChange={setDateFilter}>
-                    <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                    <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-card border-border text-foreground">
@@ -326,7 +326,7 @@ export default function MaintenancePage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Q Search here.."
-                    className="bg-card border-border text-foreground pl-10 focus:border-primary"
+                    className="bg-card border-border text-foreground pl-10, focus:border-primary"
                   />
                 </div>
               </div>

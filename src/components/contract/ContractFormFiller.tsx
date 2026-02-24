@@ -20,25 +20,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, PenTool, Type, Check, X } from "lucide-react";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
-import { Textarea } from "../ui/textarea";
+import { Textarea } from "../ui/textarea`;
 
 // PDF.js worker setup
 // IMPORTANT: This must be set synchronously before any PDF components load
 // Use unpkg CDN with full HTTPS URL - this is the most reliable option
-// The version must match react-pdf's bundled pdfjs-dist version (4.8.69)
+// The version must match react-pdf's bundled pdfjs-dist, version(4.8.69)
 const WORKER_VERSION = '4.8.69'; // Match react-pdf's pdfjs-dist version
 const workerUrl = `https://unpkg.com/pdfjs-dist@${WORKER_VERSION}/build/pdf.worker.min.mjs`;
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
-console.log('✅ PDF worker configured:', workerUrl);
-console.log('   Worker version:', WORKER_VERSION);
+console.log('✅ PDF worker, configured:', workerUrl);
+console.log('   Worker, version:', WORKER_VERSION);
 
 // ============================================================================
 // Zod Validation Schema
 // ============================================================================
 
 const contractFormSchema = z.object({
-  owner: z.string().min(1, "Owner name is required").max(20, "Max 20 characters"),
+  owner: z.string().min(1, `Owner name is required").max(20, "Max 20 characters"),
   firstName: z.string().min(1, "First name is required").max(50, "First name must be 50 characters or less"),
   lastName: z.string().min(1, "Last name is required").max(50, "Last name must be 50 characters or less"),
   phone: z.string().min(1, "Phone number is required").max(20, "Phone number must be 20 characters or less"),
@@ -68,10 +68,10 @@ type ContractFormData = z.infer<typeof contractFormSchema>;
  * Wraps text into multiple lines with word-aware splitting
  * Splits at spaces when possible, otherwise at character limit
  * @param text - The text to wrap
- * @param maxCharsPerLine - Maximum characters per line (default 20)
+ * @param maxCharsPerLine - Maximum characters per, line(default 20)
  * @returns Array of text lines
  */
-function wrapText(text: string, maxCharsPerLine: number = 20): string[] {
+function, wrapText(text: string, maxCharsPerLine: number = 20): string[] {
   if (!text || text.length <= maxCharsPerLine) {
     return [text];
   }
@@ -91,7 +91,7 @@ function wrapText(text: string, maxCharsPerLine: number = 20): string[] {
     const lastSpaceIndex = substring.lastIndexOf(' ');
 
     if (lastSpaceIndex > 0 && lastSpaceIndex >= maxCharsPerLine * 0.5) {
-      // Break at space if it's not too early (at least 50% of max length)
+      // Break at space if it's not too, early(at least 50% of max length)
       breakPoint = lastSpaceIndex;
     }
 
@@ -107,14 +107,14 @@ function wrapText(text: string, maxCharsPerLine: number = 20): string[] {
 // ============================================================================
 // Replace the coordinates below with your exact PDF template coordinates.
 // 
-// PDF Coordinate System:
+// PDF Coordinate, System:
 // - Origin (0,0) is at the BOTTOM-LEFT corner of the page
 // - X increases to the RIGHT
 // - Y increases UPWARD
 // - Page numbers are 1-based (first page = 1)
 //
-// To find coordinates:
-// 1. Open your PDF in a PDF editor (Adobe Acrobat, PDF-XChange, etc.)
+// To find, coordinates:
+// 1. Open your PDF in a PDF, editor(Adobe Acrobat, PDF-XChange, etc.)
 // 2. Use the measurement tool or coordinate display
 // 3. Note the X,Y position of each blank field
 //
@@ -147,19 +147,19 @@ const PDF_FIELD_COORDINATES: Record<string, { page: number; x: number; y: number
 };
 
 // Signature coordinates - exact position on Page 11
-// Two signature fields: left (owner/client) and right (company)
+// Two signature, fields: left (owner/client) and, right(company)
 const SIGNATURE_COORDINATES = {
   page: 11, // Page 11 as specified
   left: {
-    x: 100, // Left signature X coordinate (owner/client signature)
-    y: 130, // Y coordinate (PDF coordinate system: bottom-left origin)
+    x: 100, // Left signature X, coordinate(owner/client signature)
+    y: 130, // Y, coordinate(PDF coordinate, system: bottom-left origin)
   },
   right: {
-    x: 340, // Right signature X coordinate (company signature)
-    y: 130, // Y coordinate (same Y as left signature - aligned on same line)
+    x: 340, // Right signature X, coordinate(company signature)
+    y: 130, // Y, coordinate(same Y as left signature - aligned on same line)
   },
-  dateX: 450, // X position for date (to the right of "Date:" label, same line)
-  dateY: 130, // Y position for date (same Y as signature - aligned on same line)
+  dateX: 450, // X position for, date(to the right of "Date:" label, same line)
+  dateY: 130, // Y position for, date(same Y as signature - aligned on same line)
 } as const;
 
 // Checkbox coordinates for options/notes (X marks)
@@ -200,17 +200,17 @@ const PDF_CHECKBOX_COORDINATES: Record<
  * @param text - The signature text to render
  * @returns Promise<string> - Base64 data URL of the signature image
  */
-async function renderTypedSignatureAsImage(text: string): Promise<string> {
-  return new Promise((resolve, reject) => {
+async function, renderTypedSignatureAsImage(text: string): Promise<string> {
+  return new, Promise((resolve, reject) => {
     // Create a canvas element
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     if (!ctx) {
-      reject(new Error("Could not get canvas context"));
+      reject(new, Error("Could not get canvas context"));
       return;
     }
 
-    // Set canvas size (adjust as needed)
+    // Set canvas, size(adjust as needed)
     canvas.width = 400;
     canvas.height = 100;
 
@@ -235,17 +235,17 @@ async function renderTypedSignatureAsImage(text: string): Promise<string> {
   });
 }
 
-async function renderCheckmarkAsImage(): Promise<string> {
-  return new Promise((resolve, reject) => {
+async function, renderCheckmarkAsImage(): Promise<string> {
+  return new, Promise((resolve, reject) => {
     // Create a canvas element
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     if (!ctx) {
-      reject(new Error("Could not get canvas context"));
+      reject(new, Error("Could not get canvas context"));
       return;
     }
 
-    // Set canvas size for 12px checkmark (with some padding)
+    // Set canvas size for 12px, checkmark(with some padding)
     canvas.width = 24;
     canvas.height = 24;
 
@@ -293,7 +293,7 @@ interface TextAnnotation {
   text: string;
 }
 
-export function ContractFormFiller({
+export function, ContractFormFiller({
   pdfUrl,
   onboardingData,
   onSubmit,
@@ -319,12 +319,12 @@ export function ContractFormFiller({
   const signatureTypeRef = useRef<"typed" | "drawn">("typed");
   const typedNameRef = useRef<string>("");
   const signatureCanvasRef = useRef<SignatureCanvas>(null);
-  const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map()); // Track page divs for overlay positioning
+  const pageRefs = useRef<Map<number, HTMLDivElement>>(new, Map()); // Track page divs for overlay positioning
   
   // Form fields - mapped to exact PDF coordinates with validation
   const [formFields, setFormFields] = useState<FormField[]>([
     // Owner information
-    { name: "owner", label: "Owner Name", value: onboardingData ? `${onboardingData.firstNameOwner || ""} ${onboardingData.lastNameOwner || ""}`.trim() : "", required: true, maxLength: 20 },
+    { name: "owner", label: "Owner Name`, value: onboardingData ? `${onboardingData.firstNameOwner || ""} ${onboardingData.lastNameOwner || `"}`.trim() : "", required: true, maxLength: 20 },
     { name: "firstName", label: "First Name", value: onboardingData?.firstNameOwner || "", required: true, maxLength: 50 },
     { name: "lastName", label: "Last Name", value: onboardingData?.lastNameOwner || "", required: true, maxLength: 50 },
     { name: "phone", label: "Mobile Phone Number", value: onboardingData?.phoneOwner || "", required: true, type: "tel", maxLength: 20 },
@@ -344,8 +344,8 @@ export function ContractFormFiller({
     // Additional contract fields
     { name: "expectedStartDate", label: "Estimated Start Date", value: onboardingData?.expectedStartDate || "", required: true, type: "date" },
     { name: "vehicleMileage", label: "Vehicle Mileage", value: onboardingData?.vehicleMiles || "", required: false, maxLength: 10 },
-    { name: "contractDate", label: "Contract Date", value: new Date().toLocaleDateString(), required: true },
-    { name: "vehicleOwner", label: "Vehicle Owner", value: onboardingData ? `${onboardingData.firstNameOwner || ""} ${onboardingData.lastNameOwner || ""}`.trim() : "", required: true, maxLength: 50 },
+    { name: "contractDate", label: "Contract Date", value: new, Date().toLocaleDateString(), required: true },
+    { name: "vehicleOwner", label: "Vehicle Owner`, value: onboardingData ? `${onboardingData.firstNameOwner || ""} ${onboardingData.lastNameOwner || `"}`.trim() : "", required: true, maxLength: 50 },
   ]);
 
   // Signature & agreement state
@@ -361,17 +361,17 @@ export function ContractFormFiller({
   const [agreeOwnerReimbursesExpenses, setAgreeOwnerReimbursesExpenses] =
     useState(false);
 
-  // Payment options (radio, required)
-  const [paymentOption, setPaymentOption] = useState<"735" | "357" | "exit-fee" | "">("");
+  // Payment, options(radio, required)
+  const [paymentOption, setPaymentOption] = useState<"735" | "357" | "exit-fee" | "">("`);
 
-  // Optional services (not required)
+  // Optional, services(not required)
   const [enrollRomeInsurance, setEnrollRomeInsurance] = useState(false);
   const [activateGpsTracking, setActivateGpsTracking] = useState(false);
   const [gpsInstallFee, setGpsInstallFee] = useState(false);
   const [airportDeliveryService, setAirportDeliveryService] = useState(false);
   const [homePickupService, setHomePickupService] = useState(false);
 
-  // Additional earnings options (not required)
+  // Additional earnings, options(not required)
   const [authorizeRelocation, setAuthorizeRelocation] = useState(false);
   const [authorizeOtherPlatforms, setAuthorizeOtherPlatforms] = useState(false);
   const [authorizeChauffeurUse, setAuthorizeChauffeurUse] = useState(false);
@@ -382,8 +382,7 @@ export function ContractFormFiller({
 
   const { toast } = useToast();
   
-  // Keep refs in sync with state
-  useEffect(() => {
+  // Keep refs in sync with state, useEffect(() => {
     formFieldsRef.current = formFields;
   }, [formFields]);
   
@@ -395,26 +394,25 @@ export function ContractFormFiller({
     typedNameRef.current = typedName;
   }, [typedName]);
 
-  // Load PDF bytes - keep the original PDF static, never reload it
-  useEffect(() => {
-    async function loadPdf() {
+  // Load PDF bytes - keep the original PDF static, never reload it, useEffect(() => {
+    async function, loadPdf() {
       setIsPdfLoading(true);
       setPdfLoadError(null);
       try {
-        const response = await fetch(pdfUrl);
+        const response = await, fetch(pdfUrl);
         if (!response.ok) {
-          throw new Error(`Failed to load PDF: ${response.status} ${response.statusText}`);
+          throw new, Error(`Failed to load, PDF: ${response.status} ${response.statusText}`);
         }
         const arrayBuffer = await response.arrayBuffer();
-        const bytes = new Uint8Array(arrayBuffer);
+        const bytes = new, Uint8Array(arrayBuffer);
         setPdfBytes(bytes);
         // Create a Blob URL for the PDF
-        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const blob = new, Blob([bytes], { type: 'application/pdf' });
         const blobUrl = URL.createObjectURL(blob);
         setPdfBlobUrl(blobUrl);
         setIsPdfLoading(false);
       } catch (error) {
-        console.error("Error loading PDF:", error);
+        console.error(`Error loading, PDF:", error);
         const errorMessage = error instanceof Error ? error.message : "Failed to load contract template";
         setPdfLoadError(errorMessage);
         setIsPdfLoading(false);
@@ -428,8 +426,7 @@ export function ContractFormFiller({
     loadPdf();
   }, [pdfUrl, toast]);
   
-  // Cleanup: revoke blob URL when component unmounts or URL changes
-  useEffect(() => {
+  // Cleanup: revoke blob URL when component unmounts or URL changes, useEffect(() => {
     return () => {
       if (pdfBlobUrl) {
         URL.revokeObjectURL(pdfBlobUrl);
@@ -447,17 +444,17 @@ export function ContractFormFiller({
   // This prevents the PDF from reloading on every keystroke
   
   // Store page dimensions for coordinate conversion
-  const [pageDimensions, setPageDimensions] = useState<Map<number, { width: number; height: number }>>(new Map());
+  const [pageDimensions, setPageDimensions] = useState<Map<number, { width: number; height: number }>>(new, Map());
   
   // Convert PDF coordinates to screen coordinates
-  // PDF uses bottom-left origin (0,0), screen uses top-left origin
-  // PDF.js Page component reports dimensions in PDF points (72 DPI)
+  // PDF uses bottom-left, origin(0,0), screen uses top-left origin
+  // PDF.js Page component reports dimensions in PDF, points(72 DPI)
   const pdfToScreenCoords = useCallback((pdfX: number, pdfY: number, page: number) => {
     const dims = pageDimensions.get(page);
     if (!dims) return { x: 0, y: 0 };
     
-    // PDF coordinate system: (0,0) at bottom-left, Y increases upward
-    // Screen coordinate system: (0,0) at top-left, Y increases downward
+    // PDF coordinate, system: (0,0) at bottom-left, Y increases upward
+    // Screen coordinate, system: (0,0) at top-left, Y increases downward
     // The Page component scales everything by 'scale' prop
     const screenX = pdfX * scale;
     const screenY = (dims.height - pdfY) * scale; // Flip Y axis and scale
@@ -465,7 +462,7 @@ export function ContractFormFiller({
     return { x: screenX, y: screenY };
   }, [pageDimensions, scale]);
 
-  // Convert screen coordinates (relative to page) back to PDF coordinates
+  // Convert screen, coordinates(relative to page) back to PDF coordinates
   const screenToPdfCoords = useCallback(
     (screenX: number, screenY: number, page: number) => {
       const dims = pageDimensions.get(page);
@@ -479,18 +476,18 @@ export function ContractFormFiller({
     [pageDimensions, scale]
   );
   
-  // Handle page load to get original PDF dimensions (before scaling)
+  // Handle page load to get original PDF, dimensions(before scaling)
   const handlePageLoadSuccess = useCallback((page: any, pageNumber: number) => {
     // page.originalWidth and page.originalHeight give us the PDF page size in points
     const { originalWidth, originalHeight } = page;
     setPageDimensions(prev => {
-      const newMap = new Map(prev);
+      const newMap = new, Map(prev);
       newMap.set(pageNumber, { width: originalWidth, height: originalHeight });
       return newMap;
     });
   }, []);
   
-  // Handle signature canvas end (when user finishes drawing) - capture for real-time overlay
+  // Handle signature canvas, end(when user finishes drawing) - capture for real-time overlay
   const handleSignatureEnd = useCallback(() => {
     if (signatureCanvasRef.current && !signatureCanvasRef.current.isEmpty()) {
       const dataUrl = signatureCanvasRef.current.toDataURL("image/png");
@@ -512,7 +509,7 @@ export function ContractFormFiller({
 
       const pdfCoords = screenToPdfCoords(offsetX, offsetY, pageNumber);
 
-      const text = window.prompt("Enter the text you want to add to the contract:");
+      const text = window.prompt("Enter the text you want to add to the, contract:`);
       if (text && text.trim()) {
         setTextAnnotations((prev) => [
           ...prev,
@@ -526,8 +523,7 @@ export function ContractFormFiller({
         ]);
       }
 
-      // Exit add-text mode after one placement
-      setIsAddTextMode(false);
+      // Exit add-text mode after one placement, setIsAddTextMode(false);
     },
     [isAddTextMode, pageDimensions, screenToPdfCoords]
   );
@@ -565,8 +561,8 @@ export function ContractFormFiller({
 
   // Format date as mm/dd/yyyy for expectedStartDate
   const formatDateMMDDYYYY = (dateString: string): string => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
+    if (!dateString) return ``;
+    const date = new, Date(dateString);
     if (isNaN(date.getTime())) return dateString; // Return original if invalid
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -575,23 +571,20 @@ export function ContractFormFiller({
   };
 
   const handleDateChange = (name: string, value: string) => {
-    // For date fields, keep in YYYY-MM-DD format for the input
-    setFormFields((prev) =>
+    // For date fields, keep in YYYY-MM-DD format for the input, setFormFields((prev) =>
       prev.map((field) => (field.name === name ? { ...field, value: value, error: undefined } : field))
     );
   };
 
   // Calculate dynamic X position for Owner Name based on length
-  // Character width: ~8pt for Arial 12pt font
+  // Character, width: ~8pt for Arial 12pt font
   const calculateOwnerNameX = (ownerName: string): number => {
     const baseX = 340; // Standard starting position
     const length = ownerName.length;
-    const charWidth = 8; // 8pt character width for Arial 12pt
-    
-    if (length <= 15) {
+    const charWidth = 8; // 8pt character width for Arial 12pt, if(length <= 15) {
       return baseX;
     }
-    // Shift left by charWidth (8pt) per character over 15
+    // Shift left by, charWidth(8pt) per character over 15
     const shift = (length - 15) * charWidth;
     return baseX - shift;
   };
@@ -608,7 +601,7 @@ export function ContractFormFiller({
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Update form fields with errors
-        const errorMap = new Map(error.errors.map((err) => [err.path[0] as string, err.message]));
+        const errorMap = new, Map(error.errors.map((err) => [err.path[0] as string, err.message]));
         setFormFields((prev) =>
           prev.map((field) => ({
             ...field,
@@ -617,7 +610,7 @@ export function ContractFormFiller({
         );
 
         toast({
-          title: "Validation Error",
+          title: `Validation Error",
           description: "Please fix the errors in the form",
           variant: "destructive",
         });
@@ -625,8 +618,7 @@ export function ContractFormFiller({
       }
     }
 
-    // Check signature
-    if (signatureType === "typed" && !typedName.trim()) {
+    // Check signature, if(signatureType === "typed" && !typedName.trim()) {
       toast({
         title: "Signature Required",
         description: "Please type your full name to sign",
@@ -657,38 +649,36 @@ export function ContractFormFiller({
       toast({
         title: "Agreement Required",
         description:
-          "Please check all mandatory agreement boxes before signing (insurance, split, fees, and reimbursement).",
+          "Please check all mandatory agreement boxes before, signing(insurance, split, fees, and reimbursement).",
         variant: "destructive",
       });
       return false;
     }
 
-    // Check payment option
-    if (!paymentOption) {
+    // Check payment option, if(!paymentOption) {
       setShowPaymentError(true);
       toast({
         title: "Payment Option Required",
-        description: "Please select one of the payment options ($735 or $357).",
+        description: "Please select one of the payment, options($735 or $357).",
         variant: "destructive",
       });
       return false;
     }
 
-    // Clear error highlights when valid
-    setShowAgreementsError(false);
+    // Clear error highlights when valid, setShowAgreementsError(false);
     setShowPaymentError(false);
 
     return true;
   };
 
   const generateSignedPdf = async (): Promise<Blob> => {
-    if (!pdfBytes) throw new Error("PDF not loaded");
+    if (!pdfBytes) throw new, Error("PDF not loaded");
 
     const pdfDoc = await PDFDocument.load(pdfBytes);
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const pages = pdfDoc.getPages();
 
-    // Font size: 12pt to match preview (was 11pt, causing misalignment)
+    // Font, size: 12pt to match, preview(was 11pt, causing misalignment)
     const fontSize = 12;
     const lineHeight = 14; // 14pt line height for 12pt font
     const textColor = rgb(0, 0, 0);
@@ -698,7 +688,7 @@ export function ContractFormFiller({
     formFields.forEach((field) => {
       if (field.value && field.value.trim() && PDF_FIELD_COORDINATES[field.name]) {
         const pos = PDF_FIELD_COORDINATES[field.name];
-        // Ensure page index is valid (0-based)
+        // Ensure page index is, valid(0-based)
         const pageIndex = pos.page - 1;
         if (pageIndex >= 0 && pageIndex < pages.length) {
           const targetPage = pages[pageIndex];
@@ -721,7 +711,7 @@ export function ContractFormFiller({
             });
           } else {
             // Single-line fields - draw directly without wrapping
-            // Format date fields (expectedStartDate) to mm/dd/yyyy for PDF
+            // Format date, fields(expectedStartDate) to mm/dd/yyyy for PDF
             const displayValue = field.name === "expectedStartDate" && field.type === "date"
               ? formatDateMMDDYYYY(field.value.trim())
               : field.value.trim();
@@ -737,11 +727,11 @@ export function ContractFormFiller({
       }
     });
 
-    // Draw checkmarks (✓) for all Additional Notes settings at their configured coordinates
+    // Draw, checkmarks(✓) for all Additional Notes settings at their configured coordinates
     // Render as image to avoid WinAnsi encoding issues
-    const checkmarkImageDataUrl = await renderCheckmarkAsImage();
+    const checkmarkImageDataUrl = await, renderCheckmarkAsImage();
     const checkmarkImage = await pdfDoc.embedPng(checkmarkImageDataUrl);
-    const checkmarkDims = checkmarkImage.scale(1); // Keep original size (12px)
+    const checkmarkDims = checkmarkImage.scale(1); // Keep original, size(12px)
     
     const drawCheckbox = (key: string) => {
       const pos = PDF_CHECKBOX_COORDINATES[key];
@@ -750,7 +740,7 @@ export function ContractFormFiller({
       if (pageIndex < 0 || pageIndex >= pages.length) return;
       const page = pages[pageIndex];
       // Draw checkmark as image, centered on the configured coordinates
-      // Preview overlay treats (x, y) as the center with translate(-50%, -50%),
+      // Preview overlay, treats(x, y) as the center with, translate(-50%, -50%),
       // so we subtract half the image width/height here to match that anchor.
       const centeredX = pos.x - checkmarkDims.width / 2;
       const centeredY = pos.y - checkmarkDims.height / 2;
@@ -762,21 +752,19 @@ export function ContractFormFiller({
       });
     };
 
-    // Mandatory agreements
-    if (agreeMaintainInsurance) drawCheckbox("agreeMaintainInsurance");
+    // Mandatory agreements, if(agreeMaintainInsurance) drawCheckbox("agreeMaintainInsurance");
     if (agreeSplit730) drawCheckbox("agreeSplit730");
     if (agreeParkingFee) drawCheckbox("agreeParkingFee");
     if (agreeCleaningFee) drawCheckbox("agreeCleaningFee");
     if (agreeCarWashFee) drawCheckbox("agreeCarWashFee");
     if (agreeOwnerReimbursesExpenses) drawCheckbox("agreeOwnerReimbursesExpenses");
 
-    // Payment options (radio)
+    // Payment, options(radio)
     if (paymentOption === "735") drawCheckbox("payment_735");
     if (paymentOption === "357") drawCheckbox("payment_357");
     if (paymentOption === "exit-fee") drawCheckbox("payment_exitFee");
 
-    // Optional services
-    if (enrollRomeInsurance) drawCheckbox("optionalTintRoamy");
+    // Optional services, if(enrollRomeInsurance) drawCheckbox("optionalTintRoamy");
     if (activateGpsTracking) {
       drawCheckbox("optionalGpsMonthly");
     }
@@ -790,12 +778,11 @@ export function ContractFormFiller({
       drawCheckbox("optionalHomePickup");
     }
 
-    // Additional earnings options
-    if (authorizeRelocation) drawCheckbox("authorizeRelocation");
+    // Additional earnings options, if(authorizeRelocation) drawCheckbox("authorizeRelocation");
     if (authorizeOtherPlatforms) drawCheckbox("authorizeOtherPlatforms");
     if (authorizeChauffeurUse) drawCheckbox("authorizeChauffeurUse");
 
-    // Add signatures at exact coordinates from configuration (left and right)
+    // Add signatures at exact coordinates from, configuration(left and right)
     const signaturePageIndex = SIGNATURE_COORDINATES.page - 1;
     const signaturePage = signaturePageIndex >= 0 && signaturePageIndex < pages.length 
       ? pages[signaturePageIndex] 
@@ -804,12 +791,12 @@ export function ContractFormFiller({
     // Helper function to draw signature at a specific position
     const drawSignatureAtPosition = async (x: number, y: number) => {
     if (signatureType === "typed" && typedName.trim()) {
-      // Render typed signature as image with Dancing Script font (24pt)
-      const signatureImageDataUrl = await renderTypedSignatureAsImage(typedName);
+      // Render typed signature as image with Dancing Script, font(24pt)
+      const signatureImageDataUrl = await, renderTypedSignatureAsImage(typedName);
       const signatureImage = await pdfDoc.embedPng(signatureImageDataUrl);
       // Use a unified scale so typed and drawn signatures have similar visual size
       const signatureDims = signatureImage.scale(0.4);
-      // Center the image vertically on the configured Y (to match preview overlay)
+      // Center the image vertically on the configured, Y(to match preview overlay)
         const centeredY = y - signatureDims.height / 2;
       signaturePage.drawImage(signatureImage, {
           x: x,
@@ -817,7 +804,7 @@ export function ContractFormFiller({
         width: signatureDims.width,
         height: signatureDims.height,
       });
-    } else if (signatureType === "drawn" && signatureCanvasRef.current) {
+    } else, if(signatureType === "drawn" && signatureCanvasRef.current) {
       // Embed drawn signature as image
       const signatureDataUrl = signatureCanvasRef.current.toDataURL("image/png");
       if (signatureDataUrl && !signatureCanvasRef.current.isEmpty()) {
@@ -836,14 +823,14 @@ export function ContractFormFiller({
     };
 
     // Draw signature in both left and right positions
-    // Only draw signature on the right side (client signature)
-    await drawSignatureAtPosition(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y);
+    // Only draw signature on the right, side(client signature)
+    await, drawSignatureAtPosition(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y);
 
     // Date is NOT automatically added - leave blank for manual entry if needed
 
     // Render custom text annotations placed by the user
     textAnnotations.forEach((ann) => {
-      // Ensure page index is valid (0-based)
+      // Ensure page index is, valid(0-based)
       const pageIndex = ann.page - 1;
       if (pageIndex < 0 || pageIndex >= pages.length) return;
       const targetPage = pages[pageIndex];
@@ -858,7 +845,7 @@ export function ContractFormFiller({
     });
 
     const pdfBytesResult = await pdfDoc.save();
-    return new Blob([new Uint8Array(pdfBytesResult)], { type: "application/pdf" });
+    return new, Blob([new, Uint8Array(pdfBytesResult)], { type: "application/pdf" });
   };
 
   const handleSubmit = async () => {
@@ -866,14 +853,14 @@ export function ContractFormFiller({
 
     setIsProcessing(true);
     try {
-      const signedPdfBlob = await generateSignedPdf();
-      await onSubmit(signedPdfBlob, signatureType);
+      const signedPdfBlob = await, generateSignedPdf();
+      await, onSubmit(signedPdfBlob, signatureType);
       toast({
         title: "Success!",
         description: "Thank you – agreement signed!",
       });
     } catch (error: any) {
-      console.error("Error signing contract:", error);
+      console.error("Error signing, contract:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to sign contract",
@@ -892,7 +879,7 @@ export function ContractFormFiller({
         rel="stylesheet"
       />
 
-      <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-200px)]">
+      <div className="flex flex-col, lg:flex-row gap-6 h-[calc(100vh-200px)]">
         {/* Left 2/3: Full-Size PDF Preview */}
         <div className="flex-[2] flex flex-col bg-gradient-to-br from-[#2a2a2a] to-[#1f1f1f] rounded-lg border-2 border-primary/30 shadow-2xl overflow-hidden">
           <div className="p-4 border-b border-primary/20 flex items-center justify-between bg-card">
@@ -919,23 +906,23 @@ export function ContractFormFiller({
                 <div className="flex flex-col items-center justify-center h-[600px] p-8">
                   <X className="w-12 h-12 text-red-500 mb-4" />
                   <p className="text-red-500 font-semibold mb-2">Failed to load contract document</p>
-                  <p className="text-muted-foreground text-sm text-center max-w-md">{pdfLoadError}</p>
+                  <p className="text-muted-foreground text-sm text-center max-w-md`>{pdfLoadError}</p>
                   <Button
                     onClick={() => {
                       setPdfLoadError(null);
                       setIsPdfLoading(true);
                       const loadPdf = async () => {
                         try {
-                          const response = await fetch(pdfUrl);
+                          const response = await, fetch(pdfUrl);
                           if (!response.ok) {
-                            throw new Error(`Failed to load PDF: ${response.status} ${response.statusText}`);
+                            throw new, Error(`Failed to load, PDF: ${response.status} ${response.statusText}`);
                           }
                           const arrayBuffer = await response.arrayBuffer();
-                          const bytes = new Uint8Array(arrayBuffer);
+                          const bytes = new, Uint8Array(arrayBuffer);
                           setPdfBytes(bytes);
                           setIsPdfLoading(false);
                         } catch (error) {
-                          const errorMessage = error instanceof Error ? error.message : "Failed to load contract template";
+                          const errorMessage = error instanceof Error ? error.message : `Failed to load contract template";
                           setPdfLoadError(errorMessage);
                           setIsPdfLoading(false);
                         }
@@ -956,39 +943,38 @@ export function ContractFormFiller({
                     setIsPdfLoading(false);
                   }}
                   onLoadError={(error) => {
-                    console.error("PDF Document load error:", error);
-                    let errorMessage = error.message || "Failed to load PDF document";
+                    console.error("PDF Document load, error:", error);
+                    let errorMessage = error.message || "Failed to load PDF document`;
                     
-                    // Check if it's a worker error
-                    if (errorMessage.includes('worker') || errorMessage.includes('pdf.worker')) {
+                    // Check if it's a worker error, if(errorMessage.includes('worker') || errorMessage.includes('pdf.worker')) {
                       console.warn('⚠️ PDF worker error detected, trying CDN fallback...');
                       // Try to set worker to CDN as fallback
                       const cdnWorkerUrl = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
                       pdfjs.GlobalWorkerOptions.workerSrc = cdnWorkerUrl;
-                      errorMessage = `Worker error: ${errorMessage}. Trying CDN fallback. Please refresh the page.`;
+                      errorMessage = `Worker, error: ${errorMessage}. Trying CDN fallback. Please refresh the page.`;
                     }
                     
                     setPdfLoadError(errorMessage);
                     setIsPdfLoading(false);
                     toast({
-                      title: "PDF Load Error",
+                      title: `PDF Load Error",
                       description: errorMessage,
                       variant: "destructive",
                     });
                   }}
                   loading={
                     <div className="flex items-center justify-center h-[600px]">
-                      <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]" />
+                      <Loader2 className="w-8 h-8 animate-spin text-[#EAEB80]` />
                     </div>
                   }
                   options={documentOptions}
                 >
-                {Array.from(new Array(numPages), (el, index) => {
+                {Array.from(new, Array(numPages), (el, index) => {
                   const pageNumber = index + 1;
                   return (
                     <div
                       key={`page_${pageNumber}`}
-                      className="relative bg-white shadow-lg cursor-crosshair"
+                      className=`relative bg-white shadow-lg cursor-crosshair"
                       onClick={(e) => handlePdfClickForText(e, pageNumber)}
                     >
                       <Page
@@ -1009,15 +995,13 @@ export function ContractFormFiller({
                         const dynamicX = field.name === "owner" ? calculateOwnerNameX(field.value) : coords.x;
                         
                         // Only wrap owner name; all other fields are single-line
-                        // Format date fields (expectedStartDate) to mm/dd/yyyy for preview
+                        // Format date, fields(expectedStartDate) to mm/dd/yyyy for preview
                         const displayValue = field.name === "expectedStartDate" && field.type === "date"
                           ? formatDateMMDDYYYY(field.value)
                           : field.value;
-                        const shouldWrap = field.name === "owner";
+                        const shouldWrap = field.name === "owner`;
                         const lines = shouldWrap ? wrapText(displayValue, 20) : [displayValue];
-                        const lineHeight = 14; // 14pt line height for 12pt font
-                        
-                        return (
+                        const lineHeight = 14; // 14pt line height for 12pt font, return(
                           <div key={field.name}>
                             {lines.map((line, lineIndex) => {
                               const screenCoords = pdfToScreenCoords(
@@ -1029,7 +1013,7 @@ export function ContractFormFiller({
                               return (
                                 <div
                                   key={`${field.name}-line-${lineIndex}`}
-                                  className="absolute pointer-events-none"
+                                  className=`absolute pointer-events-none`
                                   style={{
                                     left: `${screenCoords.x}px`,
                                     top: `${screenCoords.y}px`,
@@ -1048,13 +1032,13 @@ export function ContractFormFiller({
                         );
                       })}
                       
-                      {/* Checkbox overlays for real-time preview (Additional Notes settings) */}
+                      {/* Checkbox overlays for real-time, preview(Additional Notes settings) */}
                       {Object.entries(PDF_CHECKBOX_COORDINATES)
                         .filter(([key, coords]) => coords.page === pageNumber)
                         .map(([key, coords]) => {
                           // Map component state -> active checkbox keys
                           const isActive =
-                            (key === "agreeMaintainInsurance" && agreeMaintainInsurance) ||
+                            (key === `agreeMaintainInsurance" && agreeMaintainInsurance) ||
                             (key === "agreeSplit730" && agreeSplit730) ||
                             (key === "agreeParkingFee" && agreeParkingFee) ||
                             (key === "agreeCleaningFee" && agreeCleaningFee) ||
@@ -1070,7 +1054,7 @@ export function ContractFormFiller({
                             (key === "optionalHomePickup" && homePickupService) ||
                             (key === "authorizeRelocation" && authorizeRelocation) ||
                             (key === "authorizeOtherPlatforms" && authorizeOtherPlatforms) ||
-                            (key === "authorizeChauffeurUse" && authorizeChauffeurUse);
+                            (key === "authorizeChauffeurUse` && authorizeChauffeurUse);
 
                           if (!isActive) return null;
 
@@ -1083,13 +1067,13 @@ export function ContractFormFiller({
                           return (
                             <div
                               key={`cb-${key}`}
-                              className="absolute pointer-events-none"
+                              className=`absolute pointer-events-none`
                               style={{
                                 left: `${screenCoords.x}px`,
                                 top: `${screenCoords.y}px`,
                                 // 12px bold checkmark for all Additional Notes settings
                                 fontSize: `${12 * scale}px`,
-                                fontFamily: "Arial, Helvetica, sans-serif",
+                                fontFamily: `Arial, Helvetica, sans-serif",
                                 fontWeight: "700",
                                 color: "black",
                                 transform: "translate(-50%, -50%)",
@@ -1100,18 +1084,18 @@ export function ContractFormFiller({
                           );
                         })}
 
-                      {/* Signature overlay for real-time preview - right side only (client signature) */}
+                      {/* Signature overlay for real-time preview - right side, only(client signature) */}
                       {SIGNATURE_COORDINATES.page === pageNumber && (
                         <>
                           {/* Right typed signature only */}
                           {signatureType === "typed" && typedName && (
                               <div
-                                className="absolute pointer-events-none"
+                                className="absolute pointer-events-none`
                                 style={{
                                   left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y, pageNumber).x}px`,
                                   top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y, pageNumber).y}px`,
                                   fontSize: `${24 * scale}px`,
-                                  fontFamily: "'Dancing Script', cursive",
+                                  fontFamily: `'Dancing Script', cursive",
                                   color: 'black',
                                   fontStyle: 'italic',
                                   whiteSpace: 'nowrap',
@@ -1127,7 +1111,7 @@ export function ContractFormFiller({
                               <img
                                 src={drawnSignatureDataUrl}
                                 alt="Signature"
-                                className="absolute pointer-events-none"
+                                className="absolute pointer-events-none`
                                 style={{
                                   left: `${pdfToScreenCoords(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y, pageNumber).x}px`,
                                   top: `${pdfToScreenCoords(SIGNATURE_COORDINATES.right.x, SIGNATURE_COORDINATES.right.y, pageNumber).y}px`,
@@ -1149,12 +1133,12 @@ export function ContractFormFiller({
                           return (
                             <div
                               key={ann.id}
-                              className="absolute pointer-events-none"
+                              className=`absolute pointer-events-none`
                               style={{
                                 left: `${screenCoords.x}px`,
                                 top: `${screenCoords.y}px`,
                                 fontSize: `${12 * scale}px`,
-                                fontFamily: "Arial, Helvetica, sans-serif",
+                                fontFamily: `Arial, Helvetica, sans-serif",
                                 color: "black",
                                 whiteSpace: "nowrap",
                                 transform: "translateY(-50%)",
@@ -1215,8 +1199,7 @@ export function ContractFormFiller({
                 const hasError = !!field.error;
                 const isEmpty = field.required && !field.value.trim();
                 
-                // Special handling for date fields
-                if (field.type === "date" && field.name === "expectedStartDate") {
+                // Special handling for date fields, if(field.type === "date" && field.name === "expectedStartDate") {
                   return (
                     <div key={field.name} className="space-y-1">
                       <Label htmlFor={field.name} className="text-muted-foreground text-sm">
@@ -1225,18 +1208,18 @@ export function ContractFormFiller({
                       </Label>
                       <Input
                         id={field.name}
-                        type="date"
+                        type="date`
                         value={field.value}
                         onChange={(e) => handleDateChange(field.name, e.target.value)}
                         onBlur={(e) => handleFieldBlur(field.name, e.target.value)}
                         required={field.required}
-                        className={`bg-muted border text-foreground focus:border-primary transition-colors ${
-                          hasError || isEmpty ? "border-red-500 focus:border-red-500" : "border-primary/30"
+                        className={`bg-muted border text-foreground, focus:border-primary transition-colors ${
+                          hasError || isEmpty ? "border-red-500, focus:border-red-500" : "border-primary/30"
                         }`}
                       />
                       {field.value && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Will appear as: {formatDateMMDDYYYY(field.value)}
+                        <p className=`text-xs text-muted-foreground mt-1">
+                          Will appear, as: {formatDateMMDDYYYY(field.value)}
                         </p>
                       )}
                       {field.error && (
@@ -1262,17 +1245,17 @@ export function ContractFormFiller({
                       onChange={(e) => handleFieldChange(field.name, e.target.value)}
                       onBlur={(e) => handleFieldBlur(field.name, e.target.value)}
                       required={field.required}
-                      maxLength={field.name === "owner" ? 20 : 100}
-                      className={`bg-muted border text-foreground focus:border-primary transition-colors ${
-                        hasError || isEmpty ? "border-red-500 focus:border-red-500" : "border-primary/30"
+                      maxLength={field.name === "owner` ? 20 : 100}
+                      className={`bg-muted border text-foreground, focus:border-primary transition-colors ${
+                        hasError || isEmpty ? "border-red-500, focus:border-red-500" : "border-primary/30"
                       }`}
                     />
                     {field.error && (
-                      <p className="text-xs text-red-500 mt-1">{field.error}</p>
+                      <p className=`text-xs text-red-500 mt-1">{field.error}</p>
                     )}
                     {field.name === "owner" && field.value.length > 15 && !field.error && (
                       <p className="text-xs text-[#EAEB80] mt-1">
-                        Long name detected - text will auto-shift left ({field.value.length} chars)
+                        Long name detected - text will auto-shift, left({field.value.length} chars)
                       </p>
                     )}
 
@@ -1293,9 +1276,9 @@ export function ContractFormFiller({
               {/* Mandatory Agreements */}
               <div className="mt-4 pt-4 border-t border-primary/20 space-y-3">
                 <p className="text-sm font-semibold text-[#EAEB80]">
-                  Mandatory Agreements (all required)
+                  Mandatory, Agreements(all required)
                 </p>
-                <div className="space-y-2">
+                <div className="space-y-2`>
                   <div
                     className={`flex items-start space-x-3 rounded-md p-2 ${
                       showAgreementsError && !agreeMaintainInsurance
@@ -1304,7 +1287,7 @@ export function ContractFormFiller({
                     }`}
                   >
                     <Checkbox
-                      id="agree-maintain-insurance"
+                      id=`agree-maintain-insurance"
                       checked={agreeMaintainInsurance}
                       onCheckedChange={(checked) => {
                         setAgreeMaintainInsurance(checked as boolean);
@@ -1314,7 +1297,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-maintain-insurance"
-                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed`
                     >
                       I agree to maintain full coverage insurance.
                     </Label>
@@ -1328,7 +1311,7 @@ export function ContractFormFiller({
                     }`}
                   >
                     <Checkbox
-                      id="agree-split-730"
+                      id=`agree-split-730"
                       checked={agreeSplit730}
                       onCheckedChange={(checked) => {
                         setAgreeSplit730(checked as boolean);
@@ -1338,7 +1321,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-split-730"
-                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed`
                     >
                       I agree to the 70% ~ 30% split.
                     </Label>
@@ -1352,7 +1335,7 @@ export function ContractFormFiller({
                     }`}
                   >
                     <Checkbox
-                      id="agree-parking-fee"
+                      id=`agree-parking-fee"
                       checked={agreeParkingFee}
                       onCheckedChange={(checked) => {
                         setAgreeParkingFee(checked as boolean);
@@ -1362,7 +1345,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-parking-fee"
-                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed`
                     >
                       I agree to a monthly parking fee of $100.
                     </Label>
@@ -1376,7 +1359,7 @@ export function ContractFormFiller({
                     }`}
                   >
                     <Checkbox
-                      id="agree-cleaning-fee"
+                      id=`agree-cleaning-fee"
                       checked={agreeCleaningFee}
                       onCheckedChange={(checked) => {
                         setAgreeCleaningFee(checked as boolean);
@@ -1386,7 +1369,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-cleaning-fee"
-                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed`
                     >
                       I agree to a monthly regular cleaning fee of $25.
                     </Label>
@@ -1400,7 +1383,7 @@ export function ContractFormFiller({
                     }`}
                   >
                     <Checkbox
-                      id="agree-carwash-fee"
+                      id=`agree-carwash-fee"
                       checked={agreeCarWashFee}
                       onCheckedChange={(checked) => {
                         setAgreeCarWashFee(checked as boolean);
@@ -1410,7 +1393,7 @@ export function ContractFormFiller({
                     />
                     <Label
                       htmlFor="agree-carwash-fee"
-                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed"
+                      className="text-sm text-muted-foreground cursor-pointer leading-relaxed`
                     >
                       I agree to an annual car wash service fee of $499.
                     </Label>
@@ -1424,7 +1407,7 @@ export function ContractFormFiller({
                     }`}
                   >
                     <Checkbox
-                      id="agree-owner-expenses"
+                      id=`agree-owner-expenses"
                       checked={agreeOwnerReimbursesExpenses}
                       onCheckedChange={(checked) => {
                         setAgreeOwnerReimbursesExpenses(checked as boolean);
@@ -1448,14 +1431,14 @@ export function ContractFormFiller({
                 </div>
               </div>
 
-              {/* Payment Options (radio, required) */}
+              {/* Payment, Options(radio, required) */}
               <div className="mt-4 pt-4 border-t border-primary/20 space-y-2">
                 <p className="text-sm font-semibold text-[#EAEB80]">
-                  Payment Options (choose one – required)
+                  Payment, Options(choose one – required)
                 </p>
                 <RadioGroup
                   value={paymentOption}
-                  onValueChange={(value: "735" | "357" | "exit-fee") => {
+                  onValueChange={(value: "735" | "357" | "exit-fee`) => {
                     setPaymentOption(value);
                     setShowPaymentError(false);
                   }}
@@ -1463,7 +1446,7 @@ export function ContractFormFiller({
                     showPaymentError ? "border border-red-500 bg-red-500/5" : ""
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className=`flex items-center space-x-3">
                     <RadioGroupItem value="735" id="payment-735" />
                     <Label htmlFor="payment-735" className="text-sm text-muted-foreground">
                       Pay $735. No early exit fee if removed before two years.
@@ -1492,7 +1475,7 @@ export function ContractFormFiller({
               {/* Optional Services */}
               <div className="mt-4 pt-4 border-t border-primary/20 space-y-2">
                 <p className="text-sm font-semibold text-[#EAEB80]">
-                  Optional Services (choose any)
+                  Optional, Services(choose any)
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-start space-x-3">
@@ -1581,7 +1564,7 @@ export function ContractFormFiller({
               {/* Additional Earnings Options */}
               <div className="mt-4 pt-4 border-t border-primary/20 space-y-2">
                 <p className="text-sm font-semibold text-[#EAEB80]">
-                  Additional Earnings Options (optional)
+                  Additional Earnings, Options(optional)
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-start space-x-3">
@@ -1664,7 +1647,7 @@ export function ContractFormFiller({
                   placeholder="Type your full name"
                   value={typedName}
                   onChange={(e) => setTypedName(e.target.value)}
-                  className="bg-muted border-primary/30 text-foreground focus:border-primary"
+                  className="bg-muted border-primary/30 text-foreground, focus:border-primary"
                 />
                 {typedName && (
                   <div className="bg-white p-3 rounded-md border-2 border-primary/30">
@@ -1704,11 +1687,11 @@ export function ContractFormFiller({
               
 
               {/* Submit and Decline Buttons Row */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <div className="flex flex-col, sm:flex-row gap-3 pt-2">
                 <Button
                   onClick={handleSubmit}
                   disabled={isProcessing}
-                  className="flex-1 h-12 bg-primary text-black text-lg font-bold hover:bg-primary/80 disabled:opacity-50"
+                  className="flex-1 h-12 bg-primary text-black text-lg font-bold, hover:bg-primary/80, disabled:opacity-50"
                 >
                   {isProcessing ? (
                     <>
@@ -1726,7 +1709,7 @@ export function ContractFormFiller({
                   <Button
                     onClick={onDecline}
                     disabled={isProcessing}
-                    className="flex-1 h-12 bg-[#ef4444] text-foreground text-lg font-bold hover:bg-muted/50dc2626] disabled:opacity-50"
+                    className="flex-1 h-12 bg-[#ef4444] text-foreground text-lg font-bold, hover:bg-muted/50dc2626] disabled:opacity-50"
                   >
                     <X className="w-5 h-5 mr-2" />
                     Decline Contract

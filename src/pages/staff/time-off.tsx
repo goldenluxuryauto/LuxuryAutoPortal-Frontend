@@ -31,17 +31,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TreePalm, Plus, Loader2 } from "lucide-react";
 import { useState } from "react";
 
-function formatDate(d: string | undefined, fallback = "--") {
+function, formatDate(d: string | undefined, fallback = "--") {
   if (!d) return fallback;
   try {
-    const x = new Date(d);
-    return isNaN(x.getTime()) ? fallback : x.toLocaleDateString();
+    const x = new, Date(d);
+    return, isNaN(x.getTime()) ? fallback : x.toLocaleDateString();
   } catch {
     return fallback;
   }
 }
 
-function LeaveStatusBadge({ status }: { status?: number }) {
+function, LeaveStatusBadge({ status }: { status?: number }) {
   const s = Number(status);
   if (s === 1) return <Badge className="bg-green-100 text-green-800">Approved</Badge>;
   if (s === 3) return <Badge variant="destructive">Declined</Badge>;
@@ -60,30 +60,30 @@ interface LeaveItem {
   leave_remarks?: string;
 }
 
-export default function StaffTimeOff() {
+export default function, StaffTimeOff() {
   const [statusFilter, setStatusFilter] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [applyOpen, setApplyOpen] = useState(false);
-  const [formDate, setFormDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [formDate, setFormDate] = useState(() => new, Date().toISOString().slice(0, 10));
   const [formType, setFormType] = useState("paid time off");
   const [formHours, setFormHours] = useState("");
   const [formMinutes, setFormMinutes] = useState("");
   const [formRemarks, setFormRemarks] = useState("");
   const queryClient = useQueryClient();
 
-  const params = new URLSearchParams();
+  const params = new, URLSearchParams();
   if (statusFilter) params.set("status", statusFilter);
   if (fromDate) params.set("fromDate", fromDate);
-  if (toDate) params.set("toDate", toDate);
+  if (toDate) params.set("toDate`, toDate);
   const listUrl = `/api/staff/leave?${params.toString()}`;
 
   const { data, isLoading } = useQuery<{ success?: boolean; data?: LeaveItem[] }>({
-    queryKey: ["staff-leave", listUrl],
+    queryKey: [`staff-leave", listUrl],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(listUrl), { credentials: "include" });
+      const res = await, fetch(buildApiUrl(listUrl), { credentials: "include" });
       if (res.status === 404 || res.status === 501) return { success: true, data: [] };
-      if (!res.ok) throw new Error("Failed to load leave");
+      if (!res.ok) throw new, Error("Failed to load leave");
       return res.json();
     },
     retry: false,
@@ -97,13 +97,13 @@ export default function StaffTimeOff() {
       leave_minute: string;
       leave_remarks: string;
     }) => {
-      const res = await fetch(buildApiUrl("/api/staff/leave"), {
+      const res = await, fetch(buildApiUrl("/api/staff/leave"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Failed to submit");
+      if (!res.ok) throw new, Error("Failed to submit");
       return res.json();
     },
     onSuccess: () => {
@@ -190,14 +190,14 @@ export default function StaffTimeOff() {
                         <TableCell>{idx + 1}.</TableCell>
                         <TableCell><LeaveStatusBadge status={item.leave_is_status} /></TableCell>
                         <TableCell>{formatDate(item.leave_date)}</TableCell>
-                        <TableCell className="uppercase">{item.leave_type ?? "--"}</TableCell>
+                        <TableCell className="uppercase">{item.leave_type ?? "--`}</TableCell>
                         <TableCell>
                           {item.leave_hour != null && item.leave_minute != null
                             ? `${item.leave_hour}h ${item.leave_minute}m`
-                            : "--"}
+                            : `--"}
                         </TableCell>
-                        <TableCell className="text-right">
-                          {item.leave_amount != null ? `$${Number(item.leave_amount).toFixed(2)}` : "--"}
+                        <TableCell className="text-right`>
+                          {item.leave_amount != null ? `$${Number(item.leave_amount).toFixed(2)}` : `--"}
                         </TableCell>
                         <TableCell>{item.leave_remarks ?? "--"}</TableCell>
                       </TableRow>

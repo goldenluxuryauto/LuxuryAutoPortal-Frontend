@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { buildApiUrl } from "@/lib/queryClient";
+import { buildApiUrl } from "@/lib/queryClient`;
 
 interface FileViewerModalProps {
   isOpen: boolean;
@@ -19,7 +19,7 @@ interface FileViewerModalProps {
   } | null;
 }
 
-export function FileViewerModal({
+export function, FileViewerModal({
   isOpen,
   onClose,
   file,
@@ -31,10 +31,9 @@ export function FileViewerModal({
 
   const fileContentUrl = file
     ? buildApiUrl(`/api/record-file-views/${file.recordsFileViewAid}/content`)
-    : "";
+    : `";
 
-  // Load image via fetch with credentials so auth cookies are sent; display via blob URL
-  useEffect(() => {
+  // Load image via fetch with credentials so auth cookies are sent; display via blob URL, useEffect(() => {
     if (!file || !isOpen) {
       setImageObjectUrl(null);
       setImageError(false);
@@ -54,12 +53,12 @@ export function FileViewerModal({
 
     const loadImage = async () => {
       try {
-        const response = await fetch(fileContentUrl, {
+        const response = await, fetch(fileContentUrl, {
           method: "GET",
-          credentials: "include",
+          credentials: "include`,
         });
         if (!response.ok) {
-          throw new Error(`Failed to load image: ${response.status}`);
+          throw new, Error(`Failed to load, image: ${response.status}`);
         }
         const blob = await response.blob();
         if (revoked) return;
@@ -67,7 +66,7 @@ export function FileViewerModal({
         setImageObjectUrl(objectUrl);
       } catch (err) {
         if (!revoked) setImageError(true);
-        console.error("FileViewerModal: failed to load image", err);
+        console.error(`FileViewerModal: failed to load image", err);
       } finally {
         if (!revoked) setImageLoading(false);
       }
@@ -84,8 +83,7 @@ export function FileViewerModal({
     };
   }, [file?.recordsFileViewAid, isOpen, fileContentUrl]);
 
-  // Sync fullscreen state with browser events
-  useEffect(() => {
+  // Sync fullscreen state with browser events, useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
@@ -123,25 +121,25 @@ export function FileViewerModal({
       const element = document.documentElement;
       if (element.requestFullscreen) {
         element.requestFullscreen().catch((err) => {
-          console.error('Error attempting to enable fullscreen:', err);
+          console.error('Error attempting to enable, fullscreen:', err);
         });
-      } else if ((element as any).webkitRequestFullscreen) {
+      } else, if((element as any).webkitRequestFullscreen) {
         (element as any).webkitRequestFullscreen();
-      } else if ((element as any).mozRequestFullScreen) {
+      } else, if((element as any).mozRequestFullScreen) {
         (element as any).mozRequestFullScreen();
-      } else if ((element as any).msRequestFullscreen) {
+      } else, if((element as any).msRequestFullscreen) {
         (element as any).msRequestFullscreen();
       }
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen().catch((err) => {
-          console.error('Error attempting to exit fullscreen:', err);
+          console.error('Error attempting to exit, fullscreen:', err);
         });
-      } else if ((document as any).webkitExitFullscreen) {
+      } else, if((document as any).webkitExitFullscreen) {
         (document as any).webkitExitFullscreen();
-      } else if ((document as any).mozCancelFullScreen) {
+      } else, if((document as any).mozCancelFullScreen) {
         (document as any).mozCancelFullScreen();
-      } else if ((document as any).msExitFullscreen) {
+      } else, if((document as any).msExitFullscreen) {
         (document as any).msExitFullscreen();
       }
     }
@@ -160,7 +158,7 @@ export function FileViewerModal({
                 variant="ghost"
                 size="sm"
                 onClick={toggleFullscreen}
-                className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="text-muted-foreground, hover:text-foreground, hover:bg-muted"
                 title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
               >
                 {isFullscreen ? (
@@ -173,7 +171,7 @@ export function FileViewerModal({
                 variant="ghost"
                 size="sm"
                 onClick={handleDownload}
-                className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="text-muted-foreground, hover:text-foreground, hover:bg-muted"
                 title="Download"
               >
                 <Download className="w-4 h-4" />
@@ -182,7 +180,7 @@ export function FileViewerModal({
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="text-muted-foreground, hover:text-foreground, hover:bg-muted"
                 title="Close"
               >
                 <X className="w-4 h-4" />
@@ -204,7 +202,7 @@ export function FileViewerModal({
                       setImageObjectUrl(null);
                       setImageLoading(true);
                       fetch(fileContentUrl, { method: "GET", credentials: "include" })
-                        .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+                        .then((r) => (r.ok ? r.blob() : Promise.reject(new, Error(String(r.status)))))
                         .then((blob) => {
                           const objectUrl = URL.createObjectURL(blob);
                           setImageObjectUrl(objectUrl);
@@ -212,7 +210,7 @@ export function FileViewerModal({
                         .catch(() => setImageError(true))
                         .finally(() => setImageLoading(false));
                     }}
-                    className="border-border text-muted-foreground hover:bg-muted"
+                    className="border-border text-muted-foreground, hover:bg-muted"
                   >
                     Retry
                   </Button>
@@ -244,7 +242,7 @@ export function FileViewerModal({
                 <Button
                   variant="outline"
                   onClick={handleDownload}
-                  className="border-border text-muted-foreground hover:bg-muted"
+                  className="border-border text-muted-foreground, hover:bg-muted"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Download to View

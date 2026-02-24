@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, ExternalLink } from "lucide-react";
 
-export default function StaffTuroGuide() {
+export default function, StaffTuroGuide() {
   return (
     <AdminLayout>
       <div className="space-y-6">

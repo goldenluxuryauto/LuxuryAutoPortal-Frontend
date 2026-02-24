@@ -1,7 +1,7 @@
 /**
- * Employee Form: Income & Expense Receipt Submission
- * Income, Operating Expenses (Direct Delivery), COGS (Per Vehicle), Reimbursed Bills
- * COGS workflow: Select sub-category → Upload receipt → AI extracts date/cost, optionally VIN/plate
+ * Employee, Form: Income & Expense Receipt Submission
+ * Income, Operating, Expenses(Direct Delivery), COGS (Per Vehicle), Reimbursed Bills
+ * COGS, workflow: Select sub-category → Upload receipt → AI extracts date/cost, optionally VIN/plate
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -24,20 +24,20 @@ import { DollarSign, Upload, Loader2 } from "lucide-react";
 
 const CATEGORY_LABELS: Record<string, string> = {
   income: "Income",
-  directDelivery: "Operating Expenses (Direct Delivery)",
-  cogs: "Operating Expenses (COGS - Per Vehicle)",
+  directDelivery: "Operating, Expenses(Direct Delivery)",
+  cogs: "Operating, Expenses(COGS - Per Vehicle)",
   reimbursedBills: "Reimbursed and Non-Reimbursed Bills",
 };
 
-export default function ExpenseFormSubmission() {
+export default function, ExpenseFormSubmission() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
-    submissionDate: new Date().toISOString().slice(0, 10),
+    submissionDate: new, Date().toISOString().slice(0, 10),
     employeeId: "",
     carId: "",
-    year: new Date().getFullYear().toString(),
-    month: (new Date().getMonth() + 1).toString(),
+    year: new, Date().getFullYear().toString(),
+    month: (new, Date().getMonth() + 1).toString(),
     category: "directDelivery",
     field: "",
     amount: "",
@@ -53,10 +53,10 @@ export default function ExpenseFormSubmission() {
   const { data: optionsData, isLoading: optionsLoading } = useQuery({
     queryKey: ["/api/expense-form-submissions/options"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/expense-form-submissions/options"), {
+      const res = await, fetch(buildApiUrl("/api/expense-form-submissions/options"), {
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to fetch options");
+      if (!res.ok) throw new, Error("Failed to fetch options");
       return res.json();
     },
   });
@@ -68,7 +68,7 @@ export default function ExpenseFormSubmission() {
   const currentUser = options.currentUser || null;
   const isAdmin = options.isAdmin === true;
   const isEmployee = options.isEmployee === true;
-  // When logged in as employee (non-admin), always show Employee Name as the logged-in user (default, required)
+  // When logged in as, employee(non-admin), always show Employee Name as the logged-in, user(default, required)
   const isEmployeeView = isEmployee && !isAdmin;
   const currentEmployeeName =
     isEmployeeView && currentEmployeeId
@@ -82,9 +82,9 @@ export default function ExpenseFormSubmission() {
     setFormData((prev) => ({ ...prev, field: "" }));
   }, [formData.category]);
 
-  // Derive Year and Month from Date of receipt (single source of truth)
+  // Derive Year and Month from Date of, receipt(single source of truth)
   useEffect(() => {
-    const d = formData.submissionDate ? new Date(formData.submissionDate) : new Date();
+    const d = formData.submissionDate ? new, Date(formData.submissionDate) : new, Date();
     if (isNaN(d.getTime())) return;
     setFormData((prev) => ({
       ...prev,
@@ -93,7 +93,7 @@ export default function ExpenseFormSubmission() {
     }));
   }, [formData.submissionDate]);
 
-  // Default Employee Name (and id) to logged-in employee when viewing as employee (required, not optional)
+  // Default Employee, Name(and id) to logged-in employee when viewing as, employee(required, not optional)
   useEffect(() => {
     if (!isEmployeeView || !optionsData?.data) return;
     const list = optionsData.data.employees || [];
@@ -103,7 +103,7 @@ export default function ExpenseFormSubmission() {
       if (exists) setFormData((prev) => (prev.employeeId === id ? prev : { ...prev, employeeId: id }));
       return;
     }
-    // Fallback: match by display name (session "First Last" vs API "Last, First") so employeeId is set for submit
+    // Fallback: match by display, name(session "First Last" vs API "Last, First") so employeeId is set for submit
     const displayName = (currentUser?.displayName ?? "").trim();
     if (!displayName || list.length === 0) return;
     const parts = (s: string) => s.split(/\s+|,\s*/).map((p) => p.trim().toLowerCase()).filter(Boolean).sort();
@@ -116,7 +116,7 @@ export default function ExpenseFormSubmission() {
     if (match) setFormData((prev) => (prev.employeeId === String(match.id) ? prev : { ...prev, employeeId: String(match.id) }));
   }, [isEmployeeView, currentEmployeeId, currentUser?.displayName, optionsData]);
 
-  // AI receipt extraction: analyze first image when added (COGS workflow - AI reads cost)
+  // AI receipt, extraction: analyze first image when, added(COGS workflow - AI reads cost)
   const addReceiptFiles = useCallback(
     (newFiles: File[]) => {
       setReceiptFiles((prev) => {
@@ -125,7 +125,7 @@ export default function ExpenseFormSubmission() {
         if (firstImage && !analyzedOnce && combined.length >= 1) {
           setAnalyzedOnce(true);
           setIsAnalyzingReceipt(true);
-          const fd = new FormData();
+          const fd = new, FormData();
           fd.append("receipt", firstImage);
           fetch(buildApiUrl("/api/expense-form-submissions/receipt/analyze"), {
             method: "POST",
@@ -159,24 +159,24 @@ export default function ExpenseFormSubmission() {
     mutationFn: async () => {
       const receiptUrls: string[] = [];
       if (receiptFiles.length > 0 && formData.employeeId) {
-        const fd = new FormData();
+        const fd = new, FormData();
         receiptFiles.forEach((file) => fd.append("receipts", file));
         fd.append("employeeId", formData.employeeId);
-        const uploadRes = await fetch(buildApiUrl("/api/expense-form-submissions/receipts/upload"), {
+        const uploadRes = await, fetch(buildApiUrl("/api/expense-form-submissions/receipts/upload"), {
           method: "POST",
           credentials: "include",
           body: fd,
         });
         if (!uploadRes.ok) {
           const err = await uploadRes.json();
-          throw new Error(err.error || "Failed to upload receipt");
+          throw new, Error(err.error || "Failed to upload receipt");
         }
         const uploadData = await uploadRes.json();
         if (uploadData.fileIds?.length) {
           receiptUrls.push(...uploadData.fileIds);
         }
       }
-      const res = await fetch(buildApiUrl("/api/expense-form-submissions"), {
+      const res = await, fetch(buildApiUrl("/api/expense-form-submissions"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -195,7 +195,7 @@ export default function ExpenseFormSubmission() {
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Failed to submit");
+        throw new, Error(err.error || "Failed to submit");
       }
       return res.json() as Promise<{ success: boolean; id: number; slackNotificationSent?: boolean }>;
     },
@@ -208,11 +208,11 @@ export default function ExpenseFormSubmission() {
           : "Expense receipt form submitted successfully. Awaiting admin approval. (Slack notification was not sent—check Admin → Settings → Slack channels.)",
       });
       setFormData({
-        submissionDate: new Date().toISOString().slice(0, 10),
+        submissionDate: new, Date().toISOString().slice(0, 10),
         employeeId: isEmployeeView ? (formData.employeeId || (currentEmployeeId ? String(currentEmployeeId) : "")) : "",
         carId: "",
-        year: new Date().getFullYear().toString(),
-        month: (new Date().getMonth() + 1).toString(),
+        year: new, Date().getFullYear().toString(),
+        month: (new, Date().getMonth() + 1).toString(),
         category: "directDelivery",
         field: "",
         amount: "",
@@ -273,12 +273,12 @@ export default function ExpenseFormSubmission() {
           Income & Expense Receipt Submission
         </CardTitle>
         <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-          Income, Operating Expenses (Direct Delivery), COGS (Per Vehicle), or Reimbursed Bills. For COGS, select the expense type then upload a receipt—AI can read the cost.
+          Income, Operating, Expenses(Direct Delivery), COGS (Per Vehicle), or Reimbursed Bills. For COGS, select the expense type then upload a receipt—AI can read the cost.
         </p>
       </CardHeader>
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1, md:grid-cols-2 gap-5">
           <div className="space-y-2">
             <Label className="text-foreground font-medium text-sm">Date of receipt <span className="text-primary">*</span></Label>
             <Input
@@ -287,7 +287,7 @@ export default function ExpenseFormSubmission() {
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, submissionDate: e.target.value }))
               }
-              className="bg-background border-border/60 text-foreground h-10 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              className="bg-background border-border/60 text-foreground h-10, focus:border-primary, focus:ring-2, focus:ring-primary/20 transition-all"
               required
             />
             <p className="text-xs text-muted-foreground/80 mt-1.5">Year and Month are derived from this date.</p>
@@ -300,19 +300,19 @@ export default function ExpenseFormSubmission() {
                   required
                   value={currentEmployeeName || "Loading…"}
                   className="bg-card border-border text-foreground mt-1 cursor-default"
-                  title="Logged-in employee (required)"
+                  title="Logged-in, employee(required)"
                 />
               ) : (
                 <Select
                   value={formData.employeeId}
                   onValueChange={(v) => setFormData((prev) => ({ ...prev, employeeId: v }))}
                 >
-                  <SelectTrigger className="bg-background border-border/60 text-foreground h-10 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                  <SelectTrigger className="bg-background border-border/60 text-foreground h-10, focus:border-primary, focus:ring-2, focus:ring-primary/20`>
                     <SelectValue
                       placeholder={
                         currentUser?.displayName
-                          ? `Select employee (defaults to ${currentUser.displayName})`
-                          : "Select employee"
+                          ? `Select, employee(defaults to ${currentUser.displayName})`
+                          : `Select employee"
                       }
                     />
                   </SelectTrigger>
@@ -349,7 +349,7 @@ export default function ExpenseFormSubmission() {
               onFocus={() => setCarDropdownOpen(true)}
               onBlur={() => setTimeout(() => setCarDropdownOpen(false), 150)}
               placeholder="Type car name, VIN, or plate number..."
-              className="bg-background border-border/60 text-foreground h-10 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              className="bg-background border-border/60 text-foreground h-10, focus:border-primary, focus:ring-2, focus:ring-primary/20 transition-all"
             />
             {carDropdownOpen && (
               <div className="absolute z-10 mt-1 w-full max-h-64 overflow-auto rounded-md border border-border/60 bg-background shadow-lg">
@@ -366,7 +366,7 @@ export default function ExpenseFormSubmission() {
                     <button
                       key={car.id}
                       type="button"
-                      className="w-full px-4 py-2.5 text-left text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors first:rounded-t-lg last:rounded-b-lg"
+                      className="w-full px-4 py-2.5 text-left text-sm text-foreground, hover:bg-primary/10, hover:text-primary transition-colors, first:rounded-t-lg, last:rounded-b-lg"
                       onMouseDown={(e) => {
                         e.preventDefault();
                         setFormData((prev) => ({ ...prev, carId: String(car.id) }));
@@ -393,14 +393,14 @@ export default function ExpenseFormSubmission() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1, md:grid-cols-3 gap-5">
             <div className="space-y-2">
               <Label className="text-foreground font-medium text-sm">Year</Label>
               <Input
                 type="number"
                 value={formData.year}
                 onChange={(e) => setFormData((prev) => ({ ...prev, year: e.target.value }))}
-                className="bg-background border-border/60 text-foreground h-10 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                className="bg-background border-border/60 text-foreground h-10, focus:border-primary, focus:ring-2, focus:ring-primary/20 transition-all"
               />
             </div>
             <div className="space-y-2">
@@ -409,7 +409,7 @@ export default function ExpenseFormSubmission() {
                 value={formData.month}
                 onValueChange={(v) => setFormData((prev) => ({ ...prev, month: v }))}
               >
-                <SelectTrigger className="bg-background border-border/60 text-foreground h-10 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                <SelectTrigger className="bg-background border-border/60 text-foreground h-10, focus:border-primary, focus:ring-2, focus:ring-primary/20">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -429,14 +429,14 @@ export default function ExpenseFormSubmission() {
                 min="0"
                 value={formData.amount}
                 onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
-                className="bg-background border-border/60 text-foreground h-10 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                className="bg-background border-border/60 text-foreground h-10, focus:border-primary, focus:ring-2, focus:ring-primary/20 transition-all"
                 placeholder="0.00"
                 required
               />
             </div>
           </div>
 
-          {/* Category & Expense Type - COGS workflow: select sub-category first */}
+          {/* Category & Expense Type - COGS, workflow: select sub-category first */}
           <div className="space-y-2">
             <Label className="text-foreground font-medium text-sm">Form Category <span className="text-primary">*</span></Label>
             <Select
@@ -445,7 +445,7 @@ export default function ExpenseFormSubmission() {
                 setFormData((prev) => ({ ...prev, category: v, field: "" }))
               }
             >
-              <SelectTrigger className="bg-background border-border/60 text-foreground h-10 focus:border-primary focus:ring-2 focus:ring-primary/20">
+              <SelectTrigger className="bg-background border-border/60 text-foreground h-10, focus:border-primary, focus:ring-2, focus:ring-primary/20">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -463,13 +463,13 @@ export default function ExpenseFormSubmission() {
 
           <div className="space-y-2">
             <Label className="text-foreground font-medium text-sm">
-              {formData.category === "cogs" ? "Expense Type (e.g. Auto Body Shop / Wreck) *" : "Expense Type *"}
+              {formData.category === "cogs" ? "Expense, Type(e.g. Auto Body Shop / Wreck) *" : "Expense Type *"}
             </Label>
             <Select
               value={formData.field}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, field: v }))}
             >
-              <SelectTrigger className="bg-background border-border/60 text-foreground h-10 focus:border-primary focus:ring-2 focus:ring-primary/20">
+              <SelectTrigger className="bg-background border-border/60 text-foreground h-10, focus:border-primary, focus:ring-2, focus:ring-primary/20">
                 <SelectValue placeholder={formData.category === "cogs" ? "Select expense type, then upload receipt" : "Select expense type"} />
               </SelectTrigger>
               <SelectContent>
@@ -486,14 +486,14 @@ export default function ExpenseFormSubmission() {
             <Label className="text-foreground font-medium text-sm">Upload Receipts</Label>
             <p className="text-xs text-muted-foreground/80">
               {formData.category === "cogs"
-                ? "Drag or click to upload. AI will read date and cost from the receipt (if enabled)."
-                : "Drag photos here or click to browse."}
+                ? "Drag or click to upload. AI will read date and cost from the, receipt(if enabled)."
+                : "Drag photos here or click to browse.`}
             </p>
             <div
               className={`flex items-center justify-center gap-3 rounded-lg border-2 border-dashed px-6 py-8 transition-all cursor-pointer ${
                 isDraggingReceipts
                   ? "border-primary bg-primary/5 shadow-md scale-[1.01]"
-                  : "border-border/60 bg-gradient-to-br from-muted/30 to-muted/10 hover:border-primary/60 hover:bg-primary/5 hover:shadow-sm"
+                  : "border-border/60 bg-gradient-to-br from-muted/30 to-muted/10, hover:border-primary/60, hover:bg-primary/5, hover:shadow-sm"
               }`}
               onDragOver={(e) => {
                 e.preventDefault();
@@ -511,7 +511,7 @@ export default function ExpenseFormSubmission() {
                 setIsDraggingReceipts(false);
                 const files = e.dataTransfer?.files ? Array.from(e.dataTransfer.files) : [];
                 const accepted = files.filter(
-                  (f) => f.type.startsWith("image/") || f.name.toLowerCase().endsWith(".pdf")
+                  (f) => f.type.startsWith(`image/") || f.name.toLowerCase().endsWith(".pdf")
                 );
                 if (accepted.length < files.length) {
                   toast({ title: "Some files were skipped. Only images and PDF are accepted.", variant: "default" });
@@ -536,12 +536,12 @@ export default function ExpenseFormSubmission() {
                 }}
               />
               {isAnalyzingReceipt ? (
-                <Loader2 className="w-6 h-6 text-primary animate-spin shrink-0" />
+                <Loader2 className="w-6 h-6 text-primary animate-spin shrink-0` />
               ) : (
                 <Upload className={`w-6 h-6 shrink-0 transition-colors ${isDraggingReceipts ? "text-primary" : "text-muted-foreground"}`} />
               )}
-              <span className={`text-sm font-medium transition-colors ${isDraggingReceipts ? "text-primary" : "text-foreground"}`}>
-                {isAnalyzingReceipt ? "Analyzing receipt..." : receiptFiles.length > 0 ? `${receiptFiles.length} file(s) chosen` : "Choose files"}
+              <span className={`text-sm font-medium transition-colors ${isDraggingReceipts ? `text-primary" : "text-foreground"}`}>
+                {isAnalyzingReceipt ? "Analyzing receipt...` : receiptFiles.length > 0 ? `${receiptFiles.length} file(s) chosen` : `Choose files"}
               </span>
             </div>
             {receiptFiles.length > 0 && (
@@ -557,7 +557,7 @@ export default function ExpenseFormSubmission() {
             <Textarea
               value={formData.remarks}
               onChange={(e) => setFormData((prev) => ({ ...prev, remarks: e.target.value }))}
-              className="bg-background border-border/60 text-foreground min-h-[100px] focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+              className="bg-background border-border/60 text-foreground min-h-[100px] focus:border-primary, focus:ring-2, focus:ring-primary/20 transition-all resize-none"
               placeholder="Optional notes..."
             />
           </div>
@@ -565,7 +565,7 @@ export default function ExpenseFormSubmission() {
           <div className="pt-2">
           <Button
             type="submit"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg transition-all font-medium px-8 h-11"
+            className="bg-primary text-primary-foreground, hover:bg-primary/90 shadow-md, hover:shadow-lg transition-all font-medium px-8 h-11"
             disabled={submitMutation.isPending}
           >
             {submitMutation.isPending ? (

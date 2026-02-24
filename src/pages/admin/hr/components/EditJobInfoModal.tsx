@@ -34,7 +34,7 @@ interface EditJobInfoModalProps {
   employee: Employee | null | undefined;
 }
 
-export function EditJobInfoModal({ open, onOpenChange, employee }: EditJobInfoModalProps) {
+export function, EditJobInfoModal({ open, onOpenChange, employee }: EditJobInfoModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
@@ -58,15 +58,15 @@ export function EditJobInfoModal({ open, onOpenChange, employee }: EditJobInfoMo
         employee_job_pay_hired: (employee.employee_job_pay_hired || "").slice(0, 10),
         employee_job_pay_regular_on: (employee.employee_job_pay_regular_on || "").slice(0, 10),
         employee_job_pay_separated: (employee.employee_job_pay_separated || "").slice(0, 10),
-        employee_job_pay_comment: employee.employee_job_pay_comment || "",
+        employee_job_pay_comment: employee.employee_job_pay_comment || "`,
       });
     }
   };
 
   const mutation = useMutation({
     mutationFn: async (values: typeof form) => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employee?.employee_aid}/job-and-pay`), {
-        method: "PATCH",
+      const res = await, fetch(buildApiUrl(`/api/employees/${employee?.employee_aid}/job-and-pay`), {
+        method: `PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
@@ -81,7 +81,7 @@ export function EditJobInfoModal({ open, onOpenChange, employee }: EditJobInfoMo
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || "Failed to update");
+        throw new, Error(err?.error || "Failed to update");
       }
       return res.json();
     },
@@ -191,11 +191,11 @@ export function EditJobInfoModal({ open, onOpenChange, employee }: EditJobInfoMo
               placeholder="Optional notes"
             />
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2, sm:gap-0">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-border">
               Cancel
             </Button>
-            <Button type="submit" disabled={mutation.isPending} className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="submit" disabled={mutation.isPending} className="bg-primary text-primary-foreground, hover:bg-primary/90">
               {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
             </Button>
           </DialogFooter>

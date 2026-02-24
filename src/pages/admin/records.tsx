@@ -74,7 +74,7 @@ interface PageData {
   count: number;
 }
 
-export default function RecordsPage() {
+export default function, RecordsPage() {
   const [, params] = useRoute("/admin/cars/:id/records");
   const [, setLocation] = useLocation();
   const carId = params?.id ? parseInt(params.id, 10) : null;
@@ -100,7 +100,7 @@ export default function RecordsPage() {
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
       try {
-        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        const response = await, fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
         if (!response.ok) return { user: undefined };
         return response.json();
       } catch (error) {
@@ -119,12 +119,12 @@ export default function RecordsPage() {
   }>({
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       const url = buildApiUrl(`/api/cars/${carId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
+      if (!response.ok) throw new, Error("Failed to fetch car");
       return response.json();
     },
     enabled: !!carId,
@@ -140,16 +140,16 @@ export default function RecordsPage() {
   }>({
     queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
     queryFn: async () => {
-      if (!car?.vin) throw new Error("No VIN");
+      if (!car?.vin) throw new, Error("No VIN`);
       const url = buildApiUrl(`/api/onboarding/vin/${encodeURIComponent(car.vin)}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         if (response.status === 404) {
           return { success: false, data: null };
         }
-        throw new Error("Failed to fetch onboarding");
+        throw new, Error("Failed to fetch onboarding");
       }
       return response.json();
     },
@@ -162,8 +162,7 @@ export default function RecordsPage() {
   // Get client ID from car - need to fetch from car table in backend
   const clientId = undefined; // Will be fetched from car table in backend
 
-  // Reset to page 1 when filter, search, or items per page changes
-  useEffect(() => {
+  // Reset to page 1 when filter, search, or items per page changes, useEffect(() => {
     setCurrentPage(1);
   }, [filterStatus, searchQuery, itemsPerPage, isFilter, onSearch]);
 
@@ -186,31 +185,29 @@ export default function RecordsPage() {
       isFilter,
     ],
     queryFn: async (): Promise<PageData> => {
-      const params = new URLSearchParams({
+      const params = new, URLSearchParams({
         carId: carId!.toString(),
         page: currentPage.toString(),
         limit: itemsPerPage.toString(),
       });
 
-      // Client ID will be fetched from car table in backend
-
-      if (searchQuery && searchQuery.trim() !== "") {
+      // Client ID will be fetched from car table in backend, if(searchQuery && searchQuery.trim() !== "") {
         params.append("searchValue", searchQuery);
       }
 
       if (isFilter && filterStatus !== "All") {
         params.append("isFilter", "true");
-        params.append("recordFilesIsActive", filterStatus === "Active" ? "1" : "0");
+        params.append("recordFilesIsActive", filterStatus === "Active" ? "1" : "0`);
       }
 
       const url = buildApiUrl(`/api/record-files?${params.toString()}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-        throw new Error(errorData.error || errorData.message || `Failed to fetch records: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({ error: "Unknown error` }));
+        throw new, Error(errorData.error || errorData.message || `Failed to fetch, records: ${response.statusText}`);
       }
 
       const result = await response.json();
@@ -232,8 +229,7 @@ export default function RecordsPage() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + documents.length;
 
-  // Ensure current page is valid when filtered results change
-  useEffect(() => {
+  // Ensure current page is valid when filtered results change, useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     }
@@ -241,7 +237,7 @@ export default function RecordsPage() {
 
   // Handle search
   const handleSearch = () => {
-    if (searchQuery.trim() !== "") {
+    if (searchQuery.trim() !== `") {
       setOnSearch(true);
     } else {
       setOnSearch(false);
@@ -263,7 +259,7 @@ export default function RecordsPage() {
   // Handle clear filters
   const handleClear = () => {
     setSearchQuery("");
-    setFilterStatus("All");
+    setFilterStatus("All`);
     setIsFilter(false);
     setOnSearch(false);
   };
@@ -272,8 +268,8 @@ export default function RecordsPage() {
   const archiveMutation = useMutation({
     mutationFn: async (doc: Document) => {
       const url = buildApiUrl(`/api/record-files/${doc.recordFilesAid}/status`);
-      const response = await fetch(url, {
-        method: "PUT",
+      const response = await, fetch(url, {
+        method: `PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
@@ -283,11 +279,11 @@ export default function RecordsPage() {
           record_files_remarks: doc.recordFilesRemarks,
         }),
       });
-      if (!response.ok) throw new Error("Failed to archive");
+      if (!response.ok) throw new, Error("Failed to archive");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/record-files"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/record-files`] });
     },
   });
 
@@ -295,8 +291,8 @@ export default function RecordsPage() {
   const restoreMutation = useMutation({
     mutationFn: async (doc: Document) => {
       const url = buildApiUrl(`/api/record-files/${doc.recordFilesAid}/status`);
-      const response = await fetch(url, {
-        method: "PUT",
+      const response = await, fetch(url, {
+        method: `PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
@@ -306,11 +302,11 @@ export default function RecordsPage() {
           record_files_remarks: doc.recordFilesRemarks,
         }),
       });
-      if (!response.ok) throw new Error("Failed to restore");
+      if (!response.ok) throw new, Error("Failed to restore");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/record-files"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/record-files`] });
     },
   });
 
@@ -318,8 +314,8 @@ export default function RecordsPage() {
   const deleteMutation = useMutation({
     mutationFn: async (doc: Document) => {
       const url = buildApiUrl(`/api/record-files/${doc.recordFilesAid}`);
-      const response = await fetch(url, {
-        method: "DELETE",
+      const response = await, fetch(url, {
+        method: `DELETE",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
@@ -331,7 +327,7 @@ export default function RecordsPage() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to delete");
+        throw new, Error(error.error || "Failed to delete");
       }
       return response.json();
     },
@@ -370,8 +366,7 @@ export default function RecordsPage() {
     setConfirmDialog({ open: false, type: null, doc: null });
   };
 
-  // Reset search when cleared
-  useEffect(() => {
+  // Reset search when cleared, useEffect(() => {
     if (searchQuery === "") {
       setOnSearch(false);
     }
@@ -392,7 +387,7 @@ export default function RecordsPage() {
           <p className="text-red-700">Failed to load car details</p>
           <button
             onClick={() => setLocation("/cars")}
-            className="mt-4 text-blue-700 hover:underline"
+            className="mt-4 text-blue-700, hover:underline`
           >
             ← Back to Cars
           </button>
@@ -404,7 +399,7 @@ export default function RecordsPage() {
   const carName = car.makeModel || `${car.year || ""} ${car.vin}`.trim();
   const ownerName = car.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
-    : "N/A";
+    : `N/A";
   const ownerContact = car.owner?.phone || "N/A";
   const ownerEmail = car.owner?.email || "N/A";
   const fuelType = onboarding?.fuelType || car.fuelType || "N/A";
@@ -415,10 +410,10 @@ export default function RecordsPage() {
     <AdminLayout>
       <div className="flex flex-col h-full overflow-x-hidden">
         {/* Header */}
-        <div className="mb-4 sm:mb-6">
+        <div className="mb-4, sm:mb-6">
             <button
               onClick={() => setLocation("/cars")}
-            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+            className="text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
             >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Cars</span>
@@ -439,18 +434,18 @@ export default function RecordsPage() {
                 onClick={() => {
                   setIsAddModalOpen(true);
                 }}
-                className="bg-card border-border text-foreground hover:bg-muted flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
+                className="bg-card border-border text-foreground, hover:bg-muted flex items-center gap-2 text-xs, sm:text-sm px-2, sm:px-4"
               >
-                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Add</span>
+                <Plus className="w-3 h-3, sm:w-4, sm:h-4" />
+                <span className="hidden, sm:inline">Add</span>
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setIsLogModalOpen(true)}
-                className="bg-card border-border text-foreground hover:bg-muted flex items-center gap-2 text-xs sm:text-sm px-2 sm:px-4"
+                className="bg-card border-border text-foreground, hover:bg-muted flex items-center gap-2 text-xs, sm:text-sm px-2, sm:px-4"
               >
-                <List className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Log</span>
+                <List className="w-3 h-3, sm:w-4, sm:h-4" />
+                <span className="hidden, sm:inline">Log</span>
               </Button>
             </div>
           )}
@@ -458,79 +453,79 @@ export default function RecordsPage() {
         </div>
 
         {/* Car and Owner Information Header */}
-        <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="bg-card border border-border rounded-lg p-4, sm:p-6 mb-4, sm:mb-6">
+          <div className="grid grid-cols-1, sm:grid-cols-2, lg:grid-cols-3 gap-4, sm:gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Car Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Car Name: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-words">{carName}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Car, Name: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">VIN #: </span>
-                  <span className="text-foreground font-mono text-xs sm:text-sm break-all">{car.vin}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">VIN #: </span>
+                  <span className="text-foreground font-mono text-xs, sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">License: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">License: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Owner Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Owner Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Name: </span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm`>Name: </span>
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer font-semibold"
+                      className=`text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs, sm:text-sm break-words cursor-pointer font-semibold"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                    <span className="text-[#B8860B] text-xs sm:text-sm break-words font-semibold">{ownerName}</span>
+                    <span className="text-[#B8860B] text-xs, sm:text-sm break-words font-semibold">{ownerName}</span>
                   )}
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Contact #: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{ownerContact}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Contact #: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Email: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-all">{ownerEmail}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Email: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications & Links */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Specifications & Links</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Car Specifications & Links</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Fuel/Gas: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{fuelType}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Fuel/Gas: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{fuelType}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Tire Size: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{tireSize}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Tire, Size: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{tireSize}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Oil Type: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{oilType}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Oil, Type: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{oilType}</span>
                 </div>
                 {car.turoLink && (
                   <div>
-                    <span className="text-muted-foreground text-xs sm:text-sm">Turo Link: </span>
+                    <span className="text-muted-foreground text-xs, sm:text-sm">Turo, Link: </span>
                     <a
                       href={car.turoLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-700 hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
+                      className="text-blue-700, hover:underline text-xs, sm:text-sm flex items-center gap-1 inline"
                     >
                       View Car
                       <ExternalLink className="w-3 h-3" />
@@ -539,12 +534,12 @@ export default function RecordsPage() {
                 )}
                 {car.adminTuroLink && (
                   <div>
-                    <span className="text-muted-foreground text-xs sm:text-sm">Admin Turo Link: </span>
+                    <span className="text-muted-foreground text-xs, sm:text-sm">Admin Turo, Link: </span>
                     <a
                       href={car.adminTuroLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-700 hover:underline text-xs sm:text-sm flex items-center gap-1 inline"
+                      className="text-blue-700, hover:underline text-xs, sm:text-sm flex items-center gap-1 inline"
                     >
                       View Car
                       <ExternalLink className="w-3 h-3" />
@@ -558,11 +553,11 @@ export default function RecordsPage() {
 
         {/* Records And Files Section */}
         <div className="bg-card border border-border rounded-lg overflow-hidden" style={{ overflowY: 'auto' }}>
-          <div className="p-4 sm:p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-4 sm:mb-6">Records And Files</h2>
+          <div className="p-4, sm:p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4, sm:mb-6">Records And Files</h2>
             
             {/* Filter, Items Per Page, and Search */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 sm:mb-6">
+            <div className="flex flex-col, sm:flex-row items-start, sm:items-center justify-between gap-4 mb-4, sm:mb-6">
               <div className="flex flex-wrap items-center gap-4">
                 <Select value={filterStatus} onValueChange={handleFilterChange}>
                   <SelectTrigger className="bg-card border-border text-foreground w-[120px]">
@@ -593,7 +588,7 @@ export default function RecordsPage() {
                 </div>
               </div>
 
-              <div className="flex-1 sm:max-w-md w-full">
+              <div className="flex-1, sm:max-w-md w-full">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -607,12 +602,12 @@ export default function RecordsPage() {
                           handleSearch();
                         }
                       }}
-                      className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600 h-9"
+                      className="pl-10 bg-card border-border text-foreground, placeholder:text-gray-600 h-9"
                   />
                   </div>
                   <Button
                     onClick={handleSearch}
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 h-9"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 h-9"
                   >
                     <Search className="w-4 h-4" />
                   </Button>
@@ -620,7 +615,7 @@ export default function RecordsPage() {
                     <Button
                       onClick={handleClear}
                       variant="ghost"
-                      className="text-muted-foreground hover:text-foreground underline h-9"
+                      className="text-muted-foreground, hover:text-foreground underline h-9"
                     >
                       Clear
                     </Button>
@@ -633,7 +628,7 @@ export default function RecordsPage() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-border hover:bg-transparent">
+                  <TableRow className="border-border, hover:bg-transparent">
                     <TableHead className="text-center text-foreground font-medium w-12">#</TableHead>
                     <TableHead className="text-left text-foreground font-medium">Document Name</TableHead>
                     <TableHead className="text-left text-foreground font-medium">Date</TableHead>
@@ -660,17 +655,17 @@ export default function RecordsPage() {
                     documents.map((doc, index) => (
                       <TableRow
                         key={doc.recordFilesAid}
-                        className="border-border hover:bg-card transition-colors"
+                        className="border-border, hover:bg-card transition-colors"
                       >
                         <TableCell className="text-center text-muted-foreground">
                           {startIndex + index + 1}
                         </TableCell>
-                        <TableCell className="text-foreground">
+                        <TableCell className="text-foreground`>
                           <button
                             onClick={() => {
                               setLocation(`/admin/cars/${carId}/records/${doc.recordFilesAid}/files`);
                             }}
-                            className="text-primary hover:text-[#d4d570] hover:underline transition-colors text-left"
+                            className=`text-primary, hover:text-[#d4d570] hover:underline transition-colors text-left"
                           >
                             {doc.recordFilesDocName}
                           </button>
@@ -681,17 +676,17 @@ export default function RecordsPage() {
                             const dateMatch = doc.recordFilesDate.match(/(\d{4}-\d{2}-\d{2})/);
                             if (dateMatch) {
                               const [year, month, day] = dateMatch[1].split('-');
-                              const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                              const date = new, Date(parseInt(year), parseInt(month) - 1, parseInt(day));
                               return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
                             }
                             // Fallback to original method if format doesn't match
-                            const date = new Date(doc.recordFilesDate);
+                            const date = new, Date(doc.recordFilesDate);
                             if (!isNaN(date.getTime())) {
                               // Use local date components to avoid timezone shift
                               const year = date.getFullYear();
                               const month = date.getMonth();
                               const day = date.getDate();
-                              return new Date(year, month, day).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                              return new, Date(year, month, day).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
                             }
                             return "N/A";
                           })() : "N/A"}
@@ -710,7 +705,7 @@ export default function RecordsPage() {
                                       setItemEdit(doc);
                                       setIsEditModalOpen(true);
                                     }}
-                                    className="text-muted-foreground hover:text-primary transition-colors p-1"
+                                    className="text-muted-foreground, hover:text-primary transition-colors p-1"
                                     aria-label="Edit document"
                                     title="Edit"
                                   >
@@ -721,7 +716,7 @@ export default function RecordsPage() {
                                       e.stopPropagation();
                                       handleArchive(doc);
                                     }}
-                                    className="text-muted-foreground hover:text-yellow-700 transition-colors p-1"
+                                    className="text-muted-foreground, hover:text-yellow-700 transition-colors p-1"
                                     aria-label="Archive document"
                                     title="Archive"
                                   >
@@ -735,7 +730,7 @@ export default function RecordsPage() {
                                       e.stopPropagation();
                                       handleRestore(doc);
                                     }}
-                                    className="text-muted-foreground hover:text-green-700 transition-colors p-1"
+                                    className="text-muted-foreground, hover:text-green-700 transition-colors p-1"
                                     aria-label="Restore document"
                                     title="Restore"
                                   >
@@ -746,7 +741,7 @@ export default function RecordsPage() {
                                       e.stopPropagation();
                                       handleDelete(doc);
                                     }}
-                                    className="text-muted-foreground hover:text-red-700 transition-colors p-1"
+                                    className="text-muted-foreground, hover:text-red-700 transition-colors p-1"
                                     aria-label="Delete document"
                                     title="Delete"
                                   >
@@ -772,7 +767,7 @@ export default function RecordsPage() {
 
             {/* Pagination Controls */}
             {totalDocuments > 0 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-border">
+              <div className="flex flex-col, sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-border">
                 <div className="text-sm text-muted-foreground">
                   Showing {startIndex + 1} to {endIndex} of {totalDocuments} documents
                 </div>
@@ -784,10 +779,10 @@ export default function RecordsPage() {
                       size="sm"
                       onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                       disabled={currentPage === 1 || isFetching}
-                      className="bg-card border-border text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-card border-border text-foreground, hover:bg-muted, disabled:opacity-50, disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
-                      <span className="hidden sm:inline">Previous</span>
+                      <span className="hidden, sm:inline">Previous</span>
                     </Button>
 
                     <div className="flex items-center gap-1">
@@ -799,8 +794,7 @@ export default function RecordsPage() {
                           (page >= currentPage - 1 && page <= currentPage + 1);
 
                         if (!showPage) {
-                          // Show ellipsis
-                          if (page === currentPage - 2 || page === currentPage + 2) {
+                          // Show ellipsis, if(page === currentPage - 2 || page === currentPage + 2) {
                             return (
                               <span key={page} className="text-muted-foreground px-2">
                                 ...
@@ -819,8 +813,8 @@ export default function RecordsPage() {
                             disabled={isFetching}
                             className={
                               currentPage === page
-                                ? "bg-primary text-primary-foreground hover:bg-primary/80"
-                                : "bg-card border-border text-foreground hover:bg-muted"
+                                ? "bg-primary text-primary-foreground, hover:bg-primary/80"
+                                : "bg-card border-border text-foreground, hover:bg-muted"
                             }
                           >
                             {page}
@@ -834,9 +828,9 @@ export default function RecordsPage() {
                       size="sm"
                       onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                       disabled={currentPage === totalPages || isFetching}
-                      className="bg-card border-border text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-card border-border text-foreground, hover:bg-muted, disabled:opacity-50, disabled:cursor-not-allowed"
                     >
-                      <span className="hidden sm:inline">Next</span>
+                      <span className="hidden, sm:inline">Next</span>
                       <ChevronRight className="w-4 h-4" />
                     </Button>
                   </div>
@@ -905,17 +899,17 @@ export default function RecordsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-card border-border text-muted-foreground hover:bg-muted">
+            <AlertDialogCancel className="bg-card border-border text-muted-foreground, hover:bg-muted">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmAction}
               className={
                 confirmDialog.type === "delete"
-                  ? "bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30 text-foreground"
+                  ? "bg-red-500/20 text-red-700 border-red-500/50, hover:bg-red-500/30 text-foreground"
                   : confirmDialog.type === "restore"
-                  ? "bg-green-600 hover:bg-green-700 text-foreground"
-                  : "bg-primary text-primary-foreground hover:bg-primary/80"
+                  ? "bg-green-600, hover:bg-green-700 text-foreground"
+                  : "bg-primary text-primary-foreground, hover:bg-primary/80"
               }
             >
               {confirmDialog.type === "archive" && "Archive"}

@@ -5,7 +5,7 @@ import type { IncomeExpenseData } from "../types";
  * Export all income and expense data to CSV format
  * Includes all categories in a single file with proper sections
  */
-export function exportAllIncomeExpenseData(
+export function, exportAllIncomeExpenseData(
   data: IncomeExpenseData,
   carInfo: any,
   year: string,
@@ -28,10 +28,10 @@ export function exportAllIncomeExpenseData(
     const item = arr.find((x) => x && x.month === month);
     if (!item) return 0;
     const value = item[field];
-    // Check if value exists (not null, not undefined)
+    // Check if value, exists(not null, not undefined)
     if (value === null || value === undefined) return 0;
     const numValue = Number(value);
-    return isNaN(numValue) ? 0 : numValue;
+    return, isNaN(numValue) ? 0 : numValue;
   };
   
   const getTotalDirectDeliveryForMonth = (month: number): number => {
@@ -46,7 +46,7 @@ export function exportAllIncomeExpenseData(
       const monthValue = subcat.values?.find((v: any) => v.month === month);
       return sum + (Number(monthValue?.value) || 0);
     }, 0);
-    return Number(fixedTotal) + Number(dynamicTotal);
+    return, Number(fixedTotal) + Number(dynamicTotal);
   };
   
   const getTotalCogsForMonth = (month: number): number => {
@@ -80,7 +80,7 @@ export function exportAllIncomeExpenseData(
       const monthValue = subcat.values?.find((v: any) => v.month === month);
       return sum + (Number(monthValue?.value) || 0);
     }, 0);
-    return Number(fixedTotal) + Number(dynamicTotal);
+    return, Number(fixedTotal) + Number(dynamicTotal);
   };
   
   const getTotalReimbursedBillsForMonth = (month: number): number => {
@@ -98,10 +98,10 @@ export function exportAllIncomeExpenseData(
       const monthValue = subcat.values?.find((v: any) => v.month === month);
       return sum + (Number(monthValue?.value) || 0);
     }, 0);
-    return Number(fixedTotal) + Number(dynamicTotal);
+    return, Number(fixedTotal) + Number(dynamicTotal);
   };
   
-  // Helper to get total parking fee & labor cleaning for a month (including dynamic subcategories)
+  // Helper to get total parking fee & labor cleaning for a, month(including dynamic subcategories)
   const getTotalParkingFeeLaborForMonth = (month: number): number => {
     const fixedTotal = (
       getMonthValue(data.parkingFeeLabor, month, "glaParkingFee") +
@@ -111,7 +111,7 @@ export function exportAllIncomeExpenseData(
       const monthValue = subcat.values?.find((v: any) => v.month === month);
       return sum + (Number(monthValue?.value) || 0);
     }, 0);
-    return Number(fixedTotal) + Number(dynamicTotal);
+    return, Number(fixedTotal) + Number(dynamicTotal);
   };
   
   // Calculate Car Management Split - MUST match IncomeExpenseTable.tsx logic exactly
@@ -130,7 +130,7 @@ export function exportAllIncomeExpenseData(
     const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
-    // Use calculated Negative Balance Carry Over (January 2019 will be 0, other Januaries use previous year's December) - MUST match page logic
+    // Use calculated Negative Balance Carry, Over(January 2019 will be 0, other Januaries use previous year's December) - MUST match page logic
     const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
@@ -144,10 +144,8 @@ export function exportAllIncomeExpenseData(
     
     // Year >= 2026
     if (isYear2026OrLater) {
-      // 50:50 mode
-      if (mode === 50) {
-        // A) No ski racks income
-        if (skiRacksIncome === 0) {
+      // 50:50 mode, if(mode === 50) {
+        // A) No ski racks income, if(skiRacksIncome === 0) {
           const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
                         childSeatIncome + coolersIncome + insuranceWreckIncome + otherIncome + 
                         (smokingFines * 0.9 + skiRacksIncome * mgmtPercent) - totalReimbursedBills;
@@ -158,8 +156,8 @@ export function exportAllIncomeExpenseData(
           const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
-        // B) If Car Management (GLA) is ski racks owner
-        else if ((skiRacksOwner?.[month] || "GLA") === "GLA") {
+        // B) If Car, Management(GLA) is ski racks owner
+        else, if((skiRacksOwner?.[month] || "GLA") === "GLA") {
           const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
                         childSeatIncome + coolersIncome + insuranceWreckIncome + otherIncome + 
                         skiRacksIncome + (smokingFines * 0.9) - totalReimbursedBills;
@@ -185,8 +183,7 @@ export function exportAllIncomeExpenseData(
       }
       // 70:30 mode
       else {
-        // A) No ski racks income
-        if (skiRacksIncome === 0) {
+        // A) No ski racks income, if(skiRacksIncome === 0) {
           const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
                         (skiRacksIncome * mgmtPercent) + childSeatIncome + coolersIncome + 
                         insuranceWreckIncome + (smokingFines * 0.9) + otherIncome - 
@@ -197,8 +194,8 @@ export function exportAllIncomeExpenseData(
           const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
-        // B) If Car Management (GLA) is ski racks owner
-        else if ((skiRacksOwner?.[month] || "GLA") === "GLA") {
+        // B) If Car, Management(GLA) is ski racks owner
+        else, if((skiRacksOwner?.[month] || "GLA") === "GLA") {
           const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + skiRacksIncome + 
                         childSeatIncome + coolersIncome + insuranceWreckIncome + (smokingFines * 0.9) + 
                         otherIncome - totalReimbursedBills + totalParkingFeeLabor;
@@ -222,9 +219,8 @@ export function exportAllIncomeExpenseData(
       }
     }
     // Year 2019-2025
-    else if (isYear2019To2025) {
-      // 50:50 mode
-      if (mode === 50) {
+    else, if(isYear2019To2025) {
+      // 50:50 mode, if(mode === 50) {
         const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + smokingFines + 
                       (skiRacksIncome * mgmtPercent + childSeatIncome * mgmtPercent + 
                        coolersIncome * mgmtPercent + insuranceWreckIncome * mgmtPercent + 
@@ -269,7 +265,7 @@ export function exportAllIncomeExpenseData(
     const coolersIncome = getMonthValue(data.incomeExpenses, month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(data.incomeExpenses, month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(data.incomeExpenses, month, "otherIncome");
-    // Use the calculated Negative Balance Carry Over (not stored in data) - MUST match page logic
+    // Use the calculated Negative Balance Carry, Over(not stored in data) - MUST match page logic
     const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
@@ -282,10 +278,8 @@ export function exportAllIncomeExpenseData(
     
     // Year >= 2026
     if (isYear2026OrLater) {
-      // 50:50 mode
-      if (mode === 50) {
-        // A) No ski racks income
-        if (skiRacksIncome === 0) {
+      // 50:50 mode, if(mode === 50) {
+        // A) No ski racks income, if(skiRacksIncome === 0) {
           const part1 = milesIncome + (smokingFines * 0.1 + skiRacksIncome * ownerPercent);
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                          gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
@@ -294,8 +288,8 @@ export function exportAllIncomeExpenseData(
           const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
-        // B) If Car Management (GLA) is ski racks owner
-        else if ((skiRacksOwner?.[month] || "GLA") === "GLA") {
+        // B) If Car, Management(GLA) is ski racks owner
+        else, if((skiRacksOwner?.[month] || "GLA") === "GLA") {
           const part1 = milesIncome + (smokingFines * 0.1);
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                          gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
@@ -317,8 +311,7 @@ export function exportAllIncomeExpenseData(
       }
       // 70:30 mode
       else {
-        // A) No ski racks income
-        if (skiRacksIncome === 0) {
+        // A) No ski racks income, if(skiRacksIncome === 0) {
           const part1 = (skiRacksIncome * ownerPercent + milesIncome) - totalDirectDelivery - totalCogs - 
                         totalParkingFeeLabor + negativeBalanceCarryOver + (smokingFines * 0.1);
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
@@ -327,8 +320,8 @@ export function exportAllIncomeExpenseData(
           const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
-        // B) If Car Management (GLA) is ski racks owner
-        else if ((skiRacksOwner?.[month] || "GLA") === "GLA") {
+        // B) If Car, Management(GLA) is ski racks owner
+        else, if((skiRacksOwner?.[month] || "GLA") === "GLA") {
           const part1 = milesIncome - totalDirectDelivery - totalCogs - totalParkingFeeLabor + 
                         negativeBalanceCarryOver + (smokingFines * 0.1);
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
@@ -350,9 +343,8 @@ export function exportAllIncomeExpenseData(
       }
     }
     // Year 2019-2025
-    else if (isYear2019To2025) {
-      // 50:50 mode
-      if (mode === 50) {
+    else, if(isYear2019To2025) {
+      // 50:50 mode, if(mode === 50) {
         const part1 = milesIncome + (skiRacksIncome * ownerPercent + childSeatIncome * ownerPercent + 
                       coolersIncome * ownerPercent + insuranceWreckIncome * ownerPercent + 
                       otherIncome * ownerPercent);
@@ -385,13 +377,13 @@ export function exportAllIncomeExpenseData(
     const item = arr.find((x) => x && x.month === month);
     if (!item) return 0;
     const value = item[field];
-    // Check if value exists (not null, not undefined)
+    // Check if value, exists(not null, not undefined)
     if (value === null || value === undefined) return 0;
     const numValue = Number(value);
-    return isNaN(numValue) ? 0 : numValue;
+    return, isNaN(numValue) ? 0 : numValue;
   };
 
-  // Helper to get total from previous year for Direct Delivery by month (including dynamic subcategories)
+  // Helper to get total from previous year for Direct Delivery by, month(including dynamic subcategories)
   const getPrevYearTotalDirectDelivery = (month: number): number => {
     if (!previousYearData) return 0;
     const prevData = previousYearData;
@@ -410,10 +402,10 @@ export function exportAllIncomeExpenseData(
       const numValue = Number(value);
       return sum + (isNaN(numValue) ? 0 : numValue);
     }, 0);
-    return Number(fixedTotal) + Number(dynamicTotal);
+    return, Number(fixedTotal) + Number(dynamicTotal);
   };
 
-  // Helper to get total from previous year for COGS by month (including dynamic subcategories)
+  // Helper to get total from previous year for COGS by, month(including dynamic subcategories)
   const getPrevYearTotalCogs = (month: number): number => {
     if (!previousYearData) return 0;
     const prevData = previousYearData;
@@ -451,10 +443,10 @@ export function exportAllIncomeExpenseData(
       const numValue = Number(value);
       return sum + (isNaN(numValue) ? 0 : numValue);
     }, 0);
-    return Number(fixedTotal) + Number(dynamicTotal);
+    return, Number(fixedTotal) + Number(dynamicTotal);
   };
 
-  // Helper to get total parking fee & labor cleaning from previous year by month (including dynamic subcategories)
+  // Helper to get total parking fee & labor cleaning from previous year by, month(including dynamic subcategories)
   const getPrevYearTotalParkingFeeLabor = (month: number): number => {
     if (!previousYearData) return 0;
     const prevData = previousYearData;
@@ -470,28 +462,28 @@ export function exportAllIncomeExpenseData(
       const numValue = Number(value);
       return sum + (isNaN(numValue) ? 0 : numValue);
     }, 0);
-    return Number(fixedTotal) + Number(dynamicTotal);
+    return, Number(fixedTotal) + Number(dynamicTotal);
   };
 
-  // Calculate negative balance carry over for previous year (recursive)
+  // Calculate negative balance carry over for previous, year(recursive)
   // Uses the same formulas as calculateNegativeBalanceCarryOver but for previous year data
-  // Uses CURRENT month's mode (not previous month's mode)
+  // Uses CURRENT month's, mode(not previous month's mode)
   const calculatePrevYearNegativeBalance = (month: number): number => {
     if (!previousYearData) return 0;
     
     const prevYear = parseInt(year, 10) - 1;
     
-    // Year 2019: Always 0
+    // Year, 2019: Always 0
     if (prevYear === 2019) {
       return 0;
     }
     
-    // January of other years (2020+): Use 0 (would need another level of recursion)
+    // January of other, years(2020+): Use 0 (would need another level of recursion)
     if (month === 1 && prevYear > 2019) {
       return 0;
     }
     
-    // Get the CURRENT month's mode from previous year's formulaSetting (not previous month's mode)
+    // Get the CURRENT month's mode from previous year's, formulaSetting(not previous month's mode)
     const currentMonthMode: 50 | 70 = previousYearData?.formulaSetting?.monthModes?.[month] || 50;
     
     // For months 2-12, calculate from previous month
@@ -522,8 +514,8 @@ export function exportAllIncomeExpenseData(
       // 30:70 Mode Formula
       // =IF(
       //   (Miles Income + (Smoking Fines × 10%))
-      //   - TOTAL OPERATING EXPENSE (Direct Delivery) 
-      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) 
+      //   - TOTAL OPERATING, EXPENSE(Direct Delivery) 
+      //   - TOTAL OPERATING, EXPENSE(COGS - Per Vehicle) 
       //   - Total Parking Fee & Labor Cleaning
       //   + Negative Balance Carry Over 
       //   + (Rental Income - Delivery Income - Electric Prepaid Income 
@@ -533,8 +525,8 @@ export function exportAllIncomeExpenseData(
       //    × Car Owner Split% > 0,
       //   0,
       //   (Miles Income + (Smoking Fines × 10%))
-      //   - TOTAL OPERATING EXPENSE (Direct Delivery) 
-      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) 
+      //   - TOTAL OPERATING, EXPENSE(Direct Delivery) 
+      //   - TOTAL OPERATING, EXPENSE(COGS - Per Vehicle) 
       //   - Total Parking Fee & Labor Cleaning
       //   + Negative Balance Carry Over 
       //   + (Rental Income - Delivery Income - Electric Prepaid Income 
@@ -568,15 +560,15 @@ export function exportAllIncomeExpenseData(
   const calculateNegativeBalanceCarryOver = (month: number): number => {
     const currentYear = parseInt(year, 10);
     
-    // Year 2019: Always 0
+    // Year, 2019: Always 0
     if (currentYear === 2019) {
       return 0;
     }
     
-    // Get the CURRENT month's mode (not previous month's mode)
+    // Get the CURRENT month's, mode(not previous month's mode)
     const currentMonthMode: 50 | 70 = monthModes[month] || 50;
     
-    // Get all data from previous month (or December of previous year for January)
+    // Get all data from previous, month(or December of previous year for January)
     let prevRentalIncome: number;
     let prevDeliveryIncome: number;
     let prevElectricPrepaidIncome: number;
@@ -594,8 +586,7 @@ export function exportAllIncomeExpenseData(
     let prevTotalParkingFeeLabor: number;
     let prevCarOwnerSplitPercent: number;
     
-    // January of other years (2020+): Use December of previous year
-    if (month === 1 && currentYear > 2019) {
+    // January of other, years(2020+): Use December of previous year, if(month === 1 && currentYear > 2019) {
       const prevDec = 12;
       // Get all December data from previous year
       prevRentalIncome = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "rentalIncome");
@@ -619,7 +610,7 @@ export function exportAllIncomeExpenseData(
       // The function will use December's mode internally
       prevNegativeBalanceCarryOver = calculatePrevYearNegativeBalance(prevDec);
     } else {
-      // All other months (Feb-Dec): Use previous month
+      // All other, months(Feb-Dec): Use previous month
       const prevMonth = month - 1;
       prevRentalIncome = getMonthValue(data.incomeExpenses, prevMonth, "rentalIncome");
       prevDeliveryIncome = getMonthValue(data.incomeExpenses, prevMonth, "deliveryIncome");
@@ -633,7 +624,7 @@ export function exportAllIncomeExpenseData(
       prevInsuranceWreckIncome = getMonthValue(data.incomeExpenses, prevMonth, "insuranceWreckIncome");
       prevOtherIncome = getMonthValue(data.incomeExpenses, prevMonth, "otherIncome");
       
-      // Use the calculated value from previous month (recursive call)
+      // Use the calculated value from previous, month(recursive call)
       prevNegativeBalanceCarryOver = calculateNegativeBalanceCarryOver(prevMonth);
       
       prevTotalDirectDelivery = getTotalDirectDeliveryForMonth(prevMonth);
@@ -650,8 +641,8 @@ export function exportAllIncomeExpenseData(
       // 30:70 Mode Formula
       // =IF(
       //   (Miles Income + (Smoking Fines × 10%))
-      //   - TOTAL OPERATING EXPENSE (Direct Delivery) 
-      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) 
+      //   - TOTAL OPERATING, EXPENSE(Direct Delivery) 
+      //   - TOTAL OPERATING, EXPENSE(COGS - Per Vehicle) 
       //   - Total Parking Fee & Labor Cleaning
       //   + Negative Balance Carry Over 
       //   + (Rental Income - Delivery Income - Electric Prepaid Income 
@@ -661,8 +652,8 @@ export function exportAllIncomeExpenseData(
       //    × Car Owner Split% > 0,
       //   0,
       //   (Miles Income + (Smoking Fines × 10%))
-      //   - TOTAL OPERATING EXPENSE (Direct Delivery) 
-      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) 
+      //   - TOTAL OPERATING, EXPENSE(Direct Delivery) 
+      //   - TOTAL OPERATING, EXPENSE(COGS - Per Vehicle) 
       //   - Total Parking Fee & Labor Cleaning
       //   + Negative Balance Carry Over 
       //   + (Rental Income - Delivery Income - Electric Prepaid Income 
@@ -694,34 +685,33 @@ export function exportAllIncomeExpenseData(
   };
   
   const calculateCarPayment = (month: number): number => {
-    return getMonthValue(data.cogs, month, "carPayment");
+    return, getMonthValue(data.cogs, month, "carPayment");
   };
   
   const calculateCarManagementTotalExpenses = (month: number): number => {
-    // In 30:70 mode: "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" only
-    // In 50:50 mode: "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" + ("TOTAL OPERATING EXPENSE (Direct Delivery)" + "TOTAL OPERATING EXPENSE (COGS - Per Vehicle)") * "Car Management Split %"
+    // In, 30:70, mode: "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" only
+    // In, 50:50, mode: "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" + ("TOTAL OPERATING, EXPENSE(Direct Delivery)" + "TOTAL OPERATING, EXPENSE(COGS - Per Vehicle)") * "Car Management Split %"
     const totalReimbursedBills = Number(getTotalReimbursedBillsForMonth(month)) || 0;
     
     // Get the mode for this month
     const mode = monthModes[month] || 50;
     
-    // In 30:70 mode, return only TOTAL REIMBURSE AND NON-REIMBURSE BILLS
-    if (mode === 70) {
+    // In, 30:70 mode, return only TOTAL REIMBURSE AND NON-REIMBURSE BILLS, if(mode === 70) {
       return totalReimbursedBills;
     }
     
-    // In 50:50 mode, use the full formula
+    // In, 50:50 mode, use the full formula
     const storedMgmtPercent = Number(getMonthValue(data.incomeExpenses, month, "carManagementSplit")) || 0;
     const mgmtPercent = storedMgmtPercent / 100; // Convert percentage to decimal
     const totalDirectDelivery = Number(getTotalDirectDeliveryForMonth(month)) || 0;
     const totalCogs = Number(getTotalCogsForMonth(month)) || 0;
     
-    return Number(totalReimbursedBills) + ((Number(totalDirectDelivery) + Number(totalCogs)) * mgmtPercent);
+    return, Number(totalReimbursedBills) + ((Number(totalDirectDelivery) + Number(totalCogs)) * mgmtPercent);
   };
   
   const calculateCarOwnerTotalExpenses = (month: number): number => {
-    // In 30:70 mode: "TOTAL OPERATING EXPENSE (Direct Delivery)" + "TOTAL OPERATING EXPENSE (COGS - Per Vehicle)" + "Total Parking Fee & Labor Cleaning"
-    // In 50:50 mode: ("TOTAL OPERATING EXPENSE (Direct Delivery)" + "TOTAL OPERATING EXPENSE (COGS - Per Vehicle)") * "Car Owner Split %"
+    // In, 30:70, mode: "TOTAL OPERATING, EXPENSE(Direct Delivery)" + "TOTAL OPERATING, EXPENSE(COGS - Per Vehicle)" + "Total Parking Fee & Labor Cleaning"
+    // In, 50:50, mode: ("TOTAL OPERATING, EXPENSE(Direct Delivery)" + "TOTAL OPERATING, EXPENSE(COGS - Per Vehicle)") * "Car Owner Split %"
     const totalDirectDelivery = Number(getTotalDirectDeliveryForMonth(month)) || 0;
     const totalCogs = Number(getTotalCogsForMonth(month)) || 0;
     
@@ -729,18 +719,17 @@ export function exportAllIncomeExpenseData(
     const mode = monthModes[month] || 50;
     
     if (mode === 70) {
-      // 30:70 mode: Direct Delivery + COGS + Total Parking Fee & Labor Cleaning
+      // 30:70, mode: Direct Delivery + COGS + Total Parking Fee & Labor Cleaning
       const totalParkingFeeLabor = Number(getTotalParkingFeeLaborForMonth(month)) || 0;
-      return Number(totalDirectDelivery) + Number(totalCogs) + totalParkingFeeLabor;
+      return, Number(totalDirectDelivery) + Number(totalCogs) + totalParkingFeeLabor;
     } else {
-      // 50:50 mode: (Direct Delivery + COGS) * Car Owner Split %
+      // 50:50, mode: (Direct Delivery + COGS) * Car Owner Split %
       const storedOwnerPercent = Number(getMonthValue(data.incomeExpenses, month, "carOwnerSplit")) || 0;
-      const ownerPercent = storedOwnerPercent / 100; // Convert percentage to decimal
-      return (Number(totalDirectDelivery) + Number(totalCogs)) * ownerPercent;
+      const ownerPercent = storedOwnerPercent / 100; // Convert percentage to decimal, return(Number(totalDirectDelivery) + Number(totalCogs)) * ownerPercent;
     }
   };
   
-  let csvContent = "";
+  let csvContent = "`;
   
   // ========================================
   // HEADER: Car and Owner Information
@@ -759,7 +748,7 @@ export function exportAllIncomeExpenseData(
   csvContent += `\n`;
   
   // ========================================
-  // SECTION 1: CAR MANAGEMENT OWNER SPLIT
+  // SECTION, 1: CAR MANAGEMENT OWNER SPLIT
   // ========================================
   csvContent += `SECTION,CAR MANAGEMENT OWNER SPLIT\n`;
   csvContent += `Mode Settings,`;
@@ -773,32 +762,32 @@ export function exportAllIncomeExpenseData(
   });
   csvContent += `YER,YER SPLIT,TOTAL\n`;
   
-  // Car Management Split row (calculated with percentage)
+  // Car Management Split, row(calculated with percentage)
   csvContent += `Car Management Split,`;
   let mgmtSplitTotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
     const calculatedAmount = Number(calculateCarManagementSplit(monthNum)) || 0;
-    const percentage = Number(getMonthValue(data.incomeExpenses, monthNum, "carManagementSplit")) || 0;
+    const percentage = Number(getMonthValue(data.incomeExpenses, monthNum, `carManagementSplit`)) || 0;
     csvContent += `$${calculatedAmount.toFixed(2)} (${percentage.toFixed(0)}%),`;
     mgmtSplitTotal += calculatedAmount;
   });
   csvContent += `$0.00,$0.00,$${mgmtSplitTotal.toFixed(2)}\n`;
   
-  // Car Owner Split row (calculated with percentage)
+  // Car Owner Split, row(calculated with percentage)
   csvContent += `Car Owner Split,`;
   let ownerSplitTotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
     const calculatedAmount = Number(calculateCarOwnerSplit(monthNum)) || 0;
-    const percentage = Number(getMonthValue(data.incomeExpenses, monthNum, "carOwnerSplit")) || 0;
+    const percentage = Number(getMonthValue(data.incomeExpenses, monthNum, `carOwnerSplit`)) || 0;
     csvContent += `$${calculatedAmount.toFixed(2)} (${percentage.toFixed(0)}%),`;
     ownerSplitTotal += calculatedAmount;
   });
   csvContent += `$0.00,$0.00,$${ownerSplitTotal.toFixed(2)}\n\n`;
   
   // ========================================
-  // SECTION 2: INCOME & EXPENSES
+  // SECTION, 2: INCOME & EXPENSES
   // ========================================
   csvContent += `SECTION,INCOME & EXPENSES\n`;
   csvContent += `Category,`;
@@ -844,7 +833,7 @@ export function exportAllIncomeExpenseData(
   });
   csvContent += `$0.00,$0.00,$${negativeBalanceTotal.toFixed(2)}\n`;
   
-  // Formula category - Car Payment (from COGS)
+  // Formula category - Car, Payment(from COGS)
   csvContent += `Car Payment,`;
   let carPaymentTotal = 0;
   MONTHS.forEach((_, idx) => {
@@ -895,7 +884,7 @@ export function exportAllIncomeExpenseData(
   let totalProfitTotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
-    const rentalIncome = Number(getMonthValue(data.incomeExpenses, monthNum, "rentalIncome")) || 0;
+    const rentalIncome = Number(getMonthValue(data.incomeExpenses, monthNum, `rentalIncome`)) || 0;
     const mgmt = Number(calculateCarManagementTotalExpenses(monthNum)) || 0;
     const owner = Number(calculateCarOwnerTotalExpenses(monthNum)) || 0;
     const totalExpenses = mgmt + owner;
@@ -907,9 +896,9 @@ export function exportAllIncomeExpenseData(
   csvContent += `\n`;
   
   // ========================================
-  // SECTION 3: OPERATING EXPENSE (Direct Delivery)
+  // SECTION, 3: OPERATING, EXPENSE(Direct Delivery)
   // ========================================
-  csvContent += `SECTION,OPERATING EXPENSE (Direct Delivery)\n`;
+  csvContent += `SECTION,OPERATING, EXPENSE(Direct Delivery)\n`;
   csvContent += `Category,`;
   MONTHS.forEach((month) => {
     csvContent += `${month} ${year},`;
@@ -936,8 +925,7 @@ export function exportAllIncomeExpenseData(
     csvContent += `$0.00,$0.00,$${total.toFixed(2)}\n`;
   });
   
-  // Export dynamic subcategories for Direct Delivery
-  if (dynamicSubcategories?.directDelivery) {
+  // Export dynamic subcategories for Direct Delivery, if(dynamicSubcategories?.directDelivery) {
     dynamicSubcategories.directDelivery.forEach((subcat) => {
       csvContent += `${subcat.name},`;
       let total = 0;
@@ -951,8 +939,8 @@ export function exportAllIncomeExpenseData(
     });
   }
   
-  // Formula category - TOTAL OPERATING EXPENSE (Direct Delivery)
-  csvContent += `TOTAL OPERATING EXPENSE (Direct Delivery),`;
+  // Formula category - TOTAL OPERATING, EXPENSE(Direct Delivery)
+  csvContent += `TOTAL OPERATING, EXPENSE(Direct Delivery),`;
   let totalDirectDeliveryTotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
@@ -965,9 +953,9 @@ export function exportAllIncomeExpenseData(
   csvContent += `\n`;
   
   // ========================================
-  // SECTION 4: OPERATING EXPENSE (COGS - Per Vehicle)
+  // SECTION, 4: OPERATING, EXPENSE(COGS - Per Vehicle)
   // ========================================
-  csvContent += `SECTION,OPERATING EXPENSE (COGS - Per Vehicle)\n`;
+  csvContent += `SECTION,OPERATING, EXPENSE(COGS - Per Vehicle)\n`;
   csvContent += `Category,`;
   MONTHS.forEach((month) => {
     csvContent += `${month} ${year},`;
@@ -1013,8 +1001,7 @@ export function exportAllIncomeExpenseData(
     csvContent += `$0.00,$0.00,$${total.toFixed(2)}\n`;
   });
   
-  // Export dynamic subcategories for COGS
-  if (dynamicSubcategories?.cogs) {
+  // Export dynamic subcategories for COGS, if(dynamicSubcategories?.cogs) {
     dynamicSubcategories.cogs.forEach((subcat) => {
       csvContent += `${subcat.name},`;
       let total = 0;
@@ -1028,8 +1015,8 @@ export function exportAllIncomeExpenseData(
     });
   }
   
-  // Formula category - TOTAL OPERATING EXPENSE (COGS - Per Vehicle)
-  csvContent += `TOTAL OPERATING EXPENSE (COGS - Per Vehicle),`;
+  // Formula category - TOTAL OPERATING, EXPENSE(COGS - Per Vehicle)
+  csvContent += `TOTAL OPERATING, EXPENSE(COGS - Per Vehicle),`;
   let totalCogsTotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
@@ -1042,7 +1029,7 @@ export function exportAllIncomeExpenseData(
   csvContent += `\n`;
   
   // ========================================
-  // SECTION 5: Parking Fee & Labor Cleaning
+  // SECTION, 5: Parking Fee & Labor Cleaning
   // ========================================
   csvContent += `SECTION,Parking Fee & Labor Cleaning\n`;
   csvContent += `Category,`;
@@ -1068,8 +1055,7 @@ export function exportAllIncomeExpenseData(
     csvContent += `$0.00,$0.00,$${total.toFixed(2)}\n`;
   });
   
-  // Export dynamic subcategories for Parking Fee & Labor Cleaning
-  if (dynamicSubcategories?.parkingFeeLabor) {
+  // Export dynamic subcategories for Parking Fee & Labor Cleaning, if(dynamicSubcategories?.parkingFeeLabor) {
     dynamicSubcategories.parkingFeeLabor.forEach((subcat) => {
       csvContent += `${subcat.name},`;
       let total = 0;
@@ -1089,8 +1075,8 @@ export function exportAllIncomeExpenseData(
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
     const fixedTotal = (
-      Number(getMonthValue(data.parkingFeeLabor, monthNum, "glaParkingFee")) || 0 +
-      Number(getMonthValue(data.parkingFeeLabor, monthNum, "laborCleaning")) || 0
+      Number(getMonthValue(data.parkingFeeLabor, monthNum, `glaParkingFee")) || 0 +
+      Number(getMonthValue(data.parkingFeeLabor, monthNum, "laborCleaning`)) || 0
     );
     const dynamicTotal = (dynamicSubcategories?.parkingFeeLabor || []).reduce((sum: number, subcat: any) => {
       const monthValue = subcat.values?.find((v: any) => v.month === monthNum);
@@ -1105,7 +1091,7 @@ export function exportAllIncomeExpenseData(
   csvContent += `\n`;
   
   // ========================================
-  // SECTION 6: REIMBURSE AND NON-REIMBURSE BILLS
+  // SECTION, 6: REIMBURSE AND NON-REIMBURSE BILLS
   // ========================================
   csvContent += `SECTION,REIMBURSE AND NON-REIMBURSE BILLS\n`;
   csvContent += `Category,`;
@@ -1137,8 +1123,7 @@ export function exportAllIncomeExpenseData(
     csvContent += `$0.00,$0.00,$${total.toFixed(2)}\n`;
   });
   
-  // Export dynamic subcategories for Reimbursed Bills
-  if (dynamicSubcategories?.reimbursedBills) {
+  // Export dynamic subcategories for Reimbursed Bills, if(dynamicSubcategories?.reimbursedBills) {
     dynamicSubcategories.reimbursedBills.forEach((subcat) => {
       csvContent += `${subcat.name},`;
       let total = 0;
@@ -1166,7 +1151,7 @@ export function exportAllIncomeExpenseData(
   csvContent += `\n`;
   
   // ========================================
-  // SECTION 7: HISTORY
+  // SECTION, 7: HISTORY
   // ========================================
   csvContent += `SECTION,HISTORY\n`;
   csvContent += `Category,`;
@@ -1175,29 +1160,29 @@ export function exportAllIncomeExpenseData(
   });
   csvContent += `YER,YER SPLIT,TOTAL\n`;
   
-  // Days Rented (manual entry)
+  // Days, Rented(manual entry)
   csvContent += `Days Rented,`;
   let daysRentedTotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
-    const value = Number(getMonthValue(data.history, monthNum, "daysRented")) || 0;
+    const value = Number(getMonthValue(data.history, monthNum, `daysRented`)) || 0;
     csvContent += `${Number(value)},`;
     daysRentedTotal += Number(value);
   });
   csvContent += `0,0,${daysRentedTotal}\n`;
   
-  // Cars Available For Rent (manual entry)
+  // Cars Available For, Rent(manual entry)
   csvContent += `Cars Available For Rent,`;
   let carsAvailableTotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
-    const value = Number(getMonthValue(data.history, monthNum, "carsAvailableForRent")) || 0;
+    const value = Number(getMonthValue(data.history, monthNum, `carsAvailableForRent`)) || 0;
     csvContent += `${Number(value)},`;
     carsAvailableTotal += Number(value);
   });
   csvContent += `0,0,${carsAvailableTotal}\n`;
   
-  // Trips Taken (still from history)
+  // Trips, Taken(still from history)
   csvContent += `Trips Taken,`;
   let tripsTakenTotal = 0;
     MONTHS.forEach((_, idx) => {
@@ -1210,7 +1195,7 @@ export function exportAllIncomeExpenseData(
   csvContent += `\n`;
   
   // ========================================
-  // SECTION 8: CAR RENTAL VALUE PER MONTH (Formula categories)
+  // SECTION, 8: CAR RENTAL VALUE PER, MONTH(Formula categories)
   // ========================================
   csvContent += `SECTION,CAR RENTAL VALUE PER MONTH\n`;
   csvContent += `Category,`;
@@ -1257,7 +1242,7 @@ export function exportAllIncomeExpenseData(
   csvContent += `\n`;
   
   // ========================================
-  // SECTION 9: PARKING AIRPORT AVERAGE PER TRIP - GLA (Formula categories)
+  // SECTION, 9: PARKING AIRPORT AVERAGE PER TRIP - GLA (Formula categories)
   // ========================================
   csvContent += `SECTION,PARKING AIRPORT AVERAGE PER TRIP - GLA\n`;
   csvContent += `Category,`;
@@ -1277,12 +1262,12 @@ export function exportAllIncomeExpenseData(
   });
   csvContent += `0,0,${tripsTotalGLA}\n`;
   
-  // Total Parking Airport (from REIMBURSE AND NON-REIMBURSE BILLS)
+  // Total Parking, Airport(from REIMBURSE AND NON-REIMBURSE BILLS)
   csvContent += `Total Parking Airport,`;
   let parkingAirportGLATotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
-    const value = getMonthValue(data.reimbursedBills, monthNum, "parkingAirport");
+    const value = getMonthValue(data.reimbursedBills, monthNum, `parkingAirport`);
     csvContent += `$${value.toFixed(2)},`;
     parkingAirportGLATotal += value;
   });
@@ -1293,7 +1278,7 @@ export function exportAllIncomeExpenseData(
   let aveParkingGLATotal = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
-    const parking = getMonthValue(data.reimbursedBills, monthNum, "parkingAirport");
+    const parking = getMonthValue(data.reimbursedBills, monthNum, `parkingAirport`);
     const trips = getMonthValue(data.history, monthNum, 'tripsTaken');
     const value = trips > 0 ? parking / trips : 0;
     csvContent += `$${Number(value).toFixed(2)},`;
@@ -1304,7 +1289,7 @@ export function exportAllIncomeExpenseData(
   // ========================================
   // Download CSV File
   // ========================================
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const blob = new, Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   const fileName = `Income-Expense-${carInfo?.makeModel?.replace(/\s+/g, '-') || 'Car'}-${year}.csv`;
@@ -1320,7 +1305,7 @@ export function exportAllIncomeExpenseData(
 /**
  * Helper function to calculate total income for a month
  */
-function calculateMonthTotalIncome(monthData: any): number {
+function, calculateMonthTotalIncome(monthData: any): number {
   if (!monthData) return 0;
   
   return (
@@ -1341,7 +1326,7 @@ function calculateMonthTotalIncome(monthData: any): number {
 /**
  * Parse imported CSV file and validate structure
  */
-export function parseImportedCSV(
+export function, parseImportedCSV(
   fileContent: string
 ): {
   success: boolean;
@@ -1376,9 +1361,9 @@ export function parseImportedCSV(
     };
     
     let currentSection = '';
-    let skipNextLine = false; // Flag to skip "Category" header lines
+    let skipNextLine = false; // Flag to skip `Category" header lines
     
-    // Helper function to parse CSV line (handles quoted values)
+    // Helper function to parse CSV, line(handles quoted values)
     const parseCSVLine = (line: string): string[] => {
       const result: string[] = [];
       let current = '';
@@ -1388,7 +1373,7 @@ export function parseImportedCSV(
         const char = line[i];
         if (char === '"') {
           inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
+        } else, if(char === ',' && !inQuotes) {
           result.push(current.trim());
           current = '';
         } else {
@@ -1405,8 +1390,7 @@ export function parseImportedCSV(
       
       const cells = parseCSVLine(line);
       
-      // Skip empty rows
-      if (cells.length === 0 || (cells.length === 1 && !cells[0])) {
+      // Skip empty rows, if(cells.length === 0 || (cells.length === 1 && !cells[0])) {
         currentSection = ''; // Reset section on empty line
         continue;
       }
@@ -1414,54 +1398,47 @@ export function parseImportedCSV(
       // Detect section headers
       const firstCell = cells[0].toUpperCase();
       
-      // Check for INCOME & EXPENSES section (first line with month headers)
+      // Check for INCOME & EXPENSES, section(first line with month headers)
       if (firstCell.includes('INCOME') && firstCell.includes('EXPENSES') && cells.length > 1) {
         currentSection = 'INCOME & EXPENSES';
         continue; // Skip header line
       }
       
-      // Check for OPERATING EXPENSE (Direct Delivery) section
-      if (firstCell.includes('OPERATING EXPENSE') && firstCell.includes('DIRECT DELIVERY')) {
-        currentSection = 'OPERATING EXPENSE (Direct Delivery)';
+      // Check for OPERATING, EXPENSE(Direct Delivery) section, if(firstCell.includes('OPERATING EXPENSE') && firstCell.includes('DIRECT DELIVERY')) {
+        currentSection = 'OPERATING, EXPENSE(Direct Delivery)';
         skipNextLine = true; // Next line will be "Category" header
         continue;
       }
       
-      // Check for OPERATING EXPENSE (COGS) section
-      if (firstCell.includes('OPERATING EXPENSE') && firstCell.includes('COGS')) {
-        currentSection = 'OPERATING EXPENSE (COGS - Per Vehicle)';
+      // Check for OPERATING, EXPENSE(COGS) section, if(firstCell.includes('OPERATING EXPENSE') && firstCell.includes('COGS')) {
+        currentSection = 'OPERATING, EXPENSE(COGS - Per Vehicle)';
         continue; // Skip header line
       }
       
-      // Check for PARKING FEE & LABOR CLEANING section
-      if (firstCell.includes('PARKING FEE') && firstCell.includes('LABOR')) {
+      // Check for PARKING FEE & LABOR CLEANING section, if(firstCell.includes('PARKING FEE') && firstCell.includes('LABOR')) {
         currentSection = 'PARKING FEE & LABOR CLEANING';
         continue; // Skip header line
       }
       
-      // Check for REIMBURSE section
-      if (firstCell.includes('REIMBURSE') || firstCell.includes('NON-REIMBURSE')) {
+      // Check for REIMBURSE section, if(firstCell.includes('REIMBURSE') || firstCell.includes('NON-REIMBURSE')) {
         currentSection = 'REIMBURSE AND NON-REIMBURSE BILLS';
         continue; // Skip header line
       }
       
-      // Check for HISTORY section
-      if (firstCell === 'HISTORY') {
+      // Check for HISTORY section, if(firstCell === 'HISTORY') {
         currentSection = 'HISTORY';
         continue; // Skip header line
       }
       
-      // Skip "Category" header lines
-      if (firstCell === 'CATEGORY' || skipNextLine) {
+      // Skip "Category" header lines, if(firstCell === 'CATEGORY' || skipNextLine) {
         skipNextLine = false;
         continue;
       }
       
-      // Parse data rows based on current section
-      if (currentSection && cells.length > 1 && cells[0]) {
+      // Parse data rows based on current section, if(currentSection && cells.length > 1 && cells[0]) {
         const rowData: any = { category: cells[0] };
         
-        // Parse 12 month values (columns 1-12)
+        // Parse 12 month, values(columns 1-12)
         for (let monthIdx = 0; monthIdx < 12; monthIdx++) {
           const cellValue = cells[monthIdx + 1] || '$0.00';
           // Remove quotes, dollar signs, commas, and parentheses, then parse
@@ -1470,18 +1447,17 @@ export function parseImportedCSV(
           rowData[`month${monthIdx + 1}`] = numValue;
         }
         
-        // Add to appropriate section
-        if (currentSection.includes('INCOME') && currentSection.includes('EXPENSES')) {
+        // Add to appropriate section, if(currentSection.includes('INCOME') && currentSection.includes('EXPENSES')) {
           sections.incomeExpenses.push(rowData);
-        } else if (currentSection.includes('Direct Delivery')) {
+        } else, if(currentSection.includes('Direct Delivery')) {
           sections.directDelivery.push(rowData);
-        } else if (currentSection.includes('COGS')) {
+        } else, if(currentSection.includes('COGS')) {
           sections.cogs.push(rowData);
-        } else if (currentSection.includes('Parking Fee') || currentSection.includes('LABOR')) {
+        } else, if(currentSection.includes('Parking Fee') || currentSection.includes('LABOR')) {
           sections.parkingFeeLabor.push(rowData);
-        } else if (currentSection.includes('REIMBURSE')) {
+        } else, if(currentSection.includes('REIMBURSE')) {
           sections.reimbursedBills.push(rowData);
-        } else if (currentSection === 'HISTORY') {
+        } else, if(currentSection === 'HISTORY') {
           sections.history.push(rowData);
         }
       }
@@ -1495,9 +1471,9 @@ export function parseImportedCSV(
 }
 
 /**
- * Export all data to JSON format (for backup/advanced users)
+ * Export all data to JSON, format(for backup/advanced users)
  */
-export function exportToJSON(
+export function, exportToJSON(
   data: IncomeExpenseData,
   carInfo: any,
   year: string,
@@ -1523,11 +1499,11 @@ export function exportToJSON(
       reimbursedBills: data.reimbursedBills,
       history: data.history,
     },
-    exportedAt: new Date().toISOString(),
+    exportedAt: new, Date().toISOString(),
   };
   
   const jsonString = JSON.stringify(exportData, null, 2);
-  const blob = new Blob([jsonString], { type: 'application/json' });
+  const blob = new, Blob([jsonString], { type: 'application/json' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   const fileName = `Income-Expense-${carInfo?.makeModel?.replace(/\s+/g, '-') || 'Car'}-${year}.json`;

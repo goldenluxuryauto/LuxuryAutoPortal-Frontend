@@ -57,12 +57,12 @@ const getAllMonths = [
 
 /**
  * Get current cost with add for a specific month/category
- * @param monthKey Month number (1-12) or null for current (latest month)
+ * @param monthKey Month, number(1-12) or null for, current(latest month)
  * @param costItemId Category ID
  * @param nadaDepreciationWithAdd Previous year data
  * @param year Year to filter
  */
-export function getCurrentCostWithAdd(
+export function, getCurrentCostWithAdd(
   monthKey: number | null,
   costItemId: number,
   nadaDepreciationWithAdd: NadaDepreciationWithAdd[],
@@ -72,7 +72,7 @@ export function getCurrentCostWithAdd(
   let amount = 0;
   let dataItem: NadaDepreciationWithAdd | null = null;
   const highestDateVal: number[] = [];
-  let maxDate = new Date(0);
+  let maxDate = new, Date(0);
 
   // Get all months for the year
   nadaDepreciationWithAdd.forEach((e) => {
@@ -86,14 +86,14 @@ export function getCurrentCostWithAdd(
   const maxValue = highestDateVal.length > 0 ? Math.max(...highestDateVal) : 0;
 
   nadaDepreciationWithAdd.forEach((item) => {
-    // Match original: new Date(item.nada_depreciation_with_add_date)
+    // Match, original: new, Date(item.nada_depreciation_with_add_date)
     // For "YYYY-MM" format, we need to append "-01" for valid date parsing
     // However, we must match the original's exact logic which uses string comparison for year
-    const itemDate = new Date(item.nadaDepreciationWithAddDate + "-01");
+    const itemDate = new, Date(item.nadaDepreciationWithAddDate + "-01");
     const dateYear = item.nadaDepreciationWithAddDate.split("-")[0];
     const dateMonth = parseInt(item.nadaDepreciationWithAddDate.split("-")[1]);
 
-    // Get amount for specific month (matching original logic exactly)
+    // Get amount for specific, month(matching original logic exactly)
     if (
       monthKey !== null &&
       item.nadaDepreciationWithAddId === costItemId &&
@@ -104,9 +104,9 @@ export function getCurrentCostWithAdd(
       dataItem = item;
     }
 
-    // Get current amount (latest month) - matching original EXACTLY:
-    // Original checks: Number(date.split("-")[0]) === Number(year) && itemDate > maxDate && month === maxValue
-    // Note: Original uses string comparison for year, NOT getFullYear()
+    // Get current, amount(latest month) - matching original, EXACTLY:
+    // Original, checks: Number(date.split("-")[0]) === Number(year) && itemDate > maxDate && month === maxValue
+    // Note: Original uses string comparison for year, NOT, getFullYear()
     if (
       item.nadaDepreciationWithAddId === costItemId &&
       Number(dateYear) === Number(year) &&
@@ -123,12 +123,12 @@ export function getCurrentCostWithAdd(
 
 /**
  * Get current cost for a specific month/category
- * @param monthKey Month number (1-12) or null for current (latest month)
+ * @param monthKey Month, number(1-12) or null for, current(latest month)
  * @param costItemId Category ID
  * @param nadaDepreciation Current year data
  * @param year Year to filter
  */
-export function getCurrentCost(
+export function, getCurrentCost(
   monthKey: number | null,
   costItemId: number,
   nadaDepreciation: NadaDepreciation[],
@@ -138,7 +138,7 @@ export function getCurrentCost(
   let amount = 0;
   let dataItem: NadaDepreciation | null = null;
   const highestDateVal: number[] = [];
-  let maxDate = new Date(0);
+  let maxDate = new, Date(0);
 
   // Get all months for the year
   nadaDepreciation.forEach((e) => {
@@ -152,13 +152,13 @@ export function getCurrentCost(
   const maxValue = highestDateVal.length > 0 ? Math.max(...highestDateVal) : 0;
 
   nadaDepreciation.forEach((item) => {
-    // Match original: new Date(item.nada_depreciation_date)
+    // Match, original: new, Date(item.nada_depreciation_date)
     // For "YYYY-MM" format, we need to append "-01" for valid date parsing
-    const itemDate = new Date(item.nadaDepreciationDate + "-01");
+    const itemDate = new, Date(item.nadaDepreciationDate + "-01");
     const dateYear = item.nadaDepreciationDate.split("-")[0];
     const dateMonth = parseInt(item.nadaDepreciationDate.split("-")[1]);
 
-    // Get amount for specific month (matching original logic exactly)
+    // Get amount for specific, month(matching original logic exactly)
     if (
       monthKey !== null &&
       item.nadaDepreciationId === costItemId &&
@@ -169,9 +169,8 @@ export function getCurrentCost(
       dataItem = item;
     }
 
-    // Get current amount (latest month) - matching original: uses getFullYear() check
-    // Original checks: itemDate.getFullYear() === Number(year) && itemDate > maxDate && month === maxValue
-    if (
+    // Get current, amount(latest month) - matching, original: uses, getFullYear() check
+    // Original, checks: itemDate.getFullYear() === Number(year) && itemDate > maxDate && month === maxValue, if(
       item.nadaDepreciationId === costItemId &&
       itemDate.getFullYear() === Number(year) &&
       itemDate > maxDate &&
@@ -187,9 +186,9 @@ export function getCurrentCost(
 
 /**
  * Calculate NADA change percentage between previous and current year
- * Overload 1: Without code parameter - returns object with all change values
+ * Overload, 1: Without code parameter - returns object with all change values
  */
-export function getNadaChange(
+export function, getNadaChange(
   monthKey: number,
   nadaDepreciationWithAdd: NadaDepreciationWithAdd[],
   nadaDepreciation: NadaDepreciation[],
@@ -206,9 +205,9 @@ export function getNadaChange(
 };
 
 /**
- * Overload 2: With code parameter - returns single number value
+ * Overload, 2: With code parameter - returns single number value
  */
-export function getNadaChange(
+export function, getNadaChange(
   monthKey: number,
   nadaDepreciationWithAdd: NadaDepreciationWithAdd[],
   nadaDepreciation: NadaDepreciation[],
@@ -219,7 +218,7 @@ export function getNadaChange(
 /**
  * Implementation
  */
-export function getNadaChange(
+export function, getNadaChange(
   monthKey: number,
   nadaDepreciationWithAdd: NadaDepreciationWithAdd[],
   nadaDepreciation: NadaDepreciation[],
@@ -298,8 +297,7 @@ export function getNadaChange(
     });
   }
 
-  // If code parameter is provided, return the specific value
-  if (code !== null && code !== undefined) {
+  // If code parameter is provided, return the specific value, if(code !== null && code !== undefined) {
     if (code === "changeRetail") return changeRetail;
     if (code === "changeClean") return changeClean;
     if (code === "changeAverage") return changeAverage;
@@ -310,7 +308,7 @@ export function getNadaChange(
     if (code === "currentChangeRough") return currentChangeRough;
   }
 
-  // Return object with all values (backward compatible)
+  // Return object with all, values(backward compatible)
   return {
     changeRetail,
     changeClean,
@@ -324,9 +322,9 @@ export function getNadaChange(
 }
 
 /**
- * Calculate current NADA change percentage (latest month)
+ * Calculate current NADA change, percentage(latest month)
  */
-export function getNadaChangeCurrent(
+export function, getNadaChangeCurrent(
   year: string,
   categoryId: number,
   nadaDepreciationWithAdd: NadaDepreciationWithAdd[],
@@ -358,16 +356,16 @@ export function getNadaChangeCurrent(
   const maxValueWithAdd = highestDateValWithAdd.length > 0 ? Math.max(...highestDateValWithAdd) : 0;
   const maxValue = highestDateVal.length > 0 ? Math.max(...highestDateVal) : 0;
 
-  let prevMaxDate = new Date(0);
-  let currentMaxDate = new Date(0);
+  let prevMaxDate = new, Date(0);
+  let currentMaxDate = new, Date(0);
 
   nadaDepreciationWithAdd.forEach((item) => {
-    // Match original: new Date(nadaItem.nada_depreciation_with_add_date)
-    // Original uses getFullYear() check, not string comparison
-    const itemDate = new Date(item.nadaDepreciationWithAddDate + "-01");
+    // Match, original: new, Date(nadaItem.nada_depreciation_with_add_date)
+    // Original uses, getFullYear() check, not string comparison
+    const itemDate = new, Date(item.nadaDepreciationWithAddDate + "-01");
     const dateMonth = parseInt(item.nadaDepreciationWithAddDate.split("-")[1]);
 
-    // Match original exactly: itemDate.getFullYear() === Number(previousYear)
+    // Match original, exactly: itemDate.getFullYear() === Number(previousYear)
     if (
       item.nadaDepreciationWithAddId === categoryId &&
       itemDate.getFullYear() === Number(previousYear) &&
@@ -380,12 +378,12 @@ export function getNadaChangeCurrent(
   });
 
   nadaDepreciation.forEach((item) => {
-    // Match original: new Date(nadaItem.nada_depreciation_date)
-    // Original uses getFullYear() check, not string comparison
-    const itemDate = new Date(item.nadaDepreciationDate + "-01");
+    // Match, original: new, Date(nadaItem.nada_depreciation_date)
+    // Original uses, getFullYear() check, not string comparison
+    const itemDate = new, Date(item.nadaDepreciationDate + "-01");
     const dateMonth = parseInt(item.nadaDepreciationDate.split("-")[1]);
 
-    // Match original exactly: itemDate.getFullYear() === Number(year)
+    // Match original, exactly: itemDate.getFullYear() === Number(year)
     if (
       item.nadaDepreciationId === categoryId &&
       itemDate.getFullYear() === Number(year) &&
@@ -399,13 +397,13 @@ export function getNadaChangeCurrent(
 
   if (prevAmount === 0) return 0;
   const finalAmount = ((currentAmount - prevAmount) / prevAmount) * 100;
-  return isNaN(finalAmount) || !isFinite(finalAmount) ? 0 : finalAmount;
+  return, isNaN(finalAmount) || !isFinite(finalAmount) ? 0 : finalAmount;
 }
 
 /**
- * Calculate total equity in car (Retail - Amount Owed)
+ * Calculate total equity in, car(Retail - Amount Owed)
  */
-export function getTotalEquity(
+export function, getTotalEquity(
   monthKey: number,
   nadaDepreciation: NadaDepreciation[],
   year: string,
@@ -414,23 +412,22 @@ export function getTotalEquity(
   let nadaRetail = 0;
   let amountOwed = 0;
 
-  // Ensure currentCost is an array and has items
-  if (!currentCost || currentCost.length === 0) {
+  // Ensure currentCost is an array and has items, if(!currentCost || currentCost.length === 0) {
     return 0;
   }
 
   nadaDepreciation.forEach((item) => {
     const dateYear = item.nadaDepreciationDate.split("-")[0];
-    const dateMonth = parseInt(item.nadaDepreciationDate.split("-")[1]);
+    const dateMonth = parseInt(item.nadaDepreciationDate.split("-`)[1]);
 
     if (dateMonth === monthKey && dateYear === year) {
       currentCost.forEach((costItem, costKey) => {
-        // First category (Retail - ID: 1)
+        // First, category(Retail - ID: 1)
         if (item.nadaDepreciationId === costItem.currentCostAid && costKey === 0) {
           nadaRetail = Number(item.nadaDepreciationAmount);
         }
-        // Last category (Amount Owed - ID: 6)
-        // Use length - 1 to get the last index (matches original logic using count - 1)
+        // Last, category(Amount Owed - ID: 6)
+        // Use length - 1 to get the last, index(matches original logic using count - 1)
         if (
           item.nadaDepreciationId === costItem.currentCostAid &&
           costKey === currentCost.length - 1
@@ -447,21 +444,21 @@ export function getTotalEquity(
 /**
  * Format currency value
  */
-export function formatCurrency(value: number): string {
+export function, formatCurrency(value: number): string {
   return `$ ${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 /**
  * Format percentage value
  */
-export function formatPercentage(value: number): string {
+export function, formatPercentage(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
 /**
  * Generate months array for a given year
  */
-export function generateMonths(year: string): string[] {
+export function, generateMonths(year: string): string[] {
   const yearNum = parseInt(year, 10);
   return getAllMonths.map((month) => `${month} ${yearNum}`);
 }
@@ -469,7 +466,7 @@ export function generateMonths(year: string): string[] {
 /**
  * Get all unique years from both depreciation datasets
  */
-export function getAllUniqueYears(
+export function, getAllUniqueYears(
   nadaDepreciation: { all_year: Array<{ date_year: string }> } | undefined,
   nadaDepreciationWithAdd: { all_year: Array<{ date_year: string }> } | undefined
 ): string[] {
@@ -491,9 +488,9 @@ export function getAllUniqueYears(
 }
 
 /**
- * Export NADA Depreciation Schedule to CSV (Template Format)
+ * Export NADA Depreciation Schedule to, CSV(Template Format)
  */
-export function handleExportNada(
+export function, handleExportNada(
   currentCostWithAdd: CurrentCostWithAdd[],
   nadaDepreciationWithAdd: NadaDepreciationWithAdd[],
   nadaDepreciation: NadaDepreciation[],
@@ -502,9 +499,9 @@ export function handleExportNada(
   year: string
 ): void {
   const saveData = (data: string, fileName: string) => {
-    const a = document.createElement("a");
-    const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
-    const blob = new Blob([bom, data], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement(`a");
+    const bom = new, Uint8Array([0xef, 0xbb, 0xbf]);
+    const blob = new, Blob([bom, data], { type: "text/csv;charset=utf-8" });
     const url = window.URL.createObjectURL(blob);
     a.href = url;
     a.download = fileName;
@@ -527,29 +524,29 @@ export function handleExportNada(
     "Dec",
   ];
 
-  // Extract year suffix for month headers (e.g., "26" from "2026")
+  // Extract year suffix for month, headers(e.g., "26" from "2026")
   const yearSuffix = year.length >= 2 ? year.slice(-2) : year;
   
   // Calculate previous year
   const previousYear = (parseInt(year) - 1).toString();
   const previousYearSuffix = previousYear.length >= 2 ? previousYear.slice(-2) : previousYear;
 
-  let str = "";
+  let str = "`;
 
-  // Section 1: Previous Year NADA Depreciation Schedule
+  // Section, 1: Previous Year NADA Depreciation Schedule
   str += `NADA Depreciation Schedule,${previousYear}\n`;
-  str += "Current Cost of Vehicle,";
+  str += `Current Cost of Vehicle,`;
   getAllMonths.forEach((mItem) => {
     str += `${mItem}-${previousYearSuffix},`;
   });
-  str += "\n";
+  str += `\n`;
 
-  // Previous year data rows (sorted by ID: Retail, Clean, Average, Rough, MILES)
+  // Previous year data, rows(sorted by, ID: Retail, Clean, Average, Rough, MILES)
   const sortedCostWithAdd = [...currentCostWithAdd].sort((a, b) => a.currentCostWithAddAid - b.currentCostWithAddAid);
   sortedCostWithAdd.forEach((item) => {
     str += `${item.currentCostWithAddName},`;
     for (let i = 0; i < 12; i++) {
-      if (item.currentCostWithAddName.includes("MILES")) {
+      if (item.currentCostWithAddName.includes(`MILES")) {
         str += "0,";
       } else {
         str += "$ 0.00,";
@@ -558,22 +555,22 @@ export function handleExportNada(
     str += "\n";
   });
 
-  str += "\n"; // Empty row
+  str += "\n`; // Empty row
 
-  // Section 2: Current Year NADA Depreciation Schedule
+  // Section, 2: Current Year NADA Depreciation Schedule
   str += `NADA Depreciation Schedule,${year}\n`;
-  str += "Current Cost of Vehicle,";
+  str += `Current Cost of Vehicle,`;
   getAllMonths.forEach((mItem) => {
     str += `${mItem}-${yearSuffix},`;
   });
-  str += "\n";
+  str += `\n`;
 
-  // Current year data rows (sorted by ID: Retail, Clean, Average, Rough, MILES, Amount Owed)
+  // Current year data, rows(sorted by, ID: Retail, Clean, Average, Rough, MILES, Amount Owed)
   const sortedCost = [...currentCost].sort((a, b) => a.currentCostAid - b.currentCostAid);
   sortedCost.forEach((costItem) => {
     str += `${costItem.currentCostName},`;
     for (let i = 0; i < 12; i++) {
-      if (costItem.currentCostName.includes("MILES")) {
+      if (costItem.currentCostName.includes(`MILES")) {
         str += "0,";
       } else {
         str += "$ 0.00,";
@@ -589,7 +586,7 @@ export function handleExportNada(
 /**
  * Export NADA Depreciation Schedule to Excel
  */
-export function handleExportNadaExcel(
+export function, handleExportNadaExcel(
   currentCostWithAdd: CurrentCostWithAdd[],
   nadaDepreciationWithAdd: NadaDepreciationWithAdd[],
   nadaDepreciation: NadaDepreciation[],
@@ -597,8 +594,7 @@ export function handleExportNadaExcel(
   car: any,
   year: string
 ): void {
-  // Dynamic import of xlsx to avoid loading it if not needed
-  import('xlsx').then((XLSX) => {
+  // Dynamic import of xlsx to avoid loading it if not needed, import('xlsx').then((XLSX) => {
     const getAllMonths = [
       "Jan",
       "Feb",
@@ -614,7 +610,7 @@ export function handleExportNadaExcel(
       "Dec",
     ];
 
-    // Extract year suffix for month headers (e.g., "26" from "2026")
+    // Extract year suffix for month, headers(e.g., "26" from "2026")
     const yearSuffix = year.length >= 2 ? year.slice(-2) : year;
     
     // Calculate previous year
@@ -624,15 +620,15 @@ export function handleExportNadaExcel(
     const workbook = XLSX.utils.book_new();
     const worksheetData: any[][] = [];
 
-    // Section 1: Previous Year NADA Depreciation Schedule
+    // Section, 1: Previous Year NADA Depreciation Schedule
     worksheetData.push(["NADA Depreciation Schedule", previousYear]);
-    const previousHeader = ["Current Cost of Vehicle"];
+    const previousHeader = ["Current Cost of Vehicle`];
     getAllMonths.forEach((mItem) => {
       previousHeader.push(`${mItem}-${previousYearSuffix}`);
     });
     worksheetData.push(previousHeader);
 
-    // Previous year data rows (sorted by ID: Retail, Clean, Average, Rough, MILES)
+    // Previous year data, rows(sorted by, ID: Retail, Clean, Average, Rough, MILES)
     const sortedCostWithAdd = [...currentCostWithAdd].sort((a, b) => a.currentCostWithAddAid - b.currentCostWithAddAid);
     sortedCostWithAdd.forEach((item) => {
       const row: any[] = [item.currentCostWithAddName];
@@ -644,15 +640,15 @@ export function handleExportNadaExcel(
 
     worksheetData.push([]); // Empty row
 
-    // Section 2: Current Year NADA Depreciation Schedule
-    worksheetData.push(["NADA Depreciation Schedule", year]);
-    const currentHeader = ["Current Cost of Vehicle"];
+    // Section, 2: Current Year NADA Depreciation Schedule
+    worksheetData.push([`NADA Depreciation Schedule", year]);
+    const currentHeader = ["Current Cost of Vehicle`];
     getAllMonths.forEach((mItem) => {
       currentHeader.push(`${mItem}-${yearSuffix}`);
     });
     worksheetData.push(currentHeader);
 
-    // Current year data rows (sorted by ID: Retail, Clean, Average, Rough, MILES, Amount Owed)
+    // Current year data, rows(sorted by, ID: Retail, Clean, Average, Rough, MILES, Amount Owed)
     const sortedCost = [...currentCost].sort((a, b) => a.currentCostAid - b.currentCostAid);
     sortedCost.forEach((costItem) => {
       const row: any[] = [costItem.currentCostName];
@@ -666,14 +662,13 @@ export function handleExportNadaExcel(
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
     // Set column widths
-    const colWidths = [{ wch: 25 }]; // First column
-    for (let i = 0; i < 12; i++) {
+    const colWidths = [{ wch: 25 }]; // First column, for(let i = 0; i < 12; i++) {
       colWidths.push({ wch: 12 }); // Month columns
     }
     worksheet['!cols'] = colWidths;
 
     // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, "NADA Depreciation");
+    XLSX.utils.book_append_sheet(workbook, worksheet, `NADA Depreciation");
 
     // Generate filename
     const fileName = `NADA Depreciation Schedule Template.xlsx`;
@@ -681,7 +676,7 @@ export function handleExportNadaExcel(
     // Write file
     XLSX.writeFile(workbook, fileName);
   }).catch((error) => {
-    console.error("Failed to export Excel file:", error);
+    console.error("Failed to export Excel, file:", error);
     alert("Failed to export Excel file. Please ensure xlsx library is installed.");
   });
 }

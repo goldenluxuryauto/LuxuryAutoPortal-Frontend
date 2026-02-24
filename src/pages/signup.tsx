@@ -25,12 +25,12 @@ const signupSchema = z
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
-export default function Signup() {
+export default function, Signup() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   // Get email, firstName, and lastName from URL query parameters if present
-  const urlParams = new URLSearchParams(window.location.search);
+  const urlParams = new, URLSearchParams(window.location.search);
   const emailFromUrl = urlParams.get('email') || '';
   const firstNameFromUrl = urlParams.get('firstName') || '';
   const lastNameFromUrl = urlParams.get('lastName') || '';
@@ -49,8 +49,7 @@ export default function Signup() {
     },
   });
 
-  // Pre-fill form fields if provided in URL
-  useEffect(() => {
+  // Pre-fill form fields if provided in URL, useEffect(() => {
     if (emailFromUrl) {
       setValue('email', emailFromUrl);
     }
@@ -64,10 +63,10 @@ export default function Signup() {
 
   const signupMutation = useMutation({
     mutationFn: async (data: Omit<SignupFormData, "confirmPassword">) => {
-      const response = await apiRequest("POST", "/api/auth/signup", data);
+      const response = await, apiRequest("POST", "/api/auth/signup", data);
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Signup failed");
+        throw new, Error(error.error || "Signup failed");
       }
       return response.json();
     },
@@ -126,11 +125,11 @@ export default function Signup() {
             <Input
               id="email"
               type="email"
-              {...register("email")}
-              className={`bg-card border-border222222] text-foreground focus:border-primary focus:ring-[#EAEB80] h-11 ${
+              {...register("email`)}
+              className={`bg-card border-border222222] text-foreground, focus:border-primary, focus:ring-[#EAEB80] h-11 ${
                 emailFromUrl ? 'cursor-not-allowed opacity-75' : ''
               }`}
-              placeholder="john.doe@example.com"
+              placeholder=`john.doe@example.com"
               readOnly={!!emailFromUrl}
             />
             {errors.email && (
@@ -146,7 +145,7 @@ export default function Signup() {
               id="password"
               type="password"
               {...register("password")}
-              className="bg-card border-border222222] text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
+              className="bg-card border-border222222] text-foreground, focus:border-primary, focus:ring-[#EAEB80] h-11"
               placeholder="••••••••"
             />
             {errors.password && (
@@ -162,7 +161,7 @@ export default function Signup() {
               id="confirmPassword"
               type="password"
               {...register("confirmPassword")}
-              className="bg-card border-border222222] text-foreground focus:border-primary focus:ring-[#EAEB80] h-11"
+              className="bg-card border-border222222] text-foreground, focus:border-primary, focus:ring-[#EAEB80] h-11"
               placeholder="••••••••"
             />
             {errors.confirmPassword && (
@@ -172,7 +171,7 @@ export default function Signup() {
 
           <Button
             type="submit"
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium h-11"
+            className="w-full bg-primary text-primary-foreground, hover:bg-primary/80 font-medium h-11"
             disabled={signupMutation.isPending}
           >
             {signupMutation.isPending ? "Creating account..." : "Sign Up"}
@@ -183,7 +182,7 @@ export default function Signup() {
           Already have an account?{" "}
           <button
             onClick={() => setLocation("/admin/login")}
-            className="text-blue-700 hover:underline"
+            className="text-blue-700, hover:underline"
           >
             Sign in
           </button>

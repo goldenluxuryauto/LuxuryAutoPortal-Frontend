@@ -54,7 +54,7 @@ interface AddEditPaymentModalProps {
   clientId: number;
 }
 
-export function AddEditPaymentModal({
+export function, AddEditPaymentModal({
   isOpen,
   onClose,
   payment,
@@ -85,10 +85,10 @@ export function AddEditPaymentModal({
     queryKey: ["/api/payment-status"],
     queryFn: async () => {
       const url = buildApiUrl("/api/payment-status");
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         credentials: "include",
       });
-      if (!response.ok) throw new Error("Failed to fetch payment statuses");
+      if (!response.ok) throw new, Error("Failed to fetch payment statuses");
       return response.json();
     },
   });
@@ -105,10 +105,10 @@ export function AddEditPaymentModal({
   }>({
     queryKey: ["/api/income-expense", carId, year],
     queryFn: async () => {
-      if (!year || !carId) throw new Error("Year or Car ID not set");
+      if (!year || !carId) throw new, Error("Year or Car ID not set`);
       const url = buildApiUrl(`/api/income-expense/${carId}/${year}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         // If income/expense not found, return empty data
@@ -131,7 +131,7 @@ export function AddEditPaymentModal({
   }>({
     queryKey: ["/api/income-expense/dynamic-subcategories", carId, year],
     queryFn: async () => {
-      if (!carId || !year) throw new Error("Car ID or Year not set");
+      if (!carId || !year) throw new, Error("Car ID or Year not set`);
       const categories: Array<'directDelivery' | 'cogs' | 'parkingFeeLabor' | 'reimbursedBills'> = [
         'directDelivery',
         'cogs',
@@ -141,9 +141,9 @@ export function AddEditPaymentModal({
       
       const promises = categories.map(async (categoryType) => {
         try {
-          const response = await fetch(
+          const response = await, fetch(
             buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${year}/${categoryType}`),
-            { credentials: "include" }
+            { credentials: `include` }
           );
           if (response.ok) {
             const result = await response.json();
@@ -187,12 +187,12 @@ export function AddEditPaymentModal({
     success: boolean;
     data: any;
   }>({
-    queryKey: ["/api/income-expense", carId, previousYear],
+    queryKey: [`/api/income-expense", carId, previousYear],
     queryFn: async () => {
-      if (!carId || !previousYear) throw new Error("Car ID or Previous Year not set");
-      const response = await fetch(
+      if (!carId || !previousYear) throw new, Error("Car ID or Previous Year not set`);
+      const response = await, fetch(
         buildApiUrl(`/api/income-expense/${carId}/${previousYear}`),
-        { credentials: "include" }
+        { credentials: `include" }
       );
       if (!response.ok) {
         return { success: true, data: null };
@@ -216,7 +216,7 @@ export function AddEditPaymentModal({
     const value = item[field];
     if (value === null || value === undefined) return 0;
     const numValue = Number(value);
-    return isNaN(numValue) ? 0 : numValue;
+    return, isNaN(numValue) ? 0 : numValue;
   };
 
   // Helper to get value from previous year data by month
@@ -227,10 +227,10 @@ export function AddEditPaymentModal({
     const value = item[field];
     if (value === null || value === undefined) return 0;
     const numValue = Number(value);
-    return isNaN(numValue) ? 0 : numValue;
+    return, isNaN(numValue) ? 0 : numValue;
   };
 
-  // Helper to get total Direct Delivery for a month (including dynamic subcategories)
+  // Helper to get total Direct Delivery for a, month(including dynamic subcategories)
   const getTotalDirectDeliveryForMonth = (monthNum: number): number => {
     if (!incomeExpenseDataValue) return 0;
     const fixedTotal = (
@@ -247,7 +247,7 @@ export function AddEditPaymentModal({
     return fixedTotal + dynamicTotal;
   };
 
-  // Helper to get total COGS for a month (including dynamic subcategories)
+  // Helper to get total COGS for a, month(including dynamic subcategories)
   const getTotalCogsForMonth = (monthNum: number): number => {
     if (!incomeExpenseDataValue) return 0;
     const fixedTotal = (
@@ -283,7 +283,7 @@ export function AddEditPaymentModal({
     return fixedTotal + dynamicTotal;
   };
 
-  // Helper to get total parking fee & labor for a month (including dynamic subcategories)
+  // Helper to get total parking fee & labor for a, month(including dynamic subcategories)
   const getTotalParkingFeeLaborForMonth = (monthNum: number): number => {
     if (!incomeExpenseDataValue) return 0;
     const fixedTotal = (
@@ -297,7 +297,7 @@ export function AddEditPaymentModal({
     return fixedTotal + dynamicTotal;
   };
 
-  // Calculate Negative Balance Carry Over (simplified version for modal)
+  // Calculate Negative Balance Carry, Over(simplified version for modal)
   const calculateNegativeBalanceCarryOver = (monthNum: number): number => {
     if (!incomeExpenseDataValue || !year) return 0;
     const currentYear = parseInt(String(year), 10);
@@ -385,7 +385,7 @@ export function AddEditPaymentModal({
     }
   };
 
-  // Calculate Car Owner Split (same logic as earnings.tsx)
+  // Calculate Car Owner, Split(same logic as earnings.tsx)
   const calculateCarOwnerSplit = (monthNum: number): number => {
     if (!incomeExpenseDataValue || !year || !monthNum) return 0;
     
@@ -423,7 +423,7 @@ export function AddEditPaymentModal({
                          totalDirectDelivery - totalCogs) * ownerPercent;
           const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
-        } else if ((skiRacksOwner[monthNum] || "GLA") === "GLA") {
+        } else, if((skiRacksOwner[monthNum] || "GLA") === "GLA") {
           const part1 = milesIncome + (smokingFines * 0.1);
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                          gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
@@ -449,7 +449,7 @@ export function AddEditPaymentModal({
                          insuranceWreckIncome - smokingFines - otherIncome) * ownerPercent;
           const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
-        } else if ((skiRacksOwner[monthNum] || "GLA") === "GLA") {
+        } else, if((skiRacksOwner[monthNum] || "GLA") === "GLA") {
           const part1 = milesIncome - totalDirectDelivery - totalCogs - totalParkingFeeLabor + 
                         negativeBalanceCarryOver + (smokingFines * 0.1);
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
@@ -467,7 +467,7 @@ export function AddEditPaymentModal({
           return calculation >= 0 ? calculation : 0;
         }
       }
-    } else if (isYear2019To2025) {
+    } else, if(isYear2019To2025) {
       if (mode === 50) {
         const part1 = milesIncome + (skiRacksIncome * ownerPercent + childSeatIncome * ownerPercent + 
                       coolersIncome * ownerPercent + insuranceWreckIncome * ownerPercent + 
@@ -492,7 +492,7 @@ export function AddEditPaymentModal({
     return 0;
   };
 
-  // Initialize form with payment data (for edit mode)
+  // Initialize form with payment, data(for edit mode)
   useEffect(() => {
     if (payment) {
       setYearMonth(payment.payments_year_month);
@@ -502,23 +502,23 @@ export function AddEditPaymentModal({
       setBalance(payment.payments_amount_balance.toString());
       setReferenceNumber(payment.payments_reference_number || "");
       
-      // Format payment date for input field (YYYY-MM-DD)
+      // Format payment date for input, field(YYYY-MM-DD)
       if (payment.payments_invoice_date) {
-        const date = new Date(payment.payments_invoice_date);
+        const date = new, Date(payment.payments_invoice_date);
         const formattedDate = date.toISOString().split('T')[0];
         setPaymentDate(formattedDate);
       } else {
         setPaymentDate("");
       }
       
-      setRemarks(payment.payments_remarks || "");
+      setRemarks(payment.payments_remarks || "`);
       setReceiptFiles([]);
     } else {
       // Reset form for new payment
-      const today = new Date();
+      const today = new, Date();
       const defaultYearMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
       setYearMonth(defaultYearMonth);
-      setStatusId("");
+      setStatusId(`");
       setPayable("0");
       setPayout("0");
       setBalance("0");
@@ -529,8 +529,7 @@ export function AddEditPaymentModal({
     }
   }, [payment, isOpen]);
 
-  // Auto-calculate balance when payout or payable changes
-  useEffect(() => {
+  // Auto-calculate balance when payout or payable changes, useEffect(() => {
     const payoutNum = parseFloat(payout) || 0;
     const payableNum = parseFloat(payable) || 0;
     const balanceNum = payoutNum - payableNum;
@@ -538,13 +537,13 @@ export function AddEditPaymentModal({
   }, [payout, payable]);
 
   // Update payable when income/expense data is fetched and year/month changes
-  // Always calculate from income/expense data (both add and edit modes)
+  // Always calculate from income/expense, data(both add and edit modes)
   useEffect(() => {
     if (year && month && incomeExpenseData?.success && incomeExpenseData?.data) {
       // Calculate car owner split for the selected month
       const ownerSplit = calculateCarOwnerSplit(month);
       setPayable(ownerSplit.toFixed(2));
-    } else if (year && month && incomeExpenseData && !incomeExpenseData.success) {
+    } else, if(year && month && incomeExpenseData && !incomeExpenseData.success) {
       // If income/expense data not found, set to 0
       setPayable("0.00");
     }
@@ -558,8 +557,7 @@ export function AddEditPaymentModal({
       const newFiles = Array.from(files);
       setReceiptFiles((prev) => [...prev, ...newFiles]);
     }
-    // Reset input value so the same file can be selected again
-    if (fileInputRef.current) {
+    // Reset input value so the same file can be selected again, if(fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
@@ -575,7 +573,7 @@ export function AddEditPaymentModal({
       const url = buildApiUrl("/api/payments");
       
       // Create FormData for file uploads
-      const formData = new FormData();
+      const formData = new, FormData();
       formData.append("paymentsClientId", data.paymentsClientId.toString());
       formData.append("paymentsStatusId", data.paymentsStatusId.toString());
       formData.append("paymentsCarId", data.paymentsCarId.toString());
@@ -587,21 +585,20 @@ export function AddEditPaymentModal({
       formData.append("paymentsInvoiceDate", data.paymentsInvoiceDate || "");
       formData.append("paymentsRemarks", data.paymentsRemarks || "");
       
-      // Append receipt files
-      if (data.receiptFiles && data.receiptFiles.length > 0) {
+      // Append receipt files, if(data.receiptFiles && data.receiptFiles.length > 0) {
         data.receiptFiles.forEach((file: File) => {
           formData.append("receiptFiles", file);
         });
       }
       
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         method: "POST",
         credentials: "include",
         body: formData,
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || error.error || "Failed to create payment");
+        throw new, Error(error.message || error.error || "Failed to create payment");
       }
       return response.json();
     },
@@ -625,12 +622,12 @@ export function AddEditPaymentModal({
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      if (!payment) throw new Error("No payment to update");
+      if (!payment) throw new, Error("No payment to update`);
       const url = buildApiUrl(`/api/payments/${payment.payments_aid}`);
       
       // Create FormData for file uploads
-      const formData = new FormData();
-      formData.append("paymentsClientId", data.paymentsClientId.toString());
+      const formData = new, FormData();
+      formData.append(`paymentsClientId", data.paymentsClientId.toString());
       formData.append("paymentsStatusId", data.paymentsStatusId.toString());
       formData.append("paymentsCarId", data.paymentsCarId.toString());
       formData.append("paymentsYearMonth", data.paymentsYearMonth);
@@ -641,21 +638,20 @@ export function AddEditPaymentModal({
       formData.append("paymentsInvoiceDate", data.paymentsInvoiceDate || "");
       formData.append("paymentsRemarks", data.paymentsRemarks || "");
       
-      // Append receipt files
-      if (data.receiptFiles && data.receiptFiles.length > 0) {
+      // Append receipt files, if(data.receiptFiles && data.receiptFiles.length > 0) {
         data.receiptFiles.forEach((file: File) => {
           formData.append("receiptFiles", file);
         });
       }
       
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         method: "PUT",
         credentials: "include",
         body: formData,
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || error.error || "Failed to update payment");
+        throw new, Error(error.message || error.error || "Failed to update payment");
       }
       return response.json();
     },
@@ -679,8 +675,7 @@ export function AddEditPaymentModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
-    if (!yearMonth) {
+    // Validation, if(!yearMonth) {
       toast({
         title: "Validation Error",
         description: "Please select a year/month",
@@ -770,7 +765,7 @@ export function AddEditPaymentModal({
             />
           </div>
 
-          {/* Payable Amount (Read-only, auto-filled from Income & Expense) */}
+          {/* Payable, Amount(Read-only, auto-filled from Income & Expense) */}
           <div>
             <Label htmlFor="payable" className="text-muted-foreground">
               Payable (Owner's Split)
@@ -914,7 +909,7 @@ export function AddEditPaymentModal({
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isPending}
-                className="w-full bg-muted border-border text-foreground hover:bg-muted"
+                className="w-full bg-muted border-border text-foreground, hover:bg-muted"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 {receiptFiles.length > 0 ? "Add More Files" : "Upload Receipt"}
@@ -949,7 +944,7 @@ export function AddEditPaymentModal({
                         size="sm"
                         onClick={() => handleRemoveFile(index)}
                         disabled={isPending}
-                        className="text-red-700 hover:text-red-700 hover:bg-red-400/10 ml-2"
+                        className="text-red-700, hover:text-red-700, hover:bg-red-400/10 ml-2"
                       >
                         <X className="w-4 h-4" />
                       </Button>
@@ -983,14 +978,14 @@ export function AddEditPaymentModal({
               variant="outline"
               onClick={onClose}
               disabled={isPending}
-              className="bg-muted text-foreground hover:bg-muted border-border"
+              className="bg-muted text-foreground, hover:bg-muted border-border"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isPending}
-              className="bg-primary text-primary-foreground hover:bg-primary/80"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80"
             >
               {isPending ? "Saving..." : isEdit ? "Update Payment" : "Create Payment"}
             </Button>

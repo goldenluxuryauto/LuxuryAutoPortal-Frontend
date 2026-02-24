@@ -4,20 +4,19 @@ import { Button } from "@/components/ui/button";
 import SignContract from "@/pages/sign-contract";
 import { useEffect, useRef } from "react";
 
-export default function NotFound() {
+export default function, NotFound() {
   const [location, setLocation] = useLocation();
   const previousLocationRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Store the referrer (previous page) when component mounts
+    // Store the, referrer(previous page) when component mounts
     const referrer = document.referrer;
     if (referrer) {
       try {
-        const referrerUrl = new URL(referrer);
-        const currentUrl = new URL(window.location.href);
+        const referrerUrl = new, URL(referrer);
+        const currentUrl = new, URL(window.location.href);
         
-        // Only store if referrer is from the same origin
-        if (referrerUrl.origin === currentUrl.origin) {
+        // Only store if referrer is from the same origin, if(referrerUrl.origin === currentUrl.origin) {
           previousLocationRef.current = referrerUrl.pathname + referrerUrl.search;
         }
       } catch (e) {
@@ -25,7 +24,7 @@ export default function NotFound() {
       }
     }
     
-    // Also try to get from sessionStorage (set by router or other components)
+    // Also try to get from, sessionStorage(set by router or other components)
     const storedPrevious = sessionStorage.getItem("previousLocation");
     if (storedPrevious && !previousLocationRef.current) {
       previousLocationRef.current = storedPrevious;
@@ -33,25 +32,23 @@ export default function NotFound() {
   }, []);
 
   // Check if this is actually a sign-contract route
-  // Sometimes routes don't match correctly, so we check the URL directly
-  if (location.startsWith("/sign-contract/")) {
+  // Sometimes routes don't match correctly, so we check the URL directly, if(location.startsWith("/sign-contract/")) {
     return <SignContract />;
   }
 
   const handleBack = () => {
-    // Priority 1: Use stored previous location from referrer (most reliable)
+    // Priority, 1: Use stored previous location from, referrer(most reliable)
     if (previousLocationRef.current && previousLocationRef.current !== location) {
       setLocation(previousLocationRef.current);
       return;
     }
     
-    // Priority 2: Try browser history back
+    // Priority, 2: Try browser history back
     // This will navigate to the previous page in browser history
     try {
       window.history.back();
     } catch (e) {
-      // If history.back() fails, fall back to home
-      setLocation("/");
+      // If history.back() fails, fall back to home, setLocation("/");
     }
   };
 
@@ -61,7 +58,7 @@ export default function NotFound() {
         <div className="w-20 h-20 rounded-full bg-[#EAEB80]/10 flex items-center justify-center mx-auto mb-8">
           <Construction className="w-10 h-10 text-primary" />
         </div>
-        <h1 className="font-serif text-4xl lg:text-6xl font-light text-foreground mb-4">
+        <h1 className="font-serif text-4xl, lg:text-6xl font-light text-foreground mb-4">
           Under Development
         </h1>
         <p className="text-xl text-muted-foreground mb-2">
@@ -73,7 +70,7 @@ export default function NotFound() {
         <Button 
           onClick={handleBack}
           size="lg" 
-          className="bg-primary text-primary-foreground hover:bg-primary/80"
+          className="bg-primary text-primary-foreground, hover:bg-primary/80"
           data-testid="button-back"
         >
           <ArrowLeft className="mr-2 w-4 h-4" />

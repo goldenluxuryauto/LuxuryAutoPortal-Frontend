@@ -24,15 +24,15 @@ interface TutorialModule {
   steps?: TutorialStep[];
 }
 
-export default function ClientTrainingManual() {
+export default function, ClientTrainingManual() {
   const { resetTutorial } = useTutorial();
-  const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set());
+  const [expandedModules, setExpandedModules] = useState<Set<number>>(new, Set());
   const [stepVideoState, setStepVideoState] = useState<Record<number, { loading: boolean; error: boolean }>>({});
 
   const { data: modulesData, isLoading: modulesLoading } = useQuery<{ success: boolean; data: TutorialModule[] }>({
     queryKey: ["/api/tutorial/modules", "client"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/tutorial/modules?role=client"), { credentials: "include" });
+      const res = await, fetch(buildApiUrl("/api/tutorial/modules?role=client"), { credentials: "include" });
       if (!res.ok) return { success: false, data: [] };
       return res.json();
     },
@@ -45,7 +45,7 @@ export default function ClientTrainingManual() {
   }>({
     queryKey: ["/api/tutorial/steps", "client", "with-modules"],
     queryFn: async () => {
-      const res = await fetch(
+      const res = await, fetch(
         buildApiUrl("/api/tutorial/steps?role=client&includeModules=true"),
         { credentials: "include" }
       );
@@ -60,7 +60,7 @@ export default function ClientTrainingManual() {
 
   const toggleModule = (id: number) => {
     setExpandedModules((prev) => {
-      const next = new Set(prev);
+      const next = new, Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
@@ -90,7 +90,7 @@ export default function ClientTrainingManual() {
             <button
               type="button"
               onClick={handleStartTutorial}
-              className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground, hover:bg-primary/90"
             >
               <PlayCircle className="w-4 h-4" />
               Start Tutorial
@@ -142,7 +142,7 @@ export default function ClientTrainingManual() {
                   </CardHeader>
                   {isExpanded && (
                     <CardContent className="pt-0">
-                      <div className="grid gap-4 md:grid-cols-2">
+                      <div className="grid gap-4, md:grid-cols-2">
                         {steps.map((step) => (
                           <Card key={step.id} className="bg-card border-border">
                             <CardContent className="p-4 space-y-3">
@@ -174,7 +174,7 @@ export default function ClientTrainingManual() {
                                             href={step.videoUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="mt-2 text-primary hover:underline"
+                                            className="mt-2 text-primary, hover:underline"
                                           >
                                             Open in new tab
                                           </a>
@@ -218,7 +218,7 @@ export default function ClientTrainingManual() {
                                   {step.actionButton.href ? (
                                     <a
                                       href={step.actionButton.href}
-                                      className="text-primary hover:underline"
+                                      className="text-primary, hover:underline"
                                     >
                                       {step.actionButton.label}
                                     </a>

@@ -98,9 +98,9 @@ interface Employee {
   fullname?: string;
 }
 
-function formatDate(dateString: string) {
+function, formatDate(dateString: string) {
   try {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new, Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -110,24 +110,24 @@ function formatDate(dateString: string) {
   }
 }
 
-function orDash(val: string | null | undefined): string {
+function, orDash(val: string | null | undefined): string {
   return (val ?? "").trim() || "—";
 }
 
 /** V1-style fallback for empty values */
-function unspecified(val: string | null | undefined): string {
+function, unspecified(val: string | null | undefined): string {
   return (val ?? "").trim() || "Unspecified";
 }
 
-function formatCurrency(val: string | number | null | undefined): string {
+function, formatCurrency(val: string | number | null | undefined): string {
   const n = parseFloat(String(val ?? 0));
-  return isNaN(n) ? "$0.00" : `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return, isNaN(n) ? "$0.00` : `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-function formatDateTime(dateString: string | null | undefined): string {
-  if (!dateString) return "—";
+function, formatDateTime(dateString: string | null | undefined): string {
+  if (!dateString) return `—";
   try {
-    const d = new Date(dateString);
+    const d = new, Date(dateString);
     return d.toLocaleString("en-US", {
       month: "short",
       day: "2-digit",
@@ -141,17 +141,17 @@ function formatDateTime(dateString: string | null | undefined): string {
   }
 }
 
-function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess: () => void }) {
+function, AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess: () => void }) {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
-  const [effectiveStart, setEffectiveStart] = useState(new Date().toISOString().slice(0, 10));
-  const [payType, setPayType] = useState("hourly");
+  const [effectiveStart, setEffectiveStart] = useState(new, Date().toISOString().slice(0, 10));
+  const [payType, setPayType] = useState("hourly`);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/rate-history`), {
-        method: "POST",
+      const res = await, fetch(buildApiUrl(`/api/employees/${employeeId}/rate-history`), {
+        method: `POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
@@ -162,7 +162,7 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || "Failed to add rate");
+        throw new, Error(err?.error || "Failed to add rate");
       }
       return res.json();
     },
@@ -171,7 +171,7 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
       queryClient.invalidateQueries({ queryKey: ["/api/employees", employeeId, "rate-history"] });
       setOpen(false);
       setAmount("");
-      setEffectiveStart(new Date().toISOString().slice(0, 10));
+      setEffectiveStart(new, Date().toISOString().slice(0, 10));
       onSuccess();
     },
     onError: (e: Error) => {
@@ -180,7 +180,7 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
   });
   return (
     <>
-      <Button size="sm" onClick={() => setOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
+      <Button size="sm" onClick={() => setOpen(true)} className="bg-primary text-primary-foreground, hover:bg-primary/90">
         <Plus className="w-4 h-4 mr-2" />
         Add New Rate
       </Button>
@@ -218,7 +218,7 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
               />
             </div>
             <div>
-              <Label className="text-muted-foreground">Rate Amount ($)</Label>
+              <Label className="text-muted-foreground">Rate, Amount($)</Label>
               <Input
                 type="number"
                 step="0.01"
@@ -235,7 +235,7 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
               <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-border">
                 Cancel
               </Button>
-              <Button type="submit" disabled={mutation.isPending || !amount} className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button type="submit" disabled={mutation.isPending || !amount} className="bg-primary text-primary-foreground, hover:bg-primary/90">
                 {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add Rate"}
               </Button>
             </DialogFooter>
@@ -246,7 +246,7 @@ function AddRateModal({ employeeId, onSuccess }: { employeeId: number; onSuccess
   );
 }
 
-export default function EmployeeViewPage() {
+export default function, EmployeeViewPage() {
   const { toast } = useToast();
   const [location] = useLocation();
   const [activeSection, setActiveSection] = useState<ProfileSection>("personal-information");
@@ -257,7 +257,7 @@ export default function EmployeeViewPage() {
   const [editJobOpen, setEditJobOpen] = useState(false);
   const [editPayOpen, setEditPayOpen] = useState(false);
   const employeeId = useMemo(() => {
-    const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+    const params = new, URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
     const id = params.get("employeeId");
     return id ? parseInt(id, 10) : null;
   }, [location]);
@@ -265,9 +265,9 @@ export default function EmployeeViewPage() {
   const { data, isLoading, error, refetch } = useQuery<{ success: boolean; data: Employee }>({
     queryKey: ["/api/employees", employeeId],
     queryFn: async () => {
-      if (!employeeId) throw new Error("Invalid employee");
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch employee");
+      if (!employeeId) throw new, Error("Invalid employee`);
+      const res = await, fetch(buildApiUrl(`/api/employees/${employeeId}`), { credentials: `include" });
+      if (!res.ok) throw new, Error("Failed to fetch employee");
       return res.json();
     },
     enabled: !!employeeId,
@@ -276,50 +276,50 @@ export default function EmployeeViewPage() {
   const employee = data?.data;
 
   const { data: rateHistoryData, isLoading: rateHistoryLoading, refetch: refetchRateHistory } = useQuery<{ success: boolean; data: { rate_history_aid: number; rate_history_amount: string; rate_history_date: string; rate_history_created?: string; rate_history_pay_type?: string; rate_history_effective_start?: string; rate_history_effective_end?: string | null }[] }>({
-    queryKey: ["/api/employees", employeeId, "rate-history"],
+    queryKey: ["/api/employees", employeeId, "rate-history`],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/rate-history`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch rate history");
+      const res = await, fetch(buildApiUrl(`/api/employees/${employeeId}/rate-history`), { credentials: `include" });
+      if (!res.ok) throw new, Error("Failed to fetch rate history");
       return res.json();
     },
     enabled: !!employeeId && activeSection === "rate-history",
   });
 
   const { data: jobHistoryData, isLoading: jobHistoryLoading } = useQuery<{ success: boolean; data: { employment_history_aid: number; employment_history_company_name: string; employment_history_years_deployed: string; employment_history_start_date: string; employment_history_end_date: string; employment_history_is_active: number }[] }>({
-    queryKey: ["/api/employees", employeeId, "employment-history"],
+    queryKey: ["/api/employees", employeeId, "employment-history`],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/employment-history`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch employment history");
+      const res = await, fetch(buildApiUrl(`/api/employees/${employeeId}/employment-history`), { credentials: `include" });
+      if (!res.ok) throw new, Error("Failed to fetch employment history");
       return res.json();
     },
     enabled: !!employeeId && activeSection === "job-history",
   });
 
   const { data: earningsData, isLoading: earningsLoading } = useQuery<{ success: boolean; data: { hris_earning_deduction_aid: number; hris_earning_deduction_amount: string; hris_earning_deduction_date: string; hris_earning_deduction_is_paid: number; payitem_name?: string }[] }>({
-    queryKey: ["/api/employees", employeeId, "earnings"],
+    queryKey: ["/api/employees", employeeId, "earnings`],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/earnings`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch earnings");
+      const res = await, fetch(buildApiUrl(`/api/employees/${employeeId}/earnings`), { credentials: `include" });
+      if (!res.ok) throw new, Error("Failed to fetch earnings");
       return res.json();
     },
     enabled: !!employeeId && activeSection === "earnings",
   });
 
   const { data: deductionsData, isLoading: deductionsLoading } = useQuery<{ success: boolean; data: { hris_earning_deduction_aid: number; hris_earning_deduction_amount: string; hris_earning_deduction_date: string; hris_earning_deduction_is_paid: number; payitem_name?: string }[] }>({
-    queryKey: ["/api/employees", employeeId, "deductions"],
+    queryKey: ["/api/employees", employeeId, "deductions`],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/deductions`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch deductions");
+      const res = await, fetch(buildApiUrl(`/api/employees/${employeeId}/deductions`), { credentials: `include" });
+      if (!res.ok) throw new, Error("Failed to fetch deductions");
       return res.json();
     },
     enabled: !!employeeId && activeSection === "deduction",
   });
 
   const { data: payslipsData, isLoading: payslipsLoading } = useQuery<{ success: boolean; data: { payrun_list_aid: number; payrun_number?: string; payrun_status?: number; payrun_list_gross: string; payrun_list_deduction: string; payrun_list_net: string }[] }>({
-    queryKey: ["/api/employees", employeeId, "payslips"],
+    queryKey: ["/api/employees", employeeId, "payslips`],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/payslips`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch payslips");
+      const res = await, fetch(buildApiUrl(`/api/employees/${employeeId}/payslips`), { credentials: `include" });
+      if (!res.ok) throw new, Error("Failed to fetch payslips");
       return res.json();
     },
     enabled: !!employeeId && activeSection === "payslip",
@@ -328,8 +328,8 @@ export default function EmployeeViewPage() {
   const { data: unpaidPayrollData } = useQuery<{ success: boolean; count: number }>({
     queryKey: ["/api/payroll/unpaid-count"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/payroll/unpaid-count"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch");
+      const res = await, fetch(buildApiUrl("/api/payroll/unpaid-count"), { credentials: "include" });
+      if (!res.ok) throw new, Error("Failed to fetch");
       return res.json();
     },
     enabled: !!employeeId && (activeSection === "job-and-pay" || activeSection === "rate-history"),
@@ -337,7 +337,7 @@ export default function EmployeeViewPage() {
 
   const canEditPay = (unpaidPayrollData?.count ?? 0) === 0;
   const isPending = employee?.employee_status === "pending";
-  const isOffboarded = employee?.employee_status === "offboarded" || employee?.employee_status === "separated";
+  const isOffboarded = employee?.employee_status === "offboarded" || employee?.employee_status === "separated`;
   const isActive = !isPending && !isOffboarded && employee?.employee_is_active === 1;
   const [offboarding, setOffboarding] = useState(false);
 
@@ -345,18 +345,18 @@ export default function EmployeeViewPage() {
     if (!employee || !confirm(`End contract for ${employee.employee_last_name}, ${employee.employee_first_name}? This will deactivate their system access.`)) return;
     setOffboarding(true);
     try {
-      const res = await fetch(buildApiUrl(`/api/employees/${employee.employee_aid}/offboard`), {
-        method: "POST",
+      const res = await, fetch(buildApiUrl(`/api/employees/${employee.employee_aid}/offboard`), {
+        method: `POST",
         credentials: "include",
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Failed to offboard");
+        throw new, Error(err.error || "Failed to offboard");
       }
       toast({ title: "Contract ended", description: "Employee has been offboarded and system access deactivated." });
       refetch();
     } catch (e: any) {
-      toast({ title: "Error", description: e.message || "Failed to offboard", variant: "destructive" });
+      toast({ title: "Error", description: e.message || "Failed to offboard", variant: "destructive` });
     } finally {
       setOffboarding(false);
     }
@@ -365,28 +365,28 @@ export default function EmployeeViewPage() {
   const handleApprove = async () => {
     if (!employee) return;
     try {
-      const res = await fetch(buildApiUrl(`/api/employees/${employee.employee_aid}/status`), {
-        method: "PATCH",
+      const res = await, fetch(buildApiUrl(`/api/employees/${employee.employee_aid}/status`), {
+        method: `PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ status: "" }),
       });
-      if (!res.ok) throw new Error("Failed to approve");
+      if (!res.ok) throw new, Error("Failed to approve");
       toast({ title: "Approved", description: "Employee approved successfully." });
       refetch();
     } catch (e: any) {
-      toast({ title: "Error", description: e.message || "Failed to approve", variant: "destructive" });
+      toast({ title: "Error", description: e.message || "Failed to approve", variant: "destructive` });
     }
   };
 
   const handleDelete = async () => {
     if (!employee || !confirm(`Delete ${employee.employee_last_name}, ${employee.employee_first_name}?`)) return;
     try {
-      const res = await fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
-        method: "DELETE",
+      const res = await, fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
+        method: `DELETE",
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to delete");
+      if (!res.ok) throw new, Error("Failed to delete");
       toast({ title: "Deleted", description: "Employee deleted successfully." });
       window.location.href = "/admin/hr/employees";
     } catch (e: any) {
@@ -400,7 +400,7 @@ export default function EmployeeViewPage() {
         <div className="p-6 text-center text-muted-foreground">
           <p>Invalid employee ID.</p>
           <Link href="/admin/hr/employees">
-            <Button className="mt-4 bg-primary text-primary-foreground hover:bg-primary/80">
+            <Button className="mt-4 bg-primary text-primary-foreground, hover:bg-primary/80">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Employees
             </Button>
@@ -426,8 +426,8 @@ export default function EmployeeViewPage() {
         <div className="p-6 text-center">
           <p className="text-red-700">Employee not found.</p>
           <Link href="/admin/hr/employees">
-            <Button className="mt-4 bg-primary text-primary-foreground hover:bg-primary/80">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+            <Button className="mt-4 bg-primary text-primary-foreground, hover:bg-primary/80">
+              <ArrowLeft className="w-4 h-4 mr-2` />
               Back to Employees
             </Button>
           </Link>
@@ -440,16 +440,16 @@ export default function EmployeeViewPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className=`space-y-6">
+        <div className="flex flex-col, sm:flex-row, sm:items-center, sm:justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link href="/admin/hr/employees">
-              <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10">
+              <Button variant="ghost" size="sm" className="text-primary, hover:bg-primary/10">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
             </Link>
-            <h1 className="text-xl sm:text-2xl font-serif text-primary italic">
+            <h1 className="text-xl, sm:text-2xl font-serif text-primary italic">
               {fullName}
             </h1>
             {isPending && (
@@ -480,7 +480,7 @@ export default function EmployeeViewPage() {
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
-                className="bg-green-600 hover:bg-green-700 text-foreground"
+                className="bg-green-600, hover:bg-green-700 text-foreground"
                 onClick={handleApprove}
               >
                 <UserCheck className="w-4 h-4 mr-2" />
@@ -494,22 +494,22 @@ export default function EmployeeViewPage() {
           )}
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col, lg:flex-row gap-6">
           {/* Section navigation list */}
-          <div className="w-full lg:w-72 shrink-0">
+          <div className="w-full, lg:w-72 shrink-0">
             <ul className="rounded-lg border border-border bg-card overflow-hidden">
               {PROFILE_SECTIONS.map((section) => {
                 const isActive = activeSection === section.id;
                 return (
                   <li key={section.id}>
                     <button
-                      type="button"
+                      type="button`
                       onClick={() => setActiveSection(section.id)}
-                      className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-card ${
+                      className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition-colors, hover:bg-card ${
                         isActive ? "bg-[#EAEB80]/15 text-primary" : "text-muted-foreground"
                       }`}
                     >
-                      <span className="flex items-center gap-2">
+                      <span className=`flex items-center gap-2">
                         <User className="h-4 w-4 shrink-0" />
                         <span>{section.label}</span>
                       </span>
@@ -527,9 +527,9 @@ export default function EmployeeViewPage() {
           {/* Section content */}
           <div className="flex-1 min-w-0">
             {activeSection === "personal-information" && (
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 text-sm xl:items-stretch">
+                <div className="grid grid-cols-1, xl:grid-cols-2 gap-5 text-sm, xl:items-stretch">
                   {/* Basic Information - v1 exact structure */}
-                  <Card className="bg-card border-border xl:h-full flex flex-col order-1">
+                  <Card className="bg-card border-border, xl:h-full flex flex-col order-1">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                           <div className="flex items-center gap-2">
@@ -539,7 +539,7 @@ export default function EmployeeViewPage() {
                           <button
                             type="button"
                             onClick={() => setEditBasicOpen(true)}
-                            className="flex items-center gap-2 py-2 text-blue-700 hover:underline"
+                            className="flex items-center gap-2 py-2 text-blue-700, hover:underline"
                           >
                             <Pencil className="h-3 w-3" />
                             <span>Update</span>
@@ -555,23 +555,23 @@ export default function EmployeeViewPage() {
                                 className="h-20 w-20 rounded-full object-cover object-center"
                               />
                             ) : (
-                              <div className="h-20 w-20 rounded-full border-2 border-border flex items-center justify-center" title="No photo uploaded (optional)">
+                              <div className="h-20 w-20 rounded-full border-2 border-border flex items-center justify-center" title="No photo, uploaded(optional)">
                                 <Image className="h-10 w-10 text-muted-foreground" />
                               </div>
                             )}
                           </div>
                           <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
-                            <li className="font-bold text-muted-foreground">First Name:</li>
+                            <li className="font-bold text-muted-foreground">First, Name:</li>
                             <li>{unspecified(employee.employee_first_name)}</li>
-                            <li className="font-bold text-muted-foreground">Middle Name:</li>
+                            <li className="font-bold text-muted-foreground">Middle, Name:</li>
                             <li>{unspecified(employee.employee_middle_name)}</li>
-                            <li className="font-bold text-muted-foreground">Last Name:</li>
+                            <li className="font-bold text-muted-foreground">Last, Name:</li>
                             <li>{unspecified(employee.employee_last_name)}</li>
-                            <li className="font-bold text-muted-foreground">Birth Date:</li>
+                            <li className="font-bold text-muted-foreground">Birth, Date:</li>
                             <li>{employee.employee_birthday ? formatDate(employee.employee_birthday) : "Unspecified"}</li>
-                            <li className="font-bold text-muted-foreground">Marital Status:</li>
+                            <li className="font-bold text-muted-foreground">Marital, Status:</li>
                             <li>{unspecified(employee.employee_marital_status)}</li>
-                            <li className="font-bold text-muted-foreground">Social Security Number or EIN:</li>
+                            <li className="font-bold text-muted-foreground">Social Security Number or, EIN:</li>
                             <li>{unspecified(employee.employee_ssn_ein)}</li>
                             <li className="font-bold text-muted-foreground">Street:</li>
                             <li>{unspecified(employee.employee_street)}</li>
@@ -579,17 +579,17 @@ export default function EmployeeViewPage() {
                             <li>{unspecified(employee.employee_city)}</li>
                             <li className="font-bold text-muted-foreground">State:</li>
                             <li>{unspecified(employee.employee_state)}</li>
-                            <li className="font-bold text-muted-foreground">Zip Code:</li>
+                            <li className="font-bold text-muted-foreground">Zip, Code:</li>
                             <li>{unspecified(employee.employee_zip_code)}</li>
                             <li className="font-bold text-muted-foreground">Country:</li>
                             <li>{unspecified(employee.employee_country)}</li>
-                            <li className="font-bold text-muted-foreground">Mobile Number:</li>
+                            <li className="font-bold text-muted-foreground">Mobile, Number:</li>
                             <li>{unspecified(employee.employee_mobile_number)}</li>
-                            <li className="font-bold text-muted-foreground">Telephone Number:</li>
+                            <li className="font-bold text-muted-foreground">Telephone, Number:</li>
                             <li>{unspecified(employee.employee_telephone)}</li>
-                            <li className="font-bold text-muted-foreground">Personal Email:</li>
+                            <li className="font-bold text-muted-foreground">Personal, Email:</li>
                             <li className="break-words">{unspecified(employee.employee_email)}</li>
-                            <li className="font-bold text-muted-foreground">Shirt Size:</li>
+                            <li className="font-bold text-muted-foreground">Shirt, Size:</li>
                             <li>{unspecified(employee.employee_shirt_size)}</li>
                           </ul>
                         </div>
@@ -597,7 +597,7 @@ export default function EmployeeViewPage() {
                     </Card>
 
                   {/* Other Information - v1 (same row as Basic on xl for equal height) */}
-                  <Card className="bg-card border-border xl:h-full flex flex-col order-4 xl:order-2">
+                  <Card className="bg-card border-border, xl:h-full flex flex-col order-4, xl:order-2">
                     <CardContent className="p-4 flex flex-col flex-1">
                       <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                         <div className="flex items-center gap-2">
@@ -607,7 +607,7 @@ export default function EmployeeViewPage() {
                         <button
                           type="button"
                           onClick={() => setEditOtherOpen(true)}
-                          className="flex items-center gap-2 py-2 text-blue-700 hover:underline"
+                          className="flex items-center gap-2 py-2 text-blue-700, hover:underline"
                         >
                           <Pencil className="h-3 w-3" />
                           <span>Update</span>
@@ -648,7 +648,7 @@ export default function EmployeeViewPage() {
                             )}
                           </div>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-[18rem,1fr] gap-2">
+                        <div className="grid grid-cols-1, sm:grid-cols-[18rem,1fr] gap-2">
                           <p className="font-bold text-muted-foreground">How did you hear about Golden Luxury Auto?</p>
                           <p className="text-muted-foreground">{unspecified(employee.employee_hear_about_gla)}</p>
                         </div>
@@ -657,7 +657,7 @@ export default function EmployeeViewPage() {
                   </Card>
 
                   {/* Family Information - v1 exact structure */}
-                  <Card className="bg-card border-border order-2 xl:order-3">
+                  <Card className="bg-card border-border order-2, xl:order-3">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                           <div className="flex items-center gap-2">
@@ -667,7 +667,7 @@ export default function EmployeeViewPage() {
                           <button
                             type="button"
                             onClick={() => setEditFamilyOpen(true)}
-                            className="flex items-center gap-2 py-2 text-blue-700 hover:underline"
+                            className="flex items-center gap-2 py-2 text-blue-700, hover:underline"
                           >
                             <Pencil className="h-3 w-3" />
                             <span>Update</span>
@@ -675,13 +675,13 @@ export default function EmployeeViewPage() {
                         </div>
                         <div className="mt-3">
                           <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
-                            <li className="font-bold text-muted-foreground">Mother's First Name:</li>
+                            <li className="font-bold text-muted-foreground">Mother's First, Name:</li>
                             <li>{unspecified(employee.employee_mother_name)}</li>
-                            <li className="font-bold text-muted-foreground">Father's First Name:</li>
+                            <li className="font-bold text-muted-foreground">Father's First, Name:</li>
                             <li>{unspecified(employee.employee_father_name)}</li>
-                            <li className="font-bold text-muted-foreground">Home Contact:</li>
+                            <li className="font-bold text-muted-foreground">Home, Contact:</li>
                             <li>{unspecified(employee.employee_home_contact)}</li>
-                            <li className="font-bold text-muted-foreground">Family Home Address:</li>
+                            <li className="font-bold text-muted-foreground">Family Home, Address:</li>
                             <li className="break-words">{unspecified(employee.employee_home_address)}</li>
                           </ul>
                         </div>
@@ -689,7 +689,7 @@ export default function EmployeeViewPage() {
                     </Card>
 
                   {/* Emergency Contact - v1 */}
-                  <Card className="bg-card border-border order-3 xl:order-4">
+                  <Card className="bg-card border-border order-3, xl:order-4">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between border-b border-border pb-2 mb-3">
                         <div className="flex items-center gap-2">
@@ -699,7 +699,7 @@ export default function EmployeeViewPage() {
                           <button
                             type="button"
                             onClick={() => setEditEmergencyOpen(true)}
-                            className="flex items-center gap-2 py-2 text-blue-700 hover:underline"
+                            className="flex items-center gap-2 py-2 text-blue-700, hover:underline"
                           >
                             <Pencil className="h-3 w-3" />
                             <span>Update</span>
@@ -731,24 +731,24 @@ export default function EmployeeViewPage() {
                         <List className="h-4 w-4 text-primary" />
                         <span className="font-bold uppercase text-[13px] text-primary">Job Information</span>
                       </div>
-                      <button type="button" onClick={() => setEditJobOpen(true)} className="flex items-center gap-2 py-2 text-blue-700 hover:underline">
+                      <button type="button" onClick={() => setEditJobOpen(true)} className="flex items-center gap-2 py-2 text-blue-700, hover:underline">
                         <Pencil className="h-3 w-3" /> <span>Update</span>
                       </button>
                     </div>
                     <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                      <li className="font-bold text-muted-foreground">Employee Number:</li>
+                      <li className="font-bold text-muted-foreground">Employee, Number:</li>
                       <li>{unspecified(employee.employee_number)}</li>
                       <li className="font-bold text-muted-foreground">Department:</li>
                       <li>{unspecified(employee.employee_job_pay_department_name)}</li>
-                      <li className="font-bold text-muted-foreground">Job Title:</li>
+                      <li className="font-bold text-muted-foreground">Job, Title:</li>
                       <li>{unspecified(employee.employee_job_pay_job_title_name)}</li>
-                      <li className="font-bold text-muted-foreground">Work Email:</li>
+                      <li className="font-bold text-muted-foreground">Work, Email:</li>
                       <li className="break-words">{unspecified(employee.employee_job_pay_work_email ?? employee.employee_email)}</li>
-                      <li className="font-bold text-muted-foreground">Date Hired:</li>
+                      <li className="font-bold text-muted-foreground">Date, Hired:</li>
                       <li>{employee.employee_job_pay_hired ? formatDate(employee.employee_job_pay_hired) : "Unspecified"}</li>
-                      <li className="font-bold text-muted-foreground">Regularized On:</li>
+                      <li className="font-bold text-muted-foreground">Regularized, On:</li>
                       <li>{employee.employee_job_pay_regular_on ? formatDate(employee.employee_job_pay_regular_on) : "Unspecified"}</li>
-                      <li className="font-bold text-muted-foreground">Date Separated:</li>
+                      <li className="font-bold text-muted-foreground">Date, Separated:</li>
                       <li>{employee.employee_job_pay_separated ? formatDate(employee.employee_job_pay_separated) : "Unspecified"}</li>
                       <li className="font-bold text-muted-foreground">Comment:</li>
                       <li>{unspecified(employee.employee_job_pay_comment)}</li>
@@ -763,7 +763,7 @@ export default function EmployeeViewPage() {
                         <span className="font-bold uppercase text-[13px] text-primary">Pay Information</span>
                       </div>
                       {canEditPay ? (
-                        <button type="button" onClick={() => setEditPayOpen(true)} className="flex items-center gap-2 py-2 text-blue-700 hover:underline">
+                        <button type="button" onClick={() => setEditPayOpen(true)} className="flex items-center gap-2 py-2 text-blue-700, hover:underline">
                           <Pencil className="h-3 w-3" /> <span>Update</span>
                         </button>
                       ) : (
@@ -771,11 +771,11 @@ export default function EmployeeViewPage() {
                       )}
                     </div>
                     <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                      <li className="font-bold text-muted-foreground">Payroll Eligibility:</li>
+                      <li className="font-bold text-muted-foreground">Payroll, Eligibility:</li>
                       <li>{Number(employee.employee_job_pay_eligible) === 1 ? "Eligible" : "Not Eligible"}</li>
-                      <li className="font-bold text-muted-foreground">Employee rate per hour:</li>
+                      <li className="font-bold text-muted-foreground">Employee rate per, hour:</li>
                       <li>{formatCurrency(employee.employee_job_pay_salary_rate)}</li>
-                      <li className="font-bold text-muted-foreground">Bank Account:</li>
+                      <li className="font-bold text-muted-foreground">Bank, Account:</li>
                       <li>{unspecified(employee.employee_job_pay_bank_acc)}</li>
                     </ul>
                   </CardContent>
@@ -815,14 +815,14 @@ export default function EmployeeViewPage() {
                         </thead>
                         <tbody>
                           {rateHistoryData.data.map((row, i) => (
-                            <tr key={row.rate_history_aid} className="border-b border-border/50 hover:bg-card/50">
+                            <tr key={row.rate_history_aid} className="border-b border-border/50, hover:bg-card/50">
                               <td className="py-3 text-center text-muted-foreground">{i + 1}.</td>
-                              <td className="py-3 pl-2">
+                              <td className="py-3 pl-2`>
                                 <span
                                   className={`inline-block w-5 h-5 rounded-full flex-shrink-0 ${
                                     !row.rate_history_effective_end || row.rate_history_effective_end === "" ? "bg-green-500" : "bg-gray-500/50"
                                   }`}
-                                  title={!row.rate_history_effective_end || row.rate_history_effective_end === "" ? "Current rate" : "Previous rate"}
+                                  title={!row.rate_history_effective_end || row.rate_history_effective_end === `" ? "Current rate" : "Previous rate"}
                                 />
                               </td>
                               <td className="py-3 text-muted-foreground capitalize">{row.rate_history_pay_type || "Hourly"}</td>
@@ -877,9 +877,9 @@ export default function EmployeeViewPage() {
                           {jobHistoryData.data.map((row, i) => (
                             <tr key={row.employment_history_aid} className="border-b border-border/50">
                               <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                              <td className="py-2">
+                              <td className="py-2`>
                                 <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${row.employment_history_is_active === 1 ? "bg-green-500/20 text-green-700" : "bg-gray-500/20 text-gray-700"}`}>
-                                  {row.employment_history_is_active === 1 ? "Active" : "Inactive"}
+                                  {row.employment_history_is_active === 1 ? `Active" : "Inactive"}
                                 </span>
                               </td>
                               <td className="py-2 text-muted-foreground">{row.employment_history_company_name || "—"}</td>
@@ -924,9 +924,9 @@ export default function EmployeeViewPage() {
                           {earningsData.data.map((row, i) => (
                             <tr key={row.hris_earning_deduction_aid} className="border-b border-border/50">
                               <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                              <td className="py-2">
+                              <td className="py-2`>
                                 <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                                  {row.hris_earning_deduction_is_paid === 1 ? "Paid" : "Unpaid"}
+                                  {row.hris_earning_deduction_is_paid === 1 ? `Paid" : "Unpaid"}
                                 </span>
                               </td>
                               <td className="py-2 text-muted-foreground">{formatDate(row.hris_earning_deduction_date)}</td>
@@ -970,9 +970,9 @@ export default function EmployeeViewPage() {
                           {deductionsData.data.map((row, i) => (
                             <tr key={row.hris_earning_deduction_aid} className="border-b border-border/50">
                               <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                              <td className="py-2">
+                              <td className="py-2`>
                                 <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                                  {row.hris_earning_deduction_is_paid === 1 ? "Paid" : "Unpaid"}
+                                  {row.hris_earning_deduction_is_paid === 1 ? `Paid" : "Unpaid"}
                                 </span>
                               </td>
                               <td className="py-2 text-muted-foreground">{formatDate(row.hris_earning_deduction_date)}</td>
@@ -1017,9 +1017,9 @@ export default function EmployeeViewPage() {
                           {payslipsData.data.map((row, i) => (
                             <tr key={row.payrun_list_aid} className="border-b border-border/50">
                               <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                              <td className="py-2">
+                              <td className="py-2`>
                                 <span className={`px-2 py-0.5 text-xs rounded-full ${row.payrun_status === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                                  {row.payrun_status === 1 ? "Paid" : "Unpaid"}
+                                  {row.payrun_status === 1 ? `Paid" : "Unpaid"}
                                 </span>
                               </td>
                               <td className="py-2 text-muted-foreground">{row.payrun_number || "—"}</td>

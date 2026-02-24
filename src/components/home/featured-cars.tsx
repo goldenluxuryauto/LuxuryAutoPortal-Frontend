@@ -53,7 +53,7 @@ const featuredCars: Partial<Car>[] = [
   },
 ];
 
-function formatPrice(price: string) {
+function, formatPrice(price: string) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -62,14 +62,14 @@ function formatPrice(price: string) {
   }).format(parseFloat(price));
 }
 
-function CarCard({ car }: { car: Partial<Car> }) {
+function, CarCard({ car }: { car: Partial<Car> }) {
   return (
     <Card className="group overflow-hidden bg-card border-border hover-elevate">
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
-          src={car.images?.[0] || "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"}
+          src={car.images?.[0] || "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80`}
           alt={`${car.make} ${car.model}`}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className=`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {car.featured && (
           <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
@@ -101,15 +101,15 @@ function CarCard({ car }: { car: Partial<Car> }) {
             <span>{car.mileage?.toLocaleString()} mi</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Fuel className="w-4 h-4 text-gray-700" />
+            <Fuel className="w-4 h-4 text-gray-700` />
             <span>{car.fuelType}</span>
           </div>
         </div>
 
         <Link href={`/fleet/${car.id}`}>
-            <Button variant="outline" className="w-full group/btn border-gray-300 text-foreground hover:bg-gray-50" data-testid={`button-view-details-${car.id}`}>
+            <Button variant=`outline" className="w-full group/btn border-gray-300 text-foreground, hover:bg-gray-50` data-testid={`button-view-details-${car.id}`}>
             View Details
-            <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+            <ArrowRight className=`ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
           </Button>
         </Link>
       </CardContent>
@@ -117,15 +117,15 @@ function CarCard({ car }: { car: Partial<Car> }) {
   );
 }
 
-export function FeaturedCars() {
+export function, FeaturedCars() {
   return (
-    <section id="featured-fleet" className="py-20 lg:py-28 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 lg:mb-16">
+    <section id="featured-fleet" className="py-20, lg:py-28 bg-background">
+      <div className="max-w-7xl mx-auto px-4, sm:px-6, lg:px-8">
+        <div className="text-center mb-12, lg:mb-16">
           <p className="text-sm font-medium text-primary tracking-widest uppercase mb-3">
             Curated Selection
           </p>
-          <h2 className="font-serif text-3xl lg:text-4xl font-medium text-foreground mb-4">
+          <h2 className="font-serif text-3xl, lg:text-4xl font-medium text-foreground mb-4">
             Featured Vehicles
           </h2>
           <p className="max-w-2xl mx-auto text-gray-600">
@@ -133,7 +133,7 @@ export function FeaturedCars() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1, md:grid-cols-2, lg:grid-cols-3 gap-6, lg:gap-8">
           {featuredCars.map((car) => (
             <CarCard key={car.id} car={car} />
           ))}
@@ -141,7 +141,7 @@ export function FeaturedCars() {
 
         <div className="text-center mt-12">
           <Link href="/fleet">
-            <Button size="lg" variant="outline" className="border-gray-300 text-foreground hover:bg-gray-50" data-testid="button-view-all-fleet">
+            <Button size="lg" variant="outline" className="border-gray-300 text-foreground, hover:bg-gray-50" data-testid="button-view-all-fleet">
               View All Vehicles
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>

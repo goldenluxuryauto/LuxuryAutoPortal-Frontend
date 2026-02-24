@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec`];
 
 const formatCurrency = (value: number): string => {
   return `$ ${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -46,7 +46,7 @@ const getMonthValue = (arr: any[], month: number, field: string): number => {
   const value = item[field];
   if (value === null || value === undefined) return 0;
   const numValue = Number(value);
-  return isNaN(numValue) ? 0 : numValue;
+  return, isNaN(numValue) ? 0 : numValue;
 };
 
 // Helper to calculate total from array of values
@@ -54,11 +54,11 @@ const calculateTotal = (values: number[]): number => {
   return values.reduce((sum, val) => sum + val, 0);
 };
 
-export default function EarningsPage() {
-  const [, params] = useRoute("/admin/cars/:id/earnings");
+export default function, EarningsPage() {
+  const [, params] = useRoute(`/admin/cars/:id/earnings");
   const [, setLocation] = useLocation();
   const carId = params?.id ? parseInt(params.id, 10) : null;
-  const currentYear = new Date().getFullYear();
+  const currentYear = new, Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<string>(String(currentYear));
   const [expandedSections, setExpandedSections] = useState({
     managementOwner: true,
@@ -91,12 +91,12 @@ export default function EarningsPage() {
   }>({
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       const url = buildApiUrl(`/api/cars/${carId}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
+      if (!response.ok) throw new, Error("Failed to fetch car");
       return response.json();
     },
     enabled: !!carId,
@@ -112,10 +112,10 @@ export default function EarningsPage() {
   }>({
     queryKey: ["/api/income-expense", carId, selectedYear],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
-      const response = await fetch(
+      if (!carId) throw new, Error("Invalid car ID`);
+      const response = await, fetch(
         buildApiUrl(`/api/income-expense/${carId}/${selectedYear}`),
-        { credentials: "include" }
+        { credentials: `include" }
       );
       if (!response.ok) {
         // Return empty data if not found
@@ -137,10 +137,10 @@ export default function EarningsPage() {
   }>({
     queryKey: ["/api/income-expense", carId, previousYear],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
-      const response = await fetch(
+      if (!carId) throw new, Error("Invalid car ID`);
+      const response = await, fetch(
         buildApiUrl(`/api/income-expense/${carId}/${previousYear}`),
-        { credentials: "include" }
+        { credentials: `include" }
       );
       if (!response.ok) {
         // If previous year data doesn't exist, return empty data
@@ -154,14 +154,14 @@ export default function EarningsPage() {
 
   const prevYearDecData = previousYearData?.data;
 
-  // Fetch previous year's dynamic subcategories separately (they might not be in the main API response)
+  // Fetch previous year's dynamic subcategories, separately(they might not be in the main API response)
   const { data: prevYearDynamicSubcategories } = useQuery<{
     directDelivery: any[];
     cogs: any[];
     parkingFeeLabor: any[];
     reimbursedBills: any[];
   }>({
-    queryKey: ["/api/income-expense/dynamic-subcategories", carId, previousYear],
+    queryKey: ["/api/income-expense/dynamic-subcategories`, carId, previousYear],
     queryFn: async () => {
       if (!carId || !previousYear) return { directDelivery: [], cogs: [], parkingFeeLabor: [], reimbursedBills: [] };
       
@@ -174,9 +174,9 @@ export default function EarningsPage() {
       
       const promises = categories.map(async (categoryType) => {
         try {
-          const response = await fetch(
+          const response = await, fetch(
             buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${previousYear}/${categoryType}`),
-            { credentials: "include" }
+            { credentials: `include` }
           );
           if (response.ok) {
             const result = await response.json();
@@ -217,9 +217,9 @@ export default function EarningsPage() {
       reimbursedBills: any[];
     };
   }>({
-    queryKey: ["/api/income-expense/dynamic-subcategories", carId, selectedYear],
+    queryKey: [`/api/income-expense/dynamic-subcategories", carId, selectedYear],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
+      if (!carId) throw new, Error("Invalid car ID`);
       const categories: Array<'directDelivery' | 'cogs' | 'parkingFeeLabor' | 'reimbursedBills'> = [
         'directDelivery',
         'cogs',
@@ -229,9 +229,9 @@ export default function EarningsPage() {
       
       const promises = categories.map(async (categoryType) => {
         try {
-          const response = await fetch(
+          const response = await, fetch(
             buildApiUrl(`/api/income-expense/dynamic-subcategories/${carId}/${selectedYear}/${categoryType}`),
-            { credentials: "include" }
+            { credentials: `include` }
           );
           if (response.ok) {
             const result = await response.json();
@@ -278,18 +278,18 @@ export default function EarningsPage() {
     success: boolean;
     data: any;
   }>({
-    queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
+    queryKey: [`/api/onboarding/vin", car?.vin, "onboarding"],
     queryFn: async () => {
-      if (!car?.vin) throw new Error("No VIN");
+      if (!car?.vin) throw new, Error("No VIN`);
       const url = buildApiUrl(`/api/onboarding/vin/${encodeURIComponent(car.vin)}`);
-      const response = await fetch(url, {
-        credentials: "include",
+      const response = await, fetch(url, {
+        credentials: `include",
       });
       if (!response.ok) {
         if (response.status === 404) {
           return { success: false, data: null };
         }
-        throw new Error("Failed to fetch onboarding");
+        throw new, Error("Failed to fetch onboarding");
       }
       return response.json();
     },
@@ -306,8 +306,8 @@ export default function EarningsPage() {
     }));
   };
 
-  // Helper functions to calculate totals from income-expense data (same as IncomeExpenseTable)
-  // Helper to get total operating expense (Direct Delivery) for a month (including dynamic subcategories)
+  // Helper functions to calculate totals from income-expense, data(same as IncomeExpenseTable)
+  // Helper to get total operating, expense(Direct Delivery) for a, month(including dynamic subcategories)
   const getTotalDirectDeliveryForMonth = (month: number): number => {
     const fixedTotal = (
       getMonthValue(incomeExpenseDataValue?.directDelivery || [], month, "laborCarCleaning") +
@@ -323,7 +323,7 @@ export default function EarningsPage() {
     return fixedTotal + dynamicTotal;
   };
 
-  // Helper to get total operating expense (COGS) for a month (including dynamic subcategories)
+  // Helper to get total operating, expense(COGS) for a, month(including dynamic subcategories)
   const getTotalCogsForMonth = (month: number): number => {
     const fixedTotal = (
       getMonthValue(incomeExpenseDataValue?.cogs || [], month, "autoBodyShopWreck") +
@@ -358,7 +358,7 @@ export default function EarningsPage() {
     return fixedTotal + dynamicTotal;
   };
 
-  // Helper to get total reimbursed bills for a month (including dynamic subcategories)
+  // Helper to get total reimbursed bills for a, month(including dynamic subcategories)
   const getTotalReimbursedBillsForMonth = (month: number): number => {
     const fixedTotal = (
       getMonthValue(incomeExpenseDataValue?.reimbursedBills || [], month, "electricReimbursed") +
@@ -385,10 +385,10 @@ export default function EarningsPage() {
     const value = item[field];
     if (value === null || value === undefined) return 0;
     const numValue = Number(value);
-    return isNaN(numValue) ? 0 : numValue;
+    return, isNaN(numValue) ? 0 : numValue;
   };
 
-  // Helper to get total from previous year for Direct Delivery by month (including dynamic subcategories)
+  // Helper to get total from previous year for Direct Delivery by, month(including dynamic subcategories)
   const getPrevYearTotalDirectDelivery = (month: number): number => {
     if (!prevYearDecData) return 0;
     const data = prevYearDecData;
@@ -411,7 +411,7 @@ export default function EarningsPage() {
     return fixedTotal + dynamicTotal;
   };
 
-  // Helper to get total from previous year for COGS by month (including dynamic subcategories)
+  // Helper to get total from previous year for COGS by, month(including dynamic subcategories)
   const getPrevYearTotalCogs = (month: number): number => {
     if (!prevYearDecData) return 0;
     const data = prevYearDecData;
@@ -453,7 +453,7 @@ export default function EarningsPage() {
     return fixedTotal + dynamicTotal;
   };
 
-  // Helper to get total parking fee & labor cleaning from previous year by month (including dynamic subcategories)
+  // Helper to get total parking fee & labor cleaning from previous year by, month(including dynamic subcategories)
   const getPrevYearTotalParkingFeeLabor = (month: number): number => {
     if (!prevYearDecData) return 0;
     const data = prevYearDecData;
@@ -473,25 +473,25 @@ export default function EarningsPage() {
     return fixedTotal + dynamicTotal;
   };
 
-  // Calculate negative balance carry over for previous year (recursive)
+  // Calculate negative balance carry over for previous, year(recursive)
   // Uses the same formulas as calculateNegativeBalanceCarryOver but for previous year data
-  // Uses CURRENT month's mode (not previous month's mode)
+  // Uses CURRENT month's, mode(not previous month's mode)
   const calculatePrevYearNegativeBalance = (month: number): number => {
     if (!prevYearDecData) return 0;
     
     const prevYear = parseInt(selectedYear, 10) - 1;
     
-    // Year 2019: Always 0
+    // Year, 2019: Always 0
     if (prevYear === 2019) {
       return 0;
     }
     
-    // January of other years (2020+): Use 0 (would need another level of recursion)
+    // January of other, years(2020+): Use 0 (would need another level of recursion)
     if (month === 1 && prevYear > 2019) {
       return 0;
     }
     
-    // Get the CURRENT month's mode from previous year's formulaSetting (not previous month's mode)
+    // Get the CURRENT month's mode from previous year's, formulaSetting(not previous month's mode)
     const currentMonthMode: 50 | 70 = prevYearDecData?.formulaSetting?.monthModes?.[month] || 50;
     
     // For months 2-12, calculate from previous month
@@ -543,19 +543,19 @@ export default function EarningsPage() {
     }
   };
 
-  // Calculate Negative Balance Carry Over (exact copy from IncomeExpenseTable)
+  // Calculate Negative Balance Carry, Over(exact copy from IncomeExpenseTable)
   const calculateNegativeBalanceCarryOver = (month: number): number => {
     const currentYear = parseInt(selectedYear, 10);
     
-    // Year 2019: Always 0
+    // Year, 2019: Always 0
     if (currentYear === 2019) {
       return 0;
     }
     
-    // Get the CURRENT month's mode (not previous month's mode)
+    // Get the CURRENT month's, mode(not previous month's mode)
     const currentMonthMode: 50 | 70 = monthModes[month] || 50;
     
-    // Get all data from previous month (or December of previous year for January)
+    // Get all data from previous, month(or December of previous year for January)
     let prevRentalIncome: number;
     let prevDeliveryIncome: number;
     let prevElectricPrepaidIncome: number;
@@ -573,8 +573,7 @@ export default function EarningsPage() {
     let prevTotalParkingFeeLabor: number;
     let prevCarOwnerSplitPercent: number;
     
-    // January of other years (2020+): Use December of previous year
-    if (month === 1 && currentYear > 2019) {
+    // January of other, years(2020+): Use December of previous year, if(month === 1 && currentYear > 2019) {
       const prevDec = 12;
       // Get all December data from previous year
       prevRentalIncome = getPrevYearValue(prevYearDecData?.incomeExpenses || [], prevDec, "rentalIncome");
@@ -598,7 +597,7 @@ export default function EarningsPage() {
       // The function will use December's mode internally
       prevNegativeBalanceCarryOver = calculatePrevYearNegativeBalance(prevDec);
     } else {
-      // All other months (Feb-Dec): Use previous month
+      // All other, months(Feb-Dec): Use previous month
       const prevMonth = month - 1;
       prevRentalIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], prevMonth, "rentalIncome");
       prevDeliveryIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], prevMonth, "deliveryIncome");
@@ -612,7 +611,7 @@ export default function EarningsPage() {
       prevInsuranceWreckIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], prevMonth, "insuranceWreckIncome");
       prevOtherIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], prevMonth, "otherIncome");
       
-      // Use the calculated value from previous month (recursive call)
+      // Use the calculated value from previous, month(recursive call)
       prevNegativeBalanceCarryOver = calculateNegativeBalanceCarryOver(prevMonth);
       
       prevTotalDirectDelivery = getTotalDirectDeliveryForMonth(prevMonth);
@@ -629,8 +628,8 @@ export default function EarningsPage() {
       // 30:70 Mode Formula
       // =IF(
       //   (Miles Income + (Smoking Fines × 10%))
-      //   - TOTAL OPERATING EXPENSE (Direct Delivery) 
-      //   - TOTAL OPERATING EXPENSE (COGS - Per Vehicle) 
+      //   - TOTAL OPERATING, EXPENSE(Direct Delivery) 
+      //   - TOTAL OPERATING, EXPENSE(COGS - Per Vehicle) 
       //   - Total Parking Fee & Labor Cleaning
       //   + Negative Balance Carry Over 
       //   + (Rental Income - Delivery Income - Electric Prepaid Income 
@@ -657,7 +656,7 @@ export default function EarningsPage() {
       // =IF(
       //   Rental Income - Delivery Income - Electric Prepaid Income - Gas Prepaid Income - Smoking Fines
       //   - Miles Income - Ski Racks Income - Child Seat Income - Coolers Income - Insurance Wreck Income - Other Income
-      //   - TOTAL OPERATING EXPENSE (Direct Delivery) - TOTAL OPERATING EXPENSE (COGS - Per Vehicle)
+      //   - TOTAL OPERATING, EXPENSE(Direct Delivery) - TOTAL OPERATING, EXPENSE(COGS - Per Vehicle)
       //   + Negative Balance Carry Over > 0,
       //   0,
       //   [return calculation]
@@ -672,7 +671,7 @@ export default function EarningsPage() {
     }
   };
 
-  // Helper to get total parking fee & labor for a month (including dynamic subcategories)
+  // Helper to get total parking fee & labor for a, month(including dynamic subcategories)
   const getTotalParkingFeeLaborForMonth = (month: number): number => {
     const fixedTotal = (
       getMonthValue(incomeExpenseDataValue?.parkingFeeLabor || [], month, "glaParkingFee") +
@@ -685,9 +684,9 @@ export default function EarningsPage() {
     return fixedTotal + dynamicTotal;
   };
 
-  // Calculate Car Management Split (exact copy from IncomeExpenseTable)
+  // Calculate Car Management, Split(exact copy from IncomeExpenseTable)
   const calculateCarManagementSplit = (month: number): number => {
-    // Use stored percentage, default to 0 if not set (independent of car owner split)
+    // Use stored percentage, default to 0 if not, set(independent of car owner split)
     const storedPercent = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "carManagementSplit") || 0;
     const mgmtPercent = storedPercent / 100; // Split percentage for management
     
@@ -702,7 +701,7 @@ export default function EarningsPage() {
     const coolersIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "otherIncome");
-    // Use calculated Negative Balance Carry Over (January 2019 will be 0, other Januaries use previous year's December)
+    // Use calculated Negative Balance Carry, Over(January 2019 will be 0, other Januaries use previous year's December)
     const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
@@ -716,10 +715,8 @@ export default function EarningsPage() {
     
     // Year >= 2026
     if (isYear2026OrLater) {
-      // 50:50 mode
-      if (mode === 50) {
-        // A) No ski racks income
-        if (skiRacksIncome === 0) {
+      // 50:50 mode, if(mode === 50) {
+        // A) No ski racks income, if(skiRacksIncome === 0) {
           const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
                         childSeatIncome + coolersIncome + insuranceWreckIncome + otherIncome + 
                         (smokingFines * 0.9 + skiRacksIncome * mgmtPercent) - totalReimbursedBills;
@@ -730,8 +727,8 @@ export default function EarningsPage() {
           const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
-        // B) If Car Management (GLA) is ski racks owner
-        else if ((skiRacksOwner[month] || "GLA") === "GLA") {
+        // B) If Car, Management(GLA) is ski racks owner
+        else, if((skiRacksOwner[month] || "GLA") === "GLA") {
           const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
                         childSeatIncome + coolersIncome + insuranceWreckIncome + otherIncome + 
                         skiRacksIncome + (smokingFines * 0.9) - totalReimbursedBills;
@@ -757,8 +754,7 @@ export default function EarningsPage() {
       }
       // 70:30 mode
       else {
-        // A) No ski racks income
-        if (skiRacksIncome === 0) {
+        // A) No ski racks income, if(skiRacksIncome === 0) {
           const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + 
                         (skiRacksIncome * mgmtPercent) + childSeatIncome + coolersIncome + 
                         insuranceWreckIncome + (smokingFines * 0.9) + otherIncome - 
@@ -769,8 +765,8 @@ export default function EarningsPage() {
           const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
-        // B) If Car Management (GLA) is ski racks owner
-        else if ((skiRacksOwner[month] || "GLA") === "GLA") {
+        // B) If Car, Management(GLA) is ski racks owner
+        else, if((skiRacksOwner[month] || "GLA") === "GLA") {
           const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + skiRacksIncome + 
                         childSeatIncome + coolersIncome + insuranceWreckIncome + (smokingFines * 0.9) + 
                         otherIncome - totalReimbursedBills + totalParkingFeeLabor;
@@ -794,9 +790,8 @@ export default function EarningsPage() {
       }
     }
     // Year 2019-2025
-    else if (isYear2019To2025) {
-      // 50:50 mode
-      if (mode === 50) {
+    else, if(isYear2019To2025) {
+      // 50:50 mode, if(mode === 50) {
         const part1 = deliveryIncome + electricPrepaidIncome + gasPrepaidIncome + smokingFines + 
                       (skiRacksIncome * mgmtPercent + childSeatIncome * mgmtPercent + 
                        coolersIncome * mgmtPercent + insuranceWreckIncome * mgmtPercent + 
@@ -825,9 +820,9 @@ export default function EarningsPage() {
     return 0;
   };
 
-  // Calculate Car Owner Split (exact copy from IncomeExpenseTable)
+  // Calculate Car Owner, Split(exact copy from IncomeExpenseTable)
   const calculateCarOwnerSplit = (month: number): number => {
-    // Use stored percentage, default to 0 if not set (independent of car management split)
+    // Use stored percentage, default to 0 if not, set(independent of car management split)
     const storedPercent = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "carOwnerSplit") || 0;
     const ownerPercent = storedPercent / 100; // Split percentage for owner
     
@@ -842,7 +837,7 @@ export default function EarningsPage() {
     const coolersIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "coolersIncome");
     const insuranceWreckIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "insuranceWreckIncome");
     const otherIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "otherIncome");
-    // Use calculated Negative Balance Carry Over (January 2019 will be 0, other Januaries use previous year's December)
+    // Use calculated Negative Balance Carry, Over(January 2019 will be 0, other Januaries use previous year's December)
     const negativeBalanceCarryOver = calculateNegativeBalanceCarryOver(month);
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
@@ -855,10 +850,8 @@ export default function EarningsPage() {
     
     // Year >= 2026
     if (isYear2026OrLater) {
-      // 50:50 mode
-      if (mode === 50) {
-        // A) No ski racks income
-        if (skiRacksIncome === 0) {
+      // 50:50 mode, if(mode === 50) {
+        // A) No ski racks income, if(skiRacksIncome === 0) {
           const part1 = milesIncome + (smokingFines * 0.1 + skiRacksIncome * ownerPercent);
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                          gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
@@ -867,8 +860,8 @@ export default function EarningsPage() {
           const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
-        // B) If Car Management (GLA) is ski racks owner
-        else if ((skiRacksOwner[month] || "GLA") === "GLA") {
+        // B) If Car, Management(GLA) is ski racks owner
+        else, if((skiRacksOwner[month] || "GLA") === "GLA") {
           const part1 = milesIncome + (smokingFines * 0.1);
           const part2 = (rentalIncome + negativeBalanceCarryOver - deliveryIncome - electricPrepaidIncome - 
                          gasPrepaidIncome - smokingFines - milesIncome - skiRacksIncome - 
@@ -890,8 +883,7 @@ export default function EarningsPage() {
       }
       // 70:30 mode
       else {
-        // A) No ski racks income
-        if (skiRacksIncome === 0) {
+        // A) No ski racks income, if(skiRacksIncome === 0) {
           const part1 = (skiRacksIncome * ownerPercent + milesIncome) - totalDirectDelivery - totalCogs - 
                         totalParkingFeeLabor + negativeBalanceCarryOver + (smokingFines * 0.1);
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
@@ -900,8 +892,8 @@ export default function EarningsPage() {
           const calculation = part1 + part2;
           return calculation >= 0 ? calculation : 0;
         }
-        // B) If Car Management (GLA) is ski racks owner
-        else if ((skiRacksOwner[month] || "GLA") === "GLA") {
+        // B) If Car, Management(GLA) is ski racks owner
+        else, if((skiRacksOwner[month] || "GLA") === "GLA") {
           const part1 = milesIncome - totalDirectDelivery - totalCogs - totalParkingFeeLabor + 
                         negativeBalanceCarryOver + (smokingFines * 0.1);
           const part2 = (rentalIncome - deliveryIncome - electricPrepaidIncome - gasPrepaidIncome - 
@@ -923,9 +915,8 @@ export default function EarningsPage() {
       }
     }
     // Year 2019-2025
-    else if (isYear2019To2025) {
-      // 50:50 mode
-      if (mode === 50) {
+    else, if(isYear2019To2025) {
+      // 50:50 mode, if(mode === 50) {
         const part1 = milesIncome + (skiRacksIncome * ownerPercent + childSeatIncome * ownerPercent + 
                       coolersIncome * ownerPercent + insuranceWreckIncome * ownerPercent + 
                       otherIncome * ownerPercent);
@@ -952,21 +943,20 @@ export default function EarningsPage() {
     return 0;
   };
 
-  // Calculate Car Management Total Expenses (exact copy from IncomeExpenseTable)
-  // In 30:70 mode: "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" only
-  // In 50:50 mode: "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" + ("TOTAL OPERATING EXPENSE (Direct Delivery)" + "TOTAL OPERATING EXPENSE (COGS - Per Vehicle)") * "Car Management Split %"
+  // Calculate Car Management Total, Expenses(exact copy from IncomeExpenseTable)
+  // In, 30:70, mode: "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" only
+  // In, 50:50, mode: "TOTAL REIMBURSE AND NON-REIMBURSE BILLS" + ("TOTAL OPERATING, EXPENSE(Direct Delivery)" + "TOTAL OPERATING, EXPENSE(COGS - Per Vehicle)") * "Car Management Split %"
   const calculateCarManagementTotalExpenses = (month: number): number => {
     const totalReimbursedBills = getTotalReimbursedBillsForMonth(month);
     
     // Get the mode for this month
     const mode = monthModes[month] || 50;
     
-    // In 30:70 mode, return only TOTAL REIMBURSE AND NON-REIMBURSE BILLS
-    if (mode === 70) {
+    // In, 30:70 mode, return only TOTAL REIMBURSE AND NON-REIMBURSE BILLS, if(mode === 70) {
       return totalReimbursedBills;
     }
     
-    // In 50:50 mode, use the full formula
+    // In, 50:50 mode, use the full formula
     const storedMgmtPercent = Number(getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "carManagementSplit")) || 0;
     const mgmtPercent = storedMgmtPercent / 100; // Convert percentage to decimal
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
@@ -975,9 +965,9 @@ export default function EarningsPage() {
     return totalReimbursedBills + ((totalDirectDelivery + totalCogs) * mgmtPercent);
   };
 
-  // Calculate Car Owner Total Expenses (exact copy from IncomeExpenseTable)
-  // In 30:70 mode: "TOTAL OPERATING EXPENSE (Direct Delivery)" + "TOTAL OPERATING EXPENSE (COGS - Per Vehicle)" + "Total Parking Fee & Labor Cleaning"
-  // In 50:50 mode: ("TOTAL OPERATING EXPENSE (Direct Delivery)" + "TOTAL OPERATING EXPENSE (COGS - Per Vehicle)") * "Car Owner Split %"
+  // Calculate Car Owner Total, Expenses(exact copy from IncomeExpenseTable)
+  // In, 30:70, mode: "TOTAL OPERATING, EXPENSE(Direct Delivery)" + "TOTAL OPERATING, EXPENSE(COGS - Per Vehicle)" + "Total Parking Fee & Labor Cleaning"
+  // In, 50:50, mode: ("TOTAL OPERATING, EXPENSE(Direct Delivery)" + "TOTAL OPERATING, EXPENSE(COGS - Per Vehicle)") * "Car Owner Split %"
   const calculateCarOwnerTotalExpenses = (month: number): number => {
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
@@ -986,14 +976,13 @@ export default function EarningsPage() {
     const mode = monthModes[month] || 50;
     
     if (mode === 70) {
-      // 30:70 mode: Direct Delivery + COGS + Total Parking Fee & Labor Cleaning
+      // 30:70, mode: Direct Delivery + COGS + Total Parking Fee & Labor Cleaning
       const totalParkingFeeLabor = getTotalParkingFeeLaborForMonth(month);
       return totalDirectDelivery + totalCogs + totalParkingFeeLabor;
     } else {
-      // 50:50 mode: (Direct Delivery + COGS) * Car Owner Split %
+      // 50:50, mode: (Direct Delivery + COGS) * Car Owner Split %
       const storedOwnerPercent = Number(getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "carOwnerSplit")) || 0;
-      const ownerPercent = storedOwnerPercent / 100; // Convert percentage to decimal
-      return (totalDirectDelivery + totalCogs) * ownerPercent;
+      const ownerPercent = storedOwnerPercent / 100; // Convert percentage to decimal, return(totalDirectDelivery + totalCogs) * ownerPercent;
     }
   };
 
@@ -1004,16 +993,16 @@ export default function EarningsPage() {
   }>({
     queryKey: ["/api/earnings/charts", carId, selectedYear],
     queryFn: async () => {
-      if (!carId) throw new Error("Invalid car ID");
-      const response = await fetch(
+      if (!carId) throw new, Error("Invalid car ID`);
+      const response = await, fetch(
         buildApiUrl(`/api/earnings/charts/${carId}/${selectedYear}`),
-        { credentials: "include" }
+        { credentials: `include" }
       );
       if (!response.ok) {
         if (response.status === 404) {
           return { success: true, data: {} };
         }
-        throw new Error("Failed to fetch chart images");
+        throw new, Error("Failed to fetch chart images");
       }
       return response.json();
     },
@@ -1029,26 +1018,26 @@ export default function EarningsPage() {
 
     setUploadingChart((prev) => ({ ...prev, [month]: true }));
     try {
-      const formData = new FormData();
+      const formData = new, FormData();
       formData.append("chart", file);
       formData.append("month", month.toString());
-      formData.append("year", selectedYear);
+      formData.append("year`, selectedYear);
 
-      const response = await fetch(buildApiUrl(`/api/earnings/charts/${carId}`), {
-        method: "POST",
+      const response = await, fetch(buildApiUrl(`/api/earnings/charts/${carId}`), {
+        method: `POST",
         credentials: "include",
         body: formData,
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to upload chart");
+        throw new, Error(error.error || "Failed to upload chart");
       }
 
       const result = await response.json();
       
       // Refresh chart images
-      await refetchChartImages();
+      await, refetchChartImages();
       
       toast({
         title: "Success",
@@ -1058,7 +1047,7 @@ export default function EarningsPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to upload chart",
-        variant: "destructive",
+        variant: "destructive`,
       });
     } finally {
       setUploadingChart((prev) => ({ ...prev, [month]: false }));
@@ -1074,21 +1063,21 @@ export default function EarningsPage() {
     }
 
     try {
-      const response = await fetch(
+      const response = await, fetch(
         buildApiUrl(`/api/earnings/charts/${carId}/${selectedYear}/${month}`),
         {
-          method: "DELETE",
+          method: `DELETE",
           credentials: "include",
         }
       );
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to delete chart");
+        throw new, Error(error.error || "Failed to delete chart");
       }
 
       // Refresh chart images
-      await refetchChartImages();
+      await, refetchChartImages();
       
       toast({
         title: "Success",
@@ -1115,10 +1104,10 @@ export default function EarningsPage() {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-red-700">Failed to load car details</p>
+          <p className="text-red-700`>Failed to load car details</p>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="mt-4 text-[#B8860B] hover:text-[#9A7209] hover:underline font-semibold"
+            className=`mt-4 text-[#B8860B] hover:text-[#9A7209] hover:underline font-semibold`
           >
             ← Back to View Car
           </button>
@@ -1130,7 +1119,7 @@ export default function EarningsPage() {
   const carName = car.makeModel || `${car.year || ""} ${car.vin}`.trim();
   const ownerName = car.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
-    : "N/A";
+    : `N/A";
   const ownerContact = car.owner?.phone || "N/A";
   const ownerEmail = car.owner?.email || "N/A";
   const fuelType = onboarding?.fuelType || car.fuelType || "N/A";
@@ -1141,10 +1130,10 @@ export default function EarningsPage() {
     <AdminLayout>
       <div className="flex flex-col w-full overflow-x-hidden">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6`>
           <button
             onClick={() => setLocation(`/admin/view-car/${carId}`)}
-            className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+            className=`text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to View Car</span>
@@ -1160,78 +1149,78 @@ export default function EarningsPage() {
         </div>
 
         {/* Car and Owner Information Header */}
-        <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-card border border-border rounded-lg p-4, sm:p-6 mb-4, sm:mb-6">
+          <div className="grid grid-cols-1, sm:grid-cols-2, lg:grid-cols-4 gap-4, sm:gap-6">
             {/* Car Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Car Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Car Name: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-words">{carName}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Car, Name: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-words">{carName}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">VIN #: </span>
-                  <span className="text-foreground font-mono text-xs sm:text-sm break-all">{car.vin}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">VIN #: </span>
+                  <span className="text-foreground font-mono text-xs, sm:text-sm break-all">{car.vin}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">License: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{car.licensePlate || "N/A"}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">License: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{car.licensePlate || "N/A"}</span>
                 </div>
               </div>
             </div>
 
             {/* Owner Information */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Owner Information</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Owner Information</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Name: </span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm`>Name: </span>
                   {car?.clientId ? (
                     <button
                       onClick={() => setLocation(`/admin/clients/${car.clientId}`)}
-                      className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs sm:text-sm break-words cursor-pointer font-semibold"
+                      className=`text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs, sm:text-sm break-words cursor-pointer font-semibold"
                     >
                       {ownerName}
                     </button>
                   ) : (
-                  <span className="text-[#B8860B] text-xs sm:text-sm break-words font-semibold">{ownerName}</span>
+                  <span className="text-[#B8860B] text-xs, sm:text-sm break-words font-semibold">{ownerName}</span>
                   )}
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Contact #: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{ownerContact}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Contact #: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{ownerContact}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Email: </span>
-                  <span className="text-foreground text-xs sm:text-sm break-all">{ownerEmail}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Email: </span>
+                  <span className="text-foreground text-xs, sm:text-sm break-all">{ownerEmail}</span>
                 </div>
               </div>
             </div>
 
             {/* Car Specifications */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Car Specifications</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Car Specifications</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Fuel/Gas: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{fuelType}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Fuel/Gas: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{fuelType}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Tire Size: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{tireSize}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Tire, Size: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{tireSize}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground text-xs sm:text-sm">Oil Type: </span>
-                  <span className="text-foreground text-xs sm:text-sm">{oilType}</span>
+                  <span className="text-muted-foreground text-xs, sm:text-sm">Oil, Type: </span>
+                  <span className="text-foreground text-xs, sm:text-sm">{oilType}</span>
                 </div>
               </div>
             </div>
 
             {/* Turo Links */}
             <div>
-              <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2 sm:mb-3">Turo Links</h3>
-              <div className="space-y-1.5 sm:space-y-2">
+              <h3 className="text-xs, sm:text-sm font-medium text-muted-foreground mb-2, sm:mb-3">Turo Links</h3>
+              <div className="space-y-1.5, sm:space-y-2">
                 {car.turoLink && (
                   <div>
                     <a
@@ -1240,7 +1229,7 @@ export default function EarningsPage() {
                       rel="noopener noreferrer"
                       className="text-[#B8860B] hover:text-[#9A7209] hover:underline text-sm flex items-center gap-1 font-medium"
                     >
-                      Turo Link: View Car
+                      Turo, Link: View Car
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
@@ -1253,7 +1242,7 @@ export default function EarningsPage() {
                       rel="noopener noreferrer"
                       className="text-[#B8860B] hover:text-[#9A7209] hover:underline text-sm flex items-center gap-1 font-medium"
                     >
-                      Admin Turo Link: View Car
+                      Admin Turo, Link: View Car
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
@@ -1271,7 +1260,7 @@ export default function EarningsPage() {
           <h1 className="text-3xl font-serif text-primary italic">Earnings</h1>
           <div className="w-[150px]">
             <Select value={selectedYear} onValueChange={setSelectedYear}>
-              <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+              <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                 <SelectValue placeholder="Select year" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border text-foreground">
@@ -1316,30 +1305,30 @@ export default function EarningsPage() {
                         <div className="flex flex-col items-center gap-1 justify-center">
                           <span className="text-foreground text-xs font-medium">{month}</span>
                           <div className="flex items-center justify-center gap-1 h-[24px]">
-                            {/* Mode Toggle (Read-only) - Shows 50:50 or 30:70 split mode */}
+                            {/* Mode, Toggle(Read-only) - Shows, 50:50 or, 30:70 split mode */}
                             <div
                               className={cn(
                                 "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-default",
                                 currentMode === 50 
                                   ? "bg-green-600 text-white" 
-                                  : "bg-blue-600 text-white"
+                                  : "bg-blue-600 text-white`
                               )}
-                              title={`Rate mode: ${currentMode === 50 ? "50:50 (green)" : "30:70 (blue)"} (Read-only)`}
+                              title={`Rate, mode: ${currentMode === 50 ? "50:50 (green)" : "30:70 (blue)"} (Read-only)`}
                             >
                               {currentMode}
                             </div>
-                            {/* Ski Racks Owner Toggle (Read-only) - Only show for years >= 2026 and when ski racks income exists */}
+                            {/* Ski Racks Owner, Toggle(Read-only) - Only show for years >= 2026 and when ski racks income exists */}
                             {showSkiRacksToggle && hasSkiRacksIncome && (
                               <div
                                 className={cn(
-                                  "px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px] cursor-default",
+                                  `px-2 py-0.5 rounded-full text-xs font-semibold transition-all duration-200 min-w-[24px] cursor-default",
                                   currentSkiRacksOwner === "GLA"
                                     ? "bg-purple-600 text-white"
-                                    : "bg-orange-600 text-white"
+                                    : "bg-orange-600 text-white`
                                 )}
-                                title={`Ski racks owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"} (Read-only)`}
+                                title={`Ski racks, owner: ${currentSkiRacksOwner === "GLA" ? "Management/GLA (purple)" : "Owner (orange)"} (Read-only)`}
                               >
-                                {currentSkiRacksOwner === "GLA" ? "M" : "O"}
+                                {currentSkiRacksOwner === `GLA" ? "M" : "O"}
                               </div>
                             )}
                           </div>
@@ -1425,9 +1414,9 @@ export default function EarningsPage() {
                   />
                 </CategorySection>
 
-                {/* OPERATING EXPENSE (Direct Delivery) */}
+                {/* OPERATING, EXPENSE(Direct Delivery) */}
                 <CategorySection
-                  title="OPERATING EXPENSE (DIRECT DELIVERY)"
+                  title="OPERATING, EXPENSE(DIRECT DELIVERY)"
                   isExpanded={expandedSections.directDelivery}
                   onToggle={() => toggleSection("directDelivery")}
                 >
@@ -1452,15 +1441,15 @@ export default function EarningsPage() {
                     values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.directDelivery || [], i + 1, "uberLyftLime"))}
                   />
                   <TableRow
-                    label="TOTAL OPERATING EXPENSE (Direct Delivery)"
+                    label="TOTAL OPERATING, EXPENSE(Direct Delivery)"
                     values={MONTHS.map((_, i) => getTotalDirectDeliveryForMonth(i + 1))}
                     isTotal
                   />
                 </CategorySection>
 
-                {/* OPERATING EXPENSE (COGS - Per Vehicle) */}
+                {/* OPERATING, EXPENSE(COGS - Per Vehicle) */}
                 <CategorySection
-                  title="OPERATING EXPENSE (COGS - PER VEHICLE)"
+                  title="OPERATING, EXPENSE(COGS - PER VEHICLE)"
                   isExpanded={expandedSections.cogs}
                   onToggle={() => toggleSection("cogs")}
                 >
@@ -1561,7 +1550,7 @@ export default function EarningsPage() {
                     values={MONTHS.map((_, i) => getMonthValue(incomeExpenseDataValue?.cogs || [], i + 1, "wipers"))}
                   />
                   <TableRow
-                    label="TOTAL OPERATING EXPENSE (COGS - Per Vehicle)"
+                    label="TOTAL OPERATING, EXPENSE(COGS - Per Vehicle)"
                     values={MONTHS.map((_, i) => getTotalCogsForMonth(i + 1))}
                     isTotal
                   />
@@ -1723,7 +1712,7 @@ export default function EarningsPage() {
             </div>
 
             {/* Monthly Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1, sm:grid-cols-2, lg:grid-cols-3, xl:grid-cols-4 gap-4">
               {months.map((monthLabel, index) => {
                 const monthNum = index + 1;
                 const rentalIncome = getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], monthNum, "rentalIncome");
@@ -1738,7 +1727,7 @@ export default function EarningsPage() {
                   getMonthValue(incomeExpenseDataValue?.reimbursedBills || [], monthNum, "uberLyftLimeReimbursed")
                 );
                 
-                // TODO: Add these when AI extraction provides the data:
+                // TODO: Add these when AI extraction provides the, data:
                 // - upcomingEarnings: from AI-extracted data
                 // - missedEarnings: from AI-extracted data
                 const upcomingEarnings = 0; // Placeholder - will be populated from AI extraction
@@ -1772,28 +1761,28 @@ export default function EarningsPage() {
                   </div>
                     
                     {/* Chart Image Area */}
-                    <div className="bg-card border border-border rounded-b relative group min-h-[200px] flex items-center justify-center">
+                    <div className="bg-card border border-border rounded-b relative group min-h-[200px] flex items-center justify-center`>
                       {chartImageUrl ? (
                         <>
                           {/* Manual Upload Override - Show uploaded image */}
                           <img
                             src={chartImageUrl}
                             alt={`Turo Earnings Chart - ${monthLabel}`}
-                            className="w-full h-auto max-h-[300px] object-contain"
+                            className=`w-full h-auto max-h-[300px] object-contain"
                           />
                           {/* Delete button on hover */}
                           {isAdmin && (
                             <button
                               onClick={() => handleChartDelete(monthNum)}
-                              className="absolute top-2 right-2 bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30 text-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                              title="Delete chart (will show auto-generated chart)"
+                              className="absolute top-2 right-2 bg-red-500/20 text-red-700 border-red-500/50, hover:bg-red-500/30 text-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                              title="Delete, chart(will show auto-generated chart)"
                             >
                               <X className="w-4 h-4" />
                             </button>
                           )}
                           {/* Upload overlay for replacing manual upload */}
                           {chartImageUrl && isAdmin && (
-                            <label className="absolute inset-0 bg-background bg-opacity-0 hover:bg-opacity-50 transition-all cursor-pointer flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-b">
+                            <label className="absolute inset-0 bg-background bg-opacity-0, hover:bg-opacity-50 transition-all cursor-pointer flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-b">
                               <input
                                 type="file"
                                 accept="image/*"
@@ -1807,7 +1796,7 @@ export default function EarningsPage() {
                                 }}
                                 disabled={isUploading}
                               />
-                              <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/80 transition-colors">
+                              <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded, hover:bg-primary/80 transition-colors">
                                 {isUploading ? (
                                   <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -1842,7 +1831,7 @@ export default function EarningsPage() {
                                   height={60}
                                 />
                                 <YAxis 
-                                  stroke="#9ca3af"
+                                  stroke="#9ca3af`
                                   tick={{ fill: '#9ca3af', fontSize: 10 }}
                                   tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                                 />
@@ -1856,7 +1845,7 @@ export default function EarningsPage() {
                                   formatter={(value: number) => formatCurrency(value)}
                                 />
                                 <Bar 
-                                  dataKey="value"
+                                  dataKey=`value"
                                   radius={[4, 4, 0, 0]}
                                   fill="#EAEB80"
                                 />
@@ -1866,7 +1855,7 @@ export default function EarningsPage() {
                           
                           {/* Upload button overlay for auto-generated chart */}
                           {isAdmin && (
-                            <div className="absolute inset-0 bg-background bg-opacity-0 hover:bg-opacity-30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-b">
+                            <div className="absolute inset-0 bg-background bg-opacity-0, hover:bg-opacity-30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-b">
                               <label className="cursor-pointer">
                                 <input
                                   type="file"
@@ -1881,7 +1870,7 @@ export default function EarningsPage() {
                                   }}
                                   disabled={isUploading}
                                 />
-                                <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded, hover:bg-primary/80 transition-colors, disabled:opacity-50, disabled:cursor-not-allowed">
                                   {isUploading ? (
                                     <>
                                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -1907,7 +1896,7 @@ export default function EarningsPage() {
           </div>
         </div>
 
-        {/* Graphs and Charts Report Section (moved from Graphs and Charts Report page) */}
+        {/* Graphs and Charts Report, Section(moved from Graphs and Charts Report page) */}
         <GraphsChartsReportSection
           className="mb-6"
           incomeExpenseData={incomeExpenseDataValue}
@@ -1931,7 +1920,7 @@ interface CategorySectionProps {
   children: React.ReactNode;
 }
 
-function CategorySection({ title, isExpanded, onToggle, children }: CategorySectionProps) {
+function, CategorySection({ title, isExpanded, onToggle, children }: CategorySectionProps) {
   return (
     <>
       <tr className="bg-primary">
@@ -1954,9 +1943,9 @@ interface TableRowProps {
   isTotal?: boolean;
 }
 
-function TableRow({ label, values, isInteger = false, isTotal = false }: TableRowProps) {
+function, TableRow({ label, values, isInteger = false, isTotal = false }: TableRowProps) {
   const total = calculateTotal(values);
-  // For Negative Balance Carry Over, display absolute value (remove minus sign)
+  // For Negative Balance Carry Over, display absolute, value(remove minus sign)
   const isNegativeBalance = label === "Negative Balance Carry Over";
   
   return (
@@ -1968,7 +1957,7 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
         "px-3 py-2 text-sm sticky left-0 z-[3] border-r border-border",
         isTotal ? "text-primary bg-background" : "text-muted-foreground bg-card"
       )}>
-        <span className="whitespace-nowrap">{label}</span>
+        <span className="whitespace-nowrap`>{label}</span>
       </td>
       {values.map((value, i) => {
         const cellValue = typeof value === 'number' && !isNaN(value) ? value : 0;
@@ -1977,7 +1966,7 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
         let displayText: string;
         if (isNegativeBalance && cellValue < 0) {
           displayText = `(${Math.abs(cellValue).toFixed(2)})`;
-        } else if (isInteger) {
+        } else, if(isInteger) {
           displayText = cellValue.toString();
         } else {
           displayText = formatCurrency(cellValue);
@@ -1986,7 +1975,7 @@ function TableRow({ label, values, isInteger = false, isTotal = false }: TableRo
           <td
             key={i}
             className={cn(
-              "text-right px-2 py-2 text-sm border-l border-border",
+              `text-right px-2 py-2 text-sm border-l border-border",
               cellValue !== 0
                 ? isTotal ? "text-primary font-semibold" : "text-[#B8860B] font-semibold"
                 : "text-muted-foreground"

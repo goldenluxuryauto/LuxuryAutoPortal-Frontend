@@ -34,7 +34,7 @@ import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 // Check if user is admin
-function useIsAdmin() {
+function, useIsAdmin() {
   const { data: userData } = useQuery<{ user?: { isAdmin?: boolean } }>({
     queryKey: ["/api/auth/me"],
     retry: false,
@@ -66,13 +66,12 @@ const tutorialModuleSchema = z.object({
 type TutorialStepFormData = z.infer<typeof tutorialStepSchema>;
 type TutorialModuleFormData = z.infer<typeof tutorialModuleSchema>;
 
-export default function TrainingManualPage() {
+export default function, TrainingManualPage() {
   const { isOpen: tutorialOpen, openTutorial, closeTutorial, resetTutorial } = useTutorial();
   
   // Handler for Start Tutorial button
   const handleStartTutorial = () => {
-    // Reset tutorial - this sets isOpen to true in context
-    resetTutorial();
+    // Reset tutorial - this sets isOpen to true in context, resetTutorial();
   };
   const isAdmin = useIsAdmin();
   const { toast } = useToast();
@@ -88,7 +87,7 @@ export default function TrainingManualPage() {
   const [videoValid, setVideoValid] = useState<boolean | null>(null);
   const [selectedRole, setSelectedRole] = useState<'admin' | 'client' | 'employee'>('client');
 
-  // Video state for each step (for inline video display)
+  // Video state for each, step(for inline video display)
   const [stepVideoStates, setStepVideoStates] = useState<Record<number, { loading: boolean; error: boolean }>>({});
   
   // Module management state
@@ -96,17 +95,17 @@ export default function TrainingManualPage() {
   const [isModuleDialogOpen, setIsModuleDialogOpen] = useState(false);
   const [isAddingModule, setIsAddingModule] = useState(false);
   const [deletingModuleId, setDeletingModuleId] = useState<number | null>(null);
-  const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set());
+  const [expandedModules, setExpandedModules] = useState<Set<number>>(new, Set());
 
   // Fetch tutorial modules for selected role
   const { data: tutorialModulesData, isLoading: modulesLoading } = useQuery<{ success: boolean; data: TutorialModule[] }>({
-    queryKey: ["/api/tutorial/modules", selectedRole],
+    queryKey: ["/api/tutorial/modules`, selectedRole],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl(`/api/tutorial/modules?role=${selectedRole}`), {
-        credentials: "include",
+      const response = await, fetch(buildApiUrl(`/api/tutorial/modules?role=${selectedRole}`), {
+        credentials: `include",
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch tutorial modules");
+        throw new, Error("Failed to fetch tutorial modules");
       }
       const data = await response.json();
       return data;
@@ -120,13 +119,13 @@ export default function TrainingManualPage() {
 
   // Fetch tutorial steps grouped by modules for selected role
   const { data: tutorialStepsData, isLoading, isError, isFetching } = useQuery<{ success: boolean; data: { modules: Array<TutorialModule & { steps: TutorialStep[] }> } | TutorialStep[] }>({
-    queryKey: ["/api/tutorial/steps", selectedRole, "with-modules"],
+    queryKey: ["/api/tutorial/steps", selectedRole, "with-modules`],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl(`/api/tutorial/steps?role=${selectedRole}&includeModules=true`), {
-        credentials: "include",
+      const response = await, fetch(buildApiUrl(`/api/tutorial/steps?role=${selectedRole}&includeModules=true`), {
+        credentials: `include",
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch tutorial steps");
+        throw new, Error("Failed to fetch tutorial steps");
       }
       const data = await response.json();
       return data;
@@ -156,7 +155,7 @@ export default function TrainingManualPage() {
   // Create tutorial step mutation
   const createMutation = useMutation({
     mutationFn: async ({ stepOrder, data }: { stepOrder: number; data: TutorialStepFormData }) => {
-      const response = await fetch(buildApiUrl("/api/admin/tutorial/steps"), {
+      const response = await, fetch(buildApiUrl("/api/admin/tutorial/steps"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -177,7 +176,7 @@ export default function TrainingManualPage() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to create tutorial step");
+        throw new, Error(error.error || "Failed to create tutorial step");
       }
       return response.json();
     },
@@ -198,7 +197,7 @@ export default function TrainingManualPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to create tutorial step",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
@@ -206,20 +205,19 @@ export default function TrainingManualPage() {
   // Delete tutorial step mutation
   const deleteMutation = useMutation({
     mutationFn: async (stepId: number) => {
-      const response = await fetch(buildApiUrl(`/api/admin/tutorial/steps/${stepId}?role=${selectedRole}`), {
-        method: "DELETE",
+      const response = await, fetch(buildApiUrl(`/api/admin/tutorial/steps/${stepId}?role=${selectedRole}`), {
+        method: `DELETE",
         credentials: "include",
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to delete tutorial step");
+        throw new, Error(error.error || "Failed to delete tutorial step");
       }
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps", selectedRole] });
-      queryClient.refetchQueries({ queryKey: ["/api/tutorial/steps", selectedRole] }); // Force immediate refetch
-      toast({
+      queryClient.refetchQueries({ queryKey: ["/api/tutorial/steps", selectedRole] }); // Force immediate refetch, toast({
         title: "Success",
         description: "Tutorial step deleted successfully",
       });
@@ -229,7 +227,7 @@ export default function TrainingManualPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to delete tutorial step",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
@@ -237,8 +235,8 @@ export default function TrainingManualPage() {
   // Update tutorial step mutation
   const updateMutation = useMutation({
     mutationFn: async ({ stepId, data }: { stepId: number; data: TutorialStepFormData }) => {
-      const response = await fetch(buildApiUrl(`/api/admin/tutorial/steps/${stepId}`), {
-        method: "PUT",
+      const response = await, fetch(buildApiUrl(`/api/admin/tutorial/steps/${stepId}`), {
+        method: `PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
@@ -257,7 +255,7 @@ export default function TrainingManualPage() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update tutorial step");
+        throw new, Error(error.error || "Failed to update tutorial step");
       }
       return response.json();
     },
@@ -289,7 +287,7 @@ export default function TrainingManualPage() {
   // Module mutations
   const createModuleMutation = useMutation({
     mutationFn: async (data: TutorialModuleFormData) => {
-      const response = await fetch(buildApiUrl("/api/admin/tutorial/modules"), {
+      const response = await, fetch(buildApiUrl("/api/admin/tutorial/modules"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -297,7 +295,7 @@ export default function TrainingManualPage() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to create module");
+        throw new, Error(error.error || "Failed to create module");
       }
       return response.json();
     },
@@ -323,22 +321,22 @@ export default function TrainingManualPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to create module",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
 
   const updateModuleMutation = useMutation({
     mutationFn: async ({ moduleId, data }: { moduleId: number; data: TutorialModuleFormData }) => {
-      const response = await fetch(buildApiUrl(`/api/admin/tutorial/modules/${moduleId}`), {
-        method: "PUT",
+      const response = await, fetch(buildApiUrl(`/api/admin/tutorial/modules/${moduleId}`), {
+        method: `PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(data),
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to update module");
+        throw new, Error(error.error || "Failed to update module");
       }
       return response.json();
     },
@@ -358,20 +356,20 @@ export default function TrainingManualPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to update module",
-        variant: "destructive",
+        variant: "destructive`,
       });
     },
   });
 
   const deleteModuleMutation = useMutation({
     mutationFn: async (moduleId: number) => {
-      const response = await fetch(buildApiUrl(`/api/admin/tutorial/modules/${moduleId}`), {
-        method: "DELETE",
+      const response = await, fetch(buildApiUrl(`/api/admin/tutorial/modules/${moduleId}`), {
+        method: `DELETE",
         credentials: "include",
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to delete module");
+        throw new, Error(error.error || "Failed to delete module");
       }
       return response.json();
     },
@@ -395,13 +393,13 @@ export default function TrainingManualPage() {
 
   const seedEmployeeMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(buildApiUrl("/api/admin/tutorial/seed-employee"), {
+      const response = await, fetch(buildApiUrl("/api/admin/tutorial/seed-employee"), {
         method: "POST",
         credentials: "include",
       });
       if (!response.ok) {
         const err = await response.json();
-        throw new Error(err.error || "Failed to seed employee tutorial");
+        throw new, Error(err.error || "Failed to seed employee tutorial");
       }
       return response.json();
     },
@@ -437,7 +435,7 @@ export default function TrainingManualPage() {
     },
   });
 
-  // Update form when selectedRole changes (for new steps only)
+  // Update form when selectedRole, changes(for new steps only)
   useEffect(() => {
     if (!isEditDialogOpen && !editingStep && isAddingStep) {
       form.setValue("role", selectedRole);
@@ -455,7 +453,7 @@ export default function TrainingManualPage() {
     },
   });
 
-  // Update module form role when selectedRole changes (only when not editing)
+  // Update module form role when selectedRole, changes(only when not editing)
   useEffect(() => {
     if (!isModuleDialogOpen && !editingModule) {
       moduleForm.setValue("role", selectedRole);
@@ -470,7 +468,7 @@ export default function TrainingManualPage() {
 
     try {
       // Basic URL validation
-      new URL(url);
+      new, URL(url);
       
       // Try to load the video
       const video = document.createElement("video");
@@ -489,8 +487,7 @@ export default function TrainingManualPage() {
         setVideoError("Video failed to load. Please check the URL is accessible.");
       };
       
-      // Set a timeout
-      setTimeout(() => {
+      // Set a timeout, setTimeout(() => {
         if (video.readyState === 0) {
           setVideoLoading(false);
           setVideoValid(false);
@@ -561,8 +558,7 @@ export default function TrainingManualPage() {
   };
 
   const handleModuleSubmit = (data: TutorialModuleFormData) => {
-    // Validate module order is a positive integer
-    if (!data.moduleOrder || data.moduleOrder < 1) {
+    // Validate module order is a positive integer, if(!data.moduleOrder || data.moduleOrder < 1) {
       toast({
         title: "Validation Error",
         description: "Module order must be at least 1",
@@ -571,8 +567,7 @@ export default function TrainingManualPage() {
       return;
     }
 
-    // Validate title is not empty
-    if (!data.title || data.title.trim() === "") {
+    // Validate title is not empty, if(!data.title || data.title.trim() === "") {
       toast({
         title: "Validation Error",
         description: "Module title is required",
@@ -583,13 +578,13 @@ export default function TrainingManualPage() {
 
     if (isAddingModule) {
       createModuleMutation.mutate(data);
-    } else if (editingModule) {
+    } else, if(editingModule) {
       updateModuleMutation.mutate({ moduleId: editingModule.id, data });
     }
   };
 
   const toggleModule = (moduleId: number) => {
-    const newExpanded = new Set(expandedModules);
+    const newExpanded = new, Set(expandedModules);
     if (newExpanded.has(moduleId)) {
       newExpanded.delete(moduleId);
     } else {
@@ -646,7 +641,7 @@ export default function TrainingManualPage() {
         : 0;
       const nextOrder = maxOrder + 1;
       createMutation.mutate({ stepOrder: nextOrder, data });
-    } else if (editingStep) {
+    } else, if(editingStep) {
       updateMutation.mutate({ stepId: editingStep.id, data });
     }
   };
@@ -674,7 +669,7 @@ export default function TrainingManualPage() {
               </div>
               <Button
                 onClick={handleStartTutorial}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground, hover:bg-primary/90"
               >
                 <PlayCircle className="w-4 h-4 mr-2" />
                 Start Tutorial
@@ -690,10 +685,10 @@ export default function TrainingManualPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-primary text-xl">Tutorial Configuration</CardTitle>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Manage tutorial (modules, steps, videos) by role:</span>
+                  <span className="text-sm text-muted-foreground">Manage, tutorial(modules, steps, videos) by, role:</span>
                   <Select value={selectedRole} onValueChange={(value: 'admin' | 'client' | 'employee') => {
                     setSelectedRole(value);
-                    setExpandedModules(new Set()); // Reset expanded modules when role changes
+                    setExpandedModules(new, Set()); // Reset expanded modules when role changes
                   }}>
                     <SelectTrigger className="w-[150px] bg-card border-border text-foreground">
                       <SelectValue placeholder="Select role" />
@@ -706,14 +701,14 @@ export default function TrainingManualPage() {
                   </Select>
                   <Button
                     onClick={handleAddModuleClick}
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Module
                   </Button>
                   <Button
                     onClick={() => handleAddStepClick()}
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Step
@@ -722,7 +717,7 @@ export default function TrainingManualPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      className="border-primary text-primary hover:bg-primary/10 font-medium"
+                      className="border-primary text-primary, hover:bg-primary/10 font-medium"
                       onClick={() => seedEmployeeMutation.mutate()}
                       disabled={seedEmployeeMutation.isPending}
                     >
@@ -746,7 +741,7 @@ export default function TrainingManualPage() {
                 <div className="text-center py-8">
                   <p className="text-muted-foreground mb-4">No modules or steps found. Click "Add Module" or "Add Step" to get started.</p>
                   {selectedRole === "employee" && (
-                    <p className="text-sm text-muted-foreground">Or use <strong>Seed employee tutorial guide</strong> above to add the default employee onboarding tutorial (1 module, 4 steps with videos) so it appears for employee accounts.</p>
+                    <p className="text-sm text-muted-foreground">Or use <strong>Seed employee tutorial guide</strong> above to add the default employee onboarding, tutorial(1 module, 4 steps with videos) so it appears for employee accounts.</p>
                   )}
                 </div>
               ) : (
@@ -764,7 +759,7 @@ export default function TrainingManualPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => toggleModule(module.id)}
-                                className="text-primary hover:bg-primary/10"
+                                className="text-primary, hover:bg-primary/10"
                               >
                                 {isExpanded ? (
                                   <X className="w-4 h-4" />
@@ -790,7 +785,7 @@ export default function TrainingManualPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleEditModuleClick(module)}
-                                className="text-primary hover:bg-primary/10"
+                                className="text-primary, hover:bg-primary/10"
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -799,7 +794,7 @@ export default function TrainingManualPage() {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="text-red-700 hover:bg-red-500/10"
+                                    className="text-red-700, hover:bg-red-500/10"
                                     disabled={deleteModuleMutation.isPending && deletingModuleId === module.id}
                                   >
                                     {deleteModuleMutation.isPending && deletingModuleId === module.id ? (
@@ -810,7 +805,7 @@ export default function TrainingManualPage() {
                                   </Button>
                                 }
                                 title="Delete Module"
-                                description={`Are you sure you want to delete "${module.title}"? This will also delete all steps in this module. This action cannot be undone.`}
+                                description={`Are you sure you want to delete `${module.title}`? This will also delete all steps in this module. This action cannot be undone.`}
                                 confirmText="Delete"
                                 cancelText="Cancel"
                                 variant="destructive"
@@ -823,7 +818,7 @@ export default function TrainingManualPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleAddStepClick(module.id)}
-                                className="text-primary hover:bg-primary/10"
+                                className="text-primary, hover:bg-primary/10"
                                 title="Add step to this module"
                               >
                                 <Plus className="w-4 h-4" />
@@ -833,14 +828,14 @@ export default function TrainingManualPage() {
                         </CardHeader>
                         {isExpanded && (
                           <CardContent className="pt-0">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div className="grid grid-cols-1, md:grid-cols-2 gap-4 mt-4">
                               {moduleSteps.length === 0 ? (
                                 <div className="col-span-2 text-center py-4 text-muted-foreground text-sm">
                                   No steps in this module. Click the + button to add a step.
                                 </div>
                               ) : (
                                 moduleSteps.map((step: TutorialStep) => (
-                                  <Card key={step.id} className="bg-card border-border hover:border-primary/30 transition-colors">
+                                  <Card key={step.id} className="bg-card border-border, hover:border-primary/30 transition-colors">
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 space-y-4">
@@ -894,10 +889,10 @@ export default function TrainingManualPage() {
                                                           onClick={() => {
                                                             window.open(step.videoUrl, "_blank");
                                                           }}
-                                                          className="text-primary hover:text-primary hover:bg-primary/10 mt-2"
+                                                          className="text-primary, hover:text-primary, hover:bg-primary/10 mt-2"
                                                           title="Open video in new tab"
                                                         >
-                                                          <PlayCircle className="w-4 h-4 mr-2" />
+                                                          <PlayCircle className="w-4 h-4 mr-2` />
                                                           Open in new tab
                                                         </Button>
                                                       </div>
@@ -906,7 +901,7 @@ export default function TrainingManualPage() {
                                                     <video
                                                       key={`step-${step.id}-${step.videoUrl}`}
                                                       src={step.videoUrl}
-                                                      className="w-full h-full object-contain"
+                                                      className=`w-full h-full object-contain"
                                                       controls
                                                       loop
                                                       muted
@@ -949,11 +944,11 @@ export default function TrainingManualPage() {
                                                 </div>
                                               ) : null}
                                               
-                                              {/* Video URL Info (if video is available) */}
+                                              {/* Video URL, Info(if video is available) */}
                                               {step.videoUrl && !stepVideoStates[step.id]?.error && (
                                   <div className="space-y-2">
                                     <div>
-                                      <p className="text-xs text-muted-foreground mb-1">Video URL:</p>
+                                      <p className="text-xs text-muted-foreground mb-1">Video, URL:</p>
                                       <div className="flex items-center gap-2">
                                         <p className="text-xs text-muted-foreground break-all bg-background p-2 rounded border border-border flex-1">
                                           {step.videoUrl}
@@ -965,7 +960,7 @@ export default function TrainingManualPage() {
                                           onClick={() => {
                                             window.open(step.videoUrl, "_blank");
                                           }}
-                                          className="text-primary hover:text-primary hover:bg-primary/10"
+                                          className="text-primary, hover:text-primary, hover:bg-primary/10"
                                           title="Open video in new tab"
                                         >
                                           <PlayCircle className="w-4 h-4" />
@@ -994,7 +989,7 @@ export default function TrainingManualPage() {
                             {/* Action Button */}
                             {step.actionButton && (
                               <div>
-                                <p className="text-sm font-medium text-muted-foreground mb-1">Action Button:</p>
+                                <p className="text-sm font-medium text-muted-foreground mb-1">Action, Button:</p>
                                 <div className="flex items-center gap-2 bg-background p-2 rounded border border-border">
                                   <Badge variant="outline" className="bg-[#EAEB80]/10 text-primary border-primary/30">
                                     {step.actionButton.label}
@@ -1015,7 +1010,7 @@ export default function TrainingManualPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditClick(step)}
-                              className="text-primary hover:text-primary hover:bg-primary/10 border border-primary/20"
+                              className="text-primary, hover:text-primary, hover:bg-primary/10 border border-primary/20"
                               title="Edit Step"
                             >
                               <Edit className="w-4 h-4 mr-2" />
@@ -1026,7 +1021,7 @@ export default function TrainingManualPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="text-red-700 hover:text-red-500 hover:bg-red-500/10 border border-red-500/20"
+                                  className="text-red-700, hover:text-red-500, hover:bg-red-500/10 border border-red-500/20"
                                   title="Delete Step"
                                                 disabled={deleteMutation.isPending && deletingStepId === step.id}
                                               >
@@ -1039,7 +1034,7 @@ export default function TrainingManualPage() {
                                               </Button>
                                             }
                                             title="Delete Tutorial Step"
-                                            description={`Are you sure you want to delete "${step.title}"? This action cannot be undone.`}
+                                            description={`Are you sure you want to delete `${step.title}`? This action cannot be undone.`}
                                             confirmText="Delete"
                                             cancelText="Cancel"
                                             variant="destructive"
@@ -1077,9 +1072,9 @@ export default function TrainingManualPage() {
                           </div>
                         </CardHeader>
                         <CardContent>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                             {stepsWithoutModule.map((step: TutorialStep) => (
-                            <Card key={step.id} className="bg-card border-border hover:border-primary/30 transition-colors">
+                            <Card key={step.id} className="bg-card border-border, hover:border-primary/30 transition-colors">
                               <CardContent className="p-6">
                                 <div className="flex items-start justify-between gap-4">
                                   <div className="flex-1 space-y-4">
@@ -1130,10 +1125,10 @@ export default function TrainingManualPage() {
                                                     onClick={() => {
                                                       window.open(step.videoUrl, "_blank");
                                                     }}
-                                                    className="text-primary hover:text-primary hover:bg-primary/10 mt-2"
+                                                    className="text-primary, hover:text-primary, hover:bg-primary/10 mt-2"
                                                     title="Open video in new tab"
                                                   >
-                                                    <PlayCircle className="w-4 h-4 mr-2" />
+                                                    <PlayCircle className="w-4 h-4 mr-2` />
                                                     Open in new tab
                                                   </Button>
                                                 </div>
@@ -1142,7 +1137,7 @@ export default function TrainingManualPage() {
                                               <video
                                                 key={`step-${step.id}-${step.videoUrl}`}
                                                 src={step.videoUrl}
-                                                className="w-full h-full object-contain"
+                                                className=`w-full h-full object-contain"
                                                 controls
                                                 loop
                                                 muted
@@ -1185,11 +1180,11 @@ export default function TrainingManualPage() {
                                           </div>
                                         ) : null}
                                         
-                                        {/* Video URL Info (if video is available) */}
+                                        {/* Video URL, Info(if video is available) */}
                                         {step.videoUrl && !stepVideoStates[step.id]?.error && (
                                           <div className="space-y-2">
                                             <div>
-                                              <p className="text-xs text-muted-foreground mb-1">Video URL:</p>
+                                              <p className="text-xs text-muted-foreground mb-1">Video, URL:</p>
                                               <div className="flex items-center gap-2">
                                                 <p className="text-xs text-muted-foreground break-all bg-background p-2 rounded border border-border flex-1">
                                                   {step.videoUrl}
@@ -1201,7 +1196,7 @@ export default function TrainingManualPage() {
                                                   onClick={() => {
                                                     window.open(step.videoUrl, "_blank");
                                                   }}
-                                                  className="text-primary hover:text-primary hover:bg-primary/10"
+                                                  className="text-primary, hover:text-primary, hover:bg-primary/10"
                                                   title="Open video in new tab"
                                                 >
                                                   <PlayCircle className="w-4 h-4" />
@@ -1218,7 +1213,7 @@ export default function TrainingManualPage() {
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => handleEditClick(step)}
-                                      className="text-primary hover:text-primary hover:bg-primary/10 border border-primary/20"
+                                      className="text-primary, hover:text-primary, hover:bg-primary/10 border border-primary/20"
                                     >
                                       <Edit className="w-4 h-4 mr-2" />
                                       Edit
@@ -1228,7 +1223,7 @@ export default function TrainingManualPage() {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="text-red-700 hover:text-red-500 hover:bg-red-500/10 border border-red-500/20"
+                                          className="text-red-700, hover:text-red-500, hover:bg-red-500/10 border border-red-500/20"
                                   disabled={deleteMutation.isPending && deletingStepId === step.id}
                                 >
                                   {deleteMutation.isPending && deletingStepId === step.id ? (
@@ -1240,7 +1235,7 @@ export default function TrainingManualPage() {
                                 </Button>
                               }
                               title="Delete Tutorial Step"
-                              description={`Are you sure you want to delete "${step.title}"? This action cannot be undone.`}
+                              description={`Are you sure you want to delete `${step.title}`? This action cannot be undone.`}
                               confirmText="Delete"
                               cancelText="Cancel"
                               variant="destructive"
@@ -1282,9 +1277,9 @@ export default function TrainingManualPage() {
           <DialogContent className="bg-card border-border text-foreground max-w-2xl">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold text-primary">
-                {isAddingModule ? "Add New Module" : `Edit Module ${editingModule?.id}`}
+                {isAddingModule ? "Add New Module` : `Edit Module ${editingModule?.id}`}
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground">
+              <DialogDescription className=`text-muted-foreground">
                 {isAddingModule 
                   ? "Create a new tutorial module to organize tutorial steps"
                   : "Update the module information"}
@@ -1312,7 +1307,7 @@ export default function TrainingManualPage() {
                         }}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                          <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
                         </FormControl>
@@ -1338,7 +1333,7 @@ export default function TrainingManualPage() {
                           {...field}
                           type="number"
                           min="1"
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
                         />
                       </FormControl>
@@ -1356,7 +1351,7 @@ export default function TrainingManualPage() {
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="Module title"
                         />
                       </FormControl>
@@ -1374,7 +1369,7 @@ export default function TrainingManualPage() {
                       <FormControl>
                         <Textarea
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="Module description"
                           rows={3}
                         />
@@ -1394,13 +1389,13 @@ export default function TrainingManualPage() {
                       setEditingModule(null);
                       moduleForm.reset();
                     }}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground, hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                     disabled={createModuleMutation.isPending || updateModuleMutation.isPending}
                   >
                     {(createModuleMutation.isPending || updateModuleMutation.isPending) && (
@@ -1441,9 +1436,9 @@ export default function TrainingManualPage() {
           <DialogContent className="bg-card border-border text-foreground max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold text-primary">
-                {isAddingStep ? "Add New Tutorial Step" : `Edit Tutorial Step ${editingStep?.id}`}
+                {isAddingStep ? "Add New Tutorial Step` : `Edit Tutorial Step ${editingStep?.id}`}
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground">
+              <DialogDescription className=`text-muted-foreground">
                 {isAddingStep 
                   ? "Create a new tutorial step with content, video URL, and instructions"
                   : "Update the tutorial step content, video URL, and instructions"}
@@ -1463,7 +1458,7 @@ export default function TrainingManualPage() {
                         onValueChange={field.onChange}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
+                          <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
                         </FormControl>
@@ -1489,8 +1484,8 @@ export default function TrainingManualPage() {
                         onValueChange={(value) => field.onChange(value === "none" ? undefined : parseInt(value))}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-card border-border text-foreground focus:border-primary">
-                            <SelectValue placeholder="Select module (optional)" />
+                          <SelectTrigger className="bg-card border-border text-foreground, focus:border-primary">
+                            <SelectValue placeholder="Select, module(optional)" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="bg-card border-border text-foreground">
@@ -1518,7 +1513,7 @@ export default function TrainingManualPage() {
                       <FormControl>
                         <Input
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="Step title"
                         />
                       </FormControl>
@@ -1536,7 +1531,7 @@ export default function TrainingManualPage() {
                       <FormControl>
                         <Textarea
                           {...field}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary"
                           placeholder="Step description"
                           rows={3}
                         />
@@ -1576,7 +1571,7 @@ export default function TrainingManualPage() {
                               <Input
                                 {...field}
                                 type="url"
-                                className="bg-card border-border text-foreground focus:border-primary"
+                                className="bg-card border-border text-foreground, focus:border-primary"
                                 placeholder="https://example.com/video.mp4"
                                 onChange={(e) => {
                                   field.onChange(e);
@@ -1585,8 +1580,7 @@ export default function TrainingManualPage() {
                                     setVideoPreviewUrl(url.trim());
                                     setVideoValid(null);
                                     setVideoError(null);
-                                    // Test video URL
-                                    testVideoUrl(url.trim());
+                                    // Test video URL, testVideoUrl(url.trim());
                                   } else {
                                     setVideoPreviewUrl(null);
                                     setVideoValid(null);
@@ -1622,7 +1616,7 @@ export default function TrainingManualPage() {
                           <FormControl>
                             <Input
                               {...field}
-                              className="bg-card border-border text-foreground focus:border-primary"
+                              className="bg-card border-border text-foreground, focus:border-primary"
                               placeholder="Placeholder text when video is unavailable"
                             />
                           </FormControl>
@@ -1697,15 +1691,15 @@ export default function TrainingManualPage() {
                             instructions[index] = e.target.value;
                             form.setValue("instructions", instructions);
                           }}
-                          className="bg-card border-border text-foreground focus:border-primary"
+                          className="bg-card border-border text-foreground, focus:border-primary`
                           placeholder={`Instruction ${index + 1}`}
                         />
                         <Button
-                          type="button"
+                          type=`button"
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemoveInstruction(index)}
-                          className="text-red-700 hover:text-red-500"
+                          className="text-red-700, hover:text-red-500"
                         >
                           <X className="w-4 h-4" />
                         </Button>
@@ -1721,13 +1715,13 @@ export default function TrainingManualPage() {
                             handleAddInstruction();
                           }
                         }}
-                        className="bg-card border-border text-foreground focus:border-primary"
+                        className="bg-card border-border text-foreground, focus:border-primary"
                         placeholder="Add new instruction"
                       />
                       <Button
                         type="button"
                         onClick={handleAddInstruction}
-                        className="bg-primary text-primary-foreground hover:bg-primary/80"
+                        className="bg-primary text-primary-foreground, hover:bg-primary/80"
                       >
                         <Plus className="w-4 h-4" />
                       </Button>
@@ -1748,7 +1742,7 @@ export default function TrainingManualPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="Button label"
                           />
                         </FormControl>
@@ -1766,7 +1760,7 @@ export default function TrainingManualPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            className="bg-card border-border text-foreground focus:border-primary"
+                            className="bg-card border-border text-foreground, focus:border-primary"
                             placeholder="/admin/forms"
                           />
                         </FormControl>
@@ -1786,13 +1780,13 @@ export default function TrainingManualPage() {
                       setEditingStep(null);
                       form.reset();
                     }}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground, hover:text-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                     disabled={createMutation.isPending || updateMutation.isPending}
                   >
                     {(createMutation.isPending || updateMutation.isPending) && (

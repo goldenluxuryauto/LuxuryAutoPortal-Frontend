@@ -2,9 +2,9 @@ import { Link } from "wouter";
 import { ArrowRight, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function CTASection() {
+export function, CTASection() {
   return (
-    <section className="py-20 lg:py-28 relative overflow-hidden">
+    <section className="py-20, lg:py-28 relative overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
@@ -14,11 +14,11 @@ export function CTASection() {
         <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative z-10 max-w-4xl mx-auto px-4, sm:px-6, lg:px-8 text-center">
         <p className="text-sm font-medium text-primary tracking-widest uppercase mb-4">
           Start Your Journey
         </p>
-        <h2 className="font-serif text-3xl lg:text-5xl font-light text-foreground mb-6">
+        <h2 className="font-serif text-3xl, lg:text-5xl font-light text-foreground mb-6">
           Ready to Find Your
           <span className="block text-primary mt-2">Dream Vehicle?</span>
         </h2>
@@ -27,7 +27,7 @@ export function CTASection() {
           the perfect vehicle that matches your lifestyle and preferences.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col, sm:flex-row items-center justify-center gap-4">
           <Link href="/onboarding">
             <Button size="lg" className="min-w-[200px] group" data-testid="button-cta-get-started">
               Get Started
@@ -38,7 +38,7 @@ export function CTASection() {
             <Button
               size="lg"
               variant="outline"
-              className="min-w-[200px] bg-white/5 backdrop-blur-sm border-white/20 hover:bg-white/10"
+              className="min-w-[200px] bg-white/5 backdrop-blur-sm border-white/20, hover:bg-white/10"
               data-testid="button-cta-call"
             >
               <Phone className="mr-2 w-4 h-4" />

@@ -98,7 +98,7 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/testimonials", label: "Client Testimonials", icon: Star },
 ];
 
-// Staff/employee sidebar: Dashboard, My Info, Forms, Task Management, Turo Guide, System Tutorial, Client Testimonials, Car Rental
+// Staff/employee, sidebar: Dashboard, My Info, Forms, Task Management, Turo Guide, System Tutorial, Client Testimonials, Car Rental
 const employeeSidebarItems: SidebarItem[] = [
   { href: "/staff/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["employee"] },
   { href: "/staff/my-info", label: "My Info", icon: User, roles: ["employee"] },
@@ -127,7 +127,7 @@ interface RoleOption {
   isClient: boolean;
 }
 
-function AdminLayoutContent({ children }: AdminLayoutProps) {
+function, AdminLayoutContent({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location, setLocation] = useLocation();
@@ -164,12 +164,11 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const { data } = useQuery<{ user?: any }>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      const { buildApiUrl } = await import("@/lib/queryClient");
+      const { buildApiUrl } = await, import("@/lib/queryClient");
       try {
-        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        const response = await, fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
         if (!response.ok) {
-          // 401 is expected when not authenticated - don't log as error
-          if (response.status === 401) {
+          // 401 is expected when not authenticated - don't log as error, if(response.status === 401) {
             return { user: undefined };
           }
           // For other errors, still return undefined but don't throw
@@ -187,14 +186,13 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
   const user = data?.user;
 
-  // Filter sidebar items based on user role (employees see staff nav only; admin/client see main nav)
+  // Filter sidebar items based on user, role(employees see staff nav only; admin/client see main nav)
   const sidebarItems = useMemo(() => {
     if (!user) return [];
 
     const userRole = user.isAdmin ? "admin" : user.isClient ? "client" : user.isEmployee ? "employee" : null;
 
-    // Employees see the staff sidebar (v1-style nav); admin/client see the main sidebar filtered by role
-    if (user.isEmployee) {
+    // Employees see the staff, sidebar(v1-style nav); admin/client see the main sidebar filtered by role, if(user.isEmployee) {
       return employeeSidebarItems.filter((item) => {
         const visible = !item.roles || item.roles.length === 0 || (userRole && item.roles.includes(userRole));
         if (!visible) return false;
@@ -229,7 +227,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      await apiRequest("POST", "/api/auth/logout");
+      await, apiRequest("POST", "/api/auth/logout");
       
       // Clear ALL query caches to prevent showing previous user's data
       // This ensures when a new user logs in, they see fresh data, not cached data from previous user
@@ -240,7 +238,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       
       setLocation("/admin/login");
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Logout, failed:", error);
       // Even if logout fails on server, clear cache to prevent data leakage
       queryClient.clear();
     }
@@ -250,7 +248,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
     if (roleId === user?.roleId) return;
     setSwitching(true);
     try {
-      const res = await fetch(buildApiUrl("/api/auth/switch-role"), {
+      const res = await, fetch(buildApiUrl("/api/auth/switch-role"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -258,14 +256,14 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || "Failed to switch account");
+        throw new, Error(data?.error || "Failed to switch account");
       }
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       if (role.isAdmin) setLocation("/admin/dashboard");
-      else if (role.isEmployee) setLocation("/staff/dashboard");
-      else setLocation("/dashboard");
+      else, if(role.isEmployee) setLocation("/staff/dashboard");
+      else, setLocation("/dashboard");
     } catch (e) {
-      console.error("Switch role failed:", e);
+      console.error("Switch role, failed:", e);
     } finally {
       setSwitching(false);
     }
@@ -276,7 +274,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       <aside className={cn(
         "fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar border-r border-sidebar-border transition-all duration-300",
         sidebarOpen ? "w-64" : "w-20",
-        mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        mobileMenuOpen ? "translate-x-0" : "-translate-x-full, lg:translate-x-0"
       )}>
         <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -291,7 +289,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           </Link>
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="lg:hidden text-muted-foreground hover:text-foreground"
+            className="lg:hidden text-muted-foreground, hover:text-foreground"
           >
             <X className="w-5 h-5" />
           </button>
@@ -313,22 +311,22 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                   <div
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded transition-colors relative cursor-pointer",
-                      isActiveParent ? "bg-sidebar-primary/10 text-black" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                      isActiveParent ? "bg-sidebar-primary/10 text-black" : "text-muted-foreground, hover:bg-sidebar-accent, hover:text-sidebar-foreground`
                     )}
                     onClick={() => toggleExpand(item.href)}
                     data-testid={`link-admin-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                   >
-                    <Icon className="w-4 h-4 shrink-0" />
+                    <Icon className=`w-4 h-4 shrink-0" />
                     {sidebarOpen && (
                       <>
-                        <span className="text-sm flex-1">{item.label}</span>
+                        <span className="text-sm flex-1`>{item.label}</span>
                         <ChevronDown className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`} />
                       </>
                     )}
                   </div>
 
                   {expanded && sidebarOpen && (
-                    <div className="mt-1 ml-6">
+                    <div className=`mt-1 ml-6">
                       {item.children.map((child) => {
                         const ChildIcon = child.icon;
                         const childActive = location === child.href || (child.href !== '/dashboard' && location.startsWith(child.href));
@@ -338,12 +336,12 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                             href={child.href}
                             className={cn(
                               "flex items-center gap-3 px-3 py-2 rounded text-sm",
-                              childActive ? "bg-sidebar-primary/10 text-black" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                              childActive ? "bg-sidebar-primary/10 text-black" : "text-muted-foreground, hover:bg-sidebar-accent, hover:text-sidebar-foreground`
                             )}
                             onClick={() => setMobileMenuOpen(false)}
                             data-testid={`link-admin-${child.label.toLowerCase().replace(/\s+/g, '-')}`}
                           >
-                            <ChildIcon className="w-3 h-3 shrink-0" />
+                            <ChildIcon className=`w-3 h-3 shrink-0" />
                             <span className="text-sm">{child.label}</span>
                           </Link>
                         );
@@ -362,12 +360,12 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                   "flex items-center gap-3 mx-2 px-3 py-2 rounded transition-colors relative",
                   isActive 
                     ? "bg-sidebar-primary/10 text-black" 
-                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    : "text-muted-foreground, hover:bg-sidebar-accent, hover:text-sidebar-foreground`
                 )}
                 onClick={() => setMobileMenuOpen(false)}
                 data-testid={`link-admin-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                <Icon className="w-4 h-4 shrink-0" />
+                <Icon className=`w-4 h-4 shrink-0" />
                 {sidebarOpen && (
                   <>
                     <span className="text-sm">{item.label}</span>
@@ -381,7 +379,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         <div className="p-4 border-t border-sidebar-border">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2 rounded text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+            className="flex items-center gap-3 w-full px-3 py-2 rounded text-muted-foreground, hover:bg-sidebar-accent, hover:text-sidebar-foreground transition-colors"
             data-testid="button-logout"
           >
             <LogOut className="w-4 h-4" />
@@ -394,25 +392,25 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         "flex-1 flex flex-col transition-all duration-300",
         sidebarOpen ? "lg:ml-64" : "lg:ml-20"
       )}>
-        <header className="h-14 bg-background border-b border-border flex items-center justify-between px-3 sm:px-4 lg:px-6">
+        <header className="h-14 bg-background border-b border-border flex items-center justify-between px-3, sm:px-4, lg:px-6">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden text-muted-foreground hover:text-foreground"
+            className="lg:hidden text-muted-foreground, hover:text-foreground"
           >
             <Menu className="w-6 h-6" />
           </button>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="hidden lg:flex text-muted-foreground hover:text-foreground"
+            className="hidden, lg:flex text-muted-foreground, hover:text-foreground"
           >
             <Menu className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2, sm:gap-4">
             <NotificationBell />
             {user && (
               <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm text-muted-foreground truncate max-w-[120px] sm:max-w-none">
-                  {user.firstName} {user.lastName} <span className="hidden sm:inline">({user.roleName})</span>
+                <span className="text-xs, sm:text-sm text-muted-foreground truncate max-w-[120px] sm:max-w-none">
+                  {user.firstName} {user.lastName} <span className="hidden, sm:inline">({user.roleName})</span>
                 </span>
                 {(user as any).roles?.length > 1 && (
                   <DropdownMenu>
@@ -422,14 +420,14 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                         size="sm"
                         className="text-muted-foreground"
                         disabled={switching}
-                        title="Switch account (same login)"
+                        title="Switch, account(same login)"
                       >
                         {switching ? (
                           <RefreshCw className="h-4 w-4 animate-spin" />
                         ) : (
                           <>
-                            <RefreshCw className="h-4 w-4 sm:mr-1" />
-                            <span className="hidden sm:inline">Switch account</span>
+                            <RefreshCw className="h-4 w-4, sm:mr-1" />
+                            <span className="hidden, sm:inline">Switch account</span>
                           </>
                         )}
                       </Button>
@@ -453,14 +451,14 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto-y p-3 sm:p-4 md:p-6 bg-background">
+        <main className="flex-1 overflow-auto-y p-3, sm:p-4, md:p-6 bg-background">
           {children}
         </main>
       </div>
 
       {mobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-foreground/20 z-40 lg:hidden"
+          className="fixed inset-0 bg-foreground/20 z-40, lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
@@ -468,7 +466,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   );
 }
 
-export function AdminLayout({ children }: AdminLayoutProps) {
+export function, AdminLayout({ children }: AdminLayoutProps) {
   return (
     <AuthGuard>
       <AdminLayoutContent>{children}</AdminLayoutContent>

@@ -12,18 +12,18 @@ const FORM_NAMES: Record<string, string> = {
   "62": "Car coming back from rental",
 };
 
-function isGoingOut(formTypeId: string): boolean {
+function, isGoingOut(formTypeId: string): boolean {
   return formTypeId === "car-going-out" || formTypeId === "26";
 }
 
-function isComingBack(formTypeId: string): boolean {
+function, isComingBack(formTypeId: string): boolean {
   return formTypeId === "car-coming-back" || formTypeId === "62";
 }
 
-export default function StaffCarRentalFormSubmit() {
+export default function, StaffCarRentalFormSubmit() {
   const search = useSearch();
   const [, setLocation] = useLocation();
-  const params = new URLSearchParams(search);
+  const params = new, URLSearchParams(search);
   const formTypeId = params.get("formTypeId") ?? "";
   const formName = FORM_NAMES[formTypeId] ?? "Car rental form";
   const onBack = () => setLocation("/staff/car-rental/forms");
@@ -37,7 +37,7 @@ export default function StaffCarRentalFormSubmit() {
             <CardContent className="pt-6">
               <p className="text-muted-foreground">Unknown form type. Please choose a form from the list.</p>
               <Link href="/staff/car-rental/forms">
-                <span className="text-primary hover:underline text-sm font-medium mt-2 inline-block">Back to forms</span>
+                <span className="text-primary, hover:underline text-sm font-medium mt-2 inline-block">Back to forms</span>
               </Link>
             </CardContent>
           </Card>

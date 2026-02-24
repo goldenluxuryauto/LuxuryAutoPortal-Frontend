@@ -16,7 +16,7 @@ interface ClientProfileResponse {
   data: any;
 }
 
-export default function ClientProfilePage() {
+export default function, ClientProfilePage() {
   const { toast } = useToast();
 
   const {
@@ -26,13 +26,13 @@ export default function ClientProfilePage() {
   } = useQuery<ClientProfileResponse>({
     queryKey: ["/api/client/profile"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/client/profile"), {
+      const response = await, fetch(buildApiUrl("/api/client/profile"), {
         credentials: "include",
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
+        throw new, Error(
           (errorData as any).error || "Failed to load client profile"
         );
       }
@@ -44,7 +44,7 @@ export default function ClientProfilePage() {
 
   useEffect(() => {
     if (error) {
-      console.error("❌ [CLIENT PROFILE] Error fetching profile:", error);
+      console.error("❌ [CLIENT PROFILE] Error fetching, profile:", error);
       toast({
         title: "Error loading profile",
         description:
@@ -60,10 +60,9 @@ export default function ClientProfilePage() {
   const signedContracts: any[] = profile?.signedContracts || [];
   const cars: any[] = profile?.cars || [];
 
-  // Debug: Log banking info to console
-  useEffect(() => {
+  // Debug: Log banking info to console, useEffect(() => {
     if (bankingInfo) {
-      console.log("🏦 [PROFILE PAGE] Banking Info received:", {
+      console.log("🏦 [PROFILE PAGE] Banking Info, received:", {
         id: bankingInfo.id,
         bankName: bankingInfo.bankName,
         routingNumber: bankingInfo.routingNumber ? '***' : null,
@@ -83,13 +82,13 @@ export default function ClientProfilePage() {
     if (value === null || value === undefined || value === "") {
       return "Not provided";
     }
-    return String(value);
+    return, String(value);
   };
 
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return "N/A";
     try {
-      return new Date(dateString).toLocaleDateString("en-US", {
+      return new, Date(dateString).toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -102,14 +101,14 @@ export default function ClientProfilePage() {
   const formatFullDateTime = (dateStr: string | null | undefined): string => {
                         if (!dateStr) return "Not provided";
                         try {
-                          return new Date(dateStr).toLocaleString();
+                          return new, Date(dateStr).toLocaleString();
                         } catch {
-                          return String(dateStr);
+                          return, String(dateStr);
                         }
                       };
 
                       const formatCurrency = (value: string | null): string => {
-                        if (!value) return "Not provided";
+                        if (!value) return "Not provided`;
                         const num = parseFloat(value);
                         if (isNaN(num)) return value;
                         return `$${num.toLocaleString("en-US", {
@@ -127,7 +126,7 @@ export default function ClientProfilePage() {
                         if (city) parts.push(city);
                         if (state) parts.push(state);
                         if (zipCode) parts.push(zipCode);
-                        return parts.length > 0 ? parts.join(", ") : "Not provided";
+                        return parts.length > 0 ? parts.join(`, ") : "Not provided";
                       };
 
   if (isLoading) {
@@ -176,9 +175,9 @@ export default function ClientProfilePage() {
                             <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                               Personal Information
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                               <div>
-                                <span className="text-muted-foreground block mb-1">Full Name:</span>
+                                <span className="text-muted-foreground block mb-1">Full, Name:</span>
                                 <span className="text-foreground font-medium">
                         {formatValue(onboarding.firstNameOwner)}{" "}
                         {formatValue(onboarding.lastNameOwner)}
@@ -198,7 +197,7 @@ export default function ClientProfilePage() {
                     </div>
                     <div>
                       <span className="text-muted-foreground block mb-1">
-                        Date of Birth:
+                        Date of, Birth:
                       </span>
                       <span className="text-foreground">
                         {formatValue(onboarding.birthday)}
@@ -206,7 +205,7 @@ export default function ClientProfilePage() {
                     </div>
                     <div>
                       <span className="text-muted-foreground block mb-1">
-                        T-Shirt Size:
+                        T-Shirt, Size:
                       </span>
                       <span className="text-foreground">
                         {formatValue(onboarding.tshirtSize)}
@@ -228,7 +227,7 @@ export default function ClientProfilePage() {
                               </div>
                               <div>
                       <span className="text-muted-foreground block mb-1">
-                        How Did You Hear About Us:
+                        How Did You Hear About, Us:
                       </span>
                       <span className="text-foreground">
                         {formatValue(onboarding.heardAboutUs)}
@@ -236,7 +235,7 @@ export default function ClientProfilePage() {
                               </div>
                               <div>
                       <span className="text-muted-foreground block mb-1">
-                        Emergency Contact Name:
+                        Emergency Contact, Name:
                       </span>
                       <span className="text-foreground">
                         {formatValue(onboarding.emergencyContactName)}
@@ -244,7 +243,7 @@ export default function ClientProfilePage() {
                               </div>
                               <div>
                       <span className="text-muted-foreground block mb-1">
-                        Emergency Contact Phone:
+                        Emergency Contact, Phone:
                       </span>
                       <span className="text-foreground">
                         {formatValue(onboarding.emergencyContactPhone)}
@@ -258,10 +257,10 @@ export default function ClientProfilePage() {
                             <h3 className="text-lg font-semibold text-primary mb-4 pb-2 border-b border-primary/30">
                               Address Information
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                               <div className="md:col-span-2">
                       <span className="text-muted-foreground block mb-1">
-                        Street Address:
+                        Street, Address:
                       </span>
                       <span className="text-foreground">
                         {formatValue(onboarding.streetAddress)}
@@ -280,14 +279,14 @@ export default function ClientProfilePage() {
                       </span>
                               </div>
                               <div>
-                                <span className="text-muted-foreground block mb-1">Zip Code:</span>
+                                <span className="text-muted-foreground block mb-1">Zip, Code:</span>
                       <span className="text-foreground">
                         {formatValue(onboarding.zipCode)}
                       </span>
                               </div>
                               <div className="md:col-span-2">
                       <span className="text-muted-foreground block mb-1">
-                        Full Address:
+                        Full, Address:
                       </span>
                                 <span className="text-foreground">
                         {formatAddress(
@@ -304,41 +303,41 @@ export default function ClientProfilePage() {
                             <div className="bg-card p-4 rounded-lg border border-primary/20">
                               <div className="flex justify-between items-center mb-4 pb-2 border-b border-primary/30">
                                 <h3 className="text-lg font-semibold text-primary">
-                                  Banking Information (ACH)
+                                  Banking, Information(ACH)
                                 </h3>
                               </div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                              <div className="grid grid-cols-1, md:grid-cols-2 gap-4 text-sm">
                                   {/* Bank Name */}
                                   <div>
-                                    <span className="text-muted-foreground block mb-1">Bank Name:</span>
+                                    <span className="text-muted-foreground block mb-1">Bank, Name:</span>
                                     <span className="text-foreground">
                                       {formatValue(bankingInfo?.bankName)}
                                     </span>
                                   </div>
                                   {/* Tax Classification */}
                                   <div>
-                                    <span className="text-muted-foreground block mb-1">Tax Classification:</span>
+                                    <span className="text-muted-foreground block mb-1">Tax, Classification:</span>
                                     <span className="text-foreground">
                                       {formatValue(bankingInfo?.taxClassification)}
                                     </span>
                                   </div>
                                   {/* Routing Number */}
                                   <div>
-                                    <span className="text-muted-foreground block mb-1">Routing Number:</span>
+                                    <span className="text-muted-foreground block mb-1">Routing, Number:</span>
                                     <span className="text-foreground font-mono">
                                       {formatValue(bankingInfo?.routingNumber)}
                                     </span>
                                   </div>
                                   {/* Account Number */}
                                   <div>
-                                    <span className="text-muted-foreground block mb-1">Account Number:</span>
+                                    <span className="text-muted-foreground block mb-1">Account, Number:</span>
                                     <span className="text-foreground font-mono">
                                       {formatValue(bankingInfo?.accountNumber)}
                                     </span>
                                   </div>
                                   {/* Business Name */}
                                   <div>
-                                    <span className="text-muted-foreground block mb-1">Business Name:</span>
+                                    <span className="text-muted-foreground block mb-1">Business, Name:</span>
                                     <span className="text-foreground">
                                       {formatValue(bankingInfo?.businessName)}
                                     </span>
@@ -383,7 +382,7 @@ export default function ClientProfilePage() {
                 {signedContracts.map((contract: any, index: number) => (
                   <div
                     key={contract.id ?? index}
-                    className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card border border-primary/20 rounded-lg p-4"
+                    className="flex flex-col, md:flex-row, md:items-center justify-between gap-4 bg-card border border-primary/20 rounded-lg p-4"
                   >
                     <div className="space-y-1 text-sm">
                       <div className="text-foreground font-medium">
@@ -403,7 +402,7 @@ export default function ClientProfilePage() {
                         </span>
                   </div>
                       <div className="text-muted-foreground">
-                        Signed on:{" "}
+                        Signed, on:{" "}
                         <span className="text-foreground">
                           {formatFullDateTime(
                             contract.contractSignedAt || contract.createdAt
@@ -429,7 +428,7 @@ export default function ClientProfilePage() {
                           href={contract.signedContractUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/80 transition-colors"
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium bg-primary text-primary-foreground, hover:bg-primary/80 transition-colors"
                         >
                           <Download className="w-4 h-4" />
                           Download
@@ -443,7 +442,7 @@ export default function ClientProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Quick Links (Reports / Support / Forms Center) */}
+        {/* Quick, Links(Reports / Support / Forms Center) */}
               <div className="space-y-4">
           <h2 className="text-xl font-semibold text-foreground">Quick Links</h2>
           <QuickLinks />

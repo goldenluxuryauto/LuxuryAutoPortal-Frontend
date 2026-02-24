@@ -29,15 +29,13 @@ interface IncomeExpensesPageProps {
   carIdFromRoute?: number; // When accessed from /admin/cars/:id/income-expense
 }
 
-export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPageProps) {
+export default function, IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPageProps) {
   const [, setLocation] = useLocation();
 
   // Get car ID from URL query parameter OR route parameter
   const carIdFromQuery = useMemo(() => {
-    if (carIdFromRoute) return carIdFromRoute; // Priority to route param
-    
-    if (typeof window === "undefined") return null;
-    const carParam = new URLSearchParams(window.location.search).get("car");
+    if (carIdFromRoute) return carIdFromRoute; // Priority to route param, if(typeof window === "undefined") return null;
+    const carParam = new, URLSearchParams(window.location.search).get("car");
     if (!carParam) return null;
     const parsed = parseInt(carParam, 10);
     return Number.isFinite(parsed) ? parsed : null;
@@ -45,22 +43,21 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
 
   const isCarFocused = !!carIdFromQuery;
   const isFromRoute = !!carIdFromRoute; // User came from View Car menu
-  const isAdminAllCarsView = !isCarFocused; // Admin viewing all cars (Income and Expenses menu)
+  const isAdminAllCarsView = !isCarFocused; // Admin viewing all, cars(Income and Expenses menu)
 
   const [selectedCar, setSelectedCar] = useState<string>(
     carIdFromQuery ? String(carIdFromQuery) : "all"
   );
   const [carSelectOpen, setCarSelectOpen] = useState(false);
   
-  // Get current year and generate year options (from 2019 to current year + 2 years)
-  const currentYear = new Date().getFullYear();
+  // Get current year and generate year, options(from 2019 to current year + 2 years)
+  const currentYear = new, Date().getFullYear();
   const startYear = 2019;
   const endYear = currentYear + 2;
   const yearOptions = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
   const [selectedYear, setSelectedYear] = useState<string>(String(currentYear));
 
-  // Update selected car when carIdFromQuery changes
-  useEffect(() => {
+  // Update selected car when carIdFromQuery changes, useEffect(() => {
     if (carIdFromQuery) {
       setSelectedCar(String(carIdFromQuery));
     }
@@ -73,11 +70,11 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   }>({
     queryKey: ["/api/cars", carIdFromQuery],
     queryFn: async () => {
-      if (!carIdFromQuery) throw new Error("Invalid car ID");
-      const response = await fetch(buildApiUrl(`/api/cars/${carIdFromQuery}`), {
-        credentials: "include",
+      if (!carIdFromQuery) throw new, Error("Invalid car ID`);
+      const response = await, fetch(buildApiUrl(`/api/cars/${carIdFromQuery}`), {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
+      if (!response.ok) throw new, Error("Failed to fetch car");
       return response.json();
     },
     enabled: !!carIdFromQuery,
@@ -93,14 +90,14 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   }>({
     queryKey: ["/api/onboarding/vin", car?.vin, "onboarding"],
     queryFn: async () => {
-      if (!car?.vin) throw new Error("No VIN");
-      const response = await fetch(
+      if (!car?.vin) throw new, Error("No VIN`);
+      const response = await, fetch(
         buildApiUrl(`/api/onboarding/vin/${encodeURIComponent(car.vin)}`),
-        { credentials: "include" }
+        { credentials: `include" }
       );
       if (!response.ok) {
         if (response.status === 404) return { success: true, data: null };
-        throw new Error("Failed to fetch onboarding data");
+        throw new, Error("Failed to fetch onboarding data");
       }
       return response.json();
     },
@@ -114,11 +111,11 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   const { data: carsData } = useQuery({
     queryKey: ["/api/cars", "income-expenses", "all"],
     queryFn: async () => {
-      const params = new URLSearchParams({ limit: "1000", status: "all" });
-      const response = await fetch(buildApiUrl(`/api/cars?${params}`), {
-        credentials: "include",
+      const params = new, URLSearchParams({ limit: "1000", status: "all` });
+      const response = await, fetch(buildApiUrl(`/api/cars?${params}`), {
+        credentials: `include",
       });
-      if (!response.ok) throw new Error("Failed to fetch cars");
+      if (!response.ok) throw new, Error("Failed to fetch cars");
       return response.json();
     },
     enabled: true, // Always fetch so vehicle selection searches all vehicles in the system
@@ -128,35 +125,34 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   const [carComboboxOpen, setCarComboboxOpen] = useState(false);
   const [carComboboxOpenPerCar, setCarComboboxOpenPerCar] = useState(false);
 
-  // Helper function to format car display name: "Make Model Year - Plate # - VIN #"
+  // Helper function to format car display, name: "Make Model Year - Plate # - VIN #"
   // Format: "Car Make Model Year - Plate # - VIN #"
   const formatCarDisplayName = (car: any): string => {
     const makeModel = (car.makeModel || "").trim();
     const year = car.year ? String(car.year) : null;
     const plate = (car.licensePlate || "").trim();
-    const vin = (car.vin || "").trim();
+    const vin = (car.vin || "`).trim();
     
-    // Build parts: Make Model Year, Plate, VIN
+    // Build, parts: Make Model Year, Plate, VIN
     const parts: string[] = [];
     
-    // Part 1: Make Model Year
-    if (makeModel) {
+    // Part, 1: Make Model Year, if(makeModel) {
       parts.push(year ? `${makeModel} ${year}` : makeModel);
-    } else if (year) {
+    } else, if(year) {
       parts.push(year);
     }
     
-    // Part 2: Plate #
+    // Part, 2: Plate #
     if (plate) {
       parts.push(plate);
     }
     
-    // Part 3: VIN #
+    // Part, 3: VIN #
     if (vin) {
       parts.push(vin);
     }
     
-    // Join with " - " separator
+    // Join with ` - " separator
     return parts.length > 0 ? parts.join(" - ") : "Unknown Car";
   };
 
@@ -189,10 +185,8 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   const activeCarId = selectedCar !== "all" && selectedCar !== "allcars" ? parseInt(selectedCar) : null;
   const isAllCarsView = selectedCar === "allcars";
 
-  // Show different UI based on whether this is per-car view or all-cars admin view
-  if (!activeCarId && !isAllCarsView) {
-    // Admin "Income and Expenses" (plural) - Initial view with car selector
-    return (
+  // Show different UI based on whether this is per-car view or all-cars admin view, if(!activeCarId && !isAllCarsView) {
+    // Admin "Income and Expenses" (plural) - Initial view with car selector, return(
       <AdminLayout>
         <div className="flex flex-col w-full h-full overflow-hidden">
           {/* Page Title */}
@@ -217,7 +211,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                     variant="outline"
                     role="combobox"
                     aria-expanded={carComboboxOpen}
-                    className="w-full justify-between bg-muted border-border text-foreground hover:bg-muted overflow-hidden"
+                    className="w-full justify-between bg-muted border-border text-foreground, hover:bg-muted overflow-hidden"
                   >
                     <span className="truncate text-left flex-1 min-w-0">
                     {selectedCar === "all"
@@ -236,7 +230,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                   <Command className="bg-muted">
                     <CommandInput 
                       placeholder="Search car by make, model, plate, or VIN..." 
-                      className="text-foreground placeholder:text-muted-foreground"
+                      className="text-foreground, placeholder:text-muted-foreground"
                     />
                     <CommandList>
                       <CommandEmpty className="text-muted-foreground py-6 text-center text-sm">
@@ -249,7 +243,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                             setSelectedCar("all");
                             setCarComboboxOpen(false);
                           }}
-                          className="text-foreground hover:bg-muted cursor-pointer"
+                          className="text-foreground, hover:bg-muted cursor-pointer`
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
@@ -259,12 +253,12 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                           -- Select a Car --
                         </CommandItem>
                         <CommandItem
-                          value="All Cars"
+                          value=`All Cars"
                           onSelect={() => {
                             setSelectedCar("allcars");
                             setCarComboboxOpen(false);
                           }}
-                          className="text-foreground hover:bg-muted cursor-pointer font-semibold"
+                          className="text-foreground, hover:bg-muted cursor-pointer font-semibold`
                         >
                           <Check
                             className={`mr-2 h-4 w-4 ${
@@ -284,7 +278,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                                 setSelectedCar(carItem.id.toString());
                                 setCarComboboxOpen(false);
                               }}
-                              className="text-foreground hover:bg-muted cursor-pointer"
+                              className=`text-foreground, hover:bg-muted cursor-pointer`
                             >
                               <Check
                                 className={`mr-2 h-4 w-4 ${
@@ -302,7 +296,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               </Popover>
             </div>
 
-            <div className="w-[150px]">
+            <div className=`w-[150px]">
               <label className="block text-sm font-medium text-muted-foreground mb-2">Year</label>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
                 <SelectTrigger className="bg-muted border-border text-foreground">
@@ -331,9 +325,8 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
     );
   }
 
-  // Handle "All Cars" aggregate view
-  if (isAllCarsView) {
-    // Use a placeholder carId (0) for the provider - the aggregated API doesn't need a specific carId
+  // Handle "All Cars" aggregate view, if(isAllCarsView) {
+    // Use a placeholder, carId(0) for the provider - the aggregated API doesn't need a specific carId
     const placeholderCarId = 0;
     
     return (
@@ -344,7 +337,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
             <div className="mb-2 flex-shrink-0">
               <button
                 onClick={() => setLocation("/cars")}
-                className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+                className="text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Cars</span>
@@ -366,7 +359,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         variant="outline"
                         role="combobox"
                         aria-expanded={carComboboxOpenPerCar}
-                        className="w-full justify-between bg-muted border-border text-foreground hover:bg-muted text-sm overflow-hidden"
+                        className="w-full justify-between bg-muted border-border text-foreground, hover:bg-muted text-sm overflow-hidden"
                       >
                         <span className="truncate text-left flex-1 min-w-0">All Cars</span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 flex-shrink-0" />
@@ -376,7 +369,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                       <Command className="bg-muted">
                         <CommandInput 
                           placeholder="Search car by make, model, plate, or VIN..." 
-                          className="text-foreground placeholder:text-muted-foreground"
+                          className="text-foreground, placeholder:text-muted-foreground"
                         />
                         <CommandList>
                           <CommandEmpty className="text-muted-foreground py-6 text-center text-sm">
@@ -389,7 +382,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                                 setSelectedCar("allcars");
                                 setCarComboboxOpenPerCar(false);
                               }}
-                              className="text-foreground hover:bg-muted cursor-pointer font-semibold"
+                              className="text-foreground, hover:bg-muted cursor-pointer font-semibold"
                             >
                               <Check className="mr-2 h-4 w-4 opacity-100" />
                               All Cars
@@ -405,7 +398,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                                     setSelectedCar(carItem.id.toString());
                                     setCarComboboxOpenPerCar(false);
                                   }}
-                                  className="text-foreground hover:bg-muted cursor-pointer"
+                                  className="text-foreground, hover:bg-muted cursor-pointer`
                                 >
                                   <Check
                                     className={`mr-2 h-4 w-4 ${
@@ -432,7 +425,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
             </div>
 
             {/* Main Content Area - No scroll on page, only table scrolls */}
-            <div className="flex-1 min-h-0 overflow-hidden">
+            <div className=`flex-1 min-h-0 overflow-hidden">
               <IncomeExpenseTable year={selectedYear} isFromRoute={false} showParkingAirportQB={true} isAllCarsView={true} />
             </div>
 
@@ -452,18 +445,18 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
     );
   }
 
-  // Per-car view (both from route and from admin selection)
+  // Per-car, view(both from route and from admin selection)
   return (
     <IncomeExpenseProvider carId={activeCarId} year={selectedYear}>
       <AdminLayout>
         <div className="flex flex-col w-full h-full overflow-hidden">
           {/* Header */}
-          <div className="mb-2 flex-shrink-0">
+          <div className="mb-2 flex-shrink-0`>
             {isFromRoute ? (
               // From View Car menu
               <button
                 onClick={() => setLocation(`/admin/view-car/${activeCarId}`)}
-                className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+                className=`text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to View Car</span>
@@ -472,7 +465,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               // From admin Income and Expenses menu
               <button
                 onClick={() => setLocation("/cars")}
-                className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-2"
+                className="text-muted-foreground, hover:text-foreground transition-colors flex items-center gap-1 mb-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Cars</span>
@@ -489,7 +482,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           </div>
 
           {/* Car Header */}
-          <div className="flex-shrink-0 mb-2">
+          <div className="flex-shrink-0 mb-2`>
             <CarHeader 
               car={car} 
               onboarding={onboarding} 
@@ -498,7 +491,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           </div>
 
           {/* Page Title and Actions */}
-          <div className="flex items-center justify-between mb-2 flex-shrink-0">
+          <div className=`flex items-center justify-between mb-2 flex-shrink-0">
             <h1 className="text-2xl font-bold text-primary">INCOME AND EXPENSES</h1>
             <div className="flex items-center gap-2">
               {/* Show car selector only in admin all-cars view */}
@@ -510,7 +503,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                         variant="outline"
                         role="combobox"
                         aria-expanded={carComboboxOpenPerCar}
-                        className="w-full justify-between bg-muted border-border text-foreground hover:bg-muted text-sm overflow-hidden"
+                        className="w-full justify-between bg-muted border-border text-foreground, hover:bg-muted text-sm overflow-hidden"
                       >
                         <span className="truncate text-left flex-1 min-w-0">
                         {selectedCar === "all"
@@ -529,7 +522,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                       <Command className="bg-muted">
                         <CommandInput 
                           placeholder="Search car by make, model, plate, or VIN..." 
-                          className="text-foreground placeholder:text-muted-foreground"
+                          className="text-foreground, placeholder:text-muted-foreground"
                         />
                         <CommandList>
                           <CommandEmpty className="text-muted-foreground py-6 text-center text-sm">
@@ -542,7 +535,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                                 setSelectedCar("allcars");
                                 setCarComboboxOpenPerCar(false);
                               }}
-                              className="text-foreground hover:bg-muted cursor-pointer font-semibold"
+                              className="text-foreground, hover:bg-muted cursor-pointer font-semibold`
                             >
                               <Check
                                 className={`mr-2 h-4 w-4 ${
@@ -562,7 +555,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
                                     setSelectedCar(carItem.id.toString());
                                     setCarComboboxOpenPerCar(false);
                                   }}
-                                  className="text-foreground hover:bg-muted cursor-pointer"
+                                  className=`text-foreground, hover:bg-muted cursor-pointer`
                                 >
                                   <Check
                                     className={`mr-2 h-4 w-4 ${
@@ -593,7 +586,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           <FormSubmissionsAndReceipts carId={activeCarId} year={selectedYear} />
 
           {/* Main Content Area - No scroll on page, only table scrolls */}
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className=`flex-1 min-h-0 overflow-hidden">
             <IncomeExpenseTable year={selectedYear} isFromRoute={isFromRoute} showParkingAirportQB={false} />
           </div>
 

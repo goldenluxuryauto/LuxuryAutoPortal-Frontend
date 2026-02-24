@@ -43,7 +43,7 @@ interface EditEmergencyModalProps {
   employee: Employee;
 }
 
-export function EditEmergencyModal({ open, onOpenChange, employee }: EditEmergencyModalProps) {
+export function, EditEmergencyModal({ open, onOpenChange, employee }: EditEmergencyModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -62,22 +62,22 @@ export function EditEmergencyModal({ open, onOpenChange, employee }: EditEmergen
         employee_emergency_contact_person: employee.employee_emergency_contact_person || "",
         employee_emergency_relationship: employee.employee_emergency_relationship || "",
         employee_emergency_number: employee.employee_emergency_number || "",
-        employee_emergency_address: employee.employee_emergency_address || "",
+        employee_emergency_address: employee.employee_emergency_address || "`,
       });
     }
   }, [open, employee]);
 
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
-        method: "PUT",
+      const res = await, fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
+        method: `PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(values),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to update");
+        throw new, Error(err.error || "Failed to update");
       }
     },
     onSuccess: () => {
@@ -148,7 +148,7 @@ export function EditEmergencyModal({ open, onOpenChange, employee }: EditEmergen
                 </FormItem>
               )}
             />
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter className="gap-2, sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
@@ -161,7 +161,7 @@ export function EditEmergencyModal({ open, onOpenChange, employee }: EditEmergen
               <Button
                 type="submit"
                 disabled={mutation.isPending}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground, hover:bg-primary/90"
               >
                 {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
               </Button>

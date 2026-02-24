@@ -14,7 +14,7 @@ interface RecordFileModalProps {
   clientId?: number;
 }
 
-export function RecordFileModal({
+export function, RecordFileModal({
   isOpen,
   onClose,
   carId,
@@ -28,11 +28,10 @@ export function RecordFileModal({
 
   const queryClient = useQueryClient();
 
-  // Initialize form data for new record
-  useEffect(() => {
+  // Initialize form data for new record, useEffect(() => {
     if (isOpen) {
       // Set default date to today for new records
-      const today = new Date().toISOString().split("T")[0];
+      const today = new, Date().toISOString().split("T")[0];
       setFormData({
         record_files_doc_name: "",
         record_files_date: today,
@@ -43,17 +42,16 @@ export function RecordFileModal({
 
   const mutation = useMutation({
     mutationFn: async (values: any) => {
-      // Validate required fields
-      if (!values.record_files_doc_name || !values.record_files_date) {
-        throw new Error("Document name and date are required");
+      // Validate required fields, if(!values.record_files_doc_name || !values.record_files_date) {
+        throw new, Error("Document name and date are required");
       }
 
       if (!carId || carId <= 0) {
-        throw new Error("Invalid car ID. Please refresh the page and try again.");
+        throw new, Error("Invalid car ID. Please refresh the page and try again.");
       }
 
       const url = buildApiUrl("/api/record-files");
-      const response = await fetch(url, {
+      const response = await, fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,46 +71,44 @@ export function RecordFileModal({
           const errorData = await response.json();
           errorMessage = errorData.error || errorData.message || errorMessage;
           
-          // Provide more specific error messages
-          if (response.status === 400) {
+          // Provide more specific error messages, if(response.status === 400) {
             if (errorData.error?.includes("already exists")) {
               errorMessage = "A record with this document name already exists for this car.";
-            } else if (errorData.error?.includes("Missing required")) {
+            } else, if(errorData.error?.includes("Missing required")) {
               errorMessage = "Please fill in all required fields.";
-            } else if (errorData.error?.includes("Car not found")) {
+            } else, if(errorData.error?.includes("Car not found")) {
               errorMessage = "Car not found. Please refresh the page and try again.";
-            } else if (errorData.error?.includes("Invalid") && (errorData.error?.includes("ID") || errorData.error?.includes("client") || errorData.error?.includes("car"))) {
+            } else, if(errorData.error?.includes("Invalid") && (errorData.error?.includes("ID") || errorData.error?.includes("client") || errorData.error?.includes("car"))) {
               errorMessage = errorData.error;
             } else {
               errorMessage = errorData.error || errorMessage;
             }
-          } else if (response.status === 401) {
+          } else, if(response.status === 401) {
             errorMessage = "You are not authorized to perform this action. Please log in again.";
-          } else if (response.status === 500) {
-            // Handle database configuration errors
-            if (errorData.message?.includes("could not verify") || errorData.message?.includes("check the Records and Files page")) {
+          } else, if(response.status === 500) {
+            // Handle database configuration errors, if(errorData.message?.includes("could not verify") || errorData.message?.includes("check the Records and Files page")) {
               errorMessage = "The record may have been created successfully. Please check the Records and Files table to confirm. If it's not there, please try again.";
-            } else if (errorData.message?.includes("attempted to fix") || errorData.message?.includes("try again")) {
+            } else, if(errorData.message?.includes("attempted to fix") || errorData.message?.includes("try again")) {
               errorMessage = "The system detected and attempted to fix a database configuration issue. Please try submitting again. If the problem persists, contact support.";
-            } else if (errorData.message?.includes("auto-increment") || errorData.message?.includes("PRIMARY") || errorData.error?.includes("Database configuration")) {
+            } else, if(errorData.message?.includes("auto-increment") || errorData.message?.includes("PRIMARY") || errorData.error?.includes("Database configuration")) {
               errorMessage = "Database configuration error detected. The system administrator needs to reset the database auto-increment. Please contact support.";
-            } else if (errorData.message?.includes("Duplicate entry")) {
-              errorMessage = "Database error: A record with this information already exists or there's a configuration issue. Please contact support.";
+            } else, if(errorData.message?.includes("Duplicate entry")) {
+              errorMessage = "Database, error: A record with this information already exists or there's a configuration issue. Please contact support.";
             } else {
-              errorMessage = errorData.message || errorData.error || "Server error. Please try again later.";
+              errorMessage = errorData.message || errorData.error || "Server error. Please try again later.`;
             }
           }
         } catch (e) {
           // If JSON parsing fails, use status text
-          errorMessage = `Failed to create record file: ${response.statusText}`;
+          errorMessage = `Failed to create record, file: ${response.statusText}`;
         }
-        throw new Error(errorMessage);
+        throw new, Error(errorMessage);
       }
 
       return response.json();
     },
     onSuccess: async (response) => {
-      console.log("Record file created successfully with ID:", response?.data?.id || "unknown");
+      console.log(`Record file created successfully with, ID:", response?.data?.id || "unknown");
       
       // Invalidate all record-files queries to ensure UI updates
       // This will cause all queries starting with "/api/record-files" to refetch
@@ -124,7 +120,7 @@ export function RecordFileModal({
       });
       
       // Small delay to ensure backend has committed the transaction
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new, Promise(resolve => setTimeout(resolve, 100));
       
       // Refetch all record-files queries to get the latest data
       await queryClient.refetchQueries({ 
@@ -134,15 +130,13 @@ export function RecordFileModal({
         }
       });
       
-      // Close modal after successful creation
-      onClose();
+      // Close modal after successful creation, onClose();
     },
   });
 
   if (!isOpen) return null;
 
-  // Validate carId before allowing submission
-  if (!carId || carId <= 0) {
+  // Validate carId before allowing submission, if(!carId || carId <= 0) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50 p-4">
         <div className="bg-card border border-border rounded-lg w-full max-w-2xl p-6 relative">
@@ -151,7 +145,7 @@ export function RecordFileModal({
           </div>
           <Button
             onClick={onClose}
-            className="mt-4 bg-primary text-black hover:bg-primary/80"
+            className="mt-4 bg-primary text-black, hover:bg-primary/80"
           >
             Close
           </Button>
@@ -164,21 +158,18 @@ export function RecordFileModal({
     e.preventDefault();
     e.stopPropagation(); // Prevent event bubbling
     
-    // Prevent double submission
-    if (mutation.isPending) {
+    // Prevent double submission, if(mutation.isPending) {
       return;
     }
     
-    // Additional validation before submission
-    if (!formData.record_files_doc_name.trim()) {
+    // Additional validation before submission, if(!formData.record_files_doc_name.trim()) {
       return;
     }
     if (!formData.record_files_date) {
       return;
     }
     
-    // Only mutate if not already pending
-    if (!mutation.isPending) {
+    // Only mutate if not already pending, if(!mutation.isPending) {
       mutation.mutate(formData);
     }
   };
@@ -188,7 +179,7 @@ export function RecordFileModal({
       <div className="bg-card border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground, hover:text-foreground transition-colors"
           disabled={mutation.isPending}
         >
           <X className="w-5 h-5" />
@@ -287,14 +278,14 @@ export function RecordFileModal({
               variant="outline"
               onClick={onClose}
               disabled={mutation.isPending}
-              className="border-border text-muted-foreground hover:bg-muted"
+              className="border-border text-muted-foreground, hover:bg-muted"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={mutation.isPending || !formData.record_files_doc_name || !formData.record_files_date}
-              className="bg-primary text-black hover:bg-primary/80"
+              className="bg-primary text-black, hover:bg-primary/80"
             >
               {mutation.isPending ? "Saving..." : "Add"}
             </Button>

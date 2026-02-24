@@ -52,7 +52,7 @@ const contactInfo = [
   },
 ];
 
-export default function Contact() {
+export default function, Contact() {
   const { toast } = useToast();
 
   const form = useForm<ContactFormData>({
@@ -68,7 +68,7 @@ export default function Contact() {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      const response = await fetch(buildApiUrl("/api/contact"), {
+      const response = await, fetch(buildApiUrl("/api/contact"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -82,7 +82,7 @@ export default function Contact() {
         });
         form.reset();
       } else {
-        throw new Error("Failed to send message");
+        throw new, Error("Failed to send message");
       }
     } catch {
       toast({
@@ -96,13 +96,13 @@ export default function Contact() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-20 lg:pt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="pt-20, lg:pt-24">
+        <div className="max-w-7xl mx-auto px-4, sm:px-6, lg:px-8 py-12">
           <div className="text-center mb-12">
             <p className="text-sm font-medium text-primary tracking-widest uppercase mb-3">
               Get In Touch
             </p>
-            <h1 className="font-serif text-4xl lg:text-5xl font-light text-foreground mb-4">
+            <h1 className="font-serif text-4xl, lg:text-5xl font-light text-foreground mb-4">
               Contact Us
             </h1>
             <p className="max-w-2xl mx-auto text-muted-foreground">
@@ -111,7 +111,7 @@ export default function Contact() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1, lg:grid-cols-3 gap-8, lg:gap-12">
             <div className="lg:col-span-1 space-y-6">
               {contactInfo.map((item, index) => {
                 const Icon = item.icon;
@@ -138,13 +138,13 @@ export default function Contact() {
             </div>
 
             <Card className="lg:col-span-2 bg-card border-border">
-              <CardContent className="p-6 lg:p-8">
+              <CardContent className="p-6, lg:p-8">
                 <h2 className="text-xl font-semibold text-foreground mb-6">
                   Send Us a Message
                 </h2>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1, md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
                         name="name"
@@ -238,7 +238,7 @@ export default function Contact() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" size="lg" className="w-full sm:w-auto" data-testid="button-send-message">
+                    <Button type="submit" size="lg" className="w-full, sm:w-auto" data-testid="button-send-message">
                       <Send className="mr-2 w-4 h-4" />
                       Send Message
                     </Button>

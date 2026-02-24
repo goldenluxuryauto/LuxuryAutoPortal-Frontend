@@ -1,6 +1,6 @@
 import React from "react";
 import { useIncomeExpense } from "../context/IncomeExpenseContext";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils`;
 
 interface EditableCellProps {
   value: number;
@@ -12,7 +12,7 @@ interface EditableCellProps {
   isPercentage?: boolean;
 }
 
-export default function EditableCell({
+export default function, EditableCell({
   value,
   month,
   category,
@@ -41,7 +41,7 @@ export default function EditableCell({
 
   if (!isEditable) {
     return (
-      <span className={cn("text-xs text-right block", value === 0 && "text-gray-600")}>
+      <span className={cn(`text-xs text-right block", value === 0 && "text-gray-600")}>
         {displayValue}
       </span>
     );
@@ -51,7 +51,7 @@ export default function EditableCell({
     <span
       onClick={handleClick}
       className={cn(
-        "cursor-pointer hover:bg-muted px-2 py-1 rounded block text-xs text-right transition-colors",
+        "cursor-pointer, hover:bg-muted px-2 py-1 rounded block text-xs text-right transition-colors",
         value === 0 && "text-gray-600",
         isCurrentlyEditing && "bg-muted ring-1 ring-[#EAEB80]"
       )}

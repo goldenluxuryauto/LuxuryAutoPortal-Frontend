@@ -4,22 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
 import { useLocation } from "wouter";
 
-export default function HumanResourcesPage() {
+export default function, HumanResourcesPage() {
   const [, setLocation] = useLocation();
 
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-primary italic mb-1 sm:mb-2">
+          <h1 className="text-xl, sm:text-2xl, md:text-3xl font-serif text-primary italic mb-1, sm:mb-2">
             Human Resources
           </h1>
-          <p className="text-muted-foreground text-xs sm:text-sm">
+          <p className="text-muted-foreground text-xs, sm:text-sm">
             Manage employee onboarding and employee records
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
           <Card className="bg-card border-border">
             <CardContent className="p-5 flex items-start justify-between gap-4">
               <div className="space-y-1">
@@ -32,7 +32,7 @@ export default function HumanResourcesPage() {
                 <Users className="w-6 h-6 text-primary" />
                 <Button
                   onClick={() => setLocation("/admin/hr/employees")}
-                  className="bg-primary text-primary-foreground hover:bg-primary/80"
+                  className="bg-primary text-primary-foreground, hover:bg-primary/80"
                 >
                   Open
                 </Button>

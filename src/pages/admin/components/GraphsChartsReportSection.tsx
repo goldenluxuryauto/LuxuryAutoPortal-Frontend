@@ -27,7 +27,7 @@ interface GraphsChartsReportSectionProps {
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export function GraphsChartsReportSection({
+export function, GraphsChartsReportSection({
   title = "GRAPHS AND CHART REPORT",
   className,
   incomeExpenseData,
@@ -51,7 +51,7 @@ export function GraphsChartsReportSection({
       const carOwnerTotalExpenses = calculateCarOwnerTotalExpenses(monthNum);
       const daysRented = getMonthValue(incomeExpenseData.history || [], monthNum, "daysRented");
       const tripsTaken = getMonthValue(incomeExpenseData.history || [], monthNum, "tripsTaken");
-      // Profit should equal the split values (not split minus expenses)
+      // Profit should equal the split, values(not split minus expenses)
       const carManagementProfit = carManagementSplit;
       const carOwnerProfit = carOwnerSplit;
       const avePerRental = tripsTaken > 0 ? rentalIncome / tripsTaken : 0;
@@ -91,7 +91,7 @@ export function GraphsChartsReportSection({
         "Car Owner Total Expenses": 0,
         "Days Rented": 0,
         "Trips Taken": 0,
-        "Ave Per Rental": 0,
+        "Ave Per Rental`: 0,
       }
     );
     return totals;
@@ -102,7 +102,7 @@ export function GraphsChartsReportSection({
   };
 
   const formatTooltip = (value: number, name: string) => {
-    if (name.includes("Days") || name.includes("Trips")) {
+    if (name.includes(`Days") || name.includes("Trips")) {
       return [value.toString(), name];
     }
     return [formatCurrency(value), name];
@@ -116,7 +116,7 @@ export function GraphsChartsReportSection({
       <div className="bg-card border border-border rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-muted-foreground mb-4">Rental Income</h2>
         <div className="mb-4 text-sm text-muted-foreground">
-          <div>Yearly Total: {formatCurrency(yearlyTotals["Rental Income"])}</div>
+          <div>Yearly, Total: {formatCurrency(yearlyTotals["Rental Income"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyData}>
@@ -141,7 +141,7 @@ export function GraphsChartsReportSection({
       <div className="bg-card border border-border rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-muted-foreground mb-4">Car Management Profit</h2>
         <div className="mb-4 text-sm text-muted-foreground">
-          <div>Yearly Total: {formatCurrency(yearlyTotals["Car Management Profit"])}</div>
+          <div>Yearly, Total: {formatCurrency(yearlyTotals["Car Management Profit"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyData}>
@@ -166,7 +166,7 @@ export function GraphsChartsReportSection({
       <div className="bg-card border border-border rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-muted-foreground mb-4">Car Owner Profit</h2>
         <div className="mb-4 text-sm text-muted-foreground">
-          <div>Yearly Total: {formatCurrency(yearlyTotals["Car Owner Profit"])}</div>
+          <div>Yearly, Total: {formatCurrency(yearlyTotals["Car Owner Profit"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyData}>
@@ -191,7 +191,7 @@ export function GraphsChartsReportSection({
       <div className="bg-card border border-border rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-muted-foreground mb-4">Car Owner Total Expenses</h2>
         <div className="mb-4 text-sm text-muted-foreground">
-          <div>Yearly Total: {formatCurrency(yearlyTotals["Car Owner Total Expenses"])}</div>
+          <div>Yearly, Total: {formatCurrency(yearlyTotals["Car Owner Total Expenses"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyData}>
@@ -216,7 +216,7 @@ export function GraphsChartsReportSection({
       <div className="bg-card border border-border rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-muted-foreground mb-4">Car Management Total Expenses</h2>
         <div className="mb-4 text-sm text-muted-foreground">
-          <div>Yearly Total: {formatCurrency(yearlyTotals["Car Management Total Expenses"])}</div>
+          <div>Yearly, Total: {formatCurrency(yearlyTotals["Car Management Total Expenses"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyData}>
@@ -241,8 +241,8 @@ export function GraphsChartsReportSection({
       <div className="bg-card border border-border rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-muted-foreground mb-4">History</h2>
         <div className="mb-4 text-sm text-muted-foreground">
-          <div>Days Rented - Yearly Total: {yearlyTotals["Days Rented"]}</div>
-          <div>Trips Taken - Yearly Total: {yearlyTotals["Trips Taken"]}</div>
+          <div>Days Rented - Yearly, Total: {yearlyTotals["Days Rented"]}</div>
+          <div>Trips Taken - Yearly, Total: {yearlyTotals["Trips Taken"]}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={monthlyData}>
@@ -267,9 +267,9 @@ export function GraphsChartsReportSection({
       <div className="bg-card border border-border rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-muted-foreground mb-4">CAR RENTAL VALUE PER MONTH</h2>
         <div className="mb-4 text-sm text-muted-foreground">
-          <div>Total Car Rental Income - Yearly Total: {formatCurrency(yearlyTotals["Rental Income"])}</div>
-          <div>Trips Taken - Yearly Total: {yearlyTotals["Trips Taken"]}</div>
-          <div>Ave Per Rental Per Trips Taken - Yearly Average: {formatCurrency(yearlyTotals["Ave Per Rental"])}</div>
+          <div>Total Car Rental Income - Yearly, Total: {formatCurrency(yearlyTotals["Rental Income"])}</div>
+          <div>Trips Taken - Yearly, Total: {yearlyTotals["Trips Taken"]}</div>
+          <div>Ave Per Rental Per Trips Taken - Yearly, Average: {formatCurrency(yearlyTotals["Ave Per Rental"])}</div>
         </div>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyData}>

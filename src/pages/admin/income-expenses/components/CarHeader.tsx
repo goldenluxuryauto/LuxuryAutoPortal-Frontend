@@ -7,18 +7,18 @@ interface CarHeaderProps {
   onNavigateToClient?: (clientId: number) => void;
 }
 
-export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHeaderProps) {
+export default function, CarHeader({ car, onboarding, onNavigateToClient }: CarHeaderProps) {
   return (
     <div className="bg-card border border-border rounded-lg p-3">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1, sm:grid-cols-2, lg:grid-cols-4 gap-3">
         {/* Car Information */}
         <div>
           <h3 className="text-xs font-medium text-muted-foreground mb-2">Car Information</h3>
           <div className="space-y-1">
             <div>
-              <span className="text-muted-foreground text-xs">Car Name: </span>
-              <span className="text-foreground text-xs">
-                {car?.makeModel || `${car?.year || ""} ${car?.vin || ""}`.trim()}
+              <span className="text-muted-foreground text-xs">Car, Name: </span>
+              <span className="text-foreground text-xs`>
+                {car?.makeModel || `${car?.year || ""} ${car?.vin || `"}`.trim()}
               </span>
             </div>
             <div>
@@ -41,21 +41,21 @@ export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHe
               {car?.clientId && onNavigateToClient ? (
                 <button
                   onClick={() => onNavigateToClient(car.clientId)}
-                  className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs cursor-pointer font-semibold"
+                  className="text-[#B8860B] hover:text-[#9A7209] hover:underline transition-colors text-xs cursor-pointer font-semibold`
                 >
                   {car?.owner 
                     ? `${car.owner.firstName} ${car.owner.lastName}` 
                     : car?.ownerFirstName && car?.ownerLastName
                     ? `${car.ownerFirstName} ${car.ownerLastName}`
-                    : "N/A"}
+                    : `N/A"}
                 </button>
               ) : (
-                <span className="text-[#B8860B] text-xs font-semibold">
+                <span className="text-[#B8860B] text-xs font-semibold`>
                   {car?.owner 
                     ? `${car.owner.firstName} ${car.owner.lastName}` 
                     : car?.ownerFirstName && car?.ownerLastName
                     ? `${car.ownerFirstName} ${car.ownerLastName}`
-                    : "N/A"}
+                    : `N/A"}
                 </span>
               )}
             </div>
@@ -85,13 +85,13 @@ export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHe
               </span>
             </div>
             <div>
-              <span className="text-muted-foreground text-xs">Tire Size: </span>
+              <span className="text-muted-foreground text-xs">Tire, Size: </span>
               <span className="text-foreground text-xs">
                 {onboarding?.tireSize || car?.tireSize || "N/A"}
               </span>
             </div>
             <div>
-              <span className="text-muted-foreground text-xs">Oil Type: </span>
+              <span className="text-muted-foreground text-xs">Oil, Type: </span>
               <span className="text-foreground text-xs">
                 {onboarding?.oilType || car?.oilType || "N/A"}
               </span>
@@ -109,9 +109,9 @@ export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHe
                   href={car.turoLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-700 hover:underline text-xs flex items-center gap-1"
+                  className="text-blue-700, hover:underline text-xs flex items-center gap-1"
                 >
-                  Turo Link: View Car
+                  Turo, Link: View Car
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -122,7 +122,7 @@ export default function CarHeader({ car, onboarding, onNavigateToClient }: CarHe
                   href={car.adminTuroLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-700 hover:underline text-xs flex items-center gap-1"
+                  className="text-blue-700, hover:underline text-xs flex items-center gap-1"
                 >
                   Admin Turo Link
                   <ExternalLink className="w-3 h-3" />

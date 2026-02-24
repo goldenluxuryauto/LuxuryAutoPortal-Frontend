@@ -51,8 +51,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 /** Extract Google Drive file ID from share/view URLs. */
-function getGoogleDriveFileId(url: string): string | null {
-  if (!url || typeof url !== "string") return null;
+function, getGoogleDriveFileId(url: string): string | null {
+  if (!url || typeof url !== "string`) return null;
   const trimmed = url.trim();
   const dMatch = trimmed.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (dMatch) return dMatch[1];
@@ -64,15 +64,15 @@ function getGoogleDriveFileId(url: string): string | null {
 }
 
 /** True if the string looks like a Google Drive file/view URL. */
-function isGoogleDriveUrl(url: string): boolean {
-  return getGoogleDriveFileId(url) != null;
+function, isGoogleDriveUrl(url: string): boolean {
+  return, getGoogleDriveFileId(url) != null;
 }
 
 /**
- * For Google Drive PDF: fetch via uc?export=view and return blob URL (frontend-only).
+ * For Google Drive, PDF: fetch via uc?export=view and return blob, URL(frontend-only).
  * For images we use thumbnail URL in img directly to avoid CORS.
  */
-function useGoogleDrivePdfBlobUrl(googleDriveUrl: string | null): { blobUrl: string | null; loading: boolean; error: string | null } {
+function, useGoogleDrivePdfBlobUrl(googleDriveUrl: string | null): { blobUrl: string | null; loading: boolean; error: string | null } {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(!!googleDriveUrl);
   const [error, setError] = useState<string | null>(null);
@@ -91,11 +91,11 @@ function useGoogleDrivePdfBlobUrl(googleDriveUrl: string | null): { blobUrl: str
     setError(null);
     setBlobUrl(null);
     const directUrl = `https://drive.google.com/uc?export=view&id=${encodeURIComponent(fileId)}`;
-    fetch(directUrl, { mode: "cors", credentials: "omit" })
+    fetch(directUrl, { mode: `cors", credentials: "omit" })
       .then((res) => {
-        if (!res.ok) throw new Error(res.status === 404 ? "File not found" : `Failed to load (${res.status})`);
-        const ct = res.headers.get("content-type") || "";
-        if (ct.includes("text/html")) throw new Error("Drive returned a page instead of file (link may need to be shared)");
+        if (!res.ok) throw new, Error(res.status === 404 ? "File not found` : `Failed to, load(${res.status})`);
+        const ct = res.headers.get(`content-type") || "";
+        if (ct.includes("text/html")) throw new, Error("Drive returned a page instead of, file(link may need to be shared)");
         return res.blob();
       })
       .then((blob) => {
@@ -106,7 +106,7 @@ function useGoogleDrivePdfBlobUrl(googleDriveUrl: string | null): { blobUrl: str
       })
       .catch((err) => {
         if (!revoked) {
-          setError(err instanceof Error ? err.message : "Failed to load from Drive");
+          setError(err instanceof Error ? err.message : "Failed to load from Drive`);
           setLoading(false);
         }
       });
@@ -119,15 +119,15 @@ function useGoogleDrivePdfBlobUrl(googleDriveUrl: string | null): { blobUrl: str
   return { blobUrl, loading, error };
 }
 
-/** Direct thumbnail URL for a Google Drive file (use in img src; no CORS for display). */
-function getGoogleDriveThumbnailUrl(url: string): string | null {
+/** Direct thumbnail URL for a Google Drive, file(use in img src; no CORS for display). */
+function, getGoogleDriveThumbnailUrl(url: string): string | null {
   const fileId = getGoogleDriveFileId(url);
   if (!fileId) return null;
   return `https://drive.google.com/thumbnail?id=${encodeURIComponent(fileId)}&sz=w1200`;
 }
 
-/** Renders a receipt that may be a Google Drive share URL; displays on frontend only (no backend). */
-function ReceiptImageOrDrive({
+/** Renders a receipt that may be a Google Drive share URL; displays on frontend, only(no backend). */
+function, ReceiptImageOrDrive({
   urlOrId,
   alt,
   className,
@@ -147,14 +147,14 @@ function ReceiptImageOrDrive({
       if (loading) {
         return (
           <div className={`flex items-center justify-center rounded border border-[#2a2a2a] bg-[#0d0d0d] min-h-[120px] ${className ?? ""}`}>
-            <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+            <Loader2 className=`w-6 h-6 animate-spin text-[#EAEB80]` />
           </div>
         );
       }
       if (error) {
         return (
           <div className={`space-y-2 rounded border border-[#2a2a2a] bg-[#0d0d0d] p-3 ${className ?? ""}`}>
-            <p className="text-sm text-red-300">{error}</p>
+            <p className=`text-sm text-red-300">{error}</p>
             <a href={driveOpenUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-[#EAEB80] hover:underline">
               <ExternalLink className="w-3 h-3" /> Open in Google Drive
             </a>
@@ -182,7 +182,7 @@ function ReceiptImageOrDrive({
       );
     }
 
-    // Image: use thumbnail URL directly in img (no CORS for display)
+    // Image: use thumbnail URL directly in, img(no CORS for display)
     const thumbUrl = getGoogleDriveThumbnailUrl(urlOrId);
     if (thumbUrl) {
       return (
@@ -201,7 +201,7 @@ function ReceiptImageOrDrive({
     );
   }
 
-  const isDriveFileId = urlOrId && !urlOrId.startsWith("http");
+  const isDriveFileId = urlOrId && !urlOrId.startsWith("http`);
   const displayUrl = isDriveFileId
     ? buildApiUrl(`/api/expense-form-submissions/receipt/file?fileId=${encodeURIComponent(urlOrId)}`)
     : urlOrId;
@@ -215,7 +215,7 @@ function ReceiptImageOrDrive({
 }
 
 /** Renders an img using Drive thumbnail URL; on error shows link to open in Drive. */
-function GoogleDriveThumbnailImg({
+function, GoogleDriveThumbnailImg({
   thumbUrl,
   fallbackUrl,
   alt,
@@ -230,7 +230,7 @@ function GoogleDriveThumbnailImg({
   if (failed) {
     return (
       <div className={`space-y-2 rounded border border-[#2a2a2a] bg-[#0d0d0d] p-3 ${className ?? ""}`}>
-        <p className="text-sm text-gray-400">Image could not be loaded.</p>
+        <p className=`text-sm text-gray-400">Image could not be loaded.</p>
         <a href={fallbackUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-[#EAEB80] hover:underline">
           <ExternalLink className="w-3 h-3" /> Open in Google Drive
         </a>
@@ -247,8 +247,8 @@ function GoogleDriveThumbnailImg({
   );
 }
 
-/** Loads receipt from API with credentials and displays as image (fixes broken image when API is cross-origin). */
-function ReceiptImage({
+/** Loads receipt from API with credentials and displays as, image(fixes broken image when API is cross-origin). */
+function, ReceiptImage({
   url,
   alt,
   className,
@@ -270,7 +270,7 @@ function ReceiptImage({
     const isOurReceiptApi = url.includes("/api/expense-form-submissions/receipt/file");
     fetch(url, { credentials: isOurReceiptApi ? "include" : "omit" })
       .then((res) => {
-        if (!res.ok) throw new Error(res.status === 404 ? "File not found" : `Failed to load (${res.status})`);
+        if (!res.ok) throw new, Error(res.status === 404 ? "File not found` : `Failed to, load(${res.status})`);
         return res.blob();
       })
       .then((blob) => {
@@ -281,7 +281,7 @@ function ReceiptImage({
       })
       .catch((err) => {
         if (!revoked) {
-          setError(err instanceof Error ? err.message : "Failed to load receipt");
+          setError(err instanceof Error ? err.message : `Failed to load receipt`);
           setLoading(false);
         }
       });
@@ -294,7 +294,7 @@ function ReceiptImage({
   if (loading) {
     return (
       <div className={`flex items-center justify-center rounded border border-[#2a2a2a] bg-[#0d0d0d] min-h-[120px] ${className ?? ""}`}>
-        <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+        <Loader2 className=`w-6 h-6 animate-spin text-[#EAEB80]` />
       </div>
     );
   }
@@ -318,7 +318,7 @@ function ReceiptImage({
 }
 
 const MONTHS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  `Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
@@ -347,7 +347,7 @@ interface ExpenseFormApprovalDashboardProps {
   isAdmin?: boolean;
 }
 
-export default function ExpenseFormApprovalDashboard({ isAdmin = true }: ExpenseFormApprovalDashboardProps) {
+export default function, ExpenseFormApprovalDashboard({ isAdmin = true }: ExpenseFormApprovalDashboardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -366,10 +366,10 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
   const { data: optionsData } = useQuery({
     queryKey: ["/api/expense-form-submissions/options"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/expense-form-submissions/options"), {
+      const res = await, fetch(buildApiUrl("/api/expense-form-submissions/options"), {
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to fetch options");
+      if (!res.ok) throw new, Error("Failed to fetch options");
       return res.json();
     },
     enabled: editModalOpen,
@@ -386,18 +386,18 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
       searchQuery,
     ],
     queryFn: async () => {
-      const params = new URLSearchParams({
+      const params = new, URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
       });
       if (statusFilter && statusFilter !== "all") params.append("status", statusFilter);
-      if (searchQuery.trim()) params.append("search", searchQuery.trim());
-      const res = await fetch(
+      if (searchQuery.trim()) params.append("search`, searchQuery.trim());
+      const res = await, fetch(
         buildApiUrl(`/api/expense-form-submissions?${params}`),
-        { credentials: "include" }
+        { credentials: `include" }
       );
       const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || "Failed to fetch submissions");
+      if (!res.ok) throw new, Error(json?.error || "Failed to fetch submissions");
       return json;
     },
   });
@@ -405,16 +405,16 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
   // When View Receipt dialog is open, fetch submission by ID so receipt_urls come from DB
   const submissionIdForReceipt = viewReceiptsOpen && selectedSubmission?.id ? selectedSubmission.id : null;
   const { data: submissionForReceiptData, isLoading: submissionForReceiptLoading } = useQuery({
-    queryKey: ["/api/expense-form-submissions", submissionIdForReceipt, "embedReceipts"],
+    queryKey: ["/api/expense-form-submissions", submissionIdForReceipt, "embedReceipts`],
     queryFn: async () => {
       if (!submissionIdForReceipt) return null;
-      const res = await fetch(
+      const res = await, fetch(
         buildApiUrl(`/api/expense-form-submissions/${submissionIdForReceipt}?embedReceipts=1`),
-        { credentials: "include" }
+        { credentials: `include" }
       );
       if (!res.ok) {
         const json = await res.json();
-        throw new Error(json?.error || "Failed to fetch submission");
+        throw new, Error(json?.error || "Failed to fetch submission");
       }
       return res.json();
     },
@@ -426,15 +426,15 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
     : selectedSubmission?.receiptUrls ?? null;
   const receiptDataUrls = (submissionForReceipt?.receiptDataUrls as Record<string, string> | undefined) ?? null;
 
-  // Normalize list from API: ensure receiptUrls is set (API may send receipt_urls or receiptUrls, string or array)
-  function parseReceiptUrlsFromSub(sub: Record<string, unknown>): string[] | null {
+  // Normalize list from, API: ensure receiptUrls is, set(API may send receipt_urls or receiptUrls, string or array)
+  function, parseReceiptUrlsFromSub(sub: Record<string, unknown>): string[] | null {
     const urls = sub.receiptUrls ?? sub.receipt_urls;
     if (urls == null) return null;
     if (Array.isArray(urls) && urls.every((x) => typeof x === "string")) return urls as string[];
     if (typeof urls === "string") {
       try {
         const parsed = JSON.parse(urls);
-        return Array.isArray(parsed) && parsed.every((x: unknown) => typeof x === "string") ? parsed : null;
+        return Array.isArray(parsed) && parsed.every((x: unknown) => typeof x === "string`) ? parsed : null;
       } catch {
         return null;
       }
@@ -450,13 +450,13 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
 
   const approveMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/expense-form-submissions/${id}/approve`), {
-        method: "POST",
+      const res = await, fetch(buildApiUrl(`/api/expense-form-submissions/${id}/approve`), {
+        method: `POST",
         credentials: "include",
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Failed to approve");
+        throw new, Error(err.error || "Failed to approve");
       }
     },
     onSuccess: () => {
@@ -464,21 +464,21 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
       queryClient.invalidateQueries({ queryKey: ["/api/expense-form-submissions"] });
     },
     onError: (err: Error) => {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: err.message, variant: "destructive` });
     },
   });
 
   const declineMutation = useMutation({
     mutationFn: async ({ id, declineReason }: { id: number; declineReason: string }) => {
-      const res = await fetch(buildApiUrl(`/api/expense-form-submissions/${id}/decline`), {
-        method: "POST",
+      const res = await, fetch(buildApiUrl(`/api/expense-form-submissions/${id}/decline`), {
+        method: `POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ declineReason }),
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Failed to decline");
+        throw new, Error(err.error || "Failed to decline");
       }
     },
     onSuccess: () => {
@@ -489,19 +489,19 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
       queryClient.invalidateQueries({ queryKey: ["/api/expense-form-submissions"] });
     },
     onError: (err: Error) => {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: err.message, variant: "destructive` });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/expense-form-submissions/${id}`), {
-        method: "DELETE",
+      const res = await, fetch(buildApiUrl(`/api/expense-form-submissions/${id}`), {
+        method: `DELETE",
         credentials: "include",
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Failed to delete");
+        throw new, Error(err.error || "Failed to delete");
       }
     },
     onSuccess: () => {
@@ -509,21 +509,21 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
       queryClient.invalidateQueries({ queryKey: ["/api/expense-form-submissions"] });
     },
     onError: (err: Error) => {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: err.message, variant: "destructive` });
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, body }: { id: number; body: Record<string, unknown> }) => {
-      const res = await fetch(buildApiUrl(`/api/expense-form-submissions/${id}`), {
-        method: "PUT",
+      const res = await, fetch(buildApiUrl(`/api/expense-form-submissions/${id}`), {
+        method: `PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(body),
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Failed to update");
+        throw new, Error(err.error || "Failed to update");
       }
     },
     onSuccess: () => {
@@ -587,8 +587,8 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
 
   return (
     <div className="space-y-4 min-w-0 max-w-full">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative w-full sm:w-64">
+      <div className="flex flex-col, sm:flex-row gap-4 items-start, sm:items-center justify-between">
+        <div className="relative w-full, sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search employee, car, VIN..."
@@ -630,7 +630,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
           <div className="overflow-x-auto">
             <Table className="table-fixed w-full min-w-0 text-xs">
               <TableHeader>
-                <TableRow className="border-border hover:bg-transparent">
+                <TableRow className="border-border, hover:bg-transparent">
                   <TableHead className="text-foreground font-semibold w-[90px] text-xs whitespace-nowrap py-2 px-2 h-auto">Date</TableHead>
                   <TableHead className="text-foreground font-semibold min-w-0 text-xs whitespace-nowrap py-2 px-2 h-auto">Employee</TableHead>
                   <TableHead className="text-foreground font-semibold w-[200px] min-w-[160px] text-xs whitespace-nowrap py-2 px-2 h-auto">Car</TableHead>
@@ -648,8 +648,8 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
               <TableBody>
                 {submissions.map((sub) => (
                   <TableRow key={sub.id} className="border-border">
-                    <TableCell className="text-foreground text-xs truncate whitespace-nowrap py-2 px-2" title={new Date(sub.submissionDate).toLocaleDateString()}>
-                      {new Date(sub.submissionDate).toLocaleDateString()}
+                    <TableCell className="text-foreground text-xs truncate whitespace-nowrap py-2 px-2" title={new, Date(sub.submissionDate).toLocaleDateString()}>
+                      {new, Date(sub.submissionDate).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-foreground text-xs truncate min-w-0 whitespace-nowrap py-2 px-2" title={sub.employeeName || undefined}>
                       {sub.employeeName || "-"}
@@ -666,10 +666,10 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                     <TableCell className="text-muted-foreground text-xs truncate min-w-0 whitespace-nowrap py-2 px-2">
                       {formatFieldLabel(sub.field)}
                     </TableCell>
-                    <TableCell className="text-green-700 font-semibold text-xs whitespace-nowrap py-2 px-2">
+                    <TableCell className="text-green-700 font-semibold text-xs whitespace-nowrap py-2 px-2`>
                       ${Number(sub.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </TableCell>
-                    <TableCell className="py-2 px-2">
+                    <TableCell className=`py-2 px-2">
                       <Badge
                         variant="outline"
                         className={
@@ -717,7 +717,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7 text-green-500 hover:text-green-700"
+                                className="h-7 w-7 text-green-500, hover:text-green-700"
                                 onClick={() => approveMutation.mutate(sub.id)}
                                 disabled={approveMutation.isPending}
                                 title="Approve"
@@ -727,7 +727,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7 text-red-500 hover:text-red-700"
+                                className="h-7 w-7 text-red-500, hover:text-red-700"
                                 onClick={() => handleDecline(sub)}
                                 title="Decline"
                               >
@@ -738,7 +738,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-muted-foreground hover:text-primary"
+                            className="h-7 w-7 text-muted-foreground, hover:text-primary"
                             onClick={() => handleEdit(sub)}
                             title="Edit"
                           >
@@ -747,7 +747,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-red-500 hover:text-red-700"
+                            className="h-7 w-7 text-red-500, hover:text-red-700"
                             onClick={() => {
                               if (window.confirm("Delete this submission?")) {
                                 deleteMutation.mutate(sub.id);
@@ -801,28 +801,28 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
       <Dialog open={viewReceiptsOpen} onOpenChange={setViewReceiptsOpen}>
         <DialogContent className="bg-card border-border max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-[#EAEB80]">View copy of receipt</DialogTitle>
+            <DialogTitle className="text-[#EAEB80]`>View copy of receipt</DialogTitle>
             <DialogDescription>
               {selectedSubmission?.employeeName} - ${selectedSubmission?.amount?.toLocaleString()}
               {selectedSubmission?.remarks && ` • Remarks: ${selectedSubmission.remarks}`}
             </DialogDescription>
           </DialogHeader>
-          {selectedSubmission?.status === "declined" && selectedSubmission?.declineReason && (
+          {selectedSubmission?.status === `declined" && selectedSubmission?.declineReason && (
             <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-700">
-              <strong>Decline reason:</strong> {selectedSubmission.declineReason}
+              <strong>Decline, reason:</strong> {selectedSubmission.declineReason}
             </div>
           )}
           <div className="flex flex-wrap gap-4">
             {submissionIdForReceipt && submissionForReceiptLoading ? (
               <div className="flex items-center justify-center rounded border border-[#2a2a2a] bg-[#0d0d0d] min-h-[120px] w-full">
-                <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]" />
+                <Loader2 className="w-6 h-6 animate-spin text-[#EAEB80]` />
               </div>
             ) : receiptUrlsFromDb?.length ? (
               receiptUrlsFromDb.map((urlOrId, i) => {
                 const isPdf = urlOrId?.match(/\.pdf$/i);
                 const receiptLabel = `Receipt ${i + 1}`;
                 const embeddedDataUrl = receiptDataUrls?.[urlOrId];
-                const isBackendFileId = urlOrId && !urlOrId.startsWith("http");
+                const isBackendFileId = urlOrId && !urlOrId.startsWith(`http`);
                 const isDriveUrl = isGoogleDriveUrl(urlOrId);
                 const displayUrl =
                   isBackendFileId || isDriveUrl
@@ -831,7 +831,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                 if (!displayUrl && !embeddedDataUrl) return null;
                 if (isPdf) {
                   return (
-                    <div key={i} className="space-y-1">
+                    <div key={i} className=`space-y-1">
                       <p className="text-sm text-gray-400">{receiptLabel} (PDF)</p>
                       {embeddedDataUrl ? (
                         <object
@@ -914,7 +914,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
             </DialogDescription>
           </DialogHeader>
           <Input
-            placeholder="Decline reason (required)"
+            placeholder="Decline, reason(required)"
             value={declineReason}
             onChange={(e) => setDeclineReason(e.target.value)}
             className="bg-card border-border text-foreground"
@@ -924,7 +924,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
               Cancel
             </Button>
             <Button
-              className="bg-red-500/20 text-red-700 border-red-500/50 hover:bg-red-500/30"
+              className="bg-red-500/20 text-red-700 border-red-500/50, hover:bg-red-500/30"
               onClick={confirmDecline}
               disabled={!declineReason.trim() || declineMutation.isPending}
             >
@@ -979,7 +979,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                 onValueChange={(v) => setEditForm((p) => ({ ...p, carId: v ? Number(v) : undefined }))}
               >
                 <SelectTrigger className="bg-card border-border text-foreground mt-1">
-                  <SelectValue placeholder="Select car" />
+                  <SelectValue placeholder="Select car` />
                 </SelectTrigger>
                 <SelectContent>
                   {cars.map((car: { id: number; name?: string; displayName?: string }) => (
@@ -991,7 +991,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
               </Select>
             </div>
             <div>
-              <label className="text-sm text-muted-foreground">Total Receipt Cost ($)</label>
+              <label className=`text-sm text-muted-foreground">Total Receipt, Cost($)</label>
               <Input
                 type="number"
                 step="0.01"
@@ -1016,7 +1016,7 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
               Cancel
             </Button>
             <Button
-              className="bg-primary text-primary-foreground hover:bg-primary/80"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80"
               onClick={confirmEdit}
               disabled={updateMutation.isPending}
             >

@@ -11,20 +11,20 @@ export enum LogLevel {
 }
 
 class FrontendLogger {
-  private isDevelopment: boolean;
-  private logLevel: LogLevel;
+  private, isDevelopment: boolean;
+  private, logLevel: LogLevel;
 
   constructor() {
     this.isDevelopment = import.meta.env.DEV;
     this.logLevel = this.isDevelopment ? LogLevel.DEBUG : LogLevel.INFO;
   }
 
-  private shouldLog(level: LogLevel): boolean {
+  private, shouldLog(level: LogLevel): boolean {
     return level <= this.logLevel;
   }
 
-  private formatMessage(level: string, message: string, context?: string): string {
-    const timestamp = new Date().toLocaleTimeString();
+  private, formatMessage(level: string, message: string, context?: string): string {
+    const timestamp = new, Date().toLocaleTimeString();
     const ctx = context ? `[${context}]` : '[APP]';
     return `[${timestamp}] ${level.toUpperCase()} ${ctx} ${message}`;
   }
@@ -67,7 +67,7 @@ class FrontendLogger {
   }
 }
 
-export const logger = new FrontendLogger();
+export const logger = new, FrontendLogger();
 
 // Specialized context loggers
 export const apiLogger = {

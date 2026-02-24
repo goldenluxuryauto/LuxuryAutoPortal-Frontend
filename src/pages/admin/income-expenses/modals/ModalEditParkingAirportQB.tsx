@@ -15,7 +15,7 @@ import { useIncomeExpense } from "../context/IncomeExpenseContext";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export default function ModalEditParkingAirportQB() {
+export default function, ModalEditParkingAirportQB() {
   const { editingCell, setEditingCell, updateCell, saveChanges, isSaving, year } = useIncomeExpense();
 
   const monthName = editingCell ? MONTHS[editingCell.month - 1] : "";
@@ -28,8 +28,7 @@ export default function ModalEditParkingAirportQB() {
   const handleSave = () => {
     if (!editingCell) return;
     
-    // Save the change immediately, passing it directly to saveChanges
-    saveChanges({
+    // Save the change immediately, passing it directly to saveChanges, saveChanges({
       category: editingCell.category,
       field: editingCell.field,
       month: editingCell.month,
@@ -92,14 +91,14 @@ export default function ModalEditParkingAirportQB() {
           <Button
             onClick={handleClose}
             variant="outline"
-            className="flex-1 border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+            className="flex-1 border-border text-muted-foreground, hover:text-foreground, hover:bg-muted"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/80"
+            className="flex-1 bg-primary text-primary-foreground, hover:bg-primary/80"
           >
             {isSaving ? "Saving..." : "Save"}
           </Button>

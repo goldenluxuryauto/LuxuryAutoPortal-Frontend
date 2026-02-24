@@ -1,11 +1,11 @@
-// Per-Car Income and Expense Page (singular)
-// Accessed from: View Car → "Income and Expense" menu item
+// Per-Car Income and Expense, Page(singular)
+// Accessed, from: View Car → "Income and Expense" menu item
 // Route: /admin/cars/:id/income-expense
 
 import { useRoute } from "wouter";
 import IncomeExpensePage from "./income-expenses/index";
 
-export default function CarIncomeExpensePage() {
+export default function, CarIncomeExpensePage() {
   const [, params] = useRoute("/admin/cars/:id/income-expense");
   const carId = params?.id ? parseInt(params.id, 10) : null;
 

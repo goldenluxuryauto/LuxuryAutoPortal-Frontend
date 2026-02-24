@@ -122,9 +122,9 @@ const employeeSchema = z.object({
 
 type EmployeeFormData = z.infer<typeof employeeSchema>;
 
-function formatDate(dateString: string) {
+function, formatDate(dateString: string) {
   try {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new, Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -134,7 +134,7 @@ function formatDate(dateString: string) {
   }
 }
 
-function statusBadge(employee: Employee) {
+function, statusBadge(employee: Employee) {
   if (employee.employee_status === "pending") {
     return { text: "Pending", className: "bg-yellow-500/20 text-yellow-700 border-yellow-500/30" };
   }
@@ -147,7 +147,7 @@ function statusBadge(employee: Employee) {
   return { text: "Inactive", className: "bg-gray-500/20 text-gray-700 border-gray-500/30 font-medium" };
 }
 
-export default function EmployeesPage() {
+export default function, EmployeesPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -179,44 +179,44 @@ export default function EmployeesPage() {
 
   const [location] = useLocation();
   const employeeIdFromUrl = useMemo(() => {
-    const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
-    const id = params.get("employeeId");
+    const params = new, URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+    const id = params.get("employeeId`);
     return id ? parseInt(id, 10) : null;
   }, [location]);
 
   const formLink = useMemo(() => `${window.location.origin}/employee-form`, []);
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
   const qrRef = useRef<HTMLDivElement | null>(null);
-  // Load employees from database (employees + employee_job_pay tables) via GET /api/employees
+  // Load employees from, database(employees + employee_job_pay tables) via GET /api/employees
   const { data, isLoading, error, refetch } = useQuery<{
     success: boolean;
     data: Employee[];
     pagination: { page: number; limit: number; total: number; totalPages: number };
   }>({
-    queryKey: ["/api/employees", searchQuery, statusFilter, page, itemsPerPage],
+    queryKey: [`/api/employees", searchQuery, statusFilter, page, itemsPerPage],
     placeholderData: keepPreviousData,
     queryFn: async () => {
-      const params = new URLSearchParams();
+      const params = new, URLSearchParams();
       if (searchQuery && searchQuery.trim()) params.append("search", searchQuery.trim());
       if (statusFilter !== "all") params.append("status", statusFilter);
       params.append("page", page.toString());
-      params.append("limit", itemsPerPage.toString());
+      params.append("limit`, itemsPerPage.toString());
       const url = buildApiUrl(`/api/employees?${params.toString()}`);
-      const response = await fetch(url, { credentials: "include" });
+      const response = await, fetch(url, { credentials: `include" });
       if (!response.ok) {
         const contentType = response.headers.get("content-type") || "";
         if (contentType.includes("application/json")) {
           const err = await response.json().catch(() => ({ error: "Failed to fetch employees" }));
-          throw new Error(err.error || err.message || "Failed to fetch employees");
+          throw new, Error(err.error || err.message || "Failed to fetch employees`);
         }
-        throw new Error(`Failed to fetch employees (${response.status})`);
+        throw new, Error(`Failed to fetch, employees(${response.status})`);
       }
       return response.json();
     },
     refetchOnWindowFocus: true,
   });
 
-  // When employeeId in URL (e.g. from Slack), navigate to full view page (v1 style)
+  // When employeeId in, URL(e.g. from Slack), navigate to full view, page(v1 style)
   const [, setLocation] = useLocation();
   useEffect(() => {
     if (employeeIdFromUrl) {
@@ -237,7 +237,7 @@ export default function EmployeesPage() {
   const addForm = useForm<EmployeeFormData>({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
-      firstName: "",
+      firstName: `",
       middleName: "",
       lastName: "",
       workEmail: "",
@@ -259,7 +259,7 @@ export default function EmployeesPage() {
     mutationFn: async (payload: EmployeeFormData) => {
       // Note: Files are stored in state but backend currently expects JSON
       // Files can be uploaded separately or backend can be updated to accept FormData
-      const response = await fetch(buildApiUrl("/api/employees"), {
+      const response = await, fetch(buildApiUrl("/api/employees"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -286,13 +286,13 @@ export default function EmployeesPage() {
       
       if (!response.ok) {
         const err = await response.json().catch(() => ({ error: "Failed to create employee" }));
-        throw new Error(err.error || err.message || "Failed to create employee");
+        throw new, Error(err.error || err.message || "Failed to create employee");
       }
       
       const result = await response.json();
       
       // TODO: Upload files separately if backend supports file uploads
-      // For now, files are stored in state (carInsurancePhotos, driverLicensePhoto)
+      // For now, files are stored in, state(carInsurancePhotos, driverLicensePhoto)
       // and can be uploaded via a separate endpoint if needed
       
       return result;
@@ -306,21 +306,21 @@ export default function EmployeesPage() {
       setDriverLicensePhoto(null);
     },
     onError: (e: any) => {
-      toast({ title: "Error", description: e.message || "Failed to create employee", variant: "destructive" });
+      toast({ title: "Error", description: e.message || "Failed to create employee", variant: "destructive` });
     },
   });
 
   const approveMutation = useMutation({
     mutationFn: async (employeeId: number) => {
-      const response = await fetch(buildApiUrl(`/api/employees/${employeeId}/status`), {
-        method: "PATCH",
+      const response = await, fetch(buildApiUrl(`/api/employees/${employeeId}/status`), {
+        method: `PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ status: "" }),
       });
       if (!response.ok) {
         const err = await response.json().catch(() => ({ error: "Failed to approve employee" }));
-        throw new Error(err.error || err.message || "Failed to approve employee");
+        throw new, Error(err.error || err.message || "Failed to approve employee");
       }
       return response.json();
     },
@@ -330,19 +330,19 @@ export default function EmployeesPage() {
       setEmployeeToApprove(null);
     },
     onError: (e: any) => {
-      toast({ title: "Error", description: e.message || "Failed to approve employee", variant: "destructive" });
+      toast({ title: "Error", description: e.message || "Failed to approve employee", variant: "destructive` });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (employeeId: number) => {
-      const response = await fetch(buildApiUrl(`/api/employees/${employeeId}`), {
-        method: "DELETE",
+      const response = await, fetch(buildApiUrl(`/api/employees/${employeeId}`), {
+        method: `DELETE",
         credentials: "include",
       });
       if (!response.ok) {
         const err = await response.json().catch(() => ({ error: "Failed to delete employee" }));
-        throw new Error(err.error || err.message || "Failed to delete employee");
+        throw new, Error(err.error || err.message || "Failed to delete employee");
       }
       return response.json();
     },
@@ -358,16 +358,16 @@ export default function EmployeesPage() {
 
   const importMutation = useMutation({
     mutationFn: async (file: File) => {
-      const formData = new FormData();
+      const formData = new, FormData();
       formData.append("file", file);
-      const response = await fetch(buildApiUrl("/api/admin/employees/import"), {
+      const response = await, fetch(buildApiUrl("/api/admin/employees/import"), {
         method: "POST",
         credentials: "include",
         body: formData,
       });
       if (!response.ok) {
         const err = await response.json().catch(() => ({ error: "Failed to import employees" }));
-        throw new Error(err.error || err.message || "Failed to import employees");
+        throw new, Error(err.error || err.message || "Failed to import employees");
       }
       return response.json();
     },
@@ -380,8 +380,8 @@ export default function EmployeesPage() {
       const errors = payload.errors || [];
 
       toast({
-        title: "Import Completed",
-        description: `${successful} of ${total} records imported successfully${failed > 0 ? `. ${failed} failed.` : ""}`,
+        title: "Import Completed`,
+        description: `${successful} of ${total} records imported successfully${failed > 0 ? `. ${failed} failed.` : `"}`,
       });
 
       if (failed > 0 && errors.length > 0) {
@@ -428,7 +428,7 @@ export default function EmployeesPage() {
       // Clone the SVG to avoid modifying the original
       const clonedSvg = svgElement.cloneNode(true) as SVGElement;
 
-      // Remove any existing print container (cleanup from earlier attempts)
+      // Remove any existing print, container(cleanup from earlier attempts)
       const existing = document.getElementById("print-qr-container-gla");
       if (existing && existing.parentNode) {
         existing.parentNode.removeChild(existing);
@@ -445,7 +445,7 @@ export default function EmployeesPage() {
       const printContent = document.createElement("div");
       printContent.className = "print-qr-content";
 
-      // Add CSS for print styling (embedded directly)
+      // Add CSS for print, styling(embedded directly)
       const styleSheet = document.createElement("style");
       styleSheet.type = "text/css";
       styleSheet.media = "print";
@@ -590,13 +590,13 @@ export default function EmployeesPage() {
 
       const urlLabel = document.createElement("div");
       urlLabel.className = "print-qr-url-label";
-      urlLabel.textContent = "Url link:";
+      urlLabel.textContent = "Url, link:";
 
       const urlText = document.createElement("div");
       urlText.className = "print-qr-url";
       urlText.textContent = formLink;
 
-      // Append in the desired order (logo, title, QR, caption, url label, url)
+      // Append in the desired, order(logo, title, QR, caption, url label, url)
       printContent.appendChild(logoImg);
       printContent.appendChild(title);
       printContent.appendChild(qrWrapper);
@@ -621,7 +621,7 @@ export default function EmployeesPage() {
         }
       }, 1000);
 
-      // Also try to clean up when print dialog closes (if browser supports beforeprint/afterprint)
+      // Also try to clean up when print dialog, closes(if browser supports beforeprint/afterprint)
       const afterPrintHandler = () => {
         clearTimeout(cleanupTimeout);
         if (printContainer && printContainer.parentNode) {
@@ -637,7 +637,7 @@ export default function EmployeesPage() {
         description: "Select your printer and click Print.",
       });
     } catch (error) {
-      console.error("Error printing QR:", error);
+      console.error("Error printing, QR:", error);
       toast({
         title: "Print failed",
         description: "An unexpected error occurred while preparing the print.",
@@ -646,77 +646,77 @@ export default function EmployeesPage() {
     }
   };
 
-  const downloadExport = async (format: "xlsx" | "csv", mode: "template" | "data") => {
+  const downloadExport = async (format: "xlsx" | "csv", mode: "template" | "data`) => {
     try {
       const url = buildApiUrl(`/api/admin/employees/export?format=${format}&mode=${mode}`);
-      const response = await fetch(url, { credentials: "include" });
+      const response = await, fetch(url, { credentials: `include" });
       if (!response.ok) {
         const contentType = response.headers.get("content-type") || "";
         if (contentType.includes("application/json")) {
           const err = await response.json().catch(() => ({ error: "Failed to export" }));
-          throw new Error(err.error || err.message || "Failed to export");
+          throw new, Error(err.error || err.message || "Failed to export`);
         }
-        throw new Error(`Failed to export (${response.status})`);
+        throw new, Error(`Failed to, export(${response.status})`);
       }
       const blob = await response.blob();
       const objectUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement(`a`);
       a.href = objectUrl;
       a.download = `employees_${mode}.${format}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(objectUrl);
-      toast({ title: "Download Started", description: `Employees ${mode} ${format.toUpperCase()} downloaded.` });
+      toast({ title: `Download Started`, description: `Employees ${mode} ${format.toUpperCase()} downloaded.` });
     } catch (e: any) {
-      toast({ title: "Export Failed", description: e.message || "Failed to export", variant: "destructive" });
+      toast({ title: `Export Failed", description: e.message || "Failed to export", variant: "destructive" });
     }
   };
 
   return (
     <AdminLayout>
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+      <div className="space-y-4, sm:space-y-6">
+        <div className="flex flex-col, sm:flex-row, sm:items-center, sm:justify-between gap-3, sm:gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-primary italic mb-1 sm:mb-2">
+            <h1 className="text-xl, sm:text-2xl, md:text-3xl font-serif text-primary italic mb-1, sm:mb-2">
               Employees
             </h1>
-            <p className="text-muted-foreground text-xs sm:text-sm">
+            <p className="text-muted-foreground text-xs, sm:text-sm">
               Manage employees and employee onboarding submissions
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col, sm:flex-row gap-2">
             <Button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80 w-full, sm:w-auto"
             >
-              <Plus className="w-4 h-4 sm:mr-2" />
+              <Plus className="w-4 h-4, sm:mr-2" />
               Add
             </Button>
 
             <Button
               onClick={openQRDialog}
-              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80 w-full, sm:w-auto"
             >
-              <Copy className="w-4 h-4 sm:mr-2" />
+              <Copy className="w-4 h-4, sm:mr-2" />
               Form Link
             </Button>
 
             <Button
               onClick={() => setIsImportModalOpen(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
+              className="bg-primary text-primary-foreground, hover:bg-primary/80 w-full, sm:w-auto"
             >
-              <Upload className="w-4 h-4 sm:mr-2" />
+              <Upload className="w-4 h-4, sm:mr-2" />
               Import
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  className="bg-primary text-primary-foreground hover:bg-primary/80 w-full sm:w-auto"
+                  className="bg-primary text-primary-foreground, hover:bg-primary/80 w-full, sm:w-auto"
                 >
-                  <Download className="w-4 h-4 sm:mr-2" />
+                  <Download className="w-4 h-4, sm:mr-2" />
                   Export
                 </Button>
               </DropdownMenuTrigger>
@@ -752,13 +752,13 @@ export default function EmployeesPage() {
                   </div>
 
                   <div className="flex gap-3 justify-center">
-                    <Button onClick={handlePrintQR} className="bg-primary text-primary-foreground hover:bg-primary/80">
+                    <Button onClick={handlePrintQR} className="bg-primary text-primary-foreground, hover:bg-primary/80">
                       Print
                     </Button>
-                    <Button onClick={handleViewForm} className="bg-primary text-primary-foreground hover:bg-primary/80">
+                    <Button onClick={handleViewForm} className="bg-primary text-primary-foreground, hover:bg-primary/80">
                       View
                     </Button>
-                    <Button onClick={handleCopyFormLink} variant="ghost" className="text-muted-foreground hover:text-foreground">
+                    <Button onClick={handleCopyFormLink} variant="ghost" className="text-muted-foreground, hover:text-foreground">
                       Copy Link
                     </Button>
                   </div>
@@ -772,7 +772,7 @@ export default function EmployeesPage() {
         {/* Search and Filter */}
         <Card className="bg-card border-border">
           <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col, md:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -783,7 +783,7 @@ export default function EmployeesPage() {
                     setSearchQuery(e.target.value);
                     setPage(1);
                   }}
-                  className="pl-10 bg-card border-border text-foreground placeholder:text-gray-600"
+                  className="pl-10 bg-card border-border text-foreground, placeholder:text-gray-600"
                 />
               </div>
 
@@ -794,7 +794,7 @@ export default function EmployeesPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-full md:w-[220px] bg-card border-border text-foreground">
+                <SelectTrigger className="w-full, md:w-[220px] bg-card border-border text-foreground">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border text-foreground">
@@ -815,7 +815,7 @@ export default function EmployeesPage() {
                     setStatusFilter("all");
                     setPage(1);
                   }}
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground, hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -827,38 +827,38 @@ export default function EmployeesPage() {
         {/* Employees Table */}
         <Card className="bg-card border-border">
           <CardContent className="p-0">
-            <div className="overflow-x-auto -mx-3 sm:mx-0">
+            <div className="overflow-x-auto -mx-3, sm:mx-0">
               <Table className="min-w-[1000px]">
                 <TableHeader>
-                  <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="text-center text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-16 text-[10px] sm:text-xs">
+                  <TableRow className="border-border, hover:bg-transparent">
+                    <TableHead className="text-center text-foreground font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 w-16 text-[10px] sm:text-xs">
                       No
                     </TableHead>
-                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
+                    <TableHead className="text-left text-foreground font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
                       Status
                     </TableHead>
-                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
+                    <TableHead className="text-left text-foreground font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[140px] text-[10px] sm:text-xs">
                       Employee #
                     </TableHead>
-                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[220px] text-[10px] sm:text-xs">
+                    <TableHead className="text-left text-foreground font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[220px] text-[10px] sm:text-xs">
                       Employee Name
                     </TableHead>
-                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[240px] text-[10px] sm:text-xs hidden lg:table-cell">
+                    <TableHead className="text-left text-foreground font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[240px] text-[10px] sm:text-xs hidden, lg:table-cell">
                       Work Email
                     </TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden lg:table-cell">
+                    <TableHead className="text-left text-primary font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden, lg:table-cell">
                       Mobile
                     </TableHead>
-                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
+                    <TableHead className="text-left text-foreground font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden, xl:table-cell">
                       Department
                     </TableHead>
-                    <TableHead className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden xl:table-cell">
+                    <TableHead className="text-left text-foreground font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[180px] text-[10px] sm:text-xs hidden, xl:table-cell">
                       Job Title
                     </TableHead>
-                    <TableHead className="text-left text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden md:table-cell">
+                    <TableHead className="text-left text-primary font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 min-w-[140px] text-[10px] sm:text-xs hidden, md:table-cell">
                       Created
                     </TableHead>
-                    <TableHead className="text-center text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 w-28 text-[10px] sm:text-xs">
+                    <TableHead className="text-center text-foreground font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 w-28 text-[10px] sm:text-xs">
                       Actions
                     </TableHead>
                   </TableRow>
@@ -876,7 +876,7 @@ export default function EmployeesPage() {
                           <Button
                             size="sm"
                             onClick={() => refetch()}
-                            className="bg-primary text-primary-foreground hover:bg-primary/80"
+                            className="bg-primary text-primary-foreground, hover:bg-primary/80"
                           >
                             Retry
                           </Button>
@@ -896,10 +896,10 @@ export default function EmployeesPage() {
                       const badge = statusBadge(emp);
                       return (
                         <TableRow key={emp.employee_aid} className="border-border group">
-                          <TableCell className="text-center text-primary font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
+                          <TableCell className="text-center text-primary font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm">
                             {rowNumber}
                           </TableCell>
-                          <TableCell className="text-left px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
+                          <TableCell className="text-left px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle">
                             <Badge
                               variant="outline"
                               className={cn("text-xs", badge.className)}
@@ -907,48 +907,48 @@ export default function EmployeesPage() {
                               {badge.text}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
+                          <TableCell className="text-left text-muted-foreground px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm">
                             {emp.employee_number || <span className="text-gray-600">N/A</span>}
                           </TableCell>
-                          <TableCell className="text-left text-foreground font-medium px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm">
+                          <TableCell className="text-left text-foreground font-medium px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm">
                             {emp.employee_last_name}, {emp.employee_first_name}
                           </TableCell>
-                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm hidden, lg:table-cell">
                             {emp.employee_job_pay_work_email || emp.employee_email || (
                               <span className="text-gray-600">N/A</span>
                             )}
                           </TableCell>
-                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden lg:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm hidden, lg:table-cell">
                             {emp.employee_mobile_number || emp.employee_telephone || (
                               <span className="text-gray-600">—</span>
                             )}
                           </TableCell>
-                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm hidden, xl:table-cell">
                             {emp.employee_job_pay_department_name || <span className="text-gray-600">—</span>}
                           </TableCell>
-                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden xl:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm hidden, xl:table-cell">
                             {emp.employee_job_pay_job_title_name || <span className="text-gray-600">—</span>}
                           </TableCell>
-                          <TableCell className="text-left text-muted-foreground px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle text-xs sm:text-sm hidden md:table-cell">
+                          <TableCell className="text-left text-muted-foreground px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle text-xs, sm:text-sm hidden, md:table-cell">
                             {formatDate(emp.employee_created)}
                           </TableCell>
-                          <TableCell className="text-center px-2 sm:px-4 md:px-6 py-3 sm:py-4 align-middle">
+                          <TableCell className="text-center px-2, sm:px-4, md:px-6 py-3, sm:py-4 align-middle">
                             <div className="flex items-center justify-center gap-2">
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-9 w-9 p-0 text-primary hover:text-primary hover:bg-primary/10 rounded-full"
-                                title="View"
+                                className="h-9 w-9 p-0 text-primary, hover:text-primary, hover:bg-primary/10 rounded-full"
+                                title="View`
                                 onClick={() => setLocation(`/admin/hr/employees/view?employeeId=${emp.employee_aid}`)}
                               >
-                                <Eye className="w-4 h-4" />
+                                <Eye className=`w-4 h-4" />
                               </Button>
 
                               {emp.employee_status === "pending" && (
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-9 w-9 p-0 text-green-700 hover:text-green-700 hover:bg-green-500/10 rounded-full"
+                                  className="h-9 w-9 p-0 text-green-700, hover:text-green-700, hover:bg-green-500/10 rounded-full"
                                   onClick={() => setEmployeeToApprove(emp)}
                                   title="Approve"
                                 >
@@ -959,7 +959,7 @@ export default function EmployeesPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-9 w-9 p-0 text-red-700 hover:text-red-700 hover:bg-red-500/10 rounded-full"
+                                className="h-9 w-9 p-0 text-red-700, hover:text-red-700, hover:bg-red-500/10 rounded-full"
                                 onClick={() => setEmployeeToDelete(emp)}
                                 title="Delete"
                               >
@@ -999,9 +999,9 @@ export default function EmployeesPage() {
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-primary">Add New Employee</DialogTitle>
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-primary">Add New Employee</DialogTitle>
               <DialogDescription className="text-muted-foreground">
-                Create an employee record (this does not submit the public onboarding form)
+                Create an employee, record(this does not submit the public onboarding form)
               </DialogDescription>
             </DialogHeader>
 
@@ -1010,7 +1010,7 @@ export default function EmployeesPage() {
                 onSubmit={addForm.handleSubmit((values) => createMutation.mutate(values))}
                 className="space-y-6 mt-4"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-4">
                   <FormField
                     control={addForm.control}
                     name="firstName"
@@ -1018,7 +1018,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">First Name *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1032,7 +1032,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Middle Name</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1046,7 +1046,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Last Name *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1060,7 +1060,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Work Email *</FormLabel>
                         <FormControl>
-                          <Input {...field} type="email" className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} type="email" className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1074,7 +1074,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Phone Number *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1089,7 +1089,7 @@ export default function EmployeesPage() {
                       <FormItem className="md:col-span-2">
                         <FormLabel className="text-muted-foreground">Street</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1103,7 +1103,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">City</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1117,7 +1117,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">State</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1131,7 +1131,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Country</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1145,7 +1145,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">ZIP</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1160,7 +1160,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Emergency Contact Name *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1174,7 +1174,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Emergency Contact Phone Number *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1189,7 +1189,7 @@ export default function EmployeesPage() {
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Social Security Number or EIN *</FormLabel>
                         <FormControl>
-                          <Input {...field} className="bg-card border-border text-foreground focus:border-primary" />
+                          <Input {...field} className="bg-card border-border text-foreground, focus:border-primary" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1259,7 +1259,7 @@ export default function EmployeesPage() {
                     <div className="space-y-2">
                       <label
                         htmlFor="car-insurance-upload"
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50, hover:border-primary/60, hover:bg-primary/5 transition-all cursor-pointer group"
                       >
                         <div className="flex flex-col items-center justify-center pt-4 pb-4">
                           <Upload className="w-8 h-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
@@ -1299,7 +1299,7 @@ export default function EmployeesPage() {
                                 onClick={() => {
                                   setCarInsurancePhotos((prev) => prev.filter((_, i) => i !== index));
                                 }}
-                                className="text-muted-foreground hover:text-foreground h-6 w-6 p-0"
+                                className="text-muted-foreground, hover:text-foreground h-6 w-6 p-0"
                               >
                                 <X className="w-3 h-3" />
                               </Button>
@@ -1315,7 +1315,7 @@ export default function EmployeesPage() {
                     <div className="space-y-2">
                       <label
                         htmlFor="driver-license-upload"
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/40 rounded-xl bg-background/50, hover:border-primary/60, hover:bg-primary/5 transition-all cursor-pointer group"
                       >
                         <div className="flex flex-col items-center justify-center pt-4 pb-4">
                           <Upload className="w-8 h-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
@@ -1349,7 +1349,7 @@ export default function EmployeesPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => setDriverLicensePhoto(null)}
-                            className="text-muted-foreground hover:text-foreground h-6 w-6 p-0"
+                            className="text-muted-foreground, hover:text-foreground h-6 w-6 p-0"
                           >
                             <X className="w-3 h-3" />
                           </Button>
@@ -1369,14 +1369,14 @@ export default function EmployeesPage() {
                       setCarInsurancePhotos([]);
                       setDriverLicensePhoto(null);
                     }}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground, hover:text-foreground"
                     disabled={createMutation.isPending}
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                    className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                     disabled={createMutation.isPending}
                   >
                     {createMutation.isPending ? (
@@ -1398,12 +1398,12 @@ export default function EmployeesPage() {
         <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
           <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-primary flex items-center gap-2">
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-primary flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5" />
                 Import Employees
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
-                Upload an Excel (.xlsx, .xls) or CSV file. Use Export → Template to download the correct format.
+                Upload an, Excel(.xlsx, .xls) or CSV file. Use Export → Template to download the correct format.
               </DialogDescription>
             </DialogHeader>
 
@@ -1411,14 +1411,14 @@ export default function EmployeesPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="import-file"
-                  className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-primary/40 rounded-xl bg-background/50 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer group"
+                  className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-primary/40 rounded-xl bg-background/50, hover:border-primary/60, hover:bg-primary/5 transition-all cursor-pointer group"
                 >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <Upload className="w-10 h-10 text-primary mb-3 group-hover:scale-110 transition-transform" />
                     <p className="mb-2 text-sm font-semibold text-muted-foreground group-hover:text-primary transition-colors">
                       {importFile ? importFile.name : "Click to Upload or Drag and Drop"}
                     </p>
-                    <p className="text-xs text-muted-foreground">Excel (.xlsx, .xls) or CSV file (Max 100MB)</p>
+                    <p className="text-xs text-muted-foreground">Excel (.xlsx, .xls) or CSV, file(Max 100MB)</p>
                   </div>
                   <input
                     id="import-file"
@@ -1446,7 +1446,7 @@ export default function EmployeesPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setImportFile(null)}
-                      className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
+                      className="text-muted-foreground, hover:text-foreground h-8 w-8 p-0"
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -1463,7 +1463,7 @@ export default function EmployeesPage() {
                     setImportFile(null);
                     setImportErrors([]);
                   }}
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground, hover:text-foreground"
                   disabled={importMutation.isPending}
                 >
                   Cancel
@@ -1481,7 +1481,7 @@ export default function EmployeesPage() {
                     }
                     importMutation.mutate(importFile);
                   }}
-                  className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                  className="bg-primary text-primary-foreground, hover:bg-primary/80 font-medium"
                   disabled={!importFile || importMutation.isPending}
                 >
                   {importMutation.isPending ? (
@@ -1505,8 +1505,8 @@ export default function EmployeesPage() {
         <Dialog open={showImportErrors} onOpenChange={setShowImportErrors}>
           <DialogContent className="bg-card border-border text-foreground max-w-[95vw] sm:max-w-3xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-yellow-700">
-                Import Warning ({importErrors.length})
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-yellow-700">
+                Import, Warning({importErrors.length})
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 The following rows failed to import. Please review and fix the issues.
@@ -1537,7 +1537,7 @@ export default function EmployeesPage() {
                   setImportFile(null);
                   setImportErrors([]);
                 }}
-                className="bg-card border-border text-foreground hover:bg-muted"
+                className="bg-card border-border text-foreground, hover:bg-muted"
               >
                 Close
               </Button>
@@ -1549,7 +1549,7 @@ export default function EmployeesPage() {
         <Dialog open={employeeToApprove !== null} onOpenChange={(open) => !open && setEmployeeToApprove(null)}>
           <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-green-700">Approve Employee</DialogTitle>
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-green-700">Approve Employee</DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 {employeeToApprove ? (
                   <>
@@ -1564,14 +1564,14 @@ export default function EmployeesPage() {
               <Button
                 variant="outline"
                 onClick={() => setEmployeeToApprove(null)}
-                className="border-border text-muted-foreground hover:bg-muted/50"
+                className="border-border text-muted-foreground, hover:bg-muted/50"
                 disabled={approveMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={() => employeeToApprove && approveMutation.mutate(employeeToApprove.employee_aid)}
-                className="bg-green-600 text-foreground hover:bg-green-700"
+                className="bg-green-600 text-foreground, hover:bg-green-700"
                 disabled={approveMutation.isPending}
               >
                 {approveMutation.isPending ? (
@@ -1591,7 +1591,7 @@ export default function EmployeesPage() {
         <Dialog open={employeeToDelete !== null} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>
           <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold text-red-700">Delete Employee</DialogTitle>
+              <DialogTitle className="text-lg, sm:text-xl font-semibold text-red-700">Delete Employee</DialogTitle>
               <DialogDescription className="text-muted-foreground">
                 {employeeToDelete ? (
                   <>
@@ -1606,14 +1606,14 @@ export default function EmployeesPage() {
               <Button
                 variant="outline"
                 onClick={() => setEmployeeToDelete(null)}
-                className="border-border text-muted-foreground hover:bg-muted/50"
+                className="border-border text-muted-foreground, hover:bg-muted/50"
                 disabled={deleteMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
                 onClick={() => employeeToDelete && deleteMutation.mutate(employeeToDelete.employee_aid)}
-                className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground hover:bg-red-500/30 text-red-700"
+                className="bg-red-500/20 text-red-700 border-red-500/50 text-foreground, hover:bg-red-500/30 text-red-700"
                 disabled={deleteMutation.isPending}
               >
                 {deleteMutation.isPending ? (

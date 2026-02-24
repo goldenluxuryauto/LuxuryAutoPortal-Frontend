@@ -20,7 +20,7 @@ interface ConfirmDialogProps {
   variant?: "default" | "destructive";
 }
 
-export function ConfirmDialog({
+export function, ConfirmDialog({
   trigger,
   title,
   description,
@@ -49,7 +49,7 @@ export function ConfirmDialog({
             }}
             className={
               variant === "destructive"
-                ? "bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90"
+                ? "bg-destructive text-destructive-foreground border-destructive, hover:bg-destructive/90"
                 : ""
             }
           >

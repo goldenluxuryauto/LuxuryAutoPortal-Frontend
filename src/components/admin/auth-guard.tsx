@@ -6,7 +6,7 @@ interface AuthGuardProps {
   children: React.ReactNode;
 }
 
-export function AuthGuard({ children }: AuthGuardProps) {
+export function, AuthGuard({ children }: AuthGuardProps) {
   const [, setLocation] = useLocation();
   const [isChecking, setIsChecking] = useState(true);
   const [hasAuthenticated, setHasAuthenticated] = useState(false);
@@ -15,12 +15,11 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const { data, isLoading, isError, error, isFetching } = useQuery<{ user?: { id?: number; email?: string; isAdmin?: boolean; isClient?: boolean; isEmployee?: boolean } }>({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      const { buildApiUrl } = await import("@/lib/queryClient");
+      const { buildApiUrl } = await, import("@/lib/queryClient");
       try {
-        const response = await fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
+        const response = await, fetch(buildApiUrl("/api/auth/me"), { credentials: "include" });
         if (!response.ok) {
-          // 401 is expected when not authenticated - don't log as error
-          if (response.status === 401) {
+          // 401 is expected when not authenticated - don't log as error, if(response.status === 401) {
             return { user: undefined };
           }
           // For other errors, still return undefined but don't throw
@@ -41,51 +40,40 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   useEffect(() => {
     // Handle initial authentication check
-    // Add a delay to allow session cookie to be fully set after login redirect
-    if (!isLoading && !initialLoadComplete) {
+    // Add a delay to allow session cookie to be fully set after login redirect, if(!isLoading && !initialLoadComplete) {
       // Wait for session to stabilize after login redirect
       // This prevents false negatives when the cookie hasn't been set yet
       const timer = setTimeout(() => {
         setInitialLoadComplete(true);
         
-        // Check if we have a user in the data
-        if (data?.user) {
-          // User is authenticated on initial load
-          setHasAuthenticated(true);
+        // Check if we have a user in the data, if(data?.user) {
+          // User is authenticated on initial load, setHasAuthenticated(true);
           setIsChecking(false);
         } else {
           // No user found - but this might be a race condition
-          // Wait a bit more and check again before redirecting
-          setTimeout(() => {
+          // Wait a bit more and check again before redirecting, setTimeout(() => {
             // Re-check the query data - it might have updated by now
-            // We'll check again in the next effect cycle
-            if (!data?.user) {
-              // Still no user after waiting - redirect to login
-              setLocation("/admin/login");
+            // We'll check again in the next effect cycle, if(!data?.user) {
+              // Still no user after waiting - redirect to login, setLocation("/admin/login");
             }
           }, 800);
         }
-      }, 500); // Wait 500ms before initial check to allow session to stabilize
-      
-      return () => clearTimeout(timer);
+      }, 500); // Wait 500ms before initial check to allow session to stabilize, return() => clearTimeout(timer);
     }
     
-    // After initial load is complete, handle authentication state changes
-    if (initialLoadComplete && !isLoading && !isFetching) {
+    // After initial load is complete, handle authentication state changes, if(initialLoadComplete && !isLoading && !isFetching) {
       if (data?.user) {
-        // We have a user - mark as authenticated
-        if (!hasAuthenticated) {
+        // We have a user - mark as authenticated, if(!hasAuthenticated) {
           setHasAuthenticated(true);
           setIsChecking(false);
         }
-      } else if (!data?.user && hasAuthenticated) {
+      } else, if(!data?.user && hasAuthenticated) {
         // User was authenticated but now session is gone
         // This handles actual session expiration
         // Add a delay to prevent false positives from race conditions
         const timer = setTimeout(() => {
           // Double-check that we still don't have a user
-          // The query might have updated by now
-          if (!data?.user) {
+          // The query might have updated by now, if(!data?.user) {
             setLocation("/admin/login");
           }
         }, 1500);

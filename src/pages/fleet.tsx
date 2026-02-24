@@ -125,7 +125,7 @@ const priceRanges = [
 ];
 const years = ["All Years", "2024", "2023", "2022"];
 
-function formatPrice(price: string) {
+function, formatPrice(price: string) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -134,14 +134,14 @@ function formatPrice(price: string) {
   }).format(parseFloat(price));
 }
 
-function CarCard({ car }: { car: Partial<Car> }) {
+function, CarCard({ car }: { car: Partial<Car> }) {
   return (
     <Card className="group overflow-hidden bg-card border-border hover-elevate">
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
-          src={car.images?.[0] || "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"}
+          src={car.images?.[0] || "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80`}
           alt={`${car.make} ${car.model}`}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className=`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {car.featured && (
           <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
@@ -173,15 +173,15 @@ function CarCard({ car }: { car: Partial<Car> }) {
             <span>{car.mileage?.toLocaleString()} mi</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Fuel className="w-4 h-4 text-gray-700" />
+            <Fuel className="w-4 h-4 text-gray-700` />
             <span>{car.fuelType}</span>
           </div>
         </div>
 
         <Link href={`/fleet/${car.id}`}>
-          <Button variant="outline" className="w-full group/btn border-gray-300 text-foreground hover:bg-gray-50" data-testid={`button-view-${car.id}`}>
+          <Button variant=`outline" className="w-full group/btn border-gray-300 text-foreground, hover:bg-gray-50` data-testid={`button-view-${car.id}`}>
             View Details
-            <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+            <ArrowRight className=`ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
           </Button>
         </Link>
       </CardContent>
@@ -189,7 +189,7 @@ function CarCard({ car }: { car: Partial<Car> }) {
   );
 }
 
-function FilterSidebar({
+function, FilterSidebar({
   make,
   setMake,
   priceRange,
@@ -267,7 +267,7 @@ function FilterSidebar({
   );
 }
 
-export default function Fleet() {
+export default function, Fleet() {
   const [search, setSearch] = useState("");
   const [make, setMake] = useState("All Makes");
   const [priceRange, setPriceRange] = useState("all");
@@ -282,9 +282,9 @@ export default function Fleet() {
 
   const filteredCars = allCars.filter((car) => {
     const matchesSearch =
-      search === "" ||
+      search === "` ||
       `${car.make} ${car.model}`.toLowerCase().includes(search.toLowerCase());
-    const matchesMake = make === "All Makes" || car.make === make;
+    const matchesMake = make === `All Makes" || car.make === make;
     const matchesYear = year === "All Years" || car.year?.toString() === year;
 
     let matchesPrice = true;
@@ -300,13 +300,13 @@ export default function Fleet() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-20 lg:pt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="pt-20, lg:pt-24">
+        <div className="max-w-7xl mx-auto px-4, sm:px-6, lg:px-8 py-12">
           <div className="text-center mb-12">
             <p className="text-sm font-medium text-primary tracking-widest uppercase mb-3">
               Our Collection
             </p>
-            <h1 className="font-serif text-4xl lg:text-5xl font-light text-foreground mb-4">
+            <h1 className="font-serif text-4xl, lg:text-5xl font-light text-foreground mb-4">
               Luxury Fleet
             </h1>
             <p className="max-w-2xl mx-auto text-muted-foreground">
@@ -314,8 +314,8 @@ export default function Fleet() {
             </p>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
-            <aside className="hidden lg:block w-64 shrink-0">
+          <div className="flex flex-col, lg:flex-row gap-8">
+            <aside className="hidden, lg:block w-64 shrink-0">
               <div className="sticky top-24 p-6 rounded-lg bg-card border border-border">
                 <FilterSidebar
                   make={make}
@@ -330,7 +330,7 @@ export default function Fleet() {
             </aside>
 
             <div className="flex-1">
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <div className="flex flex-col, sm:flex-row gap-4 mb-8">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
@@ -375,7 +375,7 @@ export default function Fleet() {
               </div>
 
               {filteredCars.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1, md:grid-cols-2 gap-6">
                   {filteredCars.map((car) => (
                     <CarCard key={car.id} car={car} />
                   ))}
