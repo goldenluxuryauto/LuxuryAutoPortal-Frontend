@@ -266,7 +266,7 @@
    * This way they can stack/compound. Both will overlap the parent's borders!
    * So borders will be automatically adjusted both on toggle, and hover/active,
    * and they will be compounded.
-   */
+   */ 
   .toggle-elevate::before,
   .toggle-elevate-2::before {
     content: "";
