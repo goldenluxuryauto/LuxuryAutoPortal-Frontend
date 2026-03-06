@@ -36,43 +36,71 @@ const services = [
 
 export function Services() {
   return (
-    <section className="py-20 lg:py-28 bg-gradient-to-b from-[#0a0a0a] to-[#0f0f0f]">
+    <section className="py-20 lg:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 lg:mb-16">
-          <p className="text-sm font-medium text-primary tracking-widest uppercase mb-3">
-            Why Choose Us
-          </p>
-          <h2 className="font-serif text-3xl lg:text-4xl font-medium text-white mb-4">
-            The Luxury Experience
+        {/* Enhanced Header */}
+        <div className="text-center mb-16 lg:mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <p className="text-sm font-semibold text-primary tracking-widest uppercase">
+              Luxury Service
+            </p>
+          </div>
+          
+          <h2 className="font-serif text-4xl lg:text-5xl font-light text-foreground mb-6 tracking-tight">
+            The Golden Standard
+            <span className="block text-primary mt-2">Experience</span>
           </h2>
-          <p className="max-w-2xl mx-auto text-gray-400">
+          
+          <p className="max-w-3xl mx-auto text-lg text-muted-foreground leading-relaxed">
             Beyond exceptional vehicles, we deliver an unparalleled ownership experience
             tailored to the most discerning clientele.
           </p>
+
+          {/* Decorative divider */}
+          <div className="flex items-center justify-center mt-8">
+            <div className="w-20 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
+            <Sparkles className="w-4 h-4 text-primary mx-4" />
+            <div className="w-20 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        {/* Services Grid with Staggered Animation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
           {services.map((service, index) => {
             const Icon = service.icon;
             return (
               <Card
                 key={index}
-                className="bg-white/[0.04] border-white/10 hover-elevate group"
+                className="group bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border-border/50 hover:border-primary/30 hover:bg-card/90 transition-all duration-500 hover:shadow-xl hover:shadow-primary/5 opacity-0 animate-in fade-in-0 slide-in-from-bottom-4"
+                style={{ animationDelay: `${index * 150}ms`, animationFillMode: 'forwards' }}
               >
-                <CardContent className="p-6 lg:p-8">
-                  <div className="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
-                    <Icon className="w-6 h-6 text-primary" />
+                <CardContent className="p-6 lg:p-8 relative overflow-hidden">
+                  {/* Background decoration */}
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/5 to-transparent rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-700" />
+                  
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mb-6 group-hover:from-primary/30 group-hover:to-primary/20 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                      <Icon className="w-7 h-7 text-primary" />
+                    </div>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
+                      {service.title}
+                    </h3>
+                    
+                    <p className="text-muted-foreground leading-relaxed">
+                      {service.description}
+                    </p>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    {service.title}
-                  </h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">
-                    {service.description}
-                  </p>
                 </CardContent>
               </Card>
             );
           })}
+        </div>
+
+        {/* Bottom accent */}
+        <div className="flex justify-center mt-16">
+          <div className="w-32 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
         </div>
       </div>
     </section>
