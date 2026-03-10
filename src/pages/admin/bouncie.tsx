@@ -149,7 +149,7 @@ export default function BouncieFleetPage() {
     if (connected === "true") {
       toast({ title: "Bouncie Connected", description: "Successfully connected to Bouncie. Live tracking is now active." });
       window.history.replaceState({}, "", window.location.pathname);
-      queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/bouncie/status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
     } else if (error) {
       toast({ title: "Bouncie Connection Failed", description: `Error: ${error}`, variant: "destructive" });
@@ -158,9 +158,9 @@ export default function BouncieFleetPage() {
   }, []);
 
   const { data: connData, isLoading: connLoading } = useQuery<{ success: boolean; data: ConnectionStatus }>({
-    queryKey: ["/api/bouncie/connection-status"],
+    queryKey: ["/api/auth/bouncie/status"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/connection-status"), { credentials: "include" });
+      const res = await fetch(buildApiUrl("/api/auth/bouncie/status"), { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch connection status");
       return res.json();
     },
@@ -203,7 +203,7 @@ export default function BouncieFleetPage() {
 
   const disconnectMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/disconnect"), {
+      const res = await fetch(buildApiUrl("/api/auth/bouncie/disconnect"), {
         method: "DELETE",
         credentials: "include",
       });
@@ -211,7 +211,7 @@ export default function BouncieFleetPage() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/bouncie/status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
       toast({ title: "Disconnected", description: "Bouncie connection removed." });
     },
@@ -224,8 +224,31 @@ export default function BouncieFleetPage() {
   const overview = data?.data;
   const summary = overview?.summary;
 
-  const handleConnect = () => {
-    window.location.href = buildApiUrl("/api/bouncie/connect");
+  const handleConnect = async () => {
+    try {
+      // Get the OAuth URL from the backend
+      const res = await fetch(buildApiUrl("/api/auth/bouncie"), { 
+        credentials: "include" 
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to get OAuth URL");
+      }
+      
+      const data = await res.json();
+      if (data.success && data.authUrl) {
+        // Redirect to Bouncie OAuth
+        window.location.href = data.authUrl;
+      } else {
+        throw new Error("Invalid OAuth response");
+      }
+    } catch (error) {
+      toast({ 
+        title: "Connection Error", 
+        description: "Failed to start Bouncie connection", 
+        variant: "destructive" 
+      });
+    }
   };
 
   return (
