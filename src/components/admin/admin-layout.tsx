@@ -9,7 +9,6 @@ import {
   Calculator,
   Wrench,
   ClipboardList,
-  Eye,
   Key,
   Briefcase,
   CreditCard,
@@ -79,8 +78,6 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/operations", label: "Operations", icon: Cog, roles: ["admin"] },
   { href: "/admin/maintenance", label: "Car Maintenance", icon: Wrench, roles: ["admin"] },
   { href: "/admin/forms", label: "Forms", icon: ClipboardList },
-  { href: "/admin/view-client", label: "View as a Client", icon: Eye, roles: ["admin"] },
-  { href: "/admin/view-employee", label: "View as an Employee", icon: Eye, roles: ["admin"] },
   { href: "/admin/car-rental", label: "Car Rental", icon: Key, roles: ["admin"] },
   {
     href: "/admin/hr",
@@ -98,6 +95,7 @@ const allSidebarItems: SidebarItem[] = [
   { href: "/admin/training-manual", label: "System Tutorial", icon: GraduationCap, roles: ["admin"] },
   { href: "/tutorial", label: "System Tutorial", icon: GraduationCap, roles: ["client"] },
   { href: "/admin/testimonials", label: "Client Testimonials", icon: Star },
+  { href: "/staff/dashboard", label: "Staff (view as staff)", icon: User, roles: ["admin"] },
 ];
 
 // Staff/employee sidebar: Dashboard, My Info, Forms, Task Management, Turo Guide, System Tutorial, Client Testimonials, Car Rental
@@ -189,25 +187,29 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
   const user = data?.user;
 
-  // Filter sidebar items based on user role (employees see staff nav only; admin/client see main nav)
+  // When on /staff path, show staff sidebar for both employees and admins (managers) so staff functions are available
+  const showStaffSidebar = location.startsWith("/staff") && (user?.isEmployee === true || user?.isAdmin === true);
+
+  // Filter sidebar items based on user role and path (employees see staff nav; on /staff path admins also see staff nav)
   const sidebarItems = useMemo(() => {
     if (!user) return [];
 
     const userRole = user.isAdmin ? "admin" : user.isClient ? "client" : user.isEmployee ? "employee" : null;
+    const roleForStaffNav = showStaffSidebar ? "employee" : userRole;
 
-    // Employees see the staff sidebar (v1-style nav); admin/client see the main sidebar filtered by role
-    if (user.isEmployee) {
+    // Staff sidebar: when user is employee, or when on /staff path as admin (manager using staff view)
+    if (user.isEmployee || showStaffSidebar) {
       return employeeSidebarItems.filter((item) => {
-        const visible = !item.roles || item.roles.length === 0 || (userRole && item.roles.includes(userRole));
+        const visible = !item.roles || item.roles.length === 0 || (roleForStaffNav && item.roles.includes(roleForStaffNav));
         if (!visible) return false;
         if (item.children && item.children.length > 0) {
-          const filteredChildren = item.children.filter((c) => !c.roles || c.roles.length === 0 || (userRole && c.roles.includes(userRole)));
+          const filteredChildren = item.children.filter((c) => !c.roles || c.roles.length === 0 || (roleForStaffNav && c.roles.includes(roleForStaffNav)));
           return filteredChildren.length > 0;
         }
         return true;
       }).map((item) => {
         if (item.children && item.children.length > 0) {
-          const filteredChildren = item.children.filter((c) => !c.roles || c.roles.length === 0 || (userRole && c.roles.includes(userRole)));
+          const filteredChildren = item.children.filter((c) => !c.roles || c.roles.length === 0 || (roleForStaffNav && c.roles.includes(roleForStaffNav)));
           return { ...item, children: filteredChildren };
         }
         return item;
@@ -227,7 +229,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         return item;
       })
       .filter(Boolean) as SidebarItem[];
-  }, [user]);
+  }, [user, location, showStaffSidebar]);
 
   const handleLogout = async () => {
     try {

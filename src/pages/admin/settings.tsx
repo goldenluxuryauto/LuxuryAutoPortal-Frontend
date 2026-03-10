@@ -439,8 +439,24 @@ export default function SettingsPage() {
               <CardDescription className="text-muted-foreground">
                 Configure which Slack channels receive notifications for each form type. Each form type can have its own dedicated channel.
               </CardDescription>
+              <p className="text-sm text-amber-700 dark:text-amber-400 mt-2 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span><strong>Income &amp; Expense Receipts:</strong> For Slack notifications to appear when an employee submits an Income &amp; Expense Receipt, set the <strong>Slack Bot Token</strong> below and a <strong>Slack Channel ID</strong> for each category (Income, Direct Delivery, COGS, Reimbursed Bills). Invite the bot to those channels in Slack.</span>
+              </p>
             </CardHeader>
             <CardContent className="space-y-6">
+            {(!slackBotTokenConfigured || channels.some((c) => ["expense_income", "expense_direct_delivery", "expense_cogs", "expense_reimbursed_bills"].includes(c.formType) && !(c.channelId && c.channelId.trim()))) && (
+              <div className="p-3 rounded-lg border border-amber-500/50 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 text-sm flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                <div>
+                  {!slackBotTokenConfigured && <p className="font-medium">Slack Bot Token is not set.</p>}
+                  {channels.some((c) => ["expense_income", "expense_direct_delivery", "expense_cogs", "expense_reimbursed_bills"].includes(c.formType) && !(c.channelId && c.channelId.trim())) && (
+                    <p className={slackBotTokenConfigured ? "mt-1" : "mt-1"}>One or more Income &amp; Expense channel IDs are missing. Set a Channel ID for each category so receipts post to the correct channel.</p>
+                  )}
+                  <p className="mt-1">Retest after saving: submit an Income &amp; Expense Receipt from an employee account and confirm the notification appears in the configured Slack channel(s).</p>
+                </div>
+              </div>
+            )}
             {/* Slack Bot Token - same edit pattern as Slack Channel ID */}
             <div className="p-4 border border-border rounded-lg bg-card">
               <div className="flex items-start justify-between mb-4">
