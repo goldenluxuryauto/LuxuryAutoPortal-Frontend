@@ -61,7 +61,7 @@ function getGoogleDriveFileId(url: string): string | null {
   const ucMatch = trimmed.match(/drive\.google\.com\/uc\?(?:.*&)?id=([a-zA-Z0-9_-]+)/);
   if (ucMatch) return ucMatch[1];
   return null;
-}
+} 
 
 /** True if the string looks like a Google Drive file/view URL. */
 function isGoogleDriveUrl(url: string): boolean {

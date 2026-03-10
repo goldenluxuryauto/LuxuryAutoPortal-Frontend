@@ -1,14 +1,5 @@
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -17,84 +8,45 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Textarea } from "@/components/ui/textarea";
 import { buildApiUrl } from "@/lib/queryClient";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { MessageCircle, Plus, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { MessageCircle, Loader2 } from "lucide-react";
 
-interface TestimonialItem {
-  testimonial_aid?: string;
-  testimonial_client_name?: string;
-  testimonial_content?: string;
-  testimonial_date?: string;
+interface ClientTestimonialItem {
+  client_testimonial_aid: number;
+  client_testimonial_title: string;
+  client_testimonial_description: string;
+  client_testimonial_datetime: string;
 }
 
 function formatDate(d: string | undefined, fallback = "--") {
   if (!d) return fallback;
   try {
     const x = new Date(d);
-    return isNaN(x.getTime()) ? fallback : x.toLocaleDateString();
+    return isNaN(x.getTime()) ? fallback : x.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   } catch {
     return fallback;
   }
 }
 
 export default function StaffClientTestimonials() {
-  const [addOpen, setAddOpen] = useState(false);
-  const [clientName, setClientName] = useState("");
-  const [content, setContent] = useState("");
-  const queryClient = useQueryClient();
-
-  const { data, isLoading } = useQuery<{ success?: boolean; data?: TestimonialItem[] }>({
-    queryKey: ["staff-testimonials"],
+  const { data, isLoading } = useQuery<{ success?: boolean; list?: ClientTestimonialItem[] }>({
+    queryKey: ["client-testimonials-active"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/staff/testimonials"), { credentials: "include" });
-      if (res.status === 404 || res.status === 501) return { success: true, data: [] };
+      const res = await fetch(buildApiUrl("/api/client-testimonials/active?limit=100"), { credentials: "include" });
       if (!res.ok) throw new Error("Failed to load testimonials");
       return res.json();
     },
-    retry: false,
   });
 
-  const createMutation = useMutation({
-    mutationFn: async (payload: { testimonial_client_name: string; testimonial_content: string }) => {
-      const res = await fetch(buildApiUrl("/api/staff/testimonials"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error("Failed to add");
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["staff-testimonials"] });
-      setAddOpen(false);
-      setClientName("");
-      setContent("");
-    },
-  });
-
-  const rows: TestimonialItem[] = data?.data ?? [];
-
-  const handleAdd = () => {
-    if (!clientName.trim() || !content.trim()) return;
-    createMutation.mutate({ testimonial_client_name: clientName.trim(), testimonial_content: content.trim() });
-  };
+  const rows: ClientTestimonialItem[] = data?.list ?? [];
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-primary">Client Testimonials</h1>
-            <p className="text-muted-foreground">View and add client feedback and testimonials.</p>
-          </div>
-          <Button onClick={() => setAddOpen(true)} className="gap-2">
-            <Plus className="w-4 h-4" />
-            Add
-          </Button>
+        <div>
+          <h1 className="text-2xl font-semibold text-primary">Client Testimonials</h1>
+          <p className="text-muted-foreground">View client testimonials managed by admin.</p>
         </div>
 
         <Card className="bg-card border-border">
@@ -117,18 +69,18 @@ export default function StaffClientTestimonials() {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-8">#</TableHead>
-                      <TableHead>Client</TableHead>
-                      <TableHead>Content</TableHead>
-                      <TableHead>Date</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead className="w-28">Date</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {rows.map((item, idx) => (
-                      <TableRow key={item.testimonial_aid ?? idx}>
+                      <TableRow key={item.client_testimonial_aid}>
                         <TableCell>{idx + 1}.</TableCell>
-                        <TableCell>{item.testimonial_client_name ?? "--"}</TableCell>
-                        <TableCell className="max-w-md truncate">{item.testimonial_content ?? "--"}</TableCell>
-                        <TableCell>{formatDate(item.testimonial_date)}</TableCell>
+                        <TableCell className="font-medium">{item.client_testimonial_title}</TableCell>
+                        <TableCell className="max-w-md">{item.client_testimonial_description || "—"}</TableCell>
+                        <TableCell className="text-muted-foreground text-sm">{formatDate(item.client_testimonial_datetime)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -138,44 +90,6 @@ export default function StaffClientTestimonials() {
           </CardContent>
         </Card>
       </div>
-
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add testimonial</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>Client name</Label>
-              <Input
-                value={clientName}
-                onChange={(e) => setClientName(e.target.value)}
-                placeholder="Client name"
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label>Content</Label>
-              <Textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Testimonial content"
-                className="mt-1 min-h-[100px]"
-              />
-            </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
-              <Button
-                onClick={handleAdd}
-                disabled={createMutation.isPending || !clientName.trim() || !content.trim()}
-              >
-                {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                Add
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </AdminLayout>
   );
 }

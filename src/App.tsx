@@ -41,6 +41,9 @@ import HumanResourcesPage from "@/pages/admin/hr";
 import EmployeesPage from "@/pages/admin/hr/employees";
 import EmployeeViewPage from "@/pages/admin/hr/employee-view";
 import WorkSchedulePage from "@/pages/admin/hr/work-schedule";
+import PayrollPage from "@/pages/admin/payroll";
+import PayrollByRunPage from "@/pages/admin/payroll/payroll-by-run";
+import PayslipPage from "@/pages/admin/payroll/payslip";
 import EmployeeFormPage from "@/pages/employee-form";
 import BouncieDevicesPage from "@/pages/admin/bouncie-devices";
 import BouncieFleetPage from "@/pages/admin/bouncie";
@@ -69,6 +72,7 @@ import StaffCarRentalTrips from "@/pages/staff/car-rental-trips";
 import StaffCarRentalForms from "@/pages/staff/car-rental-forms";
 import StaffCarRentalFormSubmit from "@/pages/staff/car-rental-form-submit";
 import TuroTripsPage from "@/pages/admin/turo-trips";
+import AdminTestimonialsPage from "@/pages/admin/testimonials";
 
 function Router() {
   return (
@@ -127,11 +131,15 @@ function Router() {
       <Route path="/admin/hr/work-schedule" component={WorkSchedulePage} />
       <Route path="/admin/hr/employees/view" component={EmployeeViewPage} />
       <Route path="/admin/hr/employees" component={EmployeesPage} />
+      <Route path="/admin/payroll" component={PayrollPage} />
+      <Route path="/admin/payroll/:payrunId/payslip/:employeeId" component={PayslipPage} />
+      <Route path="/admin/payroll/:payrunId" component={PayrollByRunPage} />
       <Route path="/employee-form" component={EmployeeFormPage} />
       <Route path="/profile" component={ClientProfilePage} />
       <Route path="/tutorial" component={ClientTrainingManualPage} />
       <Route path="/admin/training-manual" component={TrainingManualPage} />
       <Route path="/admin/turo-trips" component={TuroTripsPage} />
+      <Route path="/admin/testimonials" component={AdminTestimonialsPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
       <Route component={NotFound} />
     </Switch>

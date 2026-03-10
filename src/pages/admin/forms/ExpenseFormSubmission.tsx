@@ -93,9 +93,9 @@ export default function ExpenseFormSubmission() {
     }));
   }, [formData.submissionDate]);
 
-  // Default Employee Name (and id) to logged-in employee when viewing as employee (required, not optional)
+  // Default Employee Name to logged-in employee (for both admin dropdown and employee view)
   useEffect(() => {
-    if (!isEmployeeView || !optionsData?.data) return;
+    if (!optionsData?.data) return;
     const list = optionsData.data.employees || [];
     if (currentEmployeeId) {
       const id = String(currentEmployeeId);
@@ -103,18 +103,27 @@ export default function ExpenseFormSubmission() {
       if (exists) setFormData((prev) => (prev.employeeId === id ? prev : { ...prev, employeeId: id }));
       return;
     }
-    // Fallback: match by display name (session "First Last" vs API "Last, First") so employeeId is set for submit
+    // Fallback: match by display name (session "First Last" vs API "Last, First")
     const displayName = (currentUser?.displayName ?? "").trim();
-    if (!displayName || list.length === 0) return;
-    const parts = (s: string) => s.split(/\s+|,\s*/).map((p) => p.trim().toLowerCase()).filter(Boolean).sort();
-    const displayParts = parts(displayName);
-    const match = list.find((e: { name: string }) => {
-      if (!e?.name) return false;
-      const empParts = parts(e.name);
-      return displayParts.length === empParts.length && displayParts.every((p, i) => p === empParts[i]);
-    });
-    if (match) setFormData((prev) => (prev.employeeId === String(match.id) ? prev : { ...prev, employeeId: String(match.id) }));
-  }, [isEmployeeView, currentEmployeeId, currentUser?.displayName, optionsData]);
+    if (displayName && list.length > 0) {
+      const parts = (s: string) => s.split(/\s+|,\s*/).map((p) => p.trim().toLowerCase()).filter(Boolean).sort();
+      const displayParts = parts(displayName);
+      const match = list.find((e: { name: string }) => {
+        if (!e?.name) return false;
+        const empParts = parts(e.name);
+        return displayParts.length === empParts.length && displayParts.every((p, i) => p === empParts[i]);
+      });
+      if (match) {
+        setFormData((prev) => (prev.employeeId === String(match.id) ? prev : { ...prev, employeeId: String(match.id) }));
+        return;
+      }
+    }
+    // Fallback: when only one employee in list, default to them (single-user scenario)
+    if (list.length === 1) {
+      const id = String(list[0].id);
+      setFormData((prev) => (prev.employeeId === id ? prev : { ...prev, employeeId: id }));
+    }
+  }, [currentEmployeeId, currentUser?.displayName, optionsData]);
 
   // AI receipt extraction: analyze first image when added (COGS workflow - AI reads cost)
   const addReceiptFiles = useCallback(
@@ -158,10 +167,24 @@ export default function ExpenseFormSubmission() {
   const submitMutation = useMutation({
     mutationFn: async () => {
       const receiptUrls: string[] = [];
-      if (receiptFiles.length > 0 && formData.employeeId) {
+      let effectiveEmployeeIdForSubmit =
+        formData.employeeId ||
+        (currentEmployeeId != null ? String(currentEmployeeId) : "") ||
+        (employees.length === 1 ? String((employees[0] as { id: number }).id) : "");
+      if (!effectiveEmployeeIdForSubmit && isEmployeeView && (currentUser?.displayName ?? "").trim() && employees.length > 0) {
+        const parts = (s: string) => s.split(/\s+|,\s*/).map((p) => p.trim().toLowerCase()).filter(Boolean).sort();
+        const displayParts = parts((currentUser?.displayName ?? "").trim());
+        const match = (employees as { id: number; name: string }[]).find((e) => {
+          if (!e?.name) return false;
+          const empParts = parts(e.name);
+          return displayParts.length === empParts.length && displayParts.every((p, i) => p === empParts[i]);
+        });
+        if (match) effectiveEmployeeIdForSubmit = String(match.id);
+      }
+      if (receiptFiles.length > 0 && effectiveEmployeeIdForSubmit) {
         const fd = new FormData();
         receiptFiles.forEach((file) => fd.append("receipts", file));
-        fd.append("employeeId", formData.employeeId);
+        fd.append("employeeId", effectiveEmployeeIdForSubmit);
         const uploadRes = await fetch(buildApiUrl("/api/expense-form-submissions/receipts/upload"), {
           method: "POST",
           credentials: "include",
@@ -182,7 +205,7 @@ export default function ExpenseFormSubmission() {
         credentials: "include",
         body: JSON.stringify({
           submissionDate: formData.submissionDate,
-          employeeId: parseInt(formData.employeeId),
+          employeeId: parseInt(effectiveEmployeeIdForSubmit, 10),
           carId: parseInt(formData.carId),
           year: parseInt(formData.year),
           month: parseInt(formData.month),
@@ -209,7 +232,10 @@ export default function ExpenseFormSubmission() {
       });
       setFormData({
         submissionDate: new Date().toISOString().slice(0, 10),
-        employeeId: isEmployeeView ? (formData.employeeId || (currentEmployeeId ? String(currentEmployeeId) : "")) : "",
+        employeeId:
+          formData.employeeId ||
+          (currentEmployeeId != null ? String(currentEmployeeId) : "") ||
+          (employees.length === 1 ? String((employees[0] as { id: number }).id) : ""),
         carId: "",
         year: new Date().getFullYear().toString(),
         month: (new Date().getMonth() + 1).toString(),
@@ -233,16 +259,52 @@ export default function ExpenseFormSubmission() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      !formData.employeeId ||
-      !formData.carId ||
-      !formData.field ||
-      !formData.amount ||
-      parseFloat(formData.amount) <= 0
-    ) {
+    // Resolve employee: selected, API currentEmployeeId, single-employee list, or (in employee view) match by display name
+    let effectiveEmployeeId =
+      formData.employeeId ||
+      (currentEmployeeId != null ? String(currentEmployeeId) : "") ||
+      (employees.length === 1 ? String((employees[0] as { id: number }).id) : "");
+    if (!effectiveEmployeeId && isEmployeeView && (currentUser?.displayName ?? "").trim() && employees.length > 0) {
+      const parts = (s: string) => s.split(/\s+|,\s*/).map((p) => p.trim().toLowerCase()).filter(Boolean).sort();
+      const displayParts = parts((currentUser?.displayName ?? "").trim());
+      const match = (employees as { id: number; name: string }[]).find((e) => {
+        if (!e?.name) return false;
+        const empParts = parts(e.name);
+        return displayParts.length === empParts.length && displayParts.every((p, i) => p === empParts[i]);
+      });
+      if (match) effectiveEmployeeId = String(match.id);
+    }
+    if (!effectiveEmployeeId) {
       toast({
         title: "Validation Error",
-        description: "Please fill all required fields and enter a valid amount.",
+        description: isEmployeeView
+          ? "Your account could not be matched to an employee record. Please contact an administrator."
+          : "Please select an employee from the list.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!formData.carId) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a car from the dropdown list (type to search, then click a result).",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!formData.field) {
+      toast({
+        title: "Validation Error",
+        description: "Please select an expense type.",
+        variant: "destructive",
+      });
+      return;
+    }
+    const amountNum = parseFloat(formData.amount);
+    if (!formData.amount || Number.isNaN(amountNum) || amountNum <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid amount greater than 0.",
         variant: "destructive",
       });
       return;
@@ -331,6 +393,9 @@ export default function ExpenseFormSubmission() {
           <div className="relative space-y-2">
             <Label className="text-foreground font-medium text-sm">Car <span className="text-primary">*</span></Label>
             <p className="text-xs text-muted-foreground/80">Type car name, VIN, or plate number to search.</p>
+            {carSearch.trim() && !formData.carId && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">Select a car from the list above to continue.</p>
+            )}
             <Input
               value={
                 carDropdownOpen
