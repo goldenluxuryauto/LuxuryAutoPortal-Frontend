@@ -37,7 +37,7 @@ interface VehicleEntry {
   battery_level: number | null;
   odometer_miles: number | null;
   make: string | null;
-  model: string | null;
+  model: string | null | Record<string, any>;
   year: string | null;
   license_plate: string | null;
   color: string | null;
@@ -125,8 +125,11 @@ function formatLastSeen(dateStr: string | null) {
 function vehicleDisplayName(v: VehicleEntry): string {
   const year = v.year || v.liveStatus?.vehicleInfo?.year;
   const make = v.make || v.liveStatus?.vehicleInfo?.make;
-  const model = v.model || v.liveStatus?.vehicleInfo?.model;
-  const nick = v.device_nickname || v.liveStatus?.vehicleInfo?.nickname;
+  // Guard: model could still be an object if backend hasn't restarted yet
+  const rawModel = v.model || v.liveStatus?.vehicleInfo?.model;
+  const model = rawModel && typeof rawModel === "object" ? (rawModel as any).name : rawModel;
+  const nick = v.liveStatus?.vehicleInfo?.nickname ||
+    (v.device_nickname && v.device_nickname !== "[object Object]" ? v.device_nickname : null);
 
   if (year && make && model) return `${year} ${make} ${model}`;
   if (make && model) return `${make} ${model}`;
