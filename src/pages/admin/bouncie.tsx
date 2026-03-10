@@ -4,6 +4,7 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DeviceManagement } from "@/components/admin/bouncie/DeviceManagement";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
 import {
@@ -403,6 +404,11 @@ export default function BouncieFleetPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Device Management Section */}
+        {!connLoading && conn?.connected && (
+          <DeviceManagement />
+        )}
 
         {/* Vehicle List */}
         <Card>
