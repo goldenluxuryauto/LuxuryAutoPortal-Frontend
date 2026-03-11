@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +21,15 @@ import {
   Link2,
   Link2Off,
   Timer,
+  Battery,
+  BatteryLow,
+  Route,
+  BarChart3,
+  ShieldAlert,
+  Zap,
+  ExternalLink,
 } from "lucide-react";
+import { Link } from "wouter";
 
 interface VehicleEntry {
   device_id: string;
@@ -43,11 +51,13 @@ interface VehicleEntry {
   color: string | null;
   displayStatus: string;
   liveStatus: {
-    isConnected: boolean;
+    isRunning: boolean;
     speed: number;
     latitude: number | null;
     longitude: number | null;
     lastSeen: string | null;
+    fuelLevel: number | null;
+    odometer: number | null;
     vehicleInfo: {
       make: string | null;
       model: string | null;
@@ -125,7 +135,6 @@ function formatLastSeen(dateStr: string | null) {
 function vehicleDisplayName(v: VehicleEntry): string {
   const year = v.year || v.liveStatus?.vehicleInfo?.year;
   const make = v.make || v.liveStatus?.vehicleInfo?.make;
-  // Guard: model could still be an object if backend hasn't restarted yet
   const rawModel = v.model || v.liveStatus?.vehicleInfo?.model;
   const model = rawModel && typeof rawModel === "object" ? (rawModel as any).name : rawModel;
   const nick = v.liveStatus?.vehicleInfo?.nickname ||
@@ -137,11 +146,153 @@ function vehicleDisplayName(v: VehicleEntry): string {
   return `Device ${v.imei}`;
 }
 
+function BatteryIndicator({ level }: { level: number | null }) {
+  if (level == null) return null;
+  const pct = Math.round(level);
+  const color = pct <= 20 ? "text-red-500" : pct <= 50 ? "text-yellow-500" : "text-green-500";
+  const Icon = pct <= 20 ? BatteryLow : Battery;
+  return (
+    <span className={`flex items-center gap-1 text-xs ${color}`} title={`Battery: ${pct}%`}>
+      <Icon className="w-3 h-3" />
+      {pct}%
+    </span>
+  );
+}
+
+// Lazy-load the Leaflet map only on client to avoid SSR issues
+function FleetMap({ vehicles }: { vehicles: VehicleEntry[] }) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+
+  const vehiclesWithCoords = vehicles.filter(v => {
+    const lat = v.liveStatus?.latitude ?? v.last_latitude;
+    const lng = v.liveStatus?.longitude ?? v.last_longitude;
+    return lat != null && lng != null;
+  });
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Dynamically import Leaflet to avoid SSR issues
+    import("leaflet").then((L) => {
+      // Fix default icon path issue with bundlers
+      delete (L.Icon.Default.prototype as any)._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+      });
+
+      if (!mapInstanceRef.current) {
+        // Default center: Las Vegas, NV (GLA HQ area)
+        const map = L.map(mapRef.current!).setView([36.1699, -115.1398], 11);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          maxZoom: 19,
+        }).addTo(map);
+        mapInstanceRef.current = map;
+      }
+
+      const map = mapInstanceRef.current;
+
+      // Clear old markers
+      markersRef.current.forEach(m => map.removeLayer(m));
+      markersRef.current = [];
+
+      // Add markers for vehicles with coordinates
+      vehiclesWithCoords.forEach(v => {
+        const lat = (v.liveStatus?.latitude ?? v.last_latitude) as number;
+        const lng = (v.liveStatus?.longitude ?? v.last_longitude) as number;
+        const name = vehicleDisplayName(v);
+        const status = v.displayStatus;
+        const speed = v.liveStatus?.speed ?? v.last_speed_mph ?? 0;
+        const lastSeen = formatLastSeen(v.liveStatus?.lastSeen || v.last_seen);
+
+        const color = status === "driving" ? "#3b82f6" : status === "parked" || status === "online" ? "#22c55e" : "#9ca3af";
+
+        const icon = L.divIcon({
+          html: `<div style="
+            width:28px;height:28px;border-radius:50%;background:${color};
+            border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4);
+            display:flex;align-items:center;justify-content:center;
+            ${status === "driving" ? "animation:pulse 1.5s infinite;" : ""}
+          ">
+            <svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='white'>
+              <path d='M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7z'/>
+            </svg>
+          </div>`,
+          className: "",
+          iconSize: [28, 28],
+          iconAnchor: [14, 28],
+          popupAnchor: [0, -28],
+        });
+
+        const marker = L.marker([lat, lng], { icon })
+          .addTo(map)
+          .bindPopup(`
+            <div style="min-width:180px;font-family:system-ui">
+              <strong>${name}</strong><br/>
+              <span style="color:${color};font-weight:600">${statusLabel(status)}</span>
+              ${speed > 0 ? ` · ${speed.toFixed(0)} mph` : ""}
+              <br/><small>Last seen: ${lastSeen}</small>
+              ${v.license_plate ? `<br/><small>Plate: ${v.license_plate}</small>` : ""}
+              <br/><a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" style="color:#3b82f6">Open in Google Maps</a>
+            </div>
+          `);
+
+        markersRef.current.push(marker);
+      });
+
+      // Fit map to markers if we have any
+      if (markersRef.current.length > 0) {
+        const group = L.featureGroup(markersRef.current);
+        map.fitBounds(group.getBounds().pad(0.2), { maxZoom: 14 });
+      }
+    });
+
+    return () => {
+      // Don't destroy map on re-render — only clean up markers
+    };
+  }, [vehicles]);
+
+  // Cleanup map on unmount
+  useEffect(() => {
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  if (vehiclesWithCoords.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-muted-foreground bg-muted/30 rounded-lg">
+        <MapPin className="w-10 h-10 opacity-30 mb-2" />
+        <p className="text-sm">No vehicle locations available</p>
+        <p className="text-xs mt-1">Sync from Bouncie to get live coordinates</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <style>{`
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+      `}</style>
+      <div ref={mapRef} style={{ height: "400px", width: "100%", borderRadius: "8px" }} />
+    </>
+  );
+}
+
 export default function BouncieFleetPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [sseStatus, setSseStatus] = useState<"connecting" | "connected" | "disconnected">("disconnected");
+  const sseRef = useRef<EventSource | null>(null);
 
-  // Handle OAuth redirect result (bouncie_connected=true or bouncie_error=...)
+  // Handle OAuth redirect result
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const connected = params.get("bouncie_connected");
@@ -155,6 +306,35 @@ export default function BouncieFleetPage() {
       toast({ title: "Bouncie Connection Failed", description: `Error: ${error}`, variant: "destructive" });
       window.history.replaceState({}, "", window.location.pathname);
     }
+  }, []);
+
+  // SSE connection for real-time updates
+  useEffect(() => {
+    const connect = () => {
+      if (sseRef.current) sseRef.current.close();
+      setSseStatus("connecting");
+      const es = new EventSource(buildApiUrl("/api/bouncie/sse"), { withCredentials: true });
+      sseRef.current = es;
+
+      es.addEventListener("connected", () => setSseStatus("connected"));
+      es.addEventListener("fleet_event", () => {
+        queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
+      });
+      es.addEventListener("fleet_update", () => {
+        queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
+      });
+      es.onerror = () => {
+        setSseStatus("disconnected");
+        es.close();
+        // Reconnect after 10s
+        setTimeout(connect, 10000);
+      };
+    };
+
+    connect();
+    return () => {
+      sseRef.current?.close();
+    };
   }, []);
 
   const { data: connData, isLoading: connLoading } = useQuery<{ success: boolean; data: ConnectionStatus }>({
@@ -191,10 +371,7 @@ export default function BouncieFleetPage() {
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
-      toast({
-        title: "Sync Complete",
-        description: `Synced ${result.data?.synced ?? 0} vehicle(s) from Bouncie.`,
-      });
+      toast({ title: "Sync Complete", description: `Synced ${result.data?.synced ?? 0} vehicle(s) from Bouncie.` });
     },
     onError: (err: Error) => {
       toast({ title: "Sync Failed", description: err.message, variant: "destructive" });
@@ -223,6 +400,8 @@ export default function BouncieFleetPage() {
   const conn = connData?.data;
   const overview = data?.data;
   const summary = overview?.summary;
+  const vehicles = overview?.vehicles ?? [];
+  const activeTrips = vehicles.filter(v => v.displayStatus === "driving");
 
   const handleConnect = () => {
     window.location.href = buildApiUrl("/api/bouncie/connect");
@@ -243,7 +422,17 @@ export default function BouncieFleetPage() {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Connection status badge */}
+            {/* SSE status indicator */}
+            <span className={`flex items-center gap-1 text-xs font-medium ${
+              sseStatus === "connected" ? "text-green-600" :
+              sseStatus === "connecting" ? "text-yellow-600" :
+              "text-gray-400"
+            }`} title="Real-time connection status">
+              <Zap className="w-3 h-3" />
+              {sseStatus === "connected" ? "Live" : sseStatus === "connecting" ? "Connecting…" : "Offline"}
+            </span>
+
+            {/* Connection status */}
             {!connLoading && conn && (
               conn.connected ? (
                 <span className="flex items-center gap-1 text-xs text-green-600 font-medium">
@@ -260,28 +449,46 @@ export default function BouncieFleetPage() {
               )
             )}
 
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] })}
-              disabled={isFetching}
-            >
+            <Button size="sm" variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] })} disabled={isFetching}>
               <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? "animate-spin" : ""}`} />
               Refresh
             </Button>
-
-            <Button
-              size="sm"
-              onClick={() => syncMutation.mutate()}
-              disabled={syncMutation.isPending || !conn?.connected}
-            >
+            <Button size="sm" onClick={() => syncMutation.mutate()} disabled={syncMutation.isPending || !conn?.connected}>
               <RefreshCw className={`w-4 h-4 mr-2 ${syncMutation.isPending ? "animate-spin" : ""}`} />
               {syncMutation.isPending ? "Syncing…" : "Sync from Bouncie"}
             </Button>
           </div>
         </div>
 
-        {/* OAuth connection card — show unless there is a valid non-expired DB token */}
+        {/* Quick nav to sub-pages */}
+        <div className="flex gap-2 flex-wrap">
+          <Link href="/admin/bouncie-trips">
+            <Button size="sm" variant="outline" className="text-xs">
+              <Route className="w-3.5 h-3.5 mr-1.5" />
+              Trip History
+            </Button>
+          </Link>
+          <Link href="/admin/bouncie-behavior">
+            <Button size="sm" variant="outline" className="text-xs">
+              <ShieldAlert className="w-3.5 h-3.5 mr-1.5" />
+              Driving Behavior
+            </Button>
+          </Link>
+          <Link href="/admin/bouncie-geofence">
+            <Button size="sm" variant="outline" className="text-xs">
+              <MapPin className="w-3.5 h-3.5 mr-1.5" />
+              Geofence Reports
+            </Button>
+          </Link>
+          <Link href="/admin/bouncie-analytics">
+            <Button size="sm" variant="outline" className="text-xs">
+              <BarChart3 className="w-3.5 h-3.5 mr-1.5" />
+              Analytics
+            </Button>
+          </Link>
+        </div>
+
+        {/* OAuth connection card */}
         {!connLoading && conn && !(conn.source === "database" && conn.connected) && (
           <Card className={conn.isExpired ? "border-red-200 bg-red-50" : "border-amber-200 bg-amber-50"}>
             <CardContent className="pt-4 pb-4">
@@ -313,20 +520,12 @@ export default function BouncieFleetPage() {
           </Card>
         )}
 
-        {/* Connected via DB — show expiry + disconnect option */}
+        {/* Disconnect button */}
         {!connLoading && conn?.source === "database" && conn.connected && (
           <div className="flex justify-end">
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-xs text-muted-foreground hover:text-destructive"
-              onClick={() => {
-                if (confirm("Disconnect from Bouncie? Live tracking will stop.")) {
-                  disconnectMutation.mutate();
-                }
-              }}
-              disabled={disconnectMutation.isPending}
-            >
+            <Button size="sm" variant="ghost" className="text-xs text-muted-foreground hover:text-destructive"
+              onClick={() => { if (confirm("Disconnect from Bouncie? Live tracking will stop.")) disconnectMutation.mutate(); }}
+              disabled={disconnectMutation.isPending}>
               <Link2Off className="w-3.5 h-3.5 mr-1.5" />
               Disconnect Bouncie
             </Button>
@@ -380,6 +579,60 @@ export default function BouncieFleetPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Active Trips Panel */}
+        {activeTrips.length > 0 && (
+          <Card className="border-blue-200 bg-blue-50/50">
+            <CardHeader className="pb-2 pt-4">
+              <CardTitle className="text-sm font-semibold text-blue-800 flex items-center gap-2">
+                <Navigation className="w-4 h-4 animate-pulse" />
+                Active Trips ({activeTrips.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0 pb-3">
+              <div className="flex flex-wrap gap-3">
+                {activeTrips.map(v => (
+                  <div key={v.device_id} className="flex items-center gap-2 bg-white border border-blue-200 rounded-lg px-3 py-2 text-sm">
+                    <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse flex-shrink-0" />
+                    <span className="font-medium">{vehicleDisplayName(v)}</span>
+                    {v.liveStatus?.speed != null && v.liveStatus.speed > 0 && (
+                      <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+                        <Gauge className="w-3 h-3" />
+                        {v.liveStatus.speed.toFixed(0)} mph
+                      </span>
+                    )}
+                    {(v.liveStatus?.latitude || v.last_latitude) && (
+                      <a
+                        href={`https://www.google.com/maps?q=${v.liveStatus?.latitude || v.last_latitude},${v.liveStatus?.longitude || v.last_longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 hover:underline flex items-center gap-0.5"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Map
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Live Map */}
+        {vehicles.length > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" />
+                Live Fleet Map
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-3">
+              <FleetMap vehicles={vehicles} />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Vehicle List */}
         <Card>
@@ -437,9 +690,7 @@ export default function BouncieFleetPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                        <span className="text-xs text-muted-foreground font-mono">
-                          IMEI: {v.imei}
-                        </span>
+                        <span className="text-xs text-muted-foreground font-mono">IMEI: {v.imei}</span>
                         {v.last_seen && (
                           <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Clock className="w-3 h-3" />
@@ -452,10 +703,16 @@ export default function BouncieFleetPage() {
                             {v.liveStatus.speed.toFixed(0)} mph
                           </span>
                         )}
+                        {v.odometer_miles != null && (
+                          <span className="text-xs text-muted-foreground">
+                            {v.odometer_miles.toLocaleString()} mi
+                          </span>
+                        )}
+                        <BatteryIndicator level={v.battery_level} />
                       </div>
                     </div>
 
-                    {/* Location */}
+                    {/* Location link */}
                     {(v.liveStatus?.latitude || v.last_latitude) && (
                       <a
                         href={`https://www.google.com/maps?q=${v.liveStatus?.latitude || v.last_latitude},${v.liveStatus?.longitude || v.last_longitude}`}
@@ -464,9 +721,17 @@ export default function BouncieFleetPage() {
                         className="flex items-center gap-1 text-xs text-primary hover:underline"
                       >
                         <MapPin className="w-3 h-3" />
-                        View Map
+                        Map
                       </a>
                     )}
+
+                    {/* Trip history link */}
+                    <Link href={`/admin/bouncie-trips?deviceId=${v.device_id}`}>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary cursor-pointer">
+                        <Route className="w-3 h-3" />
+                        Trips
+                      </span>
+                    </Link>
 
                     {/* Status badge */}
                     <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border ${statusColor(v.displayStatus)}`}>

@@ -30,6 +30,9 @@ import {
   MapPin,
   Navigation,
   Cpu,
+  BarChart3,
+  Route,
+  ShieldAlert,
 } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { cn } from "@/lib/utils";
@@ -84,6 +87,10 @@ const allSidebarItems: SidebarItem[] = [
     children: [
       { href: "/admin/bouncie", label: "Fleet Tracking", icon: Navigation, roles: ["admin"] },
       { href: "/admin/bouncie-devices", label: "Devices", icon: Cpu, roles: ["admin"] },
+      { href: "/admin/bouncie-trips", label: "Trip History", icon: Route, roles: ["admin"] },
+      { href: "/admin/bouncie-behavior", label: "Driving Behavior", icon: ShieldAlert, roles: ["admin"] },
+      { href: "/admin/bouncie-geofence", label: "Geofence Reports", icon: MapPin, roles: ["admin"] },
+      { href: "/admin/bouncie-analytics", label: "Analytics", icon: BarChart3, roles: ["admin"] },
     ],
   },
   { href: "/admin/operations", label: "Operations", icon: Cog, roles: ["admin"] },

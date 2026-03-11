@@ -5,15 +5,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -25,15 +32,14 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  MapPin, 
-  Route, 
-  BarChart3,
+import {
+  Plus,
+  Edit,
+  Trash2,
+  MapPin,
   Wifi,
-  WifiOff 
+  WifiOff,
+  RefreshCw,
 } from "lucide-react";
 
 interface BouncieDevice {
@@ -45,6 +51,15 @@ interface BouncieDevice {
   createdAt: string;
   updatedAt: string;
   liveData?: any;
+}
+
+interface GlaCar {
+  id: string;
+  label: string;
+  make: string;
+  model: string;
+  year: string;
+  plate: string;
 }
 
 interface AddDeviceData {
@@ -59,176 +74,125 @@ interface UpdateDeviceData {
   isActive?: boolean;
 }
 
+const UNASSIGNED = "__none__";
+
 export default function BouncieDevicesPage() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingDevice, setEditingDevice] = useState<BouncieDevice | null>(null);
-  const [addFormData, setAddFormData] = useState<AddDeviceData>({
-    imei: "",
-    nickname: "",
-    carId: "",
-  });
-  const [editFormData, setEditFormData] = useState<UpdateDeviceData>({
-    nickname: "",
-    carId: "",
-    isActive: true,
-  });
+  const [addFormData, setAddFormData] = useState<AddDeviceData>({ imei: "", nickname: "", carId: "" });
+  const [editFormData, setEditFormData] = useState<UpdateDeviceData>({ nickname: "", carId: "", isActive: true });
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Fetch devices
-  const { data: devices, isLoading, error } = useQuery<{ success: boolean; data: BouncieDevice[] }>({
+  const { data: devicesData, isLoading, error } = useQuery<{ success: boolean; data: BouncieDevice[] }>({
     queryKey: ["/api/bouncie/devices"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/bouncie/devices"), {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch devices");
-      }
-      return response.json();
+      const res = await fetch(buildApiUrl("/api/bouncie/devices"), { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch devices");
+      return res.json();
     },
   });
 
-  // Add device mutation
+  // Fetch GLA cars for picker
+  const { data: carsData } = useQuery<{ success: boolean; data: GlaCar[] }>({
+    queryKey: ["/api/bouncie/cars"],
+    queryFn: async () => {
+      const res = await fetch(buildApiUrl("/api/bouncie/cars"), { credentials: "include" });
+      if (!res.ok) return { success: true, data: [] };
+      return res.json();
+    },
+  });
+  const cars = carsData?.data ?? [];
+
+  // Add device
   const addDeviceMutation = useMutation({
     mutationFn: async (data: AddDeviceData) => {
-      const response = await fetch(buildApiUrl("/api/bouncie/devices"), {
+      const res = await fetch(buildApiUrl("/api/bouncie/devices"), {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(data),
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to add device");
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to add device");
       }
-      return response.json();
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/bouncie/devices"] });
       setShowAddDialog(false);
       setAddFormData({ imei: "", nickname: "", carId: "" });
-      toast({
-        title: "Success",
-        description: "Device added successfully",
-      });
+      toast({ title: "Success", description: "Device added successfully" });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
-  // Update device mutation
+  // Update device
   const updateDeviceMutation = useMutation({
     mutationFn: async ({ deviceId, data }: { deviceId: string; data: UpdateDeviceData }) => {
-      const response = await fetch(buildApiUrl(`/api/bouncie/devices/${deviceId}`), {
+      const res = await fetch(buildApiUrl(`/api/bouncie/devices/${deviceId}`), {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(data),
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to update device");
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to update device");
       }
-      return response.json();
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/bouncie/devices"] });
       setEditingDevice(null);
-      toast({
-        title: "Success",
-        description: "Device updated successfully",
-      });
+      toast({ title: "Success", description: "Device updated successfully" });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
-  // Delete device mutation
+  // Delete device
   const deleteDeviceMutation = useMutation({
     mutationFn: async (deviceId: string) => {
-      const response = await fetch(buildApiUrl(`/api/bouncie/devices/${deviceId}`), {
+      const res = await fetch(buildApiUrl(`/api/bouncie/devices/${deviceId}`), {
         method: "DELETE",
         credentials: "include",
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to delete device");
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to delete device");
       }
-      return response.json();
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/bouncie/devices"] });
-      toast({
-        title: "Success",
-        description: "Device deleted successfully",
-      });
+      toast({ title: "Success", description: "Device deleted successfully" });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const handleAddDevice = () => {
     if (!addFormData.imei.trim()) {
-      toast({
-        title: "Error",
-        description: "IMEI is required",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "IMEI is required", variant: "destructive" });
       return;
     }
-    
-    // Basic IMEI validation (15 digits)
     if (!/^\d{15}$/.test(addFormData.imei.replace(/\s/g, ""))) {
-      toast({
-        title: "Error", 
-        description: "IMEI must be exactly 15 digits",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "IMEI must be exactly 15 digits", variant: "destructive" });
       return;
     }
-    
-    addDeviceMutation.mutate({
-      ...addFormData,
-      imei: addFormData.imei.replace(/\s/g, "") // Remove spaces
-    });
+    addDeviceMutation.mutate({ ...addFormData, imei: addFormData.imei.replace(/\s/g, "") });
   };
 
   const handleEditDevice = (device: BouncieDevice) => {
     setEditingDevice(device);
-    setEditFormData({
-      nickname: device.nickname || "",
-      carId: device.carId || "",
-      isActive: device.isActive,
-    });
+    setEditFormData({ nickname: device.nickname || "", carId: device.carId || "", isActive: device.isActive });
   };
 
   const handleUpdateDevice = () => {
     if (!editingDevice) return;
-    updateDeviceMutation.mutate({
-      deviceId: editingDevice.id,
-      data: editFormData,
-    });
+    updateDeviceMutation.mutate({ deviceId: editingDevice.id, data: editFormData });
   };
 
   const handleDeleteDevice = (deviceId: string) => {
@@ -237,27 +201,48 @@ export default function BouncieDevicesPage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+
+  const carLabel = (carId?: string) => {
+    if (!carId) return "-";
+    const car = cars.find(c => c.id === carId);
+    return car ? car.label.trim() || carId : carId;
   };
+
+  // CarPicker sub-component
+  const CarPicker = ({
+    value,
+    onChange,
+  }: {
+    value?: string;
+    onChange: (val: string) => void;
+  }) => (
+    <Select value={value || UNASSIGNED} onValueChange={(v) => onChange(v === UNASSIGNED ? "" : v)}>
+      <SelectTrigger>
+        <SelectValue placeholder="Select a GLA car…" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value={UNASSIGNED}>— Unassigned —</SelectItem>
+        {cars.map((car) => (
+          <SelectItem key={car.id} value={car.id}>
+            {car.label.trim() || car.id}
+            {car.plate ? ` (${car.plate})` : ""}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
 
   if (error) {
     return (
       <AdminLayout>
-        <div className="p-6">
-          <div className="text-red-600">
-            Error loading devices: {error.message}
-          </div>
-        </div>
+        <div className="p-6 text-red-600">Error loading devices: {(error as Error).message}</div>
       </AdminLayout>
     );
   }
+
+  const devices = devicesData?.data ?? [];
 
   return (
     <AdminLayout>
@@ -265,9 +250,7 @@ export default function BouncieDevicesPage() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">Bouncie Device Management</h1>
-            <p className="text-gray-600 mt-2">
-              Manage GPS tracking devices for fleet vehicles
-            </p>
+            <p className="text-muted-foreground mt-2">Manage GPS tracking devices and link them to fleet vehicles</p>
           </div>
           <Button onClick={() => setShowAddDialog(true)}>
             <Plus className="w-4 h-4 mr-2" />
@@ -277,83 +260,76 @@ export default function BouncieDevicesPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Registered Devices</CardTitle>
+            <CardTitle>Registered Devices ({devices.length})</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="text-center py-8">Loading devices...</div>
-            ) : !devices?.data || devices.data.length === 0 ? (
+              <div className="flex items-center justify-center py-8 text-muted-foreground gap-2">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                Loading devices…
+              </div>
+            ) : devices.length === 0 ? (
               <div className="text-center py-8">
                 <MapPin className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Bouncie Devices</h3>
-                <p className="text-gray-500 mb-4">
-                  Get started by adding your first GPS tracking device to monitor your fleet.
-                </p>
+                <h3 className="text-lg font-semibold mb-2">No Bouncie Devices</h3>
+                <p className="text-muted-foreground mb-4">Add your first GPS tracking device to monitor your fleet.</p>
                 <Button onClick={() => setShowAddDialog(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Add Your First Device
                 </Button>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>IMEI</TableHead>
-                    <TableHead>Nickname</TableHead>
-                    <TableHead>Car ID</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Connection</TableHead>
-                    <TableHead>Added</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {devices?.data?.map((device) => (
-                    <TableRow key={device.id}>
-                      <TableCell className="font-mono">{device.imei}</TableCell>
-                      <TableCell>{device.nickname || "-"}</TableCell>
-                      <TableCell>{device.carId || "-"}</TableCell>
-                      <TableCell>
-                        <Badge variant={device.isActive ? "default" : "secondary"}>
-                          {device.isActive ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {device.liveData ? (
-                          <div className="flex items-center text-green-600">
-                            <Wifi className="w-4 h-4 mr-1" />
-                            Online
-                          </div>
-                        ) : (
-                          <div className="flex items-center text-gray-400">
-                            <WifiOff className="w-4 h-4 mr-1" />
-                            Unknown
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>{formatDate(device.createdAt)}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditDevice(device)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeleteDevice(device.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>IMEI</TableHead>
+                      <TableHead>Nickname</TableHead>
+                      <TableHead>Assigned Car</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Connection</TableHead>
+                      <TableHead>Added</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {devices.map((device) => (
+                      <TableRow key={device.id}>
+                        <TableCell className="font-mono text-sm">{device.imei}</TableCell>
+                        <TableCell>{device.nickname || "-"}</TableCell>
+                        <TableCell className="text-sm">{carLabel(device.carId)}</TableCell>
+                        <TableCell>
+                          <Badge variant={device.isActive ? "default" : "secondary"}>
+                            {device.isActive ? "Active" : "Inactive"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {device.liveData ? (
+                            <div className="flex items-center text-green-600 text-sm gap-1">
+                              <Wifi className="w-4 h-4" /> Online
+                            </div>
+                          ) : (
+                            <div className="flex items-center text-gray-400 text-sm gap-1">
+                              <WifiOff className="w-4 h-4" /> Unknown
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{formatDate(device.createdAt)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="sm" onClick={() => handleEditDevice(device)}>
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => handleDeleteDevice(device.id)}>
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -363,9 +339,7 @@ export default function BouncieDevicesPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add Bouncie Device</DialogTitle>
-              <DialogDescription>
-                Register a new GPS tracking device to monitor vehicle location and activity.
-              </DialogDescription>
+              <DialogDescription>Register a new GPS tracking device to monitor vehicle location and activity.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -374,49 +348,36 @@ export default function BouncieDevicesPage() {
                   id="imei"
                   value={addFormData.imei}
                   onChange={(e) => {
-                    // Only allow digits and limit to 15 characters
-                    const value = e.target.value.replace(/\D/g, '').slice(0, 15);
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 15);
                     setAddFormData({ ...addFormData, imei: value });
                   }}
                   placeholder="123456789012345"
                   maxLength={15}
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Usually found on device label or in Bouncie app
-                </p>
+                <p className="text-xs text-muted-foreground mt-1">Found on device label or in Bouncie app</p>
               </div>
               <div>
                 <Label htmlFor="nickname">Nickname</Label>
                 <Input
                   id="nickname"
                   value={addFormData.nickname}
-                  onChange={(e) =>
-                    setAddFormData({ ...addFormData, nickname: e.target.value })
-                  }
+                  onChange={(e) => setAddFormData({ ...addFormData, nickname: e.target.value })}
                   placeholder="Optional display name"
                 />
               </div>
               <div>
-                <Label htmlFor="carId">Car ID</Label>
-                <Input
-                  id="carId"
+                <Label>Assign to GLA Car</Label>
+                <CarPicker
                   value={addFormData.carId}
-                  onChange={(e) =>
-                    setAddFormData({ ...addFormData, carId: e.target.value })
-                  }
-                  placeholder="Associated car identifier"
+                  onChange={(val) => setAddFormData({ ...addFormData, carId: val })}
                 />
+                <p className="text-xs text-muted-foreground mt-1">Link this device to a specific rental car</p>
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleAddDevice}
-                disabled={!addFormData.imei || addDeviceMutation.isPending}
-              >
-                {addDeviceMutation.isPending ? "Adding..." : "Add Device"}
+              <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
+              <Button onClick={handleAddDevice} disabled={!addFormData.imei || addDeviceMutation.isPending}>
+                {addDeviceMutation.isPending ? "Adding…" : "Add Device"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -427,53 +388,42 @@ export default function BouncieDevicesPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit Device</DialogTitle>
-              <DialogDescription>
-                Update device information and settings.
-              </DialogDescription>
+              <DialogDescription>Update device information and assignment.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
+              <div>
+                <Label>IMEI</Label>
+                <p className="text-sm font-mono text-muted-foreground mt-1">{editingDevice?.imei}</p>
+              </div>
               <div>
                 <Label htmlFor="edit-nickname">Nickname</Label>
                 <Input
                   id="edit-nickname"
                   value={editFormData.nickname}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, nickname: e.target.value })
-                  }
+                  onChange={(e) => setEditFormData({ ...editFormData, nickname: e.target.value })}
                   placeholder="Optional display name"
                 />
               </div>
               <div>
-                <Label htmlFor="edit-carId">Car ID</Label>
-                <Input
-                  id="edit-carId"
+                <Label>Assign to GLA Car</Label>
+                <CarPicker
                   value={editFormData.carId}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, carId: e.target.value })
-                  }
-                  placeholder="Associated car identifier"
+                  onChange={(val) => setEditFormData({ ...editFormData, carId: val })}
                 />
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-3">
                 <Switch
                   id="edit-isActive"
                   checked={editFormData.isActive}
-                  onCheckedChange={(checked) =>
-                    setEditFormData({ ...editFormData, isActive: checked })
-                  }
+                  onCheckedChange={(checked) => setEditFormData({ ...editFormData, isActive: checked })}
                 />
-                <Label htmlFor="edit-isActive">Active</Label>
+                <Label htmlFor="edit-isActive">Active tracking enabled</Label>
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditingDevice(null)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleUpdateDevice}
-                disabled={updateDeviceMutation.isPending}
-              >
-                {updateDeviceMutation.isPending ? "Updating..." : "Update Device"}
+              <Button variant="outline" onClick={() => setEditingDevice(null)}>Cancel</Button>
+              <Button onClick={handleUpdateDevice} disabled={updateDeviceMutation.isPending}>
+                {updateDeviceMutation.isPending ? "Updating…" : "Save Changes"}
               </Button>
             </DialogFooter>
           </DialogContent>
