@@ -337,7 +337,16 @@ export default function BouncieFleetPage() {
       sseRef.current = es;
 
       es.addEventListener("connected", () => setSseStatus("connected"));
-      es.addEventListener("fleet_event", () => {
+      es.addEventListener("fleet_event", (e: MessageEvent) => {
+        try {
+          const payload = JSON.parse(e.data || "{}");
+          if (payload?.type === "token_expired") {
+            // Refresh connection status so the reconnect banner appears automatically
+            queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
+            toast({ title: "Bouncie Token Expired", description: "Please reconnect to Bouncie to resume live tracking.", variant: "destructive" });
+            return;
+          }
+        } catch {}
         queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
       });
       es.addEventListener("fleet_update", () => {
