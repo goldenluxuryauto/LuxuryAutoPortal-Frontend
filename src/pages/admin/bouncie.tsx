@@ -311,6 +311,8 @@ export default function BouncieFleetPage() {
   const sseRef = useRef<EventSource | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [secondsAgo, setSecondsAgo] = useState<number>(0);
+  // Prevent the token-expired toast from firing more than once per session
+  const tokenExpiredNotifiedRef = useRef(false);
 
   // Handle OAuth redirect result
   useEffect(() => {
@@ -318,6 +320,7 @@ export default function BouncieFleetPage() {
     const connected = params.get("bouncie_connected");
     const error = params.get("bouncie_error");
     if (connected === "true") {
+      tokenExpiredNotifiedRef.current = false;
       toast({ title: "Bouncie Connected", description: "Successfully connected to Bouncie. Live tracking is now active." });
       window.history.replaceState({}, "", window.location.pathname);
       queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
@@ -336,14 +339,27 @@ export default function BouncieFleetPage() {
       const es = new EventSource(buildApiUrl("/api/bouncie/sse"), { withCredentials: true });
       sseRef.current = es;
 
-      es.addEventListener("connected", () => setSseStatus("connected"));
+      es.addEventListener("connected", () => {
+        setSseStatus("connected");
+        // Reset so the expired-toast can appear again if it expires in this session
+        tokenExpiredNotifiedRef.current = false;
+      });
       es.addEventListener("fleet_event", (e: MessageEvent) => {
         try {
           const payload = JSON.parse(e.data || "{}");
           if (payload?.type === "token_expired") {
-            // Refresh connection status so the reconnect banner appears automatically
+            // Refresh the connection-status banner immediately
             queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
-            toast({ title: "Bouncie Token Expired", description: "Please reconnect to Bouncie to resume live tracking.", variant: "destructive" });
+            // Show the destructive toast only ONCE per session — backend emits this
+            // event until the user reconnects, so without the guard it fires every 15 s
+            if (!tokenExpiredNotifiedRef.current) {
+              tokenExpiredNotifiedRef.current = true;
+              toast({
+                title: "Bouncie Token Expired",
+                description: "Please click 'Connect to Bouncie' below to resume live tracking.",
+                variant: "destructive",
+              });
+            }
             return;
           }
         } catch {}
