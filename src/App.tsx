@@ -12,6 +12,7 @@ import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
+import OperationsDashboard from "@/pages/operations-dashboard";
 import AdminsPage from "@/pages/admin/admins";
 import ClientsPage from "@/pages/admin/clients";
 import ClientDetailPage from "@/pages/admin/client-detail";
@@ -101,7 +102,8 @@ function Router() {
       <Route path="/staff/car-rental/trips" component={StaffCarRentalTrips} />
       <Route path="/staff/car-rental/forms/submit" component={StaffCarRentalFormSubmit} />
       <Route path="/staff/car-rental/forms" component={StaffCarRentalForms} />
-      <Route path="/dashboard" component={AdminDashboard} />
+      <Route path="/dashboard" component={OperationsDashboard} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/admins" component={AdminsPage} />
       <Route path="/admin/clients" component={ClientsPage} />
       <Route path="/admin/clients/:id" component={ClientDetailPage} />
