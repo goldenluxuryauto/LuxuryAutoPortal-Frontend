@@ -142,15 +142,18 @@ function DocumentImageWithAuth({
   const { src, loading, error } = useDocumentBlobUrl(url);
   if (loading) {
     return (
-      <div className={cn("w-full h-full flex items-center justify-center text-muted-foreground text-sm", className)}>
-        Loading...
+      <div className={cn("w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground text-sm bg-muted/30 rounded-lg", className)}>
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <span>Loading...</span>
       </div>
     );
   }
   if (error || !src) {
     return (
-      <div className={cn("w-full h-full flex items-center justify-center text-muted-foreground text-sm", className)}>
-        Failed to load document
+      <div className={cn("w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground text-sm bg-muted/30 rounded-lg border border-border p-4", className)}>
+        <FileText className="w-10 h-10 text-muted-foreground/70" />
+        <span className="text-center">Document unavailable</span>
+        <span className="text-xs text-center">File not found or no access</span>
       </div>
     );
   }
@@ -1486,7 +1489,7 @@ export default function CarDetailPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
+      <div className="w-full min-w-0 space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
             <Button
@@ -1516,136 +1519,136 @@ export default function CarDetailPage() {
         </div>
 
         {/* Row 1: Vehicle Information, Car Photos, and Car Links */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch max-w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch w-full min-w-0 max-w-full">
           {/* Vehicle Information Card */}
-          <Card className="bg-card border-border lg:col-span-6 flex flex-col min-w-0 max-w-full">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-primary text-base sm:text-lg flex items-center gap-2">
-                <Car className="w-4 h-4 sm:w-5 sm:h-5" />
-                Vehicle Information
+          <Card className="bg-card border-border lg:col-span-6 flex flex-col min-w-0 w-full max-w-full overflow-hidden">
+            <CardHeader className="pb-2 min-w-0">
+              <CardTitle className="text-primary text-base sm:text-lg flex items-center gap-2 min-w-0">
+                <Car className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                <span className="min-w-0 truncate">Vehicle Information</span>
               </CardTitle>
             </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <CardContent className="space-y-4 min-w-0 overflow-hidden">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 min-w-0">
                 {/* Column 1: Basic Vehicle Information */}
-                <div className="space-y-4">
-                  <div>
+                <div className="space-y-4 min-w-0">
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Make & Model</p>
-                    <p className="text-foreground text-base font-medium">{car.makeModel}</p>
+                    <p className="text-foreground text-base font-medium break-words min-w-0">{car.makeModel}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Year</p>
-                    <p className="text-foreground text-base">{car.year || "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.year || "N/A"}</p>
                   </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs text-muted-foreground mb-1">VIN</p>
-                    <p className="text-foreground text-base font-mono">{car.vin}</p>
+                    <p className="text-foreground text-base font-mono break-all min-w-0">{car.vin}</p>
                 </div>
-                <div>
+                <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">License Plate</p>
-                    <p className="text-foreground text-base">{car.licensePlate || "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.licensePlate || "N/A"}</p>
                 </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Title Type</p>
-                    <p className="text-foreground text-base">{onboarding?.titleType ? formatValue(onboarding.titleType) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{onboarding?.titleType ? formatValue(onboarding.titleType) : "N/A"}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Trim</p>
-                    <p className="text-foreground text-base">{car.vehicleTrim ? formatValue(car.vehicleTrim) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.vehicleTrim ? formatValue(car.vehicleTrim) : "N/A"}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Mileage</p>
-                    <p className="text-foreground text-base">{car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.mileage ? `${car.mileage.toLocaleString()} miles` : "N/A"}</p>
                   </div>
                 </div>
 
                 {/* Column 2: Specifications & Colors */}
-                <div className="space-y-4">
-                  <div>
+                <div className="space-y-4 min-w-0">
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Exterior Color</p>
-                    <p className="text-foreground text-base">{car.color ? formatValue(car.color) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.color ? formatValue(car.color) : "N/A"}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Interior Color</p>
-                    <p className="text-foreground text-base">{car.interiorColor ? formatValue(car.interiorColor) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.interiorColor ? formatValue(car.interiorColor) : "N/A"}</p>
                   </div>
-                <div>
+                <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Fuel Type</p>
-                    <p className="text-foreground text-base">{car.fuelType ? formatValue(car.fuelType) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.fuelType ? formatValue(car.fuelType) : "N/A"}</p>
                 </div>
-                <div>
+                <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Tire Size</p>
-                    <p className="text-foreground text-base">{car.tireSize ? formatValue(car.tireSize) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.tireSize ? formatValue(car.tireSize) : "N/A"}</p>
                 </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Number of Doors</p>
-                    <p className="text-foreground text-base">{car.numberOfDoors ? formatValue(car.numberOfDoors) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.numberOfDoors ? formatValue(car.numberOfDoors) : "N/A"}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Number of Seats</p>
-                    <p className="text-foreground text-base">{car.numberOfSeats ? formatValue(car.numberOfSeats) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.numberOfSeats ? formatValue(car.numberOfSeats) : "N/A"}</p>
                   </div>
                   </div>
 
                 {/* Column 3: Maintenance & Accessories */}
-                <div className="space-y-4">
-                  <div>
+                <div className="space-y-4 min-w-0">
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Oil Type</p>
-                    <p className="text-foreground text-base">{car.oilType ? formatValue(car.oilType) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.oilType ? formatValue(car.oilType) : "N/A"}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Last Oil Change</p>
-                    <p className="text-foreground text-base">{car.lastOilChange ? formatValue(car.lastOilChange) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.lastOilChange ? formatValue(car.lastOilChange) : "N/A"}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Does Your Vehicle Have Free Dealership Oil Changes?</p>
-                    <p className="text-foreground text-base">{car.freeDealershipOilChanges ? formatValue(car.freeDealershipOilChanges) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.freeDealershipOilChanges ? formatValue(car.freeDealershipOilChanges) : "N/A"}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">If Yes, For How Many Years of Oil Changes, or What Oil Package</p>
-                    <p className="text-foreground text-base">
+                    <p className="text-foreground text-base break-words min-w-0">
                       {car.oilPackageDetails ? formatValue(car.oilPackageDetails) : "N/A"}
                     </p>
                   </div>
                   {car.dealershipAddress && (
-                <div>
+                <div className="min-w-0">
                       <p className="text-xs text-muted-foreground mb-1">Dealership Address</p>
-                      <p className="text-foreground text-base">{formatValue(car.dealershipAddress)}</p>
+                      <p className="text-foreground text-base break-words min-w-0">{formatValue(car.dealershipAddress)}</p>
                 </div>
                   )}
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Registration Expiration</p>
-                    <p className="text-foreground text-base">{car.registrationExpiration ? formatValue(car.registrationExpiration) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.registrationExpiration ? formatValue(car.registrationExpiration) : "N/A"}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Vehicle Recall</p>
-                    <p className="text-foreground text-base">{car.vehicleRecall ? formatValue(car.vehicleRecall) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.vehicleRecall ? formatValue(car.vehicleRecall) : "N/A"}</p>
                   </div>
                 </div>
               </div>
               
               {/* Accessories Section - Full width */}
-              <div className="pt-4 border-t border-border">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
+              <div className="pt-4 border-t border-border min-w-0">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 min-w-0">
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Roof Rails</p>
-                    <p className="text-foreground text-base">{car.roofRails ? formatValue(car.roofRails) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.roofRails ? formatValue(car.roofRails) : "N/A"}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Ski Crossbars</p>
-                    <p className="text-foreground text-base">{car.skiCrossBars ? formatValue(car.skiCrossBars) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.skiCrossBars ? formatValue(car.skiCrossBars) : "N/A"}</p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground mb-1">Ski Rack</p>
-                    <p className="text-foreground text-base">{car.skiRacks ? formatValue(car.skiRacks) : "N/A"}</p>
+                    <p className="text-foreground text-base break-words min-w-0">{car.skiRacks ? formatValue(car.skiRacks) : "N/A"}</p>
                   </div>
               </div>
               </div>
               
               {/* Features - Full width */}
-              <div className="pt-4 border-t border-border">
+              <div className="pt-4 border-t border-border min-w-0">
                 <p className="text-xs text-muted-foreground mb-1">Features</p>
-                <p className="text-foreground text-base">
+                <p className="text-foreground text-base break-words min-w-0">
                   {car.vehicleFeatures && Array.isArray(car.vehicleFeatures) && car.vehicleFeatures.length > 0
                     ? car.vehicleFeatures.join(", ")
                     : (car.vehicleFeatures && typeof car.vehicleFeatures === 'string'
@@ -1655,10 +1658,10 @@ export default function CarDetailPage() {
               </div>
               
               {/* Assigned To Section */}
-                <div className="pt-1.5 border-t border-border">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-6">
+                <div className="pt-1.5 border-t border-border min-w-0">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-6 min-w-0">
                     {/* Left: Assigned To */}
-                    <div className="flex-shrink-0 text-center lg:text-left">
+                    <div className="flex-shrink-0 text-center lg:text-left min-w-0">
                       <p className="text-xs text-muted-foreground mb-1.5">Assigned To</p>
                     {/* Display maintenance status if car is in maintenance */}
                     {car.rawStatus === "maintenance" ? (
@@ -1715,9 +1718,9 @@ export default function CarDetailPage() {
                     </div>
 
                     {/* Right: Car Status, Management, Online Status, Last Login */}
-                    <div className="grid grid-cols-2 lg:flex lg:items-start lg:gap-6 lg:flex-1 lg:justify-end gap-4 max-w-full">
+                    <div className="grid grid-cols-2 lg:flex lg:items-start lg:gap-6 lg:flex-1 lg:justify-end gap-4 w-full min-w-0">
                       {/* Car Status */}
-                      <div className="text-center lg:min-w-[100px]">
+                      <div className="text-center lg:min-w-[100px] min-w-0">
                         <p className="text-xs text-muted-foreground mb-1.5">Car Status</p>
                         <div className="flex justify-center">
                           <Badge
@@ -1734,7 +1737,7 @@ export default function CarDetailPage() {
                       </div>
 
                       {/* Management */}
-                      <div className="text-center lg:min-w-[100px]">
+                      <div className="text-center lg:min-w-[100px] min-w-0">
                         <p className="text-xs text-muted-foreground mb-1.5">Management</p>
                         <p className="text-foreground text-xs sm:text-sm font-medium">
                           {car.managementStatus === "management"
@@ -1748,7 +1751,7 @@ export default function CarDetailPage() {
                       </div>
 
                       {/* Online Status */}
-                      <div className="text-center lg:min-w-[120px]">
+                      <div className="text-center lg:min-w-[120px] min-w-0">
                         <p className="text-xs text-muted-foreground mb-1.5">Online Status</p>
                         {!car.owner ? (
                           <p className="text-muted-foreground text-xs sm:text-sm">N/A</p>
@@ -1767,7 +1770,7 @@ export default function CarDetailPage() {
                       </div>
 
                       {/* Last Login - use client API value so it matches Client profile page */}
-                      <div className="text-center lg:min-w-[140px] col-span-2 lg:col-span-1">
+                      <div className="text-center lg:min-w-[140px] min-w-0 col-span-2 lg:col-span-1">
                         <p className="text-xs text-muted-foreground mb-1.5">Last Login</p>
                         <p className="text-foreground text-xs sm:text-sm font-medium whitespace-normal break-words">
                           {car.owner
@@ -1800,9 +1803,9 @@ export default function CarDetailPage() {
           </Card>
 
           {/* Column 2: Car Photos and Car Links stacked vertically */}
-          <div className="lg:col-span-6 flex flex-col gap-6">
+          <div className="lg:col-span-6 flex flex-col gap-6 min-w-0 w-full">
             {/* Car Photos Carousel Card */}
-            <Card className="bg-card border-border flex flex-col flex-1 min-w-0 max-w-full">
+            <Card className="bg-card border-border flex flex-col flex-1 min-w-0 w-full max-w-full overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-primary text-lg flex items-center gap-2">
                   <Car className="w-5 h-5" />
@@ -1935,7 +1938,7 @@ export default function CarDetailPage() {
           </Card>
 
             {/* Car Links Card */}
-            <Card className="bg-card border-border">
+            <Card className="bg-card border-border min-w-0 w-full max-w-full overflow-hidden">
             <CardHeader>
                 <CardTitle className="text-primary text-lg flex items-center gap-2">
                   <Car className="w-5 h-5" />
@@ -2008,7 +2011,7 @@ export default function CarDetailPage() {
         </div>
 
         {/* Row 2: Documents, Vehicle Purchase Information, Car Login Information, Insurance Information */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 max-w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 w-full min-w-0 max-w-full">
           {/* Documents Card */}
           <Card className="bg-card border-border lg:col-span-3 min-w-0 max-w-full">
             <CardHeader>
@@ -2057,17 +2060,6 @@ export default function CarDetailPage() {
                       const isPdf = isGoogleDriveId 
                         ? false // Default to image, proxy endpoint will handle PDFs via Content-Type
                         : isPdfDocument(trimmedUrl);
-                      
-                      // Debug logging
-                      if (import.meta.env.DEV) {
-                        console.log('[Car Detail] Insurance Card URL:', {
-                          original: onboarding.insuranceCardUrl,
-                          trimmed: trimmedUrl,
-                          isGoogleDriveId,
-                          documentUrl,
-                          isPdf,
-                        });
-                      }
                       
                       return (
                         <div 
@@ -2125,7 +2117,6 @@ export default function CarDetailPage() {
                                   }
                                 }}
                                 onError={(e) => {
-                                  console.error('Failed to load insurance card image:', onboarding.insuranceCardUrl);
                                   const target = e.target as HTMLImageElement;
                                   target.style.display = "none";
                                   const parent = target.parentElement?.parentElement;
@@ -2191,22 +2182,6 @@ export default function CarDetailPage() {
                               ? false // Default to image, proxy endpoint will handle PDFs via Content-Type
                               : isPdfDocument(url);
                             
-                            // Debug logging (always log to help diagnose issues)
-                            if (index === 0) {
-                              console.log('[Car Detail] Drivers License URL:', {
-                                url,
-                                isGoogleDriveId,
-                                documentUrl,
-                                isPdf,
-                                totalUrls: validDriversLicenseUrls.length,
-                                looksLikeUrl: url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/'),
-                                hasSlash: url.includes('/'),
-                                hasDot: url.includes('.'),
-                                length: url.length,
-                                matchesPattern: /^[a-zA-Z0-9_-]+$/.test(url),
-                              });
-                            }
-                          
                           return (
                             <div 
                               key={index}
@@ -2266,7 +2241,6 @@ export default function CarDetailPage() {
                                       }
                                     }}
                                     onError={(e) => {
-                                      console.error('Failed to load drivers license image:', url);
                                       const target = e.target as HTMLImageElement;
                                       target.style.display = "none";
                                       const parent = target.parentElement?.parentElement;

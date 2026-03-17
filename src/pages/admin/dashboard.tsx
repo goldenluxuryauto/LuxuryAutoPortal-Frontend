@@ -200,14 +200,14 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="text-center mb-8">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="text-center mb-6 sm:mb-8 px-2">
           <img 
             src="/logo.png" 
             alt="Golden Luxury Auto" 
-            className="h-[90px] md:h-[120px] w-auto mx-auto object-contain mb-6 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
+            className="h-16 sm:h-[90px] md:h-[120px] w-auto mx-auto object-contain mb-4 sm:mb-6 drop-shadow-[0_0_12px_rgba(234,235,128,0.4)]"
           />
-          <h1 className="text-2xl font-semibold text-primary mb-2">
+          <h1 className="text-xl sm:text-2xl font-semibold text-primary mb-2">
             {welcome.title}
           </h1>
           <p className="text-muted-foreground text-sm">
