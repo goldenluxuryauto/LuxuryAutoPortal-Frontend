@@ -300,7 +300,7 @@ export default function ViewCarPage() {
 
         {/* Menu Items List */}
         <div className="bg-card border border-border rounded-lg overflow-auto">
-          <div className="divide-y divide-border1a1a1a]">
+          <div className="divide-y divide-border">
             {menuItems.map((item, index) => (
               <button
                 key={index}

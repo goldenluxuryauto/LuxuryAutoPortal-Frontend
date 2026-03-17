@@ -549,7 +549,7 @@ export default function AdminsPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border2a2a2a]">
+                <tbody className="divide-y divide-border">
                   {isLoading ? (
                     <tr>
                       <td
@@ -862,7 +862,7 @@ export default function AdminsPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border2a2a2a]">
+                  <tbody className="divide-y divide-border">
                     {quickLinks && quickLinks.length > 0 ? (
                       quickLinks.map((link) => (
                         <tr

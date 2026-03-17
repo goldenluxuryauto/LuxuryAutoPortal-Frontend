@@ -195,9 +195,17 @@
     @apply border-border;
   }
 
+  html {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
   body {
     /* stylelint-disable-next-line at-rule-no-unknown */
     @apply font-sans antialiased bg-background text-foreground;
+    overflow-x: hidden;
+    min-height: 100dvh;
+    min-height: 100vh;
   }
 
   /* Override browser autofill dark backgrounds - ROOT FIX for inputs turning black */

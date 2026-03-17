@@ -491,7 +491,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto-y p-3 sm:p-4 md:p-6 bg-background">
+        <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-6 bg-background">
           {children}
         </main>
       </div>

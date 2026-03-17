@@ -87,7 +87,7 @@ export default function AdminLogin() {
           <img 
             src="/logo.png" 
             alt="Golden Luxury Auto" 
-            className="h-[200px] w-auto mx-auto object-contain mb-4 drop-shadow-[0_0_15px_rgba(234,235,128,0.5)]"
+            className="h-28 sm:h-40 md:h-[200px] w-auto mx-auto object-contain mb-4 drop-shadow-[0_0_15px_rgba(234,235,128,0.5)]"
           />
           <p className="text-muted-foreground text-sm">Admin Portal Login</p>
         </div>
