@@ -37,6 +37,7 @@ interface VehicleEntry {
   liveStatus: {
     isRunning: boolean;
     speed: number;
+    heading: number | null;
     latitude: number | null;
     longitude: number | null;
     lastSeen: string | null;
@@ -123,19 +124,30 @@ function BatteryIndicator({ level }: { level: number | null }) {
   );
 }
 
-function slideMarkerTo(marker: any, newLat: number, newLng: number, durationMs = 1500) {
+// Cancel any in-flight animation for a marker before starting a new one
+const _animFrames: Record<string, number> = {};
+
+function slideMarkerTo(marker: any, newLat: number, newLng: number, durationMs = 1800, markerId?: string) {
+  if (markerId && _animFrames[markerId]) cancelAnimationFrame(_animFrames[markerId]);
   const start = marker.getLatLng();
   const startTime = performance.now();
   function step(now: number) {
     const t = Math.min((now - startTime) / durationMs, 1);
-    const ease = t * (2 - t);
+    // Cubic ease-in-out for smooth deceleration at destination
+    const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     marker.setLatLng([
       start.lat + (newLat - start.lat) * ease,
       start.lng + (newLng - start.lng) * ease,
     ]);
-    if (t < 1) requestAnimationFrame(step);
+    if (t < 1) {
+      const id = requestAnimationFrame(step);
+      if (markerId) _animFrames[markerId] = id;
+    } else {
+      if (markerId) delete _animFrames[markerId];
+    }
   }
-  requestAnimationFrame(step);
+  const id = requestAnimationFrame(step);
+  if (markerId) _animFrames[markerId] = id;
 }
 
 /* ─── Vehicle Avatar ─────────────────────────────────────────────── */
@@ -303,13 +315,31 @@ function FleetMap({
 
   const buildIcon = useCallback((L: any, v: VehicleEntry, selected: boolean) => {
     const si = getStatusInfo(v.displayStatus);
+    const isDriving = v.displayStatus === "driving";
     const ring  = selected ? "3px solid #f59e0b" : "2.5px solid white";
     const glow  = selected
       ? "0 0 0 4px rgba(245,158,11,0.35), 0 4px 14px rgba(0,0,0,0.3)"
-      : "0 2px 8px rgba(0,0,0,0.35)";
+      : isDriving
+        ? `0 0 0 5px rgba(59,130,246,0.25), 0 3px 12px rgba(0,0,0,0.3)`
+        : "0 2px 8px rgba(0,0,0,0.35)";
     const size = selected ? 46 : 40;
     const photoUrl = v.car_photo_url;
     const initials = vehicleInitials(v);
+
+    // Heading arrow — shown on driving vehicles, rotated to heading direction
+    const heading = (v.liveStatus as any)?.heading ?? null;
+    const arrowHtml = isDriving && heading != null
+      ? `<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(${heading}deg);
+           width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;
+           border-bottom:10px solid ${selected ? '#f59e0b' : '#3b82f6'};filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5))"></div>`
+      : "";
+
+    // Pulsing ring for driving vehicles
+    const pulseId = `pulse-${v.device_id.replace(/[^a-z0-9]/gi, "")}`;
+    const pulseHtml = isDriving && !selected
+      ? `<div id="${pulseId}" style="position:absolute;inset:-6px;border-radius:50%;
+           border:2px solid rgba(59,130,246,0.5);animation:bounciePulse 2s ease-out infinite"></div>`
+      : "";
 
     const inner = photoUrl
       ? `<img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"
@@ -319,13 +349,19 @@ function FleetMap({
            ${initials}</div>`
       : `<span style="color:white;font-weight:700;font-size:${size * 0.32}px">${initials}</span>`;
 
+    // Wrapper is larger to accommodate pulse ring + arrow
+    const wrapSize = size + 16;
     return L.divIcon({
-      html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${si.color};
-        border:${ring};box-shadow:${glow};overflow:hidden;
-        display:flex;align-items:center;justify-content:center">${inner}</div>`,
+      html: `<div style="position:relative;width:${wrapSize}px;height:${wrapSize}px;display:flex;align-items:center;justify-content:center">
+        ${pulseHtml}
+        ${arrowHtml}
+        <div style="width:${size}px;height:${size}px;border-radius:50%;background:${si.color};
+          border:${ring};box-shadow:${glow};overflow:hidden;
+          display:flex;align-items:center;justify-content:center;position:relative;z-index:1">${inner}</div>
+      </div>`,
       className: "",
-      iconSize: [size, size],
-      iconAnchor: [size / 2, size / 2],
+      iconSize: [wrapSize, wrapSize],
+      iconAnchor: [wrapSize / 2, wrapSize / 2],
     });
   }, []);
 
@@ -411,7 +447,7 @@ function FleetMap({
           const old = m.getLatLng();
           const moved = Math.abs(old.lat - lat) > 0.00001 || Math.abs(old.lng - lng) > 0.00001;
           if (moved) {
-            slideMarkerTo(m, lat, lng, v.displayStatus === "driving" ? 2000 : 400);
+            slideMarkerTo(m, lat, lng, v.displayStatus === "driving" ? 2000 : 500, v.device_id);
           }
 
           // Only rebuild icon if visual state changed — prevents flickering
@@ -473,6 +509,11 @@ function FleetMap({
       <style>{`
         .bouncie-label { background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; }
         .bouncie-label::before { display:none !important; }
+        @keyframes bounciePulse {
+          0%   { transform: scale(1);   opacity: 0.8; }
+          70%  { transform: scale(1.6); opacity: 0; }
+          100% { transform: scale(1.6); opacity: 0; }
+        }
       `}</style>
 
       {/* Floating stats pill */}
