@@ -1,15 +1,13 @@
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { buildApiUrl } from "@/lib/queryClient";
+import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
 import {
-  RefreshCw, MapPin, Car, Navigation,
-  Clock, Gauge, AlertCircle, CheckCircle2, Link2, Link2Off,
-  Timer, Battery, BatteryLow, Route, BarChart3, ShieldAlert,
-  Zap, Search, ExternalLink, X, Fuel, Activity, Layers, Map as MapIcon,
+  RefreshCw, MapPin, Car,
+  Clock, Gauge, Battery, Route, BarChart3, ShieldAlert,
+  Search, X, Fuel, Activity, Layers, Map as MapIcon,
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -73,6 +71,17 @@ function vehicleDisplayName(v: VehicleEntry): string {
   return `Device ${v.imei}`;
 }
 
+function vehicleSidebarName(v: VehicleEntry): string {
+  const make = v.make || v.liveStatus?.vehicleInfo?.make;
+  const rawModel = v.model || v.liveStatus?.vehicleInfo?.model;
+  const model = rawModel && typeof rawModel === "object" ? (rawModel as any).name : rawModel;
+  const plate = v.license_plate;
+  const nick = v.liveStatus?.vehicleInfo?.nickname ||
+    (v.device_nickname && v.device_nickname !== "[object Object]" ? v.device_nickname : null);
+  const nameBase = make && model ? `${make} ${model}` : nick || `Device ${v.imei}`;
+  return plate ? `${nameBase} - ${plate}` : nameBase;
+}
+
 function vehicleInitials(v: VehicleEntry): string {
   const name = vehicleDisplayName(v);
   const words = name.split(/[\s\-]+/).filter(Boolean);
@@ -83,7 +92,7 @@ function vehicleInitials(v: VehicleEntry): string {
 function vehicleSubline(v: VehicleEntry): string {
   const year = v.year || v.liveStatus?.vehicleInfo?.year;
   const make = v.make || v.liveStatus?.vehicleInfo?.make;
-  return [year, make].filter(Boolean).join(" ");
+  return [year, make ? make.toUpperCase() : null].filter(Boolean).join(" ");
 }
 
 function formatLastSeen(dateStr: string | null) {
@@ -102,25 +111,13 @@ function formatLastSeen(dateStr: string | null) {
 function getStatusInfo(status: string) {
   switch (status) {
     case "driving":
-      return { label: "Driving", color: "#3b82f6", bg: "bg-blue-500", textClass: "text-blue-400" };
+      return { label: "Driving", color: "#22c55e", bg: "bg-green-500", textClass: "text-green-400" };
     case "parked":
     case "online":
-      return { label: status === "parked" ? "Parked" : "Online", color: "#22c55e", bg: "bg-green-500", textClass: "text-green-400" };
+      return { label: status === "parked" ? "Parked" : "Online", color: "#3b82f6", bg: "bg-blue-500", textClass: "text-blue-400" };
     default:
       return { label: "Offline", color: "#6b7280", bg: "bg-gray-500", textClass: "text-gray-500" };
   }
-}
-
-function BatteryIndicator({ level }: { level: number | null }) {
-  if (level == null) return null;
-  const pct = Math.round(level);
-  const color = pct <= 20 ? "text-red-400" : pct <= 50 ? "text-yellow-400" : "text-green-400";
-  const Icon = pct <= 20 ? BatteryLow : Battery;
-  return (
-    <span className={`flex items-center gap-0.5 text-xs ${color}`}>
-      <Icon className="w-3 h-3" />{pct}%
-    </span>
-  );
 }
 
 function slideMarkerTo(marker: any, newLat: number, newLng: number, durationMs = 1500) {
@@ -143,7 +140,8 @@ function VehicleAvatar({
   v, size = 48, className = "",
 }: { v: VehicleEntry; size?: number; className?: string }) {
   const [err, setErr] = useState(false);
-  const photo = !err ? v.car_photo_url : null;
+  const rawPhoto = !err ? v.car_photo_url : null;
+  const photo = rawPhoto ? getProxiedImageUrl(rawPhoto) : null;
   const si = getStatusInfo(v.displayStatus);
   const initials = vehicleInitials(v);
 
@@ -153,14 +151,14 @@ function VehicleAvatar({
         src={photo}
         alt={vehicleDisplayName(v)}
         onError={() => setErr(true)}
-        style={{ width: size, height: size, objectFit: "cover", borderRadius: 8, flexShrink: 0 }}
+        style={{ width: size, height: size, objectFit: "cover", borderRadius: "50%", flexShrink: 0 }}
         className={className}
       />
     );
   }
   return (
     <div style={{
-      width: size, height: size, borderRadius: 8, background: si.color, flexShrink: 0,
+      width: size, height: size, borderRadius: "50%", background: si.color, flexShrink: 0,
       display: "flex", alignItems: "center", justifyContent: "center",
       color: "white", fontWeight: 700, fontSize: size * 0.3,
     }} className={className}>
@@ -200,7 +198,7 @@ function VehicleDetailPanel({ v, onClose }: { v: VehicleEntry; onClose: () => vo
               {si.label}
             </span>
             {si.label === "Driving" && speed > 0 && (
-              <span className="text-[11px] font-bold text-blue-600 flex items-center gap-0.5">
+              <span className="text-[11px] font-bold text-green-600 flex items-center gap-0.5">
                 <Gauge className="w-3 h-3" />{speed.toFixed(0)} mph
               </span>
             )}
@@ -263,19 +261,19 @@ function VehicleDetailPanel({ v, onClose }: { v: VehicleEntry; onClose: () => vo
   );
 }
 
-/* ─── Tile layer configs ─────────────────────────────────────────── */
+/* ─── Tile layer configs (Google Maps — same provider as Bouncie) ── */
 const TILES = {
   satellite: {
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    opts: { maxZoom: 19, attribution: "&copy; Esri" },
+    url: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+    opts: { maxZoom: 21, attribution: "&copy; Google" },
   },
   satelliteLabels: {
-    url: "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
-    opts: { maxZoom: 19, pane: "overlayPane" },
+    url: "https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}",
+    opts: { maxZoom: 21, pane: "overlayPane" },
   },
   road: {
-    url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-    opts: { maxZoom: 19, subdomains: "abcd", attribution: "&copy; OSM &copy; CARTO" },
+    url: "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+    opts: { maxZoom: 21, attribution: "&copy; Google" },
   },
 };
 
@@ -285,11 +283,13 @@ function FleetMap({
 }: { vehicles: VehicleEntry[]; selectedId: string | null; onSelect: (v: VehicleEntry) => void }) {
   const mapRef     = useRef<HTMLDivElement>(null);
   const mapInst    = useRef<any>(null);
+  const leafletRef = useRef<any>(null);
   const markerMap  = useRef<Record<string, any>>({});
   const fittedRef  = useRef(false);
   const layersRef  = useRef<{ sat: any; labels: any; road: any }>({ sat: null, labels: null, road: null });
   const onSelectRef = useRef(onSelect);
   const prevStateRef = useRef<Record<string, string>>({});
+  const [mapReady, setMapReady] = useState(false);
 
   const [mapType, setMapType] = useState<"satellite" | "road">("satellite");
 
@@ -308,7 +308,7 @@ function FleetMap({
       ? "0 0 0 4px rgba(245,158,11,0.35), 0 4px 14px rgba(0,0,0,0.3)"
       : "0 2px 8px rgba(0,0,0,0.35)";
     const size = selected ? 46 : 40;
-    const photoUrl = v.car_photo_url;
+    const photoUrl = v.car_photo_url ? getProxiedImageUrl(v.car_photo_url) : null;
     const initials = vehicleInitials(v);
 
     const inner = photoUrl
@@ -334,7 +334,7 @@ function FleetMap({
     const short = name.length > 22 ? name.slice(0, 20) + "…" : name;
     const speed = v.liveStatus?.speed ?? v.last_speed_mph ?? 0;
     const mph   = v.displayStatus === "driving" && Number(speed) > 0
-      ? ` <b style="color:#60a5fa">${Number(speed).toFixed(0)} mph</b>` : "";
+      ? ` <b style="color:#4ade80">${Number(speed).toFixed(0)} mph</b>` : "";
     return `<div style="background:rgba(15,23,42,0.88);backdrop-filter:blur(6px);
       color:white;border-radius:6px;padding:3px 9px;font-family:system-ui;font-size:11px;
       font-weight:500;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.3);
@@ -345,6 +345,7 @@ function FleetMap({
   useEffect(() => {
     if (!mapRef.current || mapInst.current) return;
     import("leaflet").then((L) => {
+      leafletRef.current = L;
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       const map = L.map(mapRef.current!, { zoomControl: false }).setView([40.5, -111.9], 7);
 
@@ -358,6 +359,7 @@ function FleetMap({
 
       L.control.zoom({ position: "bottomright" }).addTo(map);
       mapInst.current = map;
+      setMapReady(true);
     });
 
     return () => {
@@ -367,6 +369,7 @@ function FleetMap({
         markerMap.current = {};
         prevStateRef.current = {};
         fittedRef.current = false;
+        setMapReady(false);
       }
     };
   }, []);
@@ -388,85 +391,84 @@ function FleetMap({
     }
   }, [mapType]);
 
-  // Update markers — only touches DOM when something visually changed
+  // Keep a ref of the latest vehicles so selection effect can access them without being a dependency
+  const vehiclesRef = useRef(withCoords);
+  vehiclesRef.current = withCoords;
+
+  // Sync markers with vehicle data ONLY (selectedId is NOT a dependency)
   useEffect(() => {
-    if (!mapInst.current) return;
-    import("leaflet").then((L) => {
-      const map = mapInst.current;
-      if (!map) return;
-      const existing = new Set(Object.keys(markerMap.current));
+    const L = leafletRef.current;
+    const map = mapInst.current;
+    if (!mapReady || !L || !map) return;
 
-      withCoords.forEach(v => {
-        const lat = (v.liveStatus?.latitude ?? v.last_latitude) as number;
-        const lng = (v.liveStatus?.longitude ?? v.last_longitude) as number;
-        const sel = v.device_id === selectedId;
-        const speed = Number(v.liveStatus?.speed ?? v.last_speed_mph ?? 0);
-        const stateKey = `${v.displayStatus}|${sel}|${v.car_photo_url || ""}|${speed.toFixed(0)}`;
+    const existing = new Set(Object.keys(markerMap.current));
 
-        if (markerMap.current[v.device_id]) {
-          const m = markerMap.current[v.device_id];
-          existing.delete(v.device_id);
+    withCoords.forEach(v => {
+      const lat = (v.liveStatus?.latitude ?? v.last_latitude) as number;
+      const lng = (v.liveStatus?.longitude ?? v.last_longitude) as number;
+      const speed = Number(v.liveStatus?.speed ?? v.last_speed_mph ?? 0);
+      const stateKey = `${v.displayStatus}|${v.car_photo_url || ""}|${speed.toFixed(0)}`;
 
-          // Animate position change
-          const old = m.getLatLng();
-          const moved = Math.abs(old.lat - lat) > 0.00001 || Math.abs(old.lng - lng) > 0.00001;
-          if (moved) {
-            slideMarkerTo(m, lat, lng, v.displayStatus === "driving" ? 2000 : 400);
-          }
+      if (markerMap.current[v.device_id]) {
+        const m = markerMap.current[v.device_id];
+        existing.delete(v.device_id);
 
-          // Only rebuild icon if visual state changed — prevents flickering
-          if (prevStateRef.current[v.device_id] !== stateKey) {
-            m.setIcon(buildIcon(L, v, sel));
-            prevStateRef.current[v.device_id] = stateKey;
-          }
+        const old = m.getLatLng();
+        const moved = Math.abs(old.lat - lat) > 0.00001 || Math.abs(old.lng - lng) > 0.00001;
+        if (moved) {
+          slideMarkerTo(m, lat, lng, v.displayStatus === "driving" ? 2000 : 400);
+        }
 
-          if (m.getTooltip()) m.setTooltipContent(buildLabel(v));
-        } else {
-          const icon = buildIcon(L, v, sel);
-          const marker = L.marker([lat, lng], { icon })
-            .addTo(map)
-            .bindTooltip(buildLabel(v), { permanent: true, direction: "bottom", offset: [0, 4], className: "bouncie-label" })
-            .on("click", () => onSelectRef.current(v));
-          markerMap.current[v.device_id] = marker;
+        if (prevStateRef.current[v.device_id] !== stateKey) {
+          m.setIcon(buildIcon(L, v, false));
           prevStateRef.current[v.device_id] = stateKey;
         }
-      });
 
-      existing.forEach(id => {
-        map.removeLayer(markerMap.current[id]);
-        delete markerMap.current[id];
-        delete prevStateRef.current[id];
-      });
-
-      if (!fittedRef.current && Object.keys(markerMap.current).length > 0) {
-        const group = L.featureGroup(Object.values(markerMap.current));
-        map.fitBounds(group.getBounds().pad(0.25), { maxZoom: 13 });
-        fittedRef.current = true;
+        if (m.getTooltip()) m.setTooltipContent(buildLabel(v));
+      } else {
+        const icon = buildIcon(L, v, false);
+        const marker = L.marker([lat, lng], { icon })
+          .addTo(map)
+          .bindTooltip(buildLabel(v), { permanent: true, direction: "bottom", offset: [0, 4], className: "bouncie-label" })
+          .on("click", () => onSelectRef.current(v));
+        markerMap.current[v.device_id] = marker;
+        prevStateRef.current[v.device_id] = stateKey;
       }
     });
-  }, [withCoords, selectedId, buildIcon, buildLabel]);
 
-  // Fly to selected vehicle
+    existing.forEach(id => {
+      map.removeLayer(markerMap.current[id]);
+      delete markerMap.current[id];
+      delete prevStateRef.current[id];
+    });
+
+    if (!fittedRef.current && Object.keys(markerMap.current).length > 0) {
+      const group = L.featureGroup(Object.values(markerMap.current));
+      map.fitBounds(group.getBounds().pad(0.25), { maxZoom: 13 });
+      fittedRef.current = true;
+    }
+  }, [mapReady, withCoords, buildIcon, buildLabel]);
+
+  // Selection highlight — only updates icons, never adds/removes markers
+  const prevSelectedRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!selectedId || !mapInst.current) return;
-    const m = markerMap.current[selectedId];
-    if (!m) return;
-    mapInst.current.flyTo(m.getLatLng(), 16, { duration: 0.8 });
-  }, [selectedId]);
+    const L = leafletRef.current;
+    if (!L) return;
+    const prev = prevSelectedRef.current;
+    prevSelectedRef.current = selectedId;
 
-  const drivingCount = withCoords.filter(v => v.displayStatus === "driving").length;
-  const parkedCount  = withCoords.filter(v => ["parked", "online"].includes(v.displayStatus)).length;
-  const offlineCount = withCoords.length - drivingCount - parkedCount;
-
-  if (withCoords.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-gray-400 bg-gray-50">
-        <MapPin className="w-14 h-14 opacity-15 mb-3" />
-        <p className="font-semibold text-base">No vehicle locations available</p>
-        <p className="text-sm mt-1 text-gray-400">Sync from Bouncie to get live coordinates</p>
-      </div>
-    );
-  }
+    // Deselect previous
+    if (prev && markerMap.current[prev]) {
+      const v = vehiclesRef.current.find(vv => vv.device_id === prev);
+      if (v) markerMap.current[prev].setIcon(buildIcon(L, v, false));
+    }
+    // Highlight new
+    if (selectedId && markerMap.current[selectedId]) {
+      const v = vehiclesRef.current.find(vv => vv.device_id === selectedId);
+      if (v) markerMap.current[selectedId].setIcon(buildIcon(L, v, true));
+      mapInst.current?.flyTo(markerMap.current[selectedId].getLatLng(), 16, { duration: 0.8 });
+    }
+  }, [selectedId, buildIcon]);
 
   return (
     <div className="relative h-full">
@@ -475,23 +477,19 @@ function FleetMap({
         .bouncie-label::before { display:none !important; }
       `}</style>
 
-      {/* Floating stats pill */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] bg-white/95 backdrop-blur-md rounded-xl px-4 py-2 shadow-lg border border-gray-200/80 flex items-center gap-4 text-xs text-gray-700 font-medium">
-        <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-blue-500" />
-          <b>{drivingCount}</b> driving
-        </span>
-        <span className="w-px h-3 bg-gray-200" />
-        <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-green-500" />
-          <b>{parkedCount}</b> parked
-        </span>
-        <span className="w-px h-3 bg-gray-200" />
-        <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-gray-400" />
-          <b>{offlineCount}</b> offline
-        </span>
-      </div>
+      {/* Map always rendered so the ref is available on mount */}
+      <div ref={mapRef} style={{ height: "100%", width: "100%" }} />
+
+      {/* Overlay when no vehicles have coordinates */}
+      {withCoords.length === 0 && (
+        <div className="absolute inset-0 z-[800] flex flex-col items-center justify-center pointer-events-none">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center">
+            <MapPin className="w-10 h-10 text-gray-300 mb-2" />
+            <p className="font-semibold text-sm text-gray-600">No vehicle locations yet</p>
+            <p className="text-xs text-gray-400 mt-1">Vehicles will appear once Bouncie reports their position</p>
+          </div>
+        </div>
+      )}
 
       {/* Map type toggle */}
       <button
@@ -501,70 +499,73 @@ function FleetMap({
       >
         {mapType === "satellite" ? <MapIcon className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
       </button>
-
-      <div ref={mapRef} style={{ height: "100%", width: "100%" }} />
     </div>
   );
 }
 
 /* ─── Main Page ──────────────────────────────────────────────────── */
-const LIVE_POLL_MS = 15_000;
+const LIVE_POLL_MS = 10_000;
 
 export default function BouncieFleetPage() {
   const { toast }   = useToast();
   const queryClient = useQueryClient();
-  const [sseStatus, setSseStatus]     = useState<"connecting" | "connected" | "disconnected">("disconnected");
   const sseRef                        = useRef<EventSource | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [secondsAgo, setSecondsAgo]   = useState(0);
   const [search, setSearch]           = useState("");
   const [selectedId, setSelectedId]   = useState<string | null>(null);
   const tokenExpiredNotifiedRef       = useRef(false);
   const connectGraceRef               = useRef(0);
 
+  // Handle OAuth redirect callback
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const connected = p.get("bouncie_connected");
     const error     = p.get("bouncie_error");
-    if (connected === "true") {
-      tokenExpiredNotifiedRef.current = false;
-      connectGraceRef.current = Date.now();
-      toast({ title: "Bouncie Connected", description: "Live tracking is now active." });
-      window.history.replaceState({}, "", window.location.pathname);
-      queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
-    } else if (error) {
-      toast({ title: "Connection Failed", description: `Error: ${error}`, variant: "destructive" });
+
+    if (connected === "true" || error) {
+      if (connected === "true") {
+        tokenExpiredNotifiedRef.current = false;
+        connectGraceRef.current = Date.now();
+        toast({ title: "Connected!", description: "You're all set — your vehicles are now tracking live." });
+        queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
+        setTimeout(() => queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] }), 3000);
+        setTimeout(() => queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] }), 8000);
+      } else if (error) {
+        const messages: Record<string, string> = {
+          missing_code: "Looks like you cancelled. No worries, try again when you're ready.",
+          invalid_state: "Something went wrong with the login. Please try again.",
+          token_exchange_failed: "We couldn't finish connecting. Please try once more.",
+        };
+        toast({ title: "Couldn't connect", description: messages[error] || `Something went wrong: ${error}`, variant: "destructive" });
+      }
       window.history.replaceState({}, "", window.location.pathname);
     }
   }, []);
 
+  // SSE — real-time events with notifications
   useEffect(() => {
     let reconnectTimer: ReturnType<typeof setTimeout>;
     const connect = () => {
       if (sseRef.current) sseRef.current.close();
-      setSseStatus("connecting");
       const es = new EventSource(buildApiUrl("/api/bouncie/sse"), { withCredentials: true });
       sseRef.current = es;
-      es.addEventListener("connected", () => { setSseStatus("connected"); tokenExpiredNotifiedRef.current = false; });
+      es.addEventListener("connected", () => { tokenExpiredNotifiedRef.current = false; });
       es.addEventListener("fleet_event", (e: MessageEvent) => {
         try {
           const payload = JSON.parse(e.data || "{}");
           if (payload?.type === "token_expired") {
-            // Ignore stale token_expired events that arrive within 30s after a
-            // successful OAuth connect — the new token is already saved but an
-            // in-flight request with the old token may have triggered this event.
             if (Date.now() - connectGraceRef.current < 30_000) return;
             queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
             if (!tokenExpiredNotifiedRef.current) {
               tokenExpiredNotifiedRef.current = true;
-              toast({ title: "Bouncie Token Expired", description: "Reconnect to resume live tracking.", variant: "destructive" });
+              toast({ title: "Session expired", description: "We couldn't renew your session. Please reconnect.", variant: "destructive" });
             }
             return;
           }
           if (payload?.type === "token_refreshed") {
             tokenExpiredNotifiedRef.current = false;
             connectGraceRef.current = Date.now();
+            toast({ title: "Still connected", description: "Your session was renewed automatically." });
             queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
             queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
             return;
@@ -573,72 +574,59 @@ export default function BouncieFleetPage() {
         queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
       });
       es.addEventListener("fleet_update", () => { queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] }); });
-      es.onerror = () => { setSseStatus("disconnected"); es.close(); reconnectTimer = setTimeout(connect, 10000); };
+      es.onerror = () => { es.close(); reconnectTimer = setTimeout(connect, 10000); };
     };
     connect();
     return () => { sseRef.current?.close(); clearTimeout(reconnectTimer); };
   }, []);
 
-  const { data: connData, isLoading: connLoading } = useQuery<{ success: boolean; data: ConnectionStatus }>({
+  const { data: connData, isLoading: connLoading, isError: connError } = useQuery<{ success: boolean; data: ConnectionStatus }>({
     queryKey: ["/api/bouncie/connection-status"],
     queryFn: async () => {
       const res = await fetch(buildApiUrl("/api/bouncie/connection-status"), { credentials: "include" });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error("Failed to check connection status");
       return res.json();
     },
     refetchInterval: 60000,
+    staleTime: 30000,
+    retry: 1,
+    placeholderData: keepPreviousData,
   });
 
   const connActive = connData?.data?.connected === true;
 
-  const { data, isLoading, isFetching } = useQuery<{ success: boolean; data: FleetOverview }>({
+  const { data, isLoading, isError } = useQuery<{ success: boolean; data: FleetOverview }>({
     queryKey: ["/api/bouncie/fleet-overview"],
     queryFn: async () => {
       const res = await fetch(buildApiUrl("/api/bouncie/fleet-overview"), { credentials: "include" });
-      if (!res.ok) throw new Error();
-      const json = await res.json();
-      setLastUpdated(new Date());
-      setSecondsAgo(0);
-      return json;
-    },
-    refetchInterval: connActive ? LIVE_POLL_MS : false,
-    refetchIntervalInBackground: false,
-  });
-
-  useEffect(() => {
-    if (!lastUpdated) return;
-    const id = setInterval(() => setSecondsAgo(Math.floor((Date.now() - lastUpdated.getTime()) / 1000)), 1000);
-    return () => clearInterval(id);
-  }, [lastUpdated]);
-
-  const syncMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/sync-from-bouncie"), { method: "POST", credentials: "include" });
-      if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || "Sync failed"); }
+      if (!res.ok) throw new Error("Failed to load fleet data");
       return res.json();
     },
-    onSuccess: (r) => { queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] }); toast({ title: "Sync Complete", description: `Synced ${r.data?.synced ?? 0} vehicle(s).` }); },
-    onError: (e: Error) => toast({ title: "Sync Failed", description: e.message, variant: "destructive" }),
+    refetchInterval: LIVE_POLL_MS,
+    refetchIntervalInBackground: false,
+    staleTime: LIVE_POLL_MS - 1000,
+    retry: 2,
+    placeholderData: keepPreviousData,
   });
 
   const disconnectMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(buildApiUrl("/api/bouncie/disconnect"), { method: "DELETE", credentials: "include" });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error("Failed to disconnect");
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
       queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
-      toast({ title: "Disconnected", description: "Bouncie connection removed." });
+      toast({ title: "Disconnected", description: "Bouncie tracking has been turned off." });
+    },
+    onError: () => {
+      toast({ title: "Oops", description: "Couldn't disconnect right now. Give it another try.", variant: "destructive" });
     },
   });
 
   const conn    = connData?.data;
   const overview = data?.data;
-  const summary  = overview?.summary;
-
-  // Stable reference — only changes when server data changes, not on every render
   const allVehicles = useMemo(() => overview?.vehicles ?? [], [overview]);
 
   const filtered = useMemo(() => {
@@ -656,158 +644,140 @@ export default function BouncieFleetPage() {
     [allVehicles, selectedId]
   );
 
-  const handleConnect = useCallback(() => { window.location.href = buildApiUrl("/api/bouncie/connect"); }, []);
+  const handleConnect = useCallback(() => {
+    window.location.href = buildApiUrl("/api/bouncie/connect");
+  }, []);
 
-  // Stable callback — never changes reference, so FleetMap doesn't re-render from this
   const handleMapSelect = useCallback((v: VehicleEntry) => {
     setSelectedId(prev => prev === v.device_id ? null : v.device_id);
   }, []);
 
-  const isConnected = conn?.connected && (conn.source === "database" || conn.source === "env");
+  const isConnected = conn?.connected === true && (conn.source === "database" || conn.source === "env");
+  const needsConnect = !connLoading && !isConnected;
+  const isExpiredOrRevoked = conn?.isExpired === true || connError;
 
   return (
     <AdminLayout>
       <div className="flex overflow-hidden -mx-3 -my-3 sm:-mx-4 sm:-my-4 md:-mx-6 md:-my-6" style={{ height: "calc(100vh - 56px)" }}>
 
         {/* ── Sidebar ──────────────────────────────────────────────── */}
-        <div className="flex flex-col w-72 lg:w-80 flex-shrink-0 bg-[#0f172a] text-white overflow-hidden border-r border-[#1e293b]">
+        <div className="flex flex-col w-72 lg:w-80 flex-shrink-0 bg-[#1e1e1e] text-white overflow-hidden border-r border-[#2a2a2a]">
 
-          <div className="px-4 pt-4 pb-3 border-b border-[#1e293b]">
-            <div className="flex items-center justify-between mb-3">
-              <h1 className="text-sm font-bold tracking-tight flex items-center gap-2">
-                <Navigation className="w-4 h-4 text-blue-400" /> Fleet Tracking
-              </h1>
-              <span className={`flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full ${
-                sseStatus === "connected" ? "text-green-400 bg-green-400/10"
-                  : sseStatus === "connecting" ? "text-yellow-400 bg-yellow-400/10"
-                  : "text-gray-500 bg-gray-500/10"
-              }`}>
-                <Zap className="w-3 h-3" />
-                {sseStatus === "connected" ? "Live" : sseStatus === "connecting" ? "…" : "Off"}
-              </span>
-            </div>
+          {/* ── Connected state: search + vehicle list ── */}
+          {isConnected && (
+            <>
+              {/* Search */}
+              <div className="px-3 pt-3 pb-2">
+                <div className="flex items-center gap-2 bg-[#282828] border border-[#3a3a3a] rounded-lg px-3 py-2">
+                  <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Jump to..."
+                    className="bg-transparent text-sm text-white placeholder-gray-500 outline-none flex-1 min-w-0" />
+                  {search && <button onClick={() => setSearch("")} className="text-gray-400 hover:text-white"><X className="w-3.5 h-3.5" /></button>}
+                </div>
+              </div>
 
-            {!connLoading && conn && (
-              isConnected ? (
+              {/* Vehicle count + disconnect */}
+              <div className="px-4 pb-2">
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-xs text-green-400">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    {conn.source === "database" && conn.expiresInMinutes != null ? `Connected · ${conn.expiresInMinutes}m` : "API Connected"}
-                  </span>
-                  {conn.source === "database" && (
+                  <p className="text-xs text-gray-400">
+                    Viewing <span className="text-gray-200 font-medium">{filtered.length}</span> of <span className="text-gray-200 font-medium">{allVehicles.length}</span> vehicle(s)
+                  </p>
+                  {conn?.source === "database" && (
                     <button onClick={() => confirm("Disconnect Bouncie?") && disconnectMutation.mutate()}
-                      className="text-[11px] text-gray-600 hover:text-red-400 transition-colors flex items-center gap-1">
-                      <Link2Off className="w-3 h-3" /> Disconnect
+                      className="text-[11px] text-gray-500 hover:text-red-400 transition-colors">
+                      Disconnect
                     </button>
                   )}
                 </div>
-              ) : (
-                <button onClick={handleConnect}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2.5 rounded-lg transition-colors">
-                  <Link2 className="w-3.5 h-3.5" />
-                  {conn.isExpired ? "Reconnect to Bouncie" : "Connect to Bouncie"}
-                </button>
-              )
-            )}
+                {isError && !isLoading && (
+                  <p className="text-[11px] text-red-400 mt-1">Having trouble loading vehicles.</p>
+                )}
+              </div>
 
-            {lastUpdated && (
-              <p className="text-[11px] text-gray-600 mt-2 flex items-center gap-1">
-                <RefreshCw className={`w-3 h-3 ${isFetching ? "animate-spin" : ""}`} />
-                Updated {secondsAgo < 5 ? "just now" : `${secondsAgo}s ago`}
+              {/* Vehicle list */}
+              <div className="flex-1 overflow-y-auto border-t border-[#2a2a2a]">
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12 text-gray-400">
+                    <RefreshCw className="w-4 h-4 animate-spin mr-2" /> Loading…
+                  </div>
+                ) : filtered.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-gray-500 gap-2">
+                    <Car className="w-8 h-8 opacity-25" />
+                    <p className="text-sm">{search ? "No matches" : "No vehicles"}</p>
+                  </div>
+                ) : (
+                  filtered.map(v => {
+                    const isSelected = v.device_id === selectedId;
+                    const si = getStatusInfo(v.displayStatus);
+
+                    return (
+                      <button key={v.device_id}
+                        onClick={() => setSelectedId(isSelected ? null : v.device_id)}
+                        className={`w-full text-left px-3 py-2.5 flex items-center gap-3 border-b border-[#2a2a2a] transition-colors
+                          hover:bg-[#272727] ${isSelected ? "bg-[#272727] border-l-2 border-l-blue-500 pl-[10px]" : ""}`}>
+                        <VehicleAvatar v={v} size={40} />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[13px] font-medium text-gray-100 truncate leading-tight">{vehicleSidebarName(v)}</div>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: si.color }} />
+                            <span className="text-[11px] text-gray-400 truncate">{vehicleSubline(v) || v.imei}</span>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </>
+          )}
+
+          {/* ── Not connected / Expired: onboarding CTA ── */}
+          {needsConnect && (
+            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+              <div className="w-16 h-16 rounded-full bg-[#282828] flex items-center justify-center mb-4">
+                {isExpiredOrRevoked
+                  ? <ShieldAlert className="w-8 h-8 text-amber-400" />
+                  : <Car className="w-8 h-8 text-blue-400" />}
+              </div>
+
+              <h3 className="text-base font-semibold text-gray-100 mb-1">
+                {isExpiredOrRevoked ? "Session Expired" : "Fleet Tracking"}
+              </h3>
+              <p className="text-xs text-gray-400 leading-relaxed mb-5 max-w-[220px]">
+                {isExpiredOrRevoked
+                  ? "Your Bouncie session has ended. Reconnect to resume live vehicle tracking."
+                  : "Connect your Bouncie account to see all your vehicles on the map in real time."}
               </p>
-            )}
-          </div>
 
-          <div className="grid grid-cols-3 border-b border-[#1e293b]">
-            {[
-              { label: "Total",   value: summary?.total,   color: "text-white",     dot: "bg-white/30" },
-              { label: "Online",  value: summary?.online,  color: "text-green-400", dot: "bg-green-500" },
-              { label: "Driving", value: summary?.driving, color: "text-blue-400",  dot: "bg-blue-500" },
-            ].map(s => (
-              <div key={s.label} className="flex flex-col items-center py-3 border-r last:border-0 border-[#1e293b]">
-                <span className={`text-2xl font-bold tabular-nums ${s.color}`}>{s.value ?? "—"}</span>
-                <span className="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5 flex items-center gap-1">
-                  <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />{s.label}
-                </span>
-              </div>
-            ))}
-          </div>
+              <button onClick={handleConnect}
+                className={`w-full max-w-[200px] flex items-center justify-center gap-2 text-white text-sm font-semibold py-3 rounded-lg transition-all shadow-lg ${
+                  isExpiredOrRevoked
+                    ? "bg-amber-600 hover:bg-amber-500 shadow-amber-600/20"
+                    : "bg-blue-600 hover:bg-blue-500 shadow-blue-600/20"
+                }`}>
+                {isExpiredOrRevoked ? (
+                  <><RefreshCw className="w-4 h-4" /> Reconnect</>
+                ) : (
+                  "Connect to Bouncie"
+                )}
+              </button>
 
-          <div className="px-3 py-2.5 border-b border-[#1e293b]">
-            <div className="flex items-center gap-2 bg-[#1e293b] rounded-lg px-3 py-2">
-              <Search className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search vehicles…"
-                className="bg-transparent text-sm text-white placeholder-gray-500 outline-none flex-1 min-w-0" />
-              {search && <button onClick={() => setSearch("")} className="text-gray-500 hover:text-white"><X className="w-3.5 h-3.5" /></button>}
+              <p className="text-[10px] text-gray-600 mt-3 leading-relaxed max-w-[200px]">
+                You'll be asked to sign in to your Bouncie account. It only takes a moment.
+              </p>
             </div>
-          </div>
+          )}
 
-          <div className="px-4 py-2 border-b border-[#1e293b]">
-            <p className="text-[11px] text-gray-500">
-              <span className="text-white font-semibold">{filtered.length}</span> of{" "}
-              <span className="text-white font-semibold">{allVehicles.length}</span> vehicle{allVehicles.length !== 1 ? "s" : ""}
-            </p>
-          </div>
+          {/* ── Loading state ── */}
+          {connLoading && (
+            <div className="flex-1 flex items-center justify-center text-gray-500">
+              <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+              <span className="text-sm">Checking connection…</span>
+            </div>
+          )}
 
-          <div className="flex-1 overflow-y-auto">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12 text-gray-500">
-                <RefreshCw className="w-4 h-4 animate-spin mr-2" /> Loading…
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-gray-600 gap-2">
-                <Car className="w-8 h-8 opacity-20" />
-                <p className="text-sm">{search ? "No matches" : "No vehicles"}</p>
-              </div>
-            ) : (
-              filtered.map(v => {
-                const si = getStatusInfo(v.displayStatus);
-                const isSelected = v.device_id === selectedId;
-                const speed = v.liveStatus?.speed ?? v.last_speed_mph ?? 0;
-                const lastSeen = formatLastSeen(v.liveStatus?.lastSeen || v.last_seen);
-                const hasCoords = (v.liveStatus?.latitude ?? v.last_latitude) != null;
-
-                return (
-                  <button key={v.device_id}
-                    onClick={() => setSelectedId(isSelected ? null : v.device_id)}
-                    className={`w-full text-left px-3 py-3 flex items-center gap-3 border-b border-[#1e293b] transition-colors
-                      hover:bg-[#1e293b]/70 ${isSelected ? "bg-blue-950/50 border-l-2 border-l-blue-500 pl-[10px]" : ""}`}>
-                    <div className="relative flex-shrink-0">
-                      <VehicleAvatar v={v} size={44} />
-                      <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#0f172a] ${si.bg}`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-semibold text-white truncate leading-tight">{vehicleDisplayName(v)}</div>
-                      <div className="text-[11px] text-gray-500 truncate mt-0.5">{v.license_plate || vehicleSubline(v) || v.imei}</div>
-                      <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        {v.displayStatus === "driving" && Number(speed) > 0 && (
-                          <span className="text-[11px] text-blue-400 font-bold flex items-center gap-0.5">
-                            <Gauge className="w-3 h-3" />{Number(speed).toFixed(0)} mph
-                          </span>
-                        )}
-                        <span className="text-[11px] text-gray-600 flex items-center gap-0.5"><Clock className="w-3 h-3" />{lastSeen}</span>
-                        <BatteryIndicator level={v.battery_level} />
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                      {hasCoords && (
-                        <a href={`https://www.google.com/maps?q=${v.liveStatus?.latitude ?? v.last_latitude},${v.liveStatus?.longitude ?? v.last_longitude}`}
-                          target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                          className="text-gray-600 hover:text-blue-400 transition-colors" title="Google Maps">
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                      <Link href={`/admin/bouncie-trips?deviceId=${v.device_id}`} onClick={(e: any) => e.stopPropagation()}>
-                        <span title="Trip history"><Route className="w-3.5 h-3.5 text-gray-600 hover:text-blue-400 transition-colors" /></span>
-                      </Link>
-                    </div>
-                  </button>
-                );
-              })
-            )}
-          </div>
-
-          <div className="border-t border-[#1e293b] p-2 grid grid-cols-4 gap-1">
+          {/* Bottom nav */}
+          <div className="border-t border-[#2a2a2a] p-2 grid grid-cols-4 gap-1">
             {[
               { href: "/admin/bouncie-trips",     icon: Route,       label: "Trips"    },
               { href: "/admin/bouncie-behavior",  icon: ShieldAlert, label: "Behavior" },
@@ -815,7 +785,7 @@ export default function BouncieFleetPage() {
               { href: "/admin/bouncie-analytics", icon: BarChart3,   label: "Analytics" },
             ].map(({ href, icon: Icon, label }) => (
               <Link key={href} href={href}>
-                <span className="flex flex-col items-center gap-0.5 text-[10px] text-gray-500 hover:text-white hover:bg-[#1e293b] rounded-lg px-1.5 py-1.5 transition-colors cursor-pointer">
+                <span className="flex flex-col items-center gap-0.5 text-[10px] text-gray-400 hover:text-white hover:bg-[#282828] rounded-lg px-1.5 py-1.5 transition-colors cursor-pointer">
                   <Icon className="w-3.5 h-3.5" />{label}
                 </span>
               </Link>
@@ -824,52 +794,9 @@ export default function BouncieFleetPage() {
         </div>
 
         {/* ── Map area ─────────────────────────────────────────────── */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200 gap-3 flex-shrink-0 shadow-sm">
-            <div className="flex items-center gap-2 flex-wrap">
-              {!connLoading && conn && !isConnected && (
-                <div className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg border font-medium ${
-                  conn.isExpired ? "bg-red-50 text-red-700 border-red-200" : "bg-amber-50 text-amber-700 border-amber-200"
-                }`}>
-                  {conn.isExpired ? <Timer className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
-                  {conn.isExpired ? "Token expired" : "Not connected"} —
-                  <button onClick={handleConnect} className="font-bold underline hover:no-underline ml-1">
-                    {conn.isExpired ? "Reconnect" : "Connect now"}
-                  </button>
-                </div>
-              )}
-              {(summary?.driving ?? 0) > 0 && (
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg">
-                  <Navigation className="w-3.5 h-3.5" />{summary!.driving} driving now
-                </span>
-              )}
-              {selectedVehicle && (
-                <span className="flex items-center gap-2 text-xs bg-gray-100 text-gray-700 border border-gray-200 px-3 py-1.5 rounded-lg">
-                  <VehicleAvatar v={selectedVehicle} size={18} />
-                  <span className="max-w-[140px] truncate font-medium">{vehicleDisplayName(selectedVehicle)}</span>
-                  <button onClick={() => setSelectedId(null)} className="ml-1 text-gray-400 hover:text-gray-700"><X className="w-3 h-3" /></button>
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline"
-                onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] })}
-                disabled={isFetching} className="h-8 text-xs">
-                <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isFetching ? "animate-spin" : ""}`} />Refresh
-              </Button>
-              <Button size="sm" onClick={() => syncMutation.mutate()}
-                disabled={syncMutation.isPending || !conn?.connected}
-                className="h-8 text-xs bg-blue-600 hover:bg-blue-500 text-white">
-                <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${syncMutation.isPending ? "animate-spin" : ""}`} />
-                {syncMutation.isPending ? "Syncing…" : "Sync"}
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-hidden relative">
-            <FleetMap vehicles={allVehicles} selectedId={selectedId} onSelect={handleMapSelect} />
-            {selectedVehicle && <VehicleDetailPanel v={selectedVehicle} onClose={() => setSelectedId(null)} />}
-          </div>
+        <div className="flex-1 overflow-hidden relative">
+          <FleetMap vehicles={allVehicles} selectedId={selectedId} onSelect={handleMapSelect} />
+          {selectedVehicle && <VehicleDetailPanel v={selectedVehicle} onClose={() => setSelectedId(null)} />}
         </div>
       </div>
     </AdminLayout>
