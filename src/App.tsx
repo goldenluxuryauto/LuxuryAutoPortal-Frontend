@@ -59,6 +59,7 @@ import BouncieTripsPage from "@/pages/admin/bouncie-trips";
 import BouncieBehaviorPage from "@/pages/admin/bouncie-behavior";
 import BouncieGeofencePage from "@/pages/admin/bouncie-geofence";
 import BouncieAnalyticsPage from "@/pages/admin/bouncie-analytics";
+import ClientCarTrackingPage from "@/pages/client/my-car-tracking";
 
 // Wrapper component for IncomeExpensesPage to handle Wouter route props
 function IncomeExpensesPageWrapper() {
@@ -165,6 +166,7 @@ function Router() {
       <Route path="/admin/payroll/:payrunId" component={PayrollByRunPage} />
       <Route path="/employee-form" component={EmployeeFormPage} />
       <Route path="/client/dashboard" component={ClientDashboardPage} />
+      <Route path="/client/my-car-tracking" component={ClientCarTrackingPage} />
       <Route path="/profile" component={ClientProfilePage} />
       <Route path="/tutorial" component={ClientTrainingManualPage} />
       <Route path="/admin/training-manual" component={TrainingManualPage} />

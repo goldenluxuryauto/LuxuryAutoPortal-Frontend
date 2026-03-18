@@ -1,15 +1,12 @@
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
 import {
-  RefreshCw, MapPin, Car,
-  Clock, Gauge, Battery, Route, BarChart3, ShieldAlert,
+  MapPin, Car, Clock, Gauge, Battery,
   Search, X, Fuel, Activity, Layers, Map as MapIcon,
 } from "lucide-react";
-import { Link } from "wouter";
 
 /* ─── Types ──────────────────────────────────────────────────────── */
 interface VehicleEntry {
@@ -49,14 +46,6 @@ interface FleetOverview {
   vehicles: VehicleEntry[];
   apiConnected: boolean;
 }
-interface ConnectionStatus {
-  connected: boolean;
-  expiresAt: string | null;
-  isExpired: boolean;
-  expiresInMinutes: number | null;
-  source: "database" | "env" | "none";
-  hasRefreshToken: boolean;
-}
 
 /* ─── Helpers ────────────────────────────────────────────────────── */
 function vehicleDisplayName(v: VehicleEntry): string {
@@ -70,17 +59,6 @@ function vehicleDisplayName(v: VehicleEntry): string {
   if (make && model) return `${make} ${model}`;
   if (nick) return nick;
   return `Device ${v.imei}`;
-}
-
-function vehicleSidebarName(v: VehicleEntry): string {
-  const make = v.make || v.liveStatus?.vehicleInfo?.make;
-  const rawModel = v.model || v.liveStatus?.vehicleInfo?.model;
-  const model = rawModel && typeof rawModel === "object" ? (rawModel as any).name : rawModel;
-  const plate = v.license_plate;
-  const nick = v.liveStatus?.vehicleInfo?.nickname ||
-    (v.device_nickname && v.device_nickname !== "[object Object]" ? v.device_nickname : null);
-  const nameBase = make && model ? `${make} ${model}` : nick || `Device ${v.imei}`;
-  return plate ? `${nameBase} - ${plate}` : nameBase;
 }
 
 function vehicleInitials(v: VehicleEntry): string {
@@ -137,9 +115,7 @@ function slideMarkerTo(marker: any, newLat: number, newLng: number, durationMs =
 }
 
 /* ─── Vehicle Avatar ─────────────────────────────────────────────── */
-function VehicleAvatar({
-  v, size = 48, className = "",
-}: { v: VehicleEntry; size?: number; className?: string }) {
+function VehicleAvatar({ v, size = 48 }: { v: VehicleEntry; size?: number }) {
   const [err, setErr] = useState(false);
   const rawPhoto = !err ? v.car_photo_url : null;
   const photo = rawPhoto ? getProxiedImageUrl(rawPhoto) : null;
@@ -149,11 +125,8 @@ function VehicleAvatar({
   if (photo) {
     return (
       <img
-        src={photo}
-        alt={vehicleDisplayName(v)}
-        onError={() => setErr(true)}
+        src={photo} alt={vehicleDisplayName(v)} onError={() => setErr(true)}
         style={{ width: size, height: size, objectFit: "cover", borderRadius: "50%", flexShrink: 0 }}
-        className={className}
       />
     );
   }
@@ -162,7 +135,7 @@ function VehicleAvatar({
       width: size, height: size, borderRadius: "50%", background: si.color, flexShrink: 0,
       display: "flex", alignItems: "center", justifyContent: "center",
       color: "white", fontWeight: 700, fontSize: size * 0.3,
-    }} className={className}>
+    }}>
       {initials}
     </div>
   );
@@ -186,7 +159,6 @@ function VehicleDetailPanel({ v, onClose }: { v: VehicleEntry; onClose: () => vo
       style={{ animation: "slideUp .25s ease-out" }}
     >
       <style>{`@keyframes slideUp { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }`}</style>
-
       <div className="flex items-start gap-3 p-4 pb-3">
         <VehicleAvatar v={v} size={52} />
         <div className="flex-1 min-w-0">
@@ -237,12 +209,6 @@ function VehicleDetailPanel({ v, onClose }: { v: VehicleEntry; onClose: () => vo
             <span className="font-mono text-gray-500 text-[11px]">{v.vin}</span>
           </div>
         )}
-        {v.imei && (
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-400">IMEI</span>
-            <span className="font-mono text-gray-500 text-[11px]">{v.imei}</span>
-          </div>
-        )}
         {lat != null && lng != null && (
           <div className="flex items-center justify-between text-xs">
             <span className="text-gray-400">Coordinates</span>
@@ -258,11 +224,6 @@ function VehicleDetailPanel({ v, onClose }: { v: VehicleEntry; onClose: () => vo
             <MapPin className="w-3.5 h-3.5" />Google Maps
           </a>
         )}
-        <Link href={`/admin/bouncie-trips?deviceId=${v.device_id}`}>
-          <span className="flex items-center justify-center gap-1.5 text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg py-2 px-4 transition-colors cursor-pointer">
-            <Route className="w-3.5 h-3.5" />Trips
-          </span>
-        </Link>
       </div>
     </div>
   );
@@ -297,7 +258,6 @@ function FleetMap({
   const onSelectRef = useRef(onSelect);
   const prevStateRef = useRef<Record<string, string>>({});
   const [mapReady, setMapReady] = useState(false);
-
   const [mapType, setMapType] = useState<"satellite" | "road">("satellite");
 
   useEffect(() => { onSelectRef.current = onSelect; });
@@ -348,27 +308,22 @@ function FleetMap({
       pointer-events:none;margin-top:4px">${short}${mph}</div>`;
   }, []);
 
-  // Initialize map once
   useEffect(() => {
     if (!mapRef.current || mapInst.current) return;
     import("leaflet").then((L) => {
       leafletRef.current = L;
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       const map = L.map(mapRef.current!, { zoomControl: false }).setView([40.5, -111.9], 7);
-
       const sat    = L.tileLayer(TILES.satellite.url, TILES.satellite.opts);
       const labels = L.tileLayer(TILES.satelliteLabels.url, TILES.satelliteLabels.opts);
       const road   = L.tileLayer(TILES.road.url, TILES.road.opts);
-
       sat.addTo(map);
       labels.addTo(map);
       layersRef.current = { sat, labels, road };
-
       L.control.zoom({ position: "bottomright" }).addTo(map);
       mapInst.current = map;
       setMapReady(true);
     });
-
     return () => {
       if (mapInst.current) {
         mapInst.current.remove();
@@ -381,7 +336,6 @@ function FleetMap({
     };
   }, []);
 
-  // Toggle satellite / road
   useEffect(() => {
     const map = mapInst.current;
     if (!map) return;
@@ -398,16 +352,13 @@ function FleetMap({
     }
   }, [mapType]);
 
-  // Keep a ref of the latest vehicles so selection effect can access them without being a dependency
   const vehiclesRef = useRef(withCoords);
   vehiclesRef.current = withCoords;
 
-  // Sync markers with vehicle data ONLY (selectedId is NOT a dependency)
   useEffect(() => {
     const L = leafletRef.current;
     const map = mapInst.current;
     if (!mapReady || !L || !map) return;
-
     const existing = new Set(Object.keys(markerMap.current));
 
     withCoords.forEach(v => {
@@ -419,18 +370,13 @@ function FleetMap({
       if (markerMap.current[v.device_id]) {
         const m = markerMap.current[v.device_id];
         existing.delete(v.device_id);
-
         const old = m.getLatLng();
         const moved = Math.abs(old.lat - lat) > 0.00001 || Math.abs(old.lng - lng) > 0.00001;
-        if (moved) {
-          slideMarkerTo(m, lat, lng, v.displayStatus === "driving" ? 2000 : 400);
-        }
-
+        if (moved) slideMarkerTo(m, lat, lng, v.displayStatus === "driving" ? 2000 : 400);
         if (prevStateRef.current[v.device_id] !== stateKey) {
           m.setIcon(buildIcon(L, v, false));
           prevStateRef.current[v.device_id] = stateKey;
         }
-
         if (m.getTooltip()) m.setTooltipContent(buildLabel(v));
       } else {
         const icon = buildIcon(L, v, false);
@@ -451,25 +397,21 @@ function FleetMap({
 
     if (!fittedRef.current && Object.keys(markerMap.current).length > 0) {
       const group = L.featureGroup(Object.values(markerMap.current));
-      map.fitBounds(group.getBounds().pad(0.25), { maxZoom: 13 });
+      map.fitBounds(group.getBounds().pad(0.25), { maxZoom: 16 });
       fittedRef.current = true;
     }
   }, [mapReady, withCoords, buildIcon, buildLabel]);
 
-  // Selection highlight — only updates icons, never adds/removes markers
   const prevSelectedRef = useRef<string | null>(null);
   useEffect(() => {
     const L = leafletRef.current;
     if (!L) return;
     const prev = prevSelectedRef.current;
     prevSelectedRef.current = selectedId;
-
-    // Deselect previous
     if (prev && markerMap.current[prev]) {
       const v = vehiclesRef.current.find(vv => vv.device_id === prev);
       if (v) markerMap.current[prev].setIcon(buildIcon(L, v, false));
     }
-    // Highlight new
     if (selectedId && markerMap.current[selectedId]) {
       const v = vehiclesRef.current.find(vv => vv.device_id === selectedId);
       if (v) markerMap.current[selectedId].setIcon(buildIcon(L, v, true));
@@ -483,22 +425,16 @@ function FleetMap({
         .bouncie-label { background:transparent !important; border:none !important; box-shadow:none !important; padding:0 !important; }
         .bouncie-label::before { display:none !important; }
       `}</style>
-
-      {/* Map always rendered so the ref is available on mount */}
       <div ref={mapRef} style={{ height: "100%", width: "100%" }} />
-
-      {/* Overlay when no vehicles have coordinates */}
       {withCoords.length === 0 && (
         <div className="absolute inset-0 z-[800] flex flex-col items-center justify-center pointer-events-none">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center">
             <MapPin className="w-10 h-10 text-gray-300 mb-2" />
             <p className="font-semibold text-sm text-gray-600">No vehicle locations yet</p>
-            <p className="text-xs text-gray-400 mt-1">Vehicles will appear once Bouncie reports their position</p>
+            <p className="text-xs text-gray-400 mt-1">Your vehicle will appear once its tracker reports a position</p>
           </div>
         </div>
       )}
-
-      {/* Map type toggle */}
       <button
         onClick={() => setMapType(t => t === "satellite" ? "road" : "satellite")}
         className="absolute top-3 right-3 z-[1000] bg-white/95 backdrop-blur-md rounded-lg p-2 shadow-lg border border-gray-200/80 text-gray-600 hover:text-gray-900 transition-colors"
@@ -513,100 +449,15 @@ function FleetMap({
 /* ─── Main Page ──────────────────────────────────────────────────── */
 const LIVE_POLL_MS = 10_000;
 
-export default function BouncieFleetPage() {
-  const { toast }   = useToast();
-  const queryClient = useQueryClient();
-  const sseRef                        = useRef<EventSource | null>(null);
+export default function ClientCarTrackingPage() {
   const [search, setSearch]           = useState("");
   const [selectedId, setSelectedId]   = useState<string | null>(null);
-  const tokenExpiredNotifiedRef       = useRef(false);
-  const connectGraceRef               = useRef(0);
 
-  // Handle OAuth redirect callback
-  useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
-    const connected = p.get("bouncie_connected");
-    const error     = p.get("bouncie_error");
-
-    if (connected === "true" || error) {
-      if (connected === "true") {
-        tokenExpiredNotifiedRef.current = false;
-        connectGraceRef.current = Date.now();
-        toast({ title: "Connected!", description: "You're all set — your vehicles are now tracking live." });
-        queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
-        setTimeout(() => queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] }), 3000);
-        setTimeout(() => queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] }), 8000);
-      } else if (error) {
-        const messages: Record<string, string> = {
-          missing_code: "Looks like you cancelled. No worries, try again when you're ready.",
-          invalid_state: "Something went wrong with the login. Please try again.",
-          token_exchange_failed: "We couldn't finish connecting. Please try once more.",
-        };
-        toast({ title: "Couldn't connect", description: messages[error] || `Something went wrong: ${error}`, variant: "destructive" });
-      }
-      window.history.replaceState({}, "", window.location.pathname);
-    }
-  }, []);
-
-  // SSE — real-time events with notifications
-  useEffect(() => {
-    let reconnectTimer: ReturnType<typeof setTimeout>;
-    const connect = () => {
-      if (sseRef.current) sseRef.current.close();
-      const es = new EventSource(buildApiUrl("/api/bouncie/sse"), { withCredentials: true });
-      sseRef.current = es;
-      es.addEventListener("connected", () => { tokenExpiredNotifiedRef.current = false; });
-      es.addEventListener("fleet_event", (e: MessageEvent) => {
-        try {
-          const payload = JSON.parse(e.data || "{}");
-          if (payload?.type === "token_expired") {
-            if (Date.now() - connectGraceRef.current < 30_000) return;
-            queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
-            if (!tokenExpiredNotifiedRef.current) {
-              tokenExpiredNotifiedRef.current = true;
-              toast({ title: "Session expired", description: "We couldn't renew your session. Please reconnect.", variant: "destructive" });
-            }
-            return;
-          }
-          if (payload?.type === "token_refreshed") {
-            tokenExpiredNotifiedRef.current = false;
-            connectGraceRef.current = Date.now();
-            toast({ title: "Still connected", description: "Your session was renewed automatically." });
-            queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
-            queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
-            return;
-          }
-        } catch {}
-        queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
-      });
-      es.addEventListener("fleet_update", () => { queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] }); });
-      es.onerror = () => { es.close(); reconnectTimer = setTimeout(connect, 10000); };
-    };
-    connect();
-    return () => { sseRef.current?.close(); clearTimeout(reconnectTimer); };
-  }, []);
-
-  const { data: connData, isLoading: connLoading, isError: connError } = useQuery<{ success: boolean; data: ConnectionStatus }>({
-    queryKey: ["/api/bouncie/connection-status"],
+  const { data, isLoading } = useQuery<{ success: boolean; data: FleetOverview }>({
+    queryKey: ["/api/bouncie/client-fleet"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/connection-status"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to check connection status");
-      return res.json();
-    },
-    refetchInterval: 60000,
-    staleTime: 30000,
-    retry: 1,
-    placeholderData: keepPreviousData,
-  });
-
-  const connActive = connData?.data?.connected === true;
-
-  const { data, isLoading, isError } = useQuery<{ success: boolean; data: FleetOverview }>({
-    queryKey: ["/api/bouncie/fleet-overview"],
-    queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/fleet-overview"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to load fleet data");
+      const res = await fetch(buildApiUrl("/api/bouncie/client-fleet"), { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to load vehicle data");
       return res.json();
     },
     refetchInterval: LIVE_POLL_MS,
@@ -616,23 +467,6 @@ export default function BouncieFleetPage() {
     placeholderData: keepPreviousData,
   });
 
-  const disconnectMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/disconnect"), { method: "DELETE", credentials: "include" });
-      if (!res.ok) throw new Error("Failed to disconnect");
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/bouncie/connection-status"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/bouncie/fleet-overview"] });
-      toast({ title: "Disconnected", description: "Bouncie tracking has been turned off." });
-    },
-    onError: () => {
-      toast({ title: "Oops", description: "Couldn't disconnect right now. Give it another try.", variant: "destructive" });
-    },
-  });
-
-  const conn    = connData?.data;
   const overview = data?.data;
   const allVehicles = useMemo(() => overview?.vehicles ?? [], [overview]);
 
@@ -642,7 +476,7 @@ export default function BouncieFleetPage() {
     return allVehicles.filter(v =>
       vehicleDisplayName(v).toLowerCase().includes(q)
       || (v.license_plate || "").toLowerCase().includes(q)
-      || (v.imei || "").includes(q)
+      || (v.vin || "").toLowerCase().includes(q)
     );
   }, [allVehicles, search]);
 
@@ -651,156 +485,97 @@ export default function BouncieFleetPage() {
     [allVehicles, selectedId]
   );
 
-  const handleConnect = useCallback(() => {
-    window.location.href = buildApiUrl("/api/bouncie/connect");
-  }, []);
-
   const handleMapSelect = useCallback((v: VehicleEntry) => {
     setSelectedId(prev => prev === v.device_id ? null : v.device_id);
   }, []);
-
-  const isConnected = conn?.connected === true && (conn.source === "database" || conn.source === "env");
-  const needsConnect = !connLoading && !isConnected;
-  const isExpiredOrRevoked = conn?.isExpired === true || connError;
 
   return (
     <AdminLayout>
       <div className="flex overflow-hidden -mx-3 -my-3 sm:-mx-4 sm:-my-4 md:-mx-6 md:-my-6" style={{ height: "calc(100vh - 56px)" }}>
 
-        {/* ── Sidebar ──────────────────────────────────────────────── */}
+        {/* ── Sidebar ── */}
         <div className="flex flex-col w-72 lg:w-80 flex-shrink-0 bg-[#1e1e1e] text-white overflow-hidden border-r border-[#2a2a2a]">
 
-          {/* ── Connected state: search + vehicle list ── */}
-          {isConnected && (
-            <>
-              {/* Search */}
-              <div className="px-3 pt-3 pb-2">
-                <div className="flex items-center gap-2 bg-[#282828] border border-[#3a3a3a] rounded-lg px-3 py-2">
-                  <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Jump to..."
-                    className="bg-transparent text-sm text-white placeholder-gray-500 outline-none flex-1 min-w-0" />
-                  {search && <button onClick={() => setSearch("")} className="text-gray-400 hover:text-white"><X className="w-3.5 h-3.5" /></button>}
-                </div>
+          {/* Header */}
+          <div className="px-4 py-3 border-b border-[#2a2a2a]">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                <Car className="w-4 h-4 text-white" />
               </div>
-
-              {/* Vehicle count + disconnect */}
-              <div className="px-4 pb-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-400">
-                    Viewing <span className="text-gray-200 font-medium">{filtered.length}</span> of <span className="text-gray-200 font-medium">{allVehicles.length}</span> vehicle(s)
-                  </p>
-                  {conn?.source === "database" && (
-                    <button onClick={() => confirm("Disconnect Bouncie?") && disconnectMutation.mutate()}
-                      className="text-[11px] text-gray-500 hover:text-red-400 transition-colors">
-                      Disconnect
-                    </button>
-                  )}
-                </div>
-                {isError && !isLoading && (
-                  <p className="text-[11px] text-red-400 mt-1">Having trouble loading vehicles.</p>
-                )}
+              <div>
+                <h2 className="text-sm font-bold text-gray-100">My Vehicles</h2>
+                <p className="text-[11px] text-gray-400">Live tracking</p>
               </div>
+            </div>
+          </div>
 
-              {/* Vehicle list */}
-              <div className="flex-1 overflow-y-auto border-t border-[#2a2a2a]">
-                {isLoading ? (
-                  <div className="flex items-center justify-center py-12 text-gray-400">
-                    <RefreshCw className="w-4 h-4 animate-spin mr-2" /> Loading…
-                  </div>
-                ) : filtered.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-gray-500 gap-2">
-                    <Car className="w-8 h-8 opacity-25" />
-                    <p className="text-sm">{search ? "No matches" : "No vehicles"}</p>
-                  </div>
-                ) : (
-                  filtered.map(v => {
-                    const isSelected = v.device_id === selectedId;
-                    const si = getStatusInfo(v.displayStatus);
-
-                    return (
-                      <button key={v.device_id}
-                        onClick={() => setSelectedId(isSelected ? null : v.device_id)}
-                        className={`w-full text-left px-3 py-2.5 flex items-center gap-3 border-b border-[#2a2a2a] transition-colors
-                          hover:bg-[#272727] ${isSelected ? "bg-[#272727] border-l-2 border-l-blue-500 pl-[10px]" : ""}`}>
-                        <VehicleAvatar v={v} size={40} />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[13px] font-medium text-gray-100 truncate leading-tight">{vehicleSidebarName(v)}</div>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: si.color }} />
-                            <span className="text-[11px] text-gray-400 truncate">{vehicleSubline(v) || v.imei}</span>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })
-                )}
+          {/* Search (only when >1 vehicle) */}
+          {allVehicles.length > 1 && (
+            <div className="px-3 pt-3 pb-2">
+              <div className="flex items-center gap-2 bg-[#282828] border border-[#3a3a3a] rounded-lg px-3 py-2">
+                <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search vehicle..."
+                  className="bg-transparent text-sm text-white placeholder-gray-500 outline-none flex-1 min-w-0" />
+                {search && <button onClick={() => setSearch("")} className="text-gray-400 hover:text-white"><X className="w-3.5 h-3.5" /></button>}
               </div>
-            </>
-          )}
-
-          {/* ── Not connected / Expired: onboarding CTA ── */}
-          {needsConnect && (
-            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-[#282828] flex items-center justify-center mb-4">
-                {isExpiredOrRevoked
-                  ? <ShieldAlert className="w-8 h-8 text-amber-400" />
-                  : <Car className="w-8 h-8 text-blue-400" />}
-              </div>
-
-              <h3 className="text-base font-semibold text-gray-100 mb-1">
-                {isExpiredOrRevoked ? "Session Expired" : "Fleet Tracking"}
-              </h3>
-              <p className="text-xs text-gray-400 leading-relaxed mb-5 max-w-[220px]">
-                {isExpiredOrRevoked
-                  ? "Your Bouncie session has ended. Reconnect to resume live vehicle tracking."
-                  : "Connect your Bouncie account to see all your vehicles on the map in real time."}
-              </p>
-
-              <button onClick={handleConnect}
-                className={`w-full max-w-[200px] flex items-center justify-center gap-2 text-white text-sm font-semibold py-3 rounded-lg transition-all shadow-lg ${
-                  isExpiredOrRevoked
-                    ? "bg-amber-600 hover:bg-amber-500 shadow-amber-600/20"
-                    : "bg-blue-600 hover:bg-blue-500 shadow-blue-600/20"
-                }`}>
-                {isExpiredOrRevoked ? (
-                  <><RefreshCw className="w-4 h-4" /> Reconnect</>
-                ) : (
-                  "Connect to Bouncie"
-                )}
-              </button>
-
-              <p className="text-[10px] text-gray-600 mt-3 leading-relaxed max-w-[200px]">
-                You'll be asked to sign in to your Bouncie account. It only takes a moment.
-              </p>
             </div>
           )}
 
-          {/* ── Loading state ── */}
-          {connLoading && (
-            <div className="flex-1 flex items-center justify-center text-gray-500">
-              <RefreshCw className="w-4 h-4 animate-spin mr-2" />
-              <span className="text-sm">Checking connection…</span>
-            </div>
-          )}
+          {/* Vehicle count */}
+          <div className="px-4 pb-2 pt-1">
+            <p className="text-xs text-gray-400">
+              {allVehicles.length === 1 ? "1 vehicle" : `${filtered.length} of ${allVehicles.length} vehicles`}
+            </p>
+          </div>
 
-          {/* Bottom nav */}
-          <div className="border-t border-[#2a2a2a] p-2 grid grid-cols-4 gap-1">
-            {[
-              { href: "/admin/bouncie-trips",     icon: Route,       label: "Trips"    },
-              { href: "/admin/bouncie-behavior",  icon: ShieldAlert, label: "Behavior" },
-              { href: "/admin/bouncie-geofence",  icon: MapPin,      label: "Geofence" },
-              { href: "/admin/bouncie-analytics", icon: BarChart3,   label: "Analytics" },
-            ].map(({ href, icon: Icon, label }) => (
-              <Link key={href} href={href}>
-                <span className="flex flex-col items-center gap-0.5 text-[10px] text-gray-400 hover:text-white hover:bg-[#282828] rounded-lg px-1.5 py-1.5 transition-colors cursor-pointer">
-                  <Icon className="w-3.5 h-3.5" />{label}
-                </span>
-              </Link>
-            ))}
+          {/* Vehicle list */}
+          <div className="flex-1 overflow-y-auto border-t border-[#2a2a2a]">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12 text-gray-400">
+                <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mr-2" /> Loading…
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-gray-500 gap-2">
+                <Car className="w-8 h-8 opacity-25" />
+                <p className="text-sm">{search ? "No matches" : "No tracked vehicles"}</p>
+                <p className="text-xs text-gray-600 text-center px-4 max-w-[220px]">
+                  {search ? "Try a different search" : "No vehicles are currently linked to your account."}
+                </p>
+              </div>
+            ) : (
+              filtered.map(v => {
+                const isSelected = v.device_id === selectedId;
+                const si = getStatusInfo(v.displayStatus);
+
+                return (
+                  <button key={v.device_id}
+                    onClick={() => setSelectedId(isSelected ? null : v.device_id)}
+                    className={`w-full text-left px-3 py-2.5 flex items-center gap-3 border-b border-[#2a2a2a] transition-colors
+                      hover:bg-[#272727] ${isSelected ? "bg-[#272727] border-l-2 border-l-blue-500 pl-[10px]" : ""}`}>
+                    <VehicleAvatar v={v} size={40} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] font-medium text-gray-100 truncate leading-tight">{vehicleDisplayName(v)}</div>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: si.color }} />
+                        <span className="text-[11px] text-gray-400 truncate">
+                          {si.label}
+                          {v.displayStatus === "driving" && Number(v.liveStatus?.speed ?? 0) > 0
+                            ? ` · ${Number(v.liveStatus!.speed).toFixed(0)} mph`
+                            : ""}
+                        </span>
+                      </div>
+                      {v.license_plate && (
+                        <p className="text-[10px] text-gray-500 mt-0.5">{v.license_plate}</p>
+                      )}
+                    </div>
+                  </button>
+                );
+              })
+            )}
           </div>
         </div>
 
-        {/* ── Map area ─────────────────────────────────────────────── */}
+        {/* ── Map area ── */}
         <div className="flex-1 overflow-hidden relative">
           <FleetMap vehicles={allVehicles} selectedId={selectedId} onSelect={handleMapSelect} />
           {selectedVehicle && <VehicleDetailPanel v={selectedVehicle} onClose={() => setSelectedId(null)} />}
