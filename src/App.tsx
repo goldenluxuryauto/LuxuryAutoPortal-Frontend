@@ -67,6 +67,7 @@ function IncomeExpensesPageWrapper() {
 import ClientProfilePage from "@/pages/admin/profile";
 import TrainingManualPage from "@/pages/admin/training-manual";
 import ClientTrainingManualPage from "@/pages/client/training-manual";
+import ClientDashboardPage from "@/pages/client/dashboard";
 import SignContract from "@/pages/sign-contract";
 import Signup from "@/pages/signup";
 import ResetPasswordPage from "@/pages/reset-password";
@@ -163,6 +164,7 @@ function Router() {
       <Route path="/admin/payroll/:payrunId/payslip/:employeeId" component={PayslipPage} />
       <Route path="/admin/payroll/:payrunId" component={PayrollByRunPage} />
       <Route path="/employee-form" component={EmployeeFormPage} />
+      <Route path="/client/dashboard" component={ClientDashboardPage} />
       <Route path="/profile" component={ClientProfilePage} />
       <Route path="/tutorial" component={ClientTrainingManualPage} />
       <Route path="/admin/training-manual" component={TrainingManualPage} />
