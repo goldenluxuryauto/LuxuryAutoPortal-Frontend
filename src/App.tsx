@@ -69,6 +69,7 @@ import ClientProfilePage from "@/pages/admin/profile";
 import TrainingManualPage from "@/pages/admin/training-manual";
 import ClientTrainingManualPage from "@/pages/client/training-manual";
 import ClientDashboardPage from "@/pages/client/dashboard";
+import DashboardRouter from "@/pages/dashboard-router";
 import SignContract from "@/pages/sign-contract";
 import Signup from "@/pages/signup";
 import ResetPasswordPage from "@/pages/reset-password";
@@ -115,7 +116,7 @@ function Router() {
       <Route path="/staff/car-rental/trips" component={StaffCarRentalTrips} />
       <Route path="/staff/car-rental/forms/submit" component={StaffCarRentalFormSubmit} />
       <Route path="/staff/car-rental/forms" component={StaffCarRentalForms} />
-      <Route path="/dashboard" component={AdminDashboard} />
+      <Route path="/dashboard" component={DashboardRouter} />
       <Route path="/admin/admins" component={AdminsPage} />
       <Route path="/admin/clients" component={ClientsPage} />
       <Route path="/admin/clients/:id" component={ClientDetailPage} />
