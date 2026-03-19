@@ -733,7 +733,7 @@ export default function ClientDashboard() {
                       <div className="flex gap-1">
                         <span className="text-xs text-muted-foreground flex-shrink-0 min-w-[90px]">Manufacturer:</span>
                         <a href={manufacturerUrl} target="_blank" rel="noopener noreferrer"
-                          className="text-xs text-[#EAEB80] hover:underline flex items-center gap-1">
+                          className="text-xs text-foreground hover:text-[#EAEB80] hover:underline flex items-center gap-1">
                           {manufacturerUrl.replace(/^https?:\/\//, "")}
                           <ExternalLink className="w-3 h-3" />
                         </a>
@@ -785,7 +785,7 @@ export default function ClientDashboard() {
                     <span className="text-xs text-muted-foreground flex-shrink-0 min-w-[70px]">{item.label}:</span>
                     {item.href ? (
                       <a href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined}
-                        rel="noopener noreferrer" className="text-xs text-[#EAEB80] hover:underline break-all">
+                        rel="noopener noreferrer" className="text-xs text-foreground hover:underline hover:text-[#EAEB80] break-all">
                         {item.value}
                       </a>
                     ) : (
