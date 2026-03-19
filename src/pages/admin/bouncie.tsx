@@ -437,7 +437,10 @@ function FleetMap({
         const lng = (v.liveStatus?.longitude ?? v.last_longitude) as number;
         const sel = v.device_id === selectedId;
         const speed = Number(v.liveStatus?.speed ?? v.last_speed_mph ?? 0);
-        const stateKey = `${v.displayStatus}|${sel}|${v.car_photo_url || ""}|${speed.toFixed(0)}`;
+        // Icon only rebuilt when these change — speed/heading updates tooltip but DON'T trigger icon rebuild
+        const heading = v.liveStatus?.heading ?? null;
+        const headingBucket = heading != null ? Math.round(heading / 45) : -1; // 8 buckets (N/NE/E/…)
+        const stateKey = `${v.displayStatus}|${sel}|${v.car_photo_url || ""}|${headingBucket}`;
 
         if (markerMap.current[v.device_id]) {
           const m = markerMap.current[v.device_id];
