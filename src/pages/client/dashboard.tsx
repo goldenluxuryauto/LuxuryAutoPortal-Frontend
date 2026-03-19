@@ -716,36 +716,35 @@ export default function ClientDashboard() {
                   <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 pb-1 border-b border-border">
                     Owner Information
                   </h3>
-                  <div className="space-y-1.5">
-                    {[
-                      { label: "Name", value: ownerName },
-                      { label: "Contact #", value: ownerPhone },
-                      { label: "Email", value: ownerEmail },
-                    ]
-                      .filter((f) => f.value)
-                      .map((f) => (
-                        <div key={f.label} className="flex gap-1">
-                          <span className="text-xs text-muted-foreground flex-shrink-0 min-w-[90px]">{f.label}:</span>
-                          <span className="text-xs text-foreground font-medium">{f.value}</span>
-                        </div>
-                      ))}
+                  <div className="space-y-1.5 text-sm">
+                    {ownerName && (
+                      <p><span className="font-bold text-foreground">Name</span> :{ownerName}</p>
+                    )}
+                    {ownerPhone && (
+                      <p><span className="font-bold text-foreground">Contact #</span> :{ownerPhone}</p>
+                    )}
+                    {ownerEmail && (
+                      <p><span className="font-bold text-foreground">Email</span> :{ownerEmail}</p>
+                    )}
                     {manufacturerUrl && (
-                      <div className="flex gap-1">
-                        <span className="text-xs text-muted-foreground flex-shrink-0 min-w-[90px]">Manufacturer:</span>
+                      <div className="pt-1">
+                        <p className="font-bold text-foreground text-sm">Manufacturer URL:</p>
                         <a href={manufacturerUrl} target="_blank" rel="noopener noreferrer"
-                          className="text-xs text-foreground hover:text-[#EAEB80] hover:underline flex items-center gap-1">
+                          className="text-sm text-foreground underline hover:text-[#EAEB80]">
                           {manufacturerUrl.replace(/^https?:\/\//, "")}
-                          <ExternalLink className="w-3 h-3" />
                         </a>
                       </div>
                     )}
                     {turoViewLink && (
-                      <div className="pt-2">
-                        <a href={turoViewLink} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded border border-[#EAEB80]/50 text-[#EAEB80] hover:bg-[#EAEB80]/10 transition-colors">
-                          <ExternalLink className="w-3 h-3" />
-                          View Car on Turo
-                        </a>
+                      <div className="pt-1">
+                        <p>
+                          <span className="font-bold text-foreground">Turo Link</span>
+                          {" :"}
+                          <a href={turoViewLink} target="_blank" rel="noopener noreferrer"
+                            className="text-foreground underline hover:text-[#EAEB80] ml-1">
+                            View Car
+                          </a>
+                        </p>
                       </div>
                     )}
                   </div>
@@ -757,43 +756,65 @@ export default function ClientDashboard() {
           {/* GLA Company Info */}
           <Card className="border-border bg-card h-full">
             <CardContent className="p-5 h-full">
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 pb-1 border-b border-border">
-                Golden Luxury Auto
-              </h3>
-              <div className="space-y-2">
-                <div className="flex flex-wrap gap-2 pb-1">
-                  {[
-                    { href: "https://www.facebook.com/goldenluxuryauto", label: "Facebook", icon: Globe },
-                    { href: "https://www.instagram.com/goldenluxuryauto", label: "Instagram", icon: ImageIcon },
-                    { href: "https://www.youtube.com/@goldenluxuryauto", label: "YouTube", icon: Video },
-                    { href: "https://www.linkedin.com/company/goldenluxuryauto", label: "LinkedIn", icon: Users },
-                  ].map((s) => (
-                    <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" title={s.label}
-                      className="p-1.5 rounded border border-border hover:border-[#EAEB80]/50 text-muted-foreground hover:text-[#EAEB80] transition-colors">
-                      <s.icon className="w-3.5 h-3.5" />
-                    </a>
-                  ))}
-                </div>
+
+              {/* Header: "Golden Luxury Auto:" + colored social icons inline */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="font-bold text-foreground text-sm">Golden Luxury Auto:</span>
                 {[
-                  { label: "Website",  value: "www.goldenluxuryauto.com",      href: "https://www.goldenluxuryauto.com" },
-                  { label: "Address",  value: "South 500 West, Salt Lake City, Utah 84101" },
-                  { label: "Email",    value: "golden@goldenluxuryauto.com",   href: "mailto:golden@goldenluxuryauto.com" },
-                  { label: "Inquiries",value: "cathy@goldenluxuryauto.com",    href: "mailto:cathy@goldenluxuryauto.com" },
-                  { label: "Phone",    value: "1-800-346-1394",                href: "tel:18003461394" },
-                ].map((item) => (
-                  <div key={item.label} className="flex gap-1">
-                    <span className="text-xs text-muted-foreground flex-shrink-0 min-w-[70px]">{item.label}:</span>
-                    {item.href ? (
-                      <a href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined}
-                        rel="noopener noreferrer" className="text-xs text-foreground hover:underline hover:text-[#EAEB80] break-all">
-                        {item.value}
-                      </a>
-                    ) : (
-                      <span className="text-xs text-foreground">{item.value}</span>
-                    )}
-                  </div>
+                  { href: "https://www.facebook.com/goldenluxuryauto",   label: "Facebook",  color: "#1877F2", path: "M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" },
+                  { href: "https://www.instagram.com/goldenluxuryauto",  label: "Instagram", color: "#E1306C", path: "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z M17.5 6.5h.01 M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5z" },
+                  { href: "https://www.youtube.com/@goldenluxuryauto",   label: "YouTube",   color: "#FF0000", path: "M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.96-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z M9.75 15.02l5.75-3.02-5.75-3.02v6.04z" },
+                  { href: "https://www.linkedin.com/company/goldenluxuryauto", label: "LinkedIn", color: "#0A66C2", path: "M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z M2 9h4v12H2z M4 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" },
+                ].map((s) => (
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" title={s.label}>
+                    <svg viewBox="0 0 24 24" fill={s.color} className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                      <path d={s.path} />
+                    </svg>
+                  </a>
                 ))}
               </div>
+
+              {/* Contact rows with large outline icons */}
+              <div className="space-y-3">
+                {/* Website */}
+                <div className="flex items-start gap-3">
+                  <Globe className="w-5 h-5 text-foreground flex-shrink-0 mt-0.5" />
+                  <a href="https://www.goldenluxuryauto.com" target="_blank" rel="noopener noreferrer"
+                    className="text-sm text-foreground hover:underline hover:text-[#EAEB80]">
+                    www.goldenluxuryauto.com
+                  </a>
+                </div>
+                {/* Address */}
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-foreground flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground">South 500 West, Salt Lake City, Utah 84101</span>
+                </div>
+                {/* Both emails on one row */}
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-foreground flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground">
+                    <a href="mailto:golden@goldenluxuryauto.com" className="hover:underline hover:text-[#EAEB80]">golden@goldenluxuryauto.com</a>
+                    {" / "}
+                    <a href="mailto:goldenluxuryauto@gmail.com" className="hover:underline hover:text-[#EAEB80]">goldenluxuryauto@gmail.com</a>
+                  </span>
+                </div>
+                {/* Account inquiries email */}
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-foreground flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground">
+                    <a href="mailto:cathy@goldenluxuryauto.com" className="hover:underline hover:text-[#EAEB80]">cathy@goldenluxuryauto.com</a>
+                    {" (Account Inquiries)"}
+                  </span>
+                </div>
+                {/* Phone */}
+                <div className="flex items-start gap-3">
+                  <Phone className="w-5 h-5 text-foreground flex-shrink-0 mt-0.5" />
+                  <a href="tel:18003461394" className="text-sm text-foreground hover:underline hover:text-[#EAEB80]">
+                    1-800-346-1394
+                  </a>
+                </div>
+              </div>
+
             </CardContent>
           </Card>
 
