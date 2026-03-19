@@ -824,21 +824,26 @@ export default function ClientDashboard() {
           <h2 className="text-lg font-bold uppercase text-foreground tracking-wide">Days Rented and Trips Taken</h2>
         </div>
 
-        {/* Shared 6-card grid — Row 1: year totals (3 income + 3 days) */}
-        <div className="grid grid-cols-3 xl:grid-cols-6 gap-3 mb-3">
+        {/* Shared card rows — 3 income | gap | 3 days — equal heights via shared grid */}
+        {/* Row 1: year totals */}
+        <div className="grid grid-cols-3 xl:grid-cols-[1fr_1fr_1fr_16px_1fr_1fr_1fr] gap-3 mb-3 items-stretch">
           <SummaryCard variant="black" label="Total Car Owner Rental Income" value={fmt(yearTotals.income)} />
           <SummaryCard variant="gray"  label="Total Car Owner Expenses"      value={fmt(yearTotals.expenses)} />
           <SummaryCard variant="gold"  label="Total Car Owner Profit"        value={fmt(yearTotals.profit)} />
+          {/* visual divider */}
+          <div className="hidden xl:flex items-stretch justify-center"><div className="w-px bg-border self-stretch mx-auto" /></div>
           <SummaryCard variant="black" label="Total Days Rented"  value={String(yearTotals.days)} />
           <SummaryCard variant="gray"  label="Total Trips Taken"  value={String(yearTotals.trips)} />
           <SummaryCard variant="gold"  label="Ave / Trips Taken"  value={yearTotals.trips > 0 ? fmt(yearTotals.income / yearTotals.trips) : "$0.00"} />
         </div>
 
-        {/* Shared 6-card grid — Row 2: current month */}
-        <div className="grid grid-cols-3 xl:grid-cols-6 gap-3 mb-6">
+        {/* Row 2: current month */}
+        <div className="grid grid-cols-3 xl:grid-cols-[1fr_1fr_1fr_16px_1fr_1fr_1fr] gap-3 mb-6 items-stretch">
           <SummaryCard variant="black" label={`${MONTHS_SHORT[currentMonth - 1]} ${selectedYear} Car Owner Rental Income`} value={fmt(currentMonthData?.income ?? 0)} />
           <SummaryCard variant="gray"  label={`${MONTHS_SHORT[currentMonth - 1]} ${selectedYear} Owner Expenses`}          value={fmt(currentMonthData?.expenses ?? 0)} />
           <SummaryCard variant="gold"  label={`${MONTHS_SHORT[currentMonth - 1]} ${selectedYear} Owner Profit`}            value={fmt(currentMonthData?.profit ?? 0)} />
+          {/* visual divider */}
+          <div className="hidden xl:flex items-stretch justify-center"><div className="w-px bg-border self-stretch mx-auto" /></div>
           <SummaryCard variant="black" label={`${MONTHS_SHORT[currentMonth - 1]} ${selectedYear} Days Rented`}  value={String(currentMonthData?.days ?? 0)} />
           <SummaryCard variant="gray"  label={`${MONTHS_SHORT[currentMonth - 1]} ${selectedYear} Trips Taken`}  value={String(currentMonthData?.trips ?? 0)} />
           <SummaryCard variant="gold"  label="Ave / Trips Taken" value={(currentMonthData?.trips ?? 0) > 0 ? fmt((currentMonthData?.income ?? 0) / (currentMonthData?.trips ?? 1)) : "$0.00"} />
