@@ -441,6 +441,35 @@ export default function ClientDashboard() {
     return Array.isArray(raw) ? raw : [];
   }, [maintenanceData]);
 
+  // ── Car Photos Gallery ────────────────────────────────────────────────────────
+
+  const { data: carPhotosData } = useQuery<{ success: boolean; photos: string[] }>({
+    queryKey: ["/api/client/cars", carId, "photos"],
+    queryFn: async () => {
+      const res = await fetch(buildApiUrl(`/api/client/cars/${carId}/photos`), {
+        credentials: "include",
+      });
+      if (!res.ok) return { success: false, photos: [] };
+      return res.json();
+    },
+    enabled: !!carId,
+    retry: false,
+  });
+
+  const carPhotos: string[] = useMemo(() => {
+    const photos = carPhotosData?.photos ?? [];
+    // Also include activeCar.photo if not already in the list
+    const mainPhoto = activeCar?.photo;
+    if (mainPhoto && !photos.includes(mainPhoto)) {
+      return [mainPhoto, ...photos];
+    }
+    return photos;
+  }, [carPhotosData, activeCar]);
+
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  // Reset photo index when car changes
+  const activePhoto = carPhotos[activePhotoIndex] ?? activeCar?.photo ?? null;
+
   // ── Computed Monthly Data ─────────────────────────────────────────────────────
 
   const yearNum = parseInt(selectedYear, 10);
@@ -626,55 +655,68 @@ export default function ClientDashboard() {
 
           {/* Car Gallery */}
           <Card className="border-border bg-card overflow-hidden h-full">
-            <div className="relative w-full h-full bg-muted/20 flex items-center justify-center" style={{ minHeight: "240px" }}>
-              {activeCar?.photo ? (
-                <img
-                  src={getProxiedImageUrl(activeCar.photo)}
-                  alt={activeCar?.makeModel ?? "Vehicle"}
-                  className="w-full h-full object-cover absolute inset-0"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                />
-              ) : null}
-              {/* Always show overlay info */}
-              {!activeCar?.photo && (
-                <div className="flex flex-col items-center gap-3 text-muted-foreground/30 py-12 z-10">
-                  <Car className="w-24 h-24" />
-                  <p className="text-sm text-muted-foreground">
-                    {activeCar ? `${activeCar.year ?? ""} ${activeCar.makeModel}`.trim() : "No vehicle photo"}
-                  </p>
-                </div>
-              )}
-              {activeCar && (
-                <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-gradient-to-t from-black/70 to-transparent z-10">
-                  <p className="text-sm font-bold text-white">{activeCar.year} {activeCar.makeModel}</p>
-                  {activeCar.licensePlate && <p className="text-xs text-white/70">Plate: {activeCar.licensePlate}</p>}
+            <div className="flex flex-col h-full">
+              {/* Main photo */}
+              <div className="relative flex-1 bg-muted/20 flex items-center justify-center" style={{ minHeight: "200px" }}>
+                {activePhoto ? (
+                  <img
+                    src={getProxiedImageUrl(activePhoto)}
+                    alt={activeCar?.makeModel ?? "Vehicle"}
+                    className="w-full h-full object-cover absolute inset-0"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-3 text-muted-foreground/30 py-12">
+                    <Car className="w-24 h-24" />
+                    <p className="text-sm text-muted-foreground">
+                      {activeCar ? `${activeCar.year ?? ""} ${activeCar.makeModel}`.trim() : "No vehicle photo"}
+                    </p>
+                  </div>
+                )}
+                {activeCar && (
+                  <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-gradient-to-t from-black/70 to-transparent z-10">
+                    <p className="text-sm font-bold text-white">{activeCar.year} {activeCar.makeModel}</p>
+                    {activeCar.licensePlate && <p className="text-xs text-white/70">Plate: {activeCar.licensePlate}</p>}
+                  </div>
+                )}
+              </div>
+              {/* Thumbnail strip — shown only when multiple photos exist */}
+              {carPhotos.length > 1 && (
+                <div className="flex gap-2 p-2 bg-muted/10 overflow-x-auto flex-shrink-0">
+                  {carPhotos.map((url, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActivePhotoIndex(i)}
+                      className={`flex-shrink-0 w-14 h-14 rounded overflow-hidden border-2 transition-colors ${
+                        i === activePhotoIndex ? "border-[#EAEB80]" : "border-transparent hover:border-border"
+                      }`}
+                    >
+                      <img
+                        src={getProxiedImageUrl(url)}
+                        alt={`Photo ${i + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                      />
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
           </Card>
 
-          {/* Monthly Update Video — embed YouTube iframe */}
+          {/* Monthly Update Video */}
           <Card className="border-border bg-card overflow-hidden h-full">
-            <div className="relative w-full h-full" style={{ minHeight: "240px", background: "#1a1a1a" }}>
-              {/* Public Golden Luxury Auto YouTube channel intro video */}
+            <div className="relative w-full h-full flex flex-col" style={{ minHeight: "240px", background: "#1a1a1a" }}>
+              {/* YouTube embed — temporal public video */}
               <iframe
-                className="w-full h-full absolute inset-0"
+                className="w-full flex-1"
                 style={{ minHeight: "240px" }}
-                src="https://www.youtube.com/embed/videoseries?list=PLbpi6ZahtOH6Ar_3GPy3workMEEjm0e6t&autoplay=0&rel=0"
+                src="https://www.youtube.com/embed/W86cTIoMv2U?rel=0&modestbranding=1"
                 title="Golden Luxury Auto Monthly Update"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
-              {/* Fallback overlay title (shows behind iframe on load) */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0"
-                style={{ background: "linear-gradient(135deg, #1a1a1a 0%, #2a2a10 100%)" }}>
-                <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: "#EAEB80" }}>
-                  <Video className="w-7 h-7 text-[#1a1a1a]" />
-                </div>
-                <h1 className="text-2xl font-extrabold" style={{ color: "#EAEB80" }}>Golden Luxury Auto</h1>
-                <h2 className="text-lg font-bold text-white">Monthly Update!!!</h2>
-              </div>
             </div>
           </Card>
         </div>
@@ -804,6 +846,22 @@ export default function ClientDashboard() {
                   <svg viewBox="0 0 24 24" className="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                     <rect width="24" height="24" rx="4" fill="#0A66C2"/>
                     <text x="4" y="17" fontFamily="Arial" fontWeight="bold" fontSize="14" fill="white">in</text>
+                  </svg>
+                </a>
+                {/* TikTok */}
+                <a href="https://www.tiktok.com/@goldenluxuryauto" target="_blank" rel="noopener noreferrer" title="TikTok">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="24" height="24" rx="4" fill="#010101"/>
+                    <path d="M19 8.5a4 4 0 0 1-4-4V4h-2.5v10.5a2 2 0 1 1-2-2 2 2 0 0 1 .5.07V10a4.5 4.5 0 1 0 4 4.5V8.5a6.4 6.4 0 0 0 4 1.4V7.4A4 4 0 0 1 19 8.5z" fill="white"/>
+                  </svg>
+                </a>
+                {/* Gmail */}
+                <a href="mailto:goldenluxuryauto@gmail.com" title="Gmail">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="24" height="24" rx="4" fill="#EA4335"/>
+                    <path d="M4 8l8 5 8-5v8H4z" fill="white"/>
+                    <path d="M4 8l8 5 8-5" fill="none" stroke="#EA4335" strokeWidth="0.5"/>
+                    <path d="M4 6h16L12 13z" fill="white"/>
                   </svg>
                 </a>
               </div>
