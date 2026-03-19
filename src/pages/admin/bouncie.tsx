@@ -600,8 +600,6 @@ export default function BouncieFleetPage() {
     placeholderData: keepPreviousData,
   });
 
-  const connActive = connData?.data?.connected === true;
-
   const { data, isLoading, isError } = useQuery<{ success: boolean; data: FleetOverview }>({
     queryKey: ["/api/bouncie/fleet-overview"],
     queryFn: async () => {
@@ -670,76 +668,73 @@ export default function BouncieFleetPage() {
         {/* ── Sidebar ──────────────────────────────────────────────── */}
         <div className="flex flex-col w-72 lg:w-80 flex-shrink-0 bg-[#1e1e1e] text-white overflow-hidden border-r border-[#2a2a2a]">
 
-          {/* ── Connected state: search + vehicle list ── */}
-          {isConnected && (
-            <>
-              {/* Search */}
-              <div className="px-3 pt-3 pb-2">
-                <div className="flex items-center gap-2 bg-[#282828] border border-[#3a3a3a] rounded-lg px-3 py-2">
-                  <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Jump to..."
-                    className="bg-transparent text-sm text-white placeholder-gray-500 outline-none flex-1 min-w-0" />
-                  {search && <button onClick={() => setSearch("")} className="text-gray-400 hover:text-white"><X className="w-3.5 h-3.5" /></button>}
-                </div>
+          {/* Search — always visible when there are vehicles */}
+          {allVehicles.length > 0 && (
+            <div className="px-3 pt-3 pb-2">
+              <div className="flex items-center gap-2 bg-[#282828] border border-[#3a3a3a] rounded-lg px-3 py-2">
+                <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Jump to..."
+                  className="bg-transparent text-sm text-white placeholder-gray-500 outline-none flex-1 min-w-0" />
+                {search && <button onClick={() => setSearch("")} className="text-gray-400 hover:text-white"><X className="w-3.5 h-3.5" /></button>}
               </div>
-
-              {/* Vehicle count + disconnect */}
-              <div className="px-4 pb-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-400">
-                    Viewing <span className="text-gray-200 font-medium">{filtered.length}</span> of <span className="text-gray-200 font-medium">{allVehicles.length}</span> vehicle(s)
-                  </p>
-                  {conn?.source === "database" && (
-                    <button onClick={() => confirm("Disconnect Bouncie?") && disconnectMutation.mutate()}
-                      className="text-[11px] text-gray-500 hover:text-red-400 transition-colors">
-                      Disconnect
-                    </button>
-                  )}
-                </div>
-                {isError && !isLoading && (
-                  <p className="text-[11px] text-red-400 mt-1">Having trouble loading vehicles.</p>
-                )}
-              </div>
-
-              {/* Vehicle list */}
-              <div className="flex-1 overflow-y-auto border-t border-[#2a2a2a]">
-                {isLoading ? (
-                  <div className="flex items-center justify-center py-12 text-gray-400">
-                    <RefreshCw className="w-4 h-4 animate-spin mr-2" /> Loading…
-                  </div>
-                ) : filtered.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-gray-500 gap-2">
-                    <Car className="w-8 h-8 opacity-25" />
-                    <p className="text-sm">{search ? "No matches" : "No vehicles"}</p>
-                  </div>
-                ) : (
-                  filtered.map(v => {
-                    const isSelected = v.device_id === selectedId;
-                    const si = getStatusInfo(v.displayStatus);
-
-                    return (
-                      <button key={v.device_id}
-                        onClick={() => setSelectedId(isSelected ? null : v.device_id)}
-                        className={`w-full text-left px-3 py-2.5 flex items-center gap-3 border-b border-[#2a2a2a] transition-colors
-                          hover:bg-[#272727] ${isSelected ? "bg-[#272727] border-l-2 border-l-blue-500 pl-[10px]" : ""}`}>
-                        <VehicleAvatar v={v} size={40} />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[13px] font-medium text-gray-100 truncate leading-tight">{vehicleSidebarName(v)}</div>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: si.color }} />
-                            <span className="text-[11px] text-gray-400 truncate">{vehicleSubline(v) || v.imei}</span>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-            </>
+            </div>
           )}
 
-          {/* ── Not connected / Expired: onboarding CTA ── */}
-          {needsConnect && (
+          {/* Vehicle count + disconnect */}
+          {allVehicles.length > 0 && (
+            <div className="px-4 pb-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-400">
+                  Viewing <span className="text-gray-200 font-medium">{filtered.length}</span> of <span className="text-gray-200 font-medium">{allVehicles.length}</span> vehicle(s)
+                </p>
+                {conn?.source === "database" && isConnected && (
+                  <button onClick={() => confirm("Disconnect Bouncie?") && disconnectMutation.mutate()}
+                    className="text-[11px] text-gray-500 hover:text-red-400 transition-colors">
+                    Disconnect
+                  </button>
+                )}
+              </div>
+              {isError && !isLoading && (
+                <p className="text-[11px] text-red-400 mt-1">Having trouble loading vehicles.</p>
+              )}
+            </div>
+          )}
+
+          {/* Vehicle list — ALWAYS rendered if there is data, never gated on connection status */}
+          {allVehicles.length > 0 && (
+            <div className="flex-1 overflow-y-auto border-t border-[#2a2a2a]">
+              {filtered.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-gray-500 gap-2">
+                  <Car className="w-8 h-8 opacity-25" />
+                  <p className="text-sm">{search ? "No matches" : "No vehicles"}</p>
+                </div>
+              ) : (
+                filtered.map(v => {
+                  const isSelected = v.device_id === selectedId;
+                  const si = getStatusInfo(v.displayStatus);
+
+                  return (
+                    <button key={v.device_id}
+                      onClick={() => setSelectedId(isSelected ? null : v.device_id)}
+                      className={`w-full text-left px-3 py-2.5 flex items-center gap-3 border-b border-[#2a2a2a] transition-colors
+                        hover:bg-[#272727] ${isSelected ? "bg-[#272727] border-l-2 border-l-blue-500 pl-[10px]" : ""}`}>
+                      <VehicleAvatar v={v} size={40} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[13px] font-medium text-gray-100 truncate leading-tight">{vehicleSidebarName(v)}</div>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: si.color }} />
+                          <span className="text-[11px] text-gray-400 truncate">{vehicleSubline(v) || v.imei}</span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {/* ── Not connected / Expired: show CTA only when no vehicles are loaded ── */}
+          {needsConnect && allVehicles.length === 0 && (
             <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
               <div className="w-16 h-16 rounded-full bg-[#282828] flex items-center justify-center mb-4">
                 {isExpiredOrRevoked
@@ -775,8 +770,8 @@ export default function BouncieFleetPage() {
             </div>
           )}
 
-          {/* ── Loading state ── */}
-          {connLoading && (
+          {/* ── Loading state (first load, no vehicles yet) ── */}
+          {connLoading && allVehicles.length === 0 && (
             <div className="flex-1 flex items-center justify-center text-gray-500">
               <RefreshCw className="w-4 h-4 animate-spin mr-2" />
               <span className="text-sm">Checking connection…</span>
