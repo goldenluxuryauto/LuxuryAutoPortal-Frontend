@@ -208,29 +208,30 @@ function tripDays(trip: TuroTrip): number {
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
-// Summary card — redesigned to match target: label top-right, value bottom-left, large bold value
+// Summary card — label on top (optional), large bold value centered
 // variant: "black" | "light" | "gold"
 function SummaryCard({
   label,
   value,
   variant = "gold",
   valueColor,
+  className = "",
 }: {
   label: string;
   value: string;
   variant?: "black" | "light" | "gold";
   valueColor?: string;
+  className?: string;
 }) {
-  const bg        = variant === "black" ? "#1a1a1a" : variant === "gold"  ? "#C9A227" : "#f5f5f5";
-  const labelClr  = variant === "black" ? "#aaaaaa" : variant === "gold"  ? "#333"   : "#555";
-  const valueClr  = valueColor ?? (variant === "black" ? "#ffffff" : "#111827");
+  const bg       = variant === "black" ? "#1a1a1a" : variant === "gold" ? "#C9A227" : "#f0ece0";
+  const valueClr = valueColor ?? (variant === "black" ? "#ffffff" : "#1a1a1a");
   return (
     <div
-      style={{ backgroundColor: bg, minHeight: "72px" }}
-      className="flex flex-col justify-between px-4 pt-2 pb-3 border border-gray-200"
+      style={{ backgroundColor: bg, minHeight: "68px" }}
+      className={`flex flex-col items-center justify-center px-3 py-2 border border-[#d8d0b8] rounded-lg ${className}`}
     >
-      <p className="text-xs font-semibold uppercase tracking-wide text-right leading-tight" style={{ color: labelClr }}>{label}</p>
-      <p className="text-xl font-extrabold leading-tight" style={{ color: valueClr }}>{value}</p>
+      {label && <p className="text-xs text-gray-400 mb-0.5">{label}</p>}
+      <p className="text-xl font-extrabold leading-tight text-center" style={{ color: valueClr }}>{value}</p>
     </div>
   );
 }
@@ -1077,56 +1078,57 @@ export default function ClientDashboard() {
           </div>
         </div>
 
-        {/* ── Summary card rows — match screenshot layout ── */}
-        {/* Row label + 3 cards, no gap between cards */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-1">
-          {/* Income/Expenses left block */}
+        {/* ── Summary card rows — match target screenshot ── */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-5">
+
+          {/* ── Income/Expenses block ── */}
           <div>
+            {/* Column headers row */}
+            <div className="flex items-end mb-1 ml-[88px] gap-px">
+              <div className="flex-1 text-center text-sm font-semibold text-foreground">Rental income</div>
+              <div className="flex-1 text-center text-sm font-semibold text-foreground">Expenses</div>
+              <div className="flex-1 text-center text-sm font-semibold" style={{ color: "#C9A227" }}>Profit</div>
+            </div>
             {/* Total row */}
-            <div className="flex items-stretch mb-1">
-              <div className="flex items-center px-3 w-24 flex-shrink-0 text-sm font-semibold text-foreground border border-gray-200 bg-background">Total</div>
-              <div className="flex flex-1 gap-0">
-                <div className="flex-1"><SummaryCard variant="black" label="Rental Income"  value={fmt(yearTotals.income)} /></div>
-                <div className="flex-1"><SummaryCard variant="black" label="Expenses"       value={fmt(yearTotals.expenses)} /></div>
-                <div className="flex-1"><SummaryCard variant="black" label="Profit"         value={fmt(yearTotals.profit)} valueColor={yearTotals.profit < 0 ? "#f87171" : "#ffffff"} /></div>
-              </div>
+            <div className="flex items-stretch gap-px mb-1">
+              <div className="flex items-center justify-center w-[88px] flex-shrink-0 text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg">Total</div>
+              <SummaryCard variant="black" label="" value={fmt(yearTotals.income)} className="flex-1" />
+              <SummaryCard variant="light" label="" value={fmt(yearTotals.expenses)} className="flex-1" />
+              <SummaryCard variant="gold"  label="" value={fmt(yearTotals.profit)} className="flex-1" valueColor={yearTotals.profit < 0 ? "#ef4444" : "#1a1a1a"} />
             </div>
             {/* Current month row */}
-            <div className="flex items-stretch">
-              <div className="flex items-center px-3 w-24 flex-shrink-0 text-sm font-semibold text-foreground border border-gray-200 bg-background">{MONTHS_SHORT[currentMonth - 1]} {selectedYear}</div>
-              <div className="flex flex-1 gap-0">
-                <div className="flex-1"><SummaryCard variant="gold"  label="Rental Income"  value={fmt(currentMonthData?.income ?? 0)} /></div>
-                <div className="flex-1"><SummaryCard variant="light" label="Expenses"        value={fmt(currentMonthData?.expenses ?? 0)} /></div>
-                <div className="flex-1"><SummaryCard variant="light" label="Profit"          value={fmt(currentMonthData?.profit ?? 0)} valueColor={(currentMonthData?.profit ?? 0) < 0 ? "#ef4444" : "#111827"} /></div>
-              </div>
+            <div className="flex items-stretch gap-px">
+              <div className="flex items-center justify-center w-[88px] flex-shrink-0 text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg">{MONTHS_SHORT[currentMonth - 1]} {selectedYear}</div>
+              <SummaryCard variant="black" label="" value={fmt(currentMonthData?.income ?? 0)} className="flex-1" />
+              <SummaryCard variant="light" label="" value={fmt(currentMonthData?.expenses ?? 0)} className="flex-1" />
+              <SummaryCard variant="gold"  label="" value={fmt(currentMonthData?.profit ?? 0)} className="flex-1" valueColor={(currentMonthData?.profit ?? 0) < 0 ? "#ef4444" : "#1a1a1a"} />
             </div>
           </div>
 
-          {/* Days/Trips right block */}
+          {/* ── Days/Trips block ── */}
           <div>
+            {/* Column headers row */}
+            <div className="flex items-end mb-1 ml-[88px] gap-px">
+              <div className="flex-1 text-center text-sm font-semibold text-foreground">Days Rented</div>
+              <div className="flex-1 text-center text-sm font-semibold text-foreground">Trips Taken</div>
+              <div className="flex-1 text-center text-sm font-semibold" style={{ color: "#C9A227" }}>Ave / Trip</div>
+            </div>
             {/* Total row */}
-            <div className="flex items-stretch mb-1">
-              <div className="flex items-center px-3 w-24 flex-shrink-0 text-sm font-semibold text-foreground border border-gray-200 bg-background">Total</div>
-              <div className="flex flex-1 gap-0">
-                <div className="flex-1"><SummaryCard variant="black" label="Days Rented"   value={String(yearTotalsTrips.days)} /></div>
-                <div className="flex-1"><SummaryCard variant="black" label="Trips Taken"   value={String(yearTotalsTrips.trips)} /></div>
-                <div className="flex-1"><SummaryCard variant="black" label="Ave / Trip"    value={yearTotalsTrips.trips > 0 ? fmt(yearTotalsTrips.income / yearTotalsTrips.trips) : "$0.00"} /></div>
-              </div>
+            <div className="flex items-stretch gap-px mb-1">
+              <div className="flex items-center justify-center w-[88px] flex-shrink-0 text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg">Total</div>
+              <SummaryCard variant="black" label="" value={String(yearTotalsTrips.days)} className="flex-1" />
+              <SummaryCard variant="light" label="" value={String(yearTotalsTrips.trips)} className="flex-1" />
+              <SummaryCard variant="gold"  label="" value={yearTotalsTrips.trips > 0 ? fmt(yearTotalsTrips.income / yearTotalsTrips.trips) : "$0.00"} className="flex-1" />
             </div>
             {/* Current month row */}
-            <div className="flex items-stretch">
-              <div className="flex items-center px-3 w-24 flex-shrink-0 text-sm font-semibold text-foreground border border-gray-200 bg-background">{MONTHS_SHORT[currentMonth - 1]} {selectedYearTrips}</div>
-              <div className="flex flex-1 gap-0">
-                <div className="flex-1"><SummaryCard variant="gold"  label="Days Rented"  value={String(currentMonthDaysTripsData?.days ?? 0)} /></div>
-                <div className="flex-1"><SummaryCard variant="light" label="Trips Taken"  value={String(currentMonthDaysTripsData?.trips ?? 0)} /></div>
-                <div className="flex-1"><SummaryCard variant="light" label="Ave / Trip"   value={(currentMonthDaysTripsData?.trips ?? 0) > 0 ? fmt((currentMonthDaysTripsData?.income ?? 0) / (currentMonthDaysTripsData?.trips ?? 1)) : "$0.00"} /></div>
-              </div>
+            <div className="flex items-stretch gap-px">
+              <div className="flex items-center justify-center w-[88px] flex-shrink-0 text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg">{MONTHS_SHORT[currentMonth - 1]} {selectedYearTrips}</div>
+              <SummaryCard variant="black" label="" value={String(currentMonthDaysTripsData?.days ?? 0)} className="flex-1" />
+              <SummaryCard variant="light" label="" value={String(currentMonthDaysTripsData?.trips ?? 0)} className="flex-1" />
+              <SummaryCard variant="gold"  label="" value={(currentMonthDaysTripsData?.trips ?? 0) > 0 ? fmt((currentMonthDaysTripsData?.income ?? 0) / (currentMonthDaysTripsData?.trips ?? 1)) : "$0.00"} className="flex-1" />
             </div>
           </div>
         </div>
-
-        {/* spacer */}
-        <div className="mb-5" />
 
         {/* Tables side by side — equal height via items-stretch + h-full */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
@@ -1139,11 +1141,11 @@ export default function ClientDashboard() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow style={{ backgroundColor: "#C9A227" }} className="border-b border-border">
+                  <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-b border-border">
                     <TableHead className="text-white font-bold text-xs py-3">Month</TableHead>
-                    <TableHead className="text-white font-bold text-xs py-3 text-right">Rental Income</TableHead>
-                    <TableHead className="text-white font-bold text-xs py-3 text-right">Expenses</TableHead>
-                    <TableHead className="text-white font-bold text-xs py-3 text-right">Owner Split</TableHead>
+                    <TableHead className="text-white font-bold text-xs py-3 text-right">Car owner rental income</TableHead>
+                    <TableHead className="text-white font-bold text-xs py-3 text-right">Car owner expenses</TableHead>
+                    <TableHead className="text-white font-bold text-xs py-3 text-right">Car owner split</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1156,12 +1158,12 @@ export default function ClientDashboard() {
                   ) : (
                     <>
                       {monthlyTripData.map((row, idx) => (
-                        <TableRow key={row.month} style={{ backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f9f9f9" }} className="border-border hover:bg-yellow-50">
-                          <TableCell className="text-sm py-1.5 text-gray-800">{row.month}</TableCell>
-                          <TableCell className="text-sm py-1.5 text-right text-gray-800">{fmt(row.income)}</TableCell>
-                          <TableCell className="text-sm py-1.5 text-right text-gray-800">{fmt(row.expenses)}</TableCell>
+                        <TableRow key={row.month} style={{ backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f5f0e8" }} className="hover:bg-yellow-50">
+                          <TableCell className="text-sm py-2 font-medium text-gray-900">{row.month}</TableCell>
+                          <TableCell className="text-sm py-2 text-right text-gray-800">{fmt(row.income)}</TableCell>
+                          <TableCell className="text-sm py-2 text-right text-gray-800">{fmt(row.expenses)}</TableCell>
                           <TableCell
-                            className={`text-sm py-1.5 text-right font-medium ${
+                            className={`text-sm py-2 text-right font-medium ${
                               row.profit > 0 ? "text-[#C9A227]" : row.profit < 0 ? "text-[#ef4444]" : "text-gray-800"
                             }`}
                           >
@@ -1169,12 +1171,12 @@ export default function ClientDashboard() {
                           </TableCell>
                         </TableRow>
                       ))}
-                      {/* TOTAL row — dark bg, white text, gold key values */}
-                      <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-t-2 border-[#EAEB80]">
-                        <TableCell className="text-sm font-extrabold text-white py-2.5">TOTAL</TableCell>
+                      {/* TOTAL row */}
+                      <TableRow style={{ backgroundColor: "#1a1a1a" }}>
+                        <TableCell className="text-sm font-extrabold text-white py-2.5">Total</TableCell>
                         <TableCell className="text-sm font-bold text-white py-2.5 text-right">{fmt(yearTotals.income)}</TableCell>
                         <TableCell className="text-sm font-bold text-white py-2.5 text-right">{fmt(yearTotals.expenses)}</TableCell>
-                        <TableCell className={`text-sm font-bold py-2.5 text-right ${yearTotals.profit > 0 ? "text-[#EAEB80]" : yearTotals.profit < 0 ? "text-[#f87171]" : "text-white"}`}>{fmt(yearTotals.profit)}</TableCell>
+                        <TableCell className={`text-sm font-bold py-2.5 text-right ${yearTotals.profit >= 0 ? "text-[#EAEB80]" : "text-[#f87171]"}`}>{fmt(yearTotals.profit)}</TableCell>
                       </TableRow>
                     </>
                   )}
@@ -1192,7 +1194,7 @@ export default function ClientDashboard() {
             <div className="overflow-x-auto flex-1">
               <Table>
                 <TableHeader>
-                  <TableRow style={{ backgroundColor: "#C9A227" }} className="border-b border-border">
+                  <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-b border-border">
                     <TableHead className="text-white font-bold text-xs py-3">Month</TableHead>
                     <TableHead className="text-white font-bold text-xs py-3 text-right">Days Rented</TableHead>
                     <TableHead className="text-white font-bold text-xs py-3 text-right">Trips Taken</TableHead>
@@ -1209,20 +1211,20 @@ export default function ClientDashboard() {
                   ) : (
                     <>
                       {monthlyDaysTripsData.map((row, idx) => (
-                        <TableRow key={row.month} style={{ backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f9f9f9" }} className="border-border hover:bg-yellow-50">
-                          <TableCell className="text-sm py-1.5 text-gray-800">{row.month}</TableCell>
-                          <TableCell className="text-sm py-1.5 text-right text-gray-800">{row.days}</TableCell>
-                          <TableCell className="text-sm py-1.5 text-right text-gray-800">{row.trips}</TableCell>
-                          <TableCell className="text-sm py-1.5 text-right text-gray-800">
+                        <TableRow key={row.month} style={{ backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f5f0e8" }} className="hover:bg-yellow-50">
+                          <TableCell className="text-sm py-2 font-medium text-gray-900">{row.month}</TableCell>
+                          <TableCell className="text-sm py-2 text-right text-gray-800">{row.days}</TableCell>
+                          <TableCell className="text-sm py-2 text-right text-gray-800">{row.trips}</TableCell>
+                          <TableCell className="text-sm py-2 text-right text-gray-800">
                             {row.trips > 0 ? fmt(row.avgPerTrip) : "—"}
                           </TableCell>
                         </TableRow>
                       ))}
-                      {/* TOTAL row — dark bg, white text */}
-                      <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-t-2 border-[#EAEB80]">
-                        <TableCell className="text-sm font-extrabold text-white py-2.5">TOTAL</TableCell>
-                        <TableCell className="text-sm font-bold text-[#EAEB80] py-2.5 text-right">{yearTotalsTrips.days}</TableCell>
-                        <TableCell className="text-sm font-bold text-[#EAEB80] py-2.5 text-right">{yearTotalsTrips.trips}</TableCell>
+                      {/* TOTAL row */}
+                      <TableRow style={{ backgroundColor: "#1a1a1a" }}>
+                        <TableCell className="text-sm font-extrabold text-white py-2.5">Total</TableCell>
+                        <TableCell className="text-sm font-bold text-white py-2.5 text-right">{yearTotalsTrips.days}</TableCell>
+                        <TableCell className="text-sm font-bold text-white py-2.5 text-right">{yearTotalsTrips.trips}</TableCell>
                         <TableCell className="text-sm font-bold text-[#EAEB80] py-2.5 text-right">
                           {yearTotalsTrips.trips > 0 ? fmt(yearTotalsTrips.income / yearTotalsTrips.trips) : "—"}
                         </TableCell>
