@@ -180,7 +180,7 @@ const CHART_GOLD2 = "#F59E0B";   // amber/orange-gold   — Profit / Trips Taken
 const CHART_RED   = "#EF4444";   // red                 — Expenses
 const CHART_DARK  = "#2a2a2a";
 const PIE_COLORS       = [CHART_GOLD, CHART_RED];   // for fallback
-const PIE_DONUT_COLORS = ["#EAEB80", "#1a1a1a"];    // bright gold (profit) + near-black (expenses) — max contrast
+const PIE_DONUT_COLORS = ["#EAEB80", "#C9A227"];    // bright yellow-gold (profit) + deep amber-gold (expenses)
 
 // Shared chart theme constants
 const CHART_TOOLTIP_STYLE = { background: "#1a1a1a", border: "1px solid #444", borderRadius: 6 };
