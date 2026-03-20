@@ -1143,6 +1143,12 @@ export default function ClientDashboard() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
+                  <colgroup>
+                    <col style={{ width: "88px" }} />
+                    <col style={{ width: "33.33%" }} />
+                    <col style={{ width: "33.33%" }} />
+                    <col style={{ width: "33.33%" }} />
+                  </colgroup>
                   <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-b border-border">
                     <TableHead className="text-white font-bold text-xs py-3">Month</TableHead>
                     <TableHead className="text-white font-bold text-xs py-3 text-right">Car owner rental income</TableHead>
@@ -1196,6 +1202,12 @@ export default function ClientDashboard() {
             <div className="overflow-x-auto flex-1">
               <Table>
                 <TableHeader>
+                  <colgroup>
+                    <col style={{ width: "88px" }} />
+                    <col style={{ width: "33.33%" }} />
+                    <col style={{ width: "33.33%" }} />
+                    <col style={{ width: "33.33%" }} />
+                  </colgroup>
                   <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-b border-border">
                     <TableHead className="text-white font-bold text-xs py-3">Month</TableHead>
                     <TableHead className="text-white font-bold text-xs py-3 text-right">Days Rented</TableHead>
