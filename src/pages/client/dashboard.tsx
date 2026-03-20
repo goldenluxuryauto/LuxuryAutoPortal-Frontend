@@ -1044,63 +1044,112 @@ export default function ClientDashboard() {
             Shared 6-col card grids so left & right cards have equal heights
         ════════════════════════════════════════════════════════════════════ */}
 
-        {/* ════════════════════════════════════════════════════════════════════
-            SECTIONS 3 & 4 — Single 2-col grid; title+cards+table in same column
-            so everything aligns in one vertical line per section
-        ════════════════════════════════════════════════════════════════════ */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+        {/* Section titles + year selectors — full width row */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-end mb-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold uppercase text-foreground tracking-wide">Income and Expenses</h2>
+            <Select value={selectedYear} onValueChange={setSelectedYear}>
+              <SelectTrigger className="w-28 h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {yearOptions.map((y) => (
+                  <SelectItem key={y} value={String(y)}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold uppercase text-foreground tracking-wide">Days Rented and Trips Taken</h2>
+            <Select value={selectedYearTrips} onValueChange={setSelectedYearTrips}>
+              <SelectTrigger className="w-28 h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {yearOptions.map((y) => (
+                  <SelectItem key={y} value={String(y)}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
-          {/* ── LEFT: Income and Expenses ──────────────────────────────── */}
-          <div className="flex flex-col gap-2">
+        {/* ── Summary card rows — match target screenshot ── */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-2">
 
-            {/* Section title + year selector */}
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold uppercase text-foreground tracking-wide">Income and Expenses</h2>
-              <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="w-28 h-9 text-sm"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {yearOptions.map((y) => (
-                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Column headers */}
-            <div className="grid" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px" }}>
+          {/* ── Income/Expenses block ── */}
+          <div>
+            {/* Column headers — grid aligned with the cards below */}
+            <div className="grid mb-1" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px" }}>
               <div />
               <div className="text-center text-sm font-semibold text-foreground">Rental income</div>
               <div className="text-center text-sm font-semibold text-foreground">Expenses</div>
               <div className="text-center text-sm font-semibold" style={{ color: "#C9A227" }}>Profit</div>
             </div>
-
             {/* Total row */}
-            <div className="grid" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px" }}>
-              <div className="flex items-center justify-center text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg px-2 py-1">Total</div>
+            <div className="grid" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px", marginBottom: "2px" }}>
+              <div className="flex items-center justify-center text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg px-2">Total</div>
               <SummaryCard variant="black" label="" value={fmt(yearTotals.income)} />
               <SummaryCard variant="light" label="" value={fmt(yearTotals.expenses)} />
               <SummaryCard variant="gold"  label="" value={fmt(yearTotals.profit)} valueColor={yearTotals.profit < 0 ? "#ef4444" : "#1a1a1a"} />
             </div>
-
             {/* Current month row */}
             <div className="grid" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px" }}>
-              <div className="flex items-center justify-center text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg px-2 py-1">{MONTHS_SHORT[currentMonth - 1]} {selectedYear}</div>
+              <div className="flex items-center justify-center text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg px-2">{MONTHS_SHORT[currentMonth - 1]} {selectedYear}</div>
               <SummaryCard variant="black" label="" value={fmt(currentMonthData?.income ?? 0)} />
               <SummaryCard variant="light" label="" value={fmt(currentMonthData?.expenses ?? 0)} />
               <SummaryCard variant="gold"  label="" value={fmt(currentMonthData?.profit ?? 0)} valueColor={(currentMonthData?.profit ?? 0) < 0 ? "#ef4444" : "#1a1a1a"} />
             </div>
+          </div>
 
-            {/* Table — no Card wrapper so it matches the grid width exactly */}
-            <div className="overflow-x-auto border border-border rounded-md">
+          {/* ── Days/Trips block ── */}
+          <div>
+            {/* Column headers */}
+            <div className="grid mb-1" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px" }}>
+              <div />
+              <div className="text-center text-sm font-semibold text-foreground">Days Rented</div>
+              <div className="text-center text-sm font-semibold text-foreground">Trips Taken</div>
+              <div className="text-center text-sm font-semibold" style={{ color: "#C9A227" }}>Ave / Trip</div>
+            </div>
+            {/* Total row */}
+            <div className="grid" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px", marginBottom: "2px" }}>
+              <div className="flex items-center justify-center text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg px-2">Total</div>
+              <SummaryCard variant="black" label="" value={String(yearTotalsTrips.days)} />
+              <SummaryCard variant="light" label="" value={String(yearTotalsTrips.trips)} />
+              <SummaryCard variant="gold"  label="" value={yearTotalsTrips.trips > 0 ? fmt(yearTotalsTrips.income / yearTotalsTrips.trips) : "$0.00"} />
+            </div>
+            {/* Current month row */}
+            <div className="grid" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px" }}>
+              <div className="flex items-center justify-center text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg px-2">{MONTHS_SHORT[currentMonth - 1]} {selectedYearTrips}</div>
+              <SummaryCard variant="black" label="" value={String(currentMonthDaysTripsData?.days ?? 0)} />
+              <SummaryCard variant="light" label="" value={String(currentMonthDaysTripsData?.trips ?? 0)} />
+              <SummaryCard variant="gold"  label="" value={(currentMonthDaysTripsData?.trips ?? 0) > 0 ? fmt((currentMonthDaysTripsData?.income ?? 0) / (currentMonthDaysTripsData?.trips ?? 1)) : "$0.00"} />
+            </div>
+          </div>
+        </div>
+
+        {/* Tables side by side — equal height via items-stretch + h-full */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+
+        {/* ── SECTION 3 — Income and Expenses table ────────────────────── */}
+        <div className="flex flex-col h-full">
+
+          {/* Monthly Income/Expense Table */}
+          <Card className="border-border bg-card overflow-hidden flex-1 flex flex-col">
+            <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <colgroup>
                     <col style={{ width: "88px" }} />
-                    <col />
-                    <col />
-                    <col />
+                    <col style={{ width: "33.33%" }} />
+                    <col style={{ width: "33.33%" }} />
+                    <col style={{ width: "33.33%" }} />
                   </colgroup>
-                  <TableRow style={{ backgroundColor: "#1a1a1a" }}>
+                  <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-b border-border">
                     <TableHead className="text-white font-bold text-xs py-3">Month</TableHead>
                     <TableHead className="text-white font-bold text-xs py-3 text-right">Car owner rental income</TableHead>
                     <TableHead className="text-white font-bold text-xs py-3 text-right">Car owner expenses</TableHead>
@@ -1109,7 +1158,11 @@ export default function ClientDashboard() {
                 </TableHeader>
                 <TableBody>
                   {tripsLoading || paymentsLoading ? (
-                    <TableRow><TableCell colSpan={4} className="text-center py-8"><Loader2 className="w-5 h-5 animate-spin text-[#EAEB80] mx-auto" /></TableCell></TableRow>
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8">
+                        <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80] mx-auto" />
+                      </TableCell>
+                    </TableRow>
                   ) : (
                     <>
                       {monthlyTripData.map((row, idx) => (
@@ -1117,9 +1170,16 @@ export default function ClientDashboard() {
                           <TableCell className="text-sm py-2 font-medium text-gray-900">{row.month}</TableCell>
                           <TableCell className="text-sm py-2 text-right text-gray-800">{fmt(row.income)}</TableCell>
                           <TableCell className="text-sm py-2 text-right text-gray-800">{fmt(row.expenses)}</TableCell>
-                          <TableCell className={`text-sm py-2 text-right font-medium ${row.profit > 0 ? "text-[#C9A227]" : row.profit < 0 ? "text-[#ef4444]" : "text-gray-800"}`}>{fmt(row.profit)}</TableCell>
+                          <TableCell
+                            className={`text-sm py-2 text-right font-medium ${
+                              row.profit > 0 ? "text-[#C9A227]" : row.profit < 0 ? "text-[#ef4444]" : "text-gray-800"
+                            }`}
+                          >
+                            {fmt(row.profit)}
+                          </TableCell>
                         </TableRow>
                       ))}
+                      {/* TOTAL row */}
                       <TableRow style={{ backgroundColor: "#1a1a1a" }}>
                         <TableCell className="text-sm font-extrabold text-white py-2.5">Total</TableCell>
                         <TableCell className="text-sm font-bold text-white py-2.5 text-right">{fmt(yearTotals.income)}</TableCell>
@@ -1131,59 +1191,24 @@ export default function ClientDashboard() {
                 </TableBody>
               </Table>
             </div>
-          </div>{/* end left column */}
+          </Card>
+        </div>{/* end section 3 */}
 
-          {/* ── RIGHT: Days Rented and Trips Taken ─────────────────────── */}
-          <div className="flex flex-col gap-2">
+        {/* ── SECTION 4 — Days Rented and Trips Taken table ──────────────── */}
+        <div className="flex flex-col h-full">
 
-            {/* Section title + year selector */}
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold uppercase text-foreground tracking-wide">Days Rented and Trips Taken</h2>
-              <Select value={selectedYearTrips} onValueChange={setSelectedYearTrips}>
-                <SelectTrigger className="w-28 h-9 text-sm"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {yearOptions.map((y) => (
-                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Column headers */}
-            <div className="grid" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px" }}>
-              <div />
-              <div className="text-center text-sm font-semibold text-foreground">Days Rented</div>
-              <div className="text-center text-sm font-semibold text-foreground">Trips Taken</div>
-              <div className="text-center text-sm font-semibold" style={{ color: "#C9A227" }}>Ave / Trip</div>
-            </div>
-
-            {/* Total row */}
-            <div className="grid" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px" }}>
-              <div className="flex items-center justify-center text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg px-2 py-1">Total</div>
-              <SummaryCard variant="black" label="" value={String(yearTotalsTrips.days)} />
-              <SummaryCard variant="light" label="" value={String(yearTotalsTrips.trips)} />
-              <SummaryCard variant="gold"  label="" value={yearTotalsTrips.trips > 0 ? fmt(yearTotalsTrips.income / yearTotalsTrips.trips) : "$0.00"} />
-            </div>
-
-            {/* Current month row */}
-            <div className="grid" style={{ gridTemplateColumns: "88px 1fr 1fr 1fr", gap: "2px" }}>
-              <div className="flex items-center justify-center text-sm font-semibold text-foreground bg-[#f0ece0] border border-[#d8d0b8] rounded-lg px-2 py-1">{MONTHS_SHORT[currentMonth - 1]} {selectedYearTrips}</div>
-              <SummaryCard variant="black" label="" value={String(currentMonthDaysTripsData?.days ?? 0)} />
-              <SummaryCard variant="light" label="" value={String(currentMonthDaysTripsData?.trips ?? 0)} />
-              <SummaryCard variant="gold"  label="" value={(currentMonthDaysTripsData?.trips ?? 0) > 0 ? fmt((currentMonthDaysTripsData?.income ?? 0) / (currentMonthDaysTripsData?.trips ?? 1)) : "$0.00"} />
-            </div>
-
-            {/* Table */}
-            <div className="overflow-x-auto border border-border rounded-md">
+          {/* Monthly Days/Trips Table */}
+          <Card className="border-border bg-card overflow-hidden flex-1 flex flex-col">
+            <div className="overflow-x-auto flex-1">
               <Table>
                 <TableHeader>
                   <colgroup>
                     <col style={{ width: "88px" }} />
-                    <col />
-                    <col />
-                    <col />
+                    <col style={{ width: "33.33%" }} />
+                    <col style={{ width: "33.33%" }} />
+                    <col style={{ width: "33.33%" }} />
                   </colgroup>
-                  <TableRow style={{ backgroundColor: "#1a1a1a" }}>
+                  <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-b border-border">
                     <TableHead className="text-white font-bold text-xs py-3">Month</TableHead>
                     <TableHead className="text-white font-bold text-xs py-3 text-right">Days Rented</TableHead>
                     <TableHead className="text-white font-bold text-xs py-3 text-right">Trips Taken</TableHead>
@@ -1192,7 +1217,11 @@ export default function ClientDashboard() {
                 </TableHeader>
                 <TableBody>
                   {tripsLoading ? (
-                    <TableRow><TableCell colSpan={4} className="text-center py-8"><Loader2 className="w-5 h-5 animate-spin text-[#EAEB80] mx-auto" /></TableCell></TableRow>
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8">
+                        <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80] mx-auto" />
+                      </TableCell>
+                    </TableRow>
                   ) : (
                     <>
                       {monthlyDaysTripsData.map((row, idx) => (
@@ -1200,23 +1229,29 @@ export default function ClientDashboard() {
                           <TableCell className="text-sm py-2 font-medium text-gray-900">{row.month}</TableCell>
                           <TableCell className="text-sm py-2 text-right text-gray-800">{row.days}</TableCell>
                           <TableCell className="text-sm py-2 text-right text-gray-800">{row.trips}</TableCell>
-                          <TableCell className="text-sm py-2 text-right text-gray-800">{row.trips > 0 ? fmt(row.avgPerTrip) : "—"}</TableCell>
+                          <TableCell className="text-sm py-2 text-right text-gray-800">
+                            {row.trips > 0 ? fmt(row.avgPerTrip) : "—"}
+                          </TableCell>
                         </TableRow>
                       ))}
+                      {/* TOTAL row */}
                       <TableRow style={{ backgroundColor: "#1a1a1a" }}>
                         <TableCell className="text-sm font-extrabold text-white py-2.5">Total</TableCell>
                         <TableCell className="text-sm font-bold text-white py-2.5 text-right">{yearTotalsTrips.days}</TableCell>
                         <TableCell className="text-sm font-bold text-white py-2.5 text-right">{yearTotalsTrips.trips}</TableCell>
-                        <TableCell className="text-sm font-bold text-[#EAEB80] py-2.5 text-right">{yearTotalsTrips.trips > 0 ? fmt(yearTotalsTrips.income / yearTotalsTrips.trips) : "—"}</TableCell>
+                        <TableCell className="text-sm font-bold text-[#EAEB80] py-2.5 text-right">
+                          {yearTotalsTrips.trips > 0 ? fmt(yearTotalsTrips.income / yearTotalsTrips.trips) : "—"}
+                        </TableCell>
                       </TableRow>
                     </>
                   )}
                 </TableBody>
               </Table>
             </div>
-          </div>{/* end right column */}
+          </Card>
+        </div>{/* end section 4 */}
 
-        </div>{/* end unified 2-col grid */}
+        </div>{/* end sections 3&4 grid */}
 
         {/* ════════════════════════════════════════════════════════════════════
             SECTION 5 — Charts (Line + Bar)
