@@ -706,7 +706,7 @@ export default function ClientDashboard() {
         {/* ROW 1: Car Gallery + Video — both equal height via items-stretch */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
 
-          {/* Car Gallery */}
+          {/* Car Gallery — carousel with arrows, counter, dot indicators */}
           <Card className="border-border bg-card overflow-hidden h-full">
             <div className="flex flex-col h-full">
               {/* Main photo */}
@@ -726,14 +726,52 @@ export default function ClientDashboard() {
                     </p>
                   </div>
                 )}
-                {activeCar && (
-                  <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-gradient-to-t from-black/70 to-transparent z-10">
-                    <p className="text-sm font-bold text-white">{activeCar.year} {activeCar.makeModel}</p>
-                    {activeCar.licensePlate && <p className="text-xs text-white/70">Plate: {activeCar.licensePlate}</p>}
+
+                {/* Floating nav pill: ‹  15 / 20  › */}
+                {carPhotos.length > 1 && (
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm shadow text-sm font-medium text-gray-800 select-none">
+                    <button
+                      onClick={() => setActivePhotoIndex((i) => (i - 1 + carPhotos.length) % carPhotos.length)}
+                      className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
+                      aria-label="Previous photo"
+                    >
+                      ‹
+                    </button>
+                    <span className="min-w-[40px] text-center text-xs font-semibold">
+                      {activePhotoIndex + 1} / {carPhotos.length}
+                    </span>
+                    <button
+                      onClick={() => setActivePhotoIndex((i) => (i + 1) % carPhotos.length)}
+                      className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
+                      aria-label="Next photo"
+                    >
+                      ›
+                    </button>
                   </div>
                 )}
               </div>
-              {/* Thumbnail strip removed per design update */}
+
+              {/* Dot indicators */}
+              {carPhotos.length > 1 && (
+                <div className="flex justify-center gap-1.5 py-2 px-2 flex-wrap">
+                  {carPhotos.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActivePhotoIndex(i)}
+                      className="rounded-full transition-colors"
+                      style={{
+                        width: 8,
+                        height: 8,
+                        backgroundColor: i === activePhotoIndex ? "#EAEB80" : "#1a1a1a",
+                        border: "none",
+                        padding: 0,
+                        cursor: "pointer",
+                      }}
+                      aria-label={`Photo ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </Card>
 
@@ -1172,8 +1210,8 @@ export default function ClientDashboard() {
         ════════════════════════════════════════════════════════════════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          {/* Bar Chart: Income, Profit, Expenses — full-width, angled labels to match design */}
-          <Card className="border-border bg-card lg:col-span-2">
+          {/* Line Chart: Income, Profit, Expenses — side by side with Days/Trips */}
+          <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-semibold text-foreground">
                 Monthly Car Owner Rental Income, Car Owner Profit and Expenses — {selectedYear}
@@ -1186,11 +1224,9 @@ export default function ClientDashboard() {
                 </div>
               ) : monthlyTripData.some((d) => d.income > 0 || d.expenses > 0) ? (
                 <ResponsiveContainer width="100%" height={280}>
-                  <BarChart
+                  <LineChart
                     data={monthlyTripData}
                     margin={{ top: 4, right: 16, left: 0, bottom: 48 }}
-                    barCategoryGap="20%"
-                    barGap={2}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
                     <XAxis
@@ -1212,14 +1248,11 @@ export default function ClientDashboard() {
                       labelStyle={{ color: "#eee", fontWeight: 600 }}
                       formatter={(val: number, name: string) => [fmt(val), name]}
                     />
-                    <Legend
-                      wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
-                      iconType="square"
-                    />
-                    <Bar dataKey="income"   name="Car Owner Rental Income" fill={CHART_GOLD}  radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="profit"   name="Car Owner Profit"        fill={CHART_GOLD2} radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="expenses" name="Car Owner Expenses"      fill={CHART_GOLD3} radius={[2, 2, 0, 0]} />
-                  </BarChart>
+                    <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} iconType="line" />
+                    <Line type="monotone" dataKey="income"   name="Car Owner Rental Income" stroke={CHART_GOLD}  strokeWidth={2} dot={{ r: 3, fill: CHART_GOLD }}  activeDot={{ r: 5 }} />
+                    <Line type="monotone" dataKey="profit"   name="Car Owner Profit"        stroke={CHART_GOLD2} strokeWidth={2} dot={{ r: 3, fill: CHART_GOLD2 }} activeDot={{ r: 5 }} />
+                    <Line type="monotone" dataKey="expenses" name="Car Owner Expenses"      stroke={CHART_GOLD3} strokeWidth={2} dot={{ r: 3, fill: CHART_GOLD3 }} activeDot={{ r: 5 }} />
+                  </LineChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="flex flex-col items-center justify-center h-56 text-muted-foreground">
@@ -1231,7 +1264,7 @@ export default function ClientDashboard() {
           </Card>
 
           {/* Bar Chart: Days Rented + Trips Taken */}
-          <Card className="border-border bg-card lg:col-span-2">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-semibold text-foreground">
                 Monthly Days Rented and Trips Taken — {selectedYearTrips}
@@ -1243,7 +1276,7 @@ export default function ClientDashboard() {
                   <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                 </div>
               ) : monthlyDaysTripsData.some((d) => d.days > 0 || d.trips > 0) ? (
-                <ResponsiveContainer width="100%" height={260}>
+                <ResponsiveContainer width="100%" height={280}>
                   <BarChart
                     data={monthlyDaysTripsData}
                     margin={{ top: 4, right: 16, left: -20, bottom: 48 }}
