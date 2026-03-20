@@ -208,27 +208,29 @@ function tripDays(trip: TuroTrip): number {
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
-// Summary card — variant: "black" | "gray" | "gold"
-// Fixed min-height so cards in left/right columns stay the same height
+// Summary card — redesigned to match target: label top-right, value bottom-left, large bold value
+// variant: "black" | "light" | "gold"
 function SummaryCard({
   label,
   value,
   variant = "gold",
+  valueColor,
 }: {
   label: string;
   value: string;
-  variant?: "black" | "gray" | "gold";
+  variant?: "black" | "light" | "gold";
+  valueColor?: string;
 }) {
-  const bg = variant === "black" ? "#1a1a1a" : variant === "gray" ? "#e5e5e5" : "#D4AF37";
-  const textColor = variant === "black" ? "#EAEB80" : "#1a1a1a";
-  const subColor = variant === "black" ? "#ccc" : "#333";
+  const bg        = variant === "black" ? "#1a1a1a" : variant === "gold"  ? "#C9A227" : "#f5f5f5";
+  const labelClr  = variant === "black" ? "#aaaaaa" : variant === "gold"  ? "#333"   : "#555";
+  const valueClr  = valueColor ?? (variant === "black" ? "#ffffff" : "#111827");
   return (
     <div
-      className="rounded-lg px-4 py-3 flex flex-col justify-center gap-0.5 h-full"
-      style={{ backgroundColor: bg, minHeight: "68px" }}
+      style={{ backgroundColor: bg, minHeight: "72px" }}
+      className="flex flex-col justify-between px-4 pt-2 pb-3 border border-gray-200"
     >
-      <p className="text-lg font-extrabold leading-tight" style={{ color: textColor }}>{value}</p>
-      <p className="text-xs font-medium leading-snug" style={{ color: subColor }}>{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-right leading-tight" style={{ color: labelClr }}>{label}</p>
+      <p className="text-xl font-extrabold leading-tight" style={{ color: valueClr }}>{value}</p>
     </div>
   );
 }
@@ -1075,33 +1077,56 @@ export default function ClientDashboard() {
           </div>
         </div>
 
-        {/* Row 1: year totals — 2-col outer (gap-6 = same as info sections), 3-col inner */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-3">
-          <div className="grid grid-cols-3 gap-3 items-stretch">
-            <SummaryCard variant="black" label="Total Car Owner Rental Income" value={fmt(yearTotals.income)} />
-            <SummaryCard variant="gray"  label="Total Car Owner Expenses"      value={fmt(yearTotals.expenses)} />
-            <SummaryCard variant="gold"  label="Total Car Owner Profit"        value={fmt(yearTotals.profit)} />
+        {/* ── Summary card rows — match screenshot layout ── */}
+        {/* Row label + 3 cards, no gap between cards */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-1">
+          {/* Income/Expenses left block */}
+          <div>
+            {/* Total row */}
+            <div className="flex items-stretch mb-1">
+              <div className="flex items-center px-3 w-24 flex-shrink-0 text-sm font-semibold text-foreground border border-gray-200 bg-background">Total</div>
+              <div className="flex flex-1 gap-0">
+                <div className="flex-1"><SummaryCard variant="black" label="Rental Income"  value={fmt(yearTotals.income)} /></div>
+                <div className="flex-1"><SummaryCard variant="black" label="Expenses"       value={fmt(yearTotals.expenses)} /></div>
+                <div className="flex-1"><SummaryCard variant="black" label="Profit"         value={fmt(yearTotals.profit)} valueColor={yearTotals.profit < 0 ? "#f87171" : "#ffffff"} /></div>
+              </div>
+            </div>
+            {/* Current month row */}
+            <div className="flex items-stretch">
+              <div className="flex items-center px-3 w-24 flex-shrink-0 text-sm font-semibold text-foreground border border-gray-200 bg-background">{MONTHS_SHORT[currentMonth - 1]} {selectedYear}</div>
+              <div className="flex flex-1 gap-0">
+                <div className="flex-1"><SummaryCard variant="gold"  label="Rental Income"  value={fmt(currentMonthData?.income ?? 0)} /></div>
+                <div className="flex-1"><SummaryCard variant="light" label="Expenses"        value={fmt(currentMonthData?.expenses ?? 0)} /></div>
+                <div className="flex-1"><SummaryCard variant="light" label="Profit"          value={fmt(currentMonthData?.profit ?? 0)} valueColor={(currentMonthData?.profit ?? 0) < 0 ? "#ef4444" : "#111827"} /></div>
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-3 items-stretch">
-            <SummaryCard variant="black" label="Total Days Rented" value={String(yearTotalsTrips.days)} />
-            <SummaryCard variant="gray"  label="Total Trips Taken" value={String(yearTotalsTrips.trips)} />
-            <SummaryCard variant="gold"  label="Ave / Trips Taken" value={yearTotalsTrips.trips > 0 ? fmt(yearTotalsTrips.income / yearTotalsTrips.trips) : "$0.00"} />
+
+          {/* Days/Trips right block */}
+          <div>
+            {/* Total row */}
+            <div className="flex items-stretch mb-1">
+              <div className="flex items-center px-3 w-24 flex-shrink-0 text-sm font-semibold text-foreground border border-gray-200 bg-background">Total</div>
+              <div className="flex flex-1 gap-0">
+                <div className="flex-1"><SummaryCard variant="black" label="Days Rented"   value={String(yearTotalsTrips.days)} /></div>
+                <div className="flex-1"><SummaryCard variant="black" label="Trips Taken"   value={String(yearTotalsTrips.trips)} /></div>
+                <div className="flex-1"><SummaryCard variant="black" label="Ave / Trip"    value={yearTotalsTrips.trips > 0 ? fmt(yearTotalsTrips.income / yearTotalsTrips.trips) : "$0.00"} /></div>
+              </div>
+            </div>
+            {/* Current month row */}
+            <div className="flex items-stretch">
+              <div className="flex items-center px-3 w-24 flex-shrink-0 text-sm font-semibold text-foreground border border-gray-200 bg-background">{MONTHS_SHORT[currentMonth - 1]} {selectedYearTrips}</div>
+              <div className="flex flex-1 gap-0">
+                <div className="flex-1"><SummaryCard variant="gold"  label="Days Rented"  value={String(currentMonthDaysTripsData?.days ?? 0)} /></div>
+                <div className="flex-1"><SummaryCard variant="light" label="Trips Taken"  value={String(currentMonthDaysTripsData?.trips ?? 0)} /></div>
+                <div className="flex-1"><SummaryCard variant="light" label="Ave / Trip"   value={(currentMonthDaysTripsData?.trips ?? 0) > 0 ? fmt((currentMonthDaysTripsData?.income ?? 0) / (currentMonthDaysTripsData?.trips ?? 1)) : "$0.00"} /></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Row 2: current month */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-          <div className="grid grid-cols-3 gap-3 items-stretch">
-            <SummaryCard variant="black" label={`${MONTHS_SHORT[currentMonth - 1]} ${selectedYear} Car Owner Rental Income`} value={fmt(currentMonthData?.income ?? 0)} />
-            <SummaryCard variant="gray"  label={`${MONTHS_SHORT[currentMonth - 1]} ${selectedYear} Owner Expenses`}          value={fmt(currentMonthData?.expenses ?? 0)} />
-            <SummaryCard variant="gold"  label={`${MONTHS_SHORT[currentMonth - 1]} ${selectedYear} Owner Profit`}            value={fmt(currentMonthData?.profit ?? 0)} />
-          </div>
-          <div className="grid grid-cols-3 gap-3 items-stretch">
-            <SummaryCard variant="black" label={`${MONTHS_SHORT[currentMonth - 1]} ${selectedYearTrips} Days Rented`}  value={String(currentMonthDaysTripsData?.days ?? 0)} />
-            <SummaryCard variant="gray"  label={`${MONTHS_SHORT[currentMonth - 1]} ${selectedYearTrips} Trips Taken`}  value={String(currentMonthDaysTripsData?.trips ?? 0)} />
-            <SummaryCard variant="gold"  label="Ave / Trips Taken" value={(currentMonthDaysTripsData?.trips ?? 0) > 0 ? fmt((currentMonthDaysTripsData?.income ?? 0) / (currentMonthDaysTripsData?.trips ?? 1)) : "$0.00"} />
-          </div>
-        </div>
+        {/* spacer */}
+        <div className="mb-5" />
 
         {/* Tables side by side — equal height via items-stretch + h-full */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
@@ -1114,11 +1139,11 @@ export default function ClientDashboard() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-b border-border">
-                    <TableHead className="text-white font-semibold text-xs py-3">Month and Year</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3 text-right">Car Owner Rental Income</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3 text-right">Car Owner Expenses</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3 text-right">Car Owner Split</TableHead>
+                  <TableRow style={{ backgroundColor: "#C9A227" }} className="border-b border-border">
+                    <TableHead className="text-white font-bold text-xs py-3">Month</TableHead>
+                    <TableHead className="text-white font-bold text-xs py-3 text-right">Rental Income</TableHead>
+                    <TableHead className="text-white font-bold text-xs py-3 text-right">Expenses</TableHead>
+                    <TableHead className="text-white font-bold text-xs py-3 text-right">Owner Split</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1130,14 +1155,14 @@ export default function ClientDashboard() {
                     </TableRow>
                   ) : (
                     <>
-                      {monthlyTripData.map((row) => (
-                        <TableRow key={row.month} className="border-border hover:bg-muted/30">
-                          <TableCell className="text-sm py-2">{row.month}</TableCell>
-                          <TableCell className="text-sm py-2 text-right">{fmt(row.income)}</TableCell>
-                          <TableCell className="text-sm py-2 text-right">{fmt(row.expenses)}</TableCell>
+                      {monthlyTripData.map((row, idx) => (
+                        <TableRow key={row.month} style={{ backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f9f9f9" }} className="border-border hover:bg-yellow-50">
+                          <TableCell className="text-sm py-1.5 text-gray-800">{row.month}</TableCell>
+                          <TableCell className="text-sm py-1.5 text-right text-gray-800">{fmt(row.income)}</TableCell>
+                          <TableCell className="text-sm py-1.5 text-right text-gray-800">{fmt(row.expenses)}</TableCell>
                           <TableCell
-                            className={`text-sm py-2 text-right font-medium ${
-                              row.profit > 0 ? "text-[#EAEB80]" : row.profit < 0 ? "text-[#f87171]" : "text-muted-foreground"
+                            className={`text-sm py-1.5 text-right font-medium ${
+                              row.profit > 0 ? "text-[#C9A227]" : row.profit < 0 ? "text-[#ef4444]" : "text-gray-800"
                             }`}
                           >
                             {fmt(row.profit)}
@@ -1167,11 +1192,11 @@ export default function ClientDashboard() {
             <div className="overflow-x-auto flex-1">
               <Table>
                 <TableHeader>
-                  <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-b border-border">
-                    <TableHead className="text-white font-semibold text-xs py-3">Month and Year</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3 text-right">Days Rented</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3 text-right">Trips Taken</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3 text-right">Ave / Trips Taken</TableHead>
+                  <TableRow style={{ backgroundColor: "#C9A227" }} className="border-b border-border">
+                    <TableHead className="text-white font-bold text-xs py-3">Month</TableHead>
+                    <TableHead className="text-white font-bold text-xs py-3 text-right">Days Rented</TableHead>
+                    <TableHead className="text-white font-bold text-xs py-3 text-right">Trips Taken</TableHead>
+                    <TableHead className="text-white font-bold text-xs py-3 text-right">Ave / Trips Taken</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1183,12 +1208,12 @@ export default function ClientDashboard() {
                     </TableRow>
                   ) : (
                     <>
-                      {monthlyDaysTripsData.map((row) => (
-                        <TableRow key={row.month} className="border-border hover:bg-muted/30">
-                          <TableCell className="text-sm py-2">{row.month}</TableCell>
-                          <TableCell className="text-sm py-2 text-right">{row.days}</TableCell>
-                          <TableCell className="text-sm py-2 text-right">{row.trips}</TableCell>
-                          <TableCell className="text-sm py-2 text-right">
+                      {monthlyDaysTripsData.map((row, idx) => (
+                        <TableRow key={row.month} style={{ backgroundColor: idx % 2 === 0 ? "#ffffff" : "#f9f9f9" }} className="border-border hover:bg-yellow-50">
+                          <TableCell className="text-sm py-1.5 text-gray-800">{row.month}</TableCell>
+                          <TableCell className="text-sm py-1.5 text-right text-gray-800">{row.days}</TableCell>
+                          <TableCell className="text-sm py-1.5 text-right text-gray-800">{row.trips}</TableCell>
+                          <TableCell className="text-sm py-1.5 text-right text-gray-800">
                             {row.trips > 0 ? fmt(row.avgPerTrip) : "—"}
                           </TableCell>
                         </TableRow>
