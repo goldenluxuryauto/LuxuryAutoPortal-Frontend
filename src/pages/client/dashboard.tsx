@@ -356,12 +356,16 @@ export default function ClientDashboard() {
   }>({
     queryKey: ["/api/cars", carId, "totals", selectedYear],
     queryFn: async () => {
-      const params = new URLSearchParams({ filter: "Year", from: selectedYear, to: selectedYear });
-      const res = await fetch(buildApiUrl(`/api/cars/${carId}/totals?${params}`), {
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Failed to fetch totals");
-      return res.json();
+      try {
+        const params = new URLSearchParams({ filter: "Year", from: selectedYear, to: selectedYear });
+        const res = await fetch(buildApiUrl(`/api/cars/${carId}/totals?${params}`), {
+          credentials: "include",
+        });
+        if (!res.ok) return { success: false, data: {} };
+        return res.json();
+      } catch {
+        return { success: false, data: {} };
+      }
     },
     enabled: !!carId,
     retry: false,
