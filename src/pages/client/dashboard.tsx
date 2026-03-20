@@ -212,12 +212,12 @@ function SummaryCard({
   value: string;
   variant?: "black" | "gray" | "gold";
 }) {
-  const bg = variant === "black" ? "#1a1a1a" : variant === "gray" ? "#374151" : "#F5C518";
-  const textColor = variant === "black" ? "#EAEB80" : variant === "gray" ? "#ffffff" : "#111827";
-  const subColor = variant === "black" ? "#9ca3af" : variant === "gray" ? "#9ca3af" : "#374151";
+  const bg = variant === "black" ? "#1a1a1a" : variant === "gray" ? "#e5e5e5" : "#D4AF37";
+  const textColor = variant === "black" ? "#EAEB80" : "#1a1a1a";
+  const subColor = variant === "black" ? "#ccc" : "#333";
   return (
     <div
-      className="rounded-none px-4 py-3 flex flex-col justify-center gap-0.5 h-full"
+      className="rounded-lg px-4 py-3 flex flex-col justify-center gap-0.5 h-full"
       style={{ backgroundColor: bg, minHeight: "68px" }}
     >
       <p className="text-lg font-extrabold leading-tight" style={{ color: textColor }}>{value}</p>
@@ -238,7 +238,7 @@ function ReportLinkCard({
   external?: boolean;
 }) {
   const inner = (
-    <div className="flex flex-col items-center gap-2 p-4 rounded-none border border-border bg-card hover:border-[#EAEB80]/50 hover:bg-muted/30 transition-colors text-center cursor-pointer">
+    <div className="flex flex-col items-center gap-2 p-4 rounded-lg border border-border bg-card hover:border-[#EAEB80]/50 hover:bg-muted/30 transition-colors text-center cursor-pointer">
       <Icon className="w-6 h-6 text-[#EAEB80]" />
       <span className="text-xs text-muted-foreground leading-tight">{label}</span>
     </div>
@@ -707,7 +707,7 @@ export default function ClientDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
 
           {/* Car Gallery — carousel with arrows, counter, dot indicators */}
-          <Card className="border-border bg-card overflow-hidden h-full rounded-none">
+          <Card className="border-border bg-card overflow-hidden h-full">
             <div className="flex flex-col h-full">
               {/* Main photo */}
               <div className="relative flex-1 bg-muted/20 flex items-center justify-center" style={{ minHeight: "300px" }}>
@@ -776,7 +776,7 @@ export default function ClientDashboard() {
           </Card>
 
           {/* Monthly Update Video */}
-          <Card className="border-border bg-card overflow-hidden h-full rounded-none">
+          <Card className="border-border bg-card overflow-hidden h-full">
             <div className="relative w-full h-full flex flex-col" style={{ minHeight: "300px", background: "#1a1a1a" }}>
               {/* YouTube embed — temporal public video */}
               <iframe
@@ -796,7 +796,7 @@ export default function ClientDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
 
           {/* Vehicle & Owner Information */}
-          <Card className="border-border bg-card h-full rounded-none">
+          <Card className="border-border bg-card h-full">
             <CardContent className="p-5 h-full">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
@@ -920,7 +920,7 @@ export default function ClientDashboard() {
           </Card>
 
           {/* GLA Company Info */}
-          <Card className="border-border bg-card h-full rounded-none">
+          <Card className="border-border bg-card h-full">
             <CardContent className="p-5 h-full">
 
               {/* Header: "Golden Luxury Auto:" + colored social icons inline */}
@@ -1037,7 +1037,7 @@ export default function ClientDashboard() {
         {/* Section titles + year selectors — full width row */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-end mb-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold uppercase tracking-wide text-gray-900">Income and Expenses</h2>
+            <h2 className="text-lg font-bold uppercase text-foreground tracking-wide">Income and Expenses</h2>
             <Select value={selectedYear} onValueChange={setSelectedYear}>
               <SelectTrigger className="w-28 h-9 text-sm">
                 <SelectValue />
@@ -1052,7 +1052,7 @@ export default function ClientDashboard() {
             </Select>
           </div>
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold uppercase tracking-wide text-gray-900">Days Rented and Trips Taken</h2>
+            <h2 className="text-lg font-bold uppercase text-foreground tracking-wide">Days Rented and Trips Taken</h2>
             <Select value={selectedYearTrips} onValueChange={setSelectedYearTrips}>
               <SelectTrigger className="w-28 h-9 text-sm">
                 <SelectValue />
@@ -1103,7 +1103,7 @@ export default function ClientDashboard() {
         <div className="flex flex-col h-full">
 
           {/* Monthly Income/Expense Table */}
-          <Card className="border-border bg-card overflow-hidden flex-1 flex flex-col rounded-none">
+          <Card className="border-border bg-card overflow-hidden flex-1 flex flex-col">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -1123,13 +1123,13 @@ export default function ClientDashboard() {
                     </TableRow>
                   ) : (
                     <>
-                      {monthlyTripData.map((row, idx) => (
-                        <TableRow key={row.month} className={`border-border hover:bg-muted/30 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
-                          <TableCell className="text-sm py-1.5">{row.month}</TableCell>
-                          <TableCell className="text-sm py-1.5 text-right">{fmt(row.income)}</TableCell>
-                          <TableCell className="text-sm py-1.5 text-right">{fmt(row.expenses)}</TableCell>
+                      {monthlyTripData.map((row) => (
+                        <TableRow key={row.month} className="border-border hover:bg-muted/30">
+                          <TableCell className="text-sm py-2">{row.month}</TableCell>
+                          <TableCell className="text-sm py-2 text-right">{fmt(row.income)}</TableCell>
+                          <TableCell className="text-sm py-2 text-right">{fmt(row.expenses)}</TableCell>
                           <TableCell
-                            className={`text-sm py-1.5 text-right font-medium ${
+                            className={`text-sm py-2 text-right font-medium ${
                               row.profit >= 0 ? "text-[#EAEB80]" : "text-[#f87171]"
                             }`}
                           >
@@ -1138,11 +1138,11 @@ export default function ClientDashboard() {
                         </TableRow>
                       ))}
                       {/* TOTAL row */}
-                      <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-t border-border hover:bg-[#1a1a1a]">
-                        <TableCell className="text-xs font-bold text-[#EAEB80] py-1.5">TOTAL</TableCell>
-                        <TableCell className="text-xs font-bold text-white py-1.5 text-right">{fmt(yearTotals.income)}</TableCell>
-                        <TableCell className="text-xs font-bold text-white py-1.5 text-right">{fmt(yearTotals.expenses)}</TableCell>
-                        <TableCell className="text-xs font-bold text-white py-1.5 text-right">{fmt(yearTotals.profit)}</TableCell>
+                      <TableRow style={{ backgroundColor: "#EAEB80" }} className="border-t border-border hover:bg-[#EAEB80]">
+                        <TableCell className="text-xs font-bold text-[#1a1a1a] py-2">TOTAL</TableCell>
+                        <TableCell className="text-xs font-bold text-[#1a1a1a] py-2 text-right">{fmt(yearTotals.income)}</TableCell>
+                        <TableCell className="text-xs font-bold text-[#1a1a1a] py-2 text-right">{fmt(yearTotals.expenses)}</TableCell>
+                        <TableCell className="text-xs font-bold text-[#1a1a1a] py-2 text-right">{fmt(yearTotals.profit)}</TableCell>
                       </TableRow>
                     </>
                   )}
@@ -1156,7 +1156,7 @@ export default function ClientDashboard() {
         <div className="flex flex-col h-full">
 
           {/* Monthly Days/Trips Table */}
-          <Card className="border-border bg-card overflow-hidden flex-1 flex flex-col rounded-none">
+          <Card className="border-border bg-card overflow-hidden flex-1 flex flex-col">
             <div className="overflow-x-auto flex-1">
               <Table>
                 <TableHeader>
@@ -1176,22 +1176,22 @@ export default function ClientDashboard() {
                     </TableRow>
                   ) : (
                     <>
-                      {monthlyDaysTripsData.map((row, idx) => (
-                        <TableRow key={row.month} className={`border-border hover:bg-muted/30 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
-                          <TableCell className="text-sm py-1.5">{row.month}</TableCell>
-                          <TableCell className="text-sm py-1.5 text-right">{row.days}</TableCell>
-                          <TableCell className="text-sm py-1.5 text-right">{row.trips}</TableCell>
-                          <TableCell className="text-sm py-1.5 text-right">
+                      {monthlyDaysTripsData.map((row) => (
+                        <TableRow key={row.month} className="border-border hover:bg-muted/30">
+                          <TableCell className="text-sm py-2">{row.month}</TableCell>
+                          <TableCell className="text-sm py-2 text-right">{row.days}</TableCell>
+                          <TableCell className="text-sm py-2 text-right">{row.trips}</TableCell>
+                          <TableCell className="text-sm py-2 text-right">
                             {row.trips > 0 ? fmt(row.avgPerTrip) : "—"}
                           </TableCell>
                         </TableRow>
                       ))}
                       {/* TOTAL row */}
-                      <TableRow style={{ backgroundColor: "#1a1a1a" }} className="border-t border-border hover:bg-[#1a1a1a]">
-                        <TableCell className="text-xs font-bold text-[#EAEB80] py-1.5">TOTAL</TableCell>
-                        <TableCell className="text-xs font-bold text-white py-1.5 text-right">{yearTotalsTrips.days}</TableCell>
-                        <TableCell className="text-xs font-bold text-white py-1.5 text-right">{yearTotalsTrips.trips}</TableCell>
-                        <TableCell className="text-xs font-bold text-white py-1.5 text-right">
+                      <TableRow style={{ backgroundColor: "#EAEB80" }} className="border-t border-border hover:bg-[#EAEB80]">
+                        <TableCell className="text-xs font-bold text-[#1a1a1a] py-2">TOTAL</TableCell>
+                        <TableCell className="text-xs font-bold text-[#1a1a1a] py-2 text-right">{yearTotalsTrips.days}</TableCell>
+                        <TableCell className="text-xs font-bold text-[#1a1a1a] py-2 text-right">{yearTotalsTrips.trips}</TableCell>
+                        <TableCell className="text-xs font-bold text-[#1a1a1a] py-2 text-right">
                           {yearTotalsTrips.trips > 0 ? fmt(yearTotalsTrips.income / yearTotalsTrips.trips) : "—"}
                         </TableCell>
                       </TableRow>
@@ -1211,7 +1211,7 @@ export default function ClientDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* Line Chart: Income, Profit, Expenses — side by side with Days/Trips */}
-          <Card className="border-border bg-card rounded-none">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-semibold text-foreground">
                 Monthly Car Owner Rental Income, Car Owner Profit and Expenses — {selectedYear}
@@ -1223,7 +1223,6 @@ export default function ClientDashboard() {
                   <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                 </div>
               ) : monthlyTripData.some((d) => d.income > 0 || d.expenses > 0) ? (
-                <div className="bg-gray-900 p-3 rounded-none">
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart
                     data={monthlyTripData}
@@ -1255,7 +1254,6 @@ export default function ClientDashboard() {
                     <Line type="monotone" dataKey="expenses" name="Car Owner Expenses"      stroke={CHART_RED}   strokeWidth={2} dot={{ r: 3, fill: CHART_RED }}   activeDot={{ r: 5 }} />
                   </LineChart>
                 </ResponsiveContainer>
-                </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-56 text-muted-foreground">
                   <AlertCircle className="w-8 h-8 mb-2 opacity-40" />
@@ -1266,7 +1264,7 @@ export default function ClientDashboard() {
           </Card>
 
           {/* Bar Chart: Days Rented + Trips Taken */}
-          <Card className="border-border bg-card rounded-none">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-semibold text-foreground">
                 Monthly Days Rented and Trips Taken — {selectedYearTrips}
@@ -1278,7 +1276,6 @@ export default function ClientDashboard() {
                   <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                 </div>
               ) : monthlyDaysTripsData.some((d) => d.days > 0 || d.trips > 0) ? (
-                <div className="bg-gray-900 p-3 rounded-none">
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart
                     data={monthlyDaysTripsData}
@@ -1309,7 +1306,6 @@ export default function ClientDashboard() {
                     <Bar dataKey="trips" name="Trips Taken" fill={CHART_GOLD2} radius={[2, 2, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
-                </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-56 text-muted-foreground">
                   <AlertCircle className="w-8 h-8 mb-2 opacity-40" />
@@ -1335,7 +1331,7 @@ export default function ClientDashboard() {
             <div className="grid grid-cols-2 gap-4">
 
               {/* Full year donut */}
-              <Card className="border-border bg-card rounded-none">
+              <Card className="border-border bg-card">
                 <CardHeader className="pb-1 pt-3 px-3">
                   <CardTitle className="text-xs font-semibold text-foreground leading-tight">
                     Total Car Owner Profit and Expenses
@@ -1347,7 +1343,6 @@ export default function ClientDashboard() {
                       <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                     </div>
                   ) : donutYearData.length > 0 ? (
-                    <div className="bg-gray-900 p-3 rounded-none">
                     <ResponsiveContainer width="100%" height={180}>
                       <PieChart>
                         <Pie
@@ -1373,7 +1368,6 @@ export default function ClientDashboard() {
                         <Legend wrapperStyle={{ fontSize: 10 }} />
                       </PieChart>
                     </ResponsiveContainer>
-                    </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center h-44 text-muted-foreground">
                       <AlertCircle className="w-5 h-5 mb-1 opacity-40" />
@@ -1384,7 +1378,7 @@ export default function ClientDashboard() {
               </Card>
 
               {/* Current month donut */}
-              <Card className="border-border bg-card rounded-none">
+              <Card className="border-border bg-card">
                 <CardHeader className="pb-1 pt-3 px-3">
                   <CardTitle className="text-xs font-semibold text-foreground leading-tight">
                     {MONTHS_SHORT[currentMonth - 1]} {selectedYear} Car Owner Profit and Expenses
@@ -1396,7 +1390,6 @@ export default function ClientDashboard() {
                       <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                     </div>
                   ) : donutMonthData.length > 0 ? (
-                    <div className="bg-gray-900 p-3 rounded-none">
                     <ResponsiveContainer width="100%" height={180}>
                       <PieChart>
                         <Pie
@@ -1422,7 +1415,6 @@ export default function ClientDashboard() {
                         <Legend wrapperStyle={{ fontSize: 10 }} />
                       </PieChart>
                     </ResponsiveContainer>
-                    </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center h-44 text-muted-foreground">
                       <AlertCircle className="w-5 h-5 mb-1 opacity-40" />
@@ -1434,7 +1426,7 @@ export default function ClientDashboard() {
             </div>
 
             {/* NADA Change % chart */}
-            <Card className="border-border bg-card rounded-none">
+            <Card className="border-border bg-card">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-semibold text-foreground uppercase tracking-wide" style={{ color: "#EAEB80" }}>
                   NADA Change %
@@ -1446,7 +1438,6 @@ export default function ClientDashboard() {
                     <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                   </div>
                 ) : hasNadaData ? (
-                  <div className="bg-gray-900 p-3 rounded-none">
                   <ResponsiveContainer width="100%" height={240}>
                     <AreaChart
                       data={nadaChartData}
@@ -1482,7 +1473,6 @@ export default function ClientDashboard() {
                       />
                     </AreaChart>
                   </ResponsiveContainer>
-                  </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-52 text-muted-foreground">
                     <AlertCircle className="w-8 h-8 mb-2 opacity-40" />
@@ -1502,9 +1492,9 @@ export default function ClientDashboard() {
           <div className="flex flex-col gap-6">
 
             {/* SECTION 8 — Payment History */}
-            <Card className="border-border bg-card overflow-hidden rounded-none">
+            <Card className="border-border bg-card overflow-hidden">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold uppercase tracking-wide text-gray-900">
+                <CardTitle className="text-sm font-bold uppercase text-foreground tracking-wide">
                   Payment History
                 </CardTitle>
               </CardHeader>
@@ -1525,23 +1515,23 @@ export default function ClientDashboard() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {payments.map((p, idx) => (
-                        <TableRow key={p.payments_aid} className={`border-border hover:bg-muted/30 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
-                          <TableCell className="text-sm py-1.5 font-medium">
+                      {payments.map((p) => (
+                        <TableRow key={p.payments_aid} className="border-border hover:bg-muted/30">
+                          <TableCell className="text-sm py-2 font-medium">
                             {getMonthLabel(p.payments_year_month)}
                           </TableCell>
-                          <TableCell className="text-sm py-1.5 text-right text-[#EAEB80]">
+                          <TableCell className="text-sm py-2 text-right text-[#EAEB80]">
                             {fmt(p.payments_amount_payout)}
                           </TableCell>
-                          <TableCell className="text-sm py-1.5 text-right">
+                          <TableCell className="text-sm py-2 text-right">
                             {fmt(p.payments_amount)}
                           </TableCell>
-                          <TableCell className="text-sm py-1.5 text-right">
+                          <TableCell className="text-sm py-2 text-right">
                             <span className={p.payments_amount_balance >= 0 ? "text-green-400" : "text-red-400"}>
                               {fmt(p.payments_amount_balance)}
                             </span>
                           </TableCell>
-                          <TableCell className="text-sm py-1.5 text-muted-foreground">
+                          <TableCell className="text-sm py-2 text-muted-foreground">
                             {p.payments_invoice_date ?? "—"}
                           </TableCell>
                         </TableRow>
@@ -1558,9 +1548,9 @@ export default function ClientDashboard() {
             </Card>
 
             {/* SECTION 9 — Maintenance History */}
-            <Card className="border-border bg-card overflow-hidden rounded-none">
+            <Card className="border-border bg-card overflow-hidden">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold uppercase tracking-wide text-gray-900">
+                <CardTitle className="text-sm font-bold uppercase text-foreground tracking-wide">
                   Maintenance History
                 </CardTitle>
               </CardHeader>
@@ -1579,11 +1569,11 @@ export default function ClientDashboard() {
                     </TableHeader>
                     <TableBody>
                       {maintenanceRecords.map((record, i) => (
-                        <TableRow key={i} className={`border-border hover:bg-muted/30 ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
-                          <TableCell className="text-sm py-1.5">
+                        <TableRow key={i} className="border-border hover:bg-muted/30">
+                          <TableCell className="text-sm py-2">
                             {record.maintenanceType ?? record.type ?? "—"}
                           </TableCell>
-                          <TableCell className="text-sm py-1.5 text-muted-foreground">
+                          <TableCell className="text-sm py-2 text-muted-foreground">
                             {record.dateCompleted ?? record.date_completed ?? "—"}
                           </TableCell>
                         </TableRow>
@@ -1611,7 +1601,7 @@ export default function ClientDashboard() {
         {/* ════════════════════════════════════════════════════════════════════
             SECTION 10 — Report Center
         ════════════════════════════════════════════════════════════════════ */}
-        <Card className="border-border bg-card overflow-hidden rounded-none">
+        <Card className="border-border bg-card overflow-hidden">
           <div className="px-6 py-3" style={{ backgroundColor: "#EAEB80" }}>
             <h2 className="text-base font-bold text-[#1a1a1a]">Report Center</h2>
           </div>
@@ -1632,7 +1622,7 @@ export default function ClientDashboard() {
         {/* ════════════════════════════════════════════════════════════════════
             SECTION 11 — Support Center
         ════════════════════════════════════════════════════════════════════ */}
-        <Card className="border-border bg-card overflow-hidden rounded-none">
+        <Card className="border-border bg-card overflow-hidden">
           <div className="px-6 py-3" style={{ backgroundColor: "#EAEB80" }}>
             <h2 className="text-base font-bold text-[#1a1a1a]">Support Center</h2>
           </div>
