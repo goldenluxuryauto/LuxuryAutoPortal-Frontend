@@ -1440,10 +1440,8 @@ export default function ClientDashboard() {
                 <AlertCircle className="w-8 h-8 mb-2 opacity-40" />
                 <p className="text-sm">No NADA depreciation data for {selectedYear}</p>
                 {activeCar?.id && (
-                  <Link href={`/admin/cars/${activeCar.id}/depreciation`}>
-                    <a className="text-xs text-[#EAEB80] hover:underline mt-1">
-                      View NADA Depreciation Schedule →
-                    </a>
+                  <Link href={`/admin/cars/${activeCar.id}/depreciation`} className="text-xs text-[#EAEB80] hover:underline mt-1">
+                    View NADA Depreciation Schedule →
                   </Link>
                 )}
               </div>
@@ -1556,10 +1554,8 @@ export default function ClientDashboard() {
                 <AlertCircle className="w-6 h-6 mb-2 opacity-40" />
                 <p className="text-sm">No maintenance records found</p>
                 {activeCar?.id && (
-                  <Link href={`/admin/cars/${activeCar.id}/maintenance`}>
-                    <a className="text-xs text-[#EAEB80] hover:underline mt-1">
-                      View full maintenance page →
-                    </a>
+                  <Link href={`/admin/cars/${activeCar.id}/maintenance`} className="text-xs text-[#EAEB80] hover:underline mt-1">
+                    View full maintenance page →
                   </Link>
                 )}
               </div>
