@@ -179,7 +179,8 @@ const CHART_GOLD  = "#EAEB80";   // bright yellow-gold  — Income / Days Rented
 const CHART_GOLD2 = "#F59E0B";   // amber/orange-gold   — Profit / Trips Taken
 const CHART_RED   = "#EF4444";   // red                 — Expenses
 const CHART_DARK  = "#2a2a2a";
-const PIE_COLORS  = [CHART_GOLD, CHART_RED];
+const PIE_COLORS       = [CHART_GOLD, CHART_RED];   // for fallback
+const PIE_DONUT_COLORS = ["#EAEB80", "#C9A227"];    // bright gold (profit) + dark amber gold (expenses)
 
 // Shared chart theme constants
 const CHART_TOOLTIP_STYLE = { background: "#1a1a1a", border: "1px solid #444", borderRadius: 6 };
@@ -1329,99 +1330,101 @@ export default function ClientDashboard() {
           <div className="flex flex-col gap-6">
 
             {/* Donut charts — side by side within left column */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
 
               {/* Full year donut */}
-              <Card className="border-border bg-card">
-                <CardHeader className="pb-1 pt-3 px-3">
-                  <CardTitle className="text-xs font-semibold text-foreground leading-tight">
-                    Total Car Owner Profit and Expenses
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 px-2 pb-3">
-                  {totalsLoading || tripsLoading ? (
-                    <div className="flex items-center justify-center h-44">
-                      <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
-                    </div>
-                  ) : (
-                    <ResponsiveContainer width="100%" height={200}>
-                      <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                        <Pie
-                          data={donutYearData.length > 0 ? donutYearData : [{ name: "No data", value: 1 }]}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={52}
-                          outerRadius={72}
-                          dataKey="value"
-                          label={false}
-                          labelLine={false}
-                          isAnimationActive={true}
-                        >
-                          {donutYearData.length > 0
-                            ? donutYearData.map((_, i) => (
-                                <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                              ))
-                            : <Cell fill="#2a2a2a" stroke="#555" strokeWidth={1} />
-                          }
-                        </Pie>
-                        {donutYearData.length > 0 && (
-                          <Tooltip
-                            contentStyle={CHART_TOOLTIP_STYLE}
-                            formatter={(val: number, name: string) => [fmt(val), name]}
-                          />
-                        )}
-                        <Legend wrapperStyle={{ fontSize: 10 }} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  )}
-                </CardContent>
-              </Card>
+              <div>
+                <h3 className="text-sm font-bold text-foreground mb-1">Total Car Owner Profit and Expenses</h3>
+                {totalsLoading || tripsLoading ? (
+                  <div className="flex items-center justify-center h-56">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={260}>
+                    <PieChart margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
+                      <Pie
+                        data={donutYearData.length > 0 ? donutYearData : [{ name: "No data", value: 1 }]}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={65}
+                        outerRadius={95}
+                        dataKey="value"
+                        label={donutYearData.length > 0
+                          ? ({ name, percent, value }) => `${name}\n${(percent * 100).toFixed(1)}%`
+                          : false
+                        }
+                        labelLine={donutYearData.length > 0}
+                        isAnimationActive={true}
+                      >
+                        {donutYearData.length > 0
+                          ? donutYearData.map((entry, i) => (
+                              <Cell key={i} fill={PIE_DONUT_COLORS[i % PIE_DONUT_COLORS.length]} />
+                            ))
+                          : <Cell fill="#2a2a2a" stroke="#555" strokeWidth={1} />
+                        }
+                      </Pie>
+                      {donutYearData.length > 0 && (
+                        <Tooltip
+                          contentStyle={CHART_TOOLTIP_STYLE}
+                          formatter={(val: number, name: string) => [fmt(val), name]}
+                        />
+                      )}
+                      <Legend
+                        wrapperStyle={{ fontSize: 11 }}
+                        formatter={(value) => <span style={{ color: "#1a1a1a" }}>{value}</span>}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
 
               {/* Current month donut */}
-              <Card className="border-border bg-card">
-                <CardHeader className="pb-1 pt-3 px-3">
-                  <CardTitle className="text-xs font-semibold text-foreground leading-tight">
-                    {MONTHS_SHORT[currentMonth - 1]} {selectedYear} Car Owner Profit and Expenses
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 px-2 pb-3">
-                  {paymentsLoading || tripsLoading ? (
-                    <div className="flex items-center justify-center h-44">
-                      <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
-                    </div>
-                  ) : (
-                    <ResponsiveContainer width="100%" height={200}>
-                      <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                        <Pie
-                          data={donutMonthData.length > 0 ? donutMonthData : [{ name: "No data", value: 1 }]}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={52}
-                          outerRadius={72}
-                          dataKey="value"
-                          label={false}
-                          labelLine={false}
-                          isAnimationActive={true}
-                        >
-                          {donutMonthData.length > 0
-                            ? donutMonthData.map((_, i) => (
-                                <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                              ))
-                            : <Cell fill="#2a2a2a" stroke="#555" strokeWidth={1} />
-                          }
-                        </Pie>
-                        {donutMonthData.length > 0 && (
-                          <Tooltip
-                            contentStyle={CHART_TOOLTIP_STYLE}
-                            formatter={(val: number, name: string) => [fmt(val), name]}
-                          />
-                        )}
-                        <Legend wrapperStyle={{ fontSize: 10 }} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  )}
-                </CardContent>
-              </Card>
+              <div>
+                <h3 className="text-sm font-bold text-foreground mb-1">
+                  {MONTHS_SHORT[currentMonth - 1]} {selectedYear} Car Owner Profit and Expenses
+                </h3>
+                {paymentsLoading || tripsLoading ? (
+                  <div className="flex items-center justify-center h-56">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={260}>
+                    <PieChart margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
+                      <Pie
+                        data={donutMonthData.length > 0 ? donutMonthData : [{ name: "No data", value: 1 }]}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={65}
+                        outerRadius={95}
+                        dataKey="value"
+                        label={donutMonthData.length > 0
+                          ? ({ name, percent, value }) => `${name}\n${(percent * 100).toFixed(1)}%`
+                          : false
+                        }
+                        labelLine={donutMonthData.length > 0}
+                        isAnimationActive={true}
+                      >
+                        {donutMonthData.length > 0
+                          ? donutMonthData.map((entry, i) => (
+                              <Cell key={i} fill={PIE_DONUT_COLORS[i % PIE_DONUT_COLORS.length]} />
+                            ))
+                          : <Cell fill="#2a2a2a" stroke="#555" strokeWidth={1} />
+                        }
+                      </Pie>
+                      {donutMonthData.length > 0 && (
+                        <Tooltip
+                          contentStyle={CHART_TOOLTIP_STYLE}
+                          formatter={(val: number, name: string) => [fmt(val), name]}
+                        />
+                      )}
+                      <Legend
+                        wrapperStyle={{ fontSize: 11 }}
+                        formatter={(value) => <span style={{ color: "#1a1a1a" }}>{value}</span>}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
             </div>
 
             {/* NADA Change % chart */}
