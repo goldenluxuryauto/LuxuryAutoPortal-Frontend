@@ -227,11 +227,11 @@ function SummaryCard({
   const valueClr = valueColor ?? (variant === "black" ? "#ffffff" : "#1a1a1a");
   return (
     <div
-      style={{ backgroundColor: bg, minHeight: "68px" }}
-      className={`flex flex-col items-center justify-center px-3 py-2 border border-[#d8d0b8] rounded-lg ${className}`}
+      style={{ backgroundColor: bg, minHeight: "54px" }}
+      className={`flex flex-col items-center justify-center px-3 py-1.5 border border-[#d8d0b8] rounded-lg ${className}`}
     >
       {label && <p className="text-xs text-gray-400 mb-0.5">{label}</p>}
-      <p className="text-xl font-extrabold leading-tight text-center" style={{ color: valueClr }}>{value}</p>
+      <p className="text-lg font-extrabold leading-tight text-center" style={{ color: valueClr }}>{value}</p>
     </div>
   );
 }
@@ -1365,24 +1365,21 @@ export default function ClientDashboard() {
               <div>
                 <h3 className="text-sm font-bold text-foreground mb-1">Total Car Owner Profit and Expenses</h3>
                 {totalsLoading || tripsLoading ? (
-                  <div className="flex items-center justify-center h-56">
+                  <div className="flex items-center justify-center h-48">
                     <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                   </div>
                 ) : (
-                  <ResponsiveContainer width="100%" height={260}>
-                    <PieChart margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
                       <Pie
                         data={donutYearData.length > 0 ? donutYearData : [{ name: "No data", value: 1 }]}
                         cx="50%"
                         cy="50%"
-                        innerRadius={65}
-                        outerRadius={95}
+                        innerRadius={58}
+                        outerRadius={82}
                         dataKey="value"
-                        label={donutYearData.length > 0
-                          ? ({ name, percent, value }) => `${name}\n${(percent * 100).toFixed(1)}%`
-                          : false
-                        }
-                        labelLine={donutYearData.length > 0}
+                        label={false}
+                        labelLine={false}
                         isAnimationActive={true}
                       >
                         {donutYearData.length > 0
@@ -1401,6 +1398,11 @@ export default function ClientDashboard() {
                       <Legend
                         wrapperStyle={{ fontSize: 11 }}
                         formatter={(value) => <span style={{ color: "#1a1a1a" }}>{value}</span>}
+                        payload={
+                          donutYearData.length > 0
+                            ? undefined
+                            : [{ value: "No data", type: "square", color: "#2a2a2a" }]
+                        }
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -1413,24 +1415,21 @@ export default function ClientDashboard() {
                   {MONTHS_SHORT[currentMonth - 1]} {selectedYear} Car Owner Profit and Expenses
                 </h3>
                 {paymentsLoading || tripsLoading ? (
-                  <div className="flex items-center justify-center h-56">
+                  <div className="flex items-center justify-center h-48">
                     <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                   </div>
                 ) : (
-                  <ResponsiveContainer width="100%" height={260}>
-                    <PieChart margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
                       <Pie
                         data={donutMonthData.length > 0 ? donutMonthData : [{ name: "No data", value: 1 }]}
                         cx="50%"
                         cy="50%"
-                        innerRadius={65}
-                        outerRadius={95}
+                        innerRadius={58}
+                        outerRadius={82}
                         dataKey="value"
-                        label={donutMonthData.length > 0
-                          ? ({ name, percent, value }) => `${name}\n${(percent * 100).toFixed(1)}%`
-                          : false
-                        }
-                        labelLine={donutMonthData.length > 0}
+                        label={false}
+                        labelLine={false}
                         isAnimationActive={true}
                       >
                         {donutMonthData.length > 0
@@ -1449,6 +1448,11 @@ export default function ClientDashboard() {
                       <Legend
                         wrapperStyle={{ fontSize: 11 }}
                         formatter={(value) => <span style={{ color: "#1a1a1a" }}>{value}</span>}
+                        payload={
+                          donutMonthData.length > 0
+                            ? undefined
+                            : [{ value: "No data", type: "square", color: "#2a2a2a" }]
+                        }
                       />
                     </PieChart>
                   </ResponsiveContainer>
