@@ -180,7 +180,7 @@ const CHART_GOLD2 = "#F59E0B";   // amber/orange-gold   — Profit / Trips Taken
 const CHART_RED   = "#EF4444";   // red                 — Expenses
 const CHART_DARK  = "#2a2a2a";
 const PIE_COLORS       = [CHART_GOLD, CHART_RED];   // for fallback
-const PIE_DONUT_COLORS = ["#EAEB80", "#C9A227"];    // bright gold (profit) + dark amber gold (expenses)
+const PIE_DONUT_COLORS = ["#EAEB80", "#1a1a1a"];    // bright gold (profit) + near-black (expenses) — max contrast
 
 // Shared chart theme constants
 const CHART_TOOLTIP_STYLE = { background: "#1a1a1a", border: "1px solid #444", borderRadius: 6 };
@@ -1349,43 +1349,54 @@ export default function ClientDashboard() {
                     <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                   </div>
                 ) : (
-                  <ResponsiveContainer width="100%" height={220}>
-                    <PieChart>
-                      <Pie
-                        data={donutYearData.length > 0 ? donutYearData : [{ name: "No data", value: 1 }]}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={58}
-                        outerRadius={82}
-                        dataKey="value"
-                        label={false}
-                        labelLine={false}
-                        isAnimationActive={true}
-                      >
-                        {donutYearData.length > 0
-                          ? donutYearData.map((entry, i) => (
-                              <Cell key={i} fill={PIE_DONUT_COLORS[i % PIE_DONUT_COLORS.length]} />
-                            ))
-                          : <Cell fill="#2a2a2a" stroke="#555" strokeWidth={1} />
-                        }
-                      </Pie>
-                      {donutYearData.length > 0 && (
-                        <Tooltip
-                          contentStyle={CHART_TOOLTIP_STYLE}
-                          formatter={(val: number, name: string) => [fmt(val), name]}
+                  <div className="relative">
+                    <ResponsiveContainer width="100%" height={220}>
+                      <PieChart>
+                        <Pie
+                          data={donutYearData.length > 0 ? donutYearData : [{ name: "No data", value: 1 }]}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={58}
+                          outerRadius={82}
+                          dataKey="value"
+                          label={false}
+                          labelLine={false}
+                          startAngle={90}
+                          endAngle={-270}
+                          isAnimationActive={true}
+                        >
+                          {donutYearData.length > 0
+                            ? donutYearData.map((entry, i) => (
+                                <Cell key={i} fill={PIE_DONUT_COLORS[i % PIE_DONUT_COLORS.length]} />
+                              ))
+                            : <Cell fill="#e5e7eb" stroke="#d1d5db" strokeWidth={1} />
+                          }
+                        </Pie>
+                        {donutYearData.length > 0 && (
+                          <Tooltip
+                            contentStyle={CHART_TOOLTIP_STYLE}
+                            formatter={(val: number, name: string) => [fmt(val), name]}
+                          />
+                        )}
+                        <Legend
+                          wrapperStyle={{ fontSize: 11 }}
+                          formatter={(value) => <span style={{ color: "#1a1a1a" }}>{value}</span>}
+                          payload={donutYearData.length > 0 ? undefined : [{ value: "No data yet", type: "square", color: "#9ca3af" }]}
                         />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    {/* Centered label inside ring */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none" style={{ top: 0, bottom: 28 }}>
+                      {donutYearData.length > 0 ? (
+                        <>
+                          <p className="text-xs text-gray-500 leading-none mb-0.5">Profit</p>
+                          <p className="text-base font-extrabold text-gray-900 leading-none">{fmt(yearTotals.profit)}</p>
+                        </>
+                      ) : (
+                        <p className="text-xs text-gray-400 font-medium">No data</p>
                       )}
-                      <Legend
-                        wrapperStyle={{ fontSize: 11 }}
-                        formatter={(value) => <span style={{ color: "#1a1a1a" }}>{value}</span>}
-                        payload={
-                          donutYearData.length > 0
-                            ? undefined
-                            : [{ value: "No data", type: "square", color: "#2a2a2a" }]
-                        }
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -1399,43 +1410,54 @@ export default function ClientDashboard() {
                     <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                   </div>
                 ) : (
-                  <ResponsiveContainer width="100%" height={220}>
-                    <PieChart>
-                      <Pie
-                        data={donutMonthData.length > 0 ? donutMonthData : [{ name: "No data", value: 1 }]}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={58}
-                        outerRadius={82}
-                        dataKey="value"
-                        label={false}
-                        labelLine={false}
-                        isAnimationActive={true}
-                      >
-                        {donutMonthData.length > 0
-                          ? donutMonthData.map((entry, i) => (
-                              <Cell key={i} fill={PIE_DONUT_COLORS[i % PIE_DONUT_COLORS.length]} />
-                            ))
-                          : <Cell fill="#2a2a2a" stroke="#555" strokeWidth={1} />
-                        }
-                      </Pie>
-                      {donutMonthData.length > 0 && (
-                        <Tooltip
-                          contentStyle={CHART_TOOLTIP_STYLE}
-                          formatter={(val: number, name: string) => [fmt(val), name]}
+                  <div className="relative">
+                    <ResponsiveContainer width="100%" height={220}>
+                      <PieChart>
+                        <Pie
+                          data={donutMonthData.length > 0 ? donutMonthData : [{ name: "No data", value: 1 }]}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={58}
+                          outerRadius={82}
+                          dataKey="value"
+                          label={false}
+                          labelLine={false}
+                          startAngle={90}
+                          endAngle={-270}
+                          isAnimationActive={true}
+                        >
+                          {donutMonthData.length > 0
+                            ? donutMonthData.map((entry, i) => (
+                                <Cell key={i} fill={PIE_DONUT_COLORS[i % PIE_DONUT_COLORS.length]} />
+                              ))
+                            : <Cell fill="#e5e7eb" stroke="#d1d5db" strokeWidth={1} />
+                          }
+                        </Pie>
+                        {donutMonthData.length > 0 && (
+                          <Tooltip
+                            contentStyle={CHART_TOOLTIP_STYLE}
+                            formatter={(val: number, name: string) => [fmt(val), name]}
+                          />
+                        )}
+                        <Legend
+                          wrapperStyle={{ fontSize: 11 }}
+                          formatter={(value) => <span style={{ color: "#1a1a1a" }}>{value}</span>}
+                          payload={donutMonthData.length > 0 ? undefined : [{ value: "No data yet", type: "square", color: "#9ca3af" }]}
                         />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    {/* Centered label inside ring */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none" style={{ top: 0, bottom: 28 }}>
+                      {donutMonthData.length > 0 ? (
+                        <>
+                          <p className="text-xs text-gray-500 leading-none mb-0.5">Profit</p>
+                          <p className="text-base font-extrabold text-gray-900 leading-none">{fmt(currentMonthData?.profit ?? 0)}</p>
+                        </>
+                      ) : (
+                        <p className="text-xs text-gray-400 font-medium">No data</p>
                       )}
-                      <Legend
-                        wrapperStyle={{ fontSize: 11 }}
-                        formatter={(value) => <span style={{ color: "#1a1a1a" }}>{value}</span>}
-                        payload={
-                          donutMonthData.length > 0
-                            ? undefined
-                            : [{ value: "No data", type: "square", color: "#2a2a2a" }]
-                        }
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
