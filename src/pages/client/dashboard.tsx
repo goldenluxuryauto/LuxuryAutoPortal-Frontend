@@ -1318,285 +1318,285 @@ export default function ClientDashboard() {
         </div>
 
         {/* ════════════════════════════════════════════════════════════════════
-            SECTION 6 — Donut Charts
+            SECTIONS 6-9 — 2-column layout:
+            LEFT  col: Donut charts (stacked) + NADA chart
+            RIGHT col: Payment History + Maintenance History
         ════════════════════════════════════════════════════════════════════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
 
-          {/* Full year donut */}
-          <Card className="border-border bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-foreground">
-                Total Car Owner Profit and Expenses — {selectedYear}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {totalsLoading || tripsLoading ? (
-                <div className="flex items-center justify-center h-52">
-                  <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
-                </div>
-              ) : donutYearData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={220}>
-                  <PieChart>
-                    <Pie
-                      data={donutYearData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={88}
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                      labelLine={false}
-                    >
-                      {donutYearData.map((_, i) => (
-                        <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 8 }}
-                      formatter={(val: number) => fmt(val)}
-                    />
-                    <Legend wrapperStyle={{ fontSize: 11 }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-52 text-muted-foreground">
-                  <AlertCircle className="w-6 h-6 mb-2 opacity-40" />
-                  <p className="text-sm">No data for {selectedYear}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* ── LEFT COLUMN ─────────────────────────────────────────────── */}
+          <div className="flex flex-col gap-6">
 
-          {/* Current month donut */}
-          <Card className="border-border bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-foreground">
-                {MONTHS_SHORT[currentMonth - 1]} {selectedYear} Car Owner Profit and Expenses
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {paymentsLoading || tripsLoading ? (
-                <div className="flex items-center justify-center h-52">
-                  <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
-                </div>
-              ) : donutMonthData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={220}>
-                  <PieChart>
-                    <Pie
-                      data={donutMonthData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={88}
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                      labelLine={false}
-                    >
-                      {donutMonthData.map((_, i) => (
-                        <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 8 }}
-                      formatter={(val: number) => fmt(val)}
-                    />
-                    <Legend wrapperStyle={{ fontSize: 11 }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-52 text-muted-foreground">
-                  <AlertCircle className="w-6 h-6 mb-2 opacity-40" />
-                  <p className="text-sm">No data for {MONTHS_SHORT[currentMonth - 1]} {selectedYear}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            {/* Donut charts — side by side within left column */}
+            <div className="grid grid-cols-2 gap-4">
 
-        </div>
-
-        {/* ════════════════════════════════════════════════════════════════════
-            SECTION 7 — NADA Change %
-        ════════════════════════════════════════════════════════════════════ */}
-        <Card className="border-border bg-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-foreground">
-              NADA Change % — {selectedYear}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            {nadaLoading ? (
-              <div className="flex items-center justify-center h-52">
-                <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
-              </div>
-            ) : hasNadaData ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <AreaChart
-                  data={nadaChartData}
-                  margin={{ top: 4, right: 12, left: 0, bottom: 0 }}
-                >
-                  <defs>
-                    <linearGradient id="nadaGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#EAEB80" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#EAEB80" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#888" }} />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: "#888" }}
-                    tickFormatter={(v) => fmt(v)}
-                  />
-                  <Tooltip
-                    contentStyle={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 8 }}
-                    labelStyle={{ color: "#ccc" }}
-                    formatter={(val: number | null) => (val !== null ? fmt(val) : "N/A")}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Area
-                    type="monotone"
-                    dataKey="retail"
-                    name="Retail Value"
-                    stroke={CHART_GOLD}
-                    strokeWidth={2}
-                    fill="url(#nadaGradient)"
-                    connectNulls
-                    dot={{ r: 3, fill: CHART_GOLD }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-52 text-muted-foreground">
-                <AlertCircle className="w-8 h-8 mb-2 opacity-40" />
-                <p className="text-sm">No NADA depreciation data for {selectedYear}</p>
-                {activeCar?.id && (
-                  <Link href={`/admin/cars/${activeCar.id}/depreciation`} className="text-xs text-[#EAEB80] hover:underline mt-1">
-                    View NADA Depreciation Schedule →
-                  </Link>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* ════════════════════════════════════════════════════════════════════
-            SECTIONS 8 & 9 — Payment History + Maintenance (side by side)
-        ════════════════════════════════════════════════════════════════════ */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-
-        {/* ── SECTION 8 — Payment History ────────────────────────────────── */}
-        <Card className="border-border bg-card overflow-hidden">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-[#EAEB80]" />
-              Payment History
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 overflow-x-auto p-0">
-            {paymentsLoading ? (
-              <div className="flex items-center justify-center h-24">
-                <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
-              </div>
-            ) : payments.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow style={{ backgroundColor: "#1a1a1a" }} className="">
-                    <TableHead className="text-white font-semibold text-xs py-3">Month</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3 text-right">Car Owner Split</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3 text-right">Amount Paid</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3 text-right">Balance</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3">Payment Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {payments.map((p) => (
-                    <TableRow key={p.payments_aid} className="border-border hover:bg-muted/30">
-                      <TableCell className="text-sm py-2 font-medium">
-                        {getMonthLabel(p.payments_year_month)}
-                      </TableCell>
-                      <TableCell className="text-sm py-2 text-right text-[#EAEB80]">
-                        {fmt(p.payments_amount_payout)}
-                      </TableCell>
-                      <TableCell className="text-sm py-2 text-right">
-                        {fmt(p.payments_amount)}
-                      </TableCell>
-                      <TableCell className="text-sm py-2 text-right">
-                        <span
-                          className={
-                            p.payments_amount_balance >= 0 ? "text-green-400" : "text-red-400"
+              {/* Full year donut */}
+              <Card className="border-border bg-card">
+                <CardHeader className="pb-1 pt-3 px-3">
+                  <CardTitle className="text-xs font-semibold text-foreground leading-tight">
+                    Total Car Owner Profit and Expenses
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 px-2 pb-3">
+                  {totalsLoading || tripsLoading ? (
+                    <div className="flex items-center justify-center h-44">
+                      <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
+                    </div>
+                  ) : donutYearData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={180}>
+                      <PieChart>
+                        <Pie
+                          data={donutYearData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={48}
+                          outerRadius={70}
+                          dataKey="value"
+                          label={({ name, percent, value }) =>
+                            `${name}\n${(percent * 100).toFixed(1)}%`
                           }
+                          labelLine={true}
                         >
-                          {fmt(p.payments_amount_balance)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-sm py-2 text-muted-foreground">
-                        {p.payments_invoice_date ?? "—"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-24 text-muted-foreground">
-                <AlertCircle className="w-6 h-6 mb-2 opacity-40" />
-                <p className="text-sm">No payment records found</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                          {donutYearData.map((_, i) => (
+                            <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 8 }}
+                          formatter={(val: number) => fmt(val)}
+                        />
+                        <Legend wrapperStyle={{ fontSize: 10 }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-44 text-muted-foreground">
+                      <AlertCircle className="w-5 h-5 mb-1 opacity-40" />
+                      <p className="text-xs">No data for {selectedYear}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
-        {/* ── SECTION 9 — Maintenance History ────────────────────────────── */}
-        <Card className="border-border bg-card overflow-hidden">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <Wrench className="w-4 h-4 text-[#EAEB80]" />
-              Maintenance History
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 overflow-x-auto p-0">
-            {maintenanceLoading ? (
-              <div className="flex items-center justify-center h-24">
-                <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
-              </div>
-            ) : maintenanceRecords.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow style={{ backgroundColor: "#1a1a1a" }} className="">
-                    <TableHead className="text-white font-semibold text-xs py-3">Maintenance</TableHead>
-                    <TableHead className="text-white font-semibold text-xs py-3">Date Completed</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {maintenanceRecords.map((record, i) => (
-                    <TableRow key={i} className="border-border hover:bg-muted/30">
-                      <TableCell className="text-sm py-2">
-                        {record.maintenanceType ?? record.type ?? "—"}
-                      </TableCell>
-                      <TableCell className="text-sm py-2 text-muted-foreground">
-                        {record.dateCompleted ?? record.date_completed ?? "—"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-24 text-muted-foreground">
-                <AlertCircle className="w-6 h-6 mb-2 opacity-40" />
-                <p className="text-sm">No maintenance records found</p>
-                {activeCar?.id && (
-                  <Link href={`/admin/cars/${activeCar.id}/maintenance`} className="text-xs text-[#EAEB80] hover:underline mt-1">
-                    View full maintenance page →
-                  </Link>
+              {/* Current month donut */}
+              <Card className="border-border bg-card">
+                <CardHeader className="pb-1 pt-3 px-3">
+                  <CardTitle className="text-xs font-semibold text-foreground leading-tight">
+                    {MONTHS_SHORT[currentMonth - 1]} {selectedYear} Car Owner Profit and Expenses
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 px-2 pb-3">
+                  {paymentsLoading || tripsLoading ? (
+                    <div className="flex items-center justify-center h-44">
+                      <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
+                    </div>
+                  ) : donutMonthData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={180}>
+                      <PieChart>
+                        <Pie
+                          data={donutMonthData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={48}
+                          outerRadius={70}
+                          dataKey="value"
+                          label={({ name, percent, value }) =>
+                            `${name}\n${(percent * 100).toFixed(1)}%`
+                          }
+                          labelLine={true}
+                        >
+                          {donutMonthData.map((_, i) => (
+                            <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 8 }}
+                          formatter={(val: number) => fmt(val)}
+                        />
+                        <Legend wrapperStyle={{ fontSize: 10 }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-44 text-muted-foreground">
+                      <AlertCircle className="w-5 h-5 mb-1 opacity-40" />
+                      <p className="text-xs">No data for {MONTHS_SHORT[currentMonth - 1]} {selectedYear}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* NADA Change % chart */}
+            <Card className="border-border bg-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold text-foreground uppercase tracking-wide" style={{ color: "#EAEB80" }}>
+                  NADA Change %
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {nadaLoading ? (
+                  <div className="flex items-center justify-center h-52">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
+                  </div>
+                ) : hasNadaData ? (
+                  <ResponsiveContainer width="100%" height={240}>
+                    <AreaChart
+                      data={nadaChartData}
+                      margin={{ top: 4, right: 12, left: 0, bottom: 0 }}
+                    >
+                      <defs>
+                        <linearGradient id="nadaGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#EAEB80" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#EAEB80" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#888" }} />
+                      <YAxis
+                        tick={{ fontSize: 11, fill: "#888" }}
+                        tickFormatter={(v) => fmt(v)}
+                      />
+                      <Tooltip
+                        contentStyle={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 8 }}
+                        labelStyle={{ color: "#ccc" }}
+                        formatter={(val: number | null) => (val !== null ? fmt(val) : "N/A")}
+                      />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
+                      <Area
+                        type="monotone"
+                        dataKey="retail"
+                        name="Retail Value"
+                        stroke={CHART_GOLD}
+                        strokeWidth={2}
+                        fill="url(#nadaGradient)"
+                        connectNulls
+                        dot={{ r: 3, fill: CHART_GOLD }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-52 text-muted-foreground">
+                    <AlertCircle className="w-8 h-8 mb-2 opacity-40" />
+                    <p className="text-sm">No NADA depreciation data for {selectedYear}</p>
+                    {activeCar?.id && (
+                      <Link href={`/admin/cars/${activeCar.id}/depreciation`} className="text-xs text-[#EAEB80] hover:underline mt-1">
+                        View NADA Depreciation Schedule →
+                      </Link>
+                    )}
+                  </div>
                 )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </div>{/* end left column */}
 
-        </div>{/* end sections 8&9 grid */}
+          {/* ── RIGHT COLUMN ────────────────────────────────────────────── */}
+          <div className="flex flex-col gap-6">
+
+            {/* SECTION 8 — Payment History */}
+            <Card className="border-border bg-card overflow-hidden">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-bold uppercase text-foreground tracking-wide">
+                  Payment History
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0 overflow-x-auto p-0">
+                {paymentsLoading ? (
+                  <div className="flex items-center justify-center h-24">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
+                  </div>
+                ) : payments.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow style={{ backgroundColor: "#1a1a1a" }}>
+                        <TableHead className="text-white font-semibold text-xs py-3">Month</TableHead>
+                        <TableHead className="text-white font-semibold text-xs py-3 text-right">Car Owner Split</TableHead>
+                        <TableHead className="text-white font-semibold text-xs py-3 text-right">Amount Paid</TableHead>
+                        <TableHead className="text-white font-semibold text-xs py-3 text-right">Balance</TableHead>
+                        <TableHead className="text-white font-semibold text-xs py-3">Payment Date</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {payments.map((p) => (
+                        <TableRow key={p.payments_aid} className="border-border hover:bg-muted/30">
+                          <TableCell className="text-sm py-2 font-medium">
+                            {getMonthLabel(p.payments_year_month)}
+                          </TableCell>
+                          <TableCell className="text-sm py-2 text-right text-[#EAEB80]">
+                            {fmt(p.payments_amount_payout)}
+                          </TableCell>
+                          <TableCell className="text-sm py-2 text-right">
+                            {fmt(p.payments_amount)}
+                          </TableCell>
+                          <TableCell className="text-sm py-2 text-right">
+                            <span className={p.payments_amount_balance >= 0 ? "text-green-400" : "text-red-400"}>
+                              {fmt(p.payments_amount_balance)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-sm py-2 text-muted-foreground">
+                            {p.payments_invoice_date ?? "—"}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-24 text-muted-foreground">
+                    <AlertCircle className="w-6 h-6 mb-2 opacity-40" />
+                    <p className="text-sm">No payment records found</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* SECTION 9 — Maintenance History */}
+            <Card className="border-border bg-card overflow-hidden">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-bold uppercase text-foreground tracking-wide">
+                  Maintenance History
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0 overflow-x-auto p-0">
+                {maintenanceLoading ? (
+                  <div className="flex items-center justify-center h-24">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
+                  </div>
+                ) : maintenanceRecords.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow style={{ backgroundColor: "#1a1a1a" }}>
+                        <TableHead className="text-white font-semibold text-xs py-3">Maintenance</TableHead>
+                        <TableHead className="text-white font-semibold text-xs py-3">Date Completed</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {maintenanceRecords.map((record, i) => (
+                        <TableRow key={i} className="border-border hover:bg-muted/30">
+                          <TableCell className="text-sm py-2">
+                            {record.maintenanceType ?? record.type ?? "—"}
+                          </TableCell>
+                          <TableCell className="text-sm py-2 text-muted-foreground">
+                            {record.dateCompleted ?? record.date_completed ?? "—"}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-24 text-muted-foreground">
+                    <AlertCircle className="w-6 h-6 mb-2 opacity-40" />
+                    <p className="text-sm">No maintenance records found</p>
+                    {activeCar?.id && (
+                      <Link href={`/admin/cars/${activeCar.id}/maintenance`} className="text-xs text-[#EAEB80] hover:underline mt-1">
+                        View full maintenance page →
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+          </div>{/* end right column */}
+
+        </div>{/* end sections 6-9 grid */}
 
         {/* ════════════════════════════════════════════════════════════════════
             SECTION 10 — Report Center
