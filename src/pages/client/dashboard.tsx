@@ -1136,7 +1136,7 @@ export default function ClientDashboard() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
 
         {/* ── SECTION 3 — Income and Expenses table ────────────────────── */}
-        <div className="overflow-hidden rounded-md border border-border">
+        <div className="overflow-hidden rounded-lg border border-border">
           <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
             <colgroup>
               <col style={{ width: "108px" }} />
@@ -1178,7 +1178,7 @@ export default function ClientDashboard() {
         </div>{/* end section 3 */}
 
         {/* ── SECTION 4 — Days Rented and Trips Taken table ──────────────── */}
-        <div className="overflow-hidden rounded-md border border-border">
+        <div className="overflow-hidden rounded-lg border border-border">
           <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
             <colgroup>
               <col style={{ width: "108px" }} />
