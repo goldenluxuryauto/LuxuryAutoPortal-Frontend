@@ -675,7 +675,7 @@ export default function ClientDashboard() {
           <Card className="border-border bg-card overflow-hidden h-full">
             <div className="flex flex-col h-full">
               {/* Main photo */}
-              <div className="relative flex-1 bg-muted/20 flex items-center justify-center" style={{ minHeight: "200px" }}>
+              <div className="relative flex-1 bg-muted/20 flex items-center justify-center" style={{ minHeight: "300px" }}>
                 {activePhoto ? (
                   <img
                     src={getProxiedImageUrl(activePhoto)}
@@ -724,11 +724,11 @@ export default function ClientDashboard() {
 
           {/* Monthly Update Video */}
           <Card className="border-border bg-card overflow-hidden h-full">
-            <div className="relative w-full h-full flex flex-col" style={{ minHeight: "240px", background: "#1a1a1a" }}>
+            <div className="relative w-full h-full flex flex-col" style={{ minHeight: "300px", background: "#1a1a1a" }}>
               {/* YouTube embed — temporal public video */}
               <iframe
                 className="w-full flex-1"
-                style={{ minHeight: "240px" }}
+                style={{ minHeight: "300px" }}
                 src="https://www.youtube.com/embed/W86cTIoMv2U?rel=0&modestbranding=1"
                 title="Golden Luxury Auto Monthly Update"
                 frameBorder="0"
