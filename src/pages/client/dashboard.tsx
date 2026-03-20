@@ -176,10 +176,16 @@ interface NadaDepreciation {
 
 const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const CHART_GOLD  = "#EAEB80";   // bright yellow-gold  — Income / Days Rented
-const CHART_GOLD2 = "#F59E0B";   // amber/orange-gold   — Profit / Trips Taken (clearly distinct from yellow)
-const CHART_RED   = "#EF4444";   // red                 — Expenses (semantically clear, high contrast)
+const CHART_GOLD2 = "#F59E0B";   // amber/orange-gold   — Profit / Trips Taken
+const CHART_RED   = "#EF4444";   // red                 — Expenses
 const CHART_DARK  = "#2a2a2a";
 const PIE_COLORS  = [CHART_GOLD, CHART_RED];
+
+// Shared chart theme constants
+const CHART_TOOLTIP_STYLE = { background: "#1a1a1a", border: "1px solid #444", borderRadius: 6 };
+const CHART_LEGEND_STYLE  = { fontSize: 11, paddingTop: 6 };
+const CHART_AXIS_TICK     = { fontSize: 10, fill: "#999" };
+const CHART_GRID_COLOR    = "#2d2d2d";
 
 function fmt(val: number | string | null | undefined): string {
   const n = parseFloat(String(val ?? 0)) || 0;
@@ -1210,7 +1216,7 @@ export default function ClientDashboard() {
         ════════════════════════════════════════════════════════════════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          {/* Line Chart: Income, Profit, Expenses — side by side with Days/Trips */}
+          {/* Line Chart: Income, Profit, Expenses */}
           <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-semibold text-foreground">
@@ -1222,43 +1228,41 @@ export default function ClientDashboard() {
                 <div className="flex items-center justify-center h-56">
                   <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                 </div>
-              ) : monthlyTripData.some((d) => d.income > 0 || d.expenses > 0) ? (
+              ) : (
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart
                     data={monthlyTripData}
-                    margin={{ top: 4, right: 16, left: 0, bottom: 48 }}
+                    margin={{ top: 8, right: 16, left: 0, bottom: 48 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} vertical={false} />
                     <XAxis
                       dataKey="month"
-                      tick={{ fontSize: 10, fill: "#aaa" }}
+                      tick={CHART_AXIS_TICK}
                       angle={-45}
                       textAnchor="end"
                       interval={0}
                       height={60}
+                      axisLine={{ stroke: "#444" }}
+                      tickLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: "#888" }}
+                      tick={CHART_AXIS_TICK}
                       tickFormatter={(v) => `$${(v / 1000).toFixed(1)}k`}
                       axisLine={false}
                       tickLine={false}
+                      width={48}
                     />
                     <Tooltip
-                      contentStyle={{ background: "#1a1a1a", border: "1px solid #444", borderRadius: 8 }}
+                      contentStyle={CHART_TOOLTIP_STYLE}
                       labelStyle={{ color: "#eee", fontWeight: 600 }}
                       formatter={(val: number, name: string) => [fmt(val), name]}
                     />
-                    <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} iconType="line" />
+                    <Legend wrapperStyle={CHART_LEGEND_STYLE} iconType="line" />
                     <Line type="monotone" dataKey="income"   name="Car Owner Rental Income" stroke={CHART_GOLD}  strokeWidth={2} dot={{ r: 3, fill: CHART_GOLD }}  activeDot={{ r: 5 }} />
                     <Line type="monotone" dataKey="profit"   name="Car Owner Profit"        stroke={CHART_GOLD2} strokeWidth={2} dot={{ r: 3, fill: CHART_GOLD2 }} activeDot={{ r: 5 }} />
                     <Line type="monotone" dataKey="expenses" name="Car Owner Expenses"      stroke={CHART_RED}   strokeWidth={2} dot={{ r: 3, fill: CHART_RED }}   activeDot={{ r: 5 }} />
                   </LineChart>
                 </ResponsiveContainer>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-56 text-muted-foreground">
-                  <AlertCircle className="w-8 h-8 mb-2 opacity-40" />
-                  <p className="text-sm">No chart data for {selectedYear}</p>
-                </div>
               )}
             </CardContent>
           </Card>
@@ -1275,42 +1279,39 @@ export default function ClientDashboard() {
                 <div className="flex items-center justify-center h-56">
                   <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                 </div>
-              ) : monthlyDaysTripsData.some((d) => d.days > 0 || d.trips > 0) ? (
+              ) : (
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart
                     data={monthlyDaysTripsData}
-                    margin={{ top: 4, right: 16, left: -20, bottom: 48 }}
-                    barCategoryGap="20%"
+                    margin={{ top: 8, right: 16, left: -20, bottom: 48 }}
+                    barCategoryGap="25%"
                     barGap={2}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} vertical={false} />
                     <XAxis
                       dataKey="month"
-                      tick={{ fontSize: 10, fill: "#aaa" }}
+                      tick={CHART_AXIS_TICK}
                       angle={-45}
                       textAnchor="end"
                       interval={0}
                       height={60}
+                      axisLine={{ stroke: "#444" }}
+                      tickLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: "#888" }}
+                      tick={CHART_AXIS_TICK}
                       axisLine={false}
                       tickLine={false}
                     />
                     <Tooltip
-                      contentStyle={{ background: "#1a1a1a", border: "1px solid #444", borderRadius: 8 }}
+                      contentStyle={CHART_TOOLTIP_STYLE}
                       labelStyle={{ color: "#eee", fontWeight: 600 }}
                     />
-                    <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} iconType="square" />
+                    <Legend wrapperStyle={CHART_LEGEND_STYLE} iconType="square" />
                     <Bar dataKey="days"  name="Days Rented" fill={CHART_GOLD}  radius={[2, 2, 0, 0]} />
                     <Bar dataKey="trips" name="Trips Taken" fill={CHART_GOLD2} radius={[2, 2, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-56 text-muted-foreground">
-                  <AlertCircle className="w-8 h-8 mb-2 opacity-40" />
-                  <p className="text-sm">No trip data for {selectedYearTrips}</p>
-                </div>
               )}
             </CardContent>
           </Card>
@@ -1342,37 +1343,36 @@ export default function ClientDashboard() {
                     <div className="flex items-center justify-center h-44">
                       <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                     </div>
-                  ) : donutYearData.length > 0 ? (
+                  ) : (
                     <ResponsiveContainer width="100%" height={180}>
                       <PieChart>
                         <Pie
-                          data={donutYearData}
+                          data={donutYearData.length > 0 ? donutYearData : [{ name: "No data", value: 1 }]}
                           cx="50%"
                           cy="50%"
                           innerRadius={48}
                           outerRadius={70}
                           dataKey="value"
-                          label={({ name, percent, value }) =>
-                            `${name}\n${(percent * 100).toFixed(1)}%`
+                          label={donutYearData.length > 0
+                            ? ({ name, percent }) => `${name} ${(percent * 100).toFixed(1)}%`
+                            : false
                           }
-                          labelLine={true}
+                          labelLine={donutYearData.length > 0}
                         >
-                          {donutYearData.map((_, i) => (
-                            <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                          ))}
+                          {donutYearData.length > 0
+                            ? donutYearData.map((_, i) => (
+                                <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                              ))
+                            : <Cell fill="#2a2a2a" stroke="#444" strokeWidth={1} strokeDasharray="4 4" />
+                          }
                         </Pie>
                         <Tooltip
-                          contentStyle={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 8 }}
-                          formatter={(val: number) => fmt(val)}
+                          contentStyle={CHART_TOOLTIP_STYLE}
+                          formatter={(val: number) => donutYearData.length > 0 ? fmt(val) : "—"}
                         />
                         <Legend wrapperStyle={{ fontSize: 10 }} />
                       </PieChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-44 text-muted-foreground">
-                      <AlertCircle className="w-5 h-5 mb-1 opacity-40" />
-                      <p className="text-xs">No data for {selectedYear}</p>
-                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -1389,37 +1389,36 @@ export default function ClientDashboard() {
                     <div className="flex items-center justify-center h-44">
                       <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                     </div>
-                  ) : donutMonthData.length > 0 ? (
+                  ) : (
                     <ResponsiveContainer width="100%" height={180}>
                       <PieChart>
                         <Pie
-                          data={donutMonthData}
+                          data={donutMonthData.length > 0 ? donutMonthData : [{ name: "No data", value: 1 }]}
                           cx="50%"
                           cy="50%"
                           innerRadius={48}
                           outerRadius={70}
                           dataKey="value"
-                          label={({ name, percent, value }) =>
-                            `${name}\n${(percent * 100).toFixed(1)}%`
+                          label={donutMonthData.length > 0
+                            ? ({ name, percent }) => `${name} ${(percent * 100).toFixed(1)}%`
+                            : false
                           }
-                          labelLine={true}
+                          labelLine={donutMonthData.length > 0}
                         >
-                          {donutMonthData.map((_, i) => (
-                            <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                          ))}
+                          {donutMonthData.length > 0
+                            ? donutMonthData.map((_, i) => (
+                                <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                              ))
+                            : <Cell fill="#2a2a2a" stroke="#444" strokeWidth={1} strokeDasharray="4 4" />
+                          }
                         </Pie>
                         <Tooltip
-                          contentStyle={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 8 }}
-                          formatter={(val: number) => fmt(val)}
+                          contentStyle={CHART_TOOLTIP_STYLE}
+                          formatter={(val: number) => donutMonthData.length > 0 ? fmt(val) : "—"}
                         />
                         <Legend wrapperStyle={{ fontSize: 10 }} />
                       </PieChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-44 text-muted-foreground">
-                      <AlertCircle className="w-5 h-5 mb-1 opacity-40" />
-                      <p className="text-xs">No data for {MONTHS_SHORT[currentMonth - 1]} {selectedYear}</p>
-                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -1437,30 +1436,33 @@ export default function ClientDashboard() {
                   <div className="flex items-center justify-center h-52">
                     <Loader2 className="w-5 h-5 animate-spin text-[#EAEB80]" />
                   </div>
-                ) : hasNadaData ? (
+                ) : (
                   <ResponsiveContainer width="100%" height={240}>
                     <AreaChart
                       data={nadaChartData}
-                      margin={{ top: 4, right: 12, left: 0, bottom: 0 }}
+                      margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
                     >
                       <defs>
                         <linearGradient id="nadaGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#EAEB80" stopOpacity={0.3} />
+                          <stop offset="5%" stopColor="#EAEB80" stopOpacity={0.35} />
                           <stop offset="95%" stopColor="#EAEB80" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#888" }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+                      <XAxis dataKey="month" tick={CHART_AXIS_TICK} axisLine={{ stroke: "#444" }} tickLine={false} />
                       <YAxis
-                        tick={{ fontSize: 11, fill: "#888" }}
+                        tick={CHART_AXIS_TICK}
                         tickFormatter={(v) => fmt(v)}
+                        axisLine={false}
+                        tickLine={false}
+                        width={60}
                       />
                       <Tooltip
-                        contentStyle={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 8 }}
-                        labelStyle={{ color: "#ccc" }}
+                        contentStyle={CHART_TOOLTIP_STYLE}
+                        labelStyle={{ color: "#eee", fontWeight: 600 }}
                         formatter={(val: number | null) => (val !== null ? fmt(val) : "N/A")}
                       />
-                      <Legend wrapperStyle={{ fontSize: 11 }} />
+                      <Legend wrapperStyle={CHART_LEGEND_STYLE} />
                       <Area
                         type="monotone"
                         dataKey="retail"
@@ -1470,19 +1472,10 @@ export default function ClientDashboard() {
                         fill="url(#nadaGradient)"
                         connectNulls
                         dot={{ r: 3, fill: CHART_GOLD }}
+                        activeDot={{ r: 5 }}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-52 text-muted-foreground">
-                    <AlertCircle className="w-8 h-8 mb-2 opacity-40" />
-                    <p className="text-sm">No NADA depreciation data for {selectedYear}</p>
-                    {activeCar?.id && (
-                      <Link href={`/admin/cars/${activeCar.id}/depreciation`} className="text-xs text-[#EAEB80] hover:underline mt-1">
-                        View NADA Depreciation Schedule →
-                      </Link>
-                    )}
-                  </div>
                 )}
               </CardContent>
             </Card>
