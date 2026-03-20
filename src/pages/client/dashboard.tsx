@@ -87,6 +87,9 @@ interface ClientCar {
   fuelType: string | null;
   registrationExpiration: string | null;
   photo?: string | null;
+  manufacturerWebsite?: string | null;
+  manufacturerUsername?: string | null;
+  turoPassword?: string | null;
 }
 
 interface ClientProfile {
@@ -730,25 +733,25 @@ export default function ClientDashboard() {
                     Vehicle Information
                   </h3>
                   {activeCar ? (
-                    <div className="space-y-1.5">
-                      {[
-                        { label: "Car Name", value: `${activeCar.year ?? ""} ${activeCar.makeModel}`.trim() },
-                        { label: "VIN #", value: activeCar.vin },
-                        { label: "License", value: activeCar.licensePlate },
-                        { label: "Fuel/Gas", value: activeCar.fuelType },
-                        { label: "Tire Size", value: activeCar.tireSize ?? "No Data" },
-                        { label: "Oil Type", value: activeCar.oilType ?? "No Data" },
-                        { label: "Current Miles", value: activeCar.mileage ? activeCar.mileage.toLocaleString() : null },
-                        { label: "Last Oil Change", value: activeCar.lastOilChange },
-                        { label: "Lic./Reg. Date", value: activeCar.registrationExpiration },
-                      ]
-                        .filter((f) => f.value)
-                        .map((f) => (
-                          <div key={f.label} className="flex gap-1">
-                            <span className="font-bold text-foreground flex-shrink-0 min-w-[100px] text-sm">{f.label}:</span>
-                            <span className="text-sm text-foreground">{f.value}</span>
-                          </div>
-                        ))}
+                    <div className="text-sm space-y-3">
+                      {/* Group 1: Identification */}
+                      <div className="space-y-1">
+                        <p><span className="font-bold">Car Name</span> :{`${activeCar.year ?? ""} ${activeCar.makeModel}`.trim()}</p>
+                        {activeCar.vin && <p><span className="font-bold">VIN #</span> :{activeCar.vin}</p>}
+                        {activeCar.licensePlate && <p><span className="font-bold">Liscense</span> :{activeCar.licensePlate}</p>}
+                      </div>
+                      {/* Group 2: Specs */}
+                      <div className="space-y-1">
+                        <p><span className="font-bold">Fuel/Gas</span> :{activeCar.fuelType || "No Data"}</p>
+                        <p><span className="font-bold">Tire Size</span> :{activeCar.tireSize || "No Data"}</p>
+                        <p><span className="font-bold">Oil Type</span> :{activeCar.oilType || "No Data"}</p>
+                      </div>
+                      {/* Group 3: Service */}
+                      <div className="space-y-1">
+                        {activeCar.mileage != null && <p><span className="font-bold">Current Miles:</span> {activeCar.mileage.toLocaleString()}</p>}
+                        {activeCar.lastOilChange && <p><span className="font-bold">Last Oil Change</span> : {activeCar.lastOilChange}</p>}
+                        {activeCar.registrationExpiration && <p><span className="font-bold">Lic./Reg. Date</span>: {activeCar.registrationExpiration}</p>}
+                      </div>
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground">No vehicle on file.</p>
@@ -770,27 +773,73 @@ export default function ClientDashboard() {
                     {ownerEmail && (
                       <p><span className="font-bold text-foreground">Email</span> :{ownerEmail}</p>
                     )}
-                    {manufacturerUrl && (
+
+                    {/* Manufacturer URL */}
+                    {(manufacturerUrl || activeCar?.manufacturerWebsite) && (
                       <div className="pt-1">
-                        <p className="font-bold text-foreground text-sm">Manufacturer URL:</p>
-                        <a href={manufacturerUrl} target="_blank" rel="noopener noreferrer"
-                          className="text-sm text-foreground underline hover:text-[#EAEB80]">
-                          {manufacturerUrl.replace(/^https?:\/\//, "")}
+                        <span className="font-bold text-foreground">Manufacturer URL</span>
+                        {": "}
+                        <a href={manufacturerUrl || activeCar?.manufacturerWebsite || "#"}
+                          target="_blank" rel="noopener noreferrer"
+                          className="text-foreground underline hover:text-[#EAEB80]">
+                          {(manufacturerUrl || activeCar?.manufacturerWebsite || "").replace(/^https?:\/\//, "")}
                         </a>
                       </div>
                     )}
+
+                    {/* Username */}
+                    {activeCar?.manufacturerUsername && (
+                      <p><span className="font-bold text-foreground">Username</span>: {activeCar.manufacturerUsername}</p>
+                    )}
+
+                    {/* Password */}
+                    {activeCar?.turoPassword && (
+                      <p><span className="font-bold text-foreground">Password</span>: {activeCar.turoPassword}</p>
+                    )}
+
+                    {/* Turo Link */}
                     {turoViewLink && (
                       <div className="pt-1">
-                        <p>
-                          <span className="font-bold text-foreground">Turo Link</span>
-                          {" :"}
-                          <a href={turoViewLink} target="_blank" rel="noopener noreferrer"
-                            className="text-foreground underline hover:text-[#EAEB80] ml-1">
-                            View Car
-                          </a>
-                        </p>
+                        <span className="font-bold text-foreground">Turo Link</span>
+                        {" :"}
+                        <a href={turoViewLink} target="_blank" rel="noopener noreferrer"
+                          className="text-foreground underline hover:text-[#EAEB80] ml-1">
+                          View Car
+                        </a>
                       </div>
                     )}
+
+                    {/* Book Your Car */}
+                    <div className="flex items-center gap-1 pt-0.5">
+                      <span className="font-bold text-foreground">Book Your Car</span>
+                      {" :"}
+                      <a href="https://turo.com" target="_blank" rel="noopener noreferrer"
+                        className="ml-1 text-foreground hover:text-[#EAEB80]" title="Book on Turo">
+                        <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <rect x="3" y="3" width="7" height="7" rx="1"/>
+                          <rect x="14" y="3" width="7" height="7" rx="1"/>
+                          <rect x="3" y="14" width="7" height="7" rx="1"/>
+                          <rect x="14" y="14" width="3" height="3" rx="0.5" fill="currentColor"/>
+                          <rect x="18" y="14" width="3" height="3" rx="0.5" fill="currentColor"/>
+                          <rect x="14" y="18" width="3" height="3" rx="0.5" fill="currentColor"/>
+                          <rect x="18" y="18" width="3" height="3" rx="0.5" fill="currentColor"/>
+                        </svg>
+                      </a>
+                    </div>
+
+                    {/* Schedule a Zoom call */}
+                    <div className="flex items-center gap-1 pt-0.5">
+                      <span className="font-bold text-foreground">Schedule a Zoom call</span>
+                      {" "}
+                      <a href="https://calendly.com/goldenluxuryauto" target="_blank" rel="noopener noreferrer"
+                        className="text-foreground hover:text-[#EAEB80]" title="Schedule a Zoom call">
+                        <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/>
+                          <circle cx="17" cy="7" r="4"/>
+                          <path d="M15 7h4M17 5v4"/>
+                        </svg>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
