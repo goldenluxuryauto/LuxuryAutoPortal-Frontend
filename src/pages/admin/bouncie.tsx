@@ -33,6 +33,12 @@ interface VehicleEntry {
   car_photo_url: string | null;
   vin: string | null;
   displayStatus: string;
+  // Canonical resolved coords — backend already applied live-API → DB fallback.
+  // Use these instead of manually writing `liveStatus?.latitude ?? last_latitude`.
+  latitude: number | null;
+  longitude: number | null;
+  speed: number;
+  last_seen_resolved: string | null;
   liveStatus: {
     isRunning: boolean;
     speed: number;
@@ -171,10 +177,10 @@ function VehicleAvatar({
 /* ─── Vehicle Detail Panel ───────────────────────────────────────── */
 function VehicleDetailPanel({ v, onClose }: { v: VehicleEntry; onClose: () => void }) {
   const si = getStatusInfo(v.displayStatus);
-  const speed = Number(v.liveStatus?.speed ?? v.last_speed_mph ?? 0);
-  const lat = v.liveStatus?.latitude ?? v.last_latitude;
-  const lng = v.liveStatus?.longitude ?? v.last_longitude;
-  const lastSeen = formatLastSeen(v.liveStatus?.lastSeen || v.last_seen);
+  const speed = Number(v.speed ?? 0);
+  const lat = v.latitude;
+  const lng = v.longitude;
+  const lastSeen = formatLastSeen(v.last_seen_resolved ?? v.last_seen);
   const odometer = v.liveStatus?.odometer ?? v.odometer_miles;
   const fuelLevel = v.liveStatus?.fuelLevel;
   const plate = v.license_plate;
@@ -302,11 +308,9 @@ function FleetMap({
 
   useEffect(() => { onSelectRef.current = onSelect; });
 
-  const withCoords = useMemo(() => vehicles.filter(v => {
-    const lat = v.liveStatus?.latitude ?? v.last_latitude;
-    const lng = v.liveStatus?.longitude ?? v.last_longitude;
-    return lat != null && lng != null;
-  }), [vehicles]);
+  const withCoords = useMemo(() => vehicles.filter(v =>
+    v.latitude != null && v.longitude != null
+  ), [vehicles]);
 
   const buildIcon = useCallback((L: any, v: VehicleEntry, selected: boolean) => {
     const si = getStatusInfo(v.displayStatus);
@@ -339,7 +343,7 @@ function FleetMap({
   const buildLabel = useCallback((v: VehicleEntry) => {
     const name  = vehicleDisplayName(v);
     const short = name.length > 22 ? name.slice(0, 20) + "…" : name;
-    const speed = v.liveStatus?.speed ?? v.last_speed_mph ?? 0;
+    const speed = v.speed ?? 0;
     const mph   = v.displayStatus === "driving" && Number(speed) > 0
       ? ` <b style="color:#4ade80">${Number(speed).toFixed(0)} mph</b>` : "";
     return `<div style="background:rgba(15,23,42,0.88);backdrop-filter:blur(6px);
@@ -411,9 +415,9 @@ function FleetMap({
     const existing = new Set(Object.keys(markerMap.current));
 
     withCoords.forEach(v => {
-      const lat = (v.liveStatus?.latitude ?? v.last_latitude) as number;
-      const lng = (v.liveStatus?.longitude ?? v.last_longitude) as number;
-      const speed = Number(v.liveStatus?.speed ?? v.last_speed_mph ?? 0);
+      const lat = v.latitude as number;
+      const lng = v.longitude as number;
+      const speed = Number(v.speed ?? 0);
       const stateKey = `${v.displayStatus}|${v.car_photo_url || ""}|${speed.toFixed(0)}`;
 
       if (markerMap.current[v.device_id]) {
