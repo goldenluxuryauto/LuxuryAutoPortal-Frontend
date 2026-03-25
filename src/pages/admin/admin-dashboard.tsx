@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { SectionHeader } from "@/components/admin/dashboard";
 import IncomeExpensesSection from "@/components/admin/dashboard/IncomeExpensesSection";
+import AirportParkingSection from "@/components/admin/dashboard/AirportParkingSection";
 
 const SECTIONS = [
-  "AIRPORT PARKING & TRIPS",
   "COMMISSIONS",
   "OPERATIONS — PICK UP AND DROP OFF",
   "TURO MESSAGES INSPECTIONS",
@@ -51,6 +51,9 @@ export default function AdminDashboardPage() {
 
         {/* Section 1: Income and Expenses — Phase 2 */}
         <IncomeExpensesSection year={year} onYearChange={setYear} />
+
+        {/* Section 2: Airport Parking & Trips — Phase 3 */}
+        <AirportParkingSection year={year} />
 
         {/* Remaining sections — placeholders */}
         {SECTIONS.map((section) => (
