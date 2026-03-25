@@ -38,13 +38,41 @@ export default function AdminDashboardPage() {
     <AdminLayout>
       <div className="min-h-screen bg-background">
         {/* Brand Header */}
-        <div className="mb-8 bg-black px-4 py-6 text-center">
-          <div className="mx-auto mb-2 h-[1px] w-48 bg-[#FFD700]" />
-          <h1 className="text-2xl font-bold uppercase tracking-widest text-[#FFD700]">
-            Golden Luxury Auto
-          </h1>
-          <div className="mx-auto mt-2 h-[1px] w-48 bg-[#FFD700]" />
-          <p className="mt-3 text-sm uppercase tracking-wide text-white/70">
+        <div className="mb-8 bg-black px-6 py-6">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6">
+            {/* Left — Logo */}
+            <div className="flex flex-col items-center gap-1">
+              <img
+                src="/logo.png"
+                alt="Golden Luxury Auto"
+                className="h-20 object-contain"
+              />
+            </div>
+
+            {/* Center — Hero Fleet Image */}
+            <div className="hidden flex-1 justify-center md:flex">
+              <div className="overflow-hidden rounded-lg">
+                <img
+                  src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                  alt="Golden Luxury Auto Fleet"
+                  className="h-28 w-72 object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Right — Monthly Update Badge */}
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-center font-serif text-sm italic text-[#FFD700]">
+                Golden Luxury Auto
+              </p>
+              <p className="text-center text-lg font-bold uppercase tracking-wide text-[#FFD700]">
+                Monthly Update!!!
+              </p>
+            </div>
+          </div>
+
+          {/* Subtitle */}
+          <p className="mt-4 text-center text-sm uppercase tracking-widest text-white/70">
             Admin Dashboard
           </p>
         </div>
