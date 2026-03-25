@@ -18,9 +18,9 @@ function PlaceholderSection({ title }: { title: string }) {
   return (
     <div className="mb-8">
       <SectionHeader title={title} />
-      <div className="mt-2 rounded-md bg-[#111111] px-6 py-8 text-center">
-        <p className="text-sm font-semibold uppercase tracking-wide text-[#FFD700]">
-          Phase 2 — Coming Soon
+      <div className="mt-2 rounded-md border border-gray-200 bg-white px-6 py-8 text-center">
+        <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">
+          Coming Soon
         </p>
       </div>
     </div>
@@ -36,9 +36,9 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-background">
         {/* Brand Header */}
-        <div className="mb-8 px-4 py-6 text-center">
+        <div className="mb-8 bg-black px-4 py-6 text-center">
           <div className="mx-auto mb-2 h-[1px] w-48 bg-[#FFD700]" />
           <h1 className="text-2xl font-bold uppercase tracking-widest text-[#FFD700]">
             Golden Luxury Auto
