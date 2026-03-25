@@ -90,6 +90,7 @@ import StaffCarRentalForms from "@/pages/staff/car-rental-forms";
 import StaffCarRentalFormSubmit from "@/pages/staff/car-rental-form-submit";
 import TuroTripsPage from "@/pages/admin/turo-trips";
 import AdminTestimonialsPage from "@/pages/admin/testimonials";
+import AdminDashboardPage from "@/pages/admin/admin-dashboard";
 
 function Router() {
   return (
@@ -174,6 +175,7 @@ function Router() {
       <Route path="/admin/turo-trips" component={TuroTripsPage} />
       <Route path="/admin/testimonials" component={AdminTestimonialsPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
+      <Route path="/admin/admin-dashboard" component={AdminDashboardPage} />
       <Route component={NotFound} />
     </Switch>
   );
