@@ -3,9 +3,9 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { SectionHeader } from "@/components/admin/dashboard";
 import IncomeExpensesSection from "@/components/admin/dashboard/IncomeExpensesSection";
 import AirportParkingSection from "@/components/admin/dashboard/AirportParkingSection";
+import CommissionsSection from "@/components/admin/dashboard/CommissionsSection";
 
 const SECTIONS = [
-  "COMMISSIONS",
   "OPERATIONS — PICK UP AND DROP OFF",
   "TURO MESSAGES INSPECTIONS",
   "CAR ISSUES / INSPECTIONS",
@@ -54,6 +54,9 @@ export default function AdminDashboardPage() {
 
         {/* Section 2: Airport Parking & Trips — Phase 3 */}
         <AirportParkingSection year={year} />
+
+        {/* Section 3: Commissions — Phase 4 */}
+        <CommissionsSection />
 
         {/* Remaining sections — placeholders */}
         {SECTIONS.map((section) => (
