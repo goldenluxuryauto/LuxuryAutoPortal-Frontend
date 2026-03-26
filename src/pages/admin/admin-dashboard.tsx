@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { SectionHeader } from "@/components/admin/dashboard";
 import IncomeExpensesSection from "@/components/admin/dashboard/IncomeExpensesSection";
 import AirportParkingSection from "@/components/admin/dashboard/AirportParkingSection";
 import CommissionsSection from "@/components/admin/dashboard/CommissionsSection";
@@ -9,23 +8,7 @@ import TuroInspectionsSection from "@/components/admin/dashboard/TuroInspections
 import CarIssuesSection from "@/components/admin/dashboard/CarIssuesSection";
 import MaintenanceSection from "@/components/admin/dashboard/MaintenanceSection";
 import TaskManagementSection from "@/components/admin/dashboard/TaskManagementSection";
-
-const SECTIONS = [
-  "NOTICE BOARD",
-] as const;
-
-function PlaceholderSection({ title }: { title: string }) {
-  return (
-    <div className="mb-8">
-      <SectionHeader title={title} />
-      <div className="mt-2 rounded-md border border-gray-200 bg-white px-6 py-8 text-center">
-        <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">
-          Coming Soon
-        </p>
-      </div>
-    </div>
-  );
-}
+import NoticeBoardSection from "@/components/admin/dashboard/NoticeBoardSection";
 
 export default function AdminDashboardPage() {
   const [year, setYear] = useState(String(new Date().getFullYear()));
@@ -106,10 +89,8 @@ export default function AdminDashboardPage() {
         {/* Section 8: Task Management — Phase 8 */}
         <TaskManagementSection />
 
-        {/* Remaining sections — placeholders */}
-        {SECTIONS.map((section) => (
-          <PlaceholderSection key={section} title={section} />
-        ))}
+        {/* Section 9: Notice Board — Phase 9 */}
+        <NoticeBoardSection />
       </div>
     </AdminLayout>
   );
