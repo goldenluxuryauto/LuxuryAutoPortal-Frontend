@@ -38,31 +38,31 @@ export default function AdminDashboardPage() {
     <AdminLayout>
       <div className="min-h-screen bg-background">
         {/* Brand Header */}
-        <div className="mb-8 bg-black px-6 py-6">
+        <div className="mb-8 border-b border-gray-200 bg-white px-6 py-6">
           <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-6 md:grid-cols-3">
             {/* Left — Logo */}
             <div className="flex justify-center md:justify-start">
               <img
                 src="/logo.png"
                 alt="Golden Luxury Auto"
-                className="h-24 object-contain"
+                className="h-32 w-auto object-contain"
               />
             </div>
 
-            {/* Center — Fleet Photo */}
+            {/* Center — Fleet Car Image with Link */}
             <div className="flex justify-center">
-              <div className="overflow-hidden rounded-lg">
+              <a href="/cars" className="block overflow-hidden rounded-lg shadow-md transition hover:shadow-xl">
                 <img
-                  src="/logo.png"
+                  src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                   alt="Golden Luxury Auto Fleet"
-                  className="h-36 w-80 object-cover"
+                  className="h-44 w-full object-cover"
                 />
-              </div>
+              </a>
             </div>
 
             {/* Right — YouTube Video */}
             <div className="flex justify-center md:justify-end">
-              <div className="relative h-36 w-64 overflow-hidden rounded-lg shadow-lg">
+              <div className="relative aspect-video w-full max-w-[320px] overflow-hidden rounded-lg shadow-md">
                 <iframe
                   className="absolute inset-0 h-full w-full"
                   src="https://www.youtube.com/embed/jsdo0yDeFCs?si=Le_SJZ8P7cqyx2Bn"
@@ -77,7 +77,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Subtitle */}
-          <p className="mt-4 text-center text-sm uppercase tracking-widest text-white/70">
+          <p className="mt-4 text-center text-sm font-semibold uppercase tracking-widest text-gray-500">
             Admin Dashboard
           </p>
         </div>
