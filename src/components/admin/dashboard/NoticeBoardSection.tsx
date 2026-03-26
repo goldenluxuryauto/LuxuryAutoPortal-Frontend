@@ -1,4 +1,24 @@
+import { useQuery } from "@tanstack/react-query";
+import { buildApiUrl } from "@/lib/queryClient";
 import { SectionHeader } from "@/components/admin/dashboard";
+
+interface NoticeBoardRow {
+  notice_board_aid: number;
+  notice_board_title: string;
+  notice_board_body: string;
+  notice_board_category: string;
+  notice_board_priority: string;
+  notice_board_date: string;
+  notice_board_is_active: number;
+  notice_board_created: string;
+  notice_board_updated: string;
+}
+
+interface NoticeBoardResponse {
+  success: boolean;
+  data: NoticeBoardRow[];
+  total: number;
+}
 
 interface Notice {
   title: string;
@@ -25,6 +45,34 @@ const priorityColors: Record<string, string> = {
   Info: "bg-gray-100 text-gray-600",
 };
 
+function formatDate(dateStr: string): string {
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+function mapRowToNotice(row: NoticeBoardRow): Notice {
+  return {
+    title: row.notice_board_title,
+    category: row.notice_board_category,
+    categoryColor:
+      categoryColors[row.notice_board_category] || "bg-gray-100 text-gray-600",
+    priority: row.notice_board_priority,
+    priorityColor:
+      priorityColors[row.notice_board_priority] || "bg-gray-100 text-gray-600",
+    date: formatDate(row.notice_board_date),
+    body: row.notice_board_body,
+  };
+}
+
+// Fallback hardcoded notices when no data exists yet
 function getCurrentMonthDate(day: number): string {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), day).toLocaleDateString(
@@ -33,7 +81,7 @@ function getCurrentMonthDate(day: number): string {
   );
 }
 
-const notices: Notice[] = [
+const fallbackNotices: Notice[] = [
   {
     title: "Fleet Inspection Schedule",
     category: "Operations",
@@ -53,24 +101,6 @@ const notices: Notice[] = [
     body: "Updated vehicle cleaning checklist is now mandatory before every guest pickup. See the training manual for details.",
   },
   {
-    title: "Holiday Schedule",
-    category: "HR",
-    categoryColor: categoryColors.HR,
-    priority: "Info",
-    priorityColor: priorityColors.Info,
-    date: getCurrentMonthDate(5),
-    body: "Office will operate with reduced hours during upcoming holidays. Contact management for scheduling questions.",
-  },
-  {
-    title: "Turo Performance Update",
-    category: "Revenue",
-    categoryColor: categoryColors.Revenue,
-    priority: "Info",
-    priorityColor: priorityColors.Info,
-    date: getCurrentMonthDate(8),
-    body: "Great month! Fleet utilization up 12% compared to last month. Keep up the excellent guest reviews.",
-  },
-  {
     title: "Insurance Renewal Reminder",
     category: "Compliance",
     categoryColor: categoryColors.Compliance,
@@ -78,15 +108,6 @@ const notices: Notice[] = [
     priorityColor: priorityColors.Urgent,
     date: getCurrentMonthDate(10),
     body: "Vehicle insurance policies are up for renewal. All paperwork must be submitted to the office by end of month.",
-  },
-  {
-    title: "Team Meeting",
-    category: "HR",
-    categoryColor: categoryColors.HR,
-    priority: "Important",
-    priorityColor: priorityColors.Important,
-    date: getCurrentMonthDate(12),
-    body: "Monthly all-hands meeting scheduled. Attendance is mandatory for all staff. Agenda will be shared via email.",
   },
 ];
 
@@ -112,19 +133,56 @@ function NoticeCard({ notice }: { notice: Notice }) {
   );
 }
 
+function LoadingSkeleton() {
+  return (
+    <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="h-40 animate-pulse rounded-lg bg-gray-200" />
+      ))}
+    </div>
+  );
+}
+
 export default function NoticeBoardSection() {
+  const { data, isLoading } = useQuery<NoticeBoardResponse>({
+    queryKey: ["/api/admin/notice-board"],
+    queryFn: async () => {
+      const res = await fetch(buildApiUrl("/api/admin/notice-board"), {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch notices");
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const apiNotices = data?.data ?? [];
+  const notices =
+    apiNotices.length > 0
+      ? apiNotices.map(mapRowToNotice)
+      : fallbackNotices;
+  const isUsingFallback = apiNotices.length === 0;
+
   return (
     <div className="mb-8">
       <SectionHeader title="NOTICE BOARD" />
-      <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {notices.map((notice) => (
-          <NoticeCard key={notice.title} notice={notice} />
-        ))}
-      </div>
-      <p className="mt-3 text-center text-xs italic text-gray-400">
-        Notice board will be connected to a management system in a future
-        update.
-      </p>
+
+      {isLoading ? (
+        <LoadingSkeleton />
+      ) : (
+        <>
+          <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {notices.map((notice) => (
+              <NoticeCard key={notice.title} notice={notice} />
+            ))}
+          </div>
+          {isUsingFallback && (
+            <p className="mt-3 text-center text-xs italic text-gray-400">
+              Showing sample notices. Add notices via the admin panel to replace these.
+            </p>
+          )}
+        </>
+      )}
     </div>
   );
 }
