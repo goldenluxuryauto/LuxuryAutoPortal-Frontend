@@ -1,0 +1,50 @@
+import { cn } from "@/lib/utils";
+
+/** Props for the SummaryCard component */
+interface SummaryCardProps {
+  /** Small uppercase label at the top of the card */
+  label: string;
+  /** Large bold value displayed in the center */
+  value: string;
+  /** Optional small text below the value */
+  subtitle?: string;
+  /** Card color variant: gold bg with black text, or dark bg with white/gold text */
+  variant?: "gold" | "dark";
+  /** Additional CSS classes */
+  className?: string;
+}
+
+export function SummaryCard({
+  label,
+  value,
+  subtitle,
+  variant = "dark",
+  className,
+}: SummaryCardProps) {
+  return (
+    <div
+      className={cn(
+        "rounded-md px-4 py-3",
+        variant === "gold"
+          ? "bg-[#FFD700] text-black"
+          : "bg-[#111111] text-white",
+        className,
+      )}
+    >
+      <p className="text-xs font-semibold uppercase tracking-wide opacity-80">
+        {label}
+      </p>
+      <p
+        className={cn(
+          "mt-1 text-2xl font-bold",
+          variant === "dark" && "text-[#FFD700]",
+        )}
+      >
+        {value}
+      </p>
+      {subtitle && (
+        <p className="mt-1 text-xs opacity-70">{subtitle}</p>
+      )}
+    </div>
+  );
+}
