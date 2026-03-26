@@ -58,8 +58,13 @@ const TABLE_COLUMNS = [
   { key: "total", label: "Total", align: "right" as const },
 ];
 
+interface ApiResponse {
+  success: boolean;
+  data: IncomeExpenseData;
+}
+
 export default function MaintenanceSection({ year }: MaintenanceSectionProps) {
-  const { data, isLoading } = useQuery<IncomeExpenseData>({
+  const { data, isLoading } = useQuery<ApiResponse>({
     queryKey: ["/api/income-expense/all-cars", year],
     queryFn: async () => {
       const res = await fetch(buildApiUrl(`/api/income-expense/all-cars/${year}`), {
@@ -70,7 +75,7 @@ export default function MaintenanceSection({ year }: MaintenanceSectionProps) {
     },
   });
 
-  const cogs: CogsMonth[] = data?.cogs ?? [];
+  const cogs: CogsMonth[] = data?.data?.cogs ?? [];
 
   // Build a lookup by month (1-12)
   const cogsByMonth = new Map<number, CogsMonth>();
