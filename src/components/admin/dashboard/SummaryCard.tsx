@@ -8,8 +8,8 @@ interface SummaryCardProps {
   value: string;
   /** Optional small text below the value */
   subtitle?: string;
-  /** Card color variant: gold bg with black text, or dark bg with white/gold text */
-  variant?: "gold" | "dark";
+  /** Card color variant: gold bg with black text, dark bg with white/gold text, or white bg with black text */
+  variant?: "gold" | "dark" | "white";
   /** Additional CSS classes */
   className?: string;
 }
@@ -27,7 +27,9 @@ export function SummaryCard({
         "rounded-md px-4 py-3",
         variant === "gold"
           ? "bg-[#FFD700] text-black"
-          : "bg-[#111111] text-white",
+          : variant === "white"
+            ? "bg-white text-black border border-gray-200"
+            : "bg-[#111111] text-white",
         className,
       )}
     >
@@ -37,7 +39,7 @@ export function SummaryCard({
       <p
         className={cn(
           "mt-1 text-2xl font-bold",
-          variant === "dark" && "text-[#FFD700]",
+          variant === "dark" ? "text-[#FFD700]" : "text-black",
         )}
       >
         {value}

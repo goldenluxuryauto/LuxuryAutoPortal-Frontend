@@ -73,12 +73,12 @@ export function DashboardTable({
             </tr>
           ))}
           {totalsRow && (
-            <tr className="bg-gray-100 font-bold">
+            <tr className="bg-[#FFD700] font-bold">
               {columns.map((col) => (
                 <td
                   key={col.key}
                   className={cn(
-                    "px-3 py-2 text-sm text-gray-900",
+                    "px-3 py-2 text-sm text-black",
                     alignClass[col.align ?? "left"],
                   )}
                 >
