@@ -198,40 +198,36 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-background">
         {/* Brand Header */}
         <div className="mb-8 border-b border-gray-200 bg-white px-6 py-6">
-          <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-6 md:grid-cols-3">
+          <div className="mx-auto grid max-w-7xl grid-cols-1 items-stretch gap-4 md:grid-cols-3">
             {/* Left — Logo */}
-            <div className="flex justify-center md:justify-start">
+            <div className="flex items-center justify-center rounded-lg bg-white p-4">
               <img
                 src="/logo.png"
                 alt="Golden Luxury Auto"
-                className="h-32 w-auto object-contain"
+                className="h-auto w-full max-h-48 object-contain"
               />
             </div>
 
             {/* Center — Fleet Car Image with Link */}
-            <div className="flex justify-center">
-              <a href="/cars" className="block overflow-hidden rounded-lg shadow-md transition hover:shadow-xl">
-                <img
-                  src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                  alt="Golden Luxury Auto Fleet"
-                  className="h-44 w-full object-cover"
-                />
-              </a>
-            </div>
+            <a href="/cars" className="block overflow-hidden rounded-lg shadow-md transition hover:shadow-xl">
+              <img
+                src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                alt="Golden Luxury Auto Fleet"
+                className="h-full w-full object-cover"
+              />
+            </a>
 
             {/* Right — YouTube Video */}
-            <div className="flex justify-center md:justify-end">
-              <div className="relative aspect-video w-full max-w-[320px] overflow-hidden rounded-lg shadow-md">
-                <iframe
-                  className="absolute inset-0 h-full w-full"
-                  src="https://www.youtube.com/embed/jsdo0yDeFCs?si=Le_SJZ8P7cqyx2Bn"
-                  title="Golden Luxury Auto Monthly Update"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
-              </div>
+            <div className="relative overflow-hidden rounded-lg shadow-md" style={{ minHeight: "200px" }}>
+              <iframe
+                className="absolute inset-0 h-full w-full"
+                src="https://www.youtube.com/embed/jsdo0yDeFCs?si=Le_SJZ8P7cqyx2Bn"
+                title="Golden Luxury Auto Monthly Update"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
             </div>
           </div>
 
