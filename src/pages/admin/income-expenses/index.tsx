@@ -48,7 +48,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   const isAdminAllCarsView = !isCarFocused; // Admin viewing all cars (Income and Expenses menu)
 
   const [selectedCar, setSelectedCar] = useState<string>(
-    carIdFromQuery ? String(carIdFromQuery) : "all"
+    carIdFromQuery ? String(carIdFromQuery) : "allcars"
   );
   const [carSelectOpen, setCarSelectOpen] = useState(false);
   
