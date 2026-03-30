@@ -198,7 +198,7 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-background">
         {/* Brand Header */}
         <div className="mb-8 border-b border-gray-200 bg-white px-6 py-6">
-          <div className="mx-auto grid max-w-7xl grid-cols-1 items-stretch gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-3">
             {/* Left — Logo */}
             <div className="flex items-center justify-center rounded-lg bg-white p-4">
               <img
