@@ -204,7 +204,7 @@ export default function AdminDashboard() {
               <img
                 src="/logo.png"
                 alt="Golden Luxury Auto"
-                className="h-auto w-full max-h-48 object-contain"
+                className="h-auto w-full object-contain"
               />
             </div>
 
