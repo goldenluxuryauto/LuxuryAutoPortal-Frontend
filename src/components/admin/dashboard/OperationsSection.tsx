@@ -33,9 +33,9 @@ const TABLE_COLUMNS = [
   { key: "plateNumber", label: "Plate #", align: "left" as const },
   { key: "tripStart", label: "Trip Start", align: "left" as const },
   { key: "pickUpLocation", label: "Pick Up Location", align: "left" as const },
+  { key: "assignedTo", label: "Assigned to", align: "left" as const },
   { key: "tripEnds", label: "Trip Ends", align: "left" as const },
   { key: "dropOffLocation", label: "Drop Off Location", align: "left" as const },
-  { key: "assignedTo", label: "Assigned to", align: "left" as const },
   { key: "status", label: "Status", align: "left" as const },
 ];
 
