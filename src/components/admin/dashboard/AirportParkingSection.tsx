@@ -6,6 +6,7 @@ import type {
   IncomeExpenseData,
   DirectDeliveryMonth,
   ParkingAirportQBMonth,
+  ParkingFeeLaborMonth,
   HistoryMonth,
 } from "@/pages/admin/income-expenses/types";
 
@@ -101,11 +102,17 @@ export default function AirportParkingSection({ year }: AirportParkingSectionPro
       {data && (() => {
         const d = data.data;
         const directDelivery: DirectDeliveryMonth[] = d.directDelivery ?? [];
+        const parkingFeeLabor: ParkingFeeLaborMonth[] = d.parkingFeeLabor ?? [];
         const parkingAirportQB: ParkingAirportQBMonth[] = d.parkingAirportQB ?? [];
         const history: HistoryMonth[] = d.history ?? [];
 
+        // System parking = parkingFeeLabor (glaParkingFee + laborCleaning) + directDelivery.parkingAirport
         const system = buildRows(
-          (m) => getMonthEntry(directDelivery, m)?.parkingAirport ?? 0,
+          (m) => {
+            const pfl = getMonthEntry(parkingFeeLabor, m);
+            const dd = getMonthEntry(directDelivery, m);
+            return (pfl?.glaParkingFee ?? 0) + (pfl?.laborCleaning ?? 0) + (dd?.parkingAirport ?? 0);
+          },
           history,
         );
         const qb = buildRows(
