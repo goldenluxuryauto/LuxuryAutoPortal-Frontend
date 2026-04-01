@@ -441,33 +441,6 @@ export default function PaymentsMainPage() {
             <span className="text-muted-foreground text-sm">
               Total: {paymentsData?.total ?? payments.length}
             </span>
-            <Button
-              onClick={() => setIsAddModalOpen(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/80"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsImportModalOpen(true);
-                setImportFile(null);
-                setImportResult(null);
-              }}
-              className="border-border text-muted-foreground hover:bg-card"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Import
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteByMonthModalOpen(true)}
-              className="border-border text-muted-foreground hover:bg-card"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete
-            </Button>
           </div>
         </div>
 
