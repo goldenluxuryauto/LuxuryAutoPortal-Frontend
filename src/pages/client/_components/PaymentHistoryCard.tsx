@@ -1,7 +1,9 @@
-import React from "react";
-import { Loader2, AlertCircle } from "lucide-react";
+import React, { useState } from "react";
+import { Loader2, AlertCircle, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { PaymentReceiptModal } from "@/components/modals/PaymentReceiptModal";
 import { fmt, getMonthLabel } from "./utils";
 import type { Payment } from "./types";
 
@@ -11,6 +13,8 @@ interface PaymentHistoryCardProps {
 }
 
 export function PaymentHistoryCard({ payments, isLoading }: PaymentHistoryCardProps) {
+  const [receiptPayment, setReceiptPayment] = useState<Payment | null>(null);
+
   return (
     <Card className="border-border bg-card overflow-hidden">
       <CardHeader className="pb-2">
@@ -32,6 +36,7 @@ export function PaymentHistoryCard({ payments, isLoading }: PaymentHistoryCardPr
                 <TableHead className="text-white font-semibold text-xs py-3 text-right">Amount Paid</TableHead>
                 <TableHead className="text-white font-semibold text-xs py-3 text-right">Balance</TableHead>
                 <TableHead className="text-white font-semibold text-xs py-3">Payment Date</TableHead>
+                <TableHead className="text-white font-semibold text-xs py-3 text-center">Receipt</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -46,6 +51,21 @@ export function PaymentHistoryCard({ payments, isLoading }: PaymentHistoryCardPr
                     </span>
                   </TableCell>
                   <TableCell className="text-sm py-2 text-muted-foreground">{p.payments_invoice_date ?? "—"}</TableCell>
+                  <TableCell className="text-center py-2">
+                    {p.payments_attachment ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setReceiptPayment(p)}
+                        className="text-[#EAEB80] hover:text-[#d4d570] h-7 w-7 p-0"
+                        title="View Receipt"
+                      >
+                        <FileText className="w-4 h-4" />
+                      </Button>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">—</span>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -57,6 +77,14 @@ export function PaymentHistoryCard({ payments, isLoading }: PaymentHistoryCardPr
           </div>
         )}
       </CardContent>
+
+      {receiptPayment && (
+        <PaymentReceiptModal
+          isOpen={true}
+          onClose={() => setReceiptPayment(null)}
+          payment={receiptPayment}
+        />
+      )}
     </Card>
   );
 }

@@ -286,7 +286,12 @@ export default function PaymentsPage() {
     );
   }
 
-  const carName = car.makeModel || `${car.year || ""} ${car.vin}`.trim();
+  const carName = [
+    car.makeModel || "",
+    car.year ? String(car.year) : "",
+  ].filter(Boolean).join(" ") +
+    (car.licensePlate ? ` – #${car.licensePlate.trim()}` : "") +
+    (car.vin ? ` – ${car.vin.trim()}` : "");
   const ownerName = car.owner
     ? `${car.owner.firstName} ${car.owner.lastName}`
     : "N/A";

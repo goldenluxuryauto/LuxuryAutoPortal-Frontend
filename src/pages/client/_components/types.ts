@@ -50,11 +50,15 @@ export interface Payment {
   payments_reference_number: string;
   payments_invoice_id: string;
   payments_invoice_date: string | null;
+  payments_attachment: string | null;
   payments_remarks: string | null;
   payment_status_name: string;
   payment_status_color: string;
   car_make_model: string;
+  car_make_name: string;
   car_plate_number: string;
+  car_vin_number: string;
+  car_year: number;
 }
 
 export interface TuroTrip {

@@ -19,7 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Trash2, Edit, FileText, HandCoins, Loader2 } from "lucide-react";
+import { Plus, Trash2, Edit, FileText, HandCoins, Loader2, Upload, Download } from "lucide-react";
+import { Label } from "@/components/ui/label";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -103,7 +104,9 @@ const formatYearMonth = (yearMonth: string): string => {
 
 export default function PaymentsMainPage() {
   const [filterStatus, setFilterStatus] = useState<string>("");
-  const [monthFilter, setMonthFilter] = useState<string>("");
+  const [startMonth, setStartMonth] = useState<string>("");
+  const [endMonth, setEndMonth] = useState<string>("");
+  const [carFilter, setCarFilter] = useState<string>("");
   const [clientSearch, setClientSearch] = useState<string>("");
   const [clientInputVal, setClientInputVal] = useState<string>("");
   const [isFilter, setIsFilter] = useState(false);
@@ -115,10 +118,17 @@ export default function PaymentsMainPage() {
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [deleteYearMonth, setDeleteYearMonth] = useState("");
   const [addYearMonth, setAddYearMonth] = useState("");
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importResult, setImportResult] = useState<{
+    imported?: number;
+    skipped?: number;
+    errors?: string[];
+  } | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const hasFilters = !!filterStatus || !!monthFilter || !!clientSearch;
+  const hasFilters = !!filterStatus || !!startMonth || !!endMonth || !!carFilter || !!clientSearch;
 
   const { data: statusesData } = useQuery<{
     success: boolean;
@@ -138,6 +148,22 @@ export default function PaymentsMainPage() {
     s.payment_status_name.toLowerCase().includes("to pay")
   );
 
+  const { data: carsData } = useQuery<{
+    success: boolean;
+    data: { id: number; makeModel: string; licensePlate?: string; vin?: string; year?: number }[];
+  }>({
+    queryKey: ["/api/cars", "payments-filter"],
+    queryFn: async () => {
+      const params = new URLSearchParams({ limit: "1000", status: "all" });
+      const url = buildApiUrl(`/api/cars?${params}`);
+      const response = await fetch(url, { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch cars");
+      return response.json();
+    },
+  });
+
+  const carsList = carsData?.data || [];
+
   const { data: paymentsData, isLoading: isLoadingPayments } = useQuery<{
     success: boolean;
     data: Payment[];
@@ -145,7 +171,7 @@ export default function PaymentsMainPage() {
     page: number;
     count: number;
   }>({
-    queryKey: ["/api/payments/search", clientSearch, filterStatus, monthFilter],
+    queryKey: ["/api/payments/search", clientSearch, filterStatus, startMonth, endMonth, carFilter],
     queryFn: async () => {
       const url = buildApiUrl("/api/payments/search");
       const response = await fetch(url, {
@@ -155,7 +181,9 @@ export default function PaymentsMainPage() {
         body: JSON.stringify({
           searchValue: clientSearch,
           status: filterStatus || undefined,
-          monthYear: monthFilter || undefined,
+          startDate: startMonth || undefined,
+          endDate: endMonth || undefined,
+          carId: carFilter || undefined,
           page: 1,
           limit: 100,
         }),
@@ -268,9 +296,48 @@ export default function PaymentsMainPage() {
     },
   });
 
+  const importMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      const url = buildApiUrl("/api/payments/import");
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || err.error || "Failed to import payments");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/payments/search"] });
+      setImportResult({
+        imported: data.imported ?? data.count ?? 0,
+        skipped: data.skipped ?? 0,
+        errors: data.errors ?? [],
+      });
+      toast({
+        title: "Import Complete",
+        description: `${data.imported ?? data.count ?? 0} payment(s) imported`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Import Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleClearFilters = () => {
     setFilterStatus("");
-    setMonthFilter("");
+    setStartMonth("");
+    setEndMonth("");
+    setCarFilter("");
     setClientSearch("");
     setClientInputVal("");
     setIsFilter(false);
@@ -285,10 +352,12 @@ export default function PaymentsMainPage() {
     }, 500);
   };
 
-  const formatVehicleInfo = (p: Payment) =>
-    `${p.car_make_name || ""} ${p.car_specs || ""} ${p.car_year || ""}`.trim() +
-    (p.car_plate_number ? ` - #${p.car_plate_number.trim()}` : "") +
-    (p.car_vin_number ? ` - ${p.car_vin_number.trim()}` : "");
+  const formatVehicleInfo = (p: Payment) => {
+    const name = `${p.car_make_name || ""} ${p.car_year || ""}`.trim();
+    const plate = p.car_plate_number ? `#${p.car_plate_number.trim()}` : "";
+    const vin = p.car_vin_number ? p.car_vin_number.trim() : "";
+    return [name, plate, vin].filter(Boolean).join(" – ");
+  };
 
   return (
     <AdminLayout>
@@ -325,16 +394,51 @@ export default function PaymentsMainPage() {
               </Select>
             </div>
             <div>
-              <label className="text-muted-foreground text-sm block mb-1">Month</label>
+              <label className="text-muted-foreground text-sm block mb-1">From</label>
               <Input
                 type="month"
-                value={monthFilter}
+                value={startMonth}
                 onChange={(e) => {
-                  setMonthFilter(e.target.value);
+                  setStartMonth(e.target.value);
                   setIsFilter(true);
                 }}
-                className="bg-card border-border text-foreground w-[180px] [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert"
+                className="bg-card border-border text-foreground w-[160px] [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert"
               />
+            </div>
+            <div>
+              <label className="text-muted-foreground text-sm block mb-1">To</label>
+              <Input
+                type="month"
+                value={endMonth}
+                onChange={(e) => {
+                  setEndMonth(e.target.value);
+                  setIsFilter(true);
+                }}
+                className="bg-card border-border text-foreground w-[160px] [&::-webkit-calendar-picker-indicator]:invert [&::-moz-calendar-picker-indicator]:invert"
+              />
+            </div>
+            <div>
+              <label className="text-muted-foreground text-sm block mb-1">Car</label>
+              <Select
+                value={carFilter || "__all__"}
+                onValueChange={(v) => {
+                  setCarFilter(v === "__all__" ? "" : v);
+                  setIsFilter(true);
+                }}
+              >
+                <SelectTrigger className="bg-card border-border text-foreground w-[180px]">
+                  <SelectValue placeholder="All Cars" />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border text-foreground max-h-60">
+                  <SelectItem value="__all__">All Cars</SelectItem>
+                  {carsList.map((c) => (
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {[c.makeModel, c.year ? String(c.year) : ""].filter(Boolean).join(" ")}
+                      {c.licensePlate ? ` – #${c.licensePlate}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-muted-foreground text-sm block mb-1">Client Search</label>
@@ -366,6 +470,18 @@ export default function PaymentsMainPage() {
             >
               <Plus className="w-4 h-4 mr-2" />
               Add
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsImportModalOpen(true);
+                setImportFile(null);
+                setImportResult(null);
+              }}
+              className="border-border text-muted-foreground hover:bg-card"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Import
             </Button>
             <Button
               variant="outline"
@@ -693,6 +809,98 @@ export default function PaymentsMainPage() {
             }}
             payment={selectedPayment}
           />
+        )}
+
+        {isImportModalOpen && (
+          <Dialog open={true} onOpenChange={() => setIsImportModalOpen(false)}>
+            <DialogContent className="bg-card border-border text-foreground">
+              <DialogHeader>
+                <DialogTitle>Import Payments</DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  Upload a CSV file to import payment records in bulk.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <a
+                    href={buildApiUrl("/api/payments/import-template")}
+                    className="inline-flex items-center gap-2 text-sm text-[#EAEB80] hover:text-[#d4d570] hover:underline"
+                    download
+                  >
+                    <Download className="w-4 h-4" />
+                    Download CSV Template
+                  </a>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground block mb-2">
+                    CSV File
+                  </Label>
+                  <Input
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => {
+                      setImportFile(e.target.files?.[0] || null);
+                      setImportResult(null);
+                    }}
+                    className="bg-card border-border text-foreground file:text-foreground file:bg-muted file:border-0 file:rounded file:px-3 file:py-1 file:mr-3 file:cursor-pointer"
+                  />
+                </div>
+                {importResult && (
+                  <div className="p-3 rounded-md bg-muted/50 border border-border text-sm space-y-1">
+                    <p className="text-foreground">
+                      Imported: <span className="text-[#EAEB80] font-medium">{importResult.imported ?? 0}</span>
+                    </p>
+                    <p className="text-foreground">
+                      Skipped: <span className="text-muted-foreground font-medium">{importResult.skipped ?? 0}</span>
+                    </p>
+                    {importResult.errors && importResult.errors.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-red-700 font-medium mb-1">Errors:</p>
+                        <ul className="list-disc list-inside text-red-700/80 max-h-32 overflow-y-auto">
+                          {importResult.errors.map((err, i) => (
+                            <li key={i}>{err}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsImportModalOpen(false)}
+                  className="bg-card border-border text-foreground"
+                >
+                  Close
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (importFile) {
+                      importMutation.mutate(importFile);
+                    } else {
+                      toast({
+                        title: "Error",
+                        description: "Please select a CSV file",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  disabled={!importFile || importMutation.isPending}
+                  className="bg-primary text-primary-foreground hover:bg-primary/80"
+                >
+                  {importMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4 mr-2" />
+                      Import
+                    </>
+                  )}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
     </AdminLayout>
