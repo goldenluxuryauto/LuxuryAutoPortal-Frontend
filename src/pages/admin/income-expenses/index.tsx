@@ -194,7 +194,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
     // Admin "Income and Expenses" (plural) - Initial view with car selector
     return (
       <AdminLayout>
-        <div className="flex flex-col w-full h-full overflow-hidden">
+        <div className="flex flex-col w-full">
           {/* Page Title */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-primary mb-2">
@@ -339,7 +339,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
     return (
       <IncomeExpenseProvider carId={placeholderCarId} year={selectedYear} isAllCars={true}>
         <AdminLayout>
-          <div className="flex flex-col w-full h-full overflow-hidden">
+          <div className="flex flex-col w-full">
             {/* Header */}
             <div className="mb-2 flex-shrink-0">
               <button
@@ -431,8 +431,8 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
               </div>
             </div>
 
-            {/* Main Content Area - No scroll on page, only table scrolls */}
-            <div className="flex-1 min-h-0 overflow-hidden">
+            {/* Main Content Area */}
+            <div className="w-full overflow-x-auto">
               <IncomeExpenseTable year={selectedYear} isFromRoute={false} showParkingAirportQB={true} isAllCarsView={true} />
             </div>
 
@@ -456,7 +456,7 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
   return (
     <IncomeExpenseProvider carId={activeCarId} year={selectedYear}>
       <AdminLayout>
-        <div className="flex flex-col w-full h-full overflow-hidden">
+        <div className="flex flex-col w-full">
           {/* Header */}
           <div className="mb-2 flex-shrink-0">
             {isFromRoute ? (
@@ -592,8 +592,8 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
           {/* Form Submissions & Receipts - separated from manual I&E entries */}
           <FormSubmissionsAndReceipts carId={activeCarId} year={selectedYear} />
 
-          {/* Main Content Area - No scroll on page, only table scrolls */}
-          <div className="flex-1 min-h-0 overflow-hidden">
+          {/* Main Content Area */}
+          <div className="w-full overflow-x-auto">
             <IncomeExpenseTable year={selectedYear} isFromRoute={isFromRoute} showParkingAirportQB={false} />
           </div>
 

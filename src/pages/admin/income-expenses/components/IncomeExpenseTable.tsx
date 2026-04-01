@@ -980,8 +980,8 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg overflow-hidden h-full flex flex-col">
-      <div className="overflow-auto flex-1" style={{ maxHeight: '100%' }}>
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="overflow-x-auto">
         <table className="w-full border-collapse text-xs">
           {/* Table Header */}
           <thead className="sticky top-0 z-40 bg-muted">
