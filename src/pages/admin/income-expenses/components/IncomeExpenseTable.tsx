@@ -986,7 +986,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
           {/* Table Header */}
           <thead className="sticky top-0 z-40 bg-muted">
             <tr>
-              <th className="sticky left-0 z-50 bg-muted border-r border-border px-3 py-2 text-left text-foreground min-w-[200px]">
+              <th className="sticky left-0 z-50 bg-muted border-r border-border px-2 py-1.5 text-left text-foreground min-w-[150px] max-w-[180px]">
                 Category
               </th>
               {MONTHS.map((month, index) => {
@@ -999,16 +999,16 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                 return (
                   <th
                     key={month}
-                    className="border-l border-border px-2 py-2 text-center min-w-[100px]"
+                    className="border-l border-border px-1 py-1.5 text-center min-w-[75px]"
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <span className="text-foreground text-xs">{month} {year}</span>
+                      <span className="text-foreground text-[10px]">{month} {year}</span>
                       <div className="flex items-center gap-1">
                         <button
                           onClick={isReadOnly ? undefined : () => toggleMonthMode(monthNum)}
                           disabled={isSavingMode || isReadOnly}
                           className={cn(
-                            "px-3 py-0.5 rounded-full text-xs font-semibold transition-all duration-200",
+                            "px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-200",
                             "disabled:opacity-50 disabled:cursor-not-allowed",
                             currentMode === 50 
                               ? "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-lg shadow-green-600/50" 
@@ -1055,7 +1055,7 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                   </th>
                 );
               })}
-              <th className="sticky right-0 z-30 border-l border-border px-2 py-2 text-center text-foreground min-w-[100px] bg-card font-bold">
+              <th className="sticky right-0 z-30 border-l border-border px-1 py-1.5 text-center text-foreground min-w-[75px] bg-card font-bold">
                 Total
               </th>
             </tr>
@@ -2415,9 +2415,9 @@ function DynamicSubcategoryRow({
   
   return (
     <tr className="border-b border-border">
-      <td className="sticky left-0 z-20 bg-card px-3 py-2 text-left text-muted-foreground border-r border-border text-xs">
+      <td className="sticky left-0 z-20 bg-card px-2 py-1 text-left text-muted-foreground border-r border-border text-xs">
         <div className="flex items-center gap-2">
-          <span>{subcategory.name}</span>
+          <span className="truncate">{subcategory.name}</span>
           {!isReadOnly && (
             <>
               <button
@@ -2444,11 +2444,11 @@ function DynamicSubcategoryRow({
         const value = monthValue?.value || 0;
         
         return (
-          <td key={month} className="border-l border-border px-2 py-2 text-right">
+          <td key={month} className="border-l border-border px-1 py-1 text-right">
             <span
               onClick={() => handleCellClick(month, value)}
               className={cn(
-                "px-2 py-1 rounded block text-xs text-right transition-colors",
+                "px-1 py-0.5 rounded block text-xs text-right transition-colors",
                 isReadOnly 
                   ? "cursor-default" 
                   : "cursor-pointer hover:bg-muted",
@@ -2461,7 +2461,7 @@ function DynamicSubcategoryRow({
         );
       })}
       <td className={cn(
-        "sticky right-0 z-20 border-l border-border px-2 py-2 text-right font-bold text-xs bg-card",
+        "sticky right-0 z-20 border-l border-border px-1 py-1 text-right font-bold text-xs bg-card",
         total === 0 ? "text-gray-600" : "text-[#EAEB80]"
       )}>
         ${total.toFixed(2)}
@@ -2488,7 +2488,7 @@ function CategorySection({ title, isExpanded, onToggle, children, hasActions = t
   return (
     <>
       <tr className="bg-primary">
-        <td colSpan={14} className="sticky left-0 z-30 bg-primary px-3 py-2 border-b border-primary">
+        <td colSpan={14} className="sticky left-0 z-30 bg-primary px-2 py-1.5 border-b border-primary">
           <div 
             className={`flex items-center gap-2 ${shouldShowToggle ? 'cursor-pointer hover:bg-inherit' : ''}`} 
             onClick={shouldShowToggle ? onToggle : undefined}
@@ -2615,8 +2615,8 @@ function CategoryRow({
       "border-b border-border",
       isTotal && "bg-background font-semibold"
     )}>
-      <td className="sticky left-0 z-20 bg-card px-3 py-2 text-left text-muted-foreground border-r border-border text-xs">
-        {label}
+      <td className="sticky left-0 z-20 bg-card px-2 py-1 text-left text-muted-foreground border-r border-border text-xs" title={label}>
+        <span className="truncate block">{label}</span>
       </td>
       {values.map((value, i) => {
         const month = i + 1;
@@ -2628,7 +2628,7 @@ function CategoryRow({
         return (
           <td 
             key={month} 
-            className="border-l border-border px-2 py-2 text-right"
+            className="border-l border-border px-1 py-1 text-right"
           >
             {category && field && isMonthEditable ? (
               showAmountAndPercentage && percentageValues ? (
@@ -2670,7 +2670,7 @@ function CategoryRow({
       })}
       {!hideTotal && (
         <td className={cn(
-          "sticky right-0 z-20 border-l border-border px-2 py-2 text-right text-foreground font-bold text-xs",
+          "sticky right-0 z-20 border-l border-border px-1 py-1 text-right text-foreground font-bold text-xs",
           isTotal ? "bg-background" : "bg-card"
         )}>
           {formatTotal()}
