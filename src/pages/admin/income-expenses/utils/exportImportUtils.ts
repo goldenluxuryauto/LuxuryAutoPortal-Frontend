@@ -1241,17 +1241,20 @@ export function exportAllIncomeExpenseData(
   });
   csvContent += `0,0,${tripsTotalSection8}\n`;
   
-  // Ave Per Rental Per Trips Taken
-  csvContent += `Ave Per Rental Per Trips Taken,`;
-  let aveRentalTotal = 0;
+  // Ave Rental Per Trips Taken
+  csvContent += `Ave Rental Per Trips Taken,`;
+  let totalRentalSection8 = 0;
+  let totalTripsSection8 = 0;
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
     const rental = getMonthValue(data.incomeExpenses, monthNum, 'rentalIncome');
     const trips = getMonthValue(data.history, monthNum, 'tripsTaken');
     const value = trips > 0 ? rental / trips : 0;
     csvContent += `$${Number(value).toFixed(2)},`;
-    aveRentalTotal += Number(value);
+    totalRentalSection8 += Number(rental);
+    totalTripsSection8 += Number(trips);
   });
+  const aveRentalTotal = totalTripsSection8 > 0 ? totalRentalSection8 / totalTripsSection8 : 0;
   csvContent += `$0.00,$0.00,$${aveRentalTotal.toFixed(2)}\n`;
   
   csvContent += `\n`;

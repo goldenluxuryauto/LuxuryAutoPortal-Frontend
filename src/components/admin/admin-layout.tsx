@@ -107,7 +107,6 @@ const allSidebarItems: SidebarItem[] = [
       { href: "/admin/hr/task-management", label: "Task Management", icon: Briefcase, roles: ["admin"] },
       { href: "/admin/hr/time", label: "Time", icon: Clock, roles: ["admin"] },
       { href: "/admin/hr/time-off", label: "Time Off", icon: Clock, roles: ["admin"] },
-      { href: "/admin/hr/overtime", label: "Overtime", icon: Clock, roles: ["admin"] },
       { href: "/admin/hr/report", label: "Report", icon: ClipboardList, roles: ["admin"] },
     ],
   },
