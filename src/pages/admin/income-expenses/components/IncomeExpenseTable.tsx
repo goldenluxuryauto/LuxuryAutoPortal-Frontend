@@ -2209,13 +2209,18 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                 isInteger
               />
               <CategoryRow
-                label="Ave Per Rental Per Trips Taken"
+                label="Ave Rental Per Trips Taken"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
                   const rental = getMonthValue(data.incomeExpenses, monthNum, "rentalIncome");
                   const trips = getMonthValue(data.history, monthNum, "tripsTaken");
                   return trips > 0 ? rental / trips : 0;
                 })}
+                totalOverride={(() => {
+                  const totalRental = MONTHS.reduce((sum, _, i) => sum + getMonthValue(data.incomeExpenses, i + 1, "rentalIncome"), 0);
+                  const totalTrips  = MONTHS.reduce((sum, _, i) => sum + getMonthValue(data.history,        i + 1, "tripsTaken"),  0);
+                  return totalTrips > 0 ? totalRental / totalTrips : 0;
+                })()}
                 isEditable={false}
               />
             </CategorySection>
@@ -2518,6 +2523,7 @@ interface CategoryRowProps {
   monthModes?: { [month: number]: 50 | 70 };
   isPercentage?: boolean;
   showAmountAndPercentage?: boolean; // Show both amount and percentage
+  totalOverride?: number; // Override the auto-summed total (e.g. for averages)
 }
 
 function CategoryRow({
@@ -2535,17 +2541,19 @@ function CategoryRow({
   monthModes,
   isPercentage = false,
   showAmountAndPercentage = false,
+  totalOverride,
 }: CategoryRowProps) {
   const [location] = useLocation();
   const isReadOnly = location.startsWith("/admin/income-expenses");
   // Override isEditable if in read-only mode
   const effectiveIsEditable = isReadOnly ? false : isEditable;
   
-  // Calculate total - ensure all values are numbers
-  const total = values.reduce((sum, val) => {
+  // Calculate total - ensure all values are numbers (or use override if provided)
+  const summedTotal = values.reduce((sum, val) => {
     const numVal = typeof val === 'number' && !isNaN(val) ? val : 0;
     return sum + numVal;
   }, 0);
+  const total = typeof totalOverride === "number" && !isNaN(totalOverride) ? totalOverride : summedTotal;
 
   // Helper to format value based on formatType
   const formatValue = (value: number, month: number) => {
