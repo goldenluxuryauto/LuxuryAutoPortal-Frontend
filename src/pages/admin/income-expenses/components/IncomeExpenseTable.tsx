@@ -2005,7 +2005,11 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                 label="Total Car Management Car Expenses"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  return getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses");
+                  // Mirror the "Car Management Total Expenses" row in INCOME & EXPENSES:
+                  // use backend-provided value in All Cars view, otherwise compute from this car's data.
+                  return isAllCarsView
+                    ? getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses")
+                    : calculateCarManagementTotalExpenses(monthNum);
                 })}
                 isEditable={false}
               />
@@ -2013,7 +2017,10 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                 label="Total Car Owner Car Expenses"
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
-                  return getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses");
+                  // Mirror the "Car Owner Total Expenses" row in INCOME & EXPENSES.
+                  return isAllCarsView
+                    ? getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses")
+                    : calculateCarOwnerTotalExpenses(monthNum);
                 })}
                 isEditable={false}
               />
@@ -2029,8 +2036,12 @@ export default function IncomeExpenseTable({ year, isFromRoute = false, showPark
                 values={MONTHS.map((_, i) => {
                   const monthNum = i + 1;
                   // Total Expenses = Car Management Total Expenses + Car Owner Total Expenses + Office Support (when all cars)
-                  const carManagementExpenses = getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses");
-                  const carOwnerExpenses = getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses");
+                  const carManagementExpenses = isAllCarsView
+                    ? getMonthValue(data.incomeExpenses, monthNum, "carManagementTotalExpenses")
+                    : calculateCarManagementTotalExpenses(monthNum);
+                  const carOwnerExpenses = isAllCarsView
+                    ? getMonthValue(data.incomeExpenses, monthNum, "carOwnerTotalExpenses")
+                    : calculateCarOwnerTotalExpenses(monthNum);
                   const officeSupportTotal = isAllCarsView ? getTotalOfficeSupportForMonth(monthNum) : 0;
                   return carManagementExpenses + carOwnerExpenses + officeSupportTotal;
                 })}
