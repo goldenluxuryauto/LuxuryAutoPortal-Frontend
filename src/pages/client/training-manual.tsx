@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OnboardingTutorial, useTutorial } from "@/components/onboarding/OnboardingTutorial";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useQuery } from "@tanstack/react-query";
-import { PlayCircle, Video, Loader2, AlertCircle, ChevronDown, ChevronRight } from "lucide-react";
+import { PlayCircle, Video, Loader2, ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { VideoPlayer } from "@/components/ui/video-player";
 
 interface TutorialStep {
   id: number;
@@ -134,7 +135,7 @@ export default function ClientTrainingManual() {
                       <CardTitle className="text-lg">{mod.title}</CardTitle>
                     </div>
                     {mod.description && (
-                      <p className="text-sm text-muted-foreground pl-6">{mod.description}</p>
+                      <p className="text-sm text-muted-foreground pl-6 whitespace-pre-line">{mod.description}</p>
                     )}
                     <p className="text-xs text-muted-foreground pl-6">
                       {steps.length} step{steps.length !== 1 ? "s" : ""}
@@ -152,57 +153,20 @@ export default function ClientTrainingManual() {
                                 </span>
                                 <h3 className="font-semibold">{step.title}</h3>
                               </div>
-                              <p className="text-sm text-muted-foreground">{step.description}</p>
+                              <p className="text-sm text-muted-foreground whitespace-pre-line">{step.description}</p>
                               {(step.videoUrl || step.videoPlaceholder) && (
                                 <div className="space-y-2">
                                   <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                                     <Video className="h-4 w-4" />
                                     Video
                                   </div>
-                                  {step.videoUrl ? (
-                                    <div className="relative aspect-video rounded-lg overflow-hidden bg-muted border">
-                                      {stepVideoState[step.id]?.loading && (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-muted/80">
-                                          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                        </div>
-                                      )}
-                                      {stepVideoState[step.id]?.error ? (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-sm text-muted-foreground">
-                                          <AlertCircle className="h-8 w-8 mb-2" />
-                                          {step.videoPlaceholder || "Video unavailable"}
-                                          <a
-                                            href={step.videoUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="mt-2 text-primary hover:underline"
-                                          >
-                                            Open in new tab
-                                          </a>
-                                        </div>
-                                      ) : (
-                                        <video
-                                          src={step.videoUrl}
-                                          className="w-full h-full object-contain"
-                                          controls
-                                          muted
-                                          playsInline
-                                          onLoadStart={() =>
-                                            setStepVideoState((s) => ({ ...s, [step.id]: { loading: true, error: false } }))
-                                          }
-                                          onLoadedData={() =>
-                                            setStepVideoState((s) => ({ ...s, [step.id]: { loading: false, error: false } }))
-                                          }
-                                          onError={() =>
-                                            setStepVideoState((s) => ({ ...s, [step.id]: { loading: false, error: true } }))
-                                          }
-                                        />
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <div className="aspect-video rounded-lg border bg-muted flex items-center justify-center p-4 text-sm text-muted-foreground">
-                                      {step.videoPlaceholder || "No video"}
-                                    </div>
-                                  )}
+                                  <VideoPlayer
+                                    url={step.videoUrl}
+                                    placeholder={step.videoPlaceholder}
+                                    onStatusChange={(status) =>
+                                      setStepVideoState((s) => ({ ...s, [step.id]: status }))
+                                    }
+                                  />
                                 </div>
                               )}
                               {step.instructions && step.instructions.length > 0 && (

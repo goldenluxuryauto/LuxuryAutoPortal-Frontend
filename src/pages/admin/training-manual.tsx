@@ -26,12 +26,14 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { PlayCircle, Edit, Trash2, Plus, Loader2, Save, X, Video, CheckCircle2, AlertCircle } from "lucide-react";
+import { PlayCircle, Edit, Trash2, Plus, Loader2, Save, X, Video, CheckCircle2, AlertCircle, RotateCcw, Archive } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { OnboardingTutorial, useTutorial, TutorialStep, TutorialModule } from "@/components/onboarding/OnboardingTutorial";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { VideoPlayer } from "@/components/ui/video-player";
+import { parseVideoSource } from "@/lib/video-utils";
 
 // Check if user is admin
 function useIsAdmin() {
@@ -377,10 +379,11 @@ export default function TrainingManualPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tutorial/modules", selectedRole] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/modules/deleted", selectedRole] });
       queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps", selectedRole, "with-modules"] });
       toast({
-        title: "Success",
-        description: "Module deleted successfully",
+        title: "Module moved to Deleted Modules",
+        description: "The module can be restored from the Deleted Modules section.",
       });
       setDeletingModuleId(null);
     },
@@ -388,6 +391,89 @@ export default function TrainingManualPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to delete module",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Deleted modules query
+  const { data: deletedModulesData } = useQuery<{ success: boolean; data: TutorialModule[] }>({
+    queryKey: ["/api/tutorial/modules/deleted", selectedRole],
+    queryFn: async () => {
+      const response = await fetch(
+        buildApiUrl(`/api/admin/tutorial/modules/deleted?role=${selectedRole}`),
+        { credentials: "include" }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch deleted modules");
+      }
+      return response.json();
+    },
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    retry: 1,
+    placeholderData: keepPreviousData,
+  });
+
+  const deletedModules: Array<TutorialModule & { deletedAt?: string; stepsCount?: number }> =
+    deletedModulesData?.success ? (deletedModulesData?.data || []) as any : [];
+
+  const restoreModuleMutation = useMutation({
+    mutationFn: async (moduleId: number) => {
+      const response = await fetch(
+        buildApiUrl(`/api/admin/tutorial/modules/${moduleId}/restore`),
+        { method: "POST", credentials: "include" }
+      );
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to restore module");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/modules", selectedRole] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/modules/deleted", selectedRole] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps", selectedRole, "with-modules"] });
+      toast({
+        title: "Module restored",
+        description: "The module and its steps are available again.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to restore module",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const permanentDeleteModuleMutation = useMutation({
+    mutationFn: async (moduleId: number) => {
+      const response = await fetch(
+        buildApiUrl(`/api/admin/tutorial/modules/${moduleId}/permanent`),
+        { method: "DELETE", credentials: "include" }
+      );
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to permanently delete module");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/modules/deleted", selectedRole] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/modules", selectedRole] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tutorial/steps", selectedRole, "with-modules"] });
+      toast({
+        title: "Module permanently deleted",
+        description: "This action cannot be undone.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to permanently delete module",
         variant: "destructive",
       });
     },
@@ -462,46 +548,67 @@ export default function TrainingManualPage() {
     }
   }, [selectedRole, isModuleDialogOpen, editingModule, moduleForm]);
 
-  // Test video URL validity
+  // Test video URL validity (supports YouTube, Vimeo, and direct files)
   const testVideoUrl = async (url: string) => {
     setVideoLoading(true);
     setVideoError(null);
     setVideoValid(null);
 
     try {
-      // Basic URL validation
       new URL(url);
-      
-      // Try to load the video
-      const video = document.createElement("video");
-      video.src = url;
-      video.muted = true;
-      
-      video.oncanplay = () => {
-        setVideoLoading(false);
-        setVideoValid(true);
-        setVideoError(null);
-      };
-      
-      video.onerror = () => {
-        setVideoLoading(false);
-        setVideoValid(false);
-        setVideoError("Video failed to load. Please check the URL is accessible.");
-      };
-      
-      // Set a timeout
-      setTimeout(() => {
-        if (video.readyState === 0) {
-          setVideoLoading(false);
-          setVideoValid(false);
-          setVideoError("Video is taking too long to load. URL may be invalid or inaccessible.");
-        }
-      }, 5000);
-    } catch (error) {
+    } catch {
       setVideoLoading(false);
       setVideoValid(false);
       setVideoError("Invalid URL format. Please enter a valid video URL.");
+      return;
     }
+
+    const source = parseVideoSource(url);
+
+    // YouTube / Vimeo can't be probed with a <video> element — trust the URL
+    // if we can parse a valid video ID out of it.
+    if (source.type === "youtube" || source.type === "vimeo") {
+      setVideoLoading(false);
+      setVideoValid(true);
+      setVideoError(null);
+      return;
+    }
+
+    if (source.type === "unknown") {
+      setVideoLoading(false);
+      setVideoValid(false);
+      setVideoError(
+        "Unsupported video URL. Use a YouTube/Vimeo link or a direct video file (.mp4, .webm, etc.)."
+      );
+      return;
+    }
+
+    // Direct file — verify it actually loads.
+    const video = document.createElement("video");
+    video.src = source.url;
+    video.muted = true;
+
+    video.oncanplay = () => {
+      setVideoLoading(false);
+      setVideoValid(true);
+      setVideoError(null);
+    };
+
+    video.onerror = () => {
+      setVideoLoading(false);
+      setVideoValid(false);
+      setVideoError("Video failed to load. Please check the URL is accessible.");
+    };
+
+    setTimeout(() => {
+      if (video.readyState === 0) {
+        setVideoLoading(false);
+        setVideoValid(false);
+        setVideoError(
+          "Video is taking too long to load. URL may be invalid or inaccessible."
+        );
+      }
+    }, 5000);
   };
 
   const handleEditClick = (step: TutorialStep & { role?: string; moduleId?: number }) => {
@@ -778,7 +885,7 @@ export default function TrainingManualPage() {
                               <div className="flex-1">
                                 <h3 className="text-lg font-semibold text-foreground">{module.title}</h3>
                                 {module.description && (
-                                  <p className="text-sm text-muted-foreground mt-1">{module.description}</p>
+                                  <p className="text-sm text-muted-foreground mt-1 whitespace-pre-line">{module.description}</p>
                                 )}
                                 <p className="text-xs text-muted-foreground mt-1">
                                   {moduleSteps.length} {moduleSteps.length !== 1 ? 'steps' : 'step'}
@@ -855,7 +962,7 @@ export default function TrainingManualPage() {
                             {/* Description */}
                             <div>
                               <p className="text-sm font-medium text-muted-foreground mb-1">Description:</p>
-                              <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+                              <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">{step.description}</p>
                             </div>
 
                                           {/* Video Display */}
@@ -865,90 +972,18 @@ export default function TrainingManualPage() {
                                   <Video className="w-4 h-4 text-primary" />
                                                 <p className="text-sm font-medium text-muted-foreground">Video:</p>
                                 </div>
-                                              
-                                              {/* Video Player */}
-                                              {step.videoUrl ? (
-                                                <div className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
-                                                  {stepVideoStates[step.id]?.loading && (
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
-                                                      <div className="text-center space-y-2">
-                                                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                                        <p className="text-sm text-muted-foreground">Loading video...</p>
-                                                      </div>
-                                                    </div>
-                                                  )}
-                                                  {stepVideoStates[step.id]?.error ? (
-                                                    <div className="w-full h-full flex items-center justify-center p-8">
-                                                      <div className="text-center space-y-2">
-                                                        <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto" />
-                                                        <div className="text-muted-foreground text-sm">
-                                                          {step.videoPlaceholder || "Video failed to load"}
-                                                        </div>
-                                                        <div className="text-xs text-gray-600 mt-2 break-all">
-                                                          {step.videoUrl}
-                                                        </div>
-                                                        <Button
-                                                          type="button"
-                                                          variant="ghost"
-                                                          size="sm"
-                                                          onClick={() => {
-                                                            window.open(step.videoUrl, "_blank");
-                                                          }}
-                                                          className="text-primary hover:text-primary hover:bg-primary/10 mt-2"
-                                                          title="Open video in new tab"
-                                                        >
-                                                          <PlayCircle className="w-4 h-4 mr-2" />
-                                                          Open in new tab
-                                                        </Button>
-                                                      </div>
-                                                    </div>
-                                                  ) : (
-                                                    <video
-                                                      key={`step-${step.id}-${step.videoUrl}`}
-                                                      src={step.videoUrl}
-                                                      className="w-full h-full object-contain"
-                                                      controls
-                                                      loop
-                                                      muted
-                                                      playsInline
-                                                      onError={() => {
-                                                        setStepVideoStates(prev => ({
-                                                          ...prev,
-                                                          [step.id]: { loading: false, error: true }
-                                                        }));
-                                                      }}
-                                                      onLoadedData={() => {
-                                                        setStepVideoStates(prev => ({
-                                                          ...prev,
-                                                          [step.id]: { loading: false, error: false }
-                                                        }));
-                                                      }}
-                                                      onLoadStart={() => {
-                                                        setStepVideoStates(prev => ({
-                                                          ...prev,
-                                                          [step.id]: { loading: true, error: false }
-                                                        }));
-                                                      }}
-                                                      onCanPlay={() => {
-                                                        setStepVideoStates(prev => ({
-                                                          ...prev,
-                                                          [step.id]: { loading: false, error: false }
-                                                        }));
-                                                      }}
-                                                    >
-                                                      Your browser does not support the video tag.
-                                                    </video>
-                                                  )}
-                                                </div>
-                                              ) : step.videoPlaceholder ? (
-                                                <div className="w-full aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex items-center justify-center p-8">
-                                                  <div className="text-center space-y-2">
-                                                    <Video className="w-12 h-12 text-gray-600 mx-auto" />
-                                                    <p className="text-muted-foreground text-sm">{step.videoPlaceholder}</p>
-                                                  </div>
-                                                </div>
-                                              ) : null}
-                                              
+
+                                              <VideoPlayer
+                                                url={step.videoUrl}
+                                                placeholder={step.videoPlaceholder}
+                                                onStatusChange={(status) =>
+                                                  setStepVideoStates(prev => ({
+                                                    ...prev,
+                                                    [step.id]: status,
+                                                  }))
+                                                }
+                                              />
+
                                               {/* Video URL Info (if video is available) */}
                                               {step.videoUrl && !stepVideoStates[step.id]?.error && (
                                   <div className="space-y-2">
@@ -1091,7 +1126,7 @@ export default function TrainingManualPage() {
                                     </div>
                                     <div>
                                       <p className="text-sm font-medium text-muted-foreground mb-1">Description:</p>
-                                      <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+                                      <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">{step.description}</p>
                                     </div>
 
                                     {/* Video Display */}
@@ -1101,90 +1136,18 @@ export default function TrainingManualPage() {
                                           <Video className="w-4 h-4 text-primary" />
                                           <p className="text-sm font-medium text-muted-foreground">Video:</p>
                                         </div>
-                                        
-                                        {/* Video Player */}
-                                        {step.videoUrl ? (
-                                          <div className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
-                                            {stepVideoStates[step.id]?.loading && (
-                                              <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
-                                                <div className="text-center space-y-2">
-                                                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                                  <p className="text-sm text-muted-foreground">Loading video...</p>
-                                                </div>
-                                              </div>
-                                            )}
-                                            {stepVideoStates[step.id]?.error ? (
-                                              <div className="w-full h-full flex items-center justify-center p-8">
-                                                <div className="text-center space-y-2">
-                                                  <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto" />
-                                                  <div className="text-muted-foreground text-sm">
-                                                    {step.videoPlaceholder || "Video failed to load"}
-                                                  </div>
-                                                  <div className="text-xs text-gray-600 mt-2 break-all">
-                                                    {step.videoUrl}
-                                                  </div>
-                                                  <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => {
-                                                      window.open(step.videoUrl, "_blank");
-                                                    }}
-                                                    className="text-primary hover:text-primary hover:bg-primary/10 mt-2"
-                                                    title="Open video in new tab"
-                                                  >
-                                                    <PlayCircle className="w-4 h-4 mr-2" />
-                                                    Open in new tab
-                                                  </Button>
-                                                </div>
-                                              </div>
-                                            ) : (
-                                              <video
-                                                key={`step-${step.id}-${step.videoUrl}`}
-                                                src={step.videoUrl}
-                                                className="w-full h-full object-contain"
-                                                controls
-                                                loop
-                                                muted
-                                                playsInline
-                                                onError={() => {
-                                                  setStepVideoStates(prev => ({
-                                                    ...prev,
-                                                    [step.id]: { loading: false, error: true }
-                                                  }));
-                                                }}
-                                                onLoadedData={() => {
-                                                  setStepVideoStates(prev => ({
-                                                    ...prev,
-                                                    [step.id]: { loading: false, error: false }
-                                                  }));
-                                                }}
-                                                onLoadStart={() => {
-                                                  setStepVideoStates(prev => ({
-                                                    ...prev,
-                                                    [step.id]: { loading: true, error: false }
-                                                  }));
-                                                }}
-                                                onCanPlay={() => {
-                                                  setStepVideoStates(prev => ({
-                                                    ...prev,
-                                                    [step.id]: { loading: false, error: false }
-                                                  }));
-                                                }}
-                                              >
-                                                Your browser does not support the video tag.
-                                              </video>
-                                            )}
-                                          </div>
-                                        ) : step.videoPlaceholder ? (
-                                          <div className="w-full aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex items-center justify-center p-8">
-                                            <div className="text-center space-y-2">
-                                              <Video className="w-12 h-12 text-gray-600 mx-auto" />
-                                              <p className="text-muted-foreground text-sm">{step.videoPlaceholder}</p>
-                                            </div>
-                                          </div>
-                                        ) : null}
-                                        
+
+                                        <VideoPlayer
+                                          url={step.videoUrl}
+                                          placeholder={step.videoPlaceholder}
+                                          onStatusChange={(status) =>
+                                            setStepVideoStates(prev => ({
+                                              ...prev,
+                                              [step.id]: status,
+                                            }))
+                                          }
+                                        />
+
                                         {/* Video URL Info (if video is available) */}
                                         {step.videoUrl && !stepVideoStates[step.id]?.error && (
                                           <div className="space-y-2">
@@ -1261,6 +1224,118 @@ export default function TrainingManualPage() {
                   })()}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Deleted Modules Section */}
+        {isAdmin && deletedModules.length > 0 && (
+          <Card className="bg-background border-border border-dashed">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Archive className="w-5 h-5 text-muted-foreground" />
+                <CardTitle className="text-muted-foreground text-xl">
+                  Deleted Modules ({selectedRole})
+                </CardTitle>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Modules here are hidden from users but not permanently deleted. You can restore
+                them or remove them permanently.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {deletedModules.map((module) => {
+                  const isRestoring =
+                    restoreModuleMutation.isPending &&
+                    (restoreModuleMutation.variables as any) === module.id;
+                  const isPermDeleting =
+                    permanentDeleteModuleMutation.isPending &&
+                    (permanentDeleteModuleMutation.variables as any) === module.id;
+                  return (
+                    <Card
+                      key={module.id}
+                      className="bg-card border-border opacity-90"
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <Badge
+                              variant="outline"
+                              className="bg-muted text-muted-foreground border-muted-foreground/30"
+                            >
+                              Module {module.moduleOrder}
+                            </Badge>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-base font-semibold text-foreground truncate">
+                                {module.title}
+                              </h3>
+                              {module.description && (
+                                <p className="text-xs text-muted-foreground truncate mt-0.5">
+                                  {module.description}
+                                </p>
+                              )}
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {module.stepsCount ?? 0}{" "}
+                                {module.stepsCount === 1 ? "step" : "steps"}
+                                {module.deletedAt && (
+                                  <>
+                                    {" · deleted "}
+                                    {new Date(module.deletedAt).toLocaleString()}
+                                  </>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => restoreModuleMutation.mutate(module.id)}
+                              disabled={isRestoring}
+                              className="text-primary hover:bg-primary/10 border border-primary/20"
+                              title="Restore module"
+                            >
+                              {isRestoring ? (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              ) : (
+                                <RotateCcw className="w-4 h-4 mr-2" />
+                              )}
+                              Restore
+                            </Button>
+                            <ConfirmDialog
+                              trigger={
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-700 hover:text-red-500 hover:bg-red-500/10 border border-red-500/20"
+                                  disabled={isPermDeleting}
+                                  title="Permanently delete module"
+                                >
+                                  {isPermDeleting ? (
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                  )}
+                                  Remove Permanently
+                                </Button>
+                              }
+                              title="Permanently Delete Module"
+                              description={`This will permanently delete "${module.title}" and all of its steps. This action cannot be undone. Are you sure?`}
+                              confirmText="Delete Permanently"
+                              cancelText="Cancel"
+                              variant="destructive"
+                              onConfirm={() =>
+                                permanentDeleteModuleMutation.mutate(module.id)
+                              }
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
             </CardContent>
           </Card>
         )}
@@ -1636,51 +1711,7 @@ export default function TrainingManualPage() {
                   {videoPreviewUrl && (
                     <div className="mt-4 space-y-2">
                       <Label className="text-muted-foreground text-sm">Video Preview</Label>
-                      <div className="relative h-64 bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
-                        {videoLoading && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
-                            <div className="text-center space-y-2">
-                              <Loader2 className="w-6 h-6 animate-spin text-primary mx-auto" />
-                              <p className="text-sm text-muted-foreground">Loading video preview...</p>
-                            </div>
-                          </div>
-                        )}
-                        {videoError ? (
-                          <div className="w-full h-full flex items-center justify-center p-4">
-                            <div className="text-center space-y-2">
-                              <AlertCircle className="w-8 h-8 text-red-700 mx-auto" />
-                              <p className="text-sm text-muted-foreground">{videoError}</p>
-                              <p className="text-xs text-muted-foreground break-all">{videoPreviewUrl}</p>
-                            </div>
-                          </div>
-                        ) : (
-                          <video
-                            key={videoPreviewUrl}
-                            src={videoPreviewUrl}
-                            className="w-full h-full object-contain"
-                            controls
-                            muted
-                            playsInline
-                            onLoadStart={() => setVideoLoading(true)}
-                            onLoadedData={() => {
-                              setVideoLoading(false);
-                              setVideoError(null);
-                            }}
-                            onError={() => {
-                              setVideoLoading(false);
-                              setVideoError("Failed to load video. Please check the URL.");
-                              setVideoValid(false);
-                            }}
-                            onCanPlay={() => {
-                              setVideoLoading(false);
-                              setVideoValid(true);
-                              setVideoError(null);
-                            }}
-                          >
-                            Your browser does not support the video tag.
-                          </video>
-                        )}
-                      </div>
+                      <VideoPlayer url={videoPreviewUrl} />
                     </div>
                   )}
                 </div>

@@ -25,6 +25,7 @@ import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
+import { VideoPlayer } from "@/components/ui/video-player";
 
 // Tutorial module interface
 export interface TutorialModule {
@@ -763,54 +764,27 @@ export function OnboardingTutorial({
         {/* Current Step Content */}
         <div className="space-y-4 py-2 flex-1 overflow-hidden flex flex-col min-h-0">
            {/* Video Section */}
-           <div className="relative h-[400px] bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex-shrink-0">
-             {videoError || !hasValidVideoUrl ? (
-               <div className="w-full h-full flex items-center justify-center p-8">
-                 <div className="text-center space-y-2">
-                   <div className="text-muted-foreground text-sm">
-                     {currentStepData.videoPlaceholder || "Video will be available soon"}
-                   </div>
-                   {hasValidVideoUrl && videoError && (
-                     <div className="text-xs text-gray-600 mt-2 break-all">
-                       Video URL: {currentStepData.videoUrl}
-                     </div>
-                   )}
-                 </div>
-               </div>
-             ) : (
-               <>
-                 {videoLoading && (
-                   <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
-                     <div className="text-center space-y-2">
-                       <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-                       <p className="text-sm text-muted-foreground">Loading video...</p>
-                     </div>
-                   </div>
-                 )}
-                 <video
-                   key={`${currentStep}-${currentStepData.videoUrl}`}
-                   src={currentStepData.videoUrl}
-                   className="w-full h-full object-contain"
-                   controls
-                   {...(autoPlay ? { autoPlay: true } : {})}
-                   loop
-                   muted
-                   playsInline
-                   onError={handleVideoError}
-                   onLoadedData={handleVideoLoad}
-                   onLoadStart={handleVideoLoadStart}
-                   onCanPlay={handleVideoLoad}
-                 >
-                   Your browser does not support the video tag.
-                 </video>
-               </>
-             )}
+           <div className="h-[400px] flex-shrink-0">
+             <VideoPlayer
+               key={`${currentStep}-${currentStepData.videoUrl}`}
+               url={currentStepData.videoUrl}
+               placeholder={currentStepData.videoPlaceholder || "Video will be available soon"}
+               autoPlay={autoPlay}
+               muted
+               loop
+               className="h-full aspect-auto"
+               onStatusChange={({ loading, error }) => {
+                 if (error) handleVideoError();
+                 else if (loading) handleVideoLoadStart();
+                 else handleVideoLoad();
+               }}
+             />
            </div>
 
           {/* Step Title and Description */}
           <div className="space-y-1 flex-shrink-0">
             <h3 className="text-lg font-semibold text-foreground">{currentStepData.title}</h3>
-            <p className="text-sm text-muted-foreground">{currentStepData.description}</p>
+            <p className="text-sm text-muted-foreground whitespace-pre-line">{currentStepData.description}</p>
           </div>
 
           {/* Instructions List - Two Columns */}

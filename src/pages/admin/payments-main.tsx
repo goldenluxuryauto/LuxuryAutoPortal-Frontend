@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import {
@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit, FileText, Loader2, Upload, Download, Wand2, CalendarX, Filter, FileSpreadsheet, CheckCircle2, X, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Edit, FileText, Loader2, Upload, Download, Wand2, CalendarX, Filter, FileSpreadsheet, CheckCircle2, X, AlertTriangle, Search, ChevronDown, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -49,6 +49,10 @@ interface Payment {
   client_fname: string;
   client_lname: string;
   fullname: string;
+  /** Server flag: true when the row has matching Income & Expense data for its month. */
+  payments_has_income_expense?: boolean;
+  /** Server flag: true when payments_amount/balance were live-computed from I&E (not raw DB). */
+  payments_amount_is_live?: boolean;
 }
 
 interface PaymentStatus {
@@ -100,6 +104,12 @@ export default function PaymentsMainPage() {
   const [endMonth, setEndMonth] = useState<string>("");
   const [carFilter, setCarFilter] = useState<string>("");
   const [carActivityFilter, setCarActivityFilter] = useState<"all" | "active" | "inactive">("active");
+  const [carSearch, setCarSearch] = useState<string>("");
+  const [carDropdownOpen, setCarDropdownOpen] = useState(false);
+  const carDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Developer-only mode: show destructive tools only when ?dev=1 is in the URL
+  const devMode = new URLSearchParams(window.location.search).get("dev") === "1";
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(30);
 
@@ -402,6 +412,123 @@ export default function PaymentsMainPage() {
     },
   });
 
+  const cleanupOrphansMutation = useMutation({
+    mutationFn: async (dryRun: boolean) => {
+      const url = buildApiUrl("/api/payments/cleanup-orphans");
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dryRun }),
+      });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || err.error || "Failed to clean up orphan payments");
+      }
+      return response.json() as Promise<{
+        success: boolean;
+        dryRun: boolean;
+        deleted: number;
+        preserved: number;
+        totalOrphans: number;
+      }>;
+    },
+    onSuccess: (data) => {
+      if (!data.dryRun) {
+        queryClient.invalidateQueries({ queryKey: ["/api/payments/search"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/payments/car"] });
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Cleanup failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const [isCleanupModalOpen, setIsCleanupModalOpen] = useState(false);
+  const [cleanupPreview, setCleanupPreview] = useState<{
+    deleted: number;
+    preserved: number;
+    totalOrphans: number;
+  } | null>(null);
+
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState("");
+  const [resetIncludeInactive, setResetIncludeInactive] = useState(false);
+
+  const resetAllMutation = useMutation({
+    mutationFn: async (opts: { includeInactive: boolean }) => {
+      const url = buildApiUrl("/api/payments/reset-all");
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: "DELETE ALL", includeInactive: opts.includeInactive }),
+      });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || err.error || "Failed to reset payments");
+      }
+      return response.json() as Promise<{
+        success: boolean;
+        message: string;
+        deleted: number;
+        created: number;
+        updated: number;
+        monthsProcessed: number;
+        errors: string[];
+      }>;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/payments/search"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/payments/car"] });
+      toast({
+        title: "Payments reset",
+        description: data.message,
+      });
+      setIsResetModalOpen(false);
+      setResetConfirmText("");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Reset failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const openCleanupDialog = async () => {
+    setCleanupPreview(null);
+    setIsCleanupModalOpen(true);
+    try {
+      const data = await cleanupOrphansMutation.mutateAsync(true);
+      setCleanupPreview({
+        deleted: data.totalOrphans - data.preserved,
+        preserved: data.preserved,
+        totalOrphans: data.totalOrphans,
+      });
+    } catch {
+      setIsCleanupModalOpen(false);
+    }
+  };
+
+  const confirmCleanupOrphans = async () => {
+    try {
+      const data = await cleanupOrphansMutation.mutateAsync(false);
+      toast({
+        title: "Cleanup complete",
+        description: `Removed ${data.deleted} orphan payment${data.deleted === 1 ? "" : "s"} (kept ${data.preserved} with a Paid Amount).`,
+      });
+    } finally {
+      setIsCleanupModalOpen(false);
+      setCleanupPreview(null);
+    }
+  };
+
   const handleClearFilters = () => {
     setFilterStatus("");
     setStartMonth("");
@@ -415,6 +542,18 @@ export default function PaymentsMainPage() {
   useEffect(() => {
     setPage(1);
   }, [filterStatus, startMonth, endMonth, carFilter, carActivityFilter, pageSize]);
+
+  // Close the car dropdown when the user clicks outside it
+  useEffect(() => {
+    if (!carDropdownOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (carDropdownRef.current && !carDropdownRef.current.contains(e.target as Node)) {
+        setCarDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [carDropdownOpen]);
 
   const formatVehicleInfo = (p: Payment) => {
     const name = `${p.car_make_name || ""} ${p.car_year || ""}`.trim();
@@ -460,6 +599,46 @@ export default function PaymentsMainPage() {
               <Upload className="w-4 h-4 mr-2 text-primary" />
               Import
             </Button>
+            {devMode && (
+              <Button
+                onClick={openCleanupDialog}
+                disabled={cleanupOrphansMutation.isPending}
+                variant="outline"
+                className="bg-card border-border text-foreground hover:bg-muted hover:text-foreground h-9 font-medium"
+                title="[DEV] Delete rows where the car has no Income & Expense for that month and nothing was paid"
+              >
+                {cleanupOrphansMutation.isPending && !isCleanupModalOpen ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <AlertTriangle className="w-4 h-4 mr-2 text-yellow-600" />
+                    Clean Orphans
+                  </>
+                )}
+              </Button>
+            )}
+            {devMode && (
+              <Button
+                onClick={() => {
+                  setResetConfirmText("");
+                  setResetIncludeInactive(false);
+                  setIsResetModalOpen(true);
+                }}
+                disabled={resetAllMutation.isPending}
+                variant="outline"
+                className="bg-card border-red-500/30 text-red-600 hover:bg-red-500/10 hover:text-red-700 hover:border-red-500/50 h-9 font-medium"
+                title="[DEV] Delete every payment record and regenerate from Income & Expense"
+              >
+                {resetAllMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Reset All
+                  </>
+                )}
+              </Button>
+            )}
             <Button
               onClick={() => setIsDeleteByMonthModalOpen(true)}
               variant="outline"
@@ -552,36 +731,122 @@ export default function PaymentsMainPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col flex-1 min-w-[260px]">
+            <div className="flex flex-col flex-1 min-w-[260px]" ref={carDropdownRef}>
               <label className="text-muted-foreground text-xs font-medium mb-1.5">Car</label>
-              <Select
-                value={carFilter || "__all__"}
-                onValueChange={(v) => {
-                  setCarFilter(v === "__all__" ? "" : v);
-                  setIsFilter(true);
-                }}
-              >
-                <SelectTrigger className="bg-background border-border text-foreground h-9 focus:ring-1 focus:ring-primary">
-                  <SelectValue placeholder="All Cars" />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-border text-foreground max-h-60">
-                  <SelectItem value="__all__">All Cars</SelectItem>
-                  {carsList.map((c) => {
-                    const nameYear = [c.makeModel, c.year ? String(c.year) : ""]
-                      .filter(Boolean)
-                      .join(" ");
-                    const parts: string[] = [];
-                    if (nameYear) parts.push(nameYear);
-                    if (c.licensePlate) parts.push(`#${c.licensePlate}`);
-                    if (c.vin) parts.push(c.vin);
-                    return (
-                      <SelectItem key={c.id} value={String(c.id)}>
-                        {parts.join(" - ")}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+              {/* Custom searchable car combobox */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCarDropdownOpen((prev) => !prev);
+                    setCarSearch("");
+                  }}
+                  className="flex items-center justify-between w-full h-9 px-3 py-2 text-sm bg-background border border-border rounded-md text-foreground hover:bg-muted/50 focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
+                >
+                  <span className="truncate">
+                    {carFilter
+                      ? (() => {
+                          const c = carsList.find((c) => String(c.id) === carFilter);
+                          if (!c) return "All Cars";
+                          const nameYear = [c.makeModel, c.year ? String(c.year) : ""].filter(Boolean).join(" ");
+                          const parts: string[] = [];
+                          if (nameYear) parts.push(nameYear);
+                          if (c.licensePlate) parts.push(`#${c.licensePlate}`);
+                          if (c.vin) parts.push(c.vin);
+                          return parts.join(" - ");
+                        })()
+                      : "All Cars"}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground flex-shrink-0 ml-2 transition-transform duration-150 ${carDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {carDropdownOpen && (
+                  <div
+                    className="absolute z-50 top-full mt-1 w-full min-w-[320px] bg-card border border-border rounded-md shadow-lg overflow-hidden"
+                    onMouseDown={(e) => e.stopPropagation()}
+                  >
+                    {/* Search input */}
+                    <div className="p-2 border-b border-border">
+                      <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                        <input
+                          autoFocus
+                          type="text"
+                          value={carSearch}
+                          onChange={(e) => setCarSearch(e.target.value)}
+                          placeholder="Search make, plate, VIN…"
+                          className="w-full pl-8 pr-3 py-1.5 text-sm bg-background border border-border rounded text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Options list */}
+                    <div className="max-h-56 overflow-y-auto">
+                      {/* All Cars option */}
+                      {!carSearch && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCarFilter("");
+                            setIsFilter(true);
+                            setCarDropdownOpen(false);
+                          }}
+                          className={`flex items-center justify-between w-full px-3 py-2 text-sm text-left hover:bg-muted/60 transition-colors ${!carFilter ? "text-primary font-medium" : "text-foreground"}`}
+                        >
+                          <span>All Cars</span>
+                          {!carFilter && <Check className="w-3.5 h-3.5 flex-shrink-0" />}
+                        </button>
+                      )}
+
+                      {(() => {
+                        const lower = carSearch.toLowerCase();
+                        const filtered = carsList.filter((c) => {
+                          if (!lower) return true;
+                          const nameYear = [c.makeModel, c.year ? String(c.year) : ""].filter(Boolean).join(" ").toLowerCase();
+                          return (
+                            nameYear.includes(lower) ||
+                            (c.licensePlate || "").toLowerCase().includes(lower) ||
+                            (c.vin || "").toLowerCase().includes(lower)
+                          );
+                        });
+
+                        if (filtered.length === 0) {
+                          return (
+                            <p className="px-3 py-4 text-xs text-center text-muted-foreground">
+                              No cars match "{carSearch}"
+                            </p>
+                          );
+                        }
+
+                        return filtered.map((c) => {
+                          const nameYear = [c.makeModel, c.year ? String(c.year) : ""].filter(Boolean).join(" ");
+                          const parts: string[] = [];
+                          if (nameYear) parts.push(nameYear);
+                          if (c.licensePlate) parts.push(`#${c.licensePlate}`);
+                          if (c.vin) parts.push(c.vin);
+                          const label = parts.join(" - ");
+                          const isSelected = carFilter === String(c.id);
+                          return (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => {
+                                setCarFilter(String(c.id));
+                                setIsFilter(true);
+                                setCarDropdownOpen(false);
+                              }}
+                              className={`flex items-center justify-between w-full px-3 py-2 text-sm text-left hover:bg-muted/60 transition-colors ${isSelected ? "text-primary font-medium" : "text-foreground"}`}
+                            >
+                              <span className="truncate pr-2">{label}</span>
+                              {isSelected && <Check className="w-3.5 h-3.5 flex-shrink-0" />}
+                            </button>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             {hasFilters && (
               <Button
@@ -607,8 +872,8 @@ export default function PaymentsMainPage() {
                   <th className="h-11 px-3 text-left font-semibold text-foreground w-36 text-[11px] uppercase tracking-wider">Client</th>
                   <th className="h-11 px-3 text-left font-semibold text-foreground w-28 whitespace-nowrap text-[11px] uppercase tracking-wider">Date</th>
                   <th className="h-11 px-3 text-left font-semibold text-foreground min-w-[180px] text-[11px] uppercase tracking-wider">Car</th>
-                  <th className="h-11 px-3 text-right font-semibold text-foreground w-32 tabular-nums text-[11px] whitespace-nowrap uppercase tracking-wider">Payable</th>
-                  <th className="h-11 px-3 text-right font-semibold text-foreground w-32 tabular-nums text-[11px] whitespace-nowrap uppercase tracking-wider">Payout</th>
+                  <th className="h-11 px-3 text-right font-semibold text-foreground w-36 tabular-nums text-[11px] whitespace-nowrap uppercase tracking-wider">Car Owner Split</th>
+                  <th className="h-11 px-3 text-right font-semibold text-foreground w-32 tabular-nums text-[11px] whitespace-nowrap uppercase tracking-wider">Paid Amount</th>
                   <th className="h-11 px-3 text-right font-semibold text-foreground w-32 tabular-nums text-[11px] whitespace-nowrap uppercase tracking-wider">Balance</th>
                   <th className="h-11 px-3 text-left font-semibold text-foreground w-24 text-[11px] uppercase tracking-wider">Ref #</th>
                   <th className="h-11 px-3 text-left font-semibold text-foreground w-28 whitespace-nowrap text-[11px] uppercase tracking-wider">Pmt Date</th>
@@ -658,8 +923,20 @@ export default function PaymentsMainPage() {
                           <td className="px-3 py-3 text-muted-foreground text-xs align-middle leading-snug">
                             {formatVehicleInfo(payment)}
                           </td>
-                          <td className="px-3 py-3 text-right text-primary font-semibold tabular-nums text-xs whitespace-nowrap align-middle">
-                            {formatCurrency(Number(payment.payments_amount || 0))}
+                          <td className="px-3 py-3 text-right tabular-nums text-xs whitespace-nowrap align-middle">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {payment.payments_has_income_expense === false && (
+                                <span
+                                  title="No Income & Expense data exists for this car/month, so the Car Owner Split is $0."
+                                  className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-yellow-500/15 text-yellow-700 dark:text-yellow-400"
+                                >
+                                  <AlertTriangle className="w-3 h-3" />
+                                </span>
+                              )}
+                              <span className="text-primary font-semibold">
+                                {formatCurrency(Number(payment.payments_amount || 0))}
+                              </span>
+                            </div>
                           </td>
                           <td className="px-3 py-3 text-right tabular-nums text-foreground text-xs whitespace-nowrap align-middle">
                             {formatCurrency(Number(payment.payments_amount_payout || 0))}
@@ -881,6 +1158,165 @@ export default function PaymentsMainPage() {
             carId={selectedPayment.payments_car_id}
             clientId={selectedPayment.payments_client_id}
           />
+        )}
+
+        {isCleanupModalOpen && (
+          <Dialog open={isCleanupModalOpen} onOpenChange={setIsCleanupModalOpen}>
+            <DialogContent className="bg-card border-border text-foreground">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                  Clean Orphan Payments
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  Remove payment rows whose car has no Income &amp; Expense data
+                  for that month. Rows with a non-zero Paid Amount are kept as
+                  paid history.
+                </DialogDescription>
+              </DialogHeader>
+
+              {cleanupOrphansMutation.isPending && !cleanupPreview ? (
+                <div className="flex items-center justify-center py-10 text-muted-foreground text-sm gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Scanning for orphan rows…
+                </div>
+              ) : cleanupPreview ? (
+                <div className="rounded-lg border border-border overflow-hidden">
+                  <div className="grid grid-cols-3 divide-x divide-border">
+                    <div className="px-4 py-3 text-center">
+                      <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Total orphans</div>
+                      <div className="text-xl font-semibold text-foreground tabular-nums mt-1">
+                        {cleanupPreview.totalOrphans}
+                      </div>
+                    </div>
+                    <div className="px-4 py-3 text-center bg-red-500/5">
+                      <div className="text-[11px] uppercase tracking-wider text-red-700">Will delete</div>
+                      <div className="text-xl font-semibold text-red-700 tabular-nums mt-1">
+                        {cleanupPreview.deleted}
+                      </div>
+                    </div>
+                    <div className="px-4 py-3 text-center bg-emerald-500/5">
+                      <div className="text-[11px] uppercase tracking-wider text-emerald-700">Will keep (paid)</div>
+                      <div className="text-xl font-semibold text-emerald-700 tabular-nums mt-1">
+                        {cleanupPreview.preserved}
+                      </div>
+                    </div>
+                  </div>
+                  {cleanupPreview.totalOrphans === 0 && (
+                    <div className="px-4 py-3 text-center text-xs text-muted-foreground bg-muted/30 border-t border-border">
+                      Nothing to clean — every payment has matching Income &amp; Expense data.
+                    </div>
+                  )}
+                </div>
+              ) : null}
+
+              <div className="flex justify-end gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsCleanupModalOpen(false);
+                    setCleanupPreview(null);
+                  }}
+                  className="bg-card border-border text-foreground"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmCleanupOrphans}
+                  disabled={
+                    cleanupOrphansMutation.isPending ||
+                    !cleanupPreview ||
+                    cleanupPreview.deleted === 0
+                  }
+                  className="bg-red-500/20 text-red-700 border border-red-500/50 hover:bg-red-500/30"
+                >
+                  {cleanupOrphansMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>Delete {cleanupPreview?.deleted ?? 0} row{cleanupPreview?.deleted === 1 ? "" : "s"}</>
+                  )}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {isResetModalOpen && (
+          <Dialog open={isResetModalOpen} onOpenChange={setIsResetModalOpen}>
+            <DialogContent className="bg-card border-border text-foreground">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-red-600">
+                  <AlertTriangle className="w-4 h-4" />
+                  Reset All Payments
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  This will <span className="font-semibold text-red-600">delete every payment row</span>{" "}
+                  (including Paid Amounts, references, receipts, and remarks) and
+                  regenerate fresh rows from Income &amp; Expense. One payment is
+                  created per (car, month) that has Income &amp; Expense data. Car
+                  Owner Split is computed from I&amp;E &times; owner&nbsp;% at display
+                  time. This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3">
+                <label className="flex items-start gap-2 text-sm text-foreground cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 accent-primary"
+                    checked={resetIncludeInactive}
+                    onChange={(e) => setResetIncludeInactive(e.target.checked)}
+                  />
+                  <span>
+                    Include <span className="font-medium">inactive cars</span>{" "}
+                    <span className="text-muted-foreground">
+                      (useful for migrating legacy records from old software).
+                    </span>
+                  </span>
+                </label>
+
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">
+                    Type <span className="font-mono text-red-600">DELETE ALL</span> to confirm
+                  </label>
+                  <Input
+                    value={resetConfirmText}
+                    onChange={(e) => setResetConfirmText(e.target.value)}
+                    placeholder="DELETE ALL"
+                    className="bg-background border-border text-foreground focus-visible:ring-1 focus-visible:ring-red-500"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsResetModalOpen(false)}
+                  disabled={resetAllMutation.isPending}
+                  className="bg-card border-border text-foreground"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() =>
+                    resetAllMutation.mutate({ includeInactive: resetIncludeInactive })
+                  }
+                  disabled={
+                    resetConfirmText.trim() !== "DELETE ALL" ||
+                    resetAllMutation.isPending
+                  }
+                  className="bg-red-500/20 text-red-700 border border-red-500/50 hover:bg-red-500/30"
+                >
+                  {resetAllMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "Reset & Regenerate"
+                  )}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         )}
 
         {isDeleteByMonthModalOpen && (
@@ -1108,8 +1544,8 @@ export default function PaymentsMainPage() {
                 <div className="text-[11px] text-muted-foreground leading-relaxed bg-muted/30 border border-border/60 rounded-md px-3 py-2">
                   <span className="font-medium text-foreground">How it works:</span>{" "}
                   The VIN embedded in the Car column is used to match each row to an
-                  existing car. Payable is auto-calculated from Income &amp; Expense data
-                  (it does not need to be in the file).
+                  existing car. The Car Owner Split is auto-calculated from Income &amp;
+                  Expense data (it does not need to be in the file).
                 </div>
 
                 {/* Results */}

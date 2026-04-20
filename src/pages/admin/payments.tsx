@@ -453,8 +453,8 @@ export default function PaymentsPage() {
                     <TableHead className="text-left text-foreground font-medium">Status</TableHead>
                     <TableHead className="text-left text-foreground font-medium">Date</TableHead>
                     <TableHead className="text-left text-foreground font-medium">Payment Date</TableHead>
-                    <TableHead className="text-right text-foreground font-medium">Payable</TableHead>
-                    <TableHead className="text-right text-foreground font-medium">Payout</TableHead>
+                    <TableHead className="text-right text-foreground font-medium">Car Owner Split</TableHead>
+                    <TableHead className="text-right text-foreground font-medium">Paid Amount</TableHead>
                     <TableHead className="text-right text-foreground font-medium">Balance</TableHead>
                     <TableHead className="text-left text-foreground font-medium">Ref #</TableHead>
                     <TableHead className="text-center text-foreground font-medium">Receipt</TableHead>
