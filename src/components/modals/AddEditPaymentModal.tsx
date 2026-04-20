@@ -772,8 +772,8 @@ export function AddEditPaymentModal({
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
             {isEdit
-              ? "Update the payment record. Payable is recalculated from Income & Expense."
-              : "Create a new payment. Payable will auto-fill from Income & Expense for the chosen month."}
+              ? "Update the payment record. Car Owner Split is recalculated from Income & Expense."
+              : "Create a new payment. Car Owner Split will auto-fill from Income & Expense for the chosen month."}
           </DialogDescription>
         </DialogHeader>
 
@@ -829,7 +829,7 @@ export function AddEditPaymentModal({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="payable" className="text-muted-foreground text-xs">
-                  Payable
+                  Car Owner Split
                 </Label>
                 <div className="relative mt-1">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -846,13 +846,13 @@ export function AddEditPaymentModal({
                   />
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  Auto from Income & Expense
+                  Owner split for this month (auto)
                 </p>
               </div>
 
               <div>
                 <Label htmlFor="payout" className="text-muted-foreground text-xs">
-                  Payout <span className="text-red-700">*</span>
+                  Paid Amount <span className="text-red-700">*</span>
                 </Label>
                 <div className="relative mt-1">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -871,7 +871,7 @@ export function AddEditPaymentModal({
                   />
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  Amount actually paid
+                  Amount paid to the car owner
                 </p>
               </div>
 
@@ -898,18 +898,18 @@ export function AddEditPaymentModal({
                   />
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  Payout − Payable
+                  Paid Amount − Car Owner Split
                 </p>
               </div>
             </div>
             {isLoadingIncomeExpense && (
               <p className="text-xs text-muted-foreground">
-                Loading payable amount from Income & Expense…
+                Loading Car Owner Split from Income & Expense…
               </p>
             )}
             {!isLoadingIncomeExpense && year && month && (!incomeExpenseData || !incomeExpenseData.success) && (
               <p className="text-xs text-yellow-700">
-                Income & Expense not found for {year}-{String(month).padStart(2, "0")}. Payable set to $0.00.
+                Income & Expense not found for {year}-{String(month).padStart(2, "0")}. Car Owner Split set to $0.00.
               </p>
             )}
           </section>

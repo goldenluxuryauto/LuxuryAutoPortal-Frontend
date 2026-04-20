@@ -56,7 +56,7 @@ interface OnboardingCar {
   id: number;
   createdAt: string;
   clientId: number | null;
-  clientName: string;
+  clientName: string | null;
   clientEmail: string | null;
   clientPhone: string | null;
   vin: string | null;
@@ -222,7 +222,7 @@ function CarOnboarding() {
   const handleRowClick = (car: OnboardingCar) => {
     if (car.clientId) {
       setLocation(`/admin/clients?id=${car.clientId}`);
-    } else {
+    } else if (car.clientName) {
       setLocation(
         `/admin/clients?search=${encodeURIComponent(car.clientName)}`
       );
@@ -330,11 +330,15 @@ function CarOnboarding() {
                         )}
                       >
                         <TableCell
-                          className="text-center px-2 sm:px-3 py-3 sm:py-4 text-foreground text-xs sm:text-sm cursor-pointer max-w-[120px] truncate"
+                          className="text-center px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm cursor-pointer max-w-[120px] truncate"
                           onClick={() => handleRowClick(car)}
-                          title={car.clientName}
+                          title={car.clientName || "Unassigned"}
                         >
-                          {car.clientName}
+                          {car.clientName ? (
+                            <span className="text-foreground">{car.clientName}</span>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
                         </TableCell>
                         <TableCell className="text-center px-2 sm:px-3 py-3 sm:py-4 text-muted-foreground text-xs sm:text-sm hidden md:table-cell max-w-[150px] truncate" title={car.clientEmail || "—"}>
                           {car.clientEmail || "—"}
