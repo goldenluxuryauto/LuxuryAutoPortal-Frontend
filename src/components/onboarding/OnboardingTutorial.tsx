@@ -66,6 +66,7 @@ interface TutorialContextType {
   previousStep: () => void;
   goToStep: (step: number) => void;
   goToModule: (moduleId: number) => void;
+  startTutorialFromModule: (moduleId: number) => Promise<void> | void;
   markStepComplete: (step: number) => void;
   resetTutorial: () => void;
   hasCompletedTutorial: boolean;
@@ -486,6 +487,29 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const startTutorialFromModule = async (moduleId: number) => {
+    // Refetch the latest steps/modules so we always open at the correct first step.
+    await refetchTutorialSteps();
+    await refetchTutorialModules();
+
+    const latestSteps =
+      queryClient.getQueryData<TutorialStep[]>(["/api/tutorial/steps"]) || tutorialSteps;
+    const safeLatestSteps =
+      Array.isArray(latestSteps) && latestSteps.length > 0
+        ? latestSteps
+        : DEFAULT_TUTORIAL_STEPS;
+
+    const moduleSteps = safeLatestSteps.filter(s => s.moduleId === moduleId);
+    // Fall back to the module's first step if available, otherwise fall back to the
+    // very first tutorial step so the dialog never opens in an empty state.
+    const firstStep = moduleSteps.length > 0 ? moduleSteps[0].id : safeLatestSteps[0].id;
+
+    setCurrentModule(moduleId);
+    setCurrentStep(firstStep);
+    setIsOpen(true);
+    saveState({ currentStep: firstStep, isOpen: true });
+  };
+
   const goToStep = (step: number) => {
     // Ensure tutorialSteps is an array
     if (!Array.isArray(safeTutorialSteps) || safeTutorialSteps.length === 0) {
@@ -549,6 +573,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         previousStep,
         goToStep,
         goToModule,
+        startTutorialFromModule,
         markStepComplete,
         resetTutorial,
         hasCompletedTutorial,
@@ -718,11 +743,11 @@ export function OnboardingTutorial({
           <DialogDescription className="text-xs text-muted-foreground">
             {currentModuleData ? (
               <>
-                Module: {currentModuleData.title} - Step {currentStep} of {currentModuleSteps.length}
+                Module: {currentModuleData.title} - Step {currentStepIndex >= 0 ? currentStepIndex + 1 : 1} of {currentModuleSteps.length}
               </>
             ) : (
               <>
-            Step {currentStep} of {tutorialSteps.length}
+                Step {currentStepIndex >= 0 ? currentStepIndex + 1 : 1} of {tutorialSteps.length}
               </>
             )}
           </DialogDescription>

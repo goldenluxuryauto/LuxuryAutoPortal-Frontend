@@ -69,12 +69,17 @@ type TutorialStepFormData = z.infer<typeof tutorialStepSchema>;
 type TutorialModuleFormData = z.infer<typeof tutorialModuleSchema>;
 
 export default function TrainingManualPage() {
-  const { isOpen: tutorialOpen, openTutorial, closeTutorial, resetTutorial } = useTutorial();
+  const { isOpen: tutorialOpen, openTutorial, closeTutorial, resetTutorial, startTutorialFromModule } = useTutorial();
   
   // Handler for Start Tutorial button
   const handleStartTutorial = () => {
     // Reset tutorial - this sets isOpen to true in context
     resetTutorial();
+  };
+
+  // Start tutorial from a specific module (Module 1, 2, 3...)
+  const handleStartModuleTutorial = (moduleId: number) => {
+    void startTutorialFromModule(moduleId);
   };
   const isAdmin = useIsAdmin();
   const { toast } = useToast();
@@ -892,7 +897,17 @@ export default function TrainingManualPage() {
                                 </p>
                               </div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => handleStartModuleTutorial(module.id)}
+                                disabled={moduleSteps.length === 0}
+                                className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
+                                title={moduleSteps.length === 0 ? "Add a step before starting this module" : `Start tutorial from Module ${module.moduleOrder}`}
+                              >
+                                <PlayCircle className="w-4 h-4 mr-2" />
+                                Start Tutorial
+                              </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -946,7 +961,7 @@ export default function TrainingManualPage() {
                                   No steps in this module. Click the + button to add a step.
                                 </div>
                               ) : (
-                                moduleSteps.map((step: TutorialStep) => (
+                                moduleSteps.map((step: TutorialStep, stepIndex: number) => (
                                   <Card key={step.id} className="bg-card border-border hover:border-primary/30 transition-colors">
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between gap-4">
@@ -954,7 +969,7 @@ export default function TrainingManualPage() {
                             {/* Step Header */}
                             <div className="flex items-center gap-3">
                               <Badge variant="outline" className="bg-[#EAEB80]/20 text-primary border-primary/30 text-sm font-semibold px-3 py-1">
-                                Step {step.id}
+                                Step {stepIndex + 1}
                               </Badge>
                               <h3 className="text-xl font-semibold text-foreground">{step.title}</h3>
                             </div>
@@ -1113,14 +1128,14 @@ export default function TrainingManualPage() {
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {stepsWithoutModule.map((step: TutorialStep) => (
+                            {stepsWithoutModule.map((step: TutorialStep, stepIndex: number) => (
                             <Card key={step.id} className="bg-card border-border hover:border-primary/30 transition-colors">
                               <CardContent className="p-6">
                                 <div className="flex items-start justify-between gap-4">
                                   <div className="flex-1 space-y-4">
                                     <div className="flex items-center gap-3">
                                       <Badge variant="outline" className="bg-[#EAEB80]/20 text-primary border-primary/30 text-sm font-semibold px-3 py-1">
-                                        Step {step.id}
+                                        Step {stepIndex + 1}
                                       </Badge>
                                       <h3 className="text-xl font-semibold text-foreground">{step.title}</h3>
                                     </div>

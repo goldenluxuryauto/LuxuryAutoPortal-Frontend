@@ -26,7 +26,7 @@ interface TutorialModule {
 }
 
 export default function ClientTrainingManual() {
-  const { resetTutorial } = useTutorial();
+  const { resetTutorial, startTutorialFromModule } = useTutorial();
   const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set());
   const [stepVideoState, setStepVideoState] = useState<Record<number, { loading: boolean; error: boolean }>>({});
 
@@ -70,6 +70,10 @@ export default function ClientTrainingManual() {
 
   const handleStartTutorial = () => {
     resetTutorial();
+  };
+
+  const handleStartModuleTutorial = (moduleId: number) => {
+    void startTutorialFromModule(moduleId);
   };
 
   return (
@@ -123,16 +127,31 @@ export default function ClientTrainingManual() {
                     className="cursor-pointer pb-3"
                     onClick={() => toggleModule(mod.id)}
                   >
-                    <div className="flex items-center gap-2">
-                      {isExpanded ? (
-                        <ChevronDown className="h-4 w-4 text-primary" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4 text-primary" />
-                      )}
-                      <span className="rounded border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                        Module {mod.moduleOrder}
-                      </span>
-                      <CardTitle className="text-lg">{mod.title}</CardTitle>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4 text-primary flex-shrink-0" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 text-primary flex-shrink-0" />
+                        )}
+                        <span className="rounded border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary flex-shrink-0">
+                          Module {mod.moduleOrder}
+                        </span>
+                        <CardTitle className="text-lg truncate">{mod.title}</CardTitle>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStartModuleTutorial(mod.id);
+                        }}
+                        disabled={steps.length === 0}
+                        className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                        title={steps.length === 0 ? "No steps available to start" : `Start tutorial from Module ${mod.moduleOrder}`}
+                      >
+                        <PlayCircle className="h-3.5 w-3.5" />
+                        Start Tutorial
+                      </button>
                     </div>
                     {mod.description && (
                       <p className="text-sm text-muted-foreground pl-6 whitespace-pre-line">{mod.description}</p>
@@ -144,12 +163,12 @@ export default function ClientTrainingManual() {
                   {isExpanded && (
                     <CardContent className="pt-0">
                       <div className="grid gap-4 md:grid-cols-2">
-                        {steps.map((step) => (
+                        {steps.map((step, stepIndex) => (
                           <Card key={step.id} className="bg-card border-border">
                             <CardContent className="p-4 space-y-3">
                               <div className="flex items-center gap-2">
                                 <span className="rounded border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                                  Step {step.id}
+                                  Step {stepIndex + 1}
                                 </span>
                                 <h3 className="font-semibold">{step.title}</h3>
                               </div>
