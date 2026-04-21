@@ -267,6 +267,25 @@ export default function AdminsPage() {
     retry: false,
   });
 
+  // Current session admin — used to prevent self-deletion from the UI.
+  const { data: currentSession } = useQuery<{ user?: { id?: number } }>({
+    queryKey: ["/api/auth/me"],
+    queryFn: async () => {
+      try {
+        const response = await fetch(buildApiUrl("/api/auth/me"), {
+          credentials: "include",
+        });
+        if (!response.ok) return { user: undefined };
+        return response.json();
+      } catch {
+        return { user: undefined };
+      }
+    },
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const currentUserId = Number(currentSession?.user?.id ?? 0);
+
   const { data: roles } = useQuery<Role[]>({
     queryKey: ["/api/admin/roles"],
     queryFn: async () => {
@@ -436,6 +455,36 @@ export default function AdminsPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to update status",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Permanently remove an admin/employee from the portal. The backend
+  // anonymizes the user row rather than hard-deleting it so every record
+  // they added to the system (payments recorded, income/expense entries,
+  // cars onboarded, etc.) is preserved via its foreign key.
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/admin/users/${id}`);
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || "Failed to delete user");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({
+        title: "User deleted",
+        description:
+          "The account is permanently removed. Their historical data is preserved.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete user",
         variant: "destructive",
       });
     },
@@ -816,6 +865,36 @@ export default function AdminsPage() {
                               }
                               onConfirm={() =>
                                 toggleActiveMutation.mutate(user)
+                              }
+                            />
+                            <ConfirmDialog
+                              trigger={
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-500/10 px-2 sm:px-3"
+                                  disabled={
+                                    deleteMutation.isPending ||
+                                    currentUserId === user.id
+                                  }
+                                  title={
+                                    currentUserId === user.id
+                                      ? "You cannot delete your own account"
+                                      : "Permanently delete user"
+                                  }
+                                  data-testid={`button-delete-admin-${user.id}`}
+                                >
+                                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                                  <span className="sr-only">Delete</span>
+                                </Button>
+                              }
+                              title="Permanently delete admin"
+                              description={`Permanently delete ${user.firstName} ${user.lastName}? Their login will be removed and cannot be recovered. Records they've added to the system (payments, income/expense entries, cars, contracts, etc.) will be preserved and stay linked in the history.`}
+                              confirmText="Delete permanently"
+                              cancelText="Cancel"
+                              variant="destructive"
+                              onConfirm={() =>
+                                deleteMutation.mutate(user.id)
                               }
                             />
                           </div>

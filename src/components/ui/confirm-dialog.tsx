@@ -13,7 +13,7 @@ import {
 interface ConfirmDialogProps {
   trigger: ReactNode;
   title: string;
-  description: string;
+  description: ReactNode;
   confirmText?: string;
   cancelText?: string;
   onConfirm: () => void;
