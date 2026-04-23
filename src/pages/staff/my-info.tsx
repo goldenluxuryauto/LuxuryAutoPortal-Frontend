@@ -20,12 +20,9 @@ interface MyEmployee {
   employee_job_pay_work_email?: string | null;
 }
 
-/** V1-style section list: Personal Information, Job and Pay, Earnings, Deduction, Payslip */
 const MY_INFO_SECTIONS = [
   { id: "personal-information", label: "Personal Information" },
   { id: "job-and-pay", label: "Job and Pay" },
-  { id: "earnings", label: "Earnings" },
-  { id: "deduction", label: "Deduction" },
   { id: "payslip", label: "Payslip" },
 ] as const;
 

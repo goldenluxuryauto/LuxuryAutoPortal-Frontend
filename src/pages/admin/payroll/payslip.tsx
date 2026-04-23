@@ -1,10 +1,22 @@
+/**
+ * Admin Payroll – Employee payslip (gla-v3 parity).
+ *
+ * Mirrors `PayslipList.jsx` from gla-v3:
+ *  - Header: Payroll Number, Date Range, Employee Name
+ *  - Earnings table with Hours / Rate / Amount columns
+ *  - Total Earnings line
+ *  - Deductions list
+ *  - Total Deductions / Tax / Net summary block
+ *  - Print button (uses browser print with a print-friendly layout)
+ */
+
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, useLocation } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { buildApiUrl } from "@/lib/queryClient";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Printer, Loader2 } from "lucide-react";
 
 interface PayrunRow {
   payrun_aid: number;
@@ -19,6 +31,8 @@ interface PayrunListRow {
   payrun_list_gross: string;
   payrun_list_deduction: string;
   payrun_list_net: string;
+  fullname?: string;
+  employee_name?: string;
 }
 
 interface PaysummaryRow {
@@ -34,112 +48,235 @@ interface PayslipData {
   payrun: PayrunRow;
   payrunList: PayrunListRow;
   paysummary: PaysummaryRow[];
+  employee?: { fullname?: string; first_name?: string; last_name?: string };
 }
 
 function formatDate(s: string) {
   if (!s) return "—";
   try {
-    return new Date(s).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+    return new Date(s).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   } catch {
     return s;
   }
 }
 
-function formatCurrency(s: string) {
-  const n = parseFloat(s);
+function formatCurrency(s: string | number) {
+  const n = typeof s === "number" ? s : parseFloat(String(s));
   if (Number.isNaN(n)) return "0.00";
-  return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return n.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 export default function PayslipPage() {
-  const [, params] = useRoute<{ payrunId: string; employeeId: string }>("/admin/payroll/:payrunId/payslip/:employeeId");
+  const [, params] = useRoute<{ payrunId: string; employeeId: string }>(
+    "/admin/payroll/:payrunId/payslip/:employeeId",
+  );
   const [, setLocation] = useLocation();
   const payrunId = params?.payrunId ? parseInt(params.payrunId, 10) : null;
   const employeeId = params?.employeeId ? parseInt(params.employeeId, 10) : null;
 
-  const { data: res, isLoading, error } = useQuery<{ success: boolean; data: PayslipData }>({
+  const { data: res, isLoading, error } = useQuery<{
+    success: boolean;
+    data: PayslipData;
+  }>({
     queryKey: ["/api/payroll/payruns", payrunId, "payslip", employeeId],
     queryFn: async () => {
-      const r = await fetch(buildApiUrl(`/api/payroll/payruns/${payrunId}/payslip/${employeeId}`), { credentials: "include" });
+      const r = await fetch(
+        buildApiUrl(`/api/payroll/payruns/${payrunId}/payslip/${employeeId}`),
+        { credentials: "include" },
+      );
       if (!r.ok) throw new Error("Payslip not found");
       return r.json();
     },
     enabled: payrunId != null && employeeId != null,
   });
 
-  const data = res?.data;
-  const earnings = data?.paysummary?.filter((l) => l.paysummary_is_earnings === 1) ?? [];
-  const deductions = data?.paysummary?.filter((l) => l.paysummary_is_deduction === 1) ?? [];
-
   if (payrunId == null || employeeId == null || Number.isNaN(payrunId) || Number.isNaN(employeeId)) {
     return (
       <AdminLayout>
         <div className="p-6">
           <p className="text-muted-foreground">Invalid payslip.</p>
-          <Button variant="link" className="p-0 mt-2" onClick={() => setLocation("/admin/payroll")}>Back to Pay runs</Button>
+          <Button
+            variant="ghost"
+            className="px-0 mt-2"
+            onClick={() => setLocation("/admin/payroll")}
+          >
+            Back to Pay runs
+          </Button>
         </div>
       </AdminLayout>
     );
   }
 
+  const data = res?.data;
+  const earnings = data?.paysummary?.filter((l) => Number(l.paysummary_is_deduction) === 0) ?? [];
+  const deductions = data?.paysummary?.filter((l) => Number(l.paysummary_is_deduction) === 1) ?? [];
+  const employeeName =
+    data?.payrunList.fullname ??
+    data?.payrunList.employee_name ??
+    data?.employee?.fullname ??
+    (data?.employee?.first_name
+      ? `${data.employee.first_name} ${data.employee.last_name ?? ""}`.trim()
+      : `Employee #${employeeId}`);
+
+  const handlePrint = () => {
+    if (!data) return;
+    const originalTitle = document.title;
+    document.title = `${employeeName} (${formatDate(data.payrun.payrun_date_from)} – ${formatDate(data.payrun.payrun_date_to)})`;
+    setTimeout(() => {
+      window.print();
+      document.title = originalTitle;
+    }, 50);
+  };
+
   return (
     <AdminLayout>
-      <div className="space-y-6 p-4 md:p-6 max-w-3xl mx-auto">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => setLocation(`/admin/payroll/${payrunId}`)}>
-            <ArrowLeft className="h-4 w-4" />
+      <div className="space-y-6 p-4 md:p-6 max-w-3xl mx-auto print:p-0 print:max-w-none">
+        <div className="flex items-center justify-between gap-4 print:hidden">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation(`/admin/payroll/${payrunId}`)}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h1 className="text-2xl font-semibold">Payslip</h1>
+          </div>
+          <Button
+            onClick={handlePrint}
+            disabled={!data || isLoading}
+            data-testid="button-print"
+          >
+            <Printer className="mr-2 h-4 w-4" />
+            Print
           </Button>
-          <h1 className="text-2xl font-semibold">Payslip</h1>
         </div>
 
-        {isLoading && <p className="text-muted-foreground">Loading…</p>}
+        {isLoading && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+          </div>
+        )}
         {error && <p className="text-destructive">Failed to load payslip.</p>}
+
         {data && (
-          <Card>
-            <CardHeader className="border-b">
-              <CardTitle className="text-lg">Pay run {data.payrun.payrun_number}</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Period: {formatDate(data.payrun.payrun_date_from)} – {formatDate(data.payrun.payrun_date_to)} · Pay date: {formatDate(data.payrun.payrun_pay_date)}
-              </p>
-            </CardHeader>
-            <CardContent className="pt-6">
-              {earnings.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2">Earnings</h3>
-                  <ul className="space-y-1">
-                    {earnings.map((line, i) => (
-                      <li key={i} className="flex justify-between">
-                        <span>{line.paysummary_name || "Earning"}</span>
-                        <span>${formatCurrency(line.paysummary_amount)}</span>
-                      </li>
-                    ))}
-                  </ul>
+          <Card className="print:shadow-none print:border-0">
+            <CardContent className="pt-6 print:pt-2">
+              <div className="mb-5 space-y-0.5 text-sm">
+                <p className="text-muted-foreground">
+                  Payroll Number:{" "}
+                  <span className="font-semibold text-foreground">
+                    {data.payrun.payrun_number}
+                  </span>
+                </p>
+                <p className="text-muted-foreground">
+                  Date Range:{" "}
+                  <span className="font-semibold text-foreground">
+                    {formatDate(data.payrun.payrun_date_from)} – {formatDate(data.payrun.payrun_date_to)}
+                  </span>
+                </p>
+                <p className="text-muted-foreground">
+                  Pay Date:{" "}
+                  <span className="font-semibold text-foreground">
+                    {formatDate(data.payrun.payrun_pay_date)}
+                  </span>
+                </p>
+                <p className="text-muted-foreground">
+                  Employee Name:{" "}
+                  <span className="font-semibold text-foreground">{employeeName}</span>
+                </p>
+              </div>
+
+              {/* Earnings */}
+              <div className="rounded-md border overflow-hidden">
+                <div className="grid grid-cols-[1fr_6rem_6rem_8rem] bg-muted px-3 py-2 text-xs font-semibold uppercase tracking-wide">
+                  <div>Earnings</div>
+                  <div className="text-center">Hours</div>
+                  <div className="text-right">Rate</div>
+                  <div className="text-right">Amount</div>
                 </div>
-              )}
+                {earnings.length === 0 ? (
+                  <div className="px-3 py-4 text-center text-sm text-muted-foreground">
+                    No earnings recorded.
+                  </div>
+                ) : (
+                  earnings.map((line, i) => {
+                    const hasRate = line.paysummary_rate && line.paysummary_rate !== "";
+                    const hasHrs = line.paysummary_hrs && line.paysummary_hrs !== "";
+                    return (
+                      <div
+                        key={i}
+                        className="grid grid-cols-[1fr_6rem_6rem_8rem] items-center border-t px-3 py-2 text-sm hover:bg-muted/50"
+                      >
+                        <div>{line.paysummary_name || "Earning"}</div>
+                        <div className="text-center">{hasHrs ? line.paysummary_hrs : ""}</div>
+                        <div className="text-right">
+                          {hasRate ? `$${formatCurrency(line.paysummary_rate)}` : ""}
+                        </div>
+                        <div className="text-right font-medium">
+                          ${formatCurrency(line.paysummary_amount)}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+                <div className="grid grid-cols-[1fr_8rem] border-t bg-muted/60 px-3 py-2 text-sm font-semibold">
+                  <div className="uppercase tracking-wide">Total Earnings</div>
+                  <div className="text-right">
+                    ${formatCurrency(data.payrunList.payrun_list_gross)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Deductions */}
               {deductions.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2">Deductions</h3>
-                  <ul className="space-y-1">
-                    {deductions.map((line, i) => (
-                      <li key={i} className="flex justify-between">
-                        <span>{line.paysummary_name || "Deduction"}</span>
-                        <span>-${formatCurrency(line.paysummary_amount)}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <div className="mt-6 rounded-md border overflow-hidden">
+                  <div className="grid grid-cols-[1fr_8rem] bg-muted px-3 py-2 text-xs font-semibold uppercase tracking-wide">
+                    <div>Deductions</div>
+                    <div className="text-right">Amount</div>
+                  </div>
+                  {deductions.map((line, i) => (
+                    <div
+                      key={i}
+                      className="grid grid-cols-[1fr_8rem] border-t px-3 py-2 text-sm hover:bg-muted/50"
+                    >
+                      <div>{line.paysummary_name || "Deduction"}</div>
+                      <div className="text-right font-medium">
+                        ${formatCurrency(line.paysummary_amount)}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
-              <div className="border-t pt-4 flex justify-between font-semibold text-base">
-                <span>Gross</span>
-                <span>${formatCurrency(data.payrunList.payrun_list_gross)}</span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Total deductions</span>
-                <span>-${formatCurrency(data.payrunList.payrun_list_deduction)}</span>
-              </div>
-              <div className="border-t mt-2 pt-4 flex justify-between font-semibold text-lg">
-                <span>Net pay</span>
-                <span>${formatCurrency(data.payrunList.payrun_list_net)}</span>
+
+              {/* Summary */}
+              <div className="mt-6 rounded-md border overflow-hidden">
+                <div className="grid grid-cols-[1fr_8rem] border-t bg-muted/40 px-3 py-2 text-sm">
+                  <div className="uppercase tracking-wide text-muted-foreground">
+                    Total Deduction
+                  </div>
+                  <div className="text-right">
+                    -${formatCurrency(data.payrunList.payrun_list_deduction)}
+                  </div>
+                </div>
+                <div className="grid grid-cols-[1fr_8rem] border-t bg-muted/40 px-3 py-2 text-sm">
+                  <div className="uppercase tracking-wide text-muted-foreground">Tax</div>
+                  <div className="text-right">${formatCurrency(0)}</div>
+                </div>
+                <div className="grid grid-cols-[1fr_8rem] border-t-2 border-foreground bg-primary px-3 py-3 text-base font-bold text-primary-foreground">
+                  <div className="uppercase tracking-wide">Net Pay</div>
+                  <div className="text-right">
+                    ${formatCurrency(data.payrunList.payrun_list_net)}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

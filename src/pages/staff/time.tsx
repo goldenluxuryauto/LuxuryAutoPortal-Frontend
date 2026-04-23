@@ -7,73 +7,86 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Clock, Loader2 } from "lucide-react";
 import { useState } from "react";
 
-function formatDate(d: string | undefined, fallback = "--") {
+function formatDate(d: string | null | undefined, fallback = "--") {
   if (!d) return fallback;
   try {
-    const x = new Date(d);
+    const x = new Date(String(d).replace(" ", "T"));
     return isNaN(x.getTime()) ? fallback : x.toLocaleDateString();
   } catch {
     return fallback;
   }
 }
 
-function formatTime(d: string | undefined, fallback = "--") {
+function formatTime(d: string | null | undefined, fallback = "--") {
   if (!d) return fallback;
   try {
-    const x = new Date(d);
-    return isNaN(x.getTime()) ? fallback : x.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const x = new Date(String(d).replace(" ", "T"));
+    return isNaN(x.getTime())
+      ? fallback
+      : x.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   } catch {
     return fallback;
   }
 }
 
-function decimalToHrsMin(decimal: number | string | undefined): string {
+function decimalToHrsMin(decimal: number | string | undefined | null): string {
   if (decimal === undefined || decimal === null || decimal === "") return "--";
   const n = Number(decimal);
-  if (isNaN(n)) return "--";
+  if (isNaN(n) || n <= 0) return "0h";
   const h = Math.floor(n);
   const m = Math.round((n - h) * 60);
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-type NextAction = "time_in" | "lunch_out" | "lunch_in" | "time_out" | "already_out" | "no_schedule";
+type NextAction =
+  | "time_in"
+  | "lunch_out"
+  | "lunch_in"
+  | "time_out"
+  | "already_out"
+  | "no_schedule";
 
 interface LastRecord {
+  time_aid?: number;
   time_date?: string;
   time_working_hours?: string;
-  time_in?: string;
-  time_in_status?: number;
-  time_hours_per_day?: string;
-  time_in_hours?: string;
+  time_in?: string | null;
+  time_in_status?: number | null;
+  time_hours_per_day?: string | null;
+  time_in_hours?: string | null;
   time_lunch_out?: string | null;
   time_lunch_in?: string | null;
   time_lunch_hours?: string | null;
   time_out?: string | null;
   time_out_hours?: string | null;
-  time_total_hours?: string;
-  time_amount?: string;
+  time_total_hours?: string | null;
+  time_amount?: string | null;
   time_form_details?: string | null;
 }
 
 export default function StaffTime() {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [actionLoading, setActionLoading] = useState(false);
-  const [actionError, setActionError] = useState<string | null>(null);
   const [timeOutModalOpen, setTimeOutModalOpen] = useState(false);
-  const [timeFormDetails, setTimeFormDetails] = useState<string>("[]"); // JSON array of { name, description }
+  const [timeOutNotes, setTimeOutNotes] = useState("");
 
-  const { data: lastData, isLoading } = useQuery<{
+  const { data: lastData, isLoading, error } = useQuery<{
     success: boolean;
     data: { lastRecord: LastRecord | null; nextAction: NextAction };
   }>({
     queryKey: ["/api/me/time-sheet/last"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/time-sheet/last"), { credentials: "include" });
+      const res = await fetch(buildApiUrl("/api/me/time-sheet/last"), {
+        credentials: "include",
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || "Failed to load time sheet");
@@ -106,7 +119,6 @@ export default function StaffTime() {
   };
 
   const runAction = async (body: { time_form_details?: string }) => {
-    setActionError(null);
     setActionLoading(true);
     try {
       const res = await fetch(buildApiUrl("/api/me/time-sheet/action"), {
@@ -117,11 +129,19 @@ export default function StaffTime() {
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setActionError(json.error || "Action failed");
+        toast({
+          title: "Error",
+          description: json.error || "Action failed",
+          variant: "destructive",
+        });
         return;
       }
+      toast({
+        title: "Success",
+        description: json.message || "Updated.",
+      });
       setTimeOutModalOpen(false);
-      setTimeFormDetails("[]");
+      setTimeOutNotes("");
       queryClient.invalidateQueries({ queryKey: ["/api/me/time-sheet/last"] });
     } finally {
       setActionLoading(false);
@@ -138,16 +158,15 @@ export default function StaffTime() {
   };
 
   const handleTimeOutSubmit = () => {
-    let details = timeFormDetails.trim();
-    try {
-      JSON.parse(details);
-    } catch {
-      details = "[]";
-    }
+    const notes = timeOutNotes.trim();
+    const details = notes
+      ? JSON.stringify([{ name: "Notes", description: notes }])
+      : "[]";
     runAction({ time_form_details: details });
   };
 
-  const canPunch = nextAction !== "already_out" && nextAction !== "no_schedule" && !actionLoading;
+  const canPunch =
+    nextAction !== "already_out" && nextAction !== "no_schedule" && !actionLoading;
 
   return (
     <AdminLayout>
@@ -158,7 +177,7 @@ export default function StaffTime() {
             <p className="text-muted-foreground">Clock in, lunch, and clock out.</p>
           </div>
           <Button onClick={handleActionClick} disabled={!canPunch} className="gap-2">
-            {actionLoading ? (
+            {actionLoading || isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <Clock className="w-4 h-4" />
@@ -167,9 +186,11 @@ export default function StaffTime() {
           </Button>
         </div>
 
-        {actionError && (
+        {error && (
           <Card className="bg-destructive/10 border-destructive/30">
-            <CardContent className="p-3 text-sm text-destructive">{actionError}</CardContent>
+            <CardContent className="p-3 text-sm text-destructive">
+              {error instanceof Error ? error.message : "Failed to load time sheet"}
+            </CardContent>
           </Card>
         )}
 
@@ -188,7 +209,7 @@ export default function StaffTime() {
             ) : !last ? (
               <p className="text-muted-foreground">
                 {nextAction === "no_schedule"
-                  ? "You don't have working hours for today. Contact HR to add a schedule."
+                  ? "You don't have a work schedule for today. Contact HR to add a schedule."
                   : "No active time record. Use the button above to clock in."}
               </p>
             ) : (
@@ -201,7 +222,9 @@ export default function StaffTime() {
                   <span className="text-muted-foreground">Time in: </span>
                   {formatDate(last.time_date)} {formatTime(last.time_in)}
                   {last.time_in_status === 1 && (
-                    <span className="text-amber-600 ml-1">(Late: {decimalToHrsMin(last.time_in_hours)})</span>
+                    <span className="text-amber-600 ml-1">
+                      (Late: {decimalToHrsMin(last.time_in_hours)})
+                    </span>
                   )}
                 </p>
                 {last.time_lunch_out && (
@@ -215,7 +238,10 @@ export default function StaffTime() {
                     <span className="text-muted-foreground">Lunch in: </span>
                     {formatTime(last.time_lunch_in)}
                     {last.time_lunch_hours != null && (
-                      <span className="text-muted-foreground"> ({decimalToHrsMin(Number(last.time_lunch_hours))} break)</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        ({decimalToHrsMin(Number(last.time_lunch_hours))} break)
+                      </span>
                     )}
                   </p>
                 )}
@@ -224,7 +250,10 @@ export default function StaffTime() {
                     <span className="text-muted-foreground">Time out: </span>
                     {formatDate(last.time_date)} {formatTime(last.time_out)}
                     {last.time_total_hours != null && (
-                      <span className="text-muted-foreground"> — Total: {decimalToHrsMin(Number(last.time_total_hours))}</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        — Total: {decimalToHrsMin(Number(last.time_total_hours))}
+                      </span>
                     )}
                   </p>
                 )}
@@ -237,25 +266,31 @@ export default function StaffTime() {
       <Dialog open={timeOutModalOpen} onOpenChange={setTimeOutModalOpen}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Time out — form details</DialogTitle>
+            <DialogTitle>Time out</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Please fill in the form details before clocking out (required). Use a JSON array of objects with{" "}
-            <code className="text-xs">name</code> and <code className="text-xs">description</code>, e.g.{" "}
-            <code className="text-xs">[{`{"name":"Task","description":"Done"}`}]</code>
+            Add any notes about today's work before clocking out (optional).
           </p>
-          <textarea
-            className="w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
-            value={timeFormDetails}
-            onChange={(e) => setTimeFormDetails(e.target.value)}
-            placeholder='[{"name":"Task 1","description":"Description"},...]'
-          />
+          <div className="space-y-1">
+            <Label htmlFor="timeout-notes">Notes</Label>
+            <textarea
+              id="timeout-notes"
+              className="w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+              value={timeOutNotes}
+              onChange={(e) => setTimeOutNotes(e.target.value)}
+              placeholder="e.g. Completed vehicle inspections, assisted 3 clients…"
+            />
+          </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setTimeOutModalOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setTimeOutModalOpen(false)}
+              disabled={actionLoading}
+            >
               Cancel
             </Button>
             <Button onClick={handleTimeOutSubmit} disabled={actionLoading}>
-              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               Submit time out
             </Button>
           </div>

@@ -36,18 +36,12 @@ type ProfileSection =
   | "personal-information"
   | "job-and-pay"
   | "rate-history"
-  | "job-history"
-  | "earnings"
-  | "deduction"
   | "payslip";
 
 const PROFILE_SECTIONS: { id: ProfileSection; label: string }[] = [
   { id: "personal-information", label: "Personal Information" },
   { id: "job-and-pay", label: "Job and Pay" },
   { id: "rate-history", label: "Rate History" },
-  { id: "job-history", label: "Job History" },
-  { id: "earnings", label: "Earnings" },
-  { id: "deduction", label: "Deduction" },
   { id: "payslip", label: "Payslip" },
 ];
 
@@ -283,36 +277,6 @@ export default function EmployeeViewPage() {
       return res.json();
     },
     enabled: !!employeeId && activeSection === "rate-history",
-  });
-
-  const { data: jobHistoryData, isLoading: jobHistoryLoading } = useQuery<{ success: boolean; data: { employment_history_aid: number; employment_history_company_name: string; employment_history_years_deployed: string; employment_history_start_date: string; employment_history_end_date: string; employment_history_is_active: number }[] }>({
-    queryKey: ["/api/employees", employeeId, "employment-history"],
-    queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/employment-history`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch employment history");
-      return res.json();
-    },
-    enabled: !!employeeId && activeSection === "job-history",
-  });
-
-  const { data: earningsData, isLoading: earningsLoading } = useQuery<{ success: boolean; data: { hris_earning_deduction_aid: number; hris_earning_deduction_amount: string; hris_earning_deduction_date: string; hris_earning_deduction_is_paid: number; payitem_name?: string }[] }>({
-    queryKey: ["/api/employees", employeeId, "earnings"],
-    queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/earnings`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch earnings");
-      return res.json();
-    },
-    enabled: !!employeeId && activeSection === "earnings",
-  });
-
-  const { data: deductionsData, isLoading: deductionsLoading } = useQuery<{ success: boolean; data: { hris_earning_deduction_aid: number; hris_earning_deduction_amount: string; hris_earning_deduction_date: string; hris_earning_deduction_is_paid: number; payitem_name?: string }[] }>({
-    queryKey: ["/api/employees", employeeId, "deductions"],
-    queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/deductions`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch deductions");
-      return res.json();
-    },
-    enabled: !!employeeId && activeSection === "deduction",
   });
 
   const { data: payslipsData, isLoading: payslipsLoading } = useQuery<{ success: boolean; data: { payrun_list_aid: number; payrun_number?: string; payrun_status?: number; payrun_list_gross: string; payrun_list_deduction: string; payrun_list_net: string }[] }>({
@@ -884,146 +848,6 @@ export default function EmployeeViewPage() {
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground">No rate history recorded yet.</p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {activeSection === "job-history" && (
-              <Card className="bg-card border-border">
-                <CardContent className="p-6">
-                  <h3 className="text-primary font-semibold mb-3 border-b border-border pb-2">
-                    Job History
-                  </h3>
-                  {jobHistoryLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                    </div>
-                  ) : jobHistoryData?.data?.length ? (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b border-border">
-                            <th className="text-left py-2 text-foreground font-medium">#</th>
-                            <th className="text-left py-2 text-foreground font-medium">Status</th>
-                            <th className="text-left py-2 text-foreground font-medium">Company Name</th>
-                            <th className="text-left py-2 text-foreground font-medium">Years Deployed</th>
-                            <th className="text-left py-2 text-foreground font-medium">From</th>
-                            <th className="text-left py-2 text-foreground font-medium">To</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {jobHistoryData.data.map((row, i) => (
-                            <tr key={row.employment_history_aid} className="border-b border-border/50">
-                              <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                              <td className="py-2">
-                                <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${row.employment_history_is_active === 1 ? "bg-green-500/20 text-green-700" : "bg-gray-500/20 text-gray-700"}`}>
-                                  {row.employment_history_is_active === 1 ? "Active" : "Inactive"}
-                                </span>
-                              </td>
-                              <td className="py-2 text-muted-foreground">{row.employment_history_company_name || "—"}</td>
-                              <td className="py-2 text-muted-foreground">{row.employment_history_years_deployed || "—"}</td>
-                              <td className="py-2 text-muted-foreground">{formatDate(row.employment_history_start_date)}</td>
-                              <td className="py-2 text-muted-foreground">{formatDate(row.employment_history_end_date)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No job history recorded yet.</p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {activeSection === "earnings" && (
-              <Card className="bg-card border-border">
-                <CardContent className="p-6">
-                  <h3 className="text-primary font-semibold mb-3 border-b border-border pb-2">
-                    Earnings
-                  </h3>
-                  {earningsLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                    </div>
-                  ) : earningsData?.data?.length ? (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b border-border">
-                            <th className="text-left py-2 text-foreground font-medium">#</th>
-                            <th className="text-left py-2 text-foreground font-medium">Status</th>
-                            <th className="text-left py-2 text-foreground font-medium">Date</th>
-                            <th className="text-left py-2 text-foreground font-medium">Payitem</th>
-                            <th className="text-right py-2 text-foreground font-medium">Amount</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {earningsData.data.map((row, i) => (
-                            <tr key={row.hris_earning_deduction_aid} className="border-b border-border/50">
-                              <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                              <td className="py-2">
-                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                                  {row.hris_earning_deduction_is_paid === 1 ? "Paid" : "Unpaid"}
-                                </span>
-                              </td>
-                              <td className="py-2 text-muted-foreground">{formatDate(row.hris_earning_deduction_date)}</td>
-                              <td className="py-2 text-muted-foreground">{row.payitem_name || "—"}</td>
-                              <td className="py-2 text-right text-muted-foreground">{formatCurrency(row.hris_earning_deduction_amount)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No earnings recorded yet.</p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {activeSection === "deduction" && (
-              <Card className="bg-card border-border">
-                <CardContent className="p-6">
-                  <h3 className="text-primary font-semibold mb-3 border-b border-border pb-2">
-                    Deduction
-                  </h3>
-                  {deductionsLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                    </div>
-                  ) : deductionsData?.data?.length ? (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b border-border">
-                            <th className="text-left py-2 text-foreground font-medium">#</th>
-                            <th className="text-left py-2 text-foreground font-medium">Status</th>
-                            <th className="text-left py-2 text-foreground font-medium">Date</th>
-                            <th className="text-left py-2 text-foreground font-medium">Payitem</th>
-                            <th className="text-right py-2 text-foreground font-medium">Amount</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {deductionsData.data.map((row, i) => (
-                            <tr key={row.hris_earning_deduction_aid} className="border-b border-border/50">
-                              <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                              <td className="py-2">
-                                <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                                  {row.hris_earning_deduction_is_paid === 1 ? "Paid" : "Unpaid"}
-                                </span>
-                              </td>
-                              <td className="py-2 text-muted-foreground">{formatDate(row.hris_earning_deduction_date)}</td>
-                              <td className="py-2 text-muted-foreground">{row.payitem_name || "—"}</td>
-                              <td className="py-2 text-right text-muted-foreground">{formatCurrency(row.hris_earning_deduction_amount)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No deductions recorded yet.</p>
                   )}
                 </CardContent>
               </Card>

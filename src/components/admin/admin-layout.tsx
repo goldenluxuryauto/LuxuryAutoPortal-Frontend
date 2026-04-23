@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, createContext, useContext } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -167,9 +167,14 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
   const [expandedParents, setExpandedParents] = useState<Record<string, boolean>>(() => {
     const obj: Record<string, boolean> = {};
+    const matches = (pathname: string, href: string) => {
+      if (pathname === href) return true;
+      if (href === "/dashboard") return false;
+      return pathname.startsWith(href + "/");
+    };
     [...allSidebarItems, ...employeeSidebarItems].forEach((it) => {
       if (it.children && it.children.length > 0) {
-        obj[it.href] = it.children.some((c) => location === c.href || location.startsWith(c.href));
+        obj[it.href] = it.children.some((c) => matches(location, c.href));
       }
     });
     return obj;
@@ -177,13 +182,20 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
   const toggleExpand = (href: string) => setExpandedParents((prev) => ({ ...prev, [href]: !prev[href] }));
 
+  // Proper path-boundary match so e.g. "/admin/bouncie" does NOT match "/admin/bouncie-devices".
+  const isPathActive = (pathname: string, href: string) => {
+    if (pathname === href) return true;
+    if (href === "/dashboard") return false;
+    return pathname.startsWith(href + "/");
+  };
+
   useEffect(() => {
     // Auto-expand parent when a child matches the current location
     let changed = false;
     const newState = { ...expandedParents };
     [...allSidebarItems, ...employeeSidebarItems].forEach((it) => {
       if (it.children && it.children.length > 0) {
-        const childActive = it.children.some((c) => location === c.href || location.startsWith(c.href));
+        const childActive = it.children.some((c) => isPathActive(location, c.href));
         if (childActive && !newState[it.href]) {
           newState[it.href] = true;
           changed = true;
@@ -353,20 +365,28 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         <nav className="flex-1 overflow-y-auto py-2">
           {sidebarItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));
-            
-                      if (item.children && item.children.length > 0) {
-              // Parent with children - render expandable menu
-              const isParentActive = item.children.some((c) => location === c.href || location.startsWith(c.href));
-              const isActiveParent = isActive || isParentActive;
+            // Top-level / parent active: elegant gold text + left bar, no fill.
+            // Restrained luxury — the parent is a category label, not the destination.
+            const activeClasses =
+              "border-[hsl(var(--sidebar-primary))] text-[hsl(var(--sidebar-primary))] font-semibold bg-[hsl(var(--sidebar-primary)/0.08)]";
+            // Sub-menu active: THE hero item — full premium gold gradient with glow.
+            // The selected page always gets the spotlight.
+            const childActiveClasses =
+              "bg-gradient-to-r from-[hsl(40_55%_78%)] via-[hsl(var(--sidebar-primary))] to-[hsl(36_45%_60%)] text-[hsl(var(--sidebar-primary-foreground))] font-semibold border-[hsl(36_60%_50%)] shadow-[0_4px_14px_-4px_hsl(var(--sidebar-primary)/0.5)] ring-1 ring-[hsl(var(--sidebar-primary)/0.3)]";
+            const inactiveClasses =
+              "border-transparent text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground";
+
+            if (item.children && item.children.length > 0) {
+              // Parent is considered active only when a child path is active.
+              const isParentActive = item.children.some((c) => isPathActive(location, c.href));
               const expanded = expandedParents[item.href] ?? isParentActive;
 
               return (
                 <div key={item.href} className="mx-2">
                   <div
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded transition-colors relative cursor-pointer",
-                      isActiveParent ? "bg-sidebar-primary/10 text-black" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                      "flex items-center gap-3 px-3 py-2 rounded-md transition-colors relative cursor-pointer border-l-2",
+                      isParentActive ? activeClasses : inactiveClasses
                     )}
                     onClick={() => toggleExpand(item.href)}
                     data-testid={`link-admin-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -381,23 +401,23 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                   </div>
 
                   {expanded && sidebarOpen && (
-                    <div className="mt-1 ml-6">
+                    <div className="mt-1 ml-4 border-l-2 border-[hsl(var(--sidebar-primary)/0.35)] pl-2">
                       {item.children.map((child) => {
                         const ChildIcon = child.icon;
-                        const childActive = location === child.href || (child.href !== '/dashboard' && location.startsWith(child.href));
+                        const childActive = isPathActive(location, child.href);
                         return (
                           <Link
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              "flex items-center gap-3 px-3 py-2 rounded text-sm",
-                              childActive ? "bg-sidebar-primary/10 text-black" : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                              "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors border-l-2",
+                              childActive ? childActiveClasses : inactiveClasses
                             )}
                             onClick={() => setMobileMenuOpen(false)}
                             data-testid={`link-admin-${child.label.toLowerCase().replace(/\s+/g, '-')}`}
                           >
-                            <ChildIcon className="w-3 h-3 shrink-0" />
-                            <span className="text-sm">{child.label}</span>
+                            <ChildIcon className={cn("w-3 h-3 shrink-0", childActive ? "text-[hsl(var(--sidebar-primary-foreground))]" : "text-muted-foreground")} />
+                            <span>{child.label}</span>
                           </Link>
                         );
                       })}
@@ -407,15 +427,15 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
               );
             }
 
+            const isActive = isPathActive(location, item.href);
+
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 mx-2 px-3 py-2 rounded transition-colors relative",
-                  isActive 
-                    ? "bg-sidebar-primary/10 text-black" 
-                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  "flex items-center gap-3 mx-2 px-3 py-2 rounded-md transition-colors relative border-l-2",
+                  isActive ? childActiveClasses : inactiveClasses
                 )}
                 onClick={() => setMobileMenuOpen(false)}
                 data-testid={`link-admin-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -518,8 +538,17 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           </div>
         </header>
 
+        {/*
+          Keying the page wrapper by the current `location` forces the
+          routed content to remount on every navigation — even when the
+          user clicks a link to the page they are already on. That way each
+          menu selection guarantees a fresh mount: component state is reset,
+          useQuery hooks re-run and their loading state is shown, and the
+          scroll position resets to the top. The sidebar and header are
+          outside this subtree, so they stay mounted and do NOT reload.
+        */}
         <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-6 bg-background">
-          {children}
+          <div key={location}>{children}</div>
         </main>
       </div>
 
@@ -533,10 +562,25 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   );
 }
 
+// Tracks whether an ancestor AdminLayout has already rendered the shell
+// (sidebar + header + auth guard). When true, nested <AdminLayout> usages
+// inside individual pages become a pass-through. This lets the shell stay
+// mounted across route changes so navigation only swaps the <main> content
+// instead of unmounting/remounting the entire sidebar and header.
+const AdminLayoutMountedContext = createContext<boolean>(false);
+
 export function AdminLayout({ children }: AdminLayoutProps) {
+  const alreadyMounted = useContext(AdminLayoutMountedContext);
+
+  if (alreadyMounted) {
+    return <>{children}</>;
+  }
+
   return (
-    <AuthGuard>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
-    </AuthGuard>
+    <AdminLayoutMountedContext.Provider value={true}>
+      <AuthGuard>
+        <AdminLayoutContent>{children}</AdminLayoutContent>
+      </AuthGuard>
+    </AdminLayoutMountedContext.Provider>
   );
 }

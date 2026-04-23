@@ -1,28 +1,24 @@
-import { useQuery } from "@tanstack/react-query";
+import { useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useRoute } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { buildApiUrl } from "@/lib/queryClient";
+import { buildApiUrl, buildUploadApiUrl } from "@/lib/queryClient";
 import { EmployeeDocumentImage } from "@/components/admin/EmployeeDocumentImage";
-import { ArrowLeft, ChevronRight, Image, List, Loader2, User } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, ChevronRight, Image, List, Loader2, Upload, User } from "lucide-react";
 
 type ProfileSection =
   | "personal-information"
   | "job-and-pay"
   | "rate-history"
-  | "job-history"
-  | "earnings"
-  | "deduction"
   | "payslip";
 
 const PROFILE_SECTIONS: { id: ProfileSection; label: string }[] = [
   { id: "personal-information", label: "Personal Information" },
   { id: "job-and-pay", label: "Job and Pay" },
   { id: "rate-history", label: "Rate History" },
-  { id: "job-history", label: "Job History" },
-  { id: "earnings", label: "Earnings" },
-  { id: "deduction", label: "Deduction" },
   { id: "payslip", label: "Payslip" },
 ];
 
@@ -109,6 +105,43 @@ export default function StaffMyInfoSection() {
   const [, params] = useRoute("/staff/my-info/:section");
   const section = (params?.section as ProfileSection) || "personal-information";
   const isValidSection = PROFILE_SECTIONS.some((s) => s.id === section);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  const uploadPhotoMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const fd = new FormData();
+      fd.append("employee_photo", file, file.name || "photo.jpg");
+      const res = await fetch(buildUploadApiUrl("/api/me/upload-photo"), {
+        method: "POST",
+        credentials: "include",
+        body: fd,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || err.message || "Failed to upload profile photo");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Profile photo updated." });
+      queryClient.invalidateQueries({ queryKey: ["/api/me/employee"] });
+      setPhotoPreview(null);
+      if (photoInputRef.current) photoInputRef.current.value = "";
+    },
+    onError: (e: Error) => {
+      toast({ title: "Error", description: e.message, variant: "destructive" });
+    },
+  });
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoPreview(URL.createObjectURL(file));
+    uploadPhotoMutation.mutate(file);
+  };
 
   const { data: empRes, isLoading: empLoading, error: empError } = useQuery<{ success: boolean; data: Employee }>({
     queryKey: ["/api/me/employee"],
@@ -132,36 +165,6 @@ export default function StaffMyInfoSection() {
       return res.json();
     },
     enabled: section === "rate-history",
-  });
-
-  const { data: jobHistoryData, isLoading: jobHistoryLoading } = useQuery<{ success: boolean; data: { employment_history_aid: number; employment_history_company_name: string; employment_history_years_deployed: string; employment_history_start_date: string; employment_history_end_date: string; employment_history_is_active: number }[] }>({
-    queryKey: ["/api/me/employment-history"],
-    queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/employment-history"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch employment history");
-      return res.json();
-    },
-    enabled: section === "job-history",
-  });
-
-  const { data: earningsData, isLoading: earningsLoading } = useQuery<{ success: boolean; data: { hris_earning_deduction_aid: number; hris_earning_deduction_amount: string; hris_earning_deduction_date: string; hris_earning_deduction_is_paid: number; payitem_name?: string }[] }>({
-    queryKey: ["/api/me/earnings"],
-    queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/earnings"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch earnings");
-      return res.json();
-    },
-    enabled: section === "earnings",
-  });
-
-  const { data: deductionsData, isLoading: deductionsLoading } = useQuery<{ success: boolean; data: { hris_earning_deduction_aid: number; hris_earning_deduction_amount: string; hris_earning_deduction_date: string; hris_earning_deduction_is_paid: number; payitem_name?: string }[] }>({
-    queryKey: ["/api/me/deductions"],
-    queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/deductions"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch deductions");
-      return res.json();
-    },
-    enabled: section === "deduction",
   });
 
   const { data: payslipsData, isLoading: payslipsLoading } = useQuery<{ success: boolean; data: { payrun_list_aid: number; payrun_number?: string; payrun_status?: number; payrun_list_gross: string; payrun_list_deduction: string; payrun_list_net: string }[] }>({
@@ -233,17 +236,47 @@ export default function StaffMyInfoSection() {
               <div className="mt-3">
                 <div className="mb-3">
                   <p className="font-bold text-foreground mb-1">Profile Photo <span className="font-normal text-muted-foreground">(Optional)</span></p>
-                  {employee.employee_photo ? (
-                    <EmployeeDocumentImage
-                      value={employee.employee_photo}
-                      alt="Profile"
-                      className="h-20 w-20 rounded-full object-cover object-center"
-                    />
-                  ) : (
-                    <div className="h-20 w-20 rounded-full border-2 border-border flex items-center justify-center" title="No photo uploaded (optional)">
-                      <Image className="h-10 w-10 text-muted-foreground" />
+                  <div className="flex items-center gap-4">
+                    <div className="h-20 w-20 rounded-full border-2 border-border flex items-center justify-center overflow-hidden bg-background shrink-0">
+                      {photoPreview ? (
+                        <img src={photoPreview} alt="Preview" className="h-full w-full object-cover" />
+                      ) : employee.employee_photo ? (
+                        <EmployeeDocumentImage
+                          value={employee.employee_photo}
+                          alt="Profile"
+                          className="h-full w-full object-cover object-center rounded-full"
+                        />
+                      ) : (
+                        <Image className="h-10 w-10 text-muted-foreground" />
+                      )}
                     </div>
-                  )}
+                    <div className="flex flex-col gap-1">
+                      <input
+                        ref={photoInputRef}
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf"
+                        className="hidden"
+                        onChange={handlePhotoSelect}
+                        disabled={uploadPhotoMutation.isPending}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="border-border"
+                        onClick={() => photoInputRef.current?.click()}
+                        disabled={uploadPhotoMutation.isPending}
+                      >
+                        {uploadPhotoMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Upload className="h-4 w-4 mr-2" />
+                        )}
+                        {employee.employee_photo ? "Change Photo" : "Upload Photo"}
+                      </Button>
+                      <span className="text-[11px] text-muted-foreground">JPG, PNG, GIF, WebP, PDF (max 10 MB)</span>
+                    </div>
+                  </div>
                 </div>
                 <ul className="grid grid-cols-[150px,1fr] md:grid-cols-[200px,1fr] gap-x-4 gap-y-1 text-muted-foreground capitalize">
                   <li className="font-bold text-foreground">First Name:</li><li>{unspecified(employee.employee_first_name)}</li>
@@ -434,152 +467,6 @@ export default function StaffMyInfoSection() {
               </div>
             ) : (
               <p className="text-sm text-foreground">No rate history recorded yet.</p>
-            )}
-          </CardContent>
-        </Card>
-      );
-    }
-
-    if (section === "job-history") {
-      const loading = jobHistoryLoading;
-      const rows = jobHistoryData?.data ?? [];
-      return (
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <h3 className="text-primary font-semibold mb-3 border-b border-border pb-2">Job History</h3>
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
-            ) : rows.length ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-2 text-foreground font-medium">#</th>
-                      <th className="text-left py-2 text-foreground font-medium">Status</th>
-                      <th className="text-left py-2 text-foreground font-medium">Company Name</th>
-                      <th className="text-left py-2 text-foreground font-medium">Years Deployed</th>
-                      <th className="text-left py-2 text-foreground font-medium">From</th>
-                      <th className="text-left py-2 text-foreground font-medium">To</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row, i) => (
-                      <tr key={row.employment_history_aid} className="border-b border-border/50">
-                        <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                        <td className="py-2">
-                          <span className={`px-2 py-0.5 text-xs rounded-full ${row.employment_history_is_active === 1 ? "bg-green-500/20 text-green-700" : "bg-gray-500/20 text-muted-foreground"}`}>
-                            {row.employment_history_is_active === 1 ? "Active" : "Inactive"}
-                          </span>
-                        </td>
-                        <td className="py-2 text-muted-foreground">{row.employment_history_company_name || "—"}</td>
-                        <td className="py-2 text-muted-foreground">{row.employment_history_years_deployed || "—"}</td>
-                        <td className="py-2 text-muted-foreground">{formatDate(row.employment_history_start_date)}</td>
-                        <td className="py-2 text-muted-foreground">{formatDate(row.employment_history_end_date)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-sm text-foreground">No job history recorded yet.</p>
-            )}
-          </CardContent>
-        </Card>
-      );
-    }
-
-    if (section === "earnings") {
-      const loading = earningsLoading;
-      const rows = earningsData?.data ?? [];
-      return (
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <h3 className="text-primary font-semibold mb-3 border-b border-border pb-2">Earnings</h3>
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
-            ) : rows.length ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-2 text-foreground font-medium">#</th>
-                      <th className="text-left py-2 text-foreground font-medium">Status</th>
-                      <th className="text-left py-2 text-foreground font-medium">Date</th>
-                      <th className="text-left py-2 text-foreground font-medium">Payitem</th>
-                      <th className="text-right py-2 text-foreground font-medium">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row, i) => (
-                      <tr key={row.hris_earning_deduction_aid} className="border-b border-border/50">
-                        <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                        <td className="py-2">
-                          <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                            {row.hris_earning_deduction_is_paid === 1 ? "Paid" : "Unpaid"}
-                          </span>
-                        </td>
-                        <td className="py-2 text-muted-foreground">{formatDate(row.hris_earning_deduction_date)}</td>
-                        <td className="py-2 text-muted-foreground">{row.payitem_name || "—"}</td>
-                        <td className="py-2 text-right text-muted-foreground">{formatCurrency(row.hris_earning_deduction_amount)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-sm text-foreground">No earnings recorded yet.</p>
-            )}
-          </CardContent>
-        </Card>
-      );
-    }
-
-    if (section === "deduction") {
-      const loading = deductionsLoading;
-      const rows = deductionsData?.data ?? [];
-      return (
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <h3 className="text-primary font-semibold mb-3 border-b border-border pb-2">Deduction</h3>
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
-            ) : rows.length ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-2 text-foreground font-medium">#</th>
-                      <th className="text-left py-2 text-foreground font-medium">Status</th>
-                      <th className="text-left py-2 text-foreground font-medium">Date</th>
-                      <th className="text-left py-2 text-foreground font-medium">Payitem</th>
-                      <th className="text-right py-2 text-foreground font-medium">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row, i) => (
-                      <tr key={row.hris_earning_deduction_aid} className="border-b border-border/50">
-                        <td className="py-2 text-muted-foreground">{i + 1}.</td>
-                        <td className="py-2">
-                          <span className={`px-2 py-0.5 text-xs rounded-full ${row.hris_earning_deduction_is_paid === 1 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                            {row.hris_earning_deduction_is_paid === 1 ? "Paid" : "Unpaid"}
-                          </span>
-                        </td>
-                        <td className="py-2 text-muted-foreground">{formatDate(row.hris_earning_deduction_date)}</td>
-                        <td className="py-2 text-muted-foreground">{row.payitem_name || "—"}</td>
-                        <td className="py-2 text-right text-muted-foreground">{formatCurrency(row.hris_earning_deduction_amount)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-sm text-foreground">No deductions recorded yet.</p>
             )}
           </CardContent>
         </Card>

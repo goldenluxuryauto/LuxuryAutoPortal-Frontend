@@ -851,6 +851,7 @@ export default function FormsPage() {
     ];
 
     // Admin: Client Onboarding + Employee Onboarding Process + Income & Expenses Form
+    // Admins can both submit receipts (same form as employees) and review via Approval Dashboard.
     if (formVisibilityData?.isAdmin) {
       return [
         {
@@ -869,7 +870,7 @@ export default function FormsPage() {
           id: "employee-forms",
           title: "Income & Expenses Form",
           icon: DollarSign,
-          items: [approvalDashboardItem],
+          items: [expenseReceiptItem, approvalDashboardItem],
         },
       ];
     }
@@ -1154,7 +1155,7 @@ export default function FormsPage() {
                               </div>
                             )}
 
-                            {/* Expanded content for Income & Expense Receipt Submission (employees only) */}
+                            {/* Expanded content for Income & Expense Receipt Submission (employees and admins) */}
                             {isItemExpanded && item.id === "expense-receipt" && (
                               <div className="bg-card border-t border-border px-3 sm:px-5 py-4 space-y-6 max-w-full">
                                 <ExpenseFormSubmission />

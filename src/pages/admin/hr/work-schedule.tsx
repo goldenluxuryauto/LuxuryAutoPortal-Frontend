@@ -108,7 +108,7 @@ function DayCellContent({
         <div className="mb-2 flex flex-wrap items-center gap-1">
           <span
             className={`inline-flex h-[21px] w-[21px] shrink-0 items-center justify-center rounded-full border text-center text-sm font-semibold ${
-              isToday ? "border-primary bg-primary text-primary-foreground" : "border-accent text-accent"
+              isToday ? "border-primary bg-primary text-primary-foreground" : "border-border text-foreground"
             }`}
           >
             {cell.day}
@@ -140,29 +140,39 @@ function DayCellContent({
             {list.map((entry) => (
               <div
                 key={entry.work_sched_aid}
-                className="flex items-center justify-between rounded bg-primary/10 px-2 py-1 text-sm group"
+                className="rounded bg-primary/10 px-2 py-1 text-sm group"
               >
-                <span className="truncate" title={entry.work_sched_time}>
-                  {entry.fullname}
-                </span>
-                <span className="flex shrink-0 gap-0.5">
-                  <button
-                    type="button"
-                    className="rounded p-0.5 opacity-70 hover:bg-black/10 hover:opacity-100"
-                    title="Edit"
-                    onClick={() => onEdit(cell, entry)}
+                <div className="flex items-center justify-between gap-1">
+                  <span className="truncate font-medium" title={entry.fullname}>
+                    {entry.fullname}
+                  </span>
+                  <span className="flex shrink-0 gap-0.5">
+                    <button
+                      type="button"
+                      className="rounded p-0.5 opacity-70 hover:bg-black/10 hover:opacity-100"
+                      title="Edit"
+                      onClick={() => onEdit(cell, entry)}
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded p-0.5 opacity-70 hover:bg-destructive/20 hover:opacity-100"
+                      title="Delete"
+                      onClick={() => onDelete(entry)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </span>
+                </div>
+                {entry.work_sched_time && (
+                  <div
+                    className="truncate text-xs uppercase text-muted-foreground"
+                    title={entry.work_sched_time}
                   >
-                    <Pencil className="h-3 w-3" />
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded p-0.5 opacity-70 hover:bg-destructive/20 hover:opacity-100"
-                    title="Delete"
-                    onClick={() => onDelete(entry)}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </button>
-                </span>
+                    {entry.work_sched_time}
+                  </div>
+                )}
               </div>
             ))}
             {list.length >= LIMIT_CELL && (

@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Upload, Loader2 } from "lucide-react";
+import { DollarSign, Upload, Loader2, X, FileText, Eye } from "lucide-react";
 
 const CATEGORY_LABELS: Record<string, string> = {
   income: "Income",
@@ -51,6 +51,9 @@ export default function ExpenseFormSubmission({ initialCategory, initialField }:
     remarks: "",
   });
   const [receiptFiles, setReceiptFiles] = useState<File[]>([]);
+  // Object URLs for previewing image receipts. Indexes align with receiptFiles;
+  // non-image files get an empty string so PDF rows can still show a filename/icon.
+  const [receiptPreviews, setReceiptPreviews] = useState<string[]>([]);
   const [carSearch, setCarSearch] = useState("");
   const [carDropdownOpen, setCarDropdownOpen] = useState(false);
   const [isDraggingReceipts, setIsDraggingReceipts] = useState(false);
@@ -147,6 +150,39 @@ export default function ExpenseFormSubmission({ initialCategory, initialField }:
       setFormData((prev) => (prev.employeeId === id ? prev : { ...prev, employeeId: id }));
     }
   }, [currentEmployeeId, currentUser?.displayName, optionsData]);
+
+  // Keep preview object URLs in sync with receiptFiles and revoke old ones on cleanup
+  // to avoid leaking blob URLs as the user adds/removes files.
+  useEffect(() => {
+    const urls = receiptFiles.map((f) =>
+      f.type.startsWith("image/") ? URL.createObjectURL(f) : ""
+    );
+    setReceiptPreviews(urls);
+    return () => {
+      urls.forEach((u) => {
+        if (u) URL.revokeObjectURL(u);
+      });
+    };
+  }, [receiptFiles]);
+
+  const removeReceiptFile = useCallback((index: number) => {
+    setReceiptFiles((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const openReceiptFile = useCallback(
+    (index: number) => {
+      const file = receiptFiles[index];
+      if (!file) return;
+      const existing = receiptPreviews[index];
+      const url = existing || URL.createObjectURL(file);
+      window.open(url, "_blank", "noopener,noreferrer");
+      // Only revoke the URL we created ad-hoc; previews are managed by the effect above.
+      if (!existing) {
+        setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      }
+    },
+    [receiptFiles, receiptPreviews]
+  );
 
   // AI receipt extraction: analyze first image when added (COGS workflow - AI reads cost)
   const addReceiptFiles = useCallback(
@@ -633,10 +669,65 @@ export default function ExpenseFormSubmission({ initialCategory, initialField }:
               </span>
             </div>
             {receiptFiles.length > 0 && (
-              <p className="text-xs text-muted-foreground/80 mt-2 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                {receiptFiles.length} file(s) selected
-              </p>
+              <div className="mt-3 space-y-2">
+                <p className="text-xs text-muted-foreground/80 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                  {receiptFiles.length} file(s) selected — click a thumbnail to view, or the × to remove.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {receiptFiles.map((file, index) => {
+                    const previewUrl = receiptPreviews[index];
+                    const isImage = !!previewUrl;
+                    return (
+                      <div
+                        key={`${file.name}-${file.size}-${index}`}
+                        className="group relative rounded-lg border border-border/60 bg-background overflow-hidden shadow-sm hover:shadow-md hover:border-primary/60 transition-all"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => openReceiptFile(index)}
+                          className="block w-full text-left"
+                          title={`View ${file.name}`}
+                        >
+                          {isImage ? (
+                            <div className="relative aspect-square w-full bg-muted/30">
+                              <img
+                                src={previewUrl}
+                                alt={file.name}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition-colors">
+                                <Eye className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex aspect-square w-full items-center justify-center bg-muted/30 text-muted-foreground">
+                              <FileText className="w-10 h-10" />
+                            </div>
+                          )}
+                          <div className="px-2 py-1.5 border-t border-border/60">
+                            <p className="text-xs text-foreground truncate" title={file.name}>
+                              {file.name}
+                            </p>
+                          </div>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeReceiptFile(index);
+                          }}
+                          className="absolute top-1.5 right-1.5 inline-flex items-center justify-center w-6 h-6 rounded-full bg-background/90 text-destructive border border-border/60 shadow-sm opacity-80 hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                          title="Remove file"
+                          aria-label={`Remove ${file.name}`}
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
           </div>
 

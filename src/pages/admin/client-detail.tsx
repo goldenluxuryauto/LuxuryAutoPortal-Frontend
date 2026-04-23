@@ -30,10 +30,6 @@ import {
   Phone,
   Calendar,
   User,
-  ChevronDown,
-  ChevronRight,
-  Download,
-  Wrench,
   DollarSign,
   Eye,
   Link as LinkIcon,
@@ -41,7 +37,6 @@ import {
   Folder,
   ChevronUp,
   Plus,
-  Minus,
   Edit,
   Upload,
   Trash2,
@@ -50,12 +45,6 @@ import { buildApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import QuickLinks from "@/components/admin/QuickLinks";
 import { getOnlineStatusBadge, formatLastLogin } from "@/lib/onlineStatus";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import {
   Dialog,
   DialogContent,
@@ -139,7 +128,7 @@ interface ClientDetail {
   }>;
 }
 
-type Section = "profile" | "cars" | "totals" | "maintenance";
+type Section = "profile" | "cars";
 
 export default function ClientDetailPage() {
   const [, params] = useRoute("/admin/clients/:id");
@@ -147,21 +136,8 @@ export default function ClientDetailPage() {
   const { toast } = useToast();
   const clientId = params?.id ? parseInt(params.id, 10) : null;
   const [activeSection, setActiveSection] = useState<Section>("profile");
-  const [expandedSections, setExpandedSections] = useState<Set<Section>>(
-    new Set(["profile"])
-  );
-  const [expandedTotals, setExpandedTotals] = useState<Set<string>>(new Set());
   const [quickLinksExpanded, setQuickLinksExpanded] = useState(true);
   const [viewMyCarExpanded, setViewMyCarExpanded] = useState(true);
-  const [maintenanceTypeFilter, setMaintenanceTypeFilter] = useState<string>("all");
-  const [maintenanceStatusFilter, setMaintenanceStatusFilter] = useState<string>("all");
-  const [maintenanceDateFilter, setMaintenanceDateFilter] = useState<string>("");
-  
-  // Totals filters
-  const [selectedCar, setSelectedCar] = useState<string>("all");
-  const [selectedYear, setSelectedYear] = useState<string>("2025");
-  const [fromYear, setFromYear] = useState<string>("2025");
-  const [toYear, setToYear] = useState<string>("2025");
   
   // Edit modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -352,53 +328,8 @@ export default function ClientDetailPage() {
     return onlineStatus;
   }, [client?.lastLoginAt, client?.lastLogoutAt]);
 
-  // Fetch totals data
-  const { data: totalsData, isLoading: totalsLoading } = useQuery<{
-    success: boolean;
-    data: any;
-  }>({
-    queryKey: ["/api/clients", clientId, "totals", selectedCar, selectedYear, fromYear, toYear],
-    queryFn: async () => {
-      if (!clientId) throw new Error("Invalid client ID");
-      const url = buildApiUrl(`/api/clients/${clientId}/totals?car=${selectedCar}&year=${selectedYear}&from=${fromYear}&to=${toYear}`);
-      const response = await fetch(url, {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        // Return empty data if endpoint doesn't exist yet
-        return { success: true, data: null };
-      }
-      return response.json();
-    },
-    enabled: !!clientId && activeSection === "totals",
-    retry: false,
-  });
-
-  const totals = totalsData?.data || null;
-
-  const toggleSection = (section: Section) => {
-    setExpandedSections((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(section)) {
-        newSet.delete(section);
-      } else {
-        newSet.add(section);
-      }
-      return newSet;
-    });
-  };
-
-  const toggleTotalsCategory = (category: string) => {
-    setExpandedTotals((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(category)) {
-        newSet.delete(category);
-      } else {
-        newSet.add(category);
-      }
-      return newSet;
-    });
-  };
+  // Totals and Maintenance sections were removed per product request; totals
+  // data, maintenance filters, and related toggles are no longer needed here.
 
   // Update mutation for editing onboarding data
   const updateMutation = useMutation({
@@ -990,8 +921,6 @@ export default function ClientDetailPage() {
   const sections: Array<{ id: Section; label: string; icon: any }> = [
     { id: "profile", label: "Profile", icon: User },
     { id: "cars", label: "Cars", icon: Car },
-    { id: "totals", label: "Totals", icon: DollarSign },
-    { id: "maintenance", label: "Car Maintenance", icon: Wrench },
   ];
 
   const primaryCar = client.cars && client.cars.length > 0 ? client.cars[0] : null;
@@ -1018,53 +947,35 @@ export default function ClientDetailPage() {
           </div>
         </div>
 
-        {/* Main Layout: Sidebar + Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left Sidebar */}
-          <div className="lg:col-span-1">
-            <Card className="bg-background border-border">
-              <CardContent className="p-0">
-                <nav className="space-y-1 p-2">
-                  {sections.map((section) => {
-                    const Icon = section.icon;
-                    const isExpanded = expandedSections.has(section.id);
-                    const isActive = activeSection === section.id;
-
-                    return (
-                      <div key={section.id}>
-                        <button
-                          onClick={() => {
-                            toggleSection(section.id);
-                            setActiveSection(section.id);
-                          }}
-                          className={cn(
-                            "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors",
-                            isActive
-                              ? "bg-[#D3BC8D]/10 text-black"
-                              : "text-muted-foreground hover:bg-card hover:text-primary"
-                          )}
-                        >
-                          <div className="flex items-center gap-3">
-                            <Icon className="w-4 h-4" />
-                            <span className="text-sm font-medium">{section.label}</span>
-                          </div>
-                          {isExpanded ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </nav>
-              </CardContent>
-            </Card>
+        {/* Section Tabs (Operations-style, horizontal) */}
+        <div className="mb-6">
+          <div className="bg-muted border border-border rounded-md flex flex-wrap gap-1 p-1 w-fit">
+            {sections.map((section) => {
+              const Icon = section.icon;
+              const isActive = activeSection === section.id;
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  onClick={() => setActiveSection(section.id)}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-sm px-4 py-1.5 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-card hover:text-foreground"
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{section.label}</span>
+                </button>
+              );
+            })}
           </div>
+        </div>
 
-          {/* Right Content Area */}
-          <div className="lg:col-span-3">
-            {activeSection === "profile" && (
+        {/* Section Content */}
+        <div>
+          {activeSection === "profile" && (
               <Card className="bg-background border-border">
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -1788,440 +1699,7 @@ export default function ClientDetailPage() {
               </Card>
             )}
 
-            {activeSection === "totals" && (
-              <Card className="bg-background border-border">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                  <CardTitle className="text-primary text-xl">Totals</CardTitle>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-primary hover:bg-muted/50D3BC8D]/20"
-                      onClick={() => {
-                        // Export functionality
-                        console.log("Export totals");
-                      }}
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Export
-                    </Button>
-                  </div>
-                  
-                  {/* Filters */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                    <Select value={selectedCar} onValueChange={setSelectedCar}>
-                      <SelectTrigger className="bg-card border-border text-foreground">
-                        <SelectValue placeholder="Car" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border text-foreground">
-                        <SelectItem value="all">All cars</SelectItem>
-                        {client?.cars?.map((car) => (
-                          <SelectItem key={car.id} value={car.id.toString()}>
-                            {car.make || ""} {car.model || ""} {car.year || ""}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <Select value={selectedYear} onValueChange={setSelectedYear}>
-                      <SelectTrigger className="bg-card border-border text-foreground">
-                        <SelectValue placeholder="Filter" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border text-foreground">
-                        <SelectItem value="2025">2025</SelectItem>
-                        <SelectItem value="2024">2024</SelectItem>
-                        <SelectItem value="2023">2023</SelectItem>
-                        <SelectItem value="2022">2022</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <Select value={fromYear} onValueChange={setFromYear}>
-                      <SelectTrigger className="bg-card border-border text-foreground">
-                        <SelectValue placeholder="From" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border text-foreground">
-                        <SelectItem value="2025">2025</SelectItem>
-                        <SelectItem value="2024">2024</SelectItem>
-                        <SelectItem value="2023">2023</SelectItem>
-                        <SelectItem value="2022">2022</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <Select value={toYear} onValueChange={setToYear}>
-                      <SelectTrigger className="bg-card border-border text-foreground">
-                        <SelectValue placeholder="To" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border text-foreground">
-                        <SelectItem value="2025">2025</SelectItem>
-                        <SelectItem value="2024">2024</SelectItem>
-                        <SelectItem value="2023">2023</SelectItem>
-                        <SelectItem value="2022">2022</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {totalsLoading ? (
-                    <div className="flex items-center justify-center py-12 space-y-3 flex-col">
-                      {[...Array(4)].map((_, i) => (
-                        <div key={i} className="h-4 bg-muted/50 rounded animate-pulse w-3/4" />
-                      ))}
-                    </div>
-                  ) : !totals ? (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <Folder className="w-12 h-12 mx-auto mb-4 text-gray-600" />
-                      <p>No data available</p>
-                    </div>
-                  ) : (
-                    <Accordion type="multiple" className="w-full space-y-2">
-                  {/* CAR MANAGEMENT AND CAR OWNER SPLIT */}
-                      <AccordionItem value="split" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
-                          <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                      <span className="text-foreground font-medium">CAR MANAGEMENT AND CAR OWNER SPLIT</span>
-                    </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-background">
-                          <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Car Management Split</span>
-                              <span className="text-foreground font-medium">
-                                ${totals?.carManagementSplit?.toFixed(2) || "0.00"}
-                              </span>
-                  </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Car Owner Split</span>
-                              <span className="text-foreground font-medium">
-                                ${totals?.carOwnerSplit?.toFixed(2) || "0.00"}
-                              </span>
-                            </div>
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-
-                  {/* INCOME */}
-                      <AccordionItem value="income" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
-                          <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                      <span className="text-foreground font-medium">INCOME</span>
-                        </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-background">
-                          <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Rental Income</span>
-                              <span className="text-foreground">${totals?.income?.rentalIncome?.toFixed(2) || "0.00"}</span>
-                      </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Delivery Income</span>
-                              <span className="text-foreground">${totals?.income?.deliveryIncome?.toFixed(2) || "0.00"}</span>
-                  </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Electric Prepaid Income</span>
-                              <span className="text-foreground">${totals?.income?.electricPrepaidIncome?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Smoking Fines</span>
-                              <span className="text-foreground">${totals?.income?.smokingFines?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Gas Prepaid Income</span>
-                              <span className="text-foreground">${totals?.income?.gasPrepaidIncome?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Miles Income</span>
-                              <span className="text-foreground">${totals?.income?.milesIncome?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Ski Racks Income</span>
-                              <span className="text-foreground">${totals?.income?.skiRacksIncome?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Child Seat Income</span>
-                              <span className="text-foreground">${totals?.income?.childSeatIncome?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Coolers Income</span>
-                              <span className="text-foreground">${totals?.income?.coolersIncome?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Income Insurance and Client Wrecks</span>
-                              <span className="text-foreground">${totals?.income?.incomeInsurance?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Other Income</span>
-                              <span className="text-foreground">${totals?.income?.otherIncome?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Negative Balance Carry Over</span>
-                              <span className="text-foreground">${totals?.income?.negativeBalance?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm pt-2 border-t border-border">
-                              <span className="font-medium">Car Management Total Expenses</span>
-                              <span className="text-foreground font-semibold">
-                                ${totals?.income?.carManagementTotalExpenses?.toFixed(2) || "0.00"}
-                              </span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span className="font-medium">Car Owner Total Expenses</span>
-                              <span className="text-foreground font-semibold">
-                                ${totals?.income?.carOwnerTotalExpenses?.toFixed(2) || "0.00"}
-                              </span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span className="font-medium">Car Payment</span>
-                              <span className="text-foreground font-semibold">
-                                ${totals?.income?.carPayment?.toFixed(2) || "0.00"}
-                              </span>
-                            </div>
-                            <div className="flex justify-between text-primary text-sm font-bold pt-2 border-t border-border">
-                              <span>Total Expenses</span>
-                              <span>${totals?.income?.totalExpenses?.toFixed(2) || "0.00"}</span>
-                            </div>
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-
-                  {/* OPERATING EXPENSES */}
-                      <AccordionItem value="expenses" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
-                          <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                            <span className="text-foreground font-medium">OPERATING EXPENSES (COGS - Per Vehicle)</span>
-                        </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-background">
-                          <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Auto Body Shop / Wreck</span>
-                              <span className="text-foreground">${totals?.expenses?.autoBodyShop?.toFixed(2) || "0.00"}</span>
-                      </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Alignment</span>
-                              <span className="text-foreground">${totals?.expenses?.alignment?.toFixed(2) || "0.00"}</span>
-                  </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Battery</span>
-                              <span className="text-foreground">${totals?.expenses?.battery?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Brakes</span>
-                              <span className="text-foreground">${totals?.expenses?.brakes?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Car Payment</span>
-                              <span className="text-foreground">${totals?.expenses?.carPayment?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Car Insurance</span>
-                              <span className="text-foreground">${totals?.expenses?.carInsurance?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Car Seats</span>
-                              <span className="text-foreground">${totals?.expenses?.carSeats?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Cleaning Supplies / Tools</span>
-                              <span className="text-foreground">${totals?.expenses?.cleaningSupplies?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Emissions</span>
-                              <span className="text-foreground">${totals?.expenses?.emissions?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>GPS System</span>
-                              <span className="text-foreground">${totals?.expenses?.gpsSystem?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Keys & Fob</span>
-                              <span className="text-foreground">${totals?.expenses?.keysFob?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Labor - Cleaning</span>
-                              <span className="text-foreground">${totals?.expenses?.laborDetailing?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Parking Airport (Reimbursed - GLA - Client Owner Rentals)</span>
-                              <span className="text-foreground">${totals?.expenses?.parkingAirport?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Uber/Lyft/Lime - Not Reimbursed</span>
-                              <span className="text-foreground">${totals?.expenses?.uberNotReimbursed?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Uber/Lyft/Lime - Reimbursed</span>
-                              <span className="text-foreground">${totals?.expenses?.uberReimbursed?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Gas - Service Run</span>
-                              <span className="text-foreground">${totals?.expenses?.gasServiceRun?.toFixed(2) || "0.00"}</span>
-                            </div>
-                            <div className="flex justify-between text-primary text-sm font-bold pt-2 border-t border-border">
-                              <span>Total Operating Expenses (COGS - Per Vehicle)</span>
-                              <span>${totals?.expenses?.totalOperatingExpenses?.toFixed(2) || "0.00"}</span>
-                            </div>
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-
-                  {/* GLA PARKING FEE & LABOR CLEANING */}
-                      <AccordionItem value="gla" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
-                          <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                      <span className="text-foreground font-medium">GLA PARKING FEE & LABOR CLEANING</span>
-                        </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-background">
-                          <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>GLA Labor - Cleaning</span>
-                              <span className="text-foreground">${totals?.gla?.laborCleaning?.toFixed(2) || "0.00"}</span>
-                      </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>GLA Parking Fee</span>
-                              <span className="text-foreground">${totals?.gla?.parkingFee?.toFixed(2) || "0.00"}</span>
-                  </div>
-                            <div className="flex justify-between text-primary text-sm font-bold pt-2 border-t border-border">
-                              <span>Total GLA Parking Fee & Labor Cleaning</span>
-                              <span>${totals?.gla?.total?.toFixed(2) || "0.00"}</span>
-                            </div>
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-
-                  {/* HISTORY OF THE CARS */}
-                      <AccordionItem value="history" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
-                          <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                      <span className="text-foreground font-medium">HISTORY OF THE CARS</span>
-                        </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-background">
-                          <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Days Rented</span>
-                              <span className="text-foreground font-medium">{totals?.history?.daysRented || 0}</span>
-                      </div>
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>Trips Taken</span>
-                              <span className="text-foreground font-medium">{totals?.history?.tripsTaken || 0}</span>
-                  </div>
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-
-                  {/* PAYMENT HISTORY */}
-                      <AccordionItem value="payments" className="border border-border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-muted transition-colors [&>svg]:hidden">
-                          <div className="flex items-center gap-2 w-full">
-                            <Plus className="w-4 h-4 text-primary group-data-[state=open]:hidden" />
-                            <Minus className="w-4 h-4 text-primary hidden group-data-[state=open]:block" />
-                      <span className="text-foreground font-medium">PAYMENT HISTORY</span>
-                        </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 bg-background">
-                          <div className="space-y-2 pt-2">
-                            <div className="flex justify-between text-muted-foreground text-sm">
-                              <span>{fromYear} - {toYear}</span>
-                              <span className="text-foreground font-semibold">
-                                ${totals?.payments?.total?.toFixed(2) || "0.00"}
-                              </span>
-                      </div>
-                  </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {activeSection === "maintenance" && (
-              <Card className="bg-background border-border">
-                <CardHeader>
-                  <CardTitle className="text-primary text-xl">Car Maintenance</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Filters */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Select value={maintenanceTypeFilter} onValueChange={setMaintenanceTypeFilter}>
-                      <SelectTrigger className="bg-card border-border text-foreground">
-                        <SelectValue placeholder="Select a Type" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border text-foreground">
-                        <SelectItem value="all">All Types</SelectItem>
-                        <SelectItem value="oil">Oil Change</SelectItem>
-                        <SelectItem value="tire">Tire Service</SelectItem>
-                        <SelectItem value="repair">Repair</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <Select value={maintenanceStatusFilter} onValueChange={setMaintenanceStatusFilter}>
-                      <SelectTrigger className="bg-card border-border text-foreground">
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-border text-foreground">
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="scheduled">Scheduled</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <Input
-                      type="date"
-                      value={maintenanceDateFilter}
-                      onChange={(e) => setMaintenanceDateFilter(e.target.value)}
-                      className="bg-card border-border text-foreground"
-                      placeholder="Date to Filter"
-                    />
-                  </div>
-
-                  {/* Table */}
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="border-border hover:bg-transparent">
-                          <TableHead className="text-center text-foreground font-medium px-4 py-3 w-12">#</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Make</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Model</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Year</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Plate #</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">VIN #</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Tire Size</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Maintenance Type</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Status</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Schedule Date</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Date Completed</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Price</TableHead>
-                          <TableHead className="text-left text-foreground font-medium px-4 py-3">Remarks</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        <TableRow>
-                      <TableCell colSpan={13} className="text-center py-12">
-                            <div className="flex flex-col items-center gap-3">
-                              <Folder className="w-12 h-12 text-gray-600" />
-                              <p className="text-muted-foreground">No data</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          {/* Totals and Car Maintenance sections removed per product request. */}
         </div>
       </div>
 
