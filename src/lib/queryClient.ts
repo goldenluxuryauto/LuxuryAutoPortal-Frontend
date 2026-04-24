@@ -80,7 +80,8 @@ export function buildUploadApiUrl(path: string): string {
   // In dev with proxy: use direct backend URL for uploads (proxy strips multipart body)
   if (import.meta.env.DEV) {
     // Use IPv4 explicitly on Windows to avoid dual-stack localhost issues.
-    const backendUrl = (import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:3005").replace(/\/$/, "");
+    // Default port matches backend's dev script (PORT=3000) and Vite proxy target.
+    const backendUrl = (import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:3000").replace(/\/$/, "");
     return `${backendUrl}${normalizedPath}`;
   }
   return normalizedPath;

@@ -41,7 +41,7 @@ import {
   Upload,
   Trash2,
 } from "lucide-react";
-import { buildApiUrl } from "@/lib/queryClient";
+import { buildApiUrl, buildUploadApiUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import QuickLinks from "@/components/admin/QuickLinks";
 import { getOnlineStatusBadge, formatLastLogin } from "@/lib/onlineStatus";
@@ -492,7 +492,7 @@ export default function ClientDetailPage() {
         requestFormData.append("licensePlate", selectedCar.licensePlate);
       }
 
-      const response = await fetch(buildApiUrl(`/api/clients/${clientId}/contracts`), {
+      const response = await fetch(buildUploadApiUrl(`/api/clients/${clientId}/contracts`), {
         method: "POST",
         credentials: "include",
         body: requestFormData,

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Car, Upload, X, Edit, Trash2, ChevronLeft, ChevronRight, CheckSquare, Square, FileText, Star, Plus, Minus } from "lucide-react";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
-import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { buildApiUrl, buildUploadApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -791,7 +791,7 @@ export default function CarDetailPage() {
         formData.append("driversLicenseUrls", data.driversLicenseUrls || "");
       }
 
-      const response = await fetch(buildApiUrl(`/api/cars/${carId}`), {
+      const response = await fetch(buildUploadApiUrl(`/api/cars/${carId}`), {
         method: "PATCH",
         credentials: "include",
         body: formData,
@@ -1068,7 +1068,7 @@ export default function CarDetailPage() {
         formData.append("photos", file);
       });
 
-      const response = await fetch(buildApiUrl(`/api/cars/${carId}/photos`), {
+      const response = await fetch(buildUploadApiUrl(`/api/cars/${carId}/photos`), {
         method: "POST",
         credentials: "include",
         body: formData,
