@@ -3,8 +3,9 @@
  *
  *  • One button: "Clock in" when not clocked in, "Clock out" when clocked in.
  *  • Clock-out opens a small modal so the employee picks:
- *      – "Clock out for break"  → server closes the session AND immediately opens
- *        a new one, so they're auto-clocked back in when they return.
+ *      – "Clock out for break"  → server closes the session and the employee
+ *        stays clocked OUT until they click "Clock in" again. Break time is
+ *        therefore NOT counted as worked time.
  *      – "End of shift"         → server closes the session; they stay clocked out.
  *  • Multiple clock-in / clock-out sessions per day are supported.
  *  • Sessions list at the bottom is filterable by date / date range.
@@ -36,6 +37,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -108,7 +110,7 @@ interface LastResponse {
 
 interface SessionsResponse {
   success: boolean;
-  data: { sessions: SessionRow[] };
+  data: { sessions: SessionRow[]; hourlyRate?: number };
 }
 
 // ── Time helpers (display in Utah TZ) ───────────────────────────────────
@@ -176,6 +178,65 @@ function formatDuration(start: string | null | undefined, end: string | null | u
   return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
 
+/** Seconds between two timestamps; falls back to "now" when end is null. */
+function secondsBetween(start: string | null | undefined, end: string | null | undefined): number {
+  const s = parseDb(start);
+  if (!s) return 0;
+  const e = parseDb(end) ?? new Date();
+  return Math.max(0, Math.floor((e.getTime() - s.getTime()) / 1000));
+}
+
+/** Render a duration in seconds as e.g. "5h 25m" (gla-v3 style). */
+function formatHm(totalSeconds: number): string {
+  const secs = Math.max(0, Math.floor(totalSeconds));
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  return `${h}h ${String(m).padStart(2, "0")}m`;
+}
+
+/** Render total seconds as H:MM:SS — matches individual-row duration format. */
+function formatHms(totalSeconds: number): string {
+  const secs = Math.max(0, Math.floor(totalSeconds));
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function formatUsd(amount: number): string {
+  return amount.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+/**
+ * Compute totals across the visible sessions.
+ *  • workedSec — sum of every session's duration (live for open sessions).
+ *  • breakSec  — gap between a session that ended in 'break' and the next session
+ *               that started for the same employee on the same calendar day.
+ *               Trailing break sessions (still on break) contribute 0.
+ */
+function computeTotals(sessions: SessionRow[]): { workedSec: number; breakSec: number } {
+  let workedSec = 0;
+  for (const s of sessions) workedSec += secondsBetween(s.time_in, s.time_out);
+
+  // Sessions arrive newest-first; iterate chronologically to find break gaps.
+  const chrono = [...sessions].reverse();
+  let breakSec = 0;
+  for (let i = 0; i < chrono.length; i++) {
+    const cur = chrono[i];
+    if (cur.time_end_reason !== "break" || !cur.time_out) continue;
+    const next = chrono[i + 1];
+    if (!next || !next.time_in) continue;
+    if (next.time_date !== cur.time_date) continue;
+    breakSec += secondsBetween(cur.time_out, next.time_in);
+  }
+  return { workedSec, breakSec };
+}
+
 // ── Page ────────────────────────────────────────────────────────────────
 
 export default function StaffTime() {
@@ -235,6 +296,12 @@ export default function StaffTime() {
     },
   });
   const sessions = sessionsQuery.data?.data.sessions ?? [];
+  const hourlyRate = Number(sessionsQuery.data?.data.hourlyRate ?? 0);
+
+  // Totals row — recomputed every render (cheap) so the live open session's
+  // contribution ticks every second along with the rest of the page.
+  const totals = computeTotals(sessions);
+  const totalPay = (totals.workedSec / 3600) * hourlyRate;
 
   // ── Actions ──
   const clockIn = async () => {
@@ -288,8 +355,12 @@ export default function StaffTime() {
         return;
       }
       toast({
-        title: endReason === "break" ? "Break started" : "Clocked out",
-        description: json.message ?? "",
+        title: endReason === "break" ? "On break" : "Clocked out",
+        description:
+          json.message ??
+          (endReason === "break"
+            ? "Timer paused. Clock back in when you return."
+            : ""),
       });
       setClockOutOpen(false);
       setShiftStep("choose");
@@ -505,6 +576,7 @@ export default function StaffTime() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-10 text-center">#</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Duration</TableHead>
                       <TableHead>Time</TableHead>
@@ -512,13 +584,16 @@ export default function StaffTime() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sessions.map((s) => {
+                    {sessions.map((s, idx) => {
                       const isOpenSession = !s.time_out;
                       const duration = isOpenSession
                         ? formatDuration(s.time_in, null)
                         : formatDuration(s.time_in, s.time_out);
                       return (
                         <TableRow key={s.time_aid}>
+                          <TableCell className="text-center text-muted-foreground text-xs">
+                            {sessions.length - idx}
+                          </TableCell>
                           <TableCell>{utahDate(s.time_date || s.time_in)}</TableCell>
                           <TableCell className="font-mono tabular-nums text-primary">
                             {duration}
@@ -550,6 +625,47 @@ export default function StaffTime() {
                       );
                     })}
                   </TableBody>
+                  <TableFooter>
+                    <TableRow className="bg-muted/40 font-medium">
+                      <TableCell />
+                      <TableCell className="text-primary">Total</TableCell>
+                      <TableCell>
+                        <div className="font-mono tabular-nums text-primary">
+                          {formatHms(totals.workedSec)}
+                        </div>
+                        <div className="text-xs text-muted-foreground tabular-nums">
+                          {(totals.workedSec / 3600).toFixed(2)} hrs
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-xs text-muted-foreground">
+                          Break:{" "}
+                          <span className="font-mono tabular-nums text-amber-700 dark:text-amber-400">
+                            {formatHms(totals.breakSec)}
+                          </span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          <span className="font-mono tabular-nums text-amber-700 dark:text-amber-400">
+                            {(totals.breakSec / 3600).toFixed(2)} hrs
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {hourlyRate > 0 ? (
+                          <>
+                            <div className="font-mono tabular-nums text-emerald-700 dark:text-emerald-400">
+                              {formatUsd(totalPay)}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              @ {formatUsd(hourlyRate)}/hr
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">Rate not set</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
                 </Table>
               </div>
             )}
@@ -633,8 +749,9 @@ export default function StaffTime() {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground pt-1">
-                "Break" closes this session and immediately starts a new one — you'll be auto-clocked
-                back in. "End of shift" requires a quick report before you clock out.
+                "Break" pauses your timer — you'll need to click Clock in again when you return,
+                and break time is not counted as worked time. "End of shift" requires a quick
+                report before you clock out.
               </p>
             </>
           ) : (

@@ -48,7 +48,12 @@ interface CommissionRow {
   commissions_account_owner_id: string;
   commissions_percentage: string;
   commissions_percentage_amount: string;
+  commissions_billed_gla_client?: number;
   fullname?: string;
+}
+
+function isInsuranceType(type: string): boolean {
+  return type.trim().toLowerCase() === "insurance";
 }
 
 export default function PayrollCommissionsPage() {
@@ -70,6 +75,7 @@ export default function PayrollCommissionsPage() {
     commissions_account_owner_id: "",
     commissions_percentage: "",
     commissions_percentage_amount: "",
+    commissions_billed_gla_client: 0,
   });
   const [employeeSearch, setEmployeeSearch] = useState("");
   const [selectedEmployeeName, setSelectedEmployeeName] = useState("");
@@ -164,6 +170,23 @@ export default function PayrollCommissionsPage() {
     onError: (e: Error) => toast({ variant: "destructive", title: "Error", description: e.message }),
   });
 
+  const billedGlaMutation = useMutation({
+    mutationFn: async ({ id, billed }: { id: number; billed: number }) => {
+      const res = await fetch(buildApiUrl(`/api/payroll/commissions/${id}`), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ commissions_billed_gla_client: billed }),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/payroll/commissions"] });
+      toast({ title: "Billed GLA Client updated" });
+    },
+    onError: (e: Error) => toast({ variant: "destructive", title: "Error", description: e.message }),
+  });
+
   const markPaidMutation = useMutation({
     mutationFn: async ({ id, paid }: { id: number; paid: number }) => {
       const res = await fetch(buildApiUrl(`/api/payroll/commissions/${id}/paid`), {
@@ -192,6 +215,7 @@ export default function PayrollCommissionsPage() {
       commissions_account_owner_id: "",
       commissions_percentage: "",
       commissions_percentage_amount: "",
+      commissions_billed_gla_client: 0,
     });
     setEmployeeSearch("");
     setSelectedEmployeeName("");
@@ -262,6 +286,7 @@ export default function PayrollCommissionsPage() {
                     <TableHead>Date</TableHead>
                     <TableHead className="text-right">Amount</TableHead>
                     <TableHead>Paid</TableHead>
+                    <TableHead>Billed GLA Client</TableHead>
                     <TableHead className="w-28">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -273,6 +298,27 @@ export default function PayrollCommissionsPage() {
                       <TableCell>{r.commissions_date}</TableCell>
                       <TableCell className="text-right">${Number(r.commissions_amount || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</TableCell>
                       <TableCell>{r.commissions_is_paid ? "Yes" : "No"}</TableCell>
+                      <TableCell>
+                        {isInsuranceType(r.commissions_type) ? (
+                          <label className="inline-flex items-center gap-2 cursor-pointer text-sm">
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4"
+                              checked={!!r.commissions_billed_gla_client}
+                              disabled={billedGlaMutation.isPending}
+                              onChange={(e) =>
+                                billedGlaMutation.mutate({
+                                  id: r.commissions_aid,
+                                  billed: e.target.checked ? 1 : 0,
+                                })
+                              }
+                            />
+                            <span>{r.commissions_billed_gla_client ? "Billed" : "Not billed"}</span>
+                          </label>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
                           {!r.commissions_is_paid && (
@@ -300,6 +346,7 @@ export default function PayrollCommissionsPage() {
                                 commissions_account_owner_id: r.commissions_account_owner_id ?? "",
                                 commissions_percentage: r.commissions_percentage ?? "",
                                 commissions_percentage_amount: r.commissions_percentage_amount ?? "",
+                                commissions_billed_gla_client: r.commissions_billed_gla_client ? 1 : 0,
                               });
                               setSelectedEmployeeName(r.fullname ?? "");
                               setModalOpen(true);
@@ -436,6 +483,25 @@ export default function PayrollCommissionsPage() {
                 />
               </div>
             </div>
+            {isInsuranceType(form.commissions_type) && (
+              <div className="flex items-center gap-2 rounded-md border p-3">
+                <input
+                  id="billed_gla_client"
+                  type="checkbox"
+                  className="h-4 w-4"
+                  checked={!!form.commissions_billed_gla_client}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      commissions_billed_gla_client: e.target.checked ? 1 : 0,
+                    }))
+                  }
+                />
+                <Label htmlFor="billed_gla_client" className="cursor-pointer">
+                  Billed GLA Client
+                </Label>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>Cancel</Button>
@@ -461,6 +527,7 @@ export default function PayrollCommissionsPage() {
                       commissions_account_owner_id: form.commissions_account_owner_id,
                       commissions_percentage: form.commissions_percentage,
                       commissions_percentage_amount: form.commissions_percentage_amount,
+                      commissions_billed_gla_client: form.commissions_billed_gla_client,
                     },
                   });
                 } else {

@@ -23,10 +23,17 @@ const formatDate = (dateStr: string | null): string => {
   }
 };
 
-export function MaintenanceTab() {
+interface MaintenanceTabProps {
+  /** Pre-select a status filter on mount. */
+  defaultStatus?: string;
+  /** When true, hide the status filter row (the tab already implies the filter). */
+  lockedStatus?: boolean;
+}
+
+export function MaintenanceTab({ defaultStatus = "all", lockedStatus = false }: MaintenanceTabProps = {}) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>(defaultStatus);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<MaintenanceRecord | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -101,30 +108,36 @@ export function MaintenanceTab() {
       <div className="bg-card border border-border rounded-lg overflow-auto">
         <div className="p-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
-            <div className="flex items-center gap-2">
-              <label className="text-muted-foreground text-sm">Status:</label>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="bg-card border-border text-foreground w-[170px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-border text-foreground">
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="new">New</SelectItem>
-                  <SelectItem value="damage_reported">Damage Reported</SelectItem>
-                  <SelectItem value="in_review">In Review</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="in_repair">In Repair</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="charged_customer">Charged Customer</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {filterStatus !== "all" && (
-              <Button variant="ghost" onClick={() => setFilterStatus("all")} className="text-red-700 hover:text-red-700 hover:bg-red-900/20">
-                Clear Filters
-              </Button>
+            {!lockedStatus && (
+              <>
+                <div className="flex items-center gap-2">
+                  <label className="text-muted-foreground text-sm">Status:</label>
+                  <Select value={filterStatus} onValueChange={setFilterStatus}>
+                    <SelectTrigger className="bg-card border-border text-foreground w-[170px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border text-foreground">
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="new">New</SelectItem>
+                      <SelectItem value="damage_reported">Damage Reported</SelectItem>
+                      <SelectItem value="in_review">In Review</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="in_repair">In Repair</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="charged_customer">Charged Customer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {filterStatus !== "all" && (
+                  <Button variant="ghost" onClick={() => setFilterStatus("all")} className="text-red-700 hover:text-red-700 hover:bg-red-900/20">
+                    Clear Filters
+                  </Button>
+                )}
+              </>
             )}
-            <div className="ml-auto text-muted-foreground text-sm">Total: {records.length}</div>
+            <div className={lockedStatus ? "" : "ml-auto"} >
+              <span className="text-muted-foreground text-sm">Total: {records.length}</span>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -137,6 +150,7 @@ export function MaintenanceTab() {
                   <TableHead className="text-foreground font-medium">Scheduled Date</TableHead>
                   <TableHead className="text-foreground font-medium">Due Date</TableHead>
                   <TableHead className="text-foreground font-medium">Status</TableHead>
+                  <TableHead className="text-foreground font-medium">Repair Shop</TableHead>
                   <TableHead className="text-foreground font-medium">Notes</TableHead>
                   <TableHead className="text-foreground font-medium">Photos</TableHead>
                   <TableHead className="text-center text-foreground font-medium">Actions</TableHead>
@@ -145,11 +159,11 @@ export function MaintenanceTab() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">Loading maintenance records...</TableCell>
+                    <TableCell colSpan={10} className="text-center py-12 text-muted-foreground">Loading maintenance records...</TableCell>
                   </TableRow>
                 ) : records.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">No maintenance records found</TableCell>
+                    <TableCell colSpan={10} className="text-center py-12 text-muted-foreground">No maintenance records found</TableCell>
                   </TableRow>
                 ) : (
                   records.map((rec) => (
@@ -178,6 +192,7 @@ export function MaintenanceTab() {
                           </SelectContent>
                         </Select>
                       </TableCell>
+                      <TableCell className="text-muted-foreground text-sm max-w-[160px] truncate" title={rec.repair_shop || undefined}>{rec.repair_shop || "--"}</TableCell>
                       <TableCell className="text-muted-foreground text-sm max-w-[200px] truncate" title={rec.notes || undefined}>{rec.notes || "--"}</TableCell>
                       <TableCell>
                         {rec.photos && rec.photos.length > 0 ? (

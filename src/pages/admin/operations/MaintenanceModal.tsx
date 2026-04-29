@@ -17,6 +17,18 @@ interface MaintenanceModalProps {
   prefill?: {
     inspection_id?: number;
     car_name?: string;
+    /** Pre-fill description (e.g. from an approved Pending Car Issue title). */
+    task_description?: string;
+    /** Pre-fill notes (e.g. concatenated contributor notes). */
+    notes?: string;
+    /** Pre-fill photo URLs (e.g. attachments from contributors). */
+    photos?: string[];
+    /**
+     * If set, approving this maintenance record also flips the matching
+     * Pending Car Issue to status='approved' and links it to the new
+     * maintenance row. Used by the "Approve & Schedule" flow.
+     */
+    pending_issue_id?: number;
   };
 }
 
@@ -28,12 +40,13 @@ export function MaintenanceModal({ open, onOpenChange, record, prefill }: Mainte
   const [formData, setFormData] = useState({
     inspection_id: record?.inspection_id || prefill?.inspection_id || null,
     car_name: record?.car_name || prefill?.car_name || "",
-    task_description: record?.task_description || "",
+    task_description: record?.task_description || prefill?.task_description || "",
     assigned_to: record?.assigned_to || "",
     scheduled_date: record?.scheduled_date ? record.scheduled_date.slice(0, 16) : "",
     due_date: record?.due_date ? record.due_date.slice(0, 16) : "",
-    notes: record?.notes || "",
-    photos: record?.photos || [],
+    notes: record?.notes || prefill?.notes || "",
+    photos: record?.photos || prefill?.photos || [],
+    repair_shop: record?.repair_shop || "",
   });
 
 
@@ -48,12 +61,16 @@ export function MaintenanceModal({ open, onOpenChange, record, prefill }: Mainte
         due_date: record.due_date ? record.due_date.slice(0, 16) : "",
         notes: record.notes || "",
         photos: record.photos || [],
+        repair_shop: record.repair_shop || "",
       });
     } else if (prefill) {
       setFormData((prev) => ({
         ...prev,
-        inspection_id: prefill.inspection_id || null,
-        car_name: prefill.car_name || "",
+        inspection_id: prefill.inspection_id ?? prev.inspection_id ?? null,
+        car_name: prefill.car_name || prev.car_name,
+        task_description: prefill.task_description || prev.task_description,
+        notes: prefill.notes || prev.notes,
+        photos: prefill.photos && prefill.photos.length > 0 ? prefill.photos : prev.photos,
       }));
     }
   }, [record, prefill]);
@@ -72,8 +89,34 @@ export function MaintenanceModal({ open, onOpenChange, record, prefill }: Mainte
       if (!response.ok) throw new Error("Failed to save maintenance record");
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async (resp) => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/maintenance"] });
+
+      // If this save was launched via "Approve & Schedule" from the Pending
+      // Car Issues queue, flip that pending issue to approved and link it to
+      // the maintenance row we just created.
+      const pendingIssueId = prefill?.pending_issue_id;
+      if (!isEdit && pendingIssueId) {
+        const newMaintenanceId =
+          resp?.id ??
+          resp?.data?.id ??
+          resp?.maintenance?.id ??
+          resp?.record?.id ??
+          null;
+        try {
+          await fetch(buildApiUrl(`/api/car-issues/${pendingIssueId}/approve`), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ maintenance_id: newMaintenanceId }),
+          });
+          queryClient.invalidateQueries({ queryKey: ["/api/car-issues/pending"] });
+        } catch (err) {
+          // Non-fatal: maintenance was saved; admin can dismiss/approve manually.
+          console.error("[MaintenanceModal] approve pending issue failed", err);
+        }
+      }
+
       toast({ title: "Success", description: `Maintenance ${isEdit ? "updated" : "created"} successfully` });
       onOpenChange(false);
     },
@@ -148,6 +191,16 @@ export function MaintenanceModal({ open, onOpenChange, record, prefill }: Mainte
               onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
               className="bg-card border-border text-foreground mt-1"
               style={{ colorScheme: "dark" }}
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-muted-foreground">Repair Shop</label>
+            <Input
+              value={formData.repair_shop}
+              onChange={(e) => setFormData({ ...formData, repair_shop: e.target.value })}
+              className="bg-card border-border text-foreground mt-1"
+              placeholder="Shop name / location"
             />
           </div>
 

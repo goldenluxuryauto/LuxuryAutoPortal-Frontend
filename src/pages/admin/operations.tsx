@@ -29,10 +29,13 @@ export default function OperationsPage() {
               Turo Messages
             </TabsTrigger>
             <TabsTrigger value="inspections" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm">
-              Car Inspections
+              Car Issues
             </TabsTrigger>
             <TabsTrigger value="maintenance" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm">
               Maintenance
+            </TabsTrigger>
+            <TabsTrigger value="completed" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm">
+              Completed
             </TabsTrigger>
           </TabsList>
 
@@ -50,6 +53,9 @@ export default function OperationsPage() {
           </TabsContent>
           <TabsContent value="maintenance">
             <MaintenanceTab />
+          </TabsContent>
+          <TabsContent value="completed">
+            <MaintenanceTab defaultStatus="completed" lockedStatus />
           </TabsContent>
         </Tabs>
       </div>

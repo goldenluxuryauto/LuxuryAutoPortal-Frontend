@@ -67,6 +67,8 @@ export interface MaintenanceRecord {
   status: string;
   notes: string | null;
   photos: string[];
+  repair_shop: string | null;
+  google_event_id: string | null;
   created_at: string;
   updated_at: string;
 }

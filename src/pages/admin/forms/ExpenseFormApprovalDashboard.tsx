@@ -1017,7 +1017,16 @@ export default function ExpenseFormApprovalDashboard({ isAdmin = true }: Expense
                       {sub.employeeName || "-"}
                     </TableCell>
                     <TableCell className="text-foreground text-xs py-2 px-2 align-top w-[200px] min-w-[160px] whitespace-normal break-words" title={sub.carDisplayName || undefined}>
-                      {sub.carDisplayName || "-"}
+                      {sub.carId ? (
+                        <a
+                          href={`/admin/cars/${sub.carId}/income-expense`}
+                          className="text-[#D3BC8D] hover:underline"
+                        >
+                          {sub.carDisplayName || "-"}
+                        </a>
+                      ) : (
+                        sub.carDisplayName || "-"
+                      )}
                     </TableCell>
                     <TableCell className="text-foreground text-xs whitespace-nowrap py-2 px-2">
                       {sub.year} / {MONTHS[sub.month - 1]}

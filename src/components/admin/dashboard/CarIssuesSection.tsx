@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
 import { SectionHeader, SummaryCard, DashboardTable } from "@/components/admin/dashboard";
+import PendingCarIssuesSection from "./PendingCarIssuesSection";
 
 interface CarOwner {
   firstName: string;
@@ -153,6 +154,8 @@ export default function CarIssuesSection() {
               </table>
             </div>
           </div>
+
+          <PendingCarIssuesSection />
         </div>
       )}
     </div>

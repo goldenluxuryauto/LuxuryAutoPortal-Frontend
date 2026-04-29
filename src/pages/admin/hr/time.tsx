@@ -28,9 +28,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -62,6 +62,7 @@ interface TimeRow {
   fullname: string | null;
   employee_first_name: string | null;
   employee_last_name: string | null;
+  employee_job_pay_salary_rate: string | null;
 }
 
 interface EmployeeOption {
@@ -69,6 +70,7 @@ interface EmployeeOption {
   employee_first_name: string;
   employee_last_name: string;
   employee_status?: string;
+  employee_job_pay_salary_rate?: string | null;
 }
 
 interface AuditRow {
@@ -96,6 +98,15 @@ interface TimeFormState {
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────
+
+function formatUsd(n: number): string {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
 
 function formatDate(d: string | null | undefined): string {
   if (!d) return "—";
@@ -259,6 +270,16 @@ export default function AdminHrTime() {
   });
   const rows = data?.data ?? [];
 
+  const totalHrs = rows.reduce(
+    (sum, r) => sum + (r.time_total_hours != null ? Number(r.time_total_hours) : 0),
+    0
+  );
+  const totalAmount = rows.reduce((sum, r) => {
+    const hrs = r.time_total_hours != null ? Number(r.time_total_hours) : 0;
+    const rate = r.employee_job_pay_salary_rate != null ? Number(r.employee_job_pay_salary_rate) : 0;
+    return sum + hrs * rate;
+  }, 0);
+
   // ── Mutations ──
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["/api/admin/hr/time"] });
 
@@ -414,73 +435,93 @@ export default function AdminHrTime() {
               <p className="text-muted-foreground text-center py-8">No time records found.</p>
             ) : (
               <div className="overflow-auto max-h-[65vh]">
-                <Table>
+                <table className="w-full caption-bottom text-sm">
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Employee</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Schedule</TableHead>
-                      <TableHead>Time in</TableHead>
-                      <TableHead>Lunch out</TableHead>
-                      <TableHead>Lunch in</TableHead>
-                      <TableHead>Time out</TableHead>
-                      <TableHead className="text-right">Total hrs</TableHead>
-                      <TableHead className="w-32 text-right">Actions</TableHead>
+                    <TableRow className="sticky top-0 z-10 bg-black text-white hover:bg-black border-b border-black">
+                      <TableHead className="text-white">Employee</TableHead>
+                      <TableHead className="text-white">Date</TableHead>
+                      <TableHead className="text-white">Time in</TableHead>
+                      <TableHead className="text-white">Time out</TableHead>
+                      <TableHead className="text-right text-white">Total hrs</TableHead>
+                      <TableHead className="text-right text-white">Rate</TableHead>
+                      <TableHead className="text-right text-white">Amount</TableHead>
+                      <TableHead className="w-32 text-right text-white">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {rows.map((r) => (
-                      <TableRow key={r.time_aid}>
-                        <TableCell className="font-medium">{r.fullname || "—"}</TableCell>
-                        <TableCell>{formatDate(r.time_date)}</TableCell>
-                        <TableCell className="text-muted-foreground text-xs">
-                          {r.time_working_hours || "—"}
-                        </TableCell>
-                        <TableCell>{formatTime(r.time_in)}</TableCell>
-                        <TableCell>{formatTime(r.time_lunch_out)}</TableCell>
-                        <TableCell>{formatTime(r.time_lunch_in)}</TableCell>
-                        <TableCell>{formatTime(r.time_out)}</TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {r.time_total_hours != null ? Number(r.time_total_hours).toFixed(2) : "—"}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => openEdit(r)}
-                              title="Edit"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => setHistoryRow(r)}
-                              title="Edit history"
-                            >
-                              <History className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-destructive hover:text-destructive"
-                              onClick={() => {
-                                setDeleteNotes("");
-                                setDeleteRow(r);
-                              }}
-                              title="Delete"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {rows.map((r) => {
+                      const hrs = r.time_total_hours != null ? Number(r.time_total_hours) : null;
+                      const rate = r.employee_job_pay_salary_rate != null ? Number(r.employee_job_pay_salary_rate) : null;
+                      const amount = hrs != null && rate != null ? hrs * rate : null;
+                      return (
+                        <TableRow key={r.time_aid}>
+                          <TableCell className="font-medium">{r.fullname || "—"}</TableCell>
+                          <TableCell>{formatDate(r.time_date)}</TableCell>
+                          <TableCell>{formatTime(r.time_in)}</TableCell>
+                          <TableCell>{formatTime(r.time_out)}</TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {hrs != null ? hrs.toFixed(2) : "—"}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums text-muted-foreground">
+                            {rate != null ? formatUsd(rate) : "—"}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {amount != null ? formatUsd(amount) : "—"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => openEdit(r)}
+                                title="Edit"
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setHistoryRow(r)}
+                                title="Edit history"
+                              >
+                                <History className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:text-destructive"
+                                onClick={() => {
+                                  setDeleteNotes("");
+                                  setDeleteRow(r);
+                                }}
+                                title="Delete"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
-                </Table>
+                  <TableFooter>
+                    <TableRow>
+                      <TableCell colSpan={2} className="font-semibold">Totals</TableCell>
+                      <TableCell className="text-right tabular-nums text-muted-foreground">—</TableCell>
+                      <TableCell className="text-right tabular-nums text-muted-foreground">—</TableCell>
+                      <TableCell className="text-right tabular-nums font-semibold">
+                        {totalHrs.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums text-muted-foreground">—</TableCell>
+                      <TableCell className="text-right tabular-nums font-semibold">
+                        {totalAmount > 0 ? formatUsd(totalAmount) : "—"}
+                      </TableCell>
+                      <TableCell />
+                    </TableRow>
+                  </TableFooter>
+                </table>
               </div>
             )}
             {data?.total != null && data.total > rows.length && (
