@@ -67,6 +67,7 @@ interface TutorialContextType {
   goToStep: (step: number) => void;
   goToModule: (moduleId: number) => void;
   startTutorialFromModule: (moduleId: number) => Promise<void> | void;
+  startTutorialForRole: (role: 'admin' | 'client' | 'employee', moduleId?: number) => Promise<void>;
   markStepComplete: (step: number) => void;
   resetTutorial: () => void;
   hasCompletedTutorial: boolean;
@@ -278,6 +279,9 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState(false);
+  // When an admin previews a different role's tutorial these overrides take precedence
+  const [overrideSteps, setOverrideSteps] = useState<TutorialStep[] | null>(null);
+  const [overrideModules, setOverrideModules] = useState<TutorialModule[] | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [location] = useLocation();
@@ -366,11 +370,11 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("gla_tutorial_state", JSON.stringify(newState));
   };
 
-  // Load tutorial state from localStorage (but don't auto-open)
-  // Auto-opening is now handled explicitly by the dashboard page
+  // Load tutorial state from localStorage exactly ONCE on mount.
+  // Re-running this whenever `tutorialSteps` changes (e.g. role switches,
+  // refetch, override) was overwriting the active currentStep, which made
+  // the modal lose track of the right step (causing 0% progress with mismatched n/n).
   useEffect(() => {
-    // Load saved state for existing users (step position, completed steps, etc.)
-    // But do NOT auto-open the tutorial - that's handled by dashboard page
     const savedState = localStorage.getItem("gla_tutorial_state");
     if (savedState) {
       try {
@@ -378,41 +382,33 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         setHasCompletedTutorial(parsed.completed || false);
         setCompletedSteps(new Set(parsed.completedSteps || []));
         if (parsed.currentStep) {
-          // Validate that the saved step exists in the tutorial steps
-          if (Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
-            const stepExists = tutorialSteps.some(step => step.id === parsed.currentStep);
-            if (stepExists) {
-              setCurrentStep(parsed.currentStep);
-            } else {
-              // If saved step doesn't exist, use first step
-              const firstStep = tutorialSteps[0].id;
-              setCurrentStep(firstStep);
-            }
-          } else {
-            // Fallback if steps not loaded yet
-            setCurrentStep(parsed.currentStep);
-          }
+          setCurrentStep(parsed.currentStep);
         }
-        // Do NOT set setIsOpen(true) here - tutorial should only open when explicitly called
       } catch (e) {
         console.error("Error loading tutorial state:", e);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tutorialSteps]);
+  }, []);
 
-  // Update current step when tutorialSteps change (e.g., when new steps are added)
+  // If the active step list (own role OR override) no longer contains
+  // currentStep, snap to the first step of the active list. We compute
+  // `safeTutorialSteps` further below so reference it via the same logic
+  // here using a memo of the active list.
+  const activeStepsForValidation = overrideSteps
+    ? overrideSteps
+    : (Array.isArray(tutorialSteps) ? tutorialSteps : []);
+
   useEffect(() => {
-    if (Array.isArray(tutorialSteps) && tutorialSteps.length > 0) {
-      // If current step doesn't exist in the new steps, reset to first step
-      const stepExists = tutorialSteps.some(step => step.id === currentStep);
-      if (!stepExists) {
-        const firstStep = tutorialSteps[0].id;
-        setCurrentStep(firstStep);
-        saveState({ currentStep: firstStep });
-      }
+    if (activeStepsForValidation.length === 0) return;
+    const exists = activeStepsForValidation.some(s => s.id === currentStep);
+    if (!exists) {
+      const firstStep = activeStepsForValidation[0].id;
+      setCurrentStep(firstStep);
+      saveState({ currentStep: firstStep });
     }
-  }, [tutorialSteps, currentStep]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeStepsForValidation, currentStep]);
 
   const openTutorial = async () => {
     // Refetch tutorial steps to ensure we have the latest data
@@ -431,6 +427,8 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
 
   const closeTutorial = () => {
     setIsOpen(false);
+    setOverrideSteps(null);
+    setOverrideModules(null);
     saveState({ isOpen: false });
   };
 
@@ -493,21 +491,67 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     await refetchTutorialModules();
 
     const latestSteps =
-      queryClient.getQueryData<TutorialStep[]>(["/api/tutorial/steps"]) || tutorialSteps;
+      queryClient.getQueryData<TutorialStep[]>(["/api/tutorial/steps", userRole]) || tutorialSteps;
     const safeLatestSteps =
       Array.isArray(latestSteps) && latestSteps.length > 0
         ? latestSteps
         : DEFAULT_TUTORIAL_STEPS;
 
     const moduleSteps = safeLatestSteps.filter(s => s.moduleId === moduleId);
-    // Fall back to the module's first step if available, otherwise fall back to the
-    // very first tutorial step so the dialog never opens in an empty state.
     const firstStep = moduleSteps.length > 0 ? moduleSteps[0].id : safeLatestSteps[0].id;
 
     setCurrentModule(moduleId);
     setCurrentStep(firstStep);
     setIsOpen(true);
     saveState({ currentStep: firstStep, isOpen: true });
+  };
+
+  // Preview a tutorial for an explicit role (used by the admin training-manual page)
+  const startTutorialForRole = async (role: 'admin' | 'client' | 'employee', moduleId?: number) => {
+    // Fetch steps & modules for the requested role directly
+    let steps: TutorialStep[] = [];
+    let modules: TutorialModule[] = [];
+    try {
+      const [stepsRes, modulesRes] = await Promise.all([
+        fetch(buildApiUrl(`/api/tutorial/steps?role=${role}`), { credentials: "include" }),
+        fetch(buildApiUrl(`/api/tutorial/modules?role=${role}`), { credentials: "include" }),
+      ]);
+      if (stepsRes.ok) {
+        const stepsData = await stepsRes.json();
+        if (stepsData.success) {
+          if (Array.isArray(stepsData.data)) {
+            steps = stepsData.data;
+          } else if (stepsData.data?.modules) {
+            stepsData.data.modules.forEach((m: any) => {
+              if (m.steps) steps.push(...m.steps);
+            });
+          }
+        }
+      }
+      if (modulesRes.ok) {
+        const modulesData = await modulesRes.json();
+        if (modulesData.success) modules = modulesData.data || [];
+      }
+    } catch (e) {
+      console.warn("⚠️ [TUTORIAL] Failed to fetch steps for role preview:", e);
+    }
+
+    const safeSteps = steps.length > 0 ? steps : DEFAULT_TUTORIAL_STEPS;
+
+    setOverrideSteps(safeSteps);
+    setOverrideModules(modules);
+
+    let firstStep = safeSteps[0]?.id ?? 1;
+    if (moduleId !== undefined) {
+      const moduleSteps = safeSteps.filter(s => s.moduleId === moduleId);
+      if (moduleSteps.length > 0) firstStep = moduleSteps[0].id;
+      setCurrentModule(moduleId);
+    } else {
+      setCurrentModule(null);
+    }
+
+    setCurrentStep(firstStep);
+    setIsOpen(true);
   };
 
   const goToStep = (step: number) => {
@@ -532,18 +576,20 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     saveState({ completedSteps: newCompleted });
   };
 
-  // Ensure tutorialSteps is always an array (create this before functions that use it)
-  // Also ensure it updates when tutorialSteps changes
-  const safeTutorialSteps = Array.isArray(tutorialSteps) && tutorialSteps.length > 0 
-    ? tutorialSteps 
-    : DEFAULT_TUTORIAL_STEPS;
+  // When overrideSteps are active (admin previewing another role), use them;
+  // otherwise fall back to the logged-in user's own steps.
+  const safeTutorialSteps = overrideSteps
+    ? overrideSteps
+    : (Array.isArray(tutorialSteps) && tutorialSteps.length > 0 ? tutorialSteps : DEFAULT_TUTORIAL_STEPS);
+
+  const safeModules = overrideModules ?? (Array.isArray(tutorialModules) ? tutorialModules : []);
 
   const resetTutorial = async () => {
     // Refetch tutorial steps to ensure we have the latest data before resetting
     await refetchTutorialSteps();
     
     // Get the latest tutorial steps after refetch
-    const latestSteps = queryClient.getQueryData<TutorialStep[]>(["/api/tutorial/steps"]) || tutorialSteps;
+    const latestSteps = queryClient.getQueryData<TutorialStep[]>(["/api/tutorial/steps", userRole]) || tutorialSteps;
     const safeLatestSteps = Array.isArray(latestSteps) && latestSteps.length > 0 ? latestSteps : DEFAULT_TUTORIAL_STEPS;
     
     // Always start from the first step (lowest step_order/id) when resetting tutorial
@@ -574,11 +620,12 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         goToStep,
         goToModule,
         startTutorialFromModule,
+        startTutorialForRole,
         markStepComplete,
         resetTutorial,
         hasCompletedTutorial,
-        tutorialSteps: safeTutorialSteps, // Expose steps to context (always an array)
-        tutorialModules: tutorialModules, // Expose modules to context
+        tutorialSteps: safeTutorialSteps,
+        tutorialModules: safeModules,
       }}
     >
       {children}

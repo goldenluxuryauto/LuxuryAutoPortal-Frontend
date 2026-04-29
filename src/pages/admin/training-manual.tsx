@@ -69,17 +69,16 @@ type TutorialStepFormData = z.infer<typeof tutorialStepSchema>;
 type TutorialModuleFormData = z.infer<typeof tutorialModuleSchema>;
 
 export default function TrainingManualPage() {
-  const { isOpen: tutorialOpen, openTutorial, closeTutorial, resetTutorial, startTutorialFromModule } = useTutorial();
+  const { isOpen: tutorialOpen, openTutorial, closeTutorial, resetTutorial, startTutorialForRole } = useTutorial();
   
-  // Handler for Start Tutorial button
+  // Handler for the global "Start Tutorial" button — always previews the currently selected role
   const handleStartTutorial = () => {
-    // Reset tutorial - this sets isOpen to true in context
-    resetTutorial();
+    void startTutorialForRole(selectedRole as 'admin' | 'client' | 'employee');
   };
 
-  // Start tutorial from a specific module (Module 1, 2, 3...)
+  // Start tutorial from a specific module, scoped to the currently selected role
   const handleStartModuleTutorial = (moduleId: number) => {
-    void startTutorialFromModule(moduleId);
+    void startTutorialForRole(selectedRole as 'admin' | 'client' | 'employee', moduleId);
   };
   const isAdmin = useIsAdmin();
   const { toast } = useToast();
