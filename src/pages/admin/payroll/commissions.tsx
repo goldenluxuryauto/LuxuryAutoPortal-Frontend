@@ -451,36 +451,39 @@ export default function PayrollCommissionsPage() {
                 placeholder="Remarks"
               />
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-2">
-                <Label>Account owner name (optional)</Label>
-                <Input
-                  value={form.commissions_account_owner_name}
-                  onChange={(e) => setForm((f) => ({ ...f, commissions_account_owner_name: e.target.value }))}
-                />
+            <div className="rounded-md border p-3 space-y-3">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Optional fields</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1.5">
+                  <Label>Account owner name</Label>
+                  <Input
+                    value={form.commissions_account_owner_name}
+                    onChange={(e) => setForm((f) => ({ ...f, commissions_account_owner_name: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Account owner ID</Label>
+                  <Input
+                    value={form.commissions_account_owner_id}
+                    onChange={(e) => setForm((f) => ({ ...f, commissions_account_owner_id: e.target.value }))}
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>Account owner ID (optional)</Label>
-                <Input
-                  value={form.commissions_account_owner_id}
-                  onChange={(e) => setForm((f) => ({ ...f, commissions_account_owner_id: e.target.value }))}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-2">
-                <Label>Percentage (optional)</Label>
-                <Input
-                  value={form.commissions_percentage}
-                  onChange={(e) => setForm((f) => ({ ...f, commissions_percentage: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Percentage amount (optional)</Label>
-                <Input
-                  value={form.commissions_percentage_amount}
-                  onChange={(e) => setForm((f) => ({ ...f, commissions_percentage_amount: e.target.value }))}
-                />
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1.5">
+                  <Label>Percentage</Label>
+                  <Input
+                    value={form.commissions_percentage}
+                    onChange={(e) => setForm((f) => ({ ...f, commissions_percentage: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Percentage amount</Label>
+                  <Input
+                    value={form.commissions_percentage_amount}
+                    onChange={(e) => setForm((f) => ({ ...f, commissions_percentage_amount: e.target.value }))}
+                  />
+                </div>
               </div>
             </div>
             {isInsuranceType(form.commissions_type) && (

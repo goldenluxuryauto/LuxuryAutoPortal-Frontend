@@ -450,7 +450,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                     <div className="mt-1 ml-4 border-l-2 border-[hsl(var(--sidebar-primary)/0.35)] pl-2">
                       {item.children.map((child) => {
                         const ChildIcon = child.icon;
-                        const childActive = isPathActive(location, child.href);
+                        const childActive = location === child.href;
                         return (
                           <Link
                             key={child.href}
