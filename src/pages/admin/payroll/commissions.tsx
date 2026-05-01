@@ -364,6 +364,13 @@ export default function PayrollCommissionsPage() {
                       </TableCell>
                     </TableRow>
                   ))}
+                  <TableRow className="border-t-2 font-semibold bg-muted/40">
+                    <TableCell colSpan={3} className="text-right text-sm">Total</TableCell>
+                    <TableCell className="text-right">
+                      ${rows.reduce((sum, r) => sum + Number(r.commissions_amount || 0), 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    </TableCell>
+                    <TableCell colSpan={3} />
+                  </TableRow>
                 </TableBody>
               </Table>
             )}

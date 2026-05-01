@@ -38,7 +38,10 @@ import {
   Lock,
   ClipboardCheck,
   HandCoins,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { TableRowSkeleton } from "@/components/ui/skeletons";
 
 interface PayrunRow {
@@ -138,6 +141,42 @@ export default function PayrollByRunPage() {
     enabled: payrunId != null,
   });
 
+  const generateMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(
+        buildApiUrl(`/api/payroll/payruns/${payrunId}/generate`),
+        { method: "POST", credentials: "include" },
+      );
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to generate payroll");
+      }
+      return res.json() as Promise<{
+        success: boolean;
+        data: { payrun_number: string; totalAmount: number; employeeCount: number };
+      }>;
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/payroll/payruns", payrunId] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/payroll/payruns", payrunId, "payroll"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/payroll/payruns"] });
+      const d = result?.data;
+      const total = (d?.totalAmount ?? 0).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      toast({
+        title: "Payroll generated from timesheet",
+        description: `${d?.payrun_number ?? "Pay run"}: ${d?.employeeCount ?? 0} employee(s), total $${total}.`,
+      });
+    },
+    onError: (e: Error) => {
+      toast({ variant: "destructive", title: "Error", description: e.message });
+    },
+  });
+
   const statusMutation = useMutation({
     mutationFn: async (vars: { employeeId: number; status: number }) => {
       const res = await fetch(
@@ -202,7 +241,7 @@ export default function PayrollByRunPage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-semibold">Payroll</h1>
             <p className="text-muted-foreground text-sm">
               {payrun ? (
@@ -218,6 +257,35 @@ export default function PayrollByRunPage() {
               )}
             </p>
           </div>
+          {payrun && payrun.payrun_status !== 1 && (
+            <ConfirmDialog
+              trigger={
+                <Button
+                  variant="outline"
+                  disabled={generateMutation.isPending}
+                  data-testid="button-generate-payroll"
+                >
+                  {generateMutation.isPending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                  )}
+                  Generate from Timesheet
+                </Button>
+              }
+              title="Generate payroll from timesheet?"
+              description={
+                <>
+                  This replaces all existing payslips for{" "}
+                  <span className="font-medium">{payrun.payrun_number}</span> with newly
+                  computed amounts based on clocked hours × hourly rate plus any unpaid
+                  earnings/deductions in the pay period.
+                </>
+              }
+              confirmText="Generate"
+              onConfirm={() => generateMutation.mutate()}
+            />
+          )}
         </div>
 
         <Card>
