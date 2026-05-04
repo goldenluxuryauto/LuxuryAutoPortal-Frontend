@@ -20,6 +20,9 @@ import ExpenseFormApprovalDashboard from "./forms/ExpenseFormApprovalDashboard";
 import CommissionFormSubmission from "./forms/CommissionFormSubmission";
 import CommissionFormMySubmissions from "./forms/CommissionFormMySubmissions";
 import CommissionFormApprovalDashboard from "./forms/CommissionFormApprovalDashboard";
+import ReferralFormSubmission from "./forms/ReferralFormSubmission";
+import ReferralFormMySubmissions from "./forms/ReferralFormMySubmissions";
+import ReferralFormApprovalDashboard from "./forms/ReferralFormApprovalDashboard";
 import {
   EmployeeOnboardingFormContent,
   EmployeeContract1099Content,
@@ -54,6 +57,7 @@ import {
   X,
   Upload,
   DollarSign,
+  Users,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
@@ -399,7 +403,10 @@ export default function FormsPage() {
       itemId === "employee-offboarding" ||
       itemId === "commission-form-submit" ||
       itemId === "commission-form-my-submissions" ||
-      itemId === "commission-form-approval"
+      itemId === "commission-form-approval" ||
+      itemId === "referral-form-submit" ||
+      itemId === "referral-form-my-submissions" ||
+      itemId === "referral-form-approval"
     ) {
       setExpandedItems((prev) =>
         prev.includes(itemId)
@@ -873,6 +880,22 @@ export default function FormsPage() {
       icon: FileCheck,
     };
 
+    const referralSubmitItem: FormItem = {
+      id: "referral-form-submit",
+      title: "Submit Referral Form",
+      icon: UserPlus,
+    };
+    const referralMySubmissionsItem: FormItem = {
+      id: "referral-form-my-submissions",
+      title: "My Referral Submissions",
+      icon: FileText,
+    };
+    const referralApprovalItem: FormItem = {
+      id: "referral-form-approval",
+      title: "Referral Form Approval Dashboard",
+      icon: FileCheck,
+    };
+
     // Admin: Client Onboarding + Employee Onboarding Process + Income & Expenses Form + Commissions Form
     // Admins can both submit receipts (same form as employees) and review via Approval Dashboard.
     if (formVisibilityData?.isAdmin) {
@@ -900,6 +923,12 @@ export default function FormsPage() {
           title: "Commissions Form",
           icon: DollarSign,
           items: [commissionSubmitItem, commissionMySubmissionsItem, commissionApprovalItem],
+        },
+        {
+          id: "referral-forms",
+          title: "Referral Form",
+          icon: Users,
+          items: [referralSubmitItem, referralMySubmissionsItem, referralApprovalItem],
         },
       ];
     }
@@ -961,6 +990,12 @@ export default function FormsPage() {
           title: "Client Onboarding Form",
           icon: ClipboardList,
           items: visibleItems,
+        },
+        {
+          id: "referral-forms",
+          title: "Referral Form",
+          icon: Users,
+          items: [referralSubmitItem, referralMySubmissionsItem],
         },
       ];
     }
@@ -1074,7 +1109,10 @@ export default function FormsPage() {
                             item.id === "employee-offboarding" ||
                             item.id === "commission-form-submit" ||
                             item.id === "commission-form-my-submissions" ||
-                            item.id === "commission-form-approval") &&
+                            item.id === "commission-form-approval" ||
+                            item.id === "referral-form-submit" ||
+                            item.id === "referral-form-my-submissions" ||
+                            item.id === "referral-form-approval") &&
                           !item.comingSoon;
 
                         return (
@@ -1247,6 +1285,27 @@ export default function FormsPage() {
                             {isItemExpanded && item.id === "commission-form-approval" && (
                               <div className="bg-card border-t border-border px-3 sm:px-5 py-4 min-w-0 max-w-full overflow-hidden">
                                 <CommissionFormApprovalDashboard />
+                              </div>
+                            )}
+
+                            {/* Expanded content for Referral Form Submit */}
+                            {isItemExpanded && item.id === "referral-form-submit" && (
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 max-w-full">
+                                <ReferralFormSubmission />
+                              </div>
+                            )}
+
+                            {/* Expanded content for Referral Form My Submissions */}
+                            {isItemExpanded && item.id === "referral-form-my-submissions" && (
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 max-w-full">
+                                <ReferralFormMySubmissions />
+                              </div>
+                            )}
+
+                            {/* Expanded content for Referral Form Approval Dashboard (admins only) */}
+                            {isItemExpanded && item.id === "referral-form-approval" && (
+                              <div className="bg-card border-t border-border px-3 sm:px-5 py-4 min-w-0 max-w-full overflow-hidden">
+                                <ReferralFormApprovalDashboard />
                               </div>
                             )}
 
