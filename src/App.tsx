@@ -91,6 +91,7 @@ import StaffCommissionForm from "@/pages/staff/commission-form";
 import StaffCommissionFormMySubmissions from "@/pages/staff/commission-form-my-submissions";
 import TuroTripsPage from "@/pages/admin/turo-trips";
 import AdminTestimonialsPage from "@/pages/admin/testimonials";
+import AdminTuroGuidePage from "@/pages/admin/turo-guide";
 import { AdminLayout } from "@/components/admin/admin-layout";
 
 function Router() {
@@ -196,6 +197,7 @@ function Router() {
             <Route path="/admin/training-manual" component={TrainingManualPage} />
             <Route path="/admin/turo-trips" component={TuroTripsPage} />
             <Route path="/admin/testimonials" component={AdminTestimonialsPage} />
+            <Route path="/admin/turo-guide" component={AdminTuroGuidePage} />
             <Route component={NotFound} />
           </Switch>
         </AdminLayout>

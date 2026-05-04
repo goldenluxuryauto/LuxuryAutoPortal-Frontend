@@ -38,14 +38,23 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Search, Pencil, Archive, ArchiveRestore, Trash2, Link as LinkIcon } from "lucide-react";
 import { VideoPreview } from "@/components/admin/video-preview";
 
-interface ClientTestimonialRow {
-  client_testimonial_aid: number;
-  client_testimonial_is_active: number;
-  client_testimonial_file: string;
-  client_testimonial_title: string;
-  client_testimonial_description: string;
-  client_testimonial_created: string;
-  client_testimonial_datetime: string;
+interface TuroGuideRow {
+  turo_guide_aid: number;
+  turo_guide_is_active: number;
+  turo_guide_file: string;
+  turo_guide_title: string;
+  turo_guide_description: string;
+  turo_guide_created: string;
+  turo_guide_datetime: string;
+}
+
+function formatDate(s: string) {
+  if (!s) return "—";
+  try {
+    return new Date(s).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  } catch {
+    return s;
+  }
 }
 
 function isValidUrl(s: string): boolean {
@@ -58,23 +67,14 @@ function isValidUrl(s: string): boolean {
   }
 }
 
-function formatDate(s: string) {
-  if (!s) return "—";
-  try {
-    return new Date(s).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-  } catch {
-    return s;
-  }
-}
-
-export default function AdminTestimonialsPage() {
+export default function AdminTuroGuidePage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [addOpen, setAddOpen] = useState(false);
-  const [editItem, setEditItem] = useState<ClientTestimonialRow | null>(null);
+  const [editItem, setEditItem] = useState<TuroGuideRow | null>(null);
   const [archiveId, setArchiveId] = useState<number | null>(null);
   const [restoreId, setRestoreId] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -84,30 +84,30 @@ export default function AdminTestimonialsPage() {
 
   const { data, isLoading } = useQuery<{
     success: boolean;
-    list: ClientTestimonialRow[];
+    list: TuroGuideRow[];
     total: number;
     page: number;
     limit: number;
   }>({
-    queryKey: ["/api/client-testimonials", page, search, statusFilter],
+    queryKey: ["/api/turo-guides", page, search, statusFilter],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.set("page", String(page));
       params.set("limit", "20");
       if (search.trim()) params.set("search", search.trim());
       if (statusFilter !== "all") params.set("status", statusFilter);
-      const res = await fetch(buildApiUrl(`/api/client-testimonials?${params}`), { credentials: "include" });
+      const res = await fetch(buildApiUrl(`/api/turo-guides?${params}`), { credentials: "include" });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to load testimonials");
+        throw new Error(err.error || "Failed to load turo guides");
       }
       return res.json();
     },
   });
 
   const createMutation = useMutation({
-    mutationFn: async (body: { client_testimonial_title: string; client_testimonial_description: string; client_testimonial_file: string }) => {
-      const res = await fetch(buildApiUrl("/api/client-testimonials"), {
+    mutationFn: async (body: { turo_guide_title: string; turo_guide_description: string; turo_guide_file: string }) => {
+      const res = await fetch(buildApiUrl("/api/turo-guides"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -120,8 +120,8 @@ export default function AdminTestimonialsPage() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/client-testimonials"] });
-      toast({ title: "Testimonial created" });
+      queryClient.invalidateQueries({ queryKey: ["/api/turo-guides"] });
+      toast({ title: "Turo guide created" });
       setAddOpen(false);
       setFormTitle("");
       setFormDescription("");
@@ -131,8 +131,8 @@ export default function AdminTestimonialsPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, body }: { id: number; body: { client_testimonial_title: string; client_testimonial_description: string; client_testimonial_file: string } }) => {
-      const res = await fetch(buildApiUrl(`/api/client-testimonials/${id}`), {
+    mutationFn: async ({ id, body }: { id: number; body: { turo_guide_title: string; turo_guide_description: string; turo_guide_file: string } }) => {
+      const res = await fetch(buildApiUrl(`/api/turo-guides/${id}`), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -145,8 +145,8 @@ export default function AdminTestimonialsPage() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/client-testimonials"] });
-      toast({ title: "Testimonial updated" });
+      queryClient.invalidateQueries({ queryKey: ["/api/turo-guides"] });
+      toast({ title: "Turo guide updated" });
       setEditItem(null);
       setFormTitle("");
       setFormDescription("");
@@ -157,7 +157,7 @@ export default function AdminTestimonialsPage() {
 
   const setActiveMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: number; isActive: number }) => {
-      const res = await fetch(buildApiUrl(`/api/client-testimonials/${id}/active`), {
+      const res = await fetch(buildApiUrl(`/api/turo-guides/${id}/active`), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -170,7 +170,7 @@ export default function AdminTestimonialsPage() {
       return res.json();
     },
     onSuccess: (_, { isActive }) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/client-testimonials"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/turo-guides"] });
       toast({ title: isActive === 1 ? "Restored" : "Archived" });
       setArchiveId(null);
       setRestoreId(null);
@@ -180,7 +180,7 @@ export default function AdminTestimonialsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/client-testimonials/${id}`), {
+      const res = await fetch(buildApiUrl(`/api/turo-guides/${id}`), {
         method: "DELETE",
         credentials: "include",
       });
@@ -190,8 +190,8 @@ export default function AdminTestimonialsPage() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/client-testimonials"] });
-      toast({ title: "Testimonial deleted" });
+      queryClient.invalidateQueries({ queryKey: ["/api/turo-guides"] });
+      toast({ title: "Turo guide deleted" });
       setDeleteId(null);
     },
     onError: (e: Error) => toast({ variant: "destructive", title: "Error", description: e.message }),
@@ -201,11 +201,11 @@ export default function AdminTestimonialsPage() {
   const total = data?.total ?? 0;
   const totalPages = data?.limit ? Math.ceil(total / data.limit) : 1;
 
-  const openEdit = (row: ClientTestimonialRow) => {
+  const openEdit = (row: TuroGuideRow) => {
     setEditItem(row);
-    setFormTitle(row.client_testimonial_title);
-    setFormDescription(row.client_testimonial_description || "");
-    setFormFile(row.client_testimonial_file || "");
+    setFormTitle(row.turo_guide_title);
+    setFormDescription(row.turo_guide_description || "");
+    setFormFile(row.turo_guide_file || "");
   };
 
   const fileValid = isValidUrl(formFile);
@@ -215,8 +215,8 @@ export default function AdminTestimonialsPage() {
       <div className="space-y-6 p-4 md:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">Client Testimonials</h1>
-            <p className="text-muted-foreground text-sm">Manage client testimonials. Archive or restore to control visibility on staff/client views.</p>
+            <h1 className="text-2xl font-semibold">Turo Guide</h1>
+            <p className="text-muted-foreground text-sm">Manage Turo hosting guide entries. Archive or restore to control visibility on staff/client views.</p>
           </div>
           <Button
             onClick={() => {
@@ -268,19 +268,19 @@ export default function AdminTestimonialsPage() {
                 ))}
               </div>
             ) : list.length === 0 ? (
-              <div className="py-16 text-center text-muted-foreground">No testimonials found.</div>
+              <div className="py-16 text-center text-muted-foreground">No turo guides found.</div>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {list.map((row) => (
                   <div
-                    key={row.client_testimonial_aid}
+                    key={row.turo_guide_aid}
                     className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-md"
                   >
                     <div className="relative aspect-video w-full overflow-hidden bg-muted">
-                      {row.client_testimonial_file ? (
+                      {row.turo_guide_file ? (
                         <VideoPreview
-                          url={row.client_testimonial_file}
-                          title={row.client_testimonial_title}
+                          url={row.turo_guide_file}
+                          title={row.turo_guide_title}
                           className="group/preview relative block h-full w-full"
                         />
                       ) : (
@@ -289,36 +289,36 @@ export default function AdminTestimonialsPage() {
                         </div>
                       )}
                       <div className="absolute left-2 top-2">
-                        <Badge variant={row.client_testimonial_is_active === 1 ? "default" : "secondary"}>
-                          {row.client_testimonial_is_active === 1 ? "Active" : "Inactive"}
+                        <Badge variant={row.turo_guide_is_active === 1 ? "default" : "secondary"}>
+                          {row.turo_guide_is_active === 1 ? "Active" : "Inactive"}
                         </Badge>
                       </div>
                     </div>
                     <div className="flex flex-1 flex-col gap-2 p-3">
-                      <h3 className="font-medium leading-tight line-clamp-2" title={row.client_testimonial_title}>
-                        {row.client_testimonial_title}
+                      <h3 className="font-medium leading-tight line-clamp-2" title={row.turo_guide_title}>
+                        {row.turo_guide_title}
                       </h3>
                       <p className="flex-1 text-xs text-muted-foreground line-clamp-3">
-                        {row.client_testimonial_description || "—"}
+                        {row.turo_guide_description || "—"}
                       </p>
                       <div className="flex items-center justify-between border-t border-border pt-2">
                         <span className="text-xs text-muted-foreground">
-                          {formatDate(row.client_testimonial_datetime)}
+                          {formatDate(row.turo_guide_datetime)}
                         </span>
                         <div className="flex items-center gap-0.5">
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(row)} title="Edit">
                             <Pencil className="h-3.5 w-3.5" />
                           </Button>
-                          {row.client_testimonial_is_active === 1 ? (
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setArchiveId(row.client_testimonial_aid)} title="Archive">
+                          {row.turo_guide_is_active === 1 ? (
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setArchiveId(row.turo_guide_aid)} title="Archive">
                               <Archive className="h-3.5 w-3.5" />
                             </Button>
                           ) : (
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setRestoreId(row.client_testimonial_aid)} title="Restore">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setRestoreId(row.turo_guide_aid)} title="Restore">
                               <ArchiveRestore className="h-3.5 w-3.5" />
                             </Button>
                           )}
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(row.client_testimonial_aid)} title="Delete">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(row.turo_guide_aid)} title="Delete">
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
@@ -345,7 +345,7 @@ export default function AdminTestimonialsPage() {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Client Testimonial</DialogTitle>
+            <DialogTitle>Add Turo Guide</DialogTitle>
             <DialogDescription>Paste a video link (YouTube, Drive, or direct .mp4) along with title and description.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -386,7 +386,7 @@ export default function AdminTestimonialsPage() {
             <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
             <Button
               disabled={!formTitle.trim() || !fileValid || createMutation.isPending}
-              onClick={() => createMutation.mutate({ client_testimonial_title: formTitle.trim(), client_testimonial_description: formDescription.trim(), client_testimonial_file: formFile.trim() })}
+              onClick={() => createMutation.mutate({ turo_guide_title: formTitle.trim(), turo_guide_description: formDescription.trim(), turo_guide_file: formFile.trim() })}
             >
               {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Add
@@ -399,7 +399,7 @@ export default function AdminTestimonialsPage() {
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Client Testimonial</DialogTitle>
+            <DialogTitle>Edit Turo Guide</DialogTitle>
           </DialogHeader>
           {editItem && (
             <>
@@ -441,7 +441,7 @@ export default function AdminTestimonialsPage() {
                 <Button variant="outline" onClick={() => setEditItem(null)}>Cancel</Button>
                 <Button
                   disabled={!formTitle.trim() || !fileValid || updateMutation.isPending}
-                  onClick={() => updateMutation.mutate({ id: editItem.client_testimonial_aid, body: { client_testimonial_title: formTitle.trim(), client_testimonial_description: formDescription.trim(), client_testimonial_file: formFile.trim() } })}
+                  onClick={() => updateMutation.mutate({ id: editItem.turo_guide_aid, body: { turo_guide_title: formTitle.trim(), turo_guide_description: formDescription.trim(), turo_guide_file: formFile.trim() } })}
                 >
                   {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save
@@ -456,7 +456,7 @@ export default function AdminTestimonialsPage() {
       <AlertDialog open={archiveId !== null} onOpenChange={(open) => !open && setArchiveId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Archive testimonial?</AlertDialogTitle>
+            <AlertDialogTitle>Archive turo guide?</AlertDialogTitle>
             <AlertDialogDescription>It will be hidden from staff and client views. You can restore it later.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -475,7 +475,7 @@ export default function AdminTestimonialsPage() {
       <AlertDialog open={restoreId !== null} onOpenChange={(open) => !open && setRestoreId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Restore testimonial?</AlertDialogTitle>
+            <AlertDialogTitle>Restore turo guide?</AlertDialogTitle>
             <AlertDialogDescription>It will be visible again on staff and client views.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -494,7 +494,7 @@ export default function AdminTestimonialsPage() {
       <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete testimonial?</AlertDialogTitle>
+            <AlertDialogTitle>Delete turo guide?</AlertDialogTitle>
             <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
