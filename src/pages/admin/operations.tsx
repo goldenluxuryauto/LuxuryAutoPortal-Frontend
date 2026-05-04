@@ -35,7 +35,7 @@ export default function OperationsPage() {
               Maintenance
             </TabsTrigger>
             <TabsTrigger value="completed" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm">
-              Completed
+              No Car Issues
             </TabsTrigger>
           </TabsList>
 
