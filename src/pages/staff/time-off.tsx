@@ -503,7 +503,7 @@ export default function StaffTimeOff() {
               />
             </div>
             <div>
-              <Label>Day off</Label>
+              <Label>Leave type</Label>
               <Select value={formType} onValueChange={setFormType}>
                 <SelectTrigger className="mt-1.5">
                   <SelectValue />
@@ -511,6 +511,7 @@ export default function StaffTimeOff() {
                 <SelectContent>
                   <SelectItem value="paid time off">Paid Time Off</SelectItem>
                   <SelectItem value="sick time off">Sick Time Off</SelectItem>
+                  <SelectItem value="day off">Day Off</SelectItem>
                 </SelectContent>
               </Select>
             </div>
