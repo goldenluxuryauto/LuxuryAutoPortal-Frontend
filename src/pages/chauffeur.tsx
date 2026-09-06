@@ -6,6 +6,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollReveal, StaggeredReveal, StaggeredRevealItem } from "@/components/animations/ScrollReveal";
 import {
   Select,
   SelectContent,
@@ -233,7 +234,7 @@ export default function ChauffeurPage() {
           </div>
 
           <div className="relative mx-auto grid min-h-[500px] max-w-7xl content-end px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
-            <div className="max-w-3xl animate-fade-in-up">
+            <ScrollReveal preset="hero" className="max-w-3xl">
               <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-[#D3BC8D]">Chauffeur Services</p>
               <h1 className="font-serif text-4xl font-light leading-tight text-white sm:text-5xl lg:text-6xl">
                 Professional Chauffeurs, Exceptional Service
@@ -254,12 +255,12 @@ export default function ChauffeurPage() {
                   </Button>
                 </Link>
               </div>
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
         <section className="border-b border-[#E6DDC7] bg-[#F7F4EC] px-4 py-8 sm:px-6 lg:px-8">
-          <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
+          <StaggeredReveal className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
             {[
               { icon: CarFront, title: "Business SUV", text: "7 and 8 passenger chauffeur vehicles." },
               { icon: Clock, title: "Minimum 4 Hours", text: "Service time runs pickup to final dropoff." },
@@ -267,7 +268,7 @@ export default function ChauffeurPage() {
             ].map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="flex items-start gap-4 rounded-md border border-[#E2D8BF] bg-white p-5">
+                <StaggeredRevealItem key={item.title} className="flex items-start gap-4 rounded-md border border-[#E2D8BF] bg-white p-5">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
@@ -275,15 +276,15 @@ export default function ChauffeurPage() {
                     <h2 className="font-semibold text-[#171717]">{item.title}</h2>
                     <p className="mt-1 text-sm leading-6 text-[#5D574A]">{item.text}</p>
                   </div>
-                </div>
+                </StaggeredRevealItem>
               );
             })}
-          </div>
+          </StaggeredReveal>
         </section>
 
         <section id="chauffeur-vehicles" className="px-4 py-12 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <ScrollReveal preset="soft" className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-widest text-[#C49000]">Available Vehicles</p>
                 <h2 className="mt-2 font-serif text-3xl font-light text-[#171717] sm:text-4xl">Reserve A Chauffeur</h2>
@@ -293,9 +294,9 @@ export default function ChauffeurPage() {
                   Showing <span className="font-semibold text-[#171717]">{chauffeurCars.length}</span> vehicles
                 </p>
               )}
-            </div>
+            </ScrollReveal>
 
-            <div className="mb-8 flex flex-col gap-4 rounded-md border border-[#E2D8BF] bg-white p-4 sm:flex-row sm:items-end sm:justify-between">
+            <ScrollReveal preset="soft" delay={0.06} className="mb-8 flex flex-col gap-4 rounded-md border border-[#E2D8BF] bg-white p-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="w-full sm:max-w-xs">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#7A6B44]">Sort</p>
                 <Select value={sort} onValueChange={(value) => setSort(value as ChauffeurSort)}>
@@ -333,22 +334,27 @@ export default function ChauffeurPage() {
                   ))}
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
 
             {isLoading ? (
               <div className="flex justify-center py-24">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : chauffeurCars.length > 0 ? (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <StaggeredReveal
+                key={`${seatFilter}-${sort}`}
+                className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+              >
                 {chauffeurCars.map((car) => (
-                  <ChauffeurVehicleCard key={car.id} car={car} />
+                  <StaggeredRevealItem key={car.id}>
+                    <ChauffeurVehicleCard car={car} />
+                  </StaggeredRevealItem>
                 ))}
-              </div>
+              </StaggeredReveal>
             ) : (
-              <div className="rounded-md border border-[#E2D8BF] bg-white p-10 text-center">
+              <ScrollReveal preset="soft" className="rounded-md border border-[#E2D8BF] bg-white p-10 text-center">
                 <p className="text-[#5D574A]">No chauffeur vehicles are available right now. Please check back soon.</p>
-              </div>
+              </ScrollReveal>
             )}
           </div>
         </section>

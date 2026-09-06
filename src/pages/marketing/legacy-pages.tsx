@@ -27,6 +27,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollReveal, StaggeredReveal, StaggeredRevealItem } from "@/components/animations/ScrollReveal";
 import { SITE_CONTACT } from "@/lib/site-config";
 import { getPreferredPublicLocation, withPreferredLocationPath } from "@/lib/location-config";
 import { buildApiUrl } from "@/lib/queryClient";
@@ -1106,7 +1107,7 @@ function PageShell({
             />
           </div>
           <div className="relative mx-auto grid min-h-[440px] max-w-7xl content-end px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
-            <div className="max-w-3xl animate-fade-in-up">
+            <ScrollReveal preset="hero" className="max-w-3xl">
               <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-[#D3BC8D]">{meta.eyebrow}</p>
               <h1 className="font-serif text-4xl font-light leading-tight text-white sm:text-5xl lg:text-6xl">
                 {meta.title}
@@ -1129,7 +1130,7 @@ function PageShell({
                   </CtaLink>
                 ) : null}
               </div>
-            </div>
+            </ScrollReveal>
           </div>
         </section>
         {children}
@@ -1141,11 +1142,11 @@ function PageShell({
 
 function SectionHeader({ eyebrow, title, description }: { eyebrow: string; title: string; description?: string }) {
   return (
-    <div className="reveal-on-scroll mb-10">
+    <ScrollReveal preset="soft" className="mb-10">
       <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">{eyebrow}</p>
       <h2 className="font-serif text-3xl font-light text-foreground lg:text-4xl">{title}</h2>
       {description ? <p className="mt-3 max-w-2xl text-muted-foreground">{description}</p> : null}
-    </div>
+    </ScrollReveal>
   );
 }
 
@@ -1356,32 +1357,34 @@ export function DealsPage() {
           title="Guest deals in one clean place"
           description="Rental specials and local partner offers for Golden Luxury Auto guests."
         />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <StaggeredReveal className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {deals.map((deal, index) => (
-            <Card key={`${deal.title}-${deal.offer}`} className={`border-border bg-card ${index === 0 ? "sm:col-span-2 lg:col-span-1" : ""}`}>
-              <CardContent className="flex h-full flex-col p-6">
-                <div className="mb-5 aspect-[4/3] overflow-hidden rounded-md bg-muted">
-                  <img
-                    src={deal.imageUrl}
-                    alt={deal.title}
-                    className="h-full w-full object-cover"
-                    loading={index < 3 ? "eager" : "lazy"}
-                  />
-                </div>
-                <div className="mb-5 flex items-start justify-between gap-4">
-                  <span className="rounded-md bg-primary/10 px-3 py-1 text-sm font-bold text-primary">{deal.offer}</span>
-                  <BadgePercent className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">{deal.title}</h3>
-                <p className="mt-3 flex-1 text-sm leading-6 text-muted-foreground">{deal.description}</p>
-                <CtaLink href={index === 0 ? "/fleet" : deal.websiteHref || "/contact"} className="mt-6 inline-flex items-center text-sm font-semibold text-primary">
-                  {index === 0 ? "Book Now" : "Website"}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </CtaLink>
-              </CardContent>
-            </Card>
+            <StaggeredRevealItem key={`${deal.title}-${deal.offer}`} className={index === 0 ? "sm:col-span-2 lg:col-span-1" : ""}>
+              <Card className="h-full border-border bg-card">
+                <CardContent className="flex h-full flex-col p-6">
+                  <div className="mb-5 aspect-[4/3] overflow-hidden rounded-md bg-muted">
+                    <img
+                      src={deal.imageUrl}
+                      alt={deal.title}
+                      className="h-full w-full object-cover"
+                      loading={index < 3 ? "eager" : "lazy"}
+                    />
+                  </div>
+                  <div className="mb-5 flex items-start justify-between gap-4">
+                    <span className="rounded-md bg-primary/10 px-3 py-1 text-sm font-bold text-primary">{deal.offer}</span>
+                    <BadgePercent className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground">{deal.title}</h3>
+                  <p className="mt-3 flex-1 text-sm leading-6 text-muted-foreground">{deal.description}</p>
+                  <CtaLink href={index === 0 ? "/fleet" : deal.websiteHref || "/contact"} className="mt-6 inline-flex items-center text-sm font-semibold text-primary">
+                    {index === 0 ? "Book Now" : "Website"}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </CtaLink>
+                </CardContent>
+              </Card>
+            </StaggeredRevealItem>
           ))}
-        </div>
+        </StaggeredReveal>
       </section>
       <ContactBand title="Use the rental deal or ask what local offers are active." label="Deals" />
     </PageShell>
@@ -2509,39 +2512,41 @@ export function ExtrasPage() {
           title="Travel lighter, arrive prepared"
           description={extrasDescription}
         />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <StaggeredReveal className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {visibleExtras.map((item) => (
-            <Card key={item.name} className="border-border bg-card">
-              <CardContent className="flex h-full flex-col p-6">
-                <div className="mb-5 aspect-[4/3] overflow-hidden rounded-md bg-muted">
-                  <img
-                    src={item.imageUrl}
-                    alt={item.name}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="mb-5 flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground">{item.name}</h3>
-                    <p className="mt-2 text-sm font-bold text-primary">{item.price}</p>
+            <StaggeredRevealItem key={item.name}>
+              <Card className="h-full border-border bg-card">
+                <CardContent className="flex h-full flex-col p-6">
+                  <div className="mb-5 aspect-[4/3] overflow-hidden rounded-md bg-muted">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
                   </div>
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
-                    <CarFront className="h-5 w-5 text-primary" />
+                  <div className="mb-5 flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-xl font-semibold text-foreground">{item.name}</h3>
+                      <p className="mt-2 text-sm font-bold text-primary">{item.price}</p>
+                    </div>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                      <CarFront className="h-5 w-5 text-primary" />
+                    </div>
                   </div>
-                </div>
-                <p className="flex-1 text-sm leading-6 text-muted-foreground">{item.description}</p>
-                <p className="mt-5 inline-flex rounded-md bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
-                  Quantity: {item.quantity}
-                </p>
-              </CardContent>
-            </Card>
+                  <p className="flex-1 text-sm leading-6 text-muted-foreground">{item.description}</p>
+                  <p className="mt-5 inline-flex rounded-md bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
+                    Quantity: {item.quantity}
+                  </p>
+                </CardContent>
+              </Card>
+            </StaggeredRevealItem>
           ))}
-        </div>
+        </StaggeredReveal>
       </section>
 
       <section className="bg-muted/45 px-4 py-14 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl rounded-md border border-border bg-card p-6 lg:p-8">
+        <ScrollReveal preset="soft" className="mx-auto max-w-7xl rounded-md border border-border bg-card p-6 lg:p-8">
           <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-primary">How to add extras</p>
@@ -2557,7 +2562,7 @@ export function ExtrasPage() {
               </Button>
             </Link>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
       <ContactBand title="Need a specific add-on for a trip?" label="Trip Extras" />
     </PageShell>
