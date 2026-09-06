@@ -7,9 +7,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, X, ChevronLeft, ChevronRight, Maximize2, Loader2, Copy, ExternalLink } from "lucide-react";
+import { Download, X, ChevronLeft, ChevronRight, Loader2, Copy, ExternalLink } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import InAppReceipt from "@/components/receipts/InAppReceipt";
 
 interface Payment {
   payments_aid: number;
@@ -302,8 +303,21 @@ export function PaymentReceiptModal({
   //   - Otherwise assume it's a Google Drive file ID and route through the
   //     existing /api/payments/receipt/file-content proxy (works regardless of
   //     Drive permissions).
+  const resolveDisplayUrl = (url: string): string => {
+    if (
+      url.startsWith("http://") ||
+      url.startsWith("https://") ||
+      url.startsWith("blob:") ||
+      url.startsWith("data:")
+    ) {
+      return url;
+    }
+    return buildApiUrl(url);
+  };
+
   const resolveCurrentUrl = (): string | null => {
     if (!currentFile) return null;
+    if (currentFile.url) return resolveDisplayUrl(currentFile.url);
     const id = currentFile.fileId || "";
     const isHttp = id.startsWith("http://") || id.startsWith("https://");
     const isLocal = id.startsWith("/uploads/");
@@ -314,7 +328,6 @@ export function PaymentReceiptModal({
     if (id && !id.startsWith("{") && !id.startsWith("[")) {
       return buildApiUrl(`/api/payments/receipt/file-content?fileId=${encodeURIComponent(id)}`);
     }
-    if (currentFile.url) return currentFile.url;
     return currentFile.webViewLink || currentFile.webContentLink || currentFile.previewUrl || null;
   };
   const currentAttachment = resolveCurrentUrl();
@@ -337,27 +350,6 @@ export function PaymentReceiptModal({
       a.rel = "noopener noreferrer";
       a.click();
     }
-  };
-
-  const getFileType = (file: FileUrlData | null): string => {
-    if (!file) return 'unknown';
-    
-    // Check MIME type first (from Google Drive or legacy { type: "image/jpeg" })
-    if (file.mimeType) {
-      if (file.mimeType.startsWith('image/')) return 'image';
-      if (file.mimeType === 'application/pdf') return 'pdf';
-    }
-    
-    // Fallback to filename / URL extension
-    const filename = file.name || file.url || file.fileId || '';
-    const extMatch = filename.toLowerCase().match(/\.([a-z0-9]+)(?:\?|$)/);
-    const ext = extMatch?.[1] || filename.split('.').pop()?.toLowerCase() || '';
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext)) {
-      return 'image';
-    } else if (ext === 'pdf') {
-      return 'pdf';
-    }
-    return 'unknown';
   };
 
   return (
@@ -420,67 +412,15 @@ export function PaymentReceiptModal({
                     </div>
                   </div>
                 ) : currentFile && currentAttachment ? (
-                  <>
-                    {getFileType(currentFile) === 'image' ? (
-                      <div className="flex items-center justify-center h-full">
-                        {/* Use proxy endpoint for images to avoid permission issues */}
-                        <img
-                          src={currentAttachment || ''}
-                          alt={`Receipt ${currentIndex + 1}`}
-                          className="max-w-full max-h-full object-contain"
-                          loading="eager"
-                          onLoad={() => {
-                            console.log(`✅ [Payment Receipts] Image loaded: ${currentFile?.name}`);
-                          }}
-                          onError={(e) => {
-                            console.error("Failed to load image via proxy:", currentAttachment);
-                            // Fallback to direct links if proxy fails
-                            const fallbackUrl = currentFile?.webContentLink || currentFile?.webViewLink || currentFile?.previewUrl;
-                            if (fallbackUrl && currentAttachment !== fallbackUrl) {
-                              (e.target as HTMLImageElement).src = fallbackUrl;
-                            }
-                          }}
-                        />
-                      </div>
-                    ) : getFileType(currentFile) === 'pdf' ? (
-                      <iframe
-                        src={currentAttachment || ''}
-                        title={`Receipt ${currentIndex + 1}`}
-                        className="w-full h-full min-h-[400px] border-0"
-                        allow="fullscreen"
-                        loading="eager"
-                        onLoad={() => {
-                          console.log(`✅ [Payment Receipts] PDF loaded: ${currentFile?.name}`);
-                        }}
-                        onError={() => {
-                          console.error("Failed to load PDF via proxy:", currentAttachment);
-                          // Fallback to direct links if proxy fails
-                          if (currentFile?.previewUrl && currentAttachment !== currentFile.previewUrl) {
-                            const iframe = document.querySelector(`iframe[title="Receipt ${currentIndex + 1}"]`) as HTMLIFrameElement;
-                            if (iframe) {
-                              iframe.src = currentFile.previewUrl;
-                            }
-                          }
-                        }}
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <div className="text-center">
-                          <p className="text-muted-foreground">
-                            Unsupported file type
-                          </p>
-                          <Button
-                            variant="outline"
-                            onClick={handleDownload}
-                            className="mt-4 bg-muted text-foreground hover:bg-muted/503a3a3a] border-border"
-                          >
-                            <Download className="w-4 h-4 mr-2" />
-                            Download File
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </>
+                  <div className="flex items-center justify-center h-full">
+                    <InAppReceipt
+                      src={currentAttachment}
+                      filename={currentFile.name || currentFile.fileId}
+                      alt={`Receipt ${currentIndex + 1}`}
+                      className="w-full h-full min-h-[400px] border-0 bg-background object-contain"
+                      expandable={false}
+                    />
+                  </div>
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
@@ -650,4 +590,3 @@ export function PaymentReceiptModal({
     </Dialog>
   );
 }
-

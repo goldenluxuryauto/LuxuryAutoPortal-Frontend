@@ -35,6 +35,7 @@ function isOurReceiptApi(url: string): boolean {
     url.startsWith("/") ||
     url.includes("/api/income-expense/receipt-image") ||
     url.includes("/api/expense-form-submissions/receipt/file") ||
+    url.includes("/api/payments/receipt/file-content") ||
     url.includes("/api/gcs-image-proxy")
   );
 }
@@ -46,7 +47,8 @@ function needsCredentials(url: string): boolean {
   return (
     url.startsWith("/") ||
     url.includes("/api/income-expense/receipt-image") ||
-    url.includes("/api/expense-form-submissions/receipt/file")
+    url.includes("/api/expense-form-submissions/receipt/file") ||
+    url.includes("/api/payments/receipt/file-content")
   );
 }
 
