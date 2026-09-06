@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { ArrowRight, Car, Phone } from "lucide-react";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import type { PublicLocation } from "@/lib/location-config";
 
 export function CTASection({ location }: { location: PublicLocation }) {
@@ -20,7 +21,7 @@ export function CTASection({ location }: { location: PublicLocation }) {
         />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <ScrollReveal preset="hero" className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <p
           className="text-xs font-bold tracking-widest uppercase mb-4"
           style={{ color: "#E8B830", letterSpacing: "3px" }}
@@ -127,7 +128,7 @@ export function CTASection({ location }: { location: PublicLocation }) {
             </button>
           </a>
         </div>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }

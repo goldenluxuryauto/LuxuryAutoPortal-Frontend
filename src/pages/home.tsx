@@ -6,9 +6,10 @@ import { Services } from "@/components/home/services";
 import { CTASection } from "@/components/home/cta-section";
 import { SiteStatsStrip } from "@/components/layout/site-stats-strip";
 import { RotatingGoogleReviews } from "@/components/reviews/rotating-google-reviews";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { type PublicLocation } from "@/lib/location-config";
 import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState } from "react";
 import { Link } from "wouter";
 import { ArrowRight, Car, ClipboardCheck, ExternalLink, Sparkles, UserPlus } from "lucide-react";
 
@@ -287,22 +288,6 @@ function ServiceSplitSection({ location }: { location: PublicLocation }) {
   );
 }
 
-function AnimatedHomeSection({ children, className = "" }: { children: ReactNode; className?: string }) {
-  const shouldReduceMotion = useReducedMotion();
-
-  return (
-    <motion.div
-      className={className}
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 34 }}
-      whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: 0.68, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 function HeroServiceCinematic({ location }: { location: PublicLocation }) {
   return (
     <div className="cinematic-shell relative isolate overflow-hidden bg-[#050505] text-white">
@@ -396,12 +381,12 @@ export default function Home({ location }: { location?: PublicLocation }) {
       <Navbar />
       <main className="public-page">
         <HeroServiceCinematic location={location} />
-        <AnimatedHomeSection>
+        <ScrollReveal preset="soft" amount={0.16}>
           <FeaturedCars location={location} />
-        </AnimatedHomeSection>
-        <AnimatedHomeSection>
+        </ScrollReveal>
+        <ScrollReveal preset="soft" amount={0.16}>
           <Services location={location} />
-        </AnimatedHomeSection>
+        </ScrollReveal>
         <CTASection location={location} />
       </main>
       <Footer />

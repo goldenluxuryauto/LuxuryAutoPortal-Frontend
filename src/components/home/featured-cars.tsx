@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ExternalLink, Calendar, Users, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollReveal, StaggeredReveal, StaggeredRevealItem } from "@/components/animations/ScrollReveal";
 import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
 import { fleetCarBelongsToLocation, type PublicLocation } from "@/lib/location-config";
 
@@ -133,7 +134,7 @@ export function FeaturedCars({ location }: { location: PublicLocation }) {
   return (
     <section id="featured-fleet" className="py-20 lg:py-28" style={{ background: "#FFFDF8" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 lg:mb-16">
+        <ScrollReveal preset="soft" className="text-center mb-12 lg:mb-16">
           <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#C49000", letterSpacing: "3px" }}>
             Curated Selection
           </p>
@@ -167,18 +168,20 @@ export function FeaturedCars({ location }: { location: PublicLocation }) {
               );
             })}
           </div> : null}
-        </div>
+        </ScrollReveal>
 
         {isLoading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin" style={{ color: "#C49000" }} />
           </div>
         ) : cars.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <StaggeredReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {cars.map((car) => (
-              <CarCard key={car.id} car={car} location={location} />
+              <StaggeredRevealItem key={car.id}>
+                <CarCard car={car} location={location} />
+              </StaggeredRevealItem>
             ))}
-          </div>
+          </StaggeredReveal>
         ) : (
           <p className="text-center" style={{ color: "#808080" }}>
             Explore the {location.cityState} collection below.

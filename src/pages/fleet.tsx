@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import {
   Popover,
   PopoverContent,
@@ -269,7 +270,7 @@ export default function Fleet({ location = PUBLIC_LOCATIONS.slc }: { location?: 
             />
           </div>
           <div className="relative mx-auto grid min-h-[440px] max-w-7xl content-end px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
-            <div className="max-w-3xl animate-fade-in-up">
+            <ScrollReveal preset="hero" className="max-w-3xl">
               <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-[#D3BC8D]">Our Collection</p>
               <h1 className="font-serif text-4xl font-light leading-tight text-white sm:text-5xl lg:text-6xl">
                 Browse Our Fleet
@@ -291,14 +292,14 @@ export default function Fleet({ location = PUBLIC_LOCATIONS.slc }: { location?: 
                   </Button>
                 </a>
               </div>
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
         <div id="fleet-list" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div>
             {/* Top filter bar: search on the left, filter button on the right. */}
-            <div className="flex flex-col md:flex-row md:items-end gap-4 mb-8">
+            <ScrollReveal preset="soft" className="flex flex-col md:flex-row md:items-end gap-4 mb-8">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -366,9 +367,9 @@ export default function Fleet({ location = PUBLIC_LOCATIONS.slc }: { location?: 
                   Clear All
                 </Button>
               )}
-            </div>
+            </ScrollReveal>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+            <ScrollReveal preset="soft" delay={0.06} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
               <p className="text-sm text-muted-foreground">
                 Showing <span className="text-foreground font-medium">{filteredCars.length}</span> {filteredCars.length === 1 ? "vehicle" : "vehicles"}
               </p>
@@ -386,20 +387,25 @@ export default function Fleet({ location = PUBLIC_LOCATIONS.slc }: { location?: 
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+            </ScrollReveal>
 
             {isLoading ? (
               <div className="flex justify-center py-24">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
             ) : filteredCars.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredCars.map((car) => (
-                  <CarCard key={car.id} car={car} />
+              <div
+                key={`${search}-${selectedMakes.join("|")}-${selectedYears.join("|")}-${selectedTypes.join("|")}-${selectedSeats.join("|")}-${sort}`}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              >
+                {filteredCars.map((car, index) => (
+                  <ScrollReveal key={car.id} preset="scale" amount={0.18} delay={(index % 4) * 0.045}>
+                    <CarCard car={car} />
+                  </ScrollReveal>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16">
+              <ScrollReveal preset="soft" className="text-center py-16">
                 <p className="text-lg text-muted-foreground mb-4">
                   {cars.length === 0
                     ? "No vehicles are available right now. Please check back soon."
@@ -410,7 +416,7 @@ export default function Fleet({ location = PUBLIC_LOCATIONS.slc }: { location?: 
                     Clear All Filters
                   </Button>
                 )}
-              </div>
+              </ScrollReveal>
             )}
           </div>
         </div>

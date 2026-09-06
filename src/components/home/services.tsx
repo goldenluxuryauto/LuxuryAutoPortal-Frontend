@@ -1,5 +1,6 @@
 import { Shield, Truck, Headphones, FileCheck, Sparkles, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollReveal, StaggeredReveal, StaggeredRevealItem } from "@/components/animations/ScrollReveal";
 import type { PublicLocation } from "@/lib/location-config";
 
 const services = (location: PublicLocation) => [
@@ -39,7 +40,7 @@ export function Services({ location }: { location: PublicLocation }) {
   return (
     <section className="py-20 lg:py-28" style={{ background: "#fff" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 lg:mb-16">
+        <ScrollReveal preset="soft" className="text-center mb-12 lg:mb-16">
           <p
             className="text-xs font-bold tracking-widest uppercase mb-3"
             style={{ color: "#C49000", letterSpacing: "3px" }}
@@ -59,46 +60,45 @@ export function Services({ location }: { location: PublicLocation }) {
             Quality vehicles, straightforward communication, and rental support
             built around real guest needs.
           </p>
-        </div>
+        </ScrollReveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <StaggeredReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {services(location).map((service, index) => {
             const Icon = service.icon;
             return (
-              <Card
-                key={index}
-                className="hover-elevate group transition-all duration-300 relative overflow-hidden"
-                style={{
-                  background: "#FFFDF8",
-                  border: "1px solid #E8D4A0",
-                  borderRadius: "16px",
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.borderColor = "#D4A017";
-                  el.style.transform = "translateY(-3px)";
-                  el.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)";
-                  const bar = el.querySelector(".gold-top-bar") as HTMLElement | null;
-                  if (bar) bar.style.opacity = "1";
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.borderColor = "#E8D4A0";
-                  el.style.transform = "translateY(0)";
-                  el.style.boxShadow = "none";
-                  const bar = el.querySelector(".gold-top-bar") as HTMLElement | null;
-                  if (bar) bar.style.opacity = "0";
-                }}
-              >
-                {/* Gold top accent bar on hover */}
-                <div
-                  className="gold-top-bar absolute top-0 left-0 right-0 h-[3px] transition-opacity duration-300"
+              <StaggeredRevealItem key={index}>
+                <Card
+                  className="hover-elevate group transition-all duration-300 relative overflow-hidden"
                   style={{
-                    background: "linear-gradient(90deg, #D4A017, #E8B830)",
-                    opacity: 0,
+                    background: "#FFFDF8",
+                    border: "1px solid #E8D4A0",
+                    borderRadius: "16px",
                   }}
-                />
-                <CardContent className="p-6 lg:p-8">
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget as HTMLDivElement;
+                    el.style.borderColor = "#D4A017";
+                    el.style.transform = "translateY(-3px)";
+                    el.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)";
+                    const bar = el.querySelector(".gold-top-bar") as HTMLElement | null;
+                    if (bar) bar.style.opacity = "1";
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget as HTMLDivElement;
+                    el.style.borderColor = "#E8D4A0";
+                    el.style.transform = "translateY(0)";
+                    el.style.boxShadow = "none";
+                    const bar = el.querySelector(".gold-top-bar") as HTMLElement | null;
+                    if (bar) bar.style.opacity = "0";
+                  }}
+                >
+                  <div
+                    className="gold-top-bar absolute top-0 left-0 right-0 h-[3px] transition-opacity duration-300"
+                    style={{
+                      background: "linear-gradient(90deg, #D4A017, #E8B830)",
+                      opacity: 0,
+                    }}
+                  />
+                  <CardContent className="p-6 lg:p-8">
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
                     style={{
@@ -120,11 +120,12 @@ export function Services({ location }: { location: PublicLocation }) {
                   >
                     {service.description}
                   </p>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </StaggeredRevealItem>
             );
           })}
-        </div>
+        </StaggeredReveal>
       </div>
     </section>
   );
