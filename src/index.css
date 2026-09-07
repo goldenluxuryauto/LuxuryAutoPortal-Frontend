@@ -470,13 +470,13 @@
 
 .cinematic-mobile-image {
   position: absolute;
-  inset: 0 0 auto;
-  height: 48svh;
-  min-height: 320px;
+  inset: 0;
+  height: 100svh;
+  min-height: 680px;
   background-image: url("/homepage-hero-escalade.jpg");
-  background-position: center top;
+  background-position: 50% top;
   background-repeat: no-repeat;
-  background-size: 100% auto;
+  background-size: cover;
 }
 
 @media (min-width: 640px) {

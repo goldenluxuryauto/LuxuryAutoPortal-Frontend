@@ -49,7 +49,7 @@ export function Hero({
         </div>
       ) : null}
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-12 pt-[35svh] text-left sm:px-6 sm:pb-16 sm:pt-28 lg:px-8 lg:pt-24">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-8 pt-[38svh] text-left sm:px-6 sm:pb-16 sm:pt-28 lg:px-8 lg:pt-24">
         <div
           className="mb-5 inline-flex max-w-full items-center gap-2 rounded-full px-3 py-2 sm:mb-8 sm:px-4"
           style={{
@@ -131,11 +131,11 @@ export function Hero({
             </div>
           </div>
         ) : location ? (
-          <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center sm:gap-4">
             <Link href="/choose-location">
             <Button
               size="lg"
-              className="min-w-[180px] group font-bold"
+              className="group min-w-0 w-full font-bold sm:min-w-[180px]"
               style={{
                 background: "linear-gradient(135deg, #D4A017, #E8B830)",
                 color: "#1A0E00",
@@ -151,7 +151,7 @@ export function Hero({
             <Button
               size="lg"
               variant="outline"
-              className="min-w-[180px] font-medium"
+              className="min-w-0 w-full font-medium sm:min-w-[180px]"
               style={{
                 background: "rgba(255,255,255,0.08)",
                 border: "1px solid rgba(255,255,255,0.2)",
