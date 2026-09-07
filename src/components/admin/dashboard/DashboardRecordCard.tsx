@@ -52,6 +52,8 @@ export interface DashboardRecordCardProps {
   notes?: string | null;
   /** Optional media (e.g. a photo thumbnail) shown at the top-right. */
   media?: ReactNode;
+  /** Optional media shown in the LEFT column, under the trip/location details. */
+  leftMedia?: ReactNode;
   /** Status control (the existing <Select>/<select>) — rendered in the header. */
   statusControl?: ReactNode;
   /** Optional click handler (e.g. navigate to a detail page). */
@@ -79,6 +81,7 @@ export function DashboardRecordCard({
   details = [],
   notes,
   media,
+  leftMedia,
   statusControl,
   onClick,
 }: DashboardRecordCardProps) {
@@ -167,6 +170,9 @@ export function DashboardRecordCard({
                 <span className="break-words"><span className="font-medium text-foreground">Drop Off:</span> {dropoffLocation}</span>
               </div>
             )}
+
+            {/* Left media (e.g. the car's photo) */}
+            {leftMedia && <div className="pt-1">{leftMedia}</div>}
           </div>
 
           {/* Middle: details grid */}

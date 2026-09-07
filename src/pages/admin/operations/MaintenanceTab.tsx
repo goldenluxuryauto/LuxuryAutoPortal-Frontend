@@ -710,11 +710,16 @@ export function MaintenanceTab({
                   </div>
                 ) : <span className="text-muted-foreground text-xs">--</span>;
 
+                // Uploaded maintenance photos stay on the right; the car's own
+                // photo always shows in the left column under the trip details
+                // so every record identifies its vehicle visually, even when a
+                // maintenance-specific photo has been uploaded.
                 const photosEl = rec.photos && rec.photos.length > 0 ? (
                   <PhotoUpload photos={rec.photos} onPhotosChange={() => {}} entityType="maintenance" entityId={rec.id} disabled compact />
-                ) : (
-                  <CarPhotoCell carPhoto={rec.car_photo} carName={carDisplayName} />
-                );
+                ) : null;
+                const carPhotoEl = rec.car_photo
+                  ? <CarPhotoCell carPhoto={rec.car_photo} carName={carDisplayName} />
+                  : null;
 
                 return (
                   <DashboardRecordCard
@@ -732,6 +737,7 @@ export function MaintenanceTab({
                     dropoffLocation={dropOffLocation}
                     statusControl={statusControl}
                     media={photosEl}
+                    leftMedia={carPhotoEl}
                     notes={rec.notes}
                     details={[
                       { label: "CAR Name", value: rec.car_id ? (
