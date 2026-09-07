@@ -88,7 +88,12 @@ export function TaskAssignmentModal({
     notes: task?.notes || "",
   });
 
+  // Seed the form from the task being edited / the prefill. Keyed on `open` so
+  // it runs once per opening: `prefill` is a fresh object on every parent
+  // render, so depending on it re-ran this on each render and wiped whatever
+  // the user had just typed or selected, leaving every field looking dead.
   useEffect(() => {
+    if (!open) return;
     if (task) {
       setFormData({
         turo_trip_id: task.turo_trip_id,
@@ -131,12 +136,30 @@ export function TaskAssignmentModal({
         scheduled_location: defaultLocation,
         due_date: dueDate,
       }));
+    } else {
+      // Opened fresh with no task and no prefill ("Add Task") — start clean so
+      // the previous opening's values don't linger.
+      setFormData({
+        turo_trip_id: null,
+        reservation_id: "",
+        car_name: "",
+        guest_name: "",
+        task_type: "cleaning",
+        assigned_to: "",
+        assigned_to_id: null,
+        scheduled_date: "",
+        scheduled_location: "",
+        due_date: "",
+        notes: "",
+      });
     }
-  }, [task, prefill]);
+  }, [open]);
 
-  // Re-apply defaults when the user changes the task type dropdown.
+  // Re-apply defaults when the user changes the task type dropdown. Requires a
+  // prefill carrying actual trip data — an empty {} (the "Add Task" path) has
+  // no dates to derive, so recomputing would only blank what the user entered.
   useEffect(() => {
-    if (!task && prefill) {
+    if (!task && prefill && (prefill.trip_start || prefill.trip_end)) {
       const { scheduledDate, dueDate } = computeDefaults(
         formData.task_type,
         prefill.trip_start,
