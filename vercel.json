@@ -50,18 +50,32 @@
   ],
   "rewrites": [
     {
-      "source": "/:path*",
+      "source": "/assets/:path*",
       "has": [
         {
           "type": "host",
           "value": "app.goldenluxuryauto.com"
         }
       ],
-      "destination": "https://gla-v1.vercel.app/:path*"
+      "destination": "/legacy-assets/:path*"
+    },
+    {
+      "source": "/img/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "/legacy-img/:path*"
     },
     {
       "source": "/api/:path*",
       "destination": "https://luxuryautoportal-replit-1.onrender.com/api/:path*"
+    },
+    {
+      "source": "/rest/:path*",
+      "destination": "https://luxuryautoportal-replit-1.onrender.com/rest/:path*"
     },
     {
       "source": "/contracts/:path*",
@@ -80,7 +94,17 @@
       "destination": "https://luxuryautoportal-replit-1.onrender.com/income-expense-images/:path*"
     },
     {
-      "source": "/((?!api/|contracts/|signed-contracts/|car-photos/|income-expense-images/).*)",
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "/legacy-index.html"
+    },
+    {
+      "source": "/((?!api/|rest/|contracts/|signed-contracts/|car-photos/|income-expense-images/).*)",
       "destination": "/index.html"
     }
   ]
