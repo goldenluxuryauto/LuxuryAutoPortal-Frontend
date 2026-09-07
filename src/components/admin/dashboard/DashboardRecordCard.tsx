@@ -172,7 +172,7 @@ export function DashboardRecordCard({
             )}
 
             {/* Left media (e.g. the car's photo) */}
-            {leftMedia && <div className="pt-1">{leftMedia}</div>}
+            {leftMedia && <div className="pt-1 w-full">{leftMedia}</div>}
           </div>
 
           {/* Middle: details grid */}

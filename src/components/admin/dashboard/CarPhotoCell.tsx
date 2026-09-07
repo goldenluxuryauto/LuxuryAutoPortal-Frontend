@@ -53,19 +53,32 @@ function toDisplaySrc(url: string, size: number): string {
 }
 
 /** Clickable car photo thumbnail — opens a lightbox on click. */
-export function CarPhotoCell({ carPhoto, carName }: { carPhoto: string | null | undefined; carName?: string | null }) {
+export function CarPhotoCell({
+  carPhoto,
+  carName,
+  className = "h-10 w-16",
+  size = 128,
+}: {
+  carPhoto: string | null | undefined;
+  carName?: string | null;
+  /** Sizing classes for the thumbnail. Defaults to the fixed table-cell size;
+   *  pass responsive widths/heights where the photo should fill its column. */
+  className?: string;
+  /** Requested width from the image proxy — raise it when rendering large. */
+  size?: number;
+}) {
   const [open, setOpen] = useState(false);
   const url = parseCarPhotoUrl(carPhoto);
   if (!url) return null;
 
-  const src = toDisplaySrc(url, 128);
+  const src = toDisplaySrc(url, size);
 
   return (
     <>
       <img
         src={src}
         alt={carName ?? "Car"}
-        className="h-10 w-16 object-cover rounded cursor-pointer hover:opacity-90 transition-opacity"
+        className={`${className} object-cover rounded cursor-pointer hover:opacity-90 transition-opacity`}
         onClick={e => { e.stopPropagation(); setOpen(true); }}
         title="Click to view car photo"
       />

@@ -718,7 +718,17 @@ export function MaintenanceTab({
                   <PhotoUpload photos={rec.photos} onPhotosChange={() => {}} entityType="maintenance" entityId={rec.id} disabled compact />
                 ) : null;
                 const carPhotoEl = rec.car_photo
-                  ? <CarPhotoCell carPhoto={rec.car_photo} carName={carDisplayName} />
+                  ? (
+                    <CarPhotoCell
+                      carPhoto={rec.car_photo}
+                      carName={carDisplayName}
+                      // Fill the left column instead of sitting as a small
+                      // fixed thumbnail in a mostly-empty space. Capped so a
+                      // short card doesn't grow a huge image.
+                      className="w-full max-w-[280px] h-24 sm:h-28"
+                      size={640}
+                    />
+                  )
                   : null;
 
                 return (
