@@ -42,6 +42,7 @@ import { toMtLocalInput, mtLocalInputToUtcDbString } from "@/lib/mt-datetime";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { Plus, Edit, Trash2, ChevronsUpDown, Check } from "lucide-react";
 import { OperationEditHistory } from "@/components/admin/OperationEditHistory";
+import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
 
 interface TicketViolation {
   tv_aid: number;
@@ -49,6 +50,8 @@ interface TicketViolation {
   tv_client_email: string;
   tv_car_id: number | null;
   tv_car_label: string;
+  /** Joined from the `car` table via tv_car_id; null when unlinked. */
+  car_photo?: string | null;
   tv_reservation_id: string | null;
   tv_plate: string | null;
   tv_vin: string | null;
@@ -619,6 +622,14 @@ export function TicketViolationTab() {
                     accentBorder={accent.border}
                     typeLabel="Violation"
                     reservationId={r.tv_reservation_id}
+                    leftMedia={r.car_photo ? (
+                      <CarPhotoCell
+                        carPhoto={r.car_photo}
+                        carName={r.tv_car_label}
+                        className="w-full max-w-[420px] h-40 sm:h-48"
+                        size={960}
+                      />
+                    ) : null}
                     carName={r.tv_car_label || "--"}
                     plate={r.tv_plate}
                     guestName={r.tv_client_name || r.tv_client_email || null}

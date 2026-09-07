@@ -30,6 +30,7 @@ import { Truck, Sparkles, Package, X, Wrench, Shield, CreditCard, PlaneTakeoff, 
 import { useToast } from "@/hooks/use-toast";
 import type { TuroTrip, OperationTask, TaskType } from "./types";
 import { operationLocationMatches, useOperationLocationFilter } from "./OperationLocationFilter";
+import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
 
 const formatDateTime = (dateStr: string | null): string => {
   if (!dateStr) return "--";
@@ -995,6 +996,14 @@ export function TripsOverviewTab() {
                         accentBorder={accentBorder}
                         typeLabel={trip.status || "Trip"}
                         reservationId={trip.reservationId}
+                        leftMedia={trip.carPhoto ? (
+                          <CarPhotoCell
+                            carPhoto={trip.carPhoto}
+                            carName={trip.carName}
+                            className="w-full max-w-[420px] h-40 sm:h-48"
+                            size={960}
+                          />
+                        ) : null}
                         carName={trip.carName}
                         plate={trip.plateNumber}
                         guestName={trip.guestName}

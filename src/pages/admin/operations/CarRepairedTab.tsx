@@ -41,6 +41,7 @@ import { REPAIR_TYPES } from "../forms/CarRepairedSubmission";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, ChevronsUpDown, Check } from "lucide-react";
 import { OperationEditHistory } from "@/components/admin/OperationEditHistory";
+import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
 
 interface CarRepaired {
   cr_aid: number;
@@ -48,6 +49,8 @@ interface CarRepaired {
   cr_submitter_email: string;
   cr_car_id: number | null;
   cr_car_label: string;
+  /** Joined from the `car` table via cr_car_id; null when unlinked. */
+  car_photo?: string | null;
   cr_plate: string | null;
   cr_vin: string | null;
   cr_repair_completion_date: string | null;
@@ -560,6 +563,14 @@ export function CarRepairedTab() {
                     accentBg={statusAccent.bg}
                     accentBorder={statusAccent.border}
                     typeLabel="Repaired"
+                    leftMedia={r.car_photo ? (
+                      <CarPhotoCell
+                        carPhoto={r.car_photo}
+                        carName={r.cr_car_label}
+                        className="w-full max-w-[420px] h-40 sm:h-48"
+                        size={960}
+                      />
+                    ) : null}
                     carName={r.cr_car_label || "--"}
                     plate={r.cr_plate}
                     guestName={null}

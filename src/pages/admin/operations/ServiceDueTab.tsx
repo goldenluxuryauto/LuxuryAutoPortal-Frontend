@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { operationLocationMatches, useOperationLocationFilter } from "./OperationLocationFilter";
 import { OperationEditHistoryList } from "@/components/admin/OperationEditHistory";
 import type { CarServiceDue } from "./types";
+import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
 
 type ServiceKind = "oil_change" | "tires" | "brakes" | "windshield" | "mechanic" | "license_registration";
 type SortDirection = "asc" | "desc";
@@ -722,6 +723,7 @@ export function ServiceDueTab() {
               <TableHeader>
                 <TableRow className="bg-muted/40 hover:bg-muted/40">
                   <TableHead className="sticky top-0 z-20 bg-muted whitespace-nowrap">Status</TableHead>
+                  <TableHead className="sticky top-0 z-20 bg-muted whitespace-nowrap">Photo</TableHead>
                   <SortableTableHead sortKey="car" activeKey={sort.key} direction={sort.direction} onSort={handleSort}>Car</SortableTableHead>
                   <TableHead className="sticky top-0 z-20 bg-muted whitespace-nowrap">Plate</TableHead>
                   <TableHead className="sticky top-0 z-20 bg-muted whitespace-nowrap">VIN #</TableHead>
@@ -750,6 +752,9 @@ export function ServiceDueTab() {
                       >
                         {r.car_status}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <CarPhotoCell carPhoto={r.car_photo} carName={r.car_name} />
                     </TableCell>
                     <TableCell className="font-medium">
                       <Link href={`/admin/cars/${r.car_id}/income-expense`} className="text-[#D3BC8D] hover:underline">

@@ -31,6 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { OperationEditHistory } from "@/components/admin/OperationEditHistory";
 import type { Claim } from "./types";
+import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
 
 const formatDateTime = (dateStr: string | null): string => {
   if (!dateStr) return "--";
@@ -376,6 +377,14 @@ export function ClaimsTab() {
                     accentBorder={statusAccent.border}
                     typeLabel="Claim"
                     reservationId={claim.reservationId}
+                    leftMedia={claim.carPhoto ? (
+                      <CarPhotoCell
+                        carPhoto={claim.carPhoto}
+                        carName={claim.carName}
+                        className="w-full max-w-[420px] h-40 sm:h-48"
+                        size={960}
+                      />
+                    ) : null}
                     carName={claim.carName || "--"}
                     plate={claim.plate}
                     guestName={claim.guestName}

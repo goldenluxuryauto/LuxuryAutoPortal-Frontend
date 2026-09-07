@@ -4,6 +4,8 @@ export interface TuroTrip {
   dateBooked: string;
   carName: string | null;
   carLink: string | null;
+  /** Car photo joined from the `car` table by plate; null when unmatched. */
+  carPhoto?: string | null;
   plateNumber: string | null;
   vinNumber: string | null;
   guestName: string | null;
@@ -143,6 +145,7 @@ export interface Claim {
   tripEnd: string | null;
   guestName: string | null;
   carName: string | null;
+  carPhoto?: string | null;
   vin: string | null;
   plate: string | null;
 }
@@ -175,6 +178,7 @@ export interface CarServiceDue {
   car_name: string;
   car_plate: string | null;
   car_vin: string | null;
+  car_photo?: string | null;
   locationTag?: string | null;
   car_status: "ACTIVE" | "INACTIVE";
   last_oil_change: string | null;

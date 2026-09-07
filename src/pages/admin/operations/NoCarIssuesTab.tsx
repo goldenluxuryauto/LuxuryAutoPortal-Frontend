@@ -16,6 +16,7 @@ import { RotateCcw, ArrowRight, Plus } from "lucide-react";
 import type { Inspection, TuroTrip } from "./types";
 import { TaskAssignmentModal } from "./TaskAssignmentModal";
 import { operationLocationMatches, useOperationLocationFilter } from "./OperationLocationFilter";
+import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
 
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return "--";
@@ -324,6 +325,7 @@ export function NoCarIssuesTab() {
               <TableHeader>
                 <TableRow className="border-border hover:bg-transparent">
                   <TableHead className="text-foreground font-medium">Reservation #</TableHead>
+                  <TableHead className="text-foreground font-medium">Photo</TableHead>
                   <TableHead className="text-foreground font-medium">CAR Name</TableHead>
                   <TableHead className="text-foreground font-medium">Plate #</TableHead>
                   <TableHead className="text-foreground font-medium">Trip Start</TableHead>
@@ -348,11 +350,11 @@ export function NoCarIssuesTab() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={20} className="text-center py-12 text-muted-foreground">Loading...</TableCell>
+                    <TableCell colSpan={21} className="text-center py-12 text-muted-foreground">Loading...</TableCell>
                   </TableRow>
                 ) : inspections.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={20} className="text-center py-12 text-muted-foreground">No resolved inspections yet</TableCell>
+                    <TableCell colSpan={21} className="text-center py-12 text-muted-foreground">No resolved inspections yet</TableCell>
                   </TableRow>
                 ) : (
                   pagedInspections.map((insp) => {
@@ -369,6 +371,9 @@ export function NoCarIssuesTab() {
                       <TableRow key={insp.id} className="border-border hover:bg-card/50 transition-colors">
                         <TableCell className="text-foreground font-mono text-sm">
                           {insp.reservation_id || trip?.reservationId || "--"}
+                        </TableCell>
+                        <TableCell>
+                          <CarPhotoCell carPhoto={insp.car_photo} carName={insp.car_name} />
                         </TableCell>
                         <TableCell className="text-foreground">{insp.car_name || "--"}</TableCell>
                         <TableCell className="text-foreground font-mono text-sm">{trip?.plateNumber || "--"}</TableCell>

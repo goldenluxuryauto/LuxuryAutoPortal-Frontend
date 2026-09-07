@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
 import { EmployeeSelectCombobox } from "./EmployeeSelectCombobox";
 import { operationLocationMatches, useOperationLocationFilter } from "./OperationLocationFilter";
+import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +32,8 @@ import {
 interface CarBlockOff {
   id: number;
   car_id: number | null;
+  /** Joined from the `car` table via car_id; null when unlinked. */
+  car_photo?: string | null;
   car_name: string;
   plate_number: string | null;
   owner_name: string;
@@ -236,7 +239,7 @@ export function CarBlockOffTab() {
           <thead>
             <tr className="border-b border-border bg-muted/50">
               {[
-                "Car Name", "Plate #", "Owner", "Reason",
+                "Photo", "Car Name", "Plate #", "Owner", "Reason",
                 "Pick Up Date", "Block Off End", "Pick Up Location",
                 "Drop Off Date", "Drop Off Location",
                 "Assigned To", "Pick Up Assigned To", "Drop Off Assigned To",
@@ -248,13 +251,17 @@ export function CarBlockOffTab() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={14} className="px-3 py-8 text-center text-muted-foreground">Loading...</td></tr>
+              <tr><td colSpan={15} className="px-3 py-8 text-center text-muted-foreground">Loading...</td></tr>
             ) : records.length === 0 ? (
-              <tr><td colSpan={14} className="px-3 py-8 text-center text-muted-foreground">No records found.</td></tr>
+              <tr><td colSpan={15} className="px-3 py-8 text-center text-muted-foreground">No records found.</td></tr>
             ) : records.map((r) => {
               const sm = statusMeta(r.status);
               return (
                 <tr key={r.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                  {/* Photo */}
+                  <td className="px-3 py-2">
+                    <CarPhotoCell carPhoto={r.car_photo} carName={r.car_name} />
+                  </td>
                   {/* Car Name */}
                   <td className="px-3 py-2 whitespace-nowrap font-medium text-foreground">{r.car_name}</td>
                   {/* Plate */}
