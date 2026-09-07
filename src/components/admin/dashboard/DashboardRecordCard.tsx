@@ -120,8 +120,10 @@ export function DashboardRecordCard({
             on the far right — so the empty horizontal space beside the trip
             info gets used. Stacks on small screens. */}
         <div className="flex flex-col lg:flex-row lg:gap-6 lg:items-start">
-          {/* Left column: car / guest / window / locations */}
-          <div className="space-y-1.5 lg:flex-1 lg:min-w-0">
+          {/* Left column: car / guest / window / locations. self-stretch (vs
+              the row's items-start) lets it match the card height so leftMedia
+              can center in the leftover vertical space. */}
+          <div className="space-y-1.5 lg:flex-1 lg:min-w-0 flex flex-col lg:self-stretch">
             {/* Car + plate */}
             {!isEmpty(carName) && (
               <div className="flex items-center gap-1.5 text-sm text-foreground">
@@ -171,8 +173,13 @@ export function DashboardRecordCard({
               </div>
             )}
 
-            {/* Left media (e.g. the car's photo) */}
-            {leftMedia && <div className="pt-1 w-full">{leftMedia}</div>}
+            {/* Left media (e.g. the car's photo) — takes the leftover height
+                below the trip details and centers itself in it, so the photo
+                sits in the middle of the empty space instead of hugging the
+                text above it. */}
+            {leftMedia && (
+              <div className="w-full flex-1 flex items-center py-2">{leftMedia}</div>
+            )}
           </div>
 
           {/* Middle: details grid */}
