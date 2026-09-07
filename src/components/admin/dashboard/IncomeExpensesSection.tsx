@@ -687,7 +687,11 @@ export default function IncomeExpensesSection({ year, onYearChange }: IncomeExpe
         : [];
 
   const avg = (sum: number) => completedMonths.length > 0 ? sum / completedMonths.length : 0;
-  const avgMgmtIncome = avg(completedMonths.reduce((s, m) => s + m.gross, 0));
+  // Averages must use the same post-split basis as the Worst/Best tiles beside
+  // them. Previously both blocks showed avg of fleet GROSS, so a row read
+  // gross / owner-split / owner-split — three tiles, two different bases.
+  const avgMgmtIncome = avg(completedMonths.reduce((s, m) => s + m.mgmtIncome, 0));
+  const avgOwnerIncome = avg(completedMonths.reduce((s, m) => s + m.ownerIncome, 0));
   const worstMgmtCashFlow = completedMonths.length > 0 ? Math.min(...completedMonths.map((m) => m.mgmtIncome)) : 0;
   const bestMgmtCashFlow = completedMonths.length > 0 ? Math.max(...completedMonths.map((m) => m.mgmtIncome)) : 0;
   const worstOwnerCashFlow = completedMonths.length > 0 ? Math.min(...completedMonths.map((m) => m.ownerIncome)) : 0;
@@ -716,21 +720,10 @@ export default function IncomeExpensesSection({ year, onYearChange }: IncomeExpe
             <div className="xl:col-span-1 flex h-full flex-col justify-between gap-3">
               <div className="flex flex-col">
                 <h3 className="text-sm font-bold uppercase tracking-wide text-black mb-2">
-                  Total Management Income and Expenses
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
-                  <SummaryCard label="Total Income" value={formatCurrency(totalMgmtIncome)} variant="dark" className="h-20" />
-                  <SummaryCard label="Total Management Expenses" value={formatCurrency(totalMgmtExpenses)} variant="white" className="h-20" />
-                  <SummaryCard label="Total Management Profit" value={formatCurrency(totalMgmtIncome - totalMgmtExpenses)} variant="gold" className="h-20" />
-                </div>
-              </div>
-
-              <div className="flex flex-col">
-                <h3 className="text-sm font-bold uppercase tracking-wide text-black mb-2">
                   Management Income and Expenses
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
-                  <SummaryCard label="Total Income" value={formatCurrency(totalMgmtIncome)} variant="dark" className="h-20" />
+                  <SummaryCard label="Total Mgmt Split" value={formatCurrency(totalMgmtIncome)} variant="dark" className="h-20" />
                   <SummaryCard label="Total Management Expenses" value={formatCurrency(totalMgmtExpenses)} variant="white" className="h-20" />
                   <SummaryCard label="Total Management Profit" value={formatCurrency(totalMgmtIncome - totalMgmtExpenses)} variant="gold" className="h-20" />
                 </div>
@@ -740,7 +733,7 @@ export default function IncomeExpensesSection({ year, onYearChange }: IncomeExpe
                   <SummaryCard label={`${featuredMonthLabel} Mgmt Profit`} value={formatCurrency(featuredMonth?.netMgmt ?? 0)} variant="gold" className="h-20" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 mt-1.5">
-                  <SummaryCard label="Average Rental Income" value={formatCurrency(avgMgmtIncome)} variant="dark" className="h-20" />
+                  <SummaryCard label="Average Mgmt Split" value={formatCurrency(avgMgmtIncome)} variant="dark" className="h-20" />
                   <SummaryCard label="Worst Month Cash Flow" value={formatCurrency(worstMgmtCashFlow)} variant="white" className="h-20" />
                   <SummaryCard label="Best Month Cash Flow" value={formatCurrency(bestMgmtCashFlow)} variant="gold" className="h-20" />
                 </div>
@@ -751,7 +744,7 @@ export default function IncomeExpensesSection({ year, onYearChange }: IncomeExpe
                   Car Owner Income and Expenses
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
-                  <SummaryCard label="Total Income" value={formatCurrency(totalOwnerIncome)} variant="dark" className="h-20" />
+                  <SummaryCard label="Total Owner Split" value={formatCurrency(totalOwnerIncome)} variant="dark" className="h-20" />
                   <SummaryCard label="Total Car Owner Expenses" value={formatCurrency(totalOwnerExpenses)} variant="white" className="h-20" />
                   <SummaryCard label="Total Car Owner Profit" value={formatCurrency(totalOwnerIncome - totalOwnerExpenses)} variant="gold" className="h-20" />
                 </div>
@@ -761,7 +754,7 @@ export default function IncomeExpensesSection({ year, onYearChange }: IncomeExpe
                   <SummaryCard label={`${featuredMonthLabel} Owner Profit`} value={formatCurrency(featuredMonth?.netOwner ?? 0)} variant="gold" className="h-20" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 mt-1.5">
-                  <SummaryCard label="Average Rental Income" value={formatCurrency(avgMgmtIncome)} variant="dark" className="h-20" />
+                  <SummaryCard label="Average Owner Split" value={formatCurrency(avgOwnerIncome)} variant="dark" className="h-20" />
                   <SummaryCard label="Worst Month Cash Flow" value={formatCurrency(worstOwnerCashFlow)} variant="white" className="h-20" />
                   <SummaryCard label="Best Month Cash Flow" value={formatCurrency(bestOwnerCashFlow)} variant="gold" className="h-20" />
                 </div>
