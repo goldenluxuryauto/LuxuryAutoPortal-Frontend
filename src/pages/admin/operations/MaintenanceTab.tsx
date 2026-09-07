@@ -725,8 +725,8 @@ export function MaintenanceTab({
                       // Fill the left column instead of sitting as a small
                       // fixed thumbnail in a mostly-empty space. Capped so a
                       // short card doesn't grow a huge image.
-                      className="w-full max-w-[280px] h-24 sm:h-28"
-                      size={640}
+                      className="w-full max-w-[420px] h-40 sm:h-48"
+                      size={960}
                     />
                   )
                   : null;
