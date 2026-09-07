@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import ContractManagement from "./ContractManagement";
 import CarOnboarding from "./CarOnboarding";
 import CarOffboarding from "./CarOffboarding";
+import { CarBlockOffContent } from "./CarBlockOff";
 import CarIssueFormSubmission from "./forms/CarIssueFormSubmission";
 import CarOnboardingForm from "@/components/forms/CarOnboardingForm";
 import CarOffboardingForm from "@/components/forms/CarOffboardingForm";
@@ -39,7 +40,6 @@ import TicketViolationSubmission from "./forms/TicketViolationSubmission";
 import TicketViolationMySubmissions from "./forms/TicketViolationMySubmissions";
 import CarRepairedSubmission from "./forms/CarRepairedSubmission";
 import CarRepairedMySubmissions from "./forms/CarRepairedMySubmissions";
-import CarOnOffboardingReport from "./forms/CarOnOffboardingReport";
 import {
   EmployeeOnboardingFormContent,
   EmployeeContract1099Content,
@@ -465,6 +465,15 @@ export default function FormsPage() {
     }
   }, [formVisibilityData?.isAdmin]);
 
+  useEffect(() => {
+    if (activeSection !== "car-block-off-forms") return;
+    setExpandedItems((prev) =>
+      prev.includes("car-block-off-start")
+        ? prev
+        : [...prev, "car-block-off-start"],
+    );
+  }, [activeSection]);
+
   const toggleItem = (itemId: string) => {
     if (
       itemId === "lyc" ||
@@ -486,6 +495,7 @@ export default function FormsPage() {
       itemId === "document-update-my-submissions" ||
       itemId === "document-update-approval" ||
       itemId === "car-issue-submit" ||
+      itemId === "car-block-off-start" ||
       itemId === "parking-ticket-submit" ||
       itemId === "parking-ticket-approval" ||
       itemId === "ticket-violation-submit" ||
@@ -1143,7 +1153,6 @@ export default function FormsPage() {
       id: "car-block-off-start",
       title: "Car Block Off Form",
       icon: Car,
-      externalUrl: "/admin/car-block-off",
     };
 
     const parkingTicketSubmitItem: FormItem = {
@@ -1533,15 +1542,6 @@ export default function FormsPage() {
                     </a>
                   )}
 
-                  {/* Car Onboarding & Offboarding submission report — shown
-                      above the Car Block Off section for admins. */}
-                  {formVisibilityData?.isAdmin &&
-                    section.id === "car-block-off-forms" && (
-                      <div className="bg-card border-b border-border px-3 sm:px-5 py-4 max-w-full">
-                        <CarOnOffboardingReport />
-                      </div>
-                    )}
-
                   {(
                     <div className="bg-card max-w-full">
                       {section.items.map((item) => {
@@ -1567,6 +1567,7 @@ export default function FormsPage() {
                             item.id === "document-update-my-submissions" ||
                             item.id === "document-update-approval" ||
                             item.id === "car-issue-submit" ||
+                            item.id === "car-block-off-start" ||
                             item.id === "parking-ticket-submit" ||
                             item.id === "parking-ticket-approval" ||
                             item.id === "ticket-violation-submit" ||
@@ -1822,6 +1823,14 @@ export default function FormsPage() {
                                     </a>
                                   </div>
                                   <CarIssueFormSubmission />
+                                </div>
+                              )}
+
+                            {/* Expanded content for Car Block Off / owner rental */}
+                            {isItemExpanded &&
+                              item.id === "car-block-off-start" && (
+                                <div className="bg-card border-t border-border px-3 sm:px-5 py-4 max-w-full">
+                                  <CarBlockOffContent />
                                 </div>
                               )}
 

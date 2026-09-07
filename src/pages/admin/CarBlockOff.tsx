@@ -18,9 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import CopyTabLinkButton from "@/components/common/CopyTabLinkButton";
 import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
-import { CalendarOff, Car, Search, Trash2, ChevronLeft, ChevronRight, Pencil, LogOut } from "lucide-react";
-import CarOnboardingForm from "@/components/forms/CarOnboardingForm";
-import CarOffboardingForm from "@/components/forms/CarOffboardingForm";
+import { CalendarOff, Car, Search, Trash2, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -214,20 +212,16 @@ function BlockOffSelect({ value, onChange }: { value: string; onChange: (v: stri
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export default function CarBlockOffPage() {
+export function CarBlockOffContent({ includePageLinks = false }: { includePageLinks?: boolean }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Top-level tab: Car Block Off vs. Car On-boarding vs. Car Off-boarding.
-  // Backed by ?tab=<id> so each tab is its own shareable/bookmarkable link —
-  // clients are sent straight to "Car On-boarding" rather than to the default
-  // tab plus an instruction to click across.
-  const TAB_IDS = ["block-off", "car-on", "car-off"] as const;
+  // Keep this page dedicated to owner rentals / car block-offs. Car onboarding
+  // and offboarding already live on their own form pages.
+  const TAB_IDS = ["block-off"] as const;
   type TabId = (typeof TAB_IDS)[number];
   const TAB_LABELS: Record<TabId, string> = {
     "block-off": "Car Block Off",
-    "car-on": "Car On-boarding",
-    "car-off": "Car Off-boarding",
   };
   const readTabFromUrl = (): TabId => {
     const t = new URLSearchParams(window.location.search).get("tab");
@@ -507,7 +501,7 @@ export default function CarBlockOffPage() {
   };
 
   return (
-    <AdminLayout>
+    <>
       <div className="flex flex-col gap-6">
         {/* Header */}
         <div>
@@ -520,7 +514,7 @@ export default function CarBlockOffPage() {
           </p>
         </div>
 
-        {/* Top-level tabs: Car Block Off / Car On-boarding / Car Off-boarding */}
+        {/* Shareable link for the dedicated Car Block Off / owner-rental form */}
         <div className="flex flex-wrap items-center gap-3">
         <div className="flex rounded-lg border border-border overflow-hidden w-fit">
           <button
@@ -535,39 +529,12 @@ export default function CarBlockOffPage() {
             <CalendarOff className="w-4 h-4 inline mr-2" />
             Car Block Off
           </button>
-          <button
-            type="button"
-            onClick={() => changeTab("car-on")}
-            className={`px-6 py-3 text-sm font-medium transition-colors border-l border-border ${
-              activeTab === "car-on"
-                ? "bg-primary text-primary-foreground"
-                : "bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
-          >
-            <Car className="w-4 h-4 inline mr-2" />
-            Car On-boarding
-          </button>
-          <button
-            type="button"
-            onClick={() => changeTab("car-off")}
-            className={`px-6 py-3 text-sm font-medium transition-colors border-l border-border ${
-              activeTab === "car-off"
-                ? "bg-primary text-primary-foreground"
-                : "bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
-          >
-            <LogOut className="w-4 h-4 inline mr-2" />
-            Car Off-boarding
-          </button>
         </div>
           <CopyTabLinkButton
             search={`?tab=${activeTab}`}
             label={TAB_LABELS[activeTab]}
           />
         </div>
-
-        {activeTab === "car-on" && <CarOnboardingForm />}
-        {activeTab === "car-off" && <CarOffboardingForm />}
 
         {activeTab === "block-off" && (
         <>
@@ -972,8 +939,20 @@ export default function CarBlockOffPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <ClientPageLinks />
-      <AdminPageLinks />
+      {includePageLinks && (
+        <>
+          <ClientPageLinks />
+          <AdminPageLinks />
+        </>
+      )}
+    </>
+  );
+}
+
+export default function CarBlockOffPage() {
+  return (
+    <AdminLayout>
+      <CarBlockOffContent includePageLinks />
     </AdminLayout>
   );
 }
