@@ -337,6 +337,7 @@ function EventCard({
   isAdmin: boolean;
 }) {
   const c = colorFor(event.category);
+  const displayDay = event.scheduled_day ?? date;
   const badgeClass = STATUS_BADGE[event.status ?? ""] ?? "bg-gray-100 text-gray-700 border-gray-300";
   const statusOptions = statusOptionsFor(event.type);
   const canEditAssignee = ASSIGNEE_EDITABLE_TYPES.includes(event.type);
@@ -360,7 +361,7 @@ function EventCard({
 
       {/* Time gutter */}
       <div className="flex w-full flex-shrink-0 items-center justify-between gap-2 border-b border-border bg-muted/30 px-2.5 py-2 text-[11px] leading-tight text-muted-foreground sm:w-20 sm:flex-col sm:items-end sm:justify-center sm:border-b-0 sm:border-r sm:px-1.5 sm:text-right sm:text-[10px]">
-        <span>{formatDateCompact(date)}</span>
+        <span>{formatDateCompact(displayDay)}</span>
         {event.start_time ? (
           <span className="flex items-center gap-1.5 sm:flex-col sm:items-end sm:gap-0">
             <span className="font-medium text-foreground">{fmt12(event.start_time)}</span>
@@ -819,6 +820,7 @@ function UnassignedCard({
   isAdmin: boolean;
 }) {
   const c = colorFor(event.category);
+  const displayDay = event.scheduled_day ?? "";
   return (
     <div
       draggable
@@ -830,7 +832,7 @@ function UnassignedCard({
         <div className={`font-semibold`}>{event.category}</div>
         {event.start_time && (
           <div className="text-muted-foreground flex items-center gap-1">
-            <Clock className="w-3 h-3" />{fmt12(event.start_time)}
+            <Clock className="w-3 h-3" />{displayDay ? `${formatDateCompact(displayDay)} ` : ""}{fmt12(event.start_time)}
           </div>
         )}
         {event.car_name && (
