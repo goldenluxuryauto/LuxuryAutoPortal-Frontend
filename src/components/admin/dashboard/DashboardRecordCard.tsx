@@ -171,11 +171,8 @@ export function DashboardRecordCard({
               </div>
             )}
 
-            {/* Left media (e.g. the car's photo) — centered in the column with
-                breathing room above and below. */}
-            {leftMedia && (
-              <div className="w-full flex justify-center py-3">{leftMedia}</div>
-            )}
+            {/* Left media (e.g. the car's photo) */}
+            {leftMedia && <div className="pt-1 w-full">{leftMedia}</div>}
           </div>
 
           {/* Middle: details grid */}

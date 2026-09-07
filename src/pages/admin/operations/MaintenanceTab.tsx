@@ -724,9 +724,8 @@ export function MaintenanceTab({
                       carName={carDisplayName}
                       // Fill the left column instead of sitting as a small
                       // fixed thumbnail in a mostly-empty space. Capped so a
-                      // short card doesn't grow a huge image; the wrapper
-                      // centers whatever width this resolves to.
-                      className="w-full max-w-[280px] h-24 sm:h-28 flex-shrink"
+                      // short card doesn't grow a huge image.
+                      className="w-full max-w-[280px] h-24 sm:h-28"
                       size={640}
                     />
                   )
