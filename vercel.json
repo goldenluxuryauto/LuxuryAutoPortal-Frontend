@@ -50,16 +50,6 @@
   ],
   "rewrites": [
     {
-      "source": "/assets/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "app.goldenluxuryauto.com"
-        }
-      ],
-      "destination": "/legacy-assets/:path*"
-    },
-    {
       "source": "/img/:path*",
       "has": [
         {
@@ -68,6 +58,66 @@
         }
       ],
       "destination": "/legacy-img/:path*"
+    },
+    {
+      "source": "/admin/forms",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/forms/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/car-block-off",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/car-block-off/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/operations",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/operations/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "/index.html"
     },
     {
       "source": "/api/:path*",
