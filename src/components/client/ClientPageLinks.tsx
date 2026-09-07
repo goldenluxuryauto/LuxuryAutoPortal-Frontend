@@ -39,7 +39,9 @@ import {
 import { ReportCenter } from "@/pages/client/_components/ReportCenter";
 import { SupportCenter } from "@/pages/client/_components/SupportCenter";
 
-export function ClientPageLinks() {
+/** `hideVehicleStatsLinks`: set by pages that also render View Stats
+ *  (<VehicleStatsQuickLinks />), so the per-car stats links aren't listed twice. */
+export function ClientPageLinks({ hideVehicleStatsLinks }: { hideVehicleStatsLinks?: boolean } = {}) {
   const [location] = useLocation();
 
   // If the current page URL already contains /admin/cars/:id/..., use that car
@@ -129,7 +131,7 @@ export function ClientPageLinks() {
 
   return (
     <div className="space-y-6 mt-8 mb-12">
-      <ReportCenter reportLinks={reportLinks} />
+      <ReportCenter reportLinks={reportLinks} hideVehicleStatsLinks={hideVehicleStatsLinks} />
       <SupportCenter supportLinks={supportLinks} />
     </div>
   );

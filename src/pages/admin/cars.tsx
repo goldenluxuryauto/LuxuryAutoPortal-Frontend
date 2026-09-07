@@ -1740,7 +1740,7 @@ export default function CarsPage() {
           </AlertDialogContent>
         </AlertDialog>
 
-        <ClientPageLinks />
+        <ClientPageLinks hideVehicleStatsLinks />
       </div>
       <AdminPageLinks />
     </AdminLayout>

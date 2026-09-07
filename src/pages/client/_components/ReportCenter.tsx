@@ -16,14 +16,44 @@ interface LinkItem {
 
 interface ReportCenterProps {
   reportLinks: LinkItem[];
+  /**
+   * Set on pages that also render <VehicleStatsQuickLinks /> ("View Stats").
+   * That section already links to the same per-car stats pages, so showing them
+   * here too duplicated five links — and worse, View Stats has its own car
+   * dropdown, so for a multi-car client the two sections could point at
+   * different cars at once. Drops the overlapping links and keeps the ones
+   * only Report Center has.
+   */
+  hideVehicleStatsLinks?: boolean;
 }
 
-export function ReportCenter({ reportLinks }: ReportCenterProps) {
+/** Labels covered by the View Stats section (matched case-insensitively, and
+ *  tolerant of the "… Report"/"… Schedule" suffixes Report Center adds). */
+const VEHICLE_STATS_LABELS = [
+  "earnings",
+  "totals",
+  "graphs and charts",
+  "nada depreciation",
+  "payment history",
+];
+
+function isVehicleStatsLink(label: string): boolean {
+  const normalized = label.trim().toLowerCase();
+  return VEHICLE_STATS_LABELS.some(
+    (l) => normalized === l || normalized === `${l} report` || normalized === `${l} schedule`,
+  );
+}
+
+export function ReportCenter({ reportLinks, hideVehicleStatsLinks }: ReportCenterProps) {
+  const links = hideVehicleStatsLinks
+    ? reportLinks.filter((l) => l.placeholder || !isVehicleStatsLink(l.label))
+    : reportLinks;
+
   return (
     <div className="rounded-xl border-2 border-[#d3bc8d] bg-[#D3BC8D]/10 px-6 py-5 shadow-sm shadow-[#D3BC8D]/10">
       <h2 className="text-base font-bold text-foreground mb-3">Report Center</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-1 pl-2">
-        {reportLinks.map((link, idx) =>
+        {links.map((link, idx) =>
           link.placeholder ? (
             <div key={`placeholder-${idx}`} aria-hidden className="invisible" />
           ) : (

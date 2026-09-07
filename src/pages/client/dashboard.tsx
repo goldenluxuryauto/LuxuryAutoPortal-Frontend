@@ -630,7 +630,7 @@ export default function ClientDashboard() {
         {/* Sections 10 & 11: Report Center + Support Center */}
         <div className="space-y-6 mt-8 mb-12">
           <VehicleStatsQuickLinks />
-          <ReportCenter reportLinks={reportLinks} />
+          <ReportCenter reportLinks={reportLinks} hideVehicleStatsLinks />
           <SupportCenter supportLinks={supportLinks} />
         </div>
       </div>
