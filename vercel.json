@@ -60,6 +60,16 @@
       "destination": "/legacy-img/:path*"
     },
     {
+      "source": "/admin/login",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "/index.html"
+    },
+    {
       "source": "/admin/forms",
       "has": [
         {
