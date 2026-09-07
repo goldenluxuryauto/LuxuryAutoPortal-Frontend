@@ -70,6 +70,16 @@
       "destination": "/index.html"
     },
     {
+      "source": "/admin/dashboard",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "/index.html"
+    },
+    {
       "source": "/admin/forms",
       "has": [
         {
