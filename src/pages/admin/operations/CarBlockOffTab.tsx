@@ -34,6 +34,8 @@ interface CarBlockOff {
   car_id: number | null;
   /** Joined from the `car` table via car_id; null when unlinked. */
   car_photo?: string | null;
+  /** Joined from the `car` table so SLC/Wilmington filters do not hide NA-location block-offs. */
+  location_tag?: string | null;
   car_name: string;
   plate_number: string | null;
   owner_name: string;
@@ -138,6 +140,7 @@ export function CarBlockOffTab() {
 
   const records = (data?.data ?? []).filter((record) =>
     operationLocationMatches(locationFilter, [
+      record.location_tag,
       record.pickup_location,
       record.dropoff_location,
       record.car_name,
