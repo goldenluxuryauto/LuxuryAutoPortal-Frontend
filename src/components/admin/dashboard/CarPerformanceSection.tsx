@@ -83,7 +83,11 @@ export default function CarPerformanceSection({ year }: Props) {
     <div className="mb-8">
       <SectionHeader
         title={`CAR PERFORMANCE RANKING ${monthLabel.toUpperCase()} ALL CARS`}
-        subtitle="Filter by month and arranged from highest to lowest rental income"
+        subtitle={
+          totals.carsAvailable > 0
+            ? `Filter by month and arranged from highest to lowest rental income · ${totals.carsAvailable.toLocaleString()} cars available${selectedMonth === 0 ? " (monthly average)" : ""}`
+            : "Filter by month and arranged from highest to lowest rental income"
+        }
       />
 
       {/* Month filter */}
@@ -127,7 +131,6 @@ export default function CarPerformanceSection({ year }: Props) {
                 <th className="px-3 py-2 text-right font-semibold whitespace-nowrap">Car Owner Split</th>
                 <th className="px-3 py-2 text-right font-semibold whitespace-nowrap">Days Rented</th>
                 <th className="px-3 py-2 text-right font-semibold whitespace-nowrap">Trips Taken</th>
-                <th className="px-3 py-2 text-right font-semibold whitespace-nowrap">Cars Available</th>
                 <th className="px-3 py-2 text-right font-semibold whitespace-nowrap">Available Days</th>
                 <th className="px-3 py-2 text-right font-semibold whitespace-nowrap">Fleet Utilization (%)</th>
                 <th className="px-3 py-2 text-right font-semibold whitespace-nowrap">Ave Earnings</th>
@@ -153,7 +156,6 @@ export default function CarPerformanceSection({ year }: Props) {
                   <td className="px-3 py-1.5 text-right">{fmt(r.ownerSplit)}</td>
                   <td className="px-3 py-1.5 text-right">{r.daysRented}</td>
                   <td className="px-3 py-1.5 text-right">{r.tripsTaken}</td>
-                  <td className="px-3 py-1.5 text-right">{r.carsAvailable.toLocaleString()}</td>
                   <td className="px-3 py-1.5 text-right">{r.availableDays.toLocaleString()}</td>
                   <td className="px-3 py-1.5 text-right">{r.fleetUtilization.toFixed(2)}%</td>
                   <td className="px-3 py-1.5 text-right">{fmt(r.aveEarnings)}</td>
@@ -171,7 +173,6 @@ export default function CarPerformanceSection({ year }: Props) {
                 <td className="px-3 py-2 text-right text-black">{fmt(totals.ownerSplit)}</td>
                 <td className="px-3 py-2 text-right text-black">{totals.daysRented}</td>
                 <td className="px-3 py-2 text-right text-black">{totals.tripsTaken}</td>
-                <td className="px-3 py-2 text-right text-black">{totals.carsAvailable.toLocaleString()}</td>
                 <td className="px-3 py-2 text-right text-black">{totals.availableDays.toLocaleString()}</td>
                 <td className="px-3 py-2 text-right text-black">
                   {totals.availableDays > 0
