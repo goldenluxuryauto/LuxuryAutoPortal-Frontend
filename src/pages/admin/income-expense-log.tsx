@@ -33,8 +33,24 @@ export default function IncomeExpenseLogPage() {
   const params = useParams();
   const carId = params.id ? parseInt(params.id) : null;
   const [, setLocation] = useLocation();
-  const [selectedYear, setSelectedYear] = useState("2025");
+  // Prefer the year handed over from the I&E page (?year=), then the current
+  // year — never a hardcoded past year, which made the page look broken for any
+  // car whose edits are all in a different year.
+  const [selectedYear, setSelectedYear] = useState(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("year");
+    if (fromUrl && /^\d{4}$/.test(fromUrl)) return fromUrl;
+    return String(new Date().getFullYear());
+  });
   const [selectedCategory, setSelectedCategory] = useState("all");
+  // Generated rather than hardcoded: the list previously stopped at 2026, so
+  // the default year would have had no matching option next January.
+  const yearOptions = (() => {
+    const now = new Date().getFullYear();
+    const newest = Math.max(now, parseInt(selectedYear, 10) || now);
+    const out: string[] = [];
+    for (let y = newest; y >= 2023; y--) out.push(String(y));
+    return out;
+  })();
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: logData, isLoading } = useQuery<{
@@ -132,10 +148,9 @@ export default function IncomeExpenseLogPage() {
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border text-foreground">
-                <SelectItem value="2026">2026</SelectItem>
-                <SelectItem value="2025">2025</SelectItem>
-                <SelectItem value="2024">2024</SelectItem>
-                <SelectItem value="2023">2023</SelectItem>
+                {yearOptions.map((yr) => (
+                  <SelectItem key={yr} value={yr}>{yr}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

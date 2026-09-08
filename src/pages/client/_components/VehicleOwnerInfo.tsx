@@ -12,6 +12,19 @@ interface VehicleOwnerInfoProps {
   turoViewLink: string | null;
 }
 
+/**
+ * MM/DD/YYYY, matching the Service Due tab's date format.
+ *
+ * These arrive as date-only strings ("2026-01-26") from varchar columns, so
+ * they are split rather than passed through `new Date()` — parsing a bare
+ * date as UTC and then rendering it in Mountain Time shifts it back a day.
+ */
+function formatServiceDate(value: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(value).trim());
+  if (m) return `${m[2]}/${m[3]}/${m[1]}`;
+  return value;
+}
+
 export function VehicleOwnerInfo({
   activeCar,
   ownerName,
@@ -41,8 +54,8 @@ export function VehicleOwnerInfo({
                 </div>
                 <div className="space-y-1">
                   {activeCar.mileage != null && <p><span className="font-bold">Current Miles:</span> {activeCar.mileage.toLocaleString()}</p>}
-                  {activeCar.lastOilChange && <p><span className="font-bold">Last Oil Change</span> : {activeCar.lastOilChange}</p>}
-                  {activeCar.registrationExpiration && <p><span className="font-bold">Lic./Reg. Date</span>: {activeCar.registrationExpiration}</p>}
+                  {activeCar.lastOilChange && <p><span className="font-bold">Last Oil Change</span> : {formatServiceDate(activeCar.lastOilChange)}</p>}
+                  {activeCar.registrationExpiration && <p><span className="font-bold">Lic./Reg. Date</span>: {formatServiceDate(activeCar.registrationExpiration)}</p>}
                 </div>
               </div>
             ) : (

@@ -2311,7 +2311,7 @@ export default function IncomeExpenseTable({
                 (0) until the PM confirms the formula; percentages read from the
                 stored co-host split fields when present. */}
             <CategorySection
-              title="Co-Hosting Split"
+              title="CO-HOSTING SPLIT"
               isExpanded={expandedSections.coHostingSplit}
               onToggle={() => toggleSection("coHostingSplit")}
             >
@@ -2371,7 +2371,7 @@ export default function IncomeExpenseTable({
 
             {/* CAR MANAGEMENT - OWNER SPLIT */}
             <CategorySection
-              title="Car Management - Owner Split"
+              title="CAR MANAGEMENT - OWNER SPLIT"
               isExpanded={expandedSections.managementOwner}
               onToggle={() => toggleSection("managementOwner")}
             >

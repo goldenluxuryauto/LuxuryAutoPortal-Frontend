@@ -218,7 +218,10 @@ export default function TableActions({
   };
 
   const handleViewLog = () => {
-    setLocation(`/admin/cars/${carId}/income-expense/log`);
+    // Carry the year being viewed. Without it the log page fell back to its own
+    // hardcoded default (2025) and showed "No edit history found" for a car
+    // whose edits are all in another year.
+    setLocation(`/admin/cars/${carId}/income-expense/log?year=${selectedYear}`);
   };
 
   const handleDownloadTemplate = () => {
