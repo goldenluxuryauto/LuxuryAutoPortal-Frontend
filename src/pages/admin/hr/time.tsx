@@ -52,6 +52,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl, authMeQueryFn } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Check, ChevronsUpDown, Clock, Coffee, History, Loader2, LogIn, LogOut, Pencil, Plus, Trash2 } from "lucide-react";
@@ -505,9 +506,9 @@ export default function AdminHrTime() {
   const { data: empData } = useQuery<{ success: boolean; data: EmployeeOption[] }>({
     queryKey: ["/api/employees", "time-sheet-review"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/employees?limit=1000"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch employees");
-      return res.json();
+      return api.get("/api/employees?limit=1000", {
+        fallbackMessage: "Failed to fetch employees",
+      });
     },
   });
   const employees = empData?.data ?? [];
@@ -525,9 +526,9 @@ export default function AdminHrTime() {
       if (toDate) params.set("toDate", toDate);
       if (employeeFilter && employeeFilter !== "all") params.set("employeeId", employeeFilter);
       if (search.trim()) params.set("search", search.trim());
-      const res = await fetch(buildApiUrl(`/api/admin/hr/time?${params}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch time records");
-      return res.json();
+      return api.get(`/api/admin/hr/time?${params}`, {
+        fallbackMessage: "Failed to fetch time records",
+      });
     },
     // Pick up employee clock-ins/outs without a manual reload.
     refetchOnWindowFocus: true,

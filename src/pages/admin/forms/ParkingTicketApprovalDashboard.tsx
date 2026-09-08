@@ -7,6 +7,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -144,11 +145,9 @@ export default function ParkingTicketApprovalDashboard() {
   const { data: carsData } = useQuery({
     queryKey: ["/api/parking-tickets/cars"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/parking-tickets/cars"), {
-        credentials: "include",
+      return api.get<{ data?: CarOption[] }>("/api/parking-tickets/cars", {
+        fallbackMessage: "Failed to fetch cars",
       });
-      if (!res.ok) throw new Error("Failed to fetch cars");
-      return res.json();
     },
     enabled: !!editRow,
   });

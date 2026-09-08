@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,11 +64,9 @@ export default function ExpenseFormSubmission({ initialCategory, initialField }:
   const { data: optionsData, isLoading: optionsLoading } = useQuery({
     queryKey: ["/api/expense-form-submissions/options"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/expense-form-submissions/options"), {
-        credentials: "include",
+      return api.get<{ data?: Record<string, any> }>("/api/expense-form-submissions/options", {
+        fallbackMessage: "Failed to fetch options",
       });
-      if (!res.ok) throw new Error("Failed to fetch options");
-      return res.json();
     },
   });
 

@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { Button } from "@/components/ui/button";
 import {
@@ -142,14 +143,9 @@ export function ClaimsTab() {
 
   const statusUpdateMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const response = await fetch(buildApiUrl(`/api/operations/claims/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ status }),
+      return api.put(`/api/operations/claims/${id}`, { status }, {
+        fallbackMessage: "Failed to update status",
       });
-      if (!response.ok) throw new Error("Failed to update status");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/claims"] });
@@ -170,14 +166,9 @@ export function ClaimsTab() {
       assignedTo: string | null;
       assignedToId: number | null;
     }) => {
-      const response = await fetch(buildApiUrl(`/api/operations/claims/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ assignedTo, assignedToId }),
+      return api.put(`/api/operations/claims/${id}`, { assignedTo, assignedToId }, {
+        fallbackMessage: "Failed to update assignee",
       });
-      if (!response.ok) throw new Error("Failed to update assignee");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/claims"] });

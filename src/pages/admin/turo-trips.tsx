@@ -42,6 +42,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { toMtLocalInput, mtLocalInputToUtcDbString } from "@/lib/mt-datetime";
 import { useToast } from "@/hooks/use-toast";
 import { useCarNameWithYear } from "@/hooks/use-car-name-with-year";
@@ -475,11 +476,9 @@ export default function TuroTripsPage() {
   }>({
     queryKey: ["/api/cars", "name-year-lookup"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/cars?limit=500"), {
-        credentials: "include",
+      return api.get("/api/cars?limit=500", {
+        fallbackMessage: "Failed to fetch cars",
       });
-      if (!res.ok) throw new Error("Failed to fetch cars");
-      return res.json();
     },
   });
   const carsByMakeModel = React.useMemo(() => {

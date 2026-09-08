@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Pencil, Trash2, ClipboardList } from "lucide-react";
 
@@ -78,11 +79,9 @@ export default function NoticeBoardManagementPage() {
   const { data, isLoading } = useQuery<{ success: boolean; data: NoticeBoardRow[] }>({
     queryKey: ["/api/admin/notice-board", "all"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/admin/notice-board?all=1"), {
-        credentials: "include",
+      return api.get("/api/admin/notice-board?all=1", {
+        fallbackMessage: "Failed to fetch notices",
       });
-      if (!res.ok) throw new Error("Failed to fetch notices");
-      return res.json();
     },
   });
 
@@ -95,14 +94,9 @@ export default function NoticeBoardManagementPage() {
 
   const createMutation = useMutation({
     mutationFn: async (body: typeof emptyForm) => {
-      const res = await fetch(buildApiUrl("/api/admin/notice-board"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(body),
+      return api.post("/api/admin/notice-board", body, {
+        fallbackMessage: "Failed to create notice",
       });
-      if (!res.ok) throw new Error("Failed to create notice");
-      return res.json();
     },
     onSuccess: () => {
       invalidate();
@@ -114,14 +108,9 @@ export default function NoticeBoardManagementPage() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, body }: { id: number; body: Partial<typeof emptyForm> }) => {
-      const res = await fetch(buildApiUrl(`/api/admin/notice-board/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(body),
+      return api.put(`/api/admin/notice-board/${id}`, body, {
+        fallbackMessage: "Failed to update notice",
       });
-      if (!res.ok) throw new Error("Failed to update notice");
-      return res.json();
     },
     onSuccess: () => {
       invalidate();

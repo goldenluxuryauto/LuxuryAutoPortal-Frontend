@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { ClientPageLinks } from "@/components/client/ClientPageLinks";
 import { DashboardRecordCard } from "@/components/admin/dashboard";
 import { formatMonthDayYearTime } from "@/lib/date-format";
@@ -114,11 +114,9 @@ export default function ClientTripHistory() {
   }>({
     queryKey: ["/api/client/trips", page, effectiveLimit, debouncedSearch, statusFilter, carFilter, tripFrom, tripTo],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/client/trips?${params}`), {
-        credentials: "include",
+      return api.get(`/api/client/trips?${params}`, {
+        fallbackMessage: "Failed to fetch trips",
       });
-      if (!res.ok) throw new Error("Failed to fetch trips");
-      return res.json();
     },
   });
 

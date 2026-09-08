@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,9 +76,9 @@ export default function ReferralFormMySubmissions() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["/api/referral-forms/my"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/referral-forms/my"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch submissions");
-      return res.json();
+      return api.get<{ data?: ReferralRow[] }>("/api/referral-forms/my", {
+        fallbackMessage: "Failed to fetch submissions",
+      });
     },
   });
 

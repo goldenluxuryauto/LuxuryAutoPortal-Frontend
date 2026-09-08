@@ -32,6 +32,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { differenceInDays } from "date-fns";
 
 import { MONTHS_SHORT } from "./_components/constants";
@@ -78,11 +79,9 @@ export default function ClientDashboard() {
   }>({
     queryKey: ["/api/client/profile"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/client/profile"), {
-        credentials: "include",
+      return api.get("/api/client/profile", {
+        fallbackMessage: "Failed to fetch profile",
       });
-      if (!res.ok) throw new Error("Failed to fetch profile");
-      return res.json();
     },
     retry: false,
   });
@@ -106,11 +105,9 @@ export default function ClientDashboard() {
   }>({
     queryKey: ["/api/payments/client", clientId],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/payments/client/${clientId}`), {
-        credentials: "include",
+      return api.get(`/api/payments/client/${clientId}`, {
+        fallbackMessage: "Failed to fetch payments",
       });
-      if (!res.ok) throw new Error("Failed to fetch payments");
-      return res.json();
     },
     enabled: !!clientId,
     retry: false,

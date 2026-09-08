@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { Button } from "@/components/ui/button";
 import {
@@ -224,11 +225,9 @@ export function MaintenanceTab({
   const { data: inspectionsData } = useQuery<{ data: Inspection[] }>({
     queryKey: ["/api/operations/inspections", "all_sources", "all"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/operations/inspections?limit=5000"), {
-        credentials: "include",
+      return api.get("/api/operations/inspections?limit=5000", {
+        fallbackMessage: "Failed to fetch inspections",
       });
-      if (!response.ok) throw new Error("Failed to fetch inspections");
-      return response.json();
     },
     staleTime: 2 * 60 * 1000,
   });
@@ -236,11 +235,9 @@ export function MaintenanceTab({
   const { data: tripsData } = useQuery<{ data: TuroTrip[] }>({
     queryKey: ["/api/turo-trips", "maintenance-join"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/turo-trips?limit=5000"), {
-        credentials: "include",
+      return api.get("/api/turo-trips?limit=5000", {
+        fallbackMessage: "Failed to fetch trips",
       });
-      if (!response.ok) throw new Error("Failed to fetch trips");
-      return response.json();
     },
   });
 

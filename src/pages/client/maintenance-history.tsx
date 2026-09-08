@@ -11,7 +11,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, Wrench, ExternalLink } from "lucide-react";
-import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { ClientPageLinks } from "@/components/client/ClientPageLinks";
 import { formatMonthDayYear } from "@/lib/date-format";
 
@@ -86,11 +87,9 @@ export default function ClientMaintenanceHistory() {
   }>({
     queryKey: ["/api/client/maintenance-history"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/client/maintenance-history"), {
-        credentials: "include",
+      return api.get("/api/client/maintenance-history", {
+        fallbackMessage: "Failed to fetch maintenance history",
       });
-      if (!res.ok) throw new Error("Failed to fetch maintenance history");
-      return res.json();
     },
   });
 

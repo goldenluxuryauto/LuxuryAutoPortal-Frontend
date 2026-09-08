@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { SectionHeader } from "@/components/admin/dashboard";
 
@@ -20,11 +20,9 @@ export default function NoticeBoardSection() {
   const { data, isLoading } = useQuery<NoticeBoardResponse>({
     queryKey: ["/api/admin/notice-board"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/admin/notice-board"), {
-        credentials: "include",
+      return api.get("/api/admin/notice-board", {
+        fallbackMessage: "Failed to fetch notices",
       });
-      if (!res.ok) throw new Error("Failed to fetch notices");
-      return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });

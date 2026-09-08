@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, CalendarOff } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import {
   Select,
@@ -94,11 +95,9 @@ export default function CarBlockedOffSection() {
   const { data, isLoading } = useQuery<SubmissionsResponse>({
     queryKey: ["/api/car-block-off/submissions", "dashboard"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/car-block-off/submissions?limit=50"), {
-        credentials: "include",
+      return api.get("/api/car-block-off/submissions?limit=50", {
+        fallbackMessage: "Failed to fetch",
       });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });

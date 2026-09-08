@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { TablePagination } from "@/components/ui/table-pagination";
 import { usePersistentPageSize } from "@/hooks/use-persistent-page-size";
@@ -84,18 +84,20 @@ export function NoCarIssuesTab() {
   const { data, isLoading } = useQuery<{ data: Inspection[]; total: number }>({
     queryKey: ["/api/operations/inspections", "no_issues"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl(`/api/operations/inspections?status=no_issues`), { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch inspections");
-      return response.json();
+      return api.get<{ data: Inspection[]; total: number }>(
+        "/api/operations/inspections",
+        { query: { status: "no_issues" }, fallbackMessage: "Failed to fetch inspections" },
+      );
     },
   });
 
   const { data: tripsData } = useQuery<{ data: TuroTrip[] }>({
     queryKey: ["/api/turo-trips", "no-issues-join"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/turo-trips?limit=5000"), { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch trips");
-      return response.json();
+      return api.get<{ data: TuroTrip[] }>("/api/turo-trips", {
+        query: { limit: 5000 },
+        fallbackMessage: "Failed to fetch trips",
+      });
     },
   });
   const tripsById = new Map((tripsData?.data || []).map((t) => [t.id, t]));
@@ -185,14 +187,9 @@ export function NoCarIssuesTab() {
 
   const reopenMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(buildApiUrl(`/api/operations/inspections/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ status: "in_progress" }),
+      return api.put(`/api/operations/inspections/${id}`, { status: "in_progress" }, {
+        fallbackMessage: "Failed to reopen inspection",
       });
-      if (!response.ok) throw new Error("Failed to reopen inspection");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/inspections"] });
@@ -205,14 +202,9 @@ export function NoCarIssuesTab() {
 
   const moveToTuroMessagesMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(buildApiUrl(`/api/operations/inspections/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ source: "turo_return", status: "in_progress" }),
+      return api.put(`/api/operations/inspections/${id}`, { source: "turo_return", status: "in_progress" }, {
+        fallbackMessage: "Failed to move to Turo Messages",
       });
-      if (!response.ok) throw new Error("Failed to move to Turo Messages");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/inspections"] });
@@ -225,14 +217,9 @@ export function NoCarIssuesTab() {
 
   const moveToCarInspectionsMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(buildApiUrl(`/api/operations/inspections/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ status: "in_progress" }),
+      return api.put(`/api/operations/inspections/${id}`, { status: "in_progress" }, {
+        fallbackMessage: "Failed to move to Car Inspections",
       });
-      if (!response.ok) throw new Error("Failed to move to Car Inspections");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/inspections"] });

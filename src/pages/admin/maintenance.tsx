@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, ExternalLink, Search, Folder } from "lucide-react";
 import { authMeQueryFn, buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { MAINTENANCE_SERVICE_TYPE_LABELS } from "@/pages/admin/operations/types";
@@ -69,9 +70,9 @@ export default function MaintenancePage() {
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
       if (!carId) throw new Error("Invalid car ID");
-      const response = await fetch(buildApiUrl(`/api/cars/${carId}`), { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch car");
-      return response.json();
+      return api.get(`/api/cars/${carId}`, {
+        fallbackMessage: "Failed to fetch car",
+      });
     },
     enabled: !!carId,
     retry: false,

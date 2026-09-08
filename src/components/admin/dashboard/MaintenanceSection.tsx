@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { Search, X, Wrench } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { SectionHeader, DashboardRecordCard, CarPhotoCell } from "@/components/admin/dashboard";
 import { mtDayKeyOrNull } from "@/lib/mt-datetime";
@@ -183,11 +184,9 @@ export default function MaintenanceSection(_props: MaintenanceSectionProps) {
   const { data, isLoading } = useQuery<MaintenanceResponse>({
     queryKey: ["/api/operations/maintenance"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/operations/maintenance?limit=5000"), {
-        credentials: "include",
+      return api.get("/api/operations/maintenance?limit=5000", {
+        fallbackMessage: "Failed to fetch maintenance tasks",
       });
-      if (!res.ok) throw new Error("Failed to fetch maintenance tasks");
-      return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });

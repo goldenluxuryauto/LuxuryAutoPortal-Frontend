@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buildApiUrl, buildUploadApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { formatMonthDayYear, formatMonthDayYearTime } from "@/lib/date-format";
 import { EmployeeDocumentImage } from "@/components/admin/EmployeeDocumentImage";
 import { useToast } from "@/hooks/use-toast";
@@ -282,9 +283,9 @@ export default function StaffMyInfoSection() {
   const { data: rateHistoryData, isLoading: rateHistoryLoading } = useQuery<{ success: boolean; data: { rate_history_aid: number; rate_history_amount: string; rate_history_date: string; rate_history_created?: string; rate_history_pay_type?: string; rate_history_effective_start?: string; rate_history_effective_end?: string | null }[] }>({
     queryKey: ["/api/me/rate-history"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/rate-history"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch rate history");
-      return res.json();
+      return api.get("/api/me/rate-history", {
+        fallbackMessage: "Failed to fetch rate history",
+      });
     },
     enabled: section === "rate-history",
   });
@@ -292,9 +293,9 @@ export default function StaffMyInfoSection() {
   const { data: payslipsData, isLoading: payslipsLoading } = useQuery<{ success: boolean; data: { payrun_list_aid: number; payrun_number?: string; payrun_status?: number; payrun_list_gross: string; payrun_list_deduction: string; payrun_list_net: string }[] }>({
     queryKey: ["/api/me/payslips"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/me/payslips"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch payslips");
-      return res.json();
+      return api.get("/api/me/payslips", {
+        fallbackMessage: "Failed to fetch payslips",
+      });
     },
     enabled: section === "payslip",
   });

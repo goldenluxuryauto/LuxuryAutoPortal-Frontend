@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { toMtLocalInput, mtLocalInputToUtcDbString } from "@/lib/mt-datetime";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { useToast } from "@/hooks/use-toast";
@@ -41,9 +42,9 @@ function TuroAvailabilityNotice({ carId }: { carId: number | null }) {
   const { data, isLoading } = useQuery<{ success: boolean; data: CarAvailability }>({
     queryKey: ["/api/operations/cars", carId, "availability"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/operations/cars/${carId}/availability`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to check Turo availability");
-      return res.json();
+      return api.get(`/api/operations/cars/${carId}/availability`, {
+        fallbackMessage: "Failed to check Turo availability",
+      });
     },
     enabled: carId != null,
     staleTime: 60 * 1000,

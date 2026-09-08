@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { EmployeeSelectCombobox } from "./EmployeeSelectCombobox";
 import { operationLocationMatches, useOperationLocationFilter } from "./OperationLocationFilter";
 import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
@@ -129,11 +130,9 @@ export function CarBlockOffTab() {
         page: String(page),
         limit: String(limit),
       });
-      const res = await fetch(buildApiUrl(`/api/car-block-off/submissions?${params}`), {
-        credentials: "include",
+      return api.get(`/api/car-block-off/submissions?${params}`, {
+        fallbackMessage: "Failed to fetch",
       });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
     },
     staleTime: 30_000,
   });

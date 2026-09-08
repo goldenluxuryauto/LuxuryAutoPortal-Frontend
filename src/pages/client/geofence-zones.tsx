@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import {
   MapPin,
@@ -322,9 +323,9 @@ export default function ClientGeofenceZonesPage() {
   const { data, isLoading } = useQuery<{ success: boolean; data: ClientGeofenceZone[] }>({
     queryKey: ["/api/client/geofences"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/client/geofences"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch zones");
-      return res.json();
+      return api.get("/api/client/geofences", {
+        fallbackMessage: "Failed to fetch zones",
+      });
     },
   });
 
@@ -388,14 +389,9 @@ export default function ClientGeofenceZonesPage() {
 
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
-      const res = await fetch(buildApiUrl(`/api/client/geofences/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ active }),
+      return api.put(`/api/client/geofences/${id}`, { active }, {
+        fallbackMessage: "Failed to update zone",
       });
-      if (!res.ok) throw new Error("Failed to update zone");
-      return res.json();
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/client/geofences"] }),
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),

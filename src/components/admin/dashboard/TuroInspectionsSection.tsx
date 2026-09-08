@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Search, X } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { SectionHeader, DashboardRecordCard, CarPhotoCell } from "@/components/admin/dashboard";
 import { FuelReturnedCell } from "@/pages/admin/operations/FuelReturnedCell";
@@ -159,11 +160,9 @@ export default function TuroInspectionsSection() {
     queryFn: async () => {
       // Fetch turo_return stubs server-side so this section is scoped to Turo
       // returns (the Car Issues section handles manual inspections).
-      const res = await fetch(buildApiUrl("/api/operations/inspections?source=turo_return&limit=200"), {
-        credentials: "include",
+      return api.get("/api/operations/inspections?source=turo_return&limit=200", {
+        fallbackMessage: "Failed to fetch inspections",
       });
-      if (!res.ok) throw new Error("Failed to fetch inspections");
-      return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });

@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, X } from "lucide-react";
 import { useState } from "react";
@@ -46,9 +47,9 @@ export default function AdminHrOvertime() {
   const { data, isLoading } = useQuery<{ success: boolean; data: OvertimeRow[]; total: number }>({
     queryKey: ["/api/admin/hr/overtime", fromDate, toDate, pendingOnly],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/overtime?${params}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
+      return api.get(`/api/admin/hr/overtime?${params}`, {
+        fallbackMessage: "Failed to fetch",
+      });
     },
   });
 

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/table-pagination";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useLocation } from "wouter";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -69,11 +70,9 @@ export function EmployeeOnboardingFormContent() {
       if (searchQuery.trim()) params.append("search", searchQuery.trim());
       params.append("page", page.toString());
       params.append("limit", itemsPerPage.toString());
-      const res = await fetch(buildApiUrl(`/api/employees?${params.toString()}`), {
-        credentials: "include",
+      return api.get<{ data?: Employee[]; pagination?: { page: number; limit: number; total: number; totalPages: number } }>(`/api/employees?${params.toString()}`, {
+        fallbackMessage: "Failed to fetch employees",
       });
-      if (!res.ok) throw new Error("Failed to fetch employees");
-      return res.json();
     },
   });
 
@@ -323,11 +322,9 @@ export function EmployeeOffboardingContent() {
       params.append("page", page.toString());
       params.append("limit", itemsPerPage.toString());
       params.append("status", "active");
-      const res = await fetch(buildApiUrl(`/api/employees?${params.toString()}`), {
-        credentials: "include",
+      return api.get<{ data?: Employee[]; pagination?: { page: number; limit: number; total: number; totalPages: number } }>(`/api/employees?${params.toString()}`, {
+        fallbackMessage: "Failed to fetch employees",
       });
-      if (!res.ok) throw new Error("Failed to fetch employees");
-      return res.json();
     },
   });
 

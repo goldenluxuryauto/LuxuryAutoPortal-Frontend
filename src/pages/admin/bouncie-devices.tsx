@@ -33,6 +33,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { useCoHost } from "@/hooks/use-co-host";
 import React, { useEffect } from "react";
@@ -255,11 +256,9 @@ export default function BouncieDevicesPage() {
   } = useQuery<{ success: boolean; data: BouncieDevice[] }>({
     queryKey: ["/api/bouncie/devices"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/devices"), {
-        credentials: "include",
+      return api.get("/api/bouncie/devices", {
+        fallbackMessage: "Failed to fetch devices",
       });
-      if (!res.ok) throw new Error("Failed to fetch devices");
-      return res.json();
     },
   });
 

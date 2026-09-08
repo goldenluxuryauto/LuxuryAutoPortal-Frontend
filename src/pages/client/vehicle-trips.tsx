@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { formatMonthDayYearTime } from "@/lib/date-format";
 import {
   Route,
@@ -89,9 +89,9 @@ function TripRouteMap({ tripId, startLat, startLng, endLat, endLng }: {
   const { data, isLoading } = useQuery<{ success: boolean; data: TripLocation[] }>({
     queryKey: ["/api/client/bouncie/trips", tripId, "locations"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/client/bouncie/trips/${tripId}/locations`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch route");
-      return res.json();
+      return api.get(`/api/client/bouncie/trips/${tripId}/locations`, {
+        fallbackMessage: "Failed to fetch route",
+      });
     },
   });
 
@@ -183,9 +183,9 @@ export default function ClientVehicleTripsPage() {
   const { data, isLoading, refetch, isFetching } = useQuery<{ success: boolean; data: StoredTrip[] }>({
     queryKey: ["/api/client/bouncie/trips", startDate, endDate],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/client/bouncie/trips?${queryParams.toString()}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch trips");
-      return res.json();
+      return api.get(`/api/client/bouncie/trips?${queryParams.toString()}`, {
+        fallbackMessage: "Failed to fetch trips",
+      });
     },
   });
 

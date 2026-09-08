@@ -60,7 +60,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronsUpDown, Check, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -235,11 +235,9 @@ export default function AdminHrReport() {
   const { data: empData } = useQuery<{ success: boolean; data: EmployeeOption[] }>({
     queryKey: ["/api/employees", "stats-report"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/employees?limit=1000"), {
-        credentials: "include",
+      return api.get("/api/employees?limit=1000", {
+        fallbackMessage: "Failed to fetch employees",
       });
-      if (!res.ok) throw new Error("Failed to fetch employees");
-      return res.json();
     },
   });
   const employees = empData?.data ?? [];
@@ -261,11 +259,9 @@ export default function AdminHrReport() {
   } = useQuery<{ success: boolean; data: StatsReport }>({
     queryKey: ["/api/admin/hr/stats-report", statsParams],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/stats-report?${statsParams}`), {
-        credentials: "include",
+      return api.get(`/api/admin/hr/stats-report?${statsParams}`, {
+        fallbackMessage: "Failed to fetch stats report",
       });
-      if (!res.ok) throw new Error("Failed to fetch stats report");
-      return res.json();
     },
     enabled: !!fromDate && !!toDate,
   });
@@ -287,11 +283,9 @@ export default function AdminHrReport() {
   }>({
     queryKey: ["/api/admin/hr/report", listParams],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/report?${listParams}`), {
-        credentials: "include",
+      return api.get(`/api/admin/hr/report?${listParams}`, {
+        fallbackMessage: "Failed to fetch report",
       });
-      if (!res.ok) throw new Error("Failed to fetch report");
-      return res.json();
     },
   });
   const submissionRows = listData?.data ?? [];

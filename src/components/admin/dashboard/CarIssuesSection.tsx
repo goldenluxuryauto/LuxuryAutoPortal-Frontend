@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Search, X } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { SectionHeader, DashboardRecordCard, CarPhotoCell } from "@/components/admin/dashboard";
 import { FuelReturnedCell } from "@/pages/admin/operations/FuelReturnedCell";
@@ -150,11 +151,9 @@ export default function CarIssuesSection() {
       // Fetch manual inspections server-side: there are hundreds of turo_return
       // stubs, so an unfiltered ?limit=50 page would be almost entirely Turo
       // rows and the manual Car Issues would be starved out of the page.
-      const res = await fetch(buildApiUrl("/api/operations/inspections?source=manual&limit=200"), {
-        credentials: "include",
+      return api.get("/api/operations/inspections?source=manual&limit=200", {
+        fallbackMessage: "Failed to fetch inspections",
       });
-      if (!res.ok) throw new Error("Failed to fetch inspections");
-      return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });

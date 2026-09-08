@@ -13,6 +13,7 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { AdminPageLinks } from "@/components/admin/AdminPageLinks";
 import { ClientPageLinks } from "@/components/client/ClientPageLinks";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { cn } from "@/lib/utils";
 import { Bell, Check, Loader2 } from "lucide-react";
@@ -56,11 +57,9 @@ export default function NotificationsPage() {
   }>({
     queryKey: ["/api/notifications", "full"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/notifications?limit=100"), {
-        credentials: "include",
+      return api.get("/api/notifications?limit=100", {
+        fallbackMessage: "Failed to fetch",
       });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
     },
     refetchInterval: 30000,
     refetchOnWindowFocus: true,

@@ -6,6 +6,7 @@
 import { Fragment, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -132,18 +133,18 @@ export default function CommissionFormApprovalDashboard() {
   const { data, isLoading } = useQuery({
     queryKey: ["/api/admin/commission-forms", statusFilter, search, dateFrom, dateTo],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/admin/commission-forms?${params.toString()}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
+      return api.get<{ data?: CommissionFormRow[] }>(`/api/admin/commission-forms?${params.toString()}`, {
+        fallbackMessage: "Failed to fetch",
+      });
     },
   });
 
   const { data: optionsData } = useQuery({
     queryKey: ["/api/commission-forms/options"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/commission-forms/options"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch options");
-      return res.json();
+      return api.get<{ data?: { cars?: { id: number; name: string; vin: string | null; plate: string | null }[] } }>("/api/commission-forms/options", {
+        fallbackMessage: "Failed to fetch options",
+      });
     },
   });
 

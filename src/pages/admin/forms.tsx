@@ -89,6 +89,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import CopyTabLinkButton from "@/components/common/CopyTabLinkButton";
 import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import {
   TablePagination,
   ItemsPerPage,
@@ -403,11 +404,9 @@ export default function FormsPage() {
   }>({
     queryKey: ["/api/admin/form-visibility"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/admin/form-visibility"), {
-        credentials: "include",
+      return api.get("/api/admin/form-visibility", {
+        fallbackMessage: "Failed to fetch form visibility",
       });
-      if (!response.ok) throw new Error("Failed to fetch form visibility");
-      return response.json();
     },
     retry: false,
   });

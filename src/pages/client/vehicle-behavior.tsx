@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import {
   ShieldAlert,
   RefreshCw,
@@ -77,9 +77,9 @@ export default function ClientVehicleBehaviorPage() {
   const { data, isLoading, refetch, isFetching } = useQuery<{ success: boolean; data: VehicleBehavior[] }>({
     queryKey: ["/api/client/bouncie/driving-behavior", days],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/client/bouncie/driving-behavior?days=${days}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch behavior data");
-      return res.json();
+      return api.get(`/api/client/bouncie/driving-behavior?days=${days}`, {
+        fallbackMessage: "Failed to fetch behavior data",
+      });
     },
   });
 

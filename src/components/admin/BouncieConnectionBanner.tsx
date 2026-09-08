@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { ShieldAlert, RefreshCw, Unplug } from "lucide-react";
 
 interface ConnectionStatus {
@@ -15,9 +16,9 @@ export function BouncieConnectionBanner() {
   const { data, isLoading, isError } = useQuery<{ success: boolean; data: ConnectionStatus }>({
     queryKey: ["/api/bouncie/connection-status"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/connection-status"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to check connection status");
-      return res.json();
+      return api.get("/api/bouncie/connection-status", {
+        fallbackMessage: "Failed to check connection status",
+      });
     },
     refetchInterval: 60000,
     staleTime: 30000,

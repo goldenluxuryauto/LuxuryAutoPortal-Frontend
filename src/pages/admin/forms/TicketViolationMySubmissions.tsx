@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -86,11 +86,9 @@ export default function TicketViolationMySubmissions() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["/api/ticket-violations/my"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/ticket-violations/my"), {
-        credentials: "include",
+      return api.get<{ data?: TicketViolationRow[] }>("/api/ticket-violations/my", {
+        fallbackMessage: "Failed to fetch submissions",
       });
-      if (!res.ok) throw new Error("Failed to fetch submissions");
-      return res.json();
     },
   });
 

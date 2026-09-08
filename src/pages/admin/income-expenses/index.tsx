@@ -4,6 +4,7 @@ import { ClientPageLinks } from "@/components/client/ClientPageLinks";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -87,11 +88,9 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
     queryKey: ["/api/cars", activeCarIdForFetch],
     queryFn: async () => {
       if (!activeCarIdForFetch) throw new Error("Invalid car ID");
-      const response = await fetch(buildApiUrl(`/api/cars/${activeCarIdForFetch}`), {
-        credentials: "include",
+      return api.get<{ success: boolean; data: any }>(`/api/cars/${activeCarIdForFetch}`, {
+        fallbackMessage: "Failed to fetch car",
       });
-      if (!response.ok) throw new Error("Failed to fetch car");
-      return response.json();
     },
     enabled: !!activeCarIdForFetch,
     retry: false,
@@ -128,11 +127,9 @@ export default function IncomeExpensesPage({ carIdFromRoute }: IncomeExpensesPag
     queryKey: ["/api/cars", "income-expenses", "all"],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: "1000", status: "all" });
-      const response = await fetch(buildApiUrl(`/api/cars?${params}`), {
-        credentials: "include",
+      return api.get<{ data?: any[] }>(`/api/cars?${params}`, {
+        fallbackMessage: "Failed to fetch cars",
       });
-      if (!response.ok) throw new Error("Failed to fetch cars");
-      return response.json();
     },
     enabled: true, // Always fetch so vehicle selection searches all vehicles in the system
   });

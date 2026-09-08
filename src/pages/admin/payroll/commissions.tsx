@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { COMMISSION_TYPES } from "@/lib/commissionTypes";
 import { CommissionTypeCombobox } from "@/pages/admin/payroll/CommissionTypeCombobox";
 import { useToast } from "@/hooks/use-toast";
@@ -111,11 +112,9 @@ function CommissionsMatrix() {
     queryFn: async () => {
       const params = new URLSearchParams({ year });
       if (employeeFilter !== "all") params.set("employeeId", employeeFilter);
-      const res = await fetch(buildApiUrl(`/api/payroll/commissions/matrix?${params}`), {
-        credentials: "include",
+      return api.get(`/api/payroll/commissions/matrix?${params}`, {
+        fallbackMessage: "Failed to load commissions matrix",
       });
-      if (!res.ok) throw new Error("Failed to load commissions matrix");
-      return res.json();
     },
   });
 
@@ -258,9 +257,9 @@ export default function PayrollCommissionsPage() {
   const { data, isLoading } = useQuery<{ success: boolean; data: CommissionRow[]; total: number }>({
     queryKey: ["/api/payroll/commissions", search, employeeFilter, typeFilter, dateFrom, dateTo, paidFilter],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/payroll/commissions?${params}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
+      return api.get(`/api/payroll/commissions?${params}`, {
+        fallbackMessage: "Failed to fetch",
+      });
     },
   });
 
@@ -283,14 +282,9 @@ export default function PayrollCommissionsPage() {
   const { data: employeeSearchResult } = useQuery<{ success: boolean; data: { employee_aid: number; fullname: string }[] }>({
     queryKey: ["/api/admin/work-sched/search-employee", employeeSearch],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/admin/work-sched/search-employee"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ searchValue: employeeSearch }),
+      return api.post("/api/admin/work-sched/search-employee", { searchValue: employeeSearch }, {
+        fallbackMessage: "Search failed",
       });
-      if (!res.ok) throw new Error("Search failed");
-      return res.json();
     },
     enabled: modalOpen,
   });

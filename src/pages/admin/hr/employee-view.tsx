@@ -5,6 +5,7 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { EmployeeDocumentImage } from "@/components/admin/EmployeeDocumentImage";
 import { SensitiveValue } from "@/components/admin/SensitiveValue";
 import { useToast } from "@/hooks/use-toast";
@@ -277,9 +278,9 @@ export default function EmployeeViewPage() {
     queryKey: ["/api/employees", employeeId],
     queryFn: async () => {
       if (!employeeId) throw new Error("Invalid employee");
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch employee");
-      return res.json();
+      return api.get(`/api/employees/${employeeId}`, {
+        fallbackMessage: "Failed to fetch employee",
+      });
     },
     enabled: !!employeeId,
   });
@@ -292,9 +293,9 @@ export default function EmployeeViewPage() {
   }>({
     queryKey: ["/api/employees", employeeId, "profile-edit-history"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/profile-edit-history`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch edit history");
-      return res.json();
+      return api.get(`/api/employees/${employeeId}/profile-edit-history`, {
+        fallbackMessage: "Failed to fetch edit history",
+      });
     },
     enabled: !!employeeId && editHistoryOpen,
   });
@@ -302,9 +303,9 @@ export default function EmployeeViewPage() {
   const { data: rateHistoryData, isLoading: rateHistoryLoading, refetch: refetchRateHistory } = useQuery<{ success: boolean; data: { rate_history_aid: number; rate_history_amount: string; rate_history_date: string; rate_history_created?: string; rate_history_pay_type?: string; rate_history_effective_start?: string; rate_history_effective_end?: string | null }[] }>({
     queryKey: ["/api/employees", employeeId, "rate-history"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/employees/${employeeId}/rate-history`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch rate history");
-      return res.json();
+      return api.get(`/api/employees/${employeeId}/rate-history`, {
+        fallbackMessage: "Failed to fetch rate history",
+      });
     },
     enabled: !!employeeId && activeSection === "rate-history",
   });

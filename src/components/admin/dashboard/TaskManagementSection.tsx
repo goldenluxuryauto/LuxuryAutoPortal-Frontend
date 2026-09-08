@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search, X } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { format } from "date-fns";
 import { SectionHeader, DashboardRecordCard } from "@/components/admin/dashboard";
@@ -149,11 +150,9 @@ export default function TaskManagementSection() {
   const { data, isLoading } = useQuery<TaskTimerResponse>({
     queryKey: ["/api/admin/hr/task-timers"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/admin/hr/task-timers"), {
-        credentials: "include",
+      return api.get("/api/admin/hr/task-timers", {
+        fallbackMessage: "Failed to fetch tasks",
       });
-      if (!res.ok) throw new Error("Failed to fetch tasks");
-      return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });

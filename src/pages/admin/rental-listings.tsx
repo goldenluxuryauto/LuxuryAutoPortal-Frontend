@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { buildApiUrl, apiRequest } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -168,9 +169,9 @@ function DailyPricesTab({ carId }: { carId: number }) {
   const { data, isLoading } = useQuery<{ success: boolean; list: any[] }>({
     queryKey: ["/api/rental-listings", carId, "daily-prices", year],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/rental-listings/${carId}/daily-prices?year=${year}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to load daily prices");
-      return res.json();
+      return api.get(`/api/rental-listings/${carId}/daily-prices?year=${year}`, {
+        fallbackMessage: "Failed to load daily prices",
+      });
     },
   });
 
@@ -235,9 +236,9 @@ function ListingDetail({ car, onBack }: { car: RentalCar; onBack: () => void }) 
   const { data, isLoading } = useQuery<{ success: boolean; data: any }>({
     queryKey: ["/api/rental-listings", car.car_id],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/rental-listings/${car.car_id}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to load listing");
-      return res.json();
+      return api.get(`/api/rental-listings/${car.car_id}`, {
+        fallbackMessage: "Failed to load listing",
+      });
     },
   });
   const listing = data?.data;
@@ -455,9 +456,9 @@ export default function RentalListingsPage() {
   const { data, isLoading } = useQuery<{ success: boolean; list: RentalCar[] }>({
     queryKey: ["/api/rental-listings/cars", search],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/rental-listings/cars?search=${encodeURIComponent(search)}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to load rental cars");
-      return res.json();
+      return api.get(`/api/rental-listings/cars?search=${encodeURIComponent(search)}`, {
+        fallbackMessage: "Failed to load rental cars",
+      });
     },
   });
 

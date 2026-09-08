@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { formatMonthDayYearTime } from "@/lib/date-format";
 import {
   Select,
@@ -101,9 +101,9 @@ function TripRouteMap({ tripId, startLat, startLng, endLat, endLng }: {
   const { data, isLoading } = useQuery<{ success: boolean; data: TripLocation[] }>({
     queryKey: ["/api/bouncie/trips", tripId, "locations"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/bouncie/trips/${tripId}/locations`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch route");
-      return res.json();
+      return api.get(`/api/bouncie/trips/${tripId}/locations`, {
+        fallbackMessage: "Failed to fetch route",
+      });
     },
   });
 
@@ -207,9 +207,9 @@ export default function BouncieTripsPage() {
   const { data: devicesData } = useQuery<{ success: boolean; data: any[] }>({
     queryKey: ["/api/bouncie/devices"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/devices"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch devices");
-      return res.json();
+      return api.get("/api/bouncie/devices", {
+        fallbackMessage: "Failed to fetch devices",
+      });
     },
   });
   const devices = devicesData?.data ?? [];
@@ -217,9 +217,9 @@ export default function BouncieTripsPage() {
   const { data, isLoading, refetch, isFetching } = useQuery<{ success: boolean; data: StoredTrip[] }>({
     queryKey: ["/api/bouncie/trips", deviceFilter, startDate, endDate],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/bouncie/trips?${queryParams.toString()}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch trips");
-      return res.json();
+      return api.get(`/api/bouncie/trips?${queryParams.toString()}`, {
+        fallbackMessage: "Failed to fetch trips",
+      });
     },
   });
 

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ArrowLeft, ExternalLink, Download, ChevronDown, ChevronRight, ChevronLeft, Loader2, CalendarIcon } from "lucide-react";
 import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { cn } from "@/lib/utils";
 
@@ -367,9 +368,9 @@ export default function TotalsPage() {
   const { data: carsListData } = useQuery<{ data: Array<{ id: number; makeModel: string; vin: string; licensePlate: string | null }> }>({
     queryKey: ["/api/cars", "totals-car-selector"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/cars?status=ACTIVE&limit=500"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch cars");
-      return res.json();
+      return api.get("/api/cars?status=ACTIVE&limit=500", {
+        fallbackMessage: "Failed to fetch cars",
+      });
     },
     enabled: isStandalonePage,
     staleTime: 1000 * 60 * 5,
@@ -380,9 +381,9 @@ export default function TotalsPage() {
     queryKey: ["/api/cars", carId],
     queryFn: async () => {
       if (!carId) throw new Error("Invalid car ID");
-      const response = await fetch(buildApiUrl(`/api/cars/${carId}`), { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch car");
-      return response.json();
+      return api.get(`/api/cars/${carId}`, {
+        fallbackMessage: "Failed to fetch car",
+      });
     },
     enabled: !!carId && !isAllCarsReport,
     retry: false,

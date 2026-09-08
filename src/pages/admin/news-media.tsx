@@ -40,6 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import {
   Loader2,
@@ -202,11 +203,7 @@ export default function NewsMediaPage() {
       showInDashboard: boolean; dashboardSlot: number; mediaType: string;
       audience: string[];
     }) => {
-      const res = await fetch(buildApiUrl("/api/client-testimonials"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
+      return api.post("/api/client-testimonials", {
           client_testimonial_title: `${NEWS_PREFIX}${body.title}`,
           client_testimonial_description: body.description,
           client_testimonial_file: body.file,
@@ -214,10 +211,9 @@ export default function NewsMediaPage() {
           news_dashboard_slot: body.dashboardSlot,
           news_media_type: body.mediaType,
           news_audience: body.audience,
-        }),
+        }, {
+        fallbackMessage: "Failed to create",
       });
-      if (!res.ok) throw new Error("Failed to create");
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/news-media"] });
@@ -240,11 +236,7 @@ export default function NewsMediaPage() {
               showInDashboard: boolean; dashboardSlot: number; mediaType: string;
               audience: string[]; };
     }) => {
-      const res = await fetch(buildApiUrl(`/api/client-testimonials/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
+      return api.put(`/api/client-testimonials/${id}`, {
           client_testimonial_title: `${NEWS_PREFIX}${body.title}`,
           client_testimonial_description: body.description,
           client_testimonial_file: body.file,
@@ -252,10 +244,9 @@ export default function NewsMediaPage() {
           news_dashboard_slot: body.dashboardSlot,
           news_media_type: body.mediaType,
           news_audience: body.audience,
-        }),
+        }, {
+        fallbackMessage: "Failed to update",
       });
-      if (!res.ok) throw new Error("Failed to update");
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/news-media"] });

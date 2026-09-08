@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { formatMonthDayYear } from "@/lib/date-format";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -103,11 +104,9 @@ export default function PayrollByRunPage() {
   const { data: payrunData } = useQuery<{ success: boolean; data: PayrunRow }>({
     queryKey: ["/api/payroll/payruns", payrunId],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/payroll/payruns/${payrunId}`), {
-        credentials: "include",
+      return api.get(`/api/payroll/payruns/${payrunId}`, {
+        fallbackMessage: "Payrun not found",
       });
-      if (!res.ok) throw new Error("Payrun not found");
-      return res.json();
     },
     enabled: payrunId != null,
   });
@@ -228,11 +227,9 @@ export default function PayrollByRunPage() {
       const params = new URLSearchParams();
       if (payrun?.payrun_date_from) params.set("fromDate", payrun.payrun_date_from);
       if (payrun?.payrun_date_to) params.set("toDate", payrun.payrun_date_to);
-      const res = await fetch(buildApiUrl(`/api/admin/hr/time?${params}`), {
-        credentials: "include",
+      return api.get(`/api/admin/hr/time?${params}`, {
+        fallbackMessage: "Failed to load time logs",
       });
-      if (!res.ok) throw new Error("Failed to load time logs");
-      return res.json();
     },
     enabled: Boolean(payrun?.payrun_date_from && payrun?.payrun_date_to),
   });

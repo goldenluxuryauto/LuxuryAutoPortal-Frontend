@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import {
   BarChart3,
   RefreshCw,
@@ -147,9 +147,9 @@ export default function BouncieAnalyticsPage() {
   const { data, isLoading, refetch, isFetching } = useQuery<{ success: boolean; data: FleetAnalytics }>({
     queryKey: ["/api/bouncie/analytics/fleet", days],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/bouncie/analytics/fleet?days=${days}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch analytics");
-      return res.json();
+      return api.get(`/api/bouncie/analytics/fleet?days=${days}`, {
+        fallbackMessage: "Failed to fetch analytics",
+      });
     },
   });
 

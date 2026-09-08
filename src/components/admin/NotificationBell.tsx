@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Bell, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,11 +37,9 @@ export function NotificationBell() {
   }>({
     queryKey: ["/api/notifications"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/notifications?limit=10"), {
-        credentials: "include",
+      return api.get("/api/notifications?limit=10", {
+        fallbackMessage: "Failed to fetch",
       });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
     },
     refetchInterval: 15000,
     refetchOnWindowFocus: true,

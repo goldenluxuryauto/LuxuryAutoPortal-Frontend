@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Search, X, Sparkles, Truck, Package, Clock } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone, useTimezone } from "@/hooks/use-timezone";
 import { SectionHeader } from "@/components/admin/dashboard";
 import {
@@ -220,11 +221,9 @@ export default function OperationsSection() {
         tripRangeFrom: fromDate,
         tripRangeTo: toDate,
       });
-      const res = await fetch(buildApiUrl(`/api/operations/tasks?${params}`), {
-        credentials: "include",
+      return api.get(`/api/operations/tasks?${params}`, {
+        fallbackMessage: "Failed to fetch tasks",
       });
-      if (!res.ok) throw new Error("Failed to fetch tasks");
-      return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });

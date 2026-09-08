@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { formatMonthDayYear } from "@/lib/date-format";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, HandCoins, RefreshCw, Loader2 } from "lucide-react";
@@ -99,11 +100,9 @@ export default function CommissionPayrunByRunPage() {
   }>({
     queryKey: ["/api/payroll/commission-payruns", cpayrunId, "detail"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/payroll/commission-payruns/${cpayrunId}`), {
-        credentials: "include",
+      return api.get(`/api/payroll/commission-payruns/${cpayrunId}`, {
+        fallbackMessage: "Failed to load commission pay run",
       });
-      if (!res.ok) throw new Error("Failed to load commission pay run");
-      return res.json();
     },
     enabled: cpayrunId > 0,
   });

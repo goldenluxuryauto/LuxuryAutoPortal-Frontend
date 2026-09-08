@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -435,20 +436,18 @@ export function TicketViolationTab() {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filterStatus !== "all") params.append("status", filterStatus);
-      const res = await fetch(buildApiUrl(`/api/admin/ticket-violations?${params.toString()}`), {
-        credentials: "include",
+      return api.get(`/api/admin/ticket-violations?${params.toString()}`, {
+        fallbackMessage: "Failed to fetch ticket violations",
       });
-      if (!res.ok) throw new Error("Failed to fetch ticket violations");
-      return res.json();
     },
   });
 
   const { data: carsData } = useQuery<{ data: CarOption[] }>({
     queryKey: ["/api/ticket-violations/cars"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/ticket-violations/cars"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch cars");
-      return res.json();
+      return api.get("/api/ticket-violations/cars", {
+        fallbackMessage: "Failed to fetch cars",
+      });
     },
   });
   const cars = carsData?.data || [];
@@ -488,14 +487,9 @@ export function TicketViolationTab() {
 
   const statusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const res = await fetch(buildApiUrl(`/api/admin/ticket-violations/${id}/status`), {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ status }),
+      return api.patch(`/api/admin/ticket-violations/${id}/status`, { status }, {
+        fallbackMessage: "Failed to update status",
       });
-      if (!res.ok) throw new Error("Failed to update status");
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/ticket-violations"] });

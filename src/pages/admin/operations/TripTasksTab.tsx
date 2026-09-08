@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { formatMonthDayYearTime } from "@/lib/date-format";
 import { Button } from "@/components/ui/button";
 import {
@@ -157,11 +158,9 @@ export function TripTasksTab() {
   const { data: tripsData } = useQuery<{ data: TuroTrip[] }>({
     queryKey: ["/api/turo-trips", "tasks-join"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/turo-trips?limit=5000"), {
-        credentials: "include",
+      return api.get("/api/turo-trips?limit=5000", {
+        fallbackMessage: "Failed to fetch trips",
       });
-      if (!response.ok) throw new Error("Failed to fetch trips");
-      return response.json();
     },
   });
 
@@ -233,14 +232,9 @@ export function TripTasksTab() {
 
   const statusUpdateMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const response = await fetch(buildApiUrl(`/api/operations/tasks/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ status }),
+      return api.put(`/api/operations/tasks/${id}`, { status }, {
+        fallbackMessage: "Failed to update status",
       });
-      if (!response.ok) throw new Error("Failed to update status");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/tasks"] });

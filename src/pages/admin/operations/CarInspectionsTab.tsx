@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -151,18 +152,18 @@ export function CarInspectionsTab() {
       } else {
         params.append("excludeSource", "turo_return");
       }
-      const response = await fetch(buildApiUrl(`/api/operations/inspections?${params}`), { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch inspections");
-      return response.json();
+      return api.get(`/api/operations/inspections?${params}`, {
+        fallbackMessage: "Failed to fetch inspections",
+      });
     },
   });
 
   const { data: maintenanceData, isLoading: isMaintLoading } = useQuery<{ data: MaintenanceRecord[] }>({
     queryKey: ["/api/operations/maintenance", "all"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/operations/maintenance?limit=5000"), { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch maintenance");
-      return response.json();
+      return api.get("/api/operations/maintenance?limit=5000", {
+        fallbackMessage: "Failed to fetch maintenance",
+      });
     },
     staleTime: 2 * 60 * 1000,
   });
@@ -170,11 +171,9 @@ export function CarInspectionsTab() {
   const { data: tripsData } = useQuery<{ data: TuroTrip[] }>({
     queryKey: ["/api/turo-trips", "inspections-join"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/turo-trips?limit=5000"), {
-        credentials: "include",
+      return api.get("/api/turo-trips?limit=5000", {
+        fallbackMessage: "Failed to fetch trips",
       });
-      if (!response.ok) throw new Error("Failed to fetch trips");
-      return response.json();
     },
   });
   const tripsById = new Map((tripsData?.data || []).map((t) => [t.id, t]));
@@ -287,14 +286,9 @@ export function CarInspectionsTab() {
 
   const statusUpdateMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const response = await fetch(buildApiUrl(`/api/operations/inspections/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ status }),
+      return api.put(`/api/operations/inspections/${id}`, { status }, {
+        fallbackMessage: "Failed to update status",
       });
-      if (!response.ok) throw new Error("Failed to update status");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/inspections"] });
@@ -318,14 +312,9 @@ export function CarInspectionsTab() {
       assigned_to: string | null;
       assigned_to_id: number | null;
     }) => {
-      const response = await fetch(buildApiUrl(`/api/operations/inspections/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ assigned_to, assigned_to_id }),
+      return api.put(`/api/operations/inspections/${id}`, { assigned_to, assigned_to_id }, {
+        fallbackMessage: "Failed to update assignee",
       });
-      if (!response.ok) throw new Error("Failed to update assignee");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/inspections"] });
@@ -338,14 +327,9 @@ export function CarInspectionsTab() {
 
   const moveToTuroMessagesMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(buildApiUrl(`/api/operations/inspections/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ source: "turo_return" }),
+      return api.put(`/api/operations/inspections/${id}`, { source: "turo_return" }, {
+        fallbackMessage: "Failed to move to Turo Messages",
       });
-      if (!response.ok) throw new Error("Failed to move to Turo Messages");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/inspections"] });

@@ -34,6 +34,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -535,9 +536,9 @@ export default function BouncieGeofencePage() {
   const { data: zonesData, isLoading: zonesLoading, refetch: refetchZones } = useQuery<{ success: boolean; data: GeofenceZone[] }>({
     queryKey: ["/api/bouncie/geofences"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/geofences"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch zones");
-      return res.json();
+      return api.get("/api/bouncie/geofences", {
+        fallbackMessage: "Failed to fetch zones",
+      });
     },
   });
 
@@ -545,18 +546,18 @@ export default function BouncieGeofencePage() {
   const { data, isLoading: eventsLoading, refetch: refetchEvents, isFetching } = useQuery<{ success: boolean; data: GeofenceEvent[] }>({
     queryKey: ["/api/bouncie/analytics/geofence-events", hours],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/bouncie/analytics/geofence-events?hours=${hours}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch geofence events");
-      return res.json();
+      return api.get(`/api/bouncie/analytics/geofence-events?hours=${hours}`, {
+        fallbackMessage: "Failed to fetch geofence events",
+      });
     },
   });
 
   const { data: summaryData } = useQuery<{ success: boolean; data: any[] }>({
     queryKey: ["/api/bouncie/analytics/geofence-summary", hours],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/bouncie/analytics/geofence-summary?hours=${hours}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch summary");
-      return res.json();
+      return api.get(`/api/bouncie/analytics/geofence-summary?hours=${hours}`, {
+        fallbackMessage: "Failed to fetch summary",
+      });
     },
   });
 
@@ -622,14 +623,9 @@ export default function BouncieGeofencePage() {
 
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
-      const res = await fetch(buildApiUrl(`/api/bouncie/geofences/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ active }),
+      return api.put(`/api/bouncie/geofences/${id}`, { active }, {
+        fallbackMessage: "Failed to update zone",
       });
-      if (!res.ok) throw new Error("Failed to update zone");
-      return res.json();
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/bouncie/geofences"] }),
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),

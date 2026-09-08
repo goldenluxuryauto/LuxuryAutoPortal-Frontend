@@ -34,6 +34,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Check,
@@ -170,11 +171,9 @@ export default function AdminHrTimeOff() {
       pageSize,
     ],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/leave?${params}`), {
-        credentials: "include",
+      return api.get(`/api/admin/hr/leave?${params}`, {
+        fallbackMessage: "Failed to fetch",
       });
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
     },
   });
 

@@ -10,6 +10,7 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { AdminPageLinks } from "@/components/admin/AdminPageLinks";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import {
   RefreshCw,
   MapPin,
@@ -888,11 +889,9 @@ export default function BouncieFleetPage() {
   } = useQuery<{ success: boolean; data: ConnectionStatus }>({
     queryKey: ["/api/bouncie/connection-status"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/connection-status"), {
-        credentials: "include",
+      return api.get("/api/bouncie/connection-status", {
+        fallbackMessage: "Failed to check connection status",
       });
-      if (!res.ok) throw new Error("Failed to check connection status");
-      return res.json();
     },
     refetchInterval: 60000,
     staleTime: 30000,
@@ -906,11 +905,9 @@ export default function BouncieFleetPage() {
   }>({
     queryKey: ["/api/bouncie/fleet-overview"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/fleet-overview"), {
-        credentials: "include",
+      return api.get("/api/bouncie/fleet-overview", {
+        fallbackMessage: "Failed to load fleet data",
       });
-      if (!res.ok) throw new Error("Failed to load fleet data");
-      return res.json();
     },
     refetchInterval: LIVE_POLL_MS,
     refetchIntervalInBackground: false,

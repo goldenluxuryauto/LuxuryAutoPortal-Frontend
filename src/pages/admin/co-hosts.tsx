@@ -23,7 +23,8 @@ import {
 } from "@/components/ui/select";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { apiRequest, authMeQueryFn } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { SensitiveValue } from "@/components/admin/SensitiveValue";
 import { cn } from "@/lib/utils";
 import { Search, Eye, CheckCircle, XCircle, Trash2, Loader2, ExternalLink, QrCode, Car, Save, Copy, History } from "lucide-react";
@@ -125,9 +126,9 @@ export default function CoHostsPage() {
   }>({
     queryKey: ["/api/admin/co-hosts", editHistoryCoHostId, "profile-edit-history"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/admin/co-hosts/${editHistoryCoHostId}/profile-edit-history`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch edit history");
-      return res.json();
+      return api.get(`/api/admin/co-hosts/${editHistoryCoHostId}/profile-edit-history`, {
+        fallbackMessage: "Failed to fetch edit history",
+      });
     },
     enabled: editHistoryCoHostId != null,
   });
@@ -146,9 +147,9 @@ export default function CoHostsPage() {
     queryFn: async () => {
       const params = new URLSearchParams({ status: statusFilter, page: String(page), limit: "20" });
       if (search) params.set("search", search);
-      const res = await fetch(buildApiUrl(`/api/admin/co-hosts?${params}`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch co-hosts");
-      return res.json();
+      return api.get(`/api/admin/co-hosts?${params}`, {
+        fallbackMessage: "Failed to fetch co-hosts",
+      });
     },
   });
 
@@ -185,9 +186,9 @@ export default function CoHostsPage() {
   const { data: carsData } = useQuery<{ cars: FleetCar[] }>({
     queryKey: ["/api/admin/co-hosts-cars"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/admin/co-hosts-cars"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch cars");
-      return res.json();
+      return api.get("/api/admin/co-hosts-cars", {
+        fallbackMessage: "Failed to fetch cars",
+      });
     },
   });
 
@@ -195,9 +196,9 @@ export default function CoHostsPage() {
   const { data: assignedData } = useQuery<{ carAids: number[] }>({
     queryKey: ["/api/admin/co-hosts", viewCoHost?.id, "vehicles"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/admin/co-hosts/${viewCoHost!.id}/vehicles`), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch assigned vehicles");
-      return res.json();
+      return api.get(`/api/admin/co-hosts/${viewCoHost!.id}/vehicles`, {
+        fallbackMessage: "Failed to fetch assigned vehicles",
+      });
     },
     enabled: !!viewCoHost,
   });

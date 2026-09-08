@@ -7,7 +7,8 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -117,11 +118,9 @@ export default function DocumentUpdateMySubmissions() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["/api/document-updates/my"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/document-updates/my"), {
-        credentials: "include",
+      return api.get<{ data?: DocumentUpdateRow[] }>("/api/document-updates/my", {
+        fallbackMessage: "Failed to fetch submissions",
       });
-      if (!res.ok) throw new Error("Failed to fetch submissions");
-      return res.json();
     },
   });
 

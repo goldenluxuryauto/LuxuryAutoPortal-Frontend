@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,9 +61,9 @@ export default function CommissionFormSubmission() {
   const { data: optionsData, isLoading: optionsLoading } = useQuery({
     queryKey: ["/api/commission-forms/options"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/commission-forms/options"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch options");
-      return res.json();
+      return api.get<{ data?: OptionsData }>("/api/commission-forms/options", {
+        fallbackMessage: "Failed to fetch options",
+      });
     },
   });
 

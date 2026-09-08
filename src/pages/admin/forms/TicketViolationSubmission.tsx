@@ -9,6 +9,7 @@
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,11 +75,9 @@ export default function TicketViolationSubmission() {
   const { data: carsData, isLoading: isLoadingCars } = useQuery({
     queryKey: ["/api/ticket-violations/cars"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/ticket-violations/cars"), {
-        credentials: "include",
+      return api.get<{ data?: CarOption[] }>("/api/ticket-violations/cars", {
+        fallbackMessage: "Failed to fetch cars",
       });
-      if (!res.ok) throw new Error("Failed to fetch cars");
-      return res.json();
     },
   });
 

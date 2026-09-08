@@ -5,7 +5,8 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,9 +70,9 @@ export default function CommissionFormMySubmissions() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["/api/commission-forms/my"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/commission-forms/my"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch submissions");
-      return res.json();
+      return api.get<{ data?: CommissionFormRow[] }>("/api/commission-forms/my", {
+        fallbackMessage: "Failed to fetch submissions",
+      });
     },
   });
 

@@ -6,6 +6,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -87,11 +88,9 @@ export default function ExpenseFormMySubmissions() {
   const { data: optionsData } = useQuery({
     queryKey: ["/api/expense-form-submissions/options"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/expense-form-submissions/options"), {
-        credentials: "include",
+      return api.get<{ data?: Record<string, any> }>("/api/expense-form-submissions/options", {
+        fallbackMessage: "Failed to fetch options",
       });
-      if (!res.ok) throw new Error("Failed to fetch options");
-      return res.json();
     },
   });
   const labelByValue = useMemo(() => {

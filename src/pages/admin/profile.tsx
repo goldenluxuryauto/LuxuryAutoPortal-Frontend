@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Folder, Download, ExternalLink, Pencil, X, Loader2, History } from "lucide-react";
 import { ProfileSkeleton } from "@/components/ui/skeletons";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -121,9 +122,9 @@ export default function ClientProfilePage() {
   const { data: historyRes, isLoading: historyLoading } = useQuery<{ success: boolean; data: ProfileEditHistoryEntry[] }>({
     queryKey: ["/api/client/profile/edit-history"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/client/profile/edit-history"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch edit history");
-      return res.json();
+      return api.get("/api/client/profile/edit-history", {
+        fallbackMessage: "Failed to fetch edit history",
+      });
     },
     enabled: showHistory,
   });

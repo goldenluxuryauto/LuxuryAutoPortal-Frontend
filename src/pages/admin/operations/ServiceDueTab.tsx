@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { Link } from "wouter";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { useToast } from "@/hooks/use-toast";
 import { SectionHeader } from "@/components/admin/dashboard/SectionHeader";
@@ -523,11 +524,9 @@ export function ServiceDueTab() {
   const { data, isLoading, error } = useQuery<{ success: boolean; data: CarServiceDue[] }>({
     queryKey: ["/api/operations/maintenance/service-due"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/operations/maintenance/service-due"), {
-        credentials: "include",
+      return api.get("/api/operations/maintenance/service-due", {
+        fallbackMessage: "Failed to load service-due report",
       });
-      if (!res.ok) throw new Error("Failed to load service-due report");
-      return res.json();
     },
   });
 

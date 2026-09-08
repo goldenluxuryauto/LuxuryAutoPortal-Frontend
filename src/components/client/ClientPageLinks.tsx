@@ -13,7 +13,8 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { authMeQueryFn } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import {
   BarChart3,
   BookOpen,
@@ -66,11 +67,9 @@ export function ClientPageLinks({ hideVehicleStatsLinks }: { hideVehicleStatsLin
   }>({
     queryKey: ["/api/client/profile"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/client/profile"), {
-        credentials: "include",
+      return api.get("/api/client/profile", {
+        fallbackMessage: "Failed to fetch profile",
       });
-      if (!res.ok) throw new Error("Failed to fetch profile");
-      return res.json();
     },
     enabled: isClient,
     retry: false,

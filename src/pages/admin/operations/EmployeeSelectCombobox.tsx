@@ -16,7 +16,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { ChevronsUpDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -62,11 +62,9 @@ export function EmployeeSelectCombobox({
   const { data } = useQuery<{ success: boolean; data: EmployeeOption[] }>({
     queryKey: ["/api/employees", "active-list"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/employees?limit=1000"), {
-        credentials: "include",
+      return api.get("/api/employees?limit=1000", {
+        fallbackMessage: "Failed to fetch employees",
       });
-      if (!response.ok) throw new Error("Failed to fetch employees");
-      return response.json();
     },
     staleTime: 1000 * 60 * 5,
   });

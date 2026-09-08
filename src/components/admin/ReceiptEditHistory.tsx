@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import {
   Dialog,
@@ -61,11 +61,9 @@ export function ReceiptEditHistory({ carId, year }: { carId: number; year?: numb
     queryKey: ["/api/receipt-audit", carId, year ?? "all"],
     queryFn: async () => {
       const qs = year ? `?year=${year}` : "";
-      const res = await fetch(buildApiUrl(`/api/receipt-audit/${carId}${qs}`), {
-        credentials: "include",
+      return api.get(`/api/receipt-audit/${carId}${qs}`, {
+        fallbackMessage: "Failed to load receipt history",
       });
-      if (!res.ok) throw new Error("Failed to load receipt history");
-      return res.json();
     },
     enabled: open && !!carId,
   });

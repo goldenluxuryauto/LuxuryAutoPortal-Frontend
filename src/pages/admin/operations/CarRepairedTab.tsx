@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -360,20 +361,18 @@ export function CarRepairedTab() {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filterRepairType !== "all") params.append("repairType", filterRepairType);
-      const res = await fetch(buildApiUrl(`/api/admin/car-repaired?${params.toString()}`), {
-        credentials: "include",
+      return api.get(`/api/admin/car-repaired?${params.toString()}`, {
+        fallbackMessage: "Failed to fetch car repaired logs",
       });
-      if (!res.ok) throw new Error("Failed to fetch car repaired logs");
-      return res.json();
     },
   });
 
   const { data: carsData } = useQuery<{ data: CarOption[] }>({
     queryKey: ["/api/car-repaired/cars"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/car-repaired/cars"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch cars");
-      return res.json();
+      return api.get("/api/car-repaired/cars", {
+        fallbackMessage: "Failed to fetch cars",
+      });
     },
   });
   const cars = carsData?.data || [];
@@ -428,14 +427,9 @@ export function CarRepairedTab() {
 
   const statusUpdateMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const res = await fetch(buildApiUrl(`/api/admin/car-repaired/${id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ cr_status: status }),
+      return api.put(`/api/admin/car-repaired/${id}`, { cr_status: status }, {
+        fallbackMessage: "Failed to update status",
       });
-      if (!res.ok) throw new Error("Failed to update status");
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/car-repaired"] });

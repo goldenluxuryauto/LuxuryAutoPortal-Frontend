@@ -18,6 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import CopyTabLinkButton from "@/components/common/CopyTabLinkButton";
 import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { CalendarOff, Car, Search, Trash2, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import {
   Dialog,
@@ -134,9 +135,9 @@ function CarSelect({ value, onChange, isAdmin: _isAdmin }: { value: string; onCh
   const { data } = useQuery<{ success: boolean; data: CarOption[] }>({
     queryKey: ["/api/car-block-off/my-cars"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/car-block-off/my-cars"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch cars");
-      return res.json();
+      return api.get("/api/car-block-off/my-cars", {
+        fallbackMessage: "Failed to fetch cars",
+      });
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -179,11 +180,9 @@ function BlockOffSelect({ value, onChange }: { value: string; onChange: (v: stri
   const { data } = useQuery<SubmissionsResponse>({
     queryKey: ["/api/car-block-off/submissions", "dropoff-picker"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/car-block-off/submissions?limit=100"), {
-        credentials: "include",
+      return api.get("/api/car-block-off/submissions?limit=100", {
+        fallbackMessage: "Failed to fetch block-offs",
       });
-      if (!res.ok) throw new Error("Failed to fetch block-offs");
-      return res.json();
     },
   });
 
@@ -318,11 +317,9 @@ export function CarBlockOffContent({ includePageLinks = false }: { includePageLi
         page: String(page),
         limit: String(limit),
       });
-      const res = await fetch(buildApiUrl(`/api/car-block-off/submissions?${params}`), {
-        credentials: "include",
+      return api.get(`/api/car-block-off/submissions?${params}`, {
+        fallbackMessage: "Failed to fetch submissions",
       });
-      if (!res.ok) throw new Error("Failed to fetch submissions");
-      return res.json();
     },
     staleTime: 30_000,
   });

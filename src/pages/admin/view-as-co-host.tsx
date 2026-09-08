@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl, refreshAuthForSessionTransition } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { Eye, Search, Loader2, UserCog, LogOut } from "lucide-react";
 
@@ -38,11 +39,9 @@ export default function ViewAsCoHostPage() {
   const { data: statusData } = useQuery<{ success: boolean; data: ViewStatus }>({
     queryKey: ["/api/admin/view-as-co-host/status"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/admin/view-as-co-host/status"), {
-        credentials: "include",
+      return api.get("/api/admin/view-as-co-host/status", {
+        fallbackMessage: "Failed to load status",
       });
-      if (!res.ok) throw new Error("Failed to load status");
-      return res.json();
     },
     refetchOnWindowFocus: false,
   });
@@ -51,11 +50,9 @@ export default function ViewAsCoHostPage() {
   const { data, isLoading } = useQuery<{ success: boolean; data: CoHostPick[] }>({
     queryKey: ["/api/admin/view-as-co-host/co-hosts"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/admin/view-as-co-host/co-hosts"), {
-        credentials: "include",
+      return api.get("/api/admin/view-as-co-host/co-hosts", {
+        fallbackMessage: "Failed to load co-hosts",
       });
-      if (!res.ok) throw new Error("Failed to load co-hosts");
-      return res.json();
     },
     refetchOnWindowFocus: false,
   });

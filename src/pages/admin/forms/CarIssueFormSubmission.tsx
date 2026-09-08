@@ -7,6 +7,7 @@
 import { useState, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,11 +37,9 @@ function CarSelect({
   }>({
     queryKey: ["/api/cars", "car-issue-picker"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/cars?limit=500"), {
-        credentials: "include",
+      return api.get("/api/cars?limit=500", {
+        fallbackMessage: "Failed to fetch cars",
       });
-      if (!res.ok) throw new Error("Failed to fetch cars");
-      return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });
@@ -95,11 +94,9 @@ function EmployeeSelect({
   }>({
     queryKey: ["/api/employees/picker"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/employees/picker"), {
-        credentials: "include",
+      return api.get("/api/employees/picker", {
+        fallbackMessage: "Failed to fetch employees",
       });
-      if (!res.ok) throw new Error("Failed to fetch employees");
-      return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });

@@ -4,6 +4,7 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { AdminPageLinks } from "@/components/admin/AdminPageLinks";
 import { ArrowLeft, ChevronRight, ChevronLeft, ExternalLink, Pencil, X, Check, ChevronDown, FileText, Eye, Download } from "lucide-react";
 import { authMeQueryFn, buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { CarDetailSkeleton } from "@/components/ui/skeletons";
 import { useState, useRef, useEffect } from "react";
@@ -125,11 +126,9 @@ export default function ViewCarPage() {
   const { data: statementYearsData } = useQuery<{ success: boolean; years: number[] }>({
     queryKey: ["/api/cars", carId, "statement-of-account/years"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/cars/${carId}/statement-of-account/years`), {
-        credentials: "include",
+      return api.get(`/api/cars/${carId}/statement-of-account/years`, {
+        fallbackMessage: "Failed to load statement years",
       });
-      if (!res.ok) throw new Error("Failed to load statement years");
-      return res.json();
     },
     enabled: !!carId && isAdmin && statementDialogOpen,
     retry: false,

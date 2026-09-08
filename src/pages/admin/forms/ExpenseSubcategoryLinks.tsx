@@ -56,7 +56,7 @@ import {
   Route,
   type LucideIcon,
 } from "lucide-react";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import {
   buildExpenseFormPath,
@@ -151,11 +151,9 @@ export default function ExpenseSubcategoryLinks() {
   const { data, isLoading } = useQuery({
     queryKey: ["/api/expense-form-submissions/options", "subcategory-links"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/expense-form-submissions/options"), {
-        credentials: "include",
+      return api.get<{ data?: Record<string, any> }>("/api/expense-form-submissions/options", {
+        fallbackMessage: "Failed to fetch options",
       });
-      if (!res.ok) throw new Error("Failed to fetch options");
-      return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });

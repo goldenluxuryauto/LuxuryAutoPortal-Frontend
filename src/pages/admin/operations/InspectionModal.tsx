@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { toMtLocalInput, mtLocalInputToUtcDbString } from "@/lib/mt-datetime";
 import { useToast } from "@/hooks/use-toast";
 import { PhotoUpload } from "./PhotoUpload";
@@ -91,9 +92,9 @@ export function InspectionModal({
       // Default limit is 10 — without this the "Inspected By" dropdown
       // silently cuts off after the first 10 employees (sorted by last
       // name), missing anyone alphabetically past that point.
-      const res = await fetch(buildApiUrl("/api/employees?limit=500"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch employees");
-      return res.json();
+      return api.get<{ data?: unknown[] }>("/api/employees?limit=500", {
+        fallbackMessage: "Failed to fetch employees",
+      });
     },
   });
   const employeeNames: string[] = (employeesData?.data ?? [])

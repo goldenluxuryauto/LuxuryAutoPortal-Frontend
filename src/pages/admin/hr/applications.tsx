@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Archive, Download, FileText, Loader2, Search, Trash2 } from "lucide-react";
 
 type JobApplication = {
@@ -82,11 +83,9 @@ export default function HrApplicationsPage() {
   const { data, isLoading } = useQuery<{ applications: JobApplication[] }>({
     queryKey: ["/api/admin/hr/job-applications", queryString],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/job-applications?${queryString}`), {
-        credentials: "include",
+      return api.get(`/api/admin/hr/job-applications?${queryString}`, {
+        fallbackMessage: "Failed to load job applications",
       });
-      if (!res.ok) throw new Error("Failed to load job applications");
-      return res.json();
     },
   });
 

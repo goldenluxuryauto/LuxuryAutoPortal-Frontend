@@ -3,7 +3,8 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Car, Users, DollarSign, MapPin, Mail, Phone } from "lucide-react";
-import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { authMeQueryFn } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
 
 interface CoHostCar {
@@ -130,9 +131,9 @@ export default function MyCoHostCarsPage() {
   const { data: myCarsData, isLoading: myLoading } = useQuery<{ cars: CoHostCar[] }>({
     queryKey: ["/api/co-host/my-vehicles"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/co-host/my-vehicles"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch co-host vehicles");
-      return res.json();
+      return api.get("/api/co-host/my-vehicles", {
+        fallbackMessage: "Failed to fetch co-host vehicles",
+      });
     },
     enabled: isCoHostContext,
   });
@@ -141,9 +142,9 @@ export default function MyCoHostCarsPage() {
   const { data: allData, isLoading: allLoading } = useQuery<{ groups: CoHostGroup[] }>({
     queryKey: ["/api/admin/all-co-host-cars"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/admin/all-co-host-cars"), { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch all co-host cars");
-      return res.json();
+      return api.get("/api/admin/all-co-host-cars", {
+        fallbackMessage: "Failed to fetch all co-host cars",
+      });
     },
     enabled: isGlaAdminOverview,
   });

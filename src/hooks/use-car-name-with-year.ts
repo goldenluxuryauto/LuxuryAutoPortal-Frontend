@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 
 interface CarRow {
   id: number;
@@ -28,11 +28,9 @@ export function useCarNameWithYear() {
   const { data } = useQuery<{ success: boolean; data: CarRow[] }>({
     queryKey: ["/api/cars", "name-year-lookup"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/cars?limit=500"), {
-        credentials: "include",
+      return api.get("/api/cars?limit=500", {
+        fallbackMessage: "Failed to fetch cars",
       });
-      if (!res.ok) throw new Error("Failed to fetch cars");
-      return res.json();
     },
     staleTime: 5 * 60 * 1000,
   });

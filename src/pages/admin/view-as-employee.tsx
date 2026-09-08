@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl, refreshAuthForSessionTransition } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { Eye, Search, Loader2, UserCog, LogOut, Briefcase } from "lucide-react";
 
@@ -74,11 +75,9 @@ export default function ViewAsEmployeePage() {
   const { data: statusData } = useQuery<{ success: boolean; data: ViewStatus }>({
     queryKey: ["/api/admin/view-as-employee/status"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/admin/view-as-employee/status"), {
-        credentials: "include",
+      return api.get("/api/admin/view-as-employee/status", {
+        fallbackMessage: "Failed to load status",
       });
-      if (!res.ok) throw new Error("Failed to load status");
-      return res.json();
     },
     refetchOnWindowFocus: false,
   });
@@ -87,11 +86,9 @@ export default function ViewAsEmployeePage() {
   const { data, isLoading } = useQuery<{ success: boolean; data: EmployeePick[] }>({
     queryKey: ["/api/admin/view-as-employee/employees"],
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/admin/view-as-employee/employees"), {
-        credentials: "include",
+      return api.get("/api/admin/view-as-employee/employees", {
+        fallbackMessage: "Failed to load employees",
       });
-      if (!res.ok) throw new Error("Failed to load employees");
-      return res.json();
     },
     refetchOnWindowFocus: false,
   });
