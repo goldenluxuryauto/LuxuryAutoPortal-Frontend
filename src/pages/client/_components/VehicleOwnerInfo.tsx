@@ -75,7 +75,13 @@ export function VehicleOwnerInfo({
               </div>
 
               <p><span className="font-bold text-foreground">Username</span>: {activeCar?.manufacturerUsername || "—"}</p>
-              <p><span className="font-bold text-foreground">Password</span>: {activeCar?.turoPassword || "—"}</p>
+              {/* The manufacturer-account password is withheld from clients by
+                  /api/client/profile, which sends null unless the viewer is a
+                  non-impersonating admin. Drop the row entirely in that case —
+                  a "Password: —" line would only advertise a hidden field. */}
+              {activeCar?.turoPassword ? (
+                <p><span className="font-bold text-foreground">Password</span>: {activeCar.turoPassword}</p>
+              ) : null}
 
               <div className="pt-1">
                 <span className="font-bold text-foreground">Turo Link</span>
