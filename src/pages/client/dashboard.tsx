@@ -459,7 +459,6 @@ export default function ClientDashboard() {
   const supportLinks = [
     { href: "/admin/car-block-off", icon: CalendarOff, label: "Car Block Off Form" },
     { href: "/client/offboarding-form", icon: ClipboardList, label: "Off-boarding Form" },
-    { href: "https://rent.goldenluxuryauto.com/start-block", icon: Car, label: "Book Your Car", external: true },
     { href: "/tutorial",             icon: BookOpen,      label: "Training Manual" },
     { href: "/admin/news-media",     icon: Globe,         label: "News & Media" },
 

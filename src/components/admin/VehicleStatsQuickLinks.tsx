@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   BarChart3,
-  Calculator,
   CreditCard,
   DollarSign,
   FileText,
@@ -122,8 +121,6 @@ export function VehicleStatsQuickLinks() {
         { href: carPath("income-expense"), icon: FileText, label: "Income and Expenses" },
         ...(isAdmin
           ? [
-              { href: carPath("expenses"), icon: Receipt, label: "Total Expenses" },
-              { href: carPath("calculator"), icon: Calculator, label: "Payment Calculator" },
               { href: carPath("maintenance"), icon: Wrench, label: "Maintenance" },
             ]
           : []),

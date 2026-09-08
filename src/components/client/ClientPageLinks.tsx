@@ -3,7 +3,7 @@
  *
  * Renders the two grid cards (same visual as the dashboard) with the link
  * arrays built from /api/client/profile (first car id, used to scope the
- * Report Center cards) and /api/quick-links (Turo "Book Your Car" URL).
+ * Report Center cards) and /api/quick-links.
  *
  * Self-gates on the viewer's isClient flag, so dropping this into a page that
  * admins/employees may also visit is safe — they see nothing.
@@ -109,13 +109,12 @@ export function ClientPageLinks({ hideVehicleStatsLinks }: { hideVehicleStatsLin
     { href: "/client/vehicle-behavior", icon: ShieldAlert,  label: "Driving Behavior" },
   ];
 
-  //   Row 1: Off-boarding Form | Book Your Car | Training Manual | News & Media
+  //   Row 1: Car Block Off Form | Off-boarding Form | Training Manual | News & Media
   //   Row 2: Schedule a Zoom Call | License Registration or Insurance Updates | Turo Guide | (blank)
   //   Row 3: List Another Car  | Refer Somebody | Client Testimonials
   const supportLinks = [
     { href: "/admin/car-block-off",      icon: CalendarOff,  label: "Car Block Off Form" },
     { href: "/client/offboarding-form",  icon: ClipboardList, label: "Off-boarding Form" },
-    { href: "https://rent.goldenluxuryauto.com/start-block", icon: Car, label: "Book Your Car", external: true },
     { href: "/tutorial",             icon: BookOpen,      label: "Training Manual" },
     { href: "/admin/news-media",     icon: Globe,         label: "News & Media" },
 
