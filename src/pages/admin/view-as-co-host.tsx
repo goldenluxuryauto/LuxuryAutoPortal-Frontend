@@ -71,15 +71,10 @@ export default function ViewAsCoHostPage() {
 
   const startMutation = useMutation({
     mutationFn: async (coHostId: number) => {
-      const res = await fetch(buildApiUrl("/api/admin/view-as-co-host/start"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ coHostId }),
+      const json = await api.post<{ data?: unknown }>("/api/admin/view-as-co-host/start", { coHostId }, {
+        fallbackMessage: "Failed to start",
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || "Failed to start");
-      return json.data as { coHostId: number; coHostName: string; coHostEmail: string };
+return json.data as { coHostId: number; coHostName: string; coHostEmail: string };
     },
     onSuccess: async (d) => {
       toast({

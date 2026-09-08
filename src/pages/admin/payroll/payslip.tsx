@@ -17,6 +17,7 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { formatMonthDayYear } from "@/lib/date-format";
 import { ArrowLeft, Printer, Loader2 } from "lucide-react";
 
@@ -113,11 +114,9 @@ export default function PayslipPage() {
   const { data: empRes } = useQuery<{ success: boolean; data: EmployeeLookupRow }>({
     queryKey: ["/api/employees", employeeId, "payslip-name"],
     queryFn: async () => {
-      const r = await fetch(buildApiUrl(`/api/employees/${employeeId}`), {
-        credentials: "include",
+      return api.get(`/api/employees/${employeeId}`, {
+        fallbackMessage: "Failed to fetch employee",
       });
-      if (!r.ok) throw new Error("Failed to fetch employee");
-      return r.json();
     },
     enabled: employeeId != null && !payslipName,
   });

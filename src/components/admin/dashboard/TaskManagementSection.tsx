@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search, X } from "lucide-react";
-import { buildApiUrl } from "@/lib/queryClient";
 import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { format } from "date-fns";
@@ -106,14 +105,10 @@ function TaskStatusSelect({ id, status }: { id: number; status: number }) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (newStatus: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/task-timers/${id}`), {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ task_timer_status: newStatus }),
+      await api.put(`/api/admin/hr/task-timers/${id}`, { task_timer_status: newStatus }, {
+        fallbackMessage: "Failed to update status",
       });
-      if (!res.ok) throw new Error("Failed to update status");
-    },
+},
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/hr/task-timers"] });
     },

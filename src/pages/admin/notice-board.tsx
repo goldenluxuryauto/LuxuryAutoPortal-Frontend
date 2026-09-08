@@ -32,7 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { buildApiUrl } from "@/lib/queryClient";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Pencil, Trash2, ClipboardList } from "lucide-react";
@@ -122,12 +121,9 @@ export default function NoticeBoardManagementPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/notice-board/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      return api.delete(`/api/admin/notice-board/${id}`, {
+        fallbackMessage: "Failed to delete notice",
       });
-      if (!res.ok) throw new Error("Failed to delete notice");
-      return res.json();
     },
     onSuccess: () => {
       invalidate();

@@ -34,6 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { authMeQueryFn, buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -159,14 +160,10 @@ function InlineStatusSelect({
   async function handleChange(val: string) {
     setSaving(true);
     try {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/task-timers/${taskId}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ task_timer_status: parseInt(val, 10) }),
+      await api.put(`/api/admin/hr/task-timers/${taskId}`, { task_timer_status: parseInt(val, 10) }, {
+        fallbackMessage: "Failed to update",
       });
-      if (!res.ok) throw new Error("Failed to update");
-      onChanged();
+onChanged();
     } catch {
       toast({ title: "Could not update status", variant: "destructive" });
     } finally {
@@ -519,12 +516,10 @@ export default function AdminHrTaskManagement() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/task-timers/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      await api.delete(`/api/admin/hr/task-timers/${id}`, {
+        fallbackMessage: "Failed to delete",
       });
-      if (!res.ok) throw new Error("Failed to delete");
-    },
+},
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["/api/admin/hr/task-timers"],

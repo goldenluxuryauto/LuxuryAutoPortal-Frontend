@@ -338,9 +338,10 @@ export default function PayrollCommissionsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/payroll/commissions/${id}`), { method: "DELETE", credentials: "include" });
-      if (!res.ok) throw new Error("Failed to delete");
-    },
+      await api.delete(`/api/payroll/commissions/${id}`, {
+        fallbackMessage: "Failed to delete",
+      });
+},
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/payroll/commissions"] });
       toast({ title: "Commission deleted" });
@@ -350,14 +351,10 @@ export default function PayrollCommissionsPage() {
 
   const markPaidMutation = useMutation({
     mutationFn: async ({ id, paid }: { id: number; paid: number }) => {
-      const res = await fetch(buildApiUrl(`/api/payroll/commissions/${id}/paid`), {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ commissions_is_paid: paid }),
+      await api.patch(`/api/payroll/commissions/${id}/paid`, { commissions_is_paid: paid }, {
+        fallbackMessage: "Failed to update",
       });
-      if (!res.ok) throw new Error("Failed to update");
-    },
+},
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/payroll/commissions"] });
       toast({ title: "Status updated" });

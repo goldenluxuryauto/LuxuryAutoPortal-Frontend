@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import {
   Select,
   SelectContent,
@@ -72,17 +72,13 @@ export function GasLevelCells({
     setSaving(true);
     const p = (async () => {
       try {
-        const res = await fetch(buildApiUrl(`/api/turo-trips/${tripId}/gas-levels`), {
-          method: "PATCH",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        await api.patch(`/api/turo-trips/${tripId}/gas-levels`, {
             gasLevelTripStart: newStart || null,
             gasLevelTripEnd: newEnd || null,
-          }),
+          }, {
+          fallbackMessage: "Failed to save",
         });
-        if (!res.ok) throw new Error("Failed to save");
-        setDraftStart(undefined);
+setDraftStart(undefined);
         setDraftEnd(undefined);
         toast({ title: "Gas levels saved" });
         onSaved?.();

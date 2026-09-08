@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, ChevronLeft, ChevronRight, Pencil, Check, X } from "lucide-react";
-import { buildApiUrl, authMeQueryFn } from "@/lib/queryClient";
+import { authMeQueryFn } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 
 interface Payment {
   payments_aid: number;
@@ -51,14 +52,9 @@ function usePaymentUpdate(paymentId: number, queryKey: readonly unknown[]) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (body: Record<string, unknown>) => {
-      const res = await fetch(buildApiUrl(`/api/payments/${paymentId}`), {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+      return api.put(`/api/payments/${paymentId}`, body, {
+        fallbackMessage: "Failed to update payment",
       });
-      if (!res.ok) throw new Error("Failed to update payment");
-      return res.json();
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKey as string[] }),
   });
@@ -288,20 +284,15 @@ export default function CoHostPaymentsPage() {
   }>({
     queryKey: paymentsQueryKey,
     queryFn: async () => {
-      const res = await fetch(buildApiUrl("/api/payments/search"), {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      return api.post("/api/payments/search", {
           carActiveStatus: "active",
           coHost: true,
           page,
           limit: pageSize,
           sortOrder: "desc",
-        }),
+        }, {
+        fallbackMessage: "Failed to fetch payments",
       });
-      if (!res.ok) throw new Error("Failed to fetch payments");
-      return res.json();
     },
   });
 

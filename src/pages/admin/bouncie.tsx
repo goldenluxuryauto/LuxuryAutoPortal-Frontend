@@ -918,12 +918,9 @@ export default function BouncieFleetPage() {
 
   const disconnectMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch(buildApiUrl("/api/bouncie/disconnect"), {
-        method: "DELETE",
-        credentials: "include",
+      return api.delete("/api/bouncie/disconnect", {
+        fallbackMessage: "Failed to disconnect",
       });
-      if (!res.ok) throw new Error("Failed to disconnect");
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

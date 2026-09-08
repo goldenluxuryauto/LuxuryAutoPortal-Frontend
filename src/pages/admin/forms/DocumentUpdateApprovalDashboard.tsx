@@ -9,6 +9,7 @@
 import { Fragment, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -237,12 +238,9 @@ export default function DocumentUpdateApprovalDashboard() {
       dateTo,
     ],
     queryFn: async () => {
-      const res = await fetch(
-        buildApiUrl(`/api/admin/document-updates?${params.toString()}`),
-        { credentials: "include" }
-      );
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
+      return api.get<{ data?: DocumentUpdateRow[] }>(`/api/admin/document-updates?${params.toString()}`, {
+        fallbackMessage: "Failed to fetch",
+      });
     },
   });
 
@@ -1005,12 +1003,9 @@ function InternalNotesDialog(props: {
     queryKey: ["/api/admin/document-updates", row?.du_aid, "notes"],
     enabled: !!row,
     queryFn: async () => {
-      const res = await fetch(
-        buildApiUrl(`/api/admin/document-updates/${row!.du_aid}/notes`),
-        { credentials: "include" }
-      );
-      if (!res.ok) throw new Error("Failed to load notes");
-      return res.json();
+      return api.get(`/api/admin/document-updates/${row!.du_aid}/notes`, {
+        fallbackMessage: "Failed to load notes",
+      });
     },
   });
 
@@ -1142,12 +1137,9 @@ function HistoryDialog(props: {
     queryKey: ["/api/admin/document-updates", row?.du_aid, "history"],
     enabled: !!row,
     queryFn: async () => {
-      const res = await fetch(
-        buildApiUrl(`/api/admin/document-updates/${row!.du_aid}/history`),
-        { credentials: "include" }
-      );
-      if (!res.ok) throw new Error("Failed to load history");
-      return res.json();
+      return api.get(`/api/admin/document-updates/${row!.du_aid}/history`, {
+        fallbackMessage: "Failed to load history",
+      });
     },
   });
   const entries = data?.data ?? [];

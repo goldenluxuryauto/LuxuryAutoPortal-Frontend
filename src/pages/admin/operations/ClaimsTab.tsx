@@ -181,12 +181,9 @@ export function ClaimsTab() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(buildApiUrl(`/api/operations/claims/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      return api.delete(`/api/operations/claims/${id}`, {
+        fallbackMessage: "Failed to delete",
       });
-      if (!response.ok) throw new Error("Failed to delete");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/claims"] });

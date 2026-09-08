@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, X, Check } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import ContractFormFiller from "@/components/contract/ContractFormFiller";
 
 interface ContractData {
@@ -59,16 +60,9 @@ export default function SignContract() {
     queryKey: ["validateContract", token],
     queryFn: async () => {
       if (!token) throw new Error("No token provided");
-      const response = await fetch(
-        buildApiUrl(`/api/contract/validate/${token}`),
-        {
-          credentials: "include",
-        }
-      );
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || "Invalid or expired contract link");
-      }
+      const result = await api.get<{ data: ContractData }>(`/api/contract/validate/${token}`, {
+        fallbackMessage: "Invalid or expired contract link",
+      });
       return result.data;
     },
     enabled: !!token,

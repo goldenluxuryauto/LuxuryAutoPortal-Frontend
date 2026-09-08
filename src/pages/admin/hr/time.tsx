@@ -551,15 +551,10 @@ export default function AdminHrTime() {
 
   const createMut = useMutation({
     mutationFn: async (payload: ReturnType<typeof formToPayload>) => {
-      const res = await fetch(buildApiUrl("/api/admin/hr/time"), {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      const json = await api.post<{ data?: unknown }>("/api/admin/hr/time", payload, {
+        fallbackMessage: "Create failed",
       });
-      const json = await res.json();
-      if (!res.ok || !json.success) throw new Error(json.error || "Create failed");
-      return json.data as TimeRow;
+return json.data as TimeRow;
     },
     onSuccess: () => {
       toast({ title: "Time log added", description: "Manual entry saved." });
@@ -573,15 +568,10 @@ export default function AdminHrTime() {
 
   const updateMut = useMutation({
     mutationFn: async (vars: { id: number; payload: ReturnType<typeof formToPayload> }) => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/time/${vars.id}`), {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(vars.payload),
+      const json = await api.put<{ data?: unknown }>(`/api/admin/hr/time/${vars.id}`, vars.payload, {
+        fallbackMessage: "Update failed",
       });
-      const json = await res.json();
-      if (!res.ok || !json.success) throw new Error(json.error || "Update failed");
-      return json.data as TimeRow;
+return json.data as TimeRow;
     },
     onSuccess: () => {
       toast({ title: "Time log updated" });
@@ -594,15 +584,10 @@ export default function AdminHrTime() {
 
   const deleteMut = useMutation({
     mutationFn: async (vars: { id: number; notes?: string }) => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/time/${vars.id}`), {
-        method: "DELETE",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ notes: vars.notes || undefined }),
+      await api.delete(`/api/admin/hr/time/${vars.id}`, {
+        fallbackMessage: "Delete failed",
       });
-      const json = await res.json();
-      if (!res.ok || !json.success) throw new Error(json.error || "Delete failed");
-      return true;
+return true;
     },
     onSuccess: () => {
       toast({ title: "Time log deleted" });
@@ -1261,12 +1246,9 @@ function HistoryDialog(props: { row: TimeRow | null; onClose: () => void }) {
     queryKey: ["/api/admin/hr/time", row?.time_aid, "history"],
     enabled: !!row,
     queryFn: async () => {
-      const res = await fetch(
-        buildApiUrl(`/api/admin/hr/time/${row!.time_aid}/history`),
-        { credentials: "include" }
-      );
-      if (!res.ok) throw new Error("Failed to load history");
-      return res.json();
+      return api.get(`/api/admin/hr/time/${row!.time_aid}/history`, {
+        fallbackMessage: "Failed to load history",
+      });
     },
   });
   // Hide legacy no-op "UPDATE" rows (a Save with no edits used to log an empty

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Loader2, ImageIcon, Upload, Trash2, X } from "lucide-react";
 import { useState, useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -49,12 +50,10 @@ export function TuroEarningsPanel({ carId, year }: Props) {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/client-turo-earnings/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      await api.delete(`/api/client-turo-earnings/${id}`, {
+        fallbackMessage: "Delete failed",
       });
-      if (!res.ok) throw new Error("Delete failed");
-    },
+},
     onSuccess: () => qc.invalidateQueries({ queryKey }),
   });
 

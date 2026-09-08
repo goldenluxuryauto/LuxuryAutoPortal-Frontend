@@ -132,12 +132,9 @@ export default function ParkingTicketApprovalDashboard() {
   const { data, isLoading } = useQuery({
     queryKey: ["/api/admin/parking-tickets", statusFilter, search, dateFrom, dateTo],
     queryFn: async () => {
-      const res = await fetch(
-        buildApiUrl(`/api/admin/parking-tickets?${params.toString()}`),
-        { credentials: "include" }
-      );
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
+      return api.get<{ data?: ParkingTicketRow[] }>(`/api/admin/parking-tickets?${params.toString()}`, {
+        fallbackMessage: "Failed to fetch",
+      });
     },
   });
 
@@ -159,12 +156,10 @@ export default function ParkingTicketApprovalDashboard() {
 
   const approveMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/parking-tickets/${id}/approve`), {
-        method: "PATCH",
-        credentials: "include",
+      await api.patch(`/api/admin/parking-tickets/${id}/approve`, undefined, {
+        fallbackMessage: "Failed to approve",
       });
-      if (!res.ok) throw new Error("Failed to approve");
-    },
+},
     onSuccess: () => {
       invalidate();
       toast({ title: "Approved successfully" });
@@ -175,14 +170,10 @@ export default function ParkingTicketApprovalDashboard() {
 
   const declineMutation = useMutation({
     mutationFn: async ({ id, reason }: { id: number; reason: string }) => {
-      const res = await fetch(buildApiUrl(`/api/admin/parking-tickets/${id}/decline`), {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reason }),
+      await api.patch(`/api/admin/parking-tickets/${id}/decline`, { reason }, {
+        fallbackMessage: "Failed to decline",
       });
-      if (!res.ok) throw new Error("Failed to decline");
-    },
+},
     onSuccess: () => {
       invalidate();
       setDeclineRow(null);
@@ -195,12 +186,10 @@ export default function ParkingTicketApprovalDashboard() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/parking-tickets/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      await api.delete(`/api/admin/parking-tickets/${id}`, {
+        fallbackMessage: "Failed to delete",
       });
-      if (!res.ok) throw new Error("Failed to delete");
-    },
+},
     onSuccess: () => {
       invalidate();
       setDeleteRow(null);

@@ -22,6 +22,7 @@ import {
   type DayCell,
 } from "@/lib/work-schedule-calendar";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, Copy, Loader2, Pencil, Plus, Search, Trash2, X } from "lucide-react";
@@ -711,15 +712,10 @@ export default function WorkSchedulePage() {
 
   const copyMutation = useMutation({
     mutationFn: async ({ fromDate, toDate }: { fromDate: string; toDate: string }) => {
-      const res = await fetch(buildApiUrl("/api/admin/work-sched/copy"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ fromDate, toDate }),
+      const json = await api.post("/api/admin/work-sched/copy", { fromDate, toDate }, {
+        fallbackMessage: "Copy failed",
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Copy failed");
-      return json as { data: { copied: number }; message?: string };
+return json as { data: { copied: number }; message?: string };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["work-sched"] });

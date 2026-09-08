@@ -15,7 +15,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { SectionHeader } from "@/components/admin/dashboard";
 import {
   Select,
@@ -98,9 +98,9 @@ export default function EarningsHistorySection() {
   const { data, isLoading } = useQuery<PayslipsResponse>({
     queryKey: ["/api/me/payslips"],
     queryFn: async () => {
-      const r = await fetch(buildApiUrl("/api/me/payslips"), { credentials: "include" });
-      if (!r.ok) throw new Error("Failed to load payslips");
-      return r.json();
+      return api.get("/api/me/payslips", {
+        fallbackMessage: "Failed to load payslips",
+      });
     },
     staleTime: 5 * 60 * 1000,
   });

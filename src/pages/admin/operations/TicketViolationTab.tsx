@@ -500,12 +500,9 @@ export function TicketViolationTab() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/ticket-violations/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      return api.delete(`/api/admin/ticket-violations/${id}`, {
+        fallbackMessage: "Failed to delete",
       });
-      if (!res.ok) throw new Error("Failed to delete");
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/ticket-violations"] });

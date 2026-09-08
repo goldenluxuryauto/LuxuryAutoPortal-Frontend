@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { MaintenanceModal } from "@/pages/admin/operations/MaintenanceModal";
 import { OperationEditHistoryList } from "@/components/admin/OperationEditHistory";
@@ -124,12 +125,9 @@ export default function PendingCarIssuesSection() {
 
   const dismissMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/car-issues/${id}/dismiss`), {
-        method: "POST",
-        credentials: "include",
+      return api.post(`/api/car-issues/${id}/dismiss`, undefined, {
+        fallbackMessage: "Failed to dismiss",
       });
-      if (!res.ok) throw new Error("Failed to dismiss");
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/car-issues/pending"] });
@@ -140,14 +138,10 @@ export default function PendingCarIssuesSection() {
 
   const severityMutation = useMutation({
     mutationFn: async ({ id, severity }: { id: number; severity: Severity }) => {
-      const res = await fetch(buildApiUrl(`/api/car-issues/${id}`), {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ severity }),
+      await api.patch(`/api/car-issues/${id}`, { severity }, {
+        fallbackMessage: "Failed to update severity",
       });
-      if (!res.ok) throw new Error("Failed to update severity");
-    },
+},
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/car-issues/pending"] });
     },

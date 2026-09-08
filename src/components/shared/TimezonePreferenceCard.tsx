@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { ORG_TIMEZONE_FALLBACK } from "@/hooks/use-timezone";
 import { Check, ChevronsUpDown, Globe, Loader2, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -64,9 +65,9 @@ export function TimezonePreferenceCard() {
   const { data, isLoading } = useQuery<PreferencesResponse>({
     queryKey: ["/api/me/preferences"],
     queryFn: async () => {
-      const r = await fetch(buildApiUrl("/api/me/preferences"), { credentials: "include" });
-      if (!r.ok) throw new Error("Failed to load preferences");
-      return r.json();
+      return api.get("/api/me/preferences", {
+        fallbackMessage: "Failed to load preferences",
+      });
     },
   });
 

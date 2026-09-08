@@ -4,6 +4,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { EmployeeDocumentImage } from "@/components/admin/EmployeeDocumentImage";
 import { Image } from "lucide-react";
 import { NewsMediaSlot } from "@/pages/client/_components/NewsMediaSlot";
@@ -43,9 +44,9 @@ export default function EmployeeProfileSection() {
   const { data, isLoading } = useQuery<MeEmployeeResponse>({
     queryKey: ["/api/me/employee"],
     queryFn: async () => {
-      const r = await fetch(buildApiUrl("/api/me/employee"), { credentials: "include" });
-      if (!r.ok) throw new Error("Failed to load employee");
-      return r.json();
+      return api.get("/api/me/employee", {
+        fallbackMessage: "Failed to load employee",
+      });
     },
     staleTime: 5 * 60 * 1000,
   });

@@ -81,12 +81,9 @@ export default function NotificationsPage() {
 
   const markAllRead = useMutation({
     mutationFn: async () => {
-      const res = await fetch(buildApiUrl("/api/notifications/read-all"), {
-        method: "POST",
-        credentials: "include",
+      return api.post("/api/notifications/read-all", undefined, {
+        fallbackMessage: "Failed",
       });
-      if (!res.ok) throw new Error("Failed");
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });

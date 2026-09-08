@@ -25,6 +25,7 @@ import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { VideoPlayer } from "@/components/ui/video-player";
 
 // Tutorial module interface
@@ -313,14 +314,9 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   // Mutation to mark tour as completed
   const completeTourMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(buildApiUrl("/api/auth/complete-tour"), {
-        method: "POST",
-        credentials: "include",
+      return api.post("/api/auth/complete-tour", undefined, {
+        fallbackMessage: "Failed to mark tour as completed",
       });
-      if (!response.ok) {
-        throw new Error("Failed to mark tour as completed");
-      }
-      return response.json();
     },
     onSuccess: () => {
       // Invalidate user query to refresh user data

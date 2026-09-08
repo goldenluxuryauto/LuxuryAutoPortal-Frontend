@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { useToast } from "@/hooks/use-toast";
 
@@ -90,11 +91,9 @@ export default function TaskCommentsDialog({ taskId, taskName, onClose }: Props)
   }>({
     queryKey: ["task-comments", taskId],
     queryFn: async () => {
-      const r = await fetch(buildApiUrl(`/api/tasks/${taskId}/comments`), {
-        credentials: "include",
+      return api.get(`/api/tasks/${taskId}/comments`, {
+        fallbackMessage: "Failed to load comments",
       });
-      if (!r.ok) throw new Error("Failed to load comments");
-      return r.json();
     },
     enabled: taskId != null,
     retry: false,

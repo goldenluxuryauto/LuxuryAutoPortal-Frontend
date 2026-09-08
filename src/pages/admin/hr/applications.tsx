@@ -107,14 +107,9 @@ export default function HrApplicationsPage() {
 
   const archiveMutation = useMutation({
     mutationFn: async ({ id, archived }: { id: number; archived: boolean }) => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/job-applications?action=archive&id=${id}`), {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, archived }),
+      return api.post(`/api/admin/hr/job-applications?action=archive&id=${id}`, { id, archived }, {
+        fallbackMessage: "Failed to update application",
       });
-      if (!res.ok) throw new Error("Failed to update application");
-      return res.json();
     },
     onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/hr/job-applications"] });
@@ -127,14 +122,9 @@ export default function HrApplicationsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/job-applications?action=delete&id=${id}`), {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+      return api.post(`/api/admin/hr/job-applications?action=delete&id=${id}`, { id }, {
+        fallbackMessage: "Failed to delete application",
       });
-      if (!res.ok) throw new Error("Failed to delete application");
-      return res.json();
     },
     onSuccess: () => {
       setSelectedId(null);

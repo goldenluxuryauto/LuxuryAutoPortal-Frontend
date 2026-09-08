@@ -62,9 +62,10 @@ export default function AdminHrOvertime() {
   });
   const declineMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/overtime/${id}/decline`), { method: "PUT", credentials: "include" });
-      if (!res.ok) throw new Error("Failed");
-    },
+      await api.put(`/api/admin/hr/overtime/${id}/decline`, undefined, {
+        fallbackMessage: "Failed",
+      });
+},
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/admin/hr/overtime"] }),
   });
 

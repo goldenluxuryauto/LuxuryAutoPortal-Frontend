@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Search, X } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { SectionHeader, DashboardRecordCard } from "@/components/admin/dashboard";
 import { useToast } from "@/hooks/use-toast";
@@ -95,14 +96,9 @@ export default function MyMaintenanceSection() {
 
   const updateStatus = useMutation({
     mutationFn: async (vars: { id: number; status: string }) => {
-      const r = await fetch(buildApiUrl(`/api/operations/maintenance/${vars.id}`), {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: vars.status }),
+      return api.put(`/api/operations/maintenance/${vars.id}`, { status: vars.status }, {
+        fallbackMessage: "HTTP ${r.status}",
       });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/me/maintenance"] });

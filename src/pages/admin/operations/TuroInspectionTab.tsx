@@ -213,14 +213,10 @@ export function TuroInspectionTab() {
     const trimmed = edited.trim();
     setSavingVin(tripId);
     try {
-      const res = await fetch(buildApiUrl(`/api/turo-trips/${tripId}/car-info`), {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vinNumber: trimmed === "" ? null : trimmed }),
+      await api.patch(`/api/turo-trips/${tripId}/car-info`, { vinNumber: trimmed === "" ? null : trimmed }, {
+        fallbackMessage: "Failed to save",
       });
-      if (!res.ok) throw new Error("Failed to save");
-      queryClient.invalidateQueries({ queryKey: ["/api/turo-trips"] });
+queryClient.invalidateQueries({ queryKey: ["/api/turo-trips"] });
       setVinEdits((prev) => {
         const next = { ...prev };
         delete next[tripId];

@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { Search, X, Wrench } from "lucide-react";
-import { buildApiUrl } from "@/lib/queryClient";
 import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { SectionHeader, DashboardRecordCard, CarPhotoCell } from "@/components/admin/dashboard";
@@ -152,14 +151,10 @@ function StatusSelect({ id, value }: { id: number; value: string }) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (status: string) => {
-      const res = await fetch(buildApiUrl(`/api/operations/maintenance/${id}`), {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+      await api.put(`/api/operations/maintenance/${id}`, { status }, {
+        fallbackMessage: "Failed to update status",
       });
-      if (!res.ok) throw new Error("Failed to update status");
-    },
+},
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/maintenance"] });
     },

@@ -173,26 +173,20 @@ export default function CommissionFormApprovalDashboard() {
 
   const approveMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/commission-forms/${id}/approve`), {
-        method: "PATCH",
-        credentials: "include",
+      await api.patch(`/api/admin/commission-forms/${id}/approve`, undefined, {
+        fallbackMessage: "Failed to approve",
       });
-      if (!res.ok) throw new Error("Failed to approve");
-    },
+},
     onSuccess: () => { invalidate(); toast({ title: "Approved successfully" }); },
     onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const declineMutation = useMutation({
     mutationFn: async ({ id, reason }: { id: number; reason: string }) => {
-      const res = await fetch(buildApiUrl(`/api/admin/commission-forms/${id}/decline`), {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reason }),
+      await api.patch(`/api/admin/commission-forms/${id}/decline`, { reason }, {
+        fallbackMessage: "Failed to decline",
       });
-      if (!res.ok) throw new Error("Failed to decline");
-    },
+},
     onSuccess: () => {
       invalidate();
       setDeclineRow(null);
@@ -204,12 +198,10 @@ export default function CommissionFormApprovalDashboard() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/commission-forms/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      await api.delete(`/api/admin/commission-forms/${id}`, {
+        fallbackMessage: "Failed to delete",
       });
-      if (!res.ok) throw new Error("Failed to delete");
-    },
+},
     onSuccess: () => { invalidate(); setDeleteRow(null); toast({ title: "Deleted successfully" }); },
     onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
@@ -826,12 +818,9 @@ function CommissionHistoryDialog(props: {
     queryKey: ["/api/admin/commission-forms", row?.cf_aid, "history"],
     enabled: !!row,
     queryFn: async () => {
-      const res = await fetch(
-        buildApiUrl(`/api/admin/commission-forms/${row!.cf_aid}/history`),
-        { credentials: "include" }
-      );
-      if (!res.ok) throw new Error("Failed to load history");
-      return res.json();
+      return api.get(`/api/admin/commission-forms/${row!.cf_aid}/history`, {
+        fallbackMessage: "Failed to load history",
+      });
     },
   });
   const entries = data?.data ?? [];

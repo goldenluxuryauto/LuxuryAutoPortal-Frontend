@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { OnboardingTutorial, useTutorial, TutorialStep, TutorialModule } from "@/components/onboarding/OnboardingTutorial";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { VideoPlayer } from "@/components/ui/video-player";
 import { parseVideoSource } from "@/lib/video-utils";
@@ -436,14 +437,9 @@ export default function TrainingManualPage() {
   const { data: deletedModulesData } = useQuery<{ success: boolean; data: TutorialModule[] }>({
     queryKey: ["/api/tutorial/modules/deleted", selectedRole],
     queryFn: async () => {
-      const response = await fetch(
-        buildApiUrl(`/api/admin/tutorial/modules/deleted?role=${selectedRole}`),
-        { credentials: "include" }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch deleted modules");
-      }
-      return response.json();
+      return api.get(`/api/admin/tutorial/modules/deleted?role=${selectedRole}`, {
+        fallbackMessage: "Failed to fetch deleted modules",
+      });
     },
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -710,14 +706,9 @@ export default function TrainingManualPage() {
     setImageUploading(true);
     try {
       const params = new URLSearchParams({ filename: file.name, contentType: file.type });
-      const urlRes = await fetch(buildApiUrl(`/api/admin/tutorial/upload-image-url?${params}`), {
-        credentials: "include",
+      const urlData = await api.get<{ signedUrl: string; publicUrl: string }>(`/api/admin/tutorial/upload-image-url?${params}`, {
+        fallbackMessage: "Failed to get upload URL",
       });
-      const urlData = await urlRes.json();
-      if (!urlRes.ok || !urlData.success) {
-        throw new Error(urlData.error || "Failed to get upload URL");
-      }
-
       const putRes = await fetch(urlData.signedUrl, {
         method: "PUT",
         headers: { "Content-Type": file.type },

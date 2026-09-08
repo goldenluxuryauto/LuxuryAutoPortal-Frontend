@@ -71,15 +71,10 @@ export default function ViewAsClientPage() {
 
   const startMutation = useMutation({
     mutationFn: async (clientId: number) => {
-      const res = await fetch(buildApiUrl("/api/admin/view-as-client/start"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ clientId }),
+      const json = await api.post<{ data?: unknown }>("/api/admin/view-as-client/start", { clientId }, {
+        fallbackMessage: "Failed to start",
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || "Failed to start");
-      return json.data as { clientId: number; clientName: string; clientEmail: string };
+return json.data as { clientId: number; clientName: string; clientEmail: string };
     },
     onSuccess: async (d) => {
       toast({

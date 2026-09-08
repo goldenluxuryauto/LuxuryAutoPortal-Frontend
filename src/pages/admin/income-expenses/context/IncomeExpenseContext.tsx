@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import type { IncomeExpenseData, EditingCell } from "../types";
 import { useFormAmounts, type FormAmountsMap } from "../utils/useFormAmounts";
@@ -527,21 +528,15 @@ export function IncomeExpenseProvider({
   const addDynamicSubcategory = async (categoryType: string, name: string) => {
     try {
       // Add subcategory globally (applies to all cars)
-      const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/add"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
+      await api.post("/api/income-expense/dynamic-subcategories/add", {
           carId, // Optional - if provided, initializes values for this car
           year: parseInt(year),
           categoryType,
           subcategoryName: name,
-        }),
+        }, {
+        fallbackMessage: "Failed to add subcategory",
       });
-      
-      if (!response.ok) throw new Error("Failed to add subcategory");
-
-      const refreshed = await fetchDynamicSubcategories();
+const refreshed = await fetchDynamicSubcategories();
       toast({
         title: "Success",
         description: "Subcategory added globally (applies to all cars)",
@@ -568,22 +563,16 @@ export function IncomeExpenseProvider({
   const updateDynamicSubcategoryName = async (categoryType: string, metadataId: number, newName: string) => {
     try {
       // Update subcategory name globally (affects all cars)
-      const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/update-name"), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
+      await api.put("/api/income-expense/dynamic-subcategories/update-name", {
           metadataId,
           newName,
           carId, // Optional - if provided, returns updated list for this car
           year: parseInt(year),
           categoryType,
-        }),
+        }, {
+        fallbackMessage: "Failed to update subcategory name",
       });
-      
-      if (!response.ok) throw new Error("Failed to update subcategory name");
-      
-      await fetchDynamicSubcategories();
+await fetchDynamicSubcategories();
       toast({
         title: "Success",
         description: "Subcategory name updated globally (affects all cars)",
@@ -649,11 +638,7 @@ export function IncomeExpenseProvider({
     subcategoryName: string
   ) => {
     try {
-      const response = await fetch(buildApiUrl("/api/income-expense/dynamic-subcategories/update-value"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
+      await api.post("/api/income-expense/dynamic-subcategories/update-value", {
           metadataId,
           month,
           value,
@@ -661,12 +646,10 @@ export function IncomeExpenseProvider({
           year: parseInt(year),
           categoryType,
           subcategoryName,
-        }),
+        }, {
+        fallbackMessage: "Failed to update subcategory value",
       });
-      
-      if (!response.ok) throw new Error("Failed to update subcategory value");
-      
-      await fetchDynamicSubcategories();
+await fetchDynamicSubcategories();
       invalidateIncomeExpenseAndPayments();
     } catch (error: any) {
       toast({

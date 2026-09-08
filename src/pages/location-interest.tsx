@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { type PublicLocation } from "@/lib/location-config";
 import { SITE_CONTACT } from "@/lib/site-config";
 
@@ -47,20 +47,14 @@ export default function LocationInterest({ location }: { location: PublicLocatio
 
   const onSubmit = async (data: LocationInterestFormData) => {
     try {
-      const response = await fetch(buildApiUrl("/api/public/location-interest"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
+      await api.post("/api/public/location-interest", {
           ...data,
           locationId: location.id,
           locationName: location.cityState,
-        }),
+        }, {
+        fallbackMessage: "Failed to join list",
       });
-
-      if (!response.ok) throw new Error("Failed to join list");
-
-      toast({
+toast({
         title: "You're on the list",
         description: `We'll notify you when ${location.cityState} is ready for vehicle owners.`,
       });

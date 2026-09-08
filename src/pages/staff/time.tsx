@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 
 // utahToday() below stays pinned to Utah, unlike the display helpers above:
@@ -351,12 +352,9 @@ export default function StaffTime() {
       const params = new URLSearchParams();
       if (fromDate) params.set("from", fromDate);
       if (toDate) params.set("to", toDate);
-      const r = await fetch(
-        buildApiUrl(`/api/me/time-sheet/sessions?${params.toString()}`),
-        { credentials: "include" }
-      );
-      if (!r.ok) throw new Error("Failed to load sessions");
-      return r.json();
+      return api.get(`/api/me/time-sheet/sessions?${params.toString()}`, {
+        fallbackMessage: "Failed to load sessions",
+      });
     },
     enabled: canViewTimesheet,
     refetchOnWindowFocus: true,

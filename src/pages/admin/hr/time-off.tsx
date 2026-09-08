@@ -179,14 +179,10 @@ export default function AdminHrTimeOff() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: number }) => {
-      const res = await fetch(buildApiUrl(`/api/admin/hr/leave/${id}/status`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ leave_is_status: status }),
+      await api.put(`/api/admin/hr/leave/${id}/status`, { leave_is_status: status }, {
+        fallbackMessage: "Failed to update",
       });
-      if (!res.ok) throw new Error("Failed to update");
-    },
+},
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/hr/leave"] });
       setConfirmDecline(null);

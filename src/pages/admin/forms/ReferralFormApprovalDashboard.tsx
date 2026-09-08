@@ -7,6 +7,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -131,12 +132,9 @@ export default function ReferralFormApprovalDashboard() {
   const { data, isLoading } = useQuery({
     queryKey: ["/api/admin/referral-forms", statusFilter, search, dateFrom, dateTo],
     queryFn: async () => {
-      const res = await fetch(
-        buildApiUrl(`/api/admin/referral-forms?${params.toString()}`),
-        { credentials: "include" }
-      );
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
+      return api.get<{ data?: ReferralRow[] }>(`/api/admin/referral-forms?${params.toString()}`, {
+        fallbackMessage: "Failed to fetch",
+      });
     },
   });
 
@@ -146,12 +144,10 @@ export default function ReferralFormApprovalDashboard() {
 
   const approveMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/referral-forms/${id}/approve`), {
-        method: "PATCH",
-        credentials: "include",
+      await api.patch(`/api/admin/referral-forms/${id}/approve`, undefined, {
+        fallbackMessage: "Failed to approve",
       });
-      if (!res.ok) throw new Error("Failed to approve");
-    },
+},
     onSuccess: () => {
       invalidate();
       toast({ title: "Approved successfully" });
@@ -162,14 +158,10 @@ export default function ReferralFormApprovalDashboard() {
 
   const declineMutation = useMutation({
     mutationFn: async ({ id, reason }: { id: number; reason: string }) => {
-      const res = await fetch(buildApiUrl(`/api/admin/referral-forms/${id}/decline`), {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reason }),
+      await api.patch(`/api/admin/referral-forms/${id}/decline`, { reason }, {
+        fallbackMessage: "Failed to decline",
       });
-      if (!res.ok) throw new Error("Failed to decline");
-    },
+},
     onSuccess: () => {
       invalidate();
       setDeclineRow(null);
@@ -182,12 +174,10 @@ export default function ReferralFormApprovalDashboard() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/admin/referral-forms/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      await api.delete(`/api/admin/referral-forms/${id}`, {
+        fallbackMessage: "Failed to delete",
       });
-      if (!res.ok) throw new Error("Failed to delete");
-    },
+},
     onSuccess: () => {
       invalidate();
       setDeleteRow(null);

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 
 /** Fallback while loading / on error — matches the backend default list. */
 export const DEFAULT_SALES_REPS = ["Jay Barton", "Jenn Mason", "Brynn Lunn"];
@@ -13,13 +13,9 @@ export function useSalesReps() {
   const { data, isLoading } = useQuery<{ success: boolean; data: string[] }>({
     queryKey: ["/api/settings/sales-reps"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/settings/sales-reps"), {
-        credentials: "include",
+      return api.get("/api/settings/sales-reps", {
+        fallbackMessage: "Failed to fetch sales representatives",
       });
-      if (!response.ok) {
-        throw new Error("Failed to fetch sales representatives");
-      }
-      return response.json();
     },
     staleTime: 5 * 60 * 1000,
   });

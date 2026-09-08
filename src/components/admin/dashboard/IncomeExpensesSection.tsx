@@ -16,7 +16,7 @@ import {
   Cell,
 } from "recharts";
 import { Pencil, Check, X, Loader2 } from "lucide-react";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { SectionHeader, SummaryCard } from "@/components/admin/dashboard";
@@ -364,11 +364,9 @@ export default function IncomeExpensesSection({ year, onYearChange }: IncomeExpe
   const { data, isLoading, isError } = useQuery<ApiResponse>({
     queryKey,
     queryFn: async () => {
-      const res = await fetch(buildApiUrl(`/api/income-expense/all-cars/${year}`), {
-        credentials: "include",
+      return api.get(`/api/income-expense/all-cars/${year}`, {
+        fallbackMessage: "Failed to fetch income data: ${res.status}",
       });
-      if (!res.ok) throw new Error(`Failed to fetch income data: ${res.status}`);
-      return res.json();
     },
   });
 
@@ -379,19 +377,14 @@ export default function IncomeExpensesSection({ year, onYearChange }: IncomeExpe
 
   const saveAvailableCars = useMutation({
     mutationFn: async ({ month, value }: { month: number; value: number }) => {
-      const res = await fetch(buildApiUrl("/api/income-expense/history"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
+      return api.post("/api/income-expense/history", {
           carId: 0,
           year: parseInt(year, 10),
           month,
           carsAvailableForRent: value,
-        }),
+        }, {
+        fallbackMessage: "Failed to save: ${res.status}",
       });
-      if (!res.ok) throw new Error(`Failed to save: ${res.status}`);
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });

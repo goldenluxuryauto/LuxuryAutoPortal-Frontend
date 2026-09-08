@@ -1120,16 +1120,9 @@ export default function TuroTripsPage() {
 
     setImporting(true);
     try {
-      const response = await fetch(buildApiUrl("/api/turo-trips/import"), {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rows }),
+      const data = await api.post<{ updated?: number; skipped?: unknown[] }>("/api/turo-trips/import", { rows }, {
+        fallbackMessage: "Import failed",
       });
-      const data = await response.json();
-      if (!response.ok || !data?.success) {
-        throw new Error(data?.message || "Import failed");
-      }
       queryClient.invalidateQueries({ queryKey: ["/api/turo-trips"] });
       toast({
         title: "Import complete",

@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { buildApiUrl } from "@/lib/queryClient";
 import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { Button } from "@/components/ui/button";
@@ -114,17 +113,13 @@ export function CarInspectionsTab() {
       edit.end !== undefined ? edit.end : String(trip.tripEndOdometer ?? "");
     setSavingOdoRow(trip.id);
     try {
-      const res = await fetch(buildApiUrl(`/api/turo-trips/${trip.id}/odometers`), {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      await api.patch(`/api/turo-trips/${trip.id}/odometers`, {
           tripStartOdometer: startVal !== "" ? parseInt(startVal, 10) : null,
           tripEndOdometer: endVal !== "" ? parseInt(endVal, 10) : null,
-        }),
+        }, {
+        fallbackMessage: "Failed to save",
       });
-      if (!res.ok) throw new Error("Failed to save");
-      queryClient.invalidateQueries({ queryKey: ["/api/turo-trips"] });
+queryClient.invalidateQueries({ queryKey: ["/api/turo-trips"] });
       setOdoEdits((prev) => { const next = { ...prev }; delete next[trip.id]; return next; });
       toast({ title: "Odometer saved", description: `Reservation #${trip.reservationId}` });
     } catch {
@@ -342,12 +337,9 @@ export function CarInspectionsTab() {
 
   const moveToMaintenanceMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(buildApiUrl(`/api/operations/inspections/${id}/move-to-maintenance`), {
-        method: "POST",
-        credentials: "include",
+      return api.post(`/api/operations/inspections/${id}/move-to-maintenance`, undefined, {
+        fallbackMessage: "Failed to move to maintenance",
       });
-      if (!response.ok) throw new Error("Failed to move to maintenance");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/inspections"] });
@@ -361,12 +353,9 @@ export function CarInspectionsTab() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(buildApiUrl(`/api/operations/inspections/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      return api.delete(`/api/operations/inspections/${id}`, {
+        fallbackMessage: "Failed to delete",
       });
-      if (!response.ok) throw new Error("Failed to delete");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/inspections"] });
@@ -381,12 +370,9 @@ export function CarInspectionsTab() {
 
   const deleteAllMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(buildApiUrl("/api/operations/inspections"), {
-        method: "DELETE",
-        credentials: "include",
+      return api.delete("/api/operations/inspections", {
+        fallbackMessage: "Failed to delete all",
       });
-      if (!response.ok) throw new Error("Failed to delete all");
-      return response.json();
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/inspections"] });

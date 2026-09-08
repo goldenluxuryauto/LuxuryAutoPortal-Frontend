@@ -287,12 +287,9 @@ export default function NewsMediaPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const res = await fetch(buildApiUrl(`/api/client-testimonials/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      return api.delete(`/api/client-testimonials/${id}`, {
+        fallbackMessage: "Failed to delete",
       });
-      if (!res.ok) throw new Error("Failed to delete");
-      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/news-media"] });

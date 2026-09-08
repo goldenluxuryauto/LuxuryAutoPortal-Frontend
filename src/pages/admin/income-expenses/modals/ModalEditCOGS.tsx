@@ -19,6 +19,7 @@ import AmountBreakdown from "../components/AmountBreakdown";
 import ServiceDateEditor from "../components/ServiceDateEditor";
 import { useImageUpload } from "../utils/useImageUpload";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -87,22 +88,16 @@ export default function ModalEditCOGS() {
       
       // Save remarks
       try {
-        const response = await fetch(buildApiUrl("/api/income-expense/remarks"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
+        await api.post("/api/income-expense/remarks", {
             carId,
             year: parseInt(year),
             month: editingCell.month,
             category: editingCell.category,
             field: editingCell.field,
             remarks: remarks.trim(),
-          }),
+          }, {
+          fallbackMessage: "Failed to save remarks",
         });
-        if (!response.ok) {
-          throw new Error("Failed to save remarks");
-        }
       } catch (error) {
         console.error("Error saving remarks:", error);
       }

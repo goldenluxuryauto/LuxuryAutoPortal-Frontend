@@ -365,14 +365,10 @@ export default function EmployeeViewPage() {
   const handleApprove = async () => {
     if (!employee) return;
     try {
-      const res = await fetch(buildApiUrl(`/api/employees/${employee.employee_aid}/status`), {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ status: "" }),
+      await api.patch(`/api/employees/${employee.employee_aid}/status`, { status: "" }, {
+        fallbackMessage: "Failed to approve",
       });
-      if (!res.ok) throw new Error("Failed to approve");
-      toast({ title: "Approved", description: "Employee approved successfully." });
+toast({ title: "Approved", description: "Employee approved successfully." });
       refetch();
     } catch (e: any) {
       toast({ title: "Error", description: e.message || "Failed to approve", variant: "destructive" });
@@ -382,12 +378,10 @@ export default function EmployeeViewPage() {
   const handleDelete = async () => {
     if (!employee || !confirm(`Delete ${employee.employee_last_name}, ${employee.employee_first_name}?`)) return;
     try {
-      const res = await fetch(buildApiUrl(`/api/employees/${employee.employee_aid}`), {
-        method: "DELETE",
-        credentials: "include",
+      await api.delete(`/api/employees/${employee.employee_aid}`, {
+        fallbackMessage: "Failed to delete",
       });
-      if (!res.ok) throw new Error("Failed to delete");
-      toast({ title: "Deleted", description: "Employee deleted successfully." });
+toast({ title: "Deleted", description: "Employee deleted successfully." });
       window.location.href = "/admin/hr/employees";
     } catch (e: any) {
       toast({ title: "Error", description: e.message || "Failed to delete", variant: "destructive" });

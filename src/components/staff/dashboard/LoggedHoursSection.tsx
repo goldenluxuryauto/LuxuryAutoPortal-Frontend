@@ -6,7 +6,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { SectionHeader } from "@/components/admin/dashboard";
 import { Input } from "@/components/ui/input";
@@ -171,9 +171,9 @@ export default function LoggedHoursSection() {
   const { data: empData } = useQuery<MeEmployeeResponse>({
     queryKey: ["/api/me/employee"],
     queryFn: async () => {
-      const r = await fetch(buildApiUrl("/api/me/employee"), { credentials: "include" });
-      if (!r.ok) throw new Error("Failed");
-      return r.json();
+      return api.get("/api/me/employee", {
+        fallbackMessage: "Failed",
+      });
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -185,11 +185,9 @@ export default function LoggedHoursSection() {
       const params = new URLSearchParams();
       if (from) params.set("from", from);
       if (to) params.set("to", to);
-      const r = await fetch(buildApiUrl(`/api/me/time-sheet/sessions?${params}`), {
-        credentials: "include",
+      return api.get(`/api/me/time-sheet/sessions?${params}`, {
+        fallbackMessage: "Failed",
       });
-      if (!r.ok) throw new Error("Failed");
-      return r.json();
     },
   });
 

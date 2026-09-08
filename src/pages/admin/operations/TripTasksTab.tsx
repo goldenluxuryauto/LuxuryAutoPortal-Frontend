@@ -251,12 +251,9 @@ export function TripTasksTab() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(buildApiUrl(`/api/operations/tasks/${id}`), {
-        method: "DELETE",
-        credentials: "include",
+      return api.delete(`/api/operations/tasks/${id}`, {
+        fallbackMessage: "Failed to delete task",
       });
-      if (!response.ok) throw new Error("Failed to delete task");
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/tasks"] });

@@ -14,6 +14,7 @@ import ReceiptViewerModal from "./ReceiptViewerModal";
 import { cn } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import type { IncomeExpenseData } from "../types";
 import {
   Dialog,
@@ -208,14 +209,10 @@ export default function IncomeExpenseTable({
     const prev = lastSavedNote.current;
     setSavingCoHostNote(true);
     try {
-      const res = await fetch(buildApiUrl("/api/income-expense/cohost-note"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ carId, note: coHostNote }),
+      await api.post("/api/income-expense/cohost-note", { carId, note: coHostNote }, {
+        fallbackMessage: "save failed",
       });
-      if (!res.ok) throw new Error("save failed");
-      lastSavedNote.current = coHostNote;
+lastSavedNote.current = coHostNote;
     } catch {
       setCoHostNote(prev); // revert on failure
     } finally {
@@ -231,14 +228,10 @@ export default function IncomeExpenseTable({
     setOwnership(next); // optimistic
     setSavingGlaOwned(true);
     try {
-      const res = await fetch(buildApiUrl("/api/income-expense/gla-owned"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ carId, ownership: next }),
+      await api.post("/api/income-expense/gla-owned", { carId, ownership: next }, {
+        fallbackMessage: "save failed",
       });
-      if (!res.ok) throw new Error("save failed");
-    } catch {
+} catch {
       setOwnership(prev); // revert on failure
     } finally {
       setSavingGlaOwned(false);

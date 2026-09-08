@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -459,12 +460,10 @@ export function TripsOverviewTab() {
 
   const deleteTaskMutation = useMutation({
     mutationFn: async (taskId: number) => {
-      const res = await fetch(buildApiUrl(`/api/operations/tasks/${taskId}`), {
-        method: "DELETE",
-        credentials: "include",
+      await api.delete(`/api/operations/tasks/${taskId}`, {
+        fallbackMessage: "Failed to delete task",
       });
-      if (!res.ok) throw new Error("Failed to delete task");
-    },
+},
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/operations/tasks"] });
       toast({ title: "Task deleted" });

@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/queryClient";
+import { api } from "@/lib/api";
 import { Loader2, Save, Slack, Lock, Eye, EyeOff, AlertCircle, Users, Plus, X } from "lucide-react";
 import { checkPasswordStrength, getPasswordStrengthColor, getPasswordStrengthLabel } from "@/lib/password-strength";
 
@@ -74,13 +75,9 @@ export default function SettingsPage() {
   }>({
     queryKey: ["/api/settings/slack-channels"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/settings/slack-channels"), {
-        credentials: "include",
+      return api.get("/api/settings/slack-channels", {
+        fallbackMessage: "Failed to fetch Slack channel configurations",
       });
-      if (!response.ok) {
-        throw new Error("Failed to fetch Slack channel configurations");
-      }
-      return response.json();
     },
     enabled: isAdmin, // Only fetch if user is admin
   });
@@ -89,13 +86,9 @@ export default function SettingsPage() {
   const { data: salesRepsData } = useQuery<{ success: boolean; data: string[] }>({
     queryKey: ["/api/settings/sales-reps"],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/settings/sales-reps"), {
-        credentials: "include",
+      return api.get("/api/settings/sales-reps", {
+        fallbackMessage: "Failed to fetch sales representatives",
       });
-      if (!response.ok) {
-        throw new Error("Failed to fetch sales representatives");
-      }
-      return response.json();
     },
     enabled: isAdmin,
   });
