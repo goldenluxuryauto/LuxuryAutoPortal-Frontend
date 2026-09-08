@@ -128,7 +128,10 @@ export default function GraphsChartsPage() {
   };
 
   const calculateCarManagementSplit = (month: number): number => {
-    const percent = incomeExpenseData?.formulaSetting?.carManagementSplitPercent || 0;
+    // Fall back to 50, the same default the backend serves when a car has no
+    // formula row — `|| 0` would report a $0 management split and hand 100% of
+    // rental income to the owner if the field ever arrived missing.
+    const percent = incomeExpenseData?.formulaSetting?.carManagementSplitPercent ?? 50;
     const mgmtPct = percent / 100;
     const rentalIncome = getMonthValue(incomeExpenseData?.incomeExpenses || [], month, "rentalIncome");
     return rentalIncome * mgmtPct;
