@@ -25,7 +25,18 @@ interface ReportCenterProps {
    * only Report Center has.
    */
   hideVehicleStatsLinks?: boolean;
+  /**
+   * Set on client pages whose sidebar already carries these destinations.
+   * "History" here is the same page as the sidebar's "Trip History", so the
+   * client saw one route twice on a single screen.
+   */
+  hideSidebarDuplicateLinks?: boolean;
 }
+
+/** Destinations the client sidebar already provides, so Report Center should
+ *  not repeat them. Matched on href, since the two places label them
+ *  differently ("History" here vs "Trip History" in the sidebar). */
+const SIDEBAR_HREFS = ["/client/trip-history"];
 
 /** Labels covered by the View Stats section (matched case-insensitively, and
  *  tolerant of the "… Report"/"… Schedule" suffixes Report Center adds). */
@@ -44,10 +55,17 @@ function isVehicleStatsLink(label: string): boolean {
   );
 }
 
-export function ReportCenter({ reportLinks, hideVehicleStatsLinks }: ReportCenterProps) {
-  const links = hideVehicleStatsLinks
+export function ReportCenter({
+  reportLinks,
+  hideVehicleStatsLinks,
+  hideSidebarDuplicateLinks,
+}: ReportCenterProps) {
+  let links = hideVehicleStatsLinks
     ? reportLinks.filter((l) => l.placeholder || !isVehicleStatsLink(l.label))
     : reportLinks;
+  if (hideSidebarDuplicateLinks) {
+    links = links.filter((l) => l.placeholder || !SIDEBAR_HREFS.includes(l.href));
+  }
 
   return (
     <div className="rounded-xl border-2 border-[#d3bc8d] bg-[#D3BC8D]/10 px-6 py-5 shadow-sm shadow-[#D3BC8D]/10">

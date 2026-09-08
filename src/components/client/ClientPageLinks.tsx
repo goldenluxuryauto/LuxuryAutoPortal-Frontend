@@ -131,7 +131,11 @@ export function ClientPageLinks({ hideVehicleStatsLinks }: { hideVehicleStatsLin
 
   return (
     <div className="space-y-6 mt-8 mb-12">
-      <ReportCenter reportLinks={reportLinks} hideVehicleStatsLinks={hideVehicleStatsLinks} />
+      <ReportCenter
+        reportLinks={reportLinks}
+        hideVehicleStatsLinks={hideVehicleStatsLinks}
+        hideSidebarDuplicateLinks
+      />
       <SupportCenter supportLinks={supportLinks} />
     </div>
   );
