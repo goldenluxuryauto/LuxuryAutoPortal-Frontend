@@ -395,9 +395,23 @@ export default function ClientDashboard() {
     return Math.max(0, currentMonth - 1);
   }, [selectedYear, currentYear, currentMonth]);
 
+  // ...and only from the month the car actually joined the fleet. Averaging
+  // over every completed month charged a car for months it did not exist yet:
+  // a car whose income starts in May was divided by all 8 completed months,
+  // halving Average Rental Income ($394.38 instead of $788.75) and Average
+  // Monthly Profit ($107.83 instead of $215.66). The first month with any
+  // income, expense, day or trip is the start of its tenure; months before it
+  // are all-zero placeholder rows, not real zero-earning months.
+  const firstActiveMonthIndex = useMemo(() => {
+    const idx = monthlyTripData.findIndex(
+      (r) => r.income !== 0 || r.expenses !== 0 || r.profit !== 0 || r.days !== 0 || r.trips !== 0,
+    );
+    return idx === -1 ? 0 : idx;
+  }, [monthlyTripData]);
+
   const completedMonthsTripData = useMemo(
-    () => monthlyTripData.slice(0, completedMonthCount),
-    [monthlyTripData, completedMonthCount],
+    () => monthlyTripData.slice(firstActiveMonthIndex, completedMonthCount),
+    [monthlyTripData, firstActiveMonthIndex, completedMonthCount],
   );
 
   const monthlyAverages = useMemo<YearTotals>(() => {
