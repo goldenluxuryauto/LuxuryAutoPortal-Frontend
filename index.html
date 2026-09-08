@@ -8,13 +8,27 @@
     <meta property="og:title" content="Luxury Auto Gallery - Premium & Exotic Cars" />
     <meta property="og:description" content="Discover our curated collection of luxury and exotic vehicles. Premium automotive excellence with personalized concierge service." />
     <meta property="og:type" content="website" />
+    <meta name="google" content="notranslate" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
   </head>
   <body style="margin: 0; padding: 0; min-height: 100vh;">
-    <div id="root">
+    <!--
+      class="notranslate" on the React root.
+
+      Google Translate rewrites text nodes in place. React still holds
+      references to the originals, so its next removal targets a node the
+      translated DOM no longer parents, and the whole app dies with
+      "Failed to execute 'removeChild' on 'Node'". Reported on
+      /salt-lake-city with the Translate bar visible.
+
+      Opting the root out keeps Translate from rewriting React-owned nodes.
+      The <meta> below stops Chrome from offering the translation prompt in
+      the first place.
+    -->
+    <div id="root" class="notranslate" translate="no">
       <!-- Loading fallback - will be replaced by React -->
       <div style="min-height: 100vh; background: #ffffff; display: flex; align-items: center; justify-content: center; color: #171717; font-family: system-ui, -apple-system, sans-serif;">
         <div style="text-align: center;">
