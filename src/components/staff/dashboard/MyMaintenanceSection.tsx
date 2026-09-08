@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 const MAINT_STATUS_OPTIONS = [
   { value: "new", label: "New", className: "bg-gray-100 text-gray-700" },
@@ -73,9 +74,7 @@ function fmtMoney(v: unknown): string {
 }
 
 function toMtDate(iso: string | null | undefined): string | null {
-  if (!iso) return null;
-  try { return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso)); }
-  catch { return null; }
+  return mtDayKeyOrNull(iso, getActiveTimezone());
 }
 
 export default function MyMaintenanceSection() {

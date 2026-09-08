@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 const ENDPOINT = "/api/me/pickup-dropoff";
 const QUERY_KEY = "me-pickup-dropoff";
@@ -172,11 +173,8 @@ export default function MyPickupDropoffSection() {
     return Array.from(names).sort();
   }, [allRows]);
 
-  const toMtDate = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    try { return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso)); }
-    catch { return null; }
-  };
+  const toMtDate = (iso: string | null | undefined): string | null =>
+    mtDayKeyOrNull(iso, getActiveTimezone());
 
   const rows = useMemo(() => {
     let filtered = allRows;

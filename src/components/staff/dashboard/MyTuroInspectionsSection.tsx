@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 export const INSPECTION_STATUS_OPTIONS = [
   { value: "new", label: "New", className: "bg-gray-100 text-gray-700" },
@@ -147,11 +148,8 @@ export default function MyTuroInspectionsSection() {
   const [rangeFrom, setRangeFrom] = useState("");
   const [rangeTo, setRangeTo] = useState("");
 
-  const toMtDate = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    try { return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso)); }
-    catch { return null; }
-  };
+  const toMtDate = (iso: string | null | undefined): string | null =>
+    mtDayKeyOrNull(iso, getActiveTimezone());
 
   const inspections = useMemo(() => {
     let f = allInspections;

@@ -25,6 +25,7 @@ import { GasLevelCells } from "./GasLevelCells";
 import { OperationEditHistoryList } from "@/components/admin/OperationEditHistory";
 import { operationLocationMatches, useOperationLocationFilter } from "./OperationLocationFilter";
 import { formatUniformCarLabel } from "./formatCarName";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return "--";
@@ -191,12 +192,8 @@ export function CarInspectionsTab() {
   // mis-buckets trips near midnight MT (the displayed day and the filtered day
   // disagree) — this matches the server-side filter the
   // /admin/turo-trips page uses and the client-side filter on Turo Messages.
-  const toMtDate = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    try {
-      return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso));
-    } catch { return null; }
-  };
+  const toMtDate = (iso: string | null | undefined): string | null =>
+    mtDayKeyOrNull(iso, getActiveTimezone());
 
   const inspections = useMemo(() => {
     const q = search.trim().toLowerCase();

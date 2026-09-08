@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { SectionHeader } from "./SectionHeader";
 import { DashboardRecordCard } from "./DashboardRecordCard";
 import { useLocation } from "wouter";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 // Accent color per block-off reason so the cards are scannable at a glance.
 const REASON_ACCENT: Record<string, { bg: string; border: string }> = {
@@ -132,14 +133,8 @@ export default function CarBlockedOffSection() {
   // today, which a UTC-instant comparison would drop early in the evening.
   const activeTz = getActiveTimezone();
   const todayMt = new Intl.DateTimeFormat("en-CA", { timeZone: activeTz }).format(new Date());
-  const toMtDate = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    try {
-      return new Intl.DateTimeFormat("en-CA", { timeZone: activeTz }).format(new Date(iso));
-    } catch {
-      return null;
-    }
-  };
+  const toMtDate = (iso: string | null | undefined): string | null =>
+    mtDayKeyOrNull(iso, activeTz);
   const hasEnded = (r: CarBlockOff): boolean => {
     const returned = toMtDate(r.dropoff_date);
     if (returned && returned < todayMt) return true;

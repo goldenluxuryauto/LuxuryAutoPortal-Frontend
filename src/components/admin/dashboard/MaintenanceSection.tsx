@@ -6,6 +6,7 @@ import { Search, X, Wrench } from "lucide-react";
 import { buildApiUrl } from "@/lib/queryClient";
 import { getActiveTimezone } from "@/hooks/use-timezone";
 import { SectionHeader, DashboardRecordCard, CarPhotoCell } from "@/components/admin/dashboard";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 interface MaintenanceTask {
   id: number;
@@ -197,12 +198,8 @@ export default function MaintenanceSection(_props: MaintenanceSectionProps) {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  const toMtDate = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    try {
-      return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso));
-    } catch { return null; }
-  };
+  const toMtDate = (iso: string | null | undefined): string | null =>
+    mtDayKeyOrNull(iso, getActiveTimezone());
 
   const allTasks = useMemo(() =>
     [...(data?.data ?? [])].sort((a, b) => {

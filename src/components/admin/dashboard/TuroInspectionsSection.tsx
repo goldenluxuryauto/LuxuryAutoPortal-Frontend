@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 interface Inspection {
   id: number;
@@ -237,11 +238,8 @@ export default function TuroInspectionsSection() {
     // END falls within the range (single day = From==To). Compare MT
     // YYYY-MM-DD strings so the filter agrees with the columns rendered in
     // the active timezone.
-    const toMtDate = (iso: string | null | undefined): string | null => {
-      if (!iso) return null;
-      try { return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso)); }
-      catch { return null; }
-    };
+    const toMtDate = (iso: string | null | undefined): string | null =>
+      mtDayKeyOrNull(iso, getActiveTimezone());
     if (rangeFrom || rangeTo) {
       f = f.filter(t => {
         const sd = toMtDate(t.tt_trip_start);

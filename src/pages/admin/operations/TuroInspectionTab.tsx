@@ -45,6 +45,7 @@ import { TaskAssignmentModal } from "./TaskAssignmentModal";
 import { EmployeeSelectCombobox } from "./EmployeeSelectCombobox";
 import { operationLocationMatches, useOperationLocationFilter } from "./OperationLocationFilter";
 import { formatUniformCarLabel } from "./formatCarName";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 // Status dropdown values that filter the joined Turo *trip* status (client-side)
 // rather than the inspection status (server-side). Booked / Ended / Returned.
@@ -432,12 +433,8 @@ export function TuroInspectionTab() {
 
   // Convert a UTC ISO string to a YYYY-MM-DD date in Mountain Time so date
   // comparisons match what the admin sees in the Trip Start / Trip Ends columns.
-  const toMtDate = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    try {
-      return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso));
-    } catch { return null; }
-  };
+  const toMtDate = (iso: string | null | undefined): string | null =>
+    mtDayKeyOrNull(iso, getActiveTimezone());
 
   const filteredInspections = useMemo(() => {
     const q = search.trim().toLowerCase();

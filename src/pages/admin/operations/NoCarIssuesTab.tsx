@@ -17,6 +17,7 @@ import type { Inspection, TuroTrip } from "./types";
 import { TaskAssignmentModal } from "./TaskAssignmentModal";
 import { operationLocationMatches, useOperationLocationFilter } from "./OperationLocationFilter";
 import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return "--";
@@ -103,12 +104,8 @@ export function NoCarIssuesTab() {
 
   // UTC ISO → YYYY-MM-DD calendar day in Mountain Time, so the Trip Start
   // filter buckets a trip into the same day the Trip Start column shows.
-  const toMtDate = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    try {
-      return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso));
-    } catch { return null; }
-  };
+  const toMtDate = (iso: string | null | undefined): string | null =>
+    mtDayKeyOrNull(iso, getActiveTimezone());
 
   const inspections = useMemo(() => {
     const q = search.trim().toLowerCase();

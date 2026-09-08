@@ -40,6 +40,7 @@ import { CarIssueTypesCell } from "./CarIssueTypesCell";
 import { FuelReturnedCell } from "./FuelReturnedCell";
 import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
 import { operationLocationMatches, useOperationLocationFilter } from "./OperationLocationFilter";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return "--";
@@ -248,12 +249,8 @@ export function MaintenanceTab({
 
   const rawRecords = oneMaintenancePerInspection(data?.data || []);
 
-  const toMtDate = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    try {
-      return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso));
-    } catch { return null; }
-  };
+  const toMtDate = (iso: string | null | undefined): string | null =>
+    mtDayKeyOrNull(iso, getActiveTimezone());
 
   const records = useMemo(() => {
     const q = search.trim().toLowerCase();

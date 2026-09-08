@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 export interface ReservationRow {
   [key: string]: unknown;
@@ -290,11 +291,8 @@ export default function ReservationsTableSection({
     // AND-ed together: "Trip Start on 6/17 AND Trip Ends on 6/17". Compare
     // MT YYYY-MM-DD strings (not raw UTC timestamps) so the filter agrees with
     // the Trip Start / Trip Ends columns, which render in the active timezone.
-    const toMtDate = (iso: unknown): string | null => {
-      if (!iso) return null;
-      try { return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(String(iso))); }
-      catch { return null; }
-    };
+    const toMtDate = (iso: unknown): string | null =>
+      mtDayKeyOrNull(iso as string | null | undefined, getActiveTimezone());
     if (tripStartFrom && hasTripStart) {
       filtered = filtered.filter((row) => toMtDate(row["trip_start"]) === tripStartFrom);
     }

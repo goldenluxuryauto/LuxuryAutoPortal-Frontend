@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 interface OperationTask {
   id: number;
@@ -316,11 +317,8 @@ export default function OperationsSection() {
     return Array.from(names).sort();
   }, [allGroups]);
 
-  const toMtDate = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    try { return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso)); }
-    catch { return null; }
-  };
+  const toMtDate = (iso: string | null | undefined): string | null =>
+    mtDayKeyOrNull(iso, getActiveTimezone());
 
   const groups = useMemo(() => {
     let f = allGroups;

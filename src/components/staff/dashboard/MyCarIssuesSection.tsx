@@ -21,6 +21,7 @@ import {
 import { formatUniformCarLabel } from "@/pages/admin/operations/formatCarName";
 import { useToast } from "@/hooks/use-toast";
 import { INSPECTION_STATUS_OPTIONS } from "./MyTuroInspectionsSection";
+import { mtDayKeyOrNull } from "@/lib/mt-datetime";
 
 function statusMeta(v: string | undefined | null) {
   return (
@@ -142,11 +143,8 @@ export default function MyCarIssuesSection() {
   const [rangeFrom, setRangeFrom] = useState("");
   const [rangeTo, setRangeTo] = useState("");
 
-  const toMtDate = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    try { return new Intl.DateTimeFormat("en-CA", { timeZone: getActiveTimezone() }).format(new Date(iso)); }
-    catch { return null; }
-  };
+  const toMtDate = (iso: string | null | undefined): string | null =>
+    mtDayKeyOrNull(iso, getActiveTimezone());
 
   const inspections = useMemo(() => {
     let f = allInspections;
