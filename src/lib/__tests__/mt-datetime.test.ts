@@ -4,6 +4,7 @@ import {
   mtDayStartToUtcIso,
   mtLocalInputToUtcDbString,
   mtDayKey,
+  mtDayKeyOrNull,
   mtTodayKey,
 } from "../mt-datetime";
 
@@ -64,5 +65,52 @@ describe("optional tz parameter (backward compatible)", () => {
     // Not asserting a specific date (depends on when the test runs) — just
     // that passing a tz doesn't throw and returns a well-formed day key.
     expect(mtTodayKey("Asia/Manila")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+// mtDayKeyOrNull backs the dashboard/Operations date-range filters, which
+// were 14 identical per-component `toMtDate` copies before consolidation.
+// Those copies all answered `null` for "no date", and every call site keys
+// off that with `day != null`. mtDayKey alone cannot be substituted: it
+// answers "" for an invalid date and "1969-12-31" for null, either of which
+// passes a `>=` range bound and silently widens the filter.
+describe("mtDayKeyOrNull", () => {
+  it("returns null for absent input rather than a date string", () => {
+    expect(mtDayKeyOrNull(null)).toBeNull();
+    expect(mtDayKeyOrNull(undefined)).toBeNull();
+    expect(mtDayKeyOrNull("")).toBeNull();
+  });
+
+  it("never returns the epoch day for null, which mtDayKey does", () => {
+    // The whole reason this wrapper exists.
+    expect(mtDayKey(null as unknown as string)).toBe("1969-12-31");
+    expect(mtDayKeyOrNull(null)).toBeNull();
+  });
+
+  it("returns null for an unparseable date rather than an empty string", () => {
+    expect(mtDayKey("not-a-date")).toBe("");
+    expect(mtDayKeyOrNull("not-a-date")).toBeNull();
+  });
+
+  it("matches mtDayKey for real dates", () => {
+    expect(mtDayKeyOrNull("2026-08-31T04:00:00.000Z")).toBe("2026-08-30");
+    expect(mtDayKeyOrNull("2026-08-31T04:00:00.000Z", "Asia/Manila")).toBe("2026-08-31");
+  });
+
+  it("honors an explicit tz, which call sites must pass", () => {
+    // Call sites pass getActiveTimezone(); omitting it would silently pin
+    // them back to the Denver default the timezone-preference work removed.
+    expect(mtDayKeyOrNull("2026-01-15T02:00:00.000Z", "UTC")).toBe("2026-01-15");
+    expect(mtDayKeyOrNull("2026-01-15T02:00:00.000Z", "America/Denver")).toBe("2026-01-14");
+  });
+
+  it("degrades to null instead of throwing on an invalid tz", () => {
+    expect(() => mtDayKey("2026-08-31T04:00:00.000Z", "Not/AZone")).toThrow();
+    expect(mtDayKeyOrNull("2026-08-31T04:00:00.000Z", "Not/AZone")).toBeNull();
+  });
+
+  it("accepts Date and number input like mtDayKey", () => {
+    expect(mtDayKeyOrNull(new Date("2026-08-31T04:00:00.000Z"))).toBe("2026-08-30");
+    expect(mtDayKeyOrNull(Date.parse("2026-08-31T04:00:00.000Z"))).toBe("2026-08-30");
   });
 });

@@ -149,6 +149,34 @@ export function mtDayKey(value: string | number | Date, tz: string = "America/De
   }).format(d);
 }
 
+/**
+ * `mtDayKey` for input that may legitimately be absent, returning `null`
+ * rather than a string when there is no usable date.
+ *
+ * The null is load-bearing, not a style choice. Callers filter with
+ * `day != null && day >= rangeFrom && day <= rangeTo`, comparing
+ * `YYYY-MM-DD` strings lexicographically. `mtDayKey` itself answers `""`
+ * for an invalid date and — because `new Date(null)` is the epoch, a
+ * *valid* Date — `"1969-12-31"` for null. Either would sail through a
+ * `>=` bound and silently widen the filter, turning "this row has no
+ * date" into "this row is from 1969".
+ */
+export function mtDayKeyOrNull(
+  value: string | number | Date | null | undefined,
+  tz: string = "America/Denver",
+): string | null {
+  if (!value) return null;
+  try {
+    const key = mtDayKey(value, tz);
+    return key === "" ? null : key;
+  } catch {
+    // An invalid stored tz preference makes Intl throw; degrade to "no
+    // date" the way the per-component copies of this helper always did,
+    // rather than taking the render down.
+    return null;
+  }
+}
+
 /** Today's date in Mountain Time as `YYYY-MM-DD`. */
 export function mtTodayKey(tz: string = "America/Denver"): string {
   return mtDayKey(new Date(), tz);
