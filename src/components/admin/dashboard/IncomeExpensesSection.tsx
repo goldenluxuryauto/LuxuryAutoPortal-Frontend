@@ -567,7 +567,19 @@ export default function IncomeExpensesSection({ year, onYearChange }: IncomeExpe
     totalAvailableDaysAccurate > 0
       ? (totalDaysRented / totalAvailableDaysAccurate) * 100
       : 0;
-  const avgCarsAvailable = totalCarsAvailable / 12;
+  // Average over months that have actually happened, not a flat 12. For the
+  // current year a hardcoded 12 divides 8 months of data by 12 and understates
+  // the fleet by a third. (The tiles further down already do this via
+  // `completedMonths`, which is declared after this line — hence the local
+  // count rather than reusing it.)
+  const completedMonthCountForAvg = (() => {
+    const nowYear = new Date().getFullYear();
+    if (yearNum < nowYear) return 12;
+    if (yearNum > nowYear) return 0;
+    return Math.max(0, new Date().getMonth()); // months before the current one
+  })();
+  const avgCarsAvailable =
+    completedMonthCountForAvg > 0 ? totalCarsAvailable / completedMonthCountForAvg : 0;
   const yearAvgPerTrip =
     totalTripsTakenAll > 0 ? totalGross / totalTripsTakenAll : 0;
 
@@ -646,7 +658,6 @@ export default function IncomeExpensesSection({ year, onYearChange }: IncomeExpe
   const managementProfit = totalMgmtIncome - totalMgmtExpenses;
   const ownerProfit = totalOwnerIncome - totalOwnerExpenses;
   const utilizationRate = totalAvailableDays > 0 ? (totalDaysRented / totalAvailableDays) * 100 : 0;
-  const avgDaysRentedPerMonth = totalDaysRented / 12;
   const chartTrendData = monthlyComputed.map((mc) => ({
     month: formatShortMonth(mc.month),
     "Fleet Utilization %": mc.carsAvailable > 0 ? (mc.daysRented / (mc.carsAvailable * 30)) * 100 : 0,
