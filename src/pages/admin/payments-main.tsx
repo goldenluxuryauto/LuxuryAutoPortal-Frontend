@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Edit, FileText, Loader2, Upload, Download, Wand2, CalendarX, Filter, FileSpreadsheet, CheckCircle2, X, AlertTriangle, Search, ChevronDown, Check, Lock } from "lucide-react";
+import { useCoHost } from "@/hooks/use-co-host";
 import { Label } from "@/components/ui/label";
 import { buildApiUrl } from "@/lib/queryClient";
 import { formatMonthDayYear } from "@/lib/date-format";
@@ -99,6 +100,13 @@ export default function PaymentsMainPage() {
 
   // Developer-only mode: show destructive tools only when ?dev=1 is in the URL
   const devMode = new URLSearchParams(window.location.search).get("dev") === "1";
+
+  // Client payments are GLA's books. A co-host signs in as a scoped admin, so
+  // requireAdmin alone let them create/edit/delete payment rows for cars they
+  // merely manage. The backend now rejects those writes (requireAdminNotCoHost);
+  // hide the controls too so the buttons aren't offered and then refused.
+  const { isCoHost } = useCoHost();
+  const canEditPayments = !isCoHost;
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(30);
   // "Show All" bypasses pagination for the current filters (capped at the
@@ -635,23 +643,27 @@ export default function PaymentsMainPage() {
                 )}
               </Button>
             )}
-            <Button
-              onClick={() => setIsDeleteByMonthModalOpen(true)}
-              variant="outline"
-              className="bg-card border-red-500/30 text-red-600 hover:bg-red-500/10 hover:text-red-700 hover:border-red-500/50 h-9 font-medium"
-              title="Delete all payments for a month"
-            >
-              <CalendarX className="w-4 h-4 mr-2" />
-              Delete by Month
-            </Button>
-            <Button
-              onClick={() => setIsAddModalOpen(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 font-semibold shadow-sm"
-              title="Create payments for all active cars for the selected month"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Payments
-            </Button>
+            {canEditPayments && (
+              <Button
+                onClick={() => setIsDeleteByMonthModalOpen(true)}
+                variant="outline"
+                className="bg-card border-red-500/30 text-red-600 hover:bg-red-500/10 hover:text-red-700 hover:border-red-500/50 h-9 font-medium"
+                title="Delete all payments for a month"
+              >
+                <CalendarX className="w-4 h-4 mr-2" />
+                Delete by Month
+              </Button>
+            )}
+            {canEditPayments && (
+              <Button
+                onClick={() => setIsAddModalOpen(true)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 font-semibold shadow-sm"
+                title="Create payments for all active cars for the selected month"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Payments
+              </Button>
+            )}
           </div>
         </div>
 
@@ -982,30 +994,34 @@ export default function PaymentsMainPage() {
                           </td>
                           <td className="px-3 py-3 text-center align-middle">
                             <div className="flex items-center justify-center gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  setSelectedPayment(payment);
-                                  setIsEditModalOpen(true);
-                                }}
-                                className="text-muted-foreground hover:text-primary hover:bg-primary/10 h-7 w-7"
-                                title="Edit payment"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  setSelectedPayment(payment);
-                                  setIsDeleteSingleModalOpen(true);
-                                }}
-                                className="text-muted-foreground hover:text-red-600 hover:bg-red-500/10 h-7 w-7"
-                                title="Delete payment"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                              {canEditPayments && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    setSelectedPayment(payment);
+                                    setIsEditModalOpen(true);
+                                  }}
+                                  className="text-muted-foreground hover:text-primary hover:bg-primary/10 h-7 w-7"
+                                  title="Edit payment"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                              )}
+                              {canEditPayments && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    setSelectedPayment(payment);
+                                    setIsDeleteSingleModalOpen(true);
+                                  }}
+                                  className="text-muted-foreground hover:text-red-600 hover:bg-red-500/10 h-7 w-7"
+                                  title="Delete payment"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
                             </div>
                           </td>
                         </tr>

@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Car, Users, DollarSign, MapPin, Mail, Phone } from "lucide-react";
 import { authMeQueryFn, buildApiUrl } from "@/lib/queryClient";
+import { CarPhotoCell } from "@/components/admin/dashboard/CarPhotoCell";
 
 interface CoHostCar {
   id: number;
@@ -13,6 +14,10 @@ interface CoHostCar {
   vin: string;
   licensePlate: string;
   isActive: number;
+  /** Authoritative fleet state. `isActive` is a legacy flag that disagrees with
+   *  car_status on 217 of 336 cars, so it must not drive the badge. */
+  carStatus?: string | null;
+  carPhoto?: string | null;
   ownerFirstName?: string | null;
   ownerLastName?: string | null;
   ownerEmail?: string | null;
@@ -27,6 +32,16 @@ interface CoHostGroup {
   coHostEmail?: string | null;
   coHostPhone?: string | null;
   cars: CoHostCar[];
+}
+
+/** The Cars page derives Active/Inactive from car_status; this table used the
+ *  legacy car_is_active flag and so contradicted it (BMW X2 G113NE read
+ *  "Inactive" here while Cars showed ACTIVE). car_status wins; the flag is only
+ *  a fallback for rows that somehow have no status. */
+function isCarActive(car: CoHostCar): boolean {
+  const status = (car.carStatus ?? "").trim().toLowerCase();
+  if (status) return status === "available" || status === "in_use" || status === "pending";
+  return Boolean(car.isActive);
 }
 
 function CarTable({ cars }: { cars: CoHostCar[] }) {
@@ -51,7 +66,15 @@ function CarTable({ cars }: { cars: CoHostCar[] }) {
             <tr key={car.id} className="hover:bg-muted/50 transition-colors">
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <Car className="w-4 h-4 text-muted-foreground shrink-0" />
+                  {car.carPhoto ? (
+                    <CarPhotoCell
+                      carPhoto={car.carPhoto}
+                      carName={[car.year, car.make, car.model].filter(Boolean).join(" ")}
+                      className="h-8 w-12 shrink-0"
+                    />
+                  ) : (
+                    <Car className="w-4 h-4 text-muted-foreground shrink-0" />
+                  )}
                   <span className="text-sm font-medium text-foreground">
                     {[car.year, car.make, car.model].filter(Boolean).join(" ") || `Car #${car.id}`}
                   </span>
@@ -64,11 +87,11 @@ function CarTable({ cars }: { cars: CoHostCar[] }) {
               <td className="px-4 py-3">
                 <Badge
                   variant="outline"
-                  className={car.isActive
+                  className={isCarActive(car)
                     ? "bg-green-500/20 text-green-700 border-green-500/30 text-xs"
                     : "bg-muted text-muted-foreground border-border text-xs"}
                 >
-                  {car.isActive ? "Active" : "Inactive"}
+                  {isCarActive(car) ? "Active" : "Inactive"}
                 </Badge>
               </td>
               <td className="px-4 py-3">
