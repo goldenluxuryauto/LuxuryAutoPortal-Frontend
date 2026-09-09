@@ -159,9 +159,22 @@ export default function ModalEditManagementSplit() {
       return sum + (monthValue?.value || 0);
     }, 0);
   
-  const storedMgmtPercent = Number(getMonthValue(data.incomeExpenses, month, "carManagementSplit")) || 0;
+  // An unset percent must fall back to the car's configured default, not 0 —
+  // a month synthesized by ensureAllMonths carries no split field at all, and
+  // `|| 0` collapsed that into a real 0%, zeroing the expense share. A stored
+  // 0 is honoured.
+  const splitRow = data.incomeExpenses?.find((x: any) => x && x.month === month);
+  const rawMgmtStored = splitRow?.carManagementSplit;
+  const storedMgmtPercent =
+    rawMgmtStored != null
+      ? Number(rawMgmtStored)
+      : (data.formulaSetting?.carManagementSplitPercent ?? 50);
   const mgmtPercent = storedMgmtPercent / 100;
-  const storedOwnerPercent = Number(getMonthValue(data.incomeExpenses, month, "carOwnerSplit")) || 0;
+  const rawOwnerStored = splitRow?.carOwnerSplit;
+  const storedOwnerPercent =
+    rawOwnerStored != null
+      ? Number(rawOwnerStored)
+      : (data.formulaSetting?.carOwnerSplitPercent ?? 50);
   const ownerPercent = storedOwnerPercent / 100;
   
   const carManagementTotalExpenses = totalReimbursedBills + (totalDirectDelivery * mgmtPercent) + (totalCogs * mgmtPercent);

@@ -551,8 +551,18 @@ export default function EarningsPage() {
     const prevTotalCogs = getPrevYearTotalCogs(prevMonth);
     const prevTotalParkingFeeLabor = getPrevYearTotalParkingFeeLabor(prevMonth);
     
-    // Get car owner split percentage from previous year data
-    const prevCarOwnerSplitPercent = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevMonth, "carOwnerSplit") || 0;
+    // Get car owner split percentage from previous year data.
+    // getPrevYearValue answers 0 for "no row / no value" as well as for a
+    // real 0, so treat 0 as unset and fall back to the configured percent
+    // (50 if none) — matching the two sibling call sites below. `|| 0` here
+    // paid the owner 0% for any month whose split was never recorded.
+    const prevYearOwnerRawForCarry = getPrevYearValue(prevYearDecData.incomeExpenses || [], prevMonth, "carOwnerSplit");
+    const prevCarOwnerSplitPercent =
+      prevYearOwnerRawForCarry !== 0
+        ? prevYearOwnerRawForCarry
+        : (prevYearDecData?.formulaSetting?.carOwnerSplitPercent ??
+           incomeExpenseDataValue?.formulaSetting?.carOwnerSplitPercent ??
+           50);
     const prevCarOwnerSplitDecimal = prevCarOwnerSplitPercent / 100;
     
     let calculation: number;
@@ -1050,7 +1060,19 @@ export default function EarningsPage() {
     }
     
     // In 50:50 mode, use the full formula
-    const storedMgmtPercent = Number(getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "carManagementSplit")) || 0;
+    // Fall back to the car's formulaSetting default (NOT 0) when the percent
+    // is unset — the same rule IncomeExpenseTable's copy of this function
+    // already uses. A month synthesized by ensureAllMonths has no
+    // carManagementSplit field at all, and `|| 0` collapsed that into a real
+    // 0%, dropping the expense share entirely. A stored 0 is honoured.
+    const mgmtRow = incomeExpenseDataValue?.incomeExpenses?.find(
+      (x: any) => x && x.month === month,
+    );
+    const rawMgmtStored = mgmtRow?.carManagementSplit;
+    const storedMgmtPercent =
+      rawMgmtStored != null
+        ? Number(rawMgmtStored)
+        : (incomeExpenseDataValue?.formulaSetting?.carManagementSplitPercent ?? 50);
     const mgmtPercent = storedMgmtPercent / 100; // Convert percentage to decimal
     const totalDirectDelivery = getTotalDirectDeliveryForMonth(month);
     const totalCogs = getTotalCogsForMonth(month);
@@ -1078,7 +1100,15 @@ export default function EarningsPage() {
       return totalDirectDelivery + totalCogs + totalParkingFeeLabor;
     } else {
       // 50:50 mode: (Direct Delivery + COGS) * Car Owner Split %
-      const storedOwnerPercent = Number(getMonthValue(incomeExpenseDataValue?.incomeExpenses || [], month, "carOwnerSplit")) || 0;
+      // Unset percent falls back to the configured default, not 0.
+      const ownerRowForExp = incomeExpenseDataValue?.incomeExpenses?.find(
+        (x: any) => x && x.month === month,
+      );
+      const rawOwnerForExp = ownerRowForExp?.carOwnerSplit;
+      const storedOwnerPercent =
+        rawOwnerForExp != null
+          ? Number(rawOwnerForExp)
+          : (incomeExpenseDataValue?.formulaSetting?.carOwnerSplitPercent ?? 50);
       const ownerPercent = storedOwnerPercent / 100; // Convert percentage to decimal
       return (totalDirectDelivery + totalCogs) * ownerPercent;
     }

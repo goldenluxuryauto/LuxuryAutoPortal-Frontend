@@ -4,6 +4,26 @@ import type { IncomeExpenseData } from "../types";
 import { buildApiUrl } from "@/lib/queryClient";
 
 /**
+ * The car-management split percent for a month, with the same
+ * unset-vs-zero rule the UI uses: an absent percent falls back to the car's
+ * configured default (50 if none), while a stored 0 is honoured. A month
+ * synthesized by ensureAllMonths carries no split field at all, so `|| 0`
+ * here exported a 0% split and a 0 amount for it.
+ */
+function resolveMgmtSplitPercent(data: IncomeExpenseData, month: number): number {
+  const row = (data.incomeExpenses as any[])?.find((x: any) => x && x.month === month);
+  const raw = row?.carManagementSplit;
+  return raw != null ? Number(raw) : (data.formulaSetting?.carManagementSplitPercent ?? 50);
+}
+
+/** The car-owner split percent for a month, same unset-vs-zero rule. */
+function resolveOwnerSplitPercent(data: IncomeExpenseData, month: number): number {
+  const row = (data.incomeExpenses as any[])?.find((x: any) => x && x.month === month);
+  const raw = row?.carOwnerSplit;
+  return raw != null ? Number(raw) : (data.formulaSetting?.carOwnerSplitPercent ?? 50);
+}
+
+/**
  * Build the CSV content for the full income/expense export.
  * (Pure function — returns the string instead of triggering a download.)
  * Used both by the CSV-only download path and by the ZIP exporter that
@@ -120,7 +140,7 @@ export function buildIncomeExpenseCSV(
   
   // Calculate Car Management Split - MUST match IncomeExpenseTable.tsx logic exactly
   const calculateCarManagementSplit = (month: number): number => {
-    const storedPercent = Number(getMonthValue(data.incomeExpenses, month, "carManagementSplit")) || 0;
+    const storedPercent = resolveMgmtSplitPercent(data, month);
     const mgmtPercent = storedPercent / 100;
     
     const rentalIncome = getMonthValue(data.incomeExpenses, month, "rentalIncome");
@@ -259,7 +279,7 @@ export function buildIncomeExpenseCSV(
   
   // Calculate Car Owner Split - MUST match IncomeExpenseTable.tsx logic exactly
   const calculateCarOwnerSplit = (month: number): number => {
-    const storedPercent = Number(getMonthValue(data.incomeExpenses, month, "carOwnerSplit")) || 0;
+    const storedPercent = resolveOwnerSplitPercent(data, month);
     const ownerPercent = storedPercent / 100;
     
     const rentalIncome = getMonthValue(data.incomeExpenses, month, "rentalIncome");
@@ -521,8 +541,17 @@ export function buildIncomeExpenseCSV(
     const prevTotalCogs = getPrevYearTotalCogs(prevMonth);
     const prevTotalParkingFeeLabor = getPrevYearTotalParkingFeeLabor(prevMonth);
     
-    // Get car owner split percentage from previous year data
-    const prevCarOwnerSplitPercent = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "carOwnerSplit") || 0;
+    // Get car owner split percentage from previous year data.
+    // getPrevYearValue collapses "absent" to 0, so treat 0 as unset and fall
+    // back to the configured percent (50 if none). `|| 0` exported a 0% owner
+    // split for any month whose split was never recorded.
+    const prevYearOwnerRaw = getPrevYearValue(previousYearData.incomeExpenses || [], prevMonth, "carOwnerSplit");
+    const prevCarOwnerSplitPercent =
+      prevYearOwnerRaw !== 0
+        ? prevYearOwnerRaw
+        : (previousYearData?.formulaSetting?.carOwnerSplitPercent ??
+           data?.formulaSetting?.carOwnerSplitPercent ??
+           50);
     const prevCarOwnerSplitDecimal = prevCarOwnerSplitPercent / 100;
     
     let calculation: number;
@@ -622,7 +651,13 @@ export function buildIncomeExpenseCSV(
       prevTotalDirectDelivery = getPrevYearTotalDirectDelivery(prevDec);
       prevTotalCogs = getPrevYearTotalCogs(prevDec);
       prevTotalParkingFeeLabor = getPrevYearTotalParkingFeeLabor(prevDec);
-      prevCarOwnerSplitPercent = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "carOwnerSplit") || 0;
+      const prevDecOwnerRaw = getPrevYearValue(previousYearData?.incomeExpenses || [], prevDec, "carOwnerSplit");
+      prevCarOwnerSplitPercent =
+        prevDecOwnerRaw !== 0
+          ? prevDecOwnerRaw
+          : (previousYearData?.formulaSetting?.carOwnerSplitPercent ??
+           data?.formulaSetting?.carOwnerSplitPercent ??
+           50);
       
       // Calculate previous year December's negative balance carry over
       // The function will use December's mode internally
@@ -648,7 +683,11 @@ export function buildIncomeExpenseCSV(
       prevTotalDirectDelivery = getTotalDirectDeliveryForMonth(prevMonth);
       prevTotalCogs = getTotalCogsForMonth(prevMonth);
       prevTotalParkingFeeLabor = getTotalParkingFeeLaborForMonth(prevMonth);
-      prevCarOwnerSplitPercent = getMonthValue(data.incomeExpenses, prevMonth, "carOwnerSplit") || 0;
+      const prevMonthOwnerRaw = getMonthValue(data.incomeExpenses, prevMonth, "carOwnerSplit");
+      prevCarOwnerSplitPercent =
+        prevMonthOwnerRaw !== 0
+          ? prevMonthOwnerRaw
+          : (data?.formulaSetting?.carOwnerSplitPercent ?? 50);
     }
     
     const prevCarOwnerSplitDecimal = prevCarOwnerSplitPercent / 100;
@@ -720,7 +759,7 @@ export function buildIncomeExpenseCSV(
     }
     
     // In 50:50 mode, use the full formula
-    const storedMgmtPercent = Number(getMonthValue(data.incomeExpenses, month, "carManagementSplit")) || 0;
+    const storedMgmtPercent = resolveMgmtSplitPercent(data, month);
     const mgmtPercent = storedMgmtPercent / 100; // Convert percentage to decimal
     const totalDirectDelivery = Number(getTotalDirectDeliveryForMonth(month)) || 0;
     const totalCogs = Number(getTotalCogsForMonth(month)) || 0;
@@ -743,7 +782,7 @@ export function buildIncomeExpenseCSV(
       return Number(totalDirectDelivery) + Number(totalCogs) + totalParkingFeeLabor;
     } else {
       // 50:50 mode: (Direct Delivery + COGS) * Car Owner Split %
-      const storedOwnerPercent = Number(getMonthValue(data.incomeExpenses, month, "carOwnerSplit")) || 0;
+      const storedOwnerPercent = resolveOwnerSplitPercent(data, month);
       const ownerPercent = storedOwnerPercent / 100; // Convert percentage to decimal
       return (Number(totalDirectDelivery) + Number(totalCogs)) * ownerPercent;
     }
@@ -788,7 +827,7 @@ export function buildIncomeExpenseCSV(
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
     const calculatedAmount = Number(calculateCarManagementSplit(monthNum)) || 0;
-    const percentage = Number(getMonthValue(data.incomeExpenses, monthNum, "carManagementSplit")) || 0;
+    const percentage = resolveMgmtSplitPercent(data, monthNum);
     csvContent += `$${calculatedAmount.toFixed(2)} (${percentage.toFixed(0)}%),`;
     mgmtSplitTotal += calculatedAmount;
   });
@@ -800,7 +839,7 @@ export function buildIncomeExpenseCSV(
   MONTHS.forEach((_, idx) => {
     const monthNum = idx + 1;
     const calculatedAmount = Number(calculateCarOwnerSplit(monthNum)) || 0;
-    const percentage = Number(getMonthValue(data.incomeExpenses, monthNum, "carOwnerSplit")) || 0;
+    const percentage = resolveOwnerSplitPercent(data, monthNum);
     csvContent += `$${calculatedAmount.toFixed(2)} (${percentage.toFixed(0)}%),`;
     ownerSplitTotal += calculatedAmount;
   });
