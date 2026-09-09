@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getOnlineStatusBadge, formatLastLogin } from "@/lib/onlineStatus";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -72,6 +73,9 @@ interface CoHost {
   vehicle_registration_file_id?: string;
   notes?: string;
   created_at: string;
+  /** Joined from the `user` row matching this co-host's email. */
+  lastLoginAt?: string | null;
+  lastLogoutAt?: string | null;
   // The GLA fleet vehicles actually assigned to this co-host (co_host_vehicles).
   // This is the real co-hosted car — distinct from the self-reported
   // vehicle_make/model captured on the onboarding application.
@@ -295,6 +299,8 @@ export default function CoHostsPage() {
                     <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 hidden md:table-cell">Email</th>
                     <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 hidden lg:table-cell">Vehicle</th>
                     <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Status</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Online</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 hidden lg:table-cell">Last Login</th>
                     <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3 hidden lg:table-cell">Submitted</th>
                     <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Actions</th>
                   </tr>
@@ -302,13 +308,13 @@ export default function CoHostsPage() {
                 <tbody className="divide-y divide-border">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                      <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">
                         <Loader2 className="w-5 h-5 animate-spin mx-auto" />
                       </td>
                     </tr>
                   ) : coHosts.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">No co-host applications found.</td>
+                      <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">No co-host applications found.</td>
                     </tr>
                   ) : (
                     coHosts.map((ch) => (
@@ -357,6 +363,19 @@ export default function CoHostsPage() {
                           <Badge variant="outline" className={cn(statusBadge(ch.status), "text-xs capitalize")}>
                             {ch.status}
                           </Badge>
+                        </td>
+                        <td className="px-4 py-3">
+                          {(() => {
+                            const online = getOnlineStatusBadge(ch.lastLoginAt, ch.lastLogoutAt);
+                            return (
+                              <Badge variant="outline" className={cn(online.className, "text-xs")}>
+                                {online.text}
+                              </Badge>
+                            );
+                          })()}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground hidden lg:table-cell">
+                          {formatLastLogin(ch.lastLoginAt)}
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground hidden lg:table-cell">
                           {format(new Date(ch.created_at), "MM/dd/yyyy")}
