@@ -1040,13 +1040,23 @@ lastSavedNote.current = coHostNote;
     const prevTotalCogs = getPrevYearTotalCogs(prevMonth);
     const prevTotalParkingFeeLabor = getPrevYearTotalParkingFeeLabor(prevMonth);
 
-    // Get car owner split percentage from previous year data
+    // Get car owner split percentage from previous year data.
+    // getPrevYearValue answers 0 both for "no row / no value" and for a real
+    // 0, so treat 0 as unset and fall back to the configured percent (50 if
+    // none). `|| 0` here silently paid the owner 0% on any month whose split
+    // was never recorded — the same bug already fixed in the two sibling
+    // call sites below and in earnings.tsx.
+    const prevYearOwnerRaw = getPrevYearValue(
+      prevYearDecData.incomeExpenses || [],
+      prevMonth,
+      "carOwnerSplit",
+    );
     const prevCarOwnerSplitPercent =
-      getPrevYearValue(
-        prevYearDecData.incomeExpenses || [],
-        prevMonth,
-        "carOwnerSplit",
-      ) || 0;
+      prevYearOwnerRaw !== 0
+        ? prevYearOwnerRaw
+        : (prevYearDecData?.formulaSetting?.carOwnerSplitPercent ??
+           data.formulaSetting?.carOwnerSplitPercent ??
+           50);
     const prevCarOwnerSplitDecimal = prevCarOwnerSplitPercent / 100;
 
     let calculation: number;
