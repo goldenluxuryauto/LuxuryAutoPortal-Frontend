@@ -578,6 +578,10 @@ export default function PaymentsMainPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            {/* Auto-Generate and Import mutate payments fleet-wide, so they stay
+                admin-only — a co-host must not regenerate other owners' rows. */}
+            {canEditPayments && (
+            <>
             <Button
               onClick={() => autoGenerateMutation.mutate(false)}
               disabled={autoGenerateMutation.isPending}
@@ -603,6 +607,8 @@ export default function PaymentsMainPage() {
               <Upload className="w-4 h-4 mr-2 text-primary" />
               Import
             </Button>
+            </>
+            )}
             {devMode && (
               <Button
                 onClick={openCleanupDialog}
