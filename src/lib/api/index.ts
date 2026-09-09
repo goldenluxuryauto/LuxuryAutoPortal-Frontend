@@ -1,6 +1,7 @@
 import type { z } from "zod";
 import { buildApiUrl, buildUploadApiUrl } from "../queryClient";
 import { ApiError, apiErrorFromResponse } from "../errors";
+import { validate, validateStrict } from "../validation";
 
 /**
  * Typed HTTP client for the backend.
@@ -180,11 +181,16 @@ function isStatusOnlyMessage(err: ApiError, res: Response): boolean {
 export interface JsonOptions<S extends z.ZodTypeAny = z.ZodTypeAny> extends RequestOptions {
   /**
    * Validate the parsed body against a schema and return the inferred type.
-   * Opt-in; a failed parse throws a ZodError. Boundary validation policy
-   * (strict vs. warn) is a Phase 3 decision, so nothing is validated unless
-   * a schema is passed.
+   * Opt-in: nothing is validated unless a schema is passed.
+   *
+   * Routed through `lib/validation`, so the default policy applies — a
+   * mismatch WARNS and returns the body unchanged in the browser, and
+   * THROWS under test so drift fails CI. Pass `strict: true` where acting on
+   * a wrong shape is worse than failing.
    */
   schema?: S;
+  /** Reject a schema mismatch instead of warning. */
+  strict?: boolean;
 }
 
 /**
@@ -200,13 +206,16 @@ export async function apiJson<S extends z.ZodTypeAny>(
   options: JsonOptions<S> & { schema: S },
 ): Promise<z.infer<S>>;
 export async function apiJson(path: string, options: JsonOptions = {}): Promise<unknown> {
-  const { schema, ...rest } = options;
+  const { schema, strict, ...rest } = options;
   const res = await apiFetch(path, rest);
   if (res.status === 204) return undefined;
   const text = await res.text();
   if (text === "") return undefined;
   const parsed: unknown = JSON.parse(text);
-  return schema ? schema.parse(parsed) : parsed;
+  if (!schema) return parsed;
+  return strict
+    ? validateStrict(schema, parsed, path)
+    : validate(schema, parsed, path);
 }
 
 /** Request a binary payload (PDF exports, proxied images, CSV downloads). */
