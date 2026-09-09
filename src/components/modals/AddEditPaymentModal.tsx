@@ -449,7 +449,7 @@ export function AddEditPaymentModal({
                 <Label htmlFor="status" className="text-muted-foreground text-xs">
                   Payment Status <span className="text-red-700">*</span>
                 </Label>
-                <Select value={statusId} onValueChange={setStatusId} disabled={isPending} modal={false}>
+                <Select value={statusId} onValueChange={setStatusId} disabled={isPending}>
                   <SelectTrigger className="bg-card border-border text-foreground mt-1 h-10">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>

@@ -176,7 +176,9 @@ function Router() {
       <Route path="/">
         <Redirect to="/salt-lake-city" />
       </Route>
-      <Route path="/choose-location" component={Home} />
+      <Route path="/choose-location">
+        <Home />
+      </Route>
       <Route path="/salt-lake-city">
         <Home location={PUBLIC_LOCATIONS.slc} />
       </Route>

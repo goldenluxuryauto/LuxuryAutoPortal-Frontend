@@ -29,8 +29,8 @@ function ServiceSplitSection({ location }: { location: PublicLocation }) {
     target: sectionRef,
     offset: ["start start", "end end"],
   });
-  const splitY = useTransform(scrollYProgress, [0, 0.58, 0.76], shouldReduceMotion ? [0, 0, 0] : ["16vh", "-8vh", "-38vh"]);
-  const reviewY = useTransform(scrollYProgress, [0.44, 0.64, 0.9], shouldReduceMotion ? [0, 0, 0] : ["28vh", "0vh", "-16vh"]);
+  const splitY = useTransform(scrollYProgress, [0, 0.58, 0.76], shouldReduceMotion ? ["0vh", "0vh", "0vh"] : ["16vh", "-8vh", "-38vh"]);
+  const reviewY = useTransform(scrollYProgress, [0.44, 0.64, 0.9], shouldReduceMotion ? ["0vh", "0vh", "0vh"] : ["28vh", "0vh", "-16vh"]);
   const splitOpacity = useTransform(scrollYProgress, [0, 0.5, 0.64], [1, 1, 0]);
   const reviewOpacity = useTransform(scrollYProgress, [0.56, 0.68, 0.88, 0.97], [0, 1, 1, 0]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.08, 0.86, 1], [0.96, 1, 1, 0.96]);

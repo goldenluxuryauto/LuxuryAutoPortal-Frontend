@@ -12,7 +12,7 @@ type ScrollRevealProps = HTMLMotionProps<"div"> & {
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-const presets: Record<RevealPreset, { hidden: HTMLMotionProps<"div">["initial"]; show: HTMLMotionProps<"div">["animate"]; duration: number }> = {
+const presets: Record<RevealPreset, { hidden: HTMLMotionProps<"div">["initial"]; show: HTMLMotionProps<"div">["whileInView"]; duration: number }> = {
   lift: {
     hidden: { opacity: 0, y: 42, filter: "blur(10px)" },
     show: { opacity: 1, y: 0, filter: "blur(0px)" },
