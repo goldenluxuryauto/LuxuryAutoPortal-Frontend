@@ -4,6 +4,39 @@
   "framework": "vite",
   "redirects": [
     {
+      "source": "/sign-contract/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "https://goldenluxuryauto.com/sign-contract/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/maintenance-approval/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "https://goldenluxuryauto.com/maintenance-approval/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/reset-password",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.goldenluxuryauto.com"
+        }
+      ],
+      "destination": "https://goldenluxuryauto.com/reset-password",
+      "permanent": true
+    },
+    {
       "source": "/",
       "has": [
         {
