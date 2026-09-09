@@ -279,7 +279,6 @@ export function CarBlockOffContent({ includePageLinks = false }: { includePageLi
   const [editPickupDate, setEditPickupDate] = useState("");
   const [editBlockOffEnd, setEditBlockOffEnd] = useState("");
   const [editPickupLocation, setEditPickupLocation] = useState("");
-  const [editDropoffDate, setEditDropoffDate] = useState("");
   const [editDropoffLocation, setEditDropoffLocation] = useState("");
 
   const openEdit = (s: CarBlockOff) => {
@@ -287,7 +286,6 @@ export function CarBlockOffContent({ includePageLinks = false }: { includePageLi
     setEditPickupDate(toInputValue(s.pickup_date));
     setEditBlockOffEnd(toInputValue(s.block_off_end_date));
     setEditPickupLocation(s.pickup_location ?? "");
-    setEditDropoffDate(toInputValue(s.dropoff_date));
     setEditDropoffLocation(s.dropoff_location ?? "");
   };
 
@@ -418,7 +416,6 @@ export function CarBlockOffContent({ includePageLinks = false }: { includePageLi
           pickupDate: editPickupDate,
           blockOffEndDate: editBlockOffEnd || null,
           pickupLocation: editPickupLocation,
-          dropoffDate: editDropoffDate || null,
           dropoffLocation: editDropoffLocation || null,
         }),
       });
@@ -888,19 +885,14 @@ export function CarBlockOffContent({ includePageLinks = false }: { includePageLi
                 onChange={(e) => setEditPickupLocation(e.target.value)}
                 className="bg-card border-border text-foreground" placeholder="Address or description" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-muted-foreground text-sm">Drop Off Date & Time</Label>
-                <Input type="datetime-local" value={editDropoffDate}
-                  onChange={(e) => setEditDropoffDate(e.target.value)}
-                  className="bg-card border-border text-foreground" />
-              </div>
-              <div>
-                <Label className="text-muted-foreground text-sm">Drop Off Location</Label>
-                <Input value={editDropoffLocation}
-                  onChange={(e) => setEditDropoffLocation(e.target.value)}
-                  className="bg-card border-border text-foreground" placeholder="Address or description" />
-              </div>
+            {/* Block Off End date/time above IS the drop-off time — a separate
+                "Drop Off Date & Time" field here was a duplicate of it. Only the
+                drop-off LOCATION is distinct, so that is all we ask for. */}
+            <div>
+              <Label className="text-muted-foreground text-sm">Block Off End (Drop Off) Location</Label>
+              <Input value={editDropoffLocation}
+                onChange={(e) => setEditDropoffLocation(e.target.value)}
+                className="bg-card border-border text-foreground" placeholder="Address or description" />
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setEditRecord(null)}>

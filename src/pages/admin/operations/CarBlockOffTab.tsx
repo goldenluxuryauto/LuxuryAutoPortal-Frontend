@@ -103,6 +103,24 @@ function fmtDateTime(v: string | null | undefined) {
   }
 }
 
+/** "YYYY-MM-DD" day key of a stored datetime, without UTC conversion (values
+ *  are already Mountain time — see fmtDateTime). */
+function dayKey(v: string | null | undefined): string {
+  if (!v) return "";
+  return String(v).replace(" ", "T").slice(0, 10);
+}
+
+/** Inclusive date-range test. A blank bound means "unbounded on that side";
+ *  a row with no date is only excluded once a bound is actually set. */
+function inDateRange(value: string | null | undefined, from: string, to: string): boolean {
+  if (!from && !to) return true;
+  const day = dayKey(value);
+  if (!day) return false;
+  if (from && day < from) return false;
+  if (to && day > to) return false;
+  return true;
+}
+
 const PAGE_SIZE_KEY = "operations.carBlockOff.pageSize";
 
 // ── Tab component ─────────────────────────────────────────────────────────────
@@ -114,6 +132,10 @@ export function CarBlockOffTab() {
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [pickupFrom, setPickupFrom] = useState("");
+  const [pickupTo, setPickupTo] = useState("");
+  const [endFrom, setEndFrom] = useState("");
+  const [endTo, setEndTo] = useState("");
   const [page, setPage] = useState(1);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
@@ -137,15 +159,18 @@ export function CarBlockOffTab() {
     staleTime: 30_000,
   });
 
-  const records = (data?.data ?? []).filter((record) =>
-    operationLocationMatches(locationFilter, [
-      record.location_tag,
-      record.pickup_location,
-      record.dropoff_location,
-      record.car_name,
-      record.plate_number,
-    ]),
-  );
+  const records = (data?.data ?? [])
+    .filter((record) =>
+      operationLocationMatches(locationFilter, [
+        record.location_tag,
+        record.pickup_location,
+        record.dropoff_location,
+        record.car_name,
+        record.plate_number,
+      ]),
+    )
+    .filter((record) => inDateRange(record.pickup_date, pickupFrom, pickupTo))
+    .filter((record) => inDateRange(record.block_off_end_date, endFrom, endTo));
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
@@ -230,8 +255,34 @@ export function CarBlockOffTab() {
             ))}
           </SelectContent>
         </Select>
+        {/* Date ranges are applied to the loaded page client-side, matching how
+            the location filter already narrows these rows. */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground whitespace-nowrap">Pick Up</span>
+          <Input type="date" value={pickupFrom} onChange={(e) => setPickupFrom(e.target.value)}
+            className="bg-card border-border text-foreground h-9 w-[9.5rem]" aria-label="Pick Up date from" />
+          <span className="text-xs text-muted-foreground">to</span>
+          <Input type="date" value={pickupTo} min={pickupFrom || undefined} onChange={(e) => setPickupTo(e.target.value)}
+            className="bg-card border-border text-foreground h-9 w-[9.5rem]" aria-label="Pick Up date to" />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground whitespace-nowrap">Block Off End</span>
+          <Input type="date" value={endFrom} onChange={(e) => setEndFrom(e.target.value)}
+            className="bg-card border-border text-foreground h-9 w-[9.5rem]" aria-label="Block Off End date from" />
+          <span className="text-xs text-muted-foreground">to</span>
+          <Input type="date" value={endTo} min={endFrom || undefined} onChange={(e) => setEndTo(e.target.value)}
+            className="bg-card border-border text-foreground h-9 w-[9.5rem]" aria-label="Block Off End date to" />
+        </div>
+        {(pickupFrom || pickupTo || endFrom || endTo) && (
+          <Button variant="ghost" size="sm" className="h-9 text-muted-foreground"
+            onClick={() => { setPickupFrom(""); setPickupTo(""); setEndFrom(""); setEndTo(""); }}>
+            Clear dates
+          </Button>
+        )}
         {total > 0 && (
-          <span className="text-sm text-muted-foreground">{total} record{total !== 1 ? "s" : ""}</span>
+          <span className="text-sm text-muted-foreground">
+            {records.length === total ? `${total} record${total !== 1 ? "s" : ""}` : `${records.length} of ${total} records`}
+          </span>
         )}
       </div>
 
@@ -243,7 +294,7 @@ export function CarBlockOffTab() {
               {[
                 "Photo", "Car Name", "Plate #", "Owner", "Reason",
                 "Pick Up Date", "Block Off End", "Pick Up Location",
-                "Drop Off Date", "Drop Off Location",
+                "Drop Off Location",
                 "Assigned To", "Pick Up Assigned To", "Drop Off Assigned To",
                 "Status", "Actions"
               ].map((h) => (
@@ -253,9 +304,9 @@ export function CarBlockOffTab() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={15} className="px-3 py-8 text-center text-muted-foreground">Loading...</td></tr>
+              <tr><td colSpan={14} className="px-3 py-8 text-center text-muted-foreground">Loading...</td></tr>
             ) : records.length === 0 ? (
-              <tr><td colSpan={15} className="px-3 py-8 text-center text-muted-foreground">No records found.</td></tr>
+              <tr><td colSpan={14} className="px-3 py-8 text-center text-muted-foreground">No records found.</td></tr>
             ) : records.map((r) => {
               const sm = statusMeta(r.status);
               return (
@@ -283,8 +334,6 @@ export function CarBlockOffTab() {
                   <td className="px-3 py-2 whitespace-nowrap text-foreground text-xs">{r.block_off_end_date ? fmtDateTime(r.block_off_end_date) : "—"}</td>
                   {/* Pick Up Location */}
                   <td className="px-3 py-2 text-foreground max-w-[160px] truncate">{r.pickup_location}</td>
-                  {/* Drop Off Date */}
-                  <td className="px-3 py-2 whitespace-nowrap text-foreground text-xs">{fmtDateTime(r.dropoff_date)}</td>
                   {/* Drop Off Location */}
                   <td className="px-3 py-2 text-foreground max-w-[160px] truncate">{r.dropoff_location ?? "—"}</td>
 
