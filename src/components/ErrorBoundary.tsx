@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { AlertCircle, RefreshCw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { recoverFromStaleChunk } from "@/lib/chunkRecovery";
 
 interface Props {
   children: ReactNode;
@@ -58,6 +59,10 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("❌ [ERROR BOUNDARY] Caught error:", error);
     console.error("❌ [ERROR BOUNDARY] Error info:", errorInfo);
+
+    if (recoverFromStaleChunk(error)) {
+      return;
+    }
     
     // Log to console for debugging
     if (typeof window !== 'undefined') {
@@ -160,4 +165,3 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
-
