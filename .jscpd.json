@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kucherenko/jscpd/master/packages/jscpd/schema.json",
+  "path": [
+    "src"
+  ],
+  "reporters": [
+    "console",
+    "json"
+  ],
+  "output": "reports/jscpd",
+  "gitignore": true,
+  "absolute": false,
+  "threshold": 14.0,
+  "ignore": [
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/components/ui/**"
+  ]
+}
