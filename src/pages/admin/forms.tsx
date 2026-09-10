@@ -86,7 +86,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import CopyTabLinkButton from "@/components/common/CopyTabLinkButton";
 import { buildApiUrl, getProxiedImageUrl } from "@/lib/queryClient";
 import { api } from "@/lib/api";
 import {
@@ -1451,20 +1450,8 @@ export default function FormsPage() {
         {/* No section tab strip: every section the current role can see is
             already a sidebar item under Forms (the sidebar carries a separate
             list per role), so the horizontal row duplicated those controls.
-            ?section= still selects the panel — handleSectionChange stays the
-            writer for the copy-link button and deep links. */}
-
-        {/* Link to exactly the tab being viewed, so it can be sent to a client
-            rather than "open Forms, then click across to X". Sits outside the
-            TabsList because that list scrolls horizontally on narrow screens. */}
-        {selectedSection && (
-          <div className="-mt-2 mb-4">
-            <CopyTabLinkButton
-              search={`?section=${selectedSection.id}`}
-              label={selectedSection.title}
-            />
-          </div>
-        )}
+            ?section= still selects the panel: sidebar clicks land through the
+            useSearch watcher below, back/forward through popstate. */}
 
         <Card className="bg-card border-primary/20 max-w-full overflow-hidden">
           <CardContent className="p-0 max-w-full overflow-hidden">
