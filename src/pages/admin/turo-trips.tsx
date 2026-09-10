@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -60,6 +61,7 @@ import {
   XCircle,
   Loader2,
   Download,
+  Upload,
   ChevronDown,
   Gauge,
   Repeat,
@@ -224,6 +226,9 @@ export default function TuroTripsPage() {
     return params;
   };
 
+  const [importOpen, setImportOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importing, setImporting] = useState(false);
   const [exporting, setExporting] = useState(false);
 
   /**
@@ -234,6 +239,79 @@ export default function TuroTripsPage() {
    * included alongside the identifying ones. Pulled in pages of 1000 because
    * the table endpoint is paginated and the full set is ~14.5k rows.
    */
+  // Parse the user's paste (tab or multi-space separated rows from Excel) and
+  // POST it to the bulk-import endpoint. We accept either a header row or none
+  // — column order is fixed: Reservation ID, Plate#, VIN#, Trip Start Odometer,
+  // Trip Ends Odometer.
+  const runImport = async () => {
+    const raw = importText.trim();
+    if (!raw) {
+      toast({
+        title: "Nothing to import",
+        description: "Paste rows from your Turo export first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const rows: any[] = [];
+    for (const line of raw.split(/\r?\n/)) {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue;
+      // Split on tabs first (Excel paste); fall back to runs of 2+ spaces.
+      const cols = trimmedLine.includes("\t")
+        ? trimmedLine.split("\t")
+        : trimmedLine.split(/ {2,}/);
+      const reservationId = (cols[0] ?? "").trim();
+      if (!reservationId) continue;
+      // Skip header row.
+      if (/reservation/i.test(reservationId)) continue;
+      // Plate may carry a leading '#' from the export — strip it.
+      const plateRaw = (cols[1] ?? "").trim();
+      const plateNumber = plateRaw === "" ? null : plateRaw.replace(/^#/, "");
+      const vinRaw = (cols[2] ?? "").trim();
+      const startRaw = (cols[3] ?? "").trim();
+      const endRaw = (cols[4] ?? "").trim();
+      const row: any = { reservationId };
+      // Only include fields the user actually filled in so we don't clobber
+      // existing values with blanks.
+      if (plateRaw !== "" && plateNumber !== null) row.plateNumber = plateNumber;
+      if (vinRaw !== "") row.vinNumber = vinRaw;
+      if (startRaw !== "") row.tripStartOdometer = startRaw;
+      if (endRaw !== "") row.tripEndOdometer = endRaw;
+      rows.push(row);
+    }
+
+    if (rows.length === 0) {
+      toast({ title: "No valid rows found", variant: "destructive" });
+      return;
+    }
+
+    setImporting(true);
+    try {
+      const data = await api.post<{ updated?: number; skipped?: unknown[] }>("/api/turo-trips/import", { rows }, {
+        fallbackMessage: "Import failed",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/turo-trips"] });
+      toast({
+        title: "Import complete",
+        description: data.skipped?.length
+          ? `Updated ${data.updated}. Skipped ${data.skipped.length} unknown reservation ID(s).`
+          : `Updated ${data.updated} trip(s).`,
+      });
+      setImportOpen(false);
+      setImportText("");
+    } catch (e: any) {
+      toast({
+        title: "Import failed",
+        description: e.message,
+        variant: "destructive",
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const handleExportCsv = async () => {
     setExporting(true);
     try {
@@ -1037,6 +1115,10 @@ export default function TuroTripsPage() {
                 <Download className="w-4 h-4 mr-2" />
               )}
               {exporting ? "Exporting…" : "Export CSV"}
+            </Button>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setImportOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Import from Turo
             </Button>
             <Button
               className="w-full sm:w-auto"
@@ -2641,6 +2723,62 @@ export default function TuroTripsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Bulk import from Turo export. The user pastes rows straight from
+          their Excel export (tab-separated). We update plate # and odometers
+          by reservation_id; unknown reservation IDs are reported back. */}
+      <Dialog
+        open={importOpen}
+        onOpenChange={(open) => {
+          if (!importing) setImportOpen(open);
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Import from Turo Export</DialogTitle>
+            <DialogDescription>
+              Paste rows directly from your Turo Excel export. Column order:
+              <span className="font-mono">
+                {" "}
+                Reservation ID, Plate#, VIN#, Trip Start Odometer, Trip Ends Odometer
+              </span>
+              . Plate # is required to fill the column; VIN# and odometer values are
+              optional and can be left blank. Unknown reservation IDs are
+              reported, not created.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={importText}
+            onChange={(e) => setImportText(e.target.value)}
+            placeholder={
+              "41899967\t#G022VR\t1HGCM82633A004352\t\t\n43472991\t#H868CW\t\t\t\n49053682\t#H516HL\t\t23044\t23144"
+            }
+            className="font-mono text-xs h-64"
+            disabled={importing}
+          />
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setImportOpen(false)}
+              disabled={importing}
+            >
+              Cancel
+            </Button>
+            <Button onClick={runImport} disabled={importing}>
+              {importing ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Importing...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <AdminPageLinks />
     </AdminLayout>
   );
