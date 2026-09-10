@@ -10,7 +10,6 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { AdminPageLinks } from "@/components/admin/AdminPageLinks";
 import { ClientPageLinks } from "@/components/client/ClientPageLinks";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ContractManagement from "./ContractManagement";
@@ -1419,25 +1418,6 @@ export default function FormsPage() {
   const selectedSection =
     formSections.find((s) => s.id === activeSection) ?? formSections[0];
 
-  // Give every tab its own shareable URL (?section=<id>). The page already
-  // READ this param on load for subcategory form links, but never wrote it —
-  // so a client who clicked through to a tab had no link to copy or bookmark,
-  // and browser back/forward skipped straight off the page. pushState (not
-  // replaceState) so Back returns to the previously viewed tab.
-  const handleSectionChange = (next: string) => {
-    setActiveSection(next);
-    const params = new URLSearchParams(window.location.search);
-    params.set("section", next);
-    // A subcategory deep link (?category=&field=) targets one specific tab;
-    // carrying those params onto a different tab would re-open the expense
-    // form against a sub-category the new tab doesn't show.
-    if (next !== deepLinkRef.current.section) {
-      params.delete("category");
-      params.delete("field");
-    }
-    window.history.pushState({}, "", `${window.location.pathname}?${params}`);
-  };
-
   // Keep the tab in sync when the user navigates with the browser's back /
   // forward buttons, which change the URL without re-mounting this page.
   useEffect(() => {
@@ -1468,31 +1448,11 @@ export default function FormsPage() {
             Access and submit important forms for client onboarding, referrals, and document updates. This section allows you to add new vehicle, request vehicle block-offs, submit referrals, upload updated licenses, registrations, or insurance documents, and track the status of your submissions.
           </p>
         </div>
-        {/* Keep section tabs visible on the page for every role. The sidebar
-            links are helpful, but admins need the full form list visible here
-            too when they land directly on Forms. */}
-        {formSections.length > 1 && (
-          <Tabs value={activeSection} onValueChange={handleSectionChange}>
-            <div className="-mx-2 sm:mx-0 mb-4 overflow-x-auto">
-              <TabsList className="bg-muted border border-border h-auto gap-1 p-1 inline-flex w-max min-w-full sm:w-auto sm:min-w-0 sm:flex-wrap">
-                {formSections.map((section) => {
-                  const SectionIcon = section.icon;
-                  return (
-                    <TabsTrigger
-                      key={section.id}
-                      value={section.id}
-                      className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm whitespace-nowrap gap-2"
-                      data-testid={`button-section-${section.id}`}
-                    >
-                      <SectionIcon className="w-4 h-4" />
-                      {section.title}
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-            </div>
-          </Tabs>
-        )}
+        {/* No section tab strip: every section the current role can see is
+            already a sidebar item under Forms (the sidebar carries a separate
+            list per role), so the horizontal row duplicated those controls.
+            ?section= still selects the panel — handleSectionChange stays the
+            writer for the copy-link button and deep links. */}
 
         {/* Link to exactly the tab being viewed, so it can be sent to a client
             rather than "open Forms, then click across to X". Sits outside the
