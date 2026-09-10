@@ -3,7 +3,7 @@ import { useLocation, useSearch } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { AdminPageLinks } from "@/components/admin/AdminPageLinks";
 import { ClientPageLinks } from "@/components/client/ClientPageLinks";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TripsOverviewTab } from "./operations/TripsOverviewTab";
 import { TuroInspectionTab } from "./operations/TuroInspectionTab";
@@ -25,21 +25,6 @@ import {
 
 const TAB_IDS = ["trips", "turo-inspection", "inspections", "claims", "ticket-violation", "maintenance", "service-due", "completed", "car-repaired", "car-block-off", "day-schedule", "tv-timeline"] as const;
 type TabId = typeof TAB_IDS[number];
-
-const TAB_LABELS: Record<TabId, string> = {
-  trips: "Trips Overview",
-  "turo-inspection": "Turo Messages",
-  inspections: "Car Issues",
-  claims: "Claims",
-  "ticket-violation": "Ticket Violation",
-  maintenance: "Maintenance",
-  "service-due": "Service Due",
-  completed: "No Car Issues",
-  "car-repaired": "Car Repaired",
-  "car-block-off": "Car Block Off",
-  "day-schedule": "Day Schedule",
-  "tv-timeline": "TV Timeline",
-};
 
 // Renders a tab's content only after it has been activated for the first time,
 // then keeps it mounted (hidden) so state and cache are preserved on re-visit.
@@ -121,19 +106,10 @@ export default function OperationsPage() {
             </Select>
           </div>
 
-          <div className="-mx-2 mb-6 overflow-x-auto sm:mx-0">
-            <TabsList className="inline-flex h-auto w-max min-w-full gap-1 border border-border bg-muted p-1 sm:min-w-0 sm:flex-wrap">
-              {TAB_IDS.map((tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className="whitespace-nowrap text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  {TAB_LABELS[tab]}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
+          {/* No tab strip: every tab is already a sidebar item under
+              Operations, so the horizontal row was a duplicate set of controls.
+              <Tabs> stays as the state container — ?tab= still selects the
+              panel, and the sidebar links are what switch it. */}
 
           <LazyTab value="trips" activeTab={activeTab} mountedTabs={mountedTabs}>
             <TripsOverviewTab />
