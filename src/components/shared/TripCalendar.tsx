@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight, AlertTriangle, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { packLanes, laneCountOf } from "@/lib/lanePack";
 import {
   addUtcDays,
   dayKeyToUtcDate,
@@ -63,7 +64,14 @@ interface CalendarResponse {
 
 const DAY_MS = 86_400_000;
 const MIN_COL_W = 44; // px per day column before it is allowed to stretch
-const ROW_H = 46;   // px per vehicle row
+const ROW_H = 46;   // px per vehicle row (one lane)
+// A car can legitimately hold two overlapping bars — a trip that runs past
+// midnight into the next booking, or a block-off spanning a reservation. With
+// every bar pinned to the same `top` the later one painted straight over the
+// earlier one, hiding it completely. Bars are packed into lanes instead (the
+// classic interval-partitioning greedy), and the row grows to fit.
+const LANE_H = 34;  // px per stacked bar inside a row
+const LANE_GAP = 4;
 const LABEL_W = 190;
 const STEP_DAYS = 7; // arrows advance a week, like Turo's calendar
 /**
@@ -689,15 +697,29 @@ export function TripCalendar({ title }: { title?: string }) {
             {cars.map((car) => {
               const trips = tripsByCar.get(Number(car.carId)) ?? [];
               const blocks = blocksByCar.get(Number(car.carId)) ?? [];
+              // Block-offs and trips share one lane pool so a block never hides
+              // behind a booking either. Blocks are laid out first, keeping
+              // them on the upper lanes as context for the bookings below.
+              const laidBlocks = packLanes(blocks, (b) => barFor(b.start, b.end));
+              const blockLanes = laneCountOf(laidBlocks);
+              const laidTrips = packLanes(trips, (t) => barFor(t.tripStart, t.tripEnd));
+              const tripLanes = laneCountOf(laidTrips);
+              const laneCount = Math.max(1, blockLanes + tripLanes);
+              const rowH = Math.max(ROW_H, laneCount * LANE_H + LANE_GAP * 2);
+              // Vertical offset of a lane inside the row.
+              const laneTop = (lane: number) => LANE_GAP + lane * LANE_H;
               return (
                 <div
                   key={car.carId}
                   className="flex border-b border-border last:border-b-0"
-                  style={{ height: ROW_H }}
+                  style={{ height: rowH }}
                 >
                   <div
-                    className="z-10 flex flex-shrink-0 flex-col justify-center overflow-hidden border-r border-border bg-card px-3 md:sticky md:left-0"
-                    style={{ width: LABEL_W }}
+                    // Top-aligned, not centred: a row with several stacked
+                    // bookings is tall, and a vertically centred label drifts
+                    // away from the first bar it names.
+                    className="z-10 flex flex-shrink-0 flex-col justify-start overflow-hidden border-r border-border bg-card px-3 md:sticky md:left-0"
+                    style={{ width: LABEL_W, paddingTop: LANE_GAP + 6 }}
                   >
                     <div className="truncate text-xs font-medium text-foreground">
                       {car.carName || `Car #${car.carId}`}
@@ -733,16 +755,14 @@ export function TripCalendar({ title }: { title?: string }) {
 
                     {/* Owner block-offs sit under trips: a block is context for
                         why a car is unavailable, a booking is the actual event. */}
-                    {blocks.map((b) => {
-                      const pos = barFor(b.start, b.end);
-                      if (!pos) return null;
+                    {laidBlocks.map(({ item: b, pos, lane }) => {
                       return (
                         <div
                           key={`b-${b.id}`}
                           title={`${REASON_LABEL[b.reason] ?? b.reason} — ${b.ownerName}\n${fmtDateTime(b.start)} → ${b.end ? fmtDateTime(b.end) : "ongoing"}`}
                           onClick={() => setSelected({ kind: "block", block: b, car })}
                           className="absolute flex cursor-pointer items-center overflow-hidden rounded border border-amber-400/70 bg-amber-100/80 px-2 hover:brightness-95"
-                          style={{ left: pos.left + 3, width: pos.width, top: 6, height: ROW_H - 12 }}
+                          style={{ left: pos.left + 3, width: pos.width, top: laneTop(lane) + 2, height: LANE_H - 6 }}
                         >
                           <span className="truncate text-[10px] font-medium text-amber-900">
                             {REASON_LABEL[b.reason] ?? "Blocked off"}
@@ -751,9 +771,7 @@ export function TripCalendar({ title }: { title?: string }) {
                       );
                     })}
 
-                    {trips.map((t) => {
-                      const pos = barFor(t.tripStart, t.tripEnd);
-                      if (!pos) return null;
+                    {laidTrips.map(({ item: t, pos, lane }) => {
                       return (
                         <div
                           key={`t-${t.id}`}
@@ -767,7 +785,7 @@ export function TripCalendar({ title }: { title?: string }) {
                             pos.clippedLeft && "rounded-l-none",
                             pos.clippedRight && "rounded-r-none",
                           )}
-                          style={{ left: pos.left + 3, width: pos.width, top: 8, height: ROW_H - 16 }}
+                          style={{ left: pos.left + 3, width: pos.width, top: laneTop(blockLanes + lane) + 2, height: LANE_H - 6 }}
                         >
                           <span className="truncate text-[10px] font-medium">
                             {t.guestName ?? "Booked"}
