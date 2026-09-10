@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -60,7 +59,6 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
-  Upload,
   Download,
   ChevronDown,
   Gauge,
@@ -154,6 +152,26 @@ function calculateDaysRented(
   }
 }
 
+/**
+ * The host-feed sync surfaces raw transport failures (a 300-char slice of
+ * whatever Turo returned). Turo fronts the feed with Cloudflare, so an expired
+ * session comes back as a WAF block page rather than a clean 401 — dumping that
+ * HTML at an admin tells them nothing actionable. Map the known shapes to the
+ * action that actually fixes them; show anything unrecognised verbatim.
+ */
+function describeTuroSyncError(raw: string): string {
+  if (/waf-block|Just a moment|cf-browser-verification/i.test(raw)) {
+    return "Turo session expired — the sync was blocked by Turo's bot protection. Paste a fresh Turo cookie to reconnect.";
+  }
+  if (/status=(401|403)/.test(raw)) {
+    return "Turo session expired — paste a fresh Turo cookie to reconnect.";
+  }
+  if (/cookie jar not configured/i.test(raw)) {
+    return "Turo is not connected — paste a Turo cookie to enable host sync.";
+  }
+  return raw;
+}
+
 export default function TuroTripsPage() {
   const [selectedTrip, setSelectedTrip] = useState<TuroTrip | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -208,11 +226,6 @@ export default function TuroTripsPage() {
   >({});
   const [savingDates, setSavingDates] = useState<number | null>(null);
   // Bulk paste-import modal state
-  const [importOpen, setImportOpen] = useState(false);
-  const [importText, setImportText] = useState("");
-  const [importing, setImporting] = useState(false);
-  const [turoCookieOpen, setTuroCookieOpen] = useState(false);
-  const [turoCookieInput, setTuroCookieInput] = useState("");
   const itemsPerPage = 20;
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -442,7 +455,7 @@ export default function TuroTripsPage() {
     },
   });
 
-  const { data: apiSyncStatus, refetch: refetchApiSyncStatus } = useQuery<TuroApiSyncStatus>({
+  const { data: apiSyncStatus } = useQuery<TuroApiSyncStatus>({
     queryKey: ["/api/turo-trips/api-sync/status"],
     queryFn: async () => {
       const response = await fetch(buildApiUrl("/api/turo-trips/api-sync/status"), {
@@ -556,70 +569,6 @@ export default function TuroTripsPage() {
     },
   });
 
-  const hostApiSyncMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(buildApiUrl("/api/turo-trips/api-sync"), {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await response.json().catch(() => null);
-      if (!response.ok || !data?.success) {
-        const reason = data?.error || data?.message || `HTTP ${response.status}`;
-        throw new Error(reason);
-      }
-      return data;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/turo-trips"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/turo-trips/summary"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/turo-trips/api-sync/status"] });
-      toast({
-        title: "Host sync complete",
-        description: `${data.reservations ?? 0} reservations, ${data.created ?? 0} created, ${data.updated ?? 0} updated, ${data.errors ?? 0} errors.`,
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Host sync failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const turoCookieMutation = useMutation({
-    mutationFn: async (cookie: string) => {
-      const response = await fetch(buildApiUrl("/api/turo-trips/api-sync/cookie"), {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cookie }),
-      });
-      const data = await response.json().catch(() => null);
-      if (!response.ok || !data?.success) {
-        const reason = data?.error || data?.message || `HTTP ${response.status}`;
-        throw new Error(reason);
-      }
-      return data;
-    },
-    onSuccess: async () => {
-      setTuroCookieInput("");
-      setTuroCookieOpen(false);
-      await refetchApiSyncStatus();
-      toast({
-        title: "Turo path refreshed",
-        description: "Saved the new Turo session. Run Host Sync now.",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Turo refresh failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
   // Per-trip re-parse — re-fetches the original Turo email for ONE trip by
   // reservation ID and rewrites its trip_start/trip_end. Used as the fallback
   // when the bulk Repair Dates pass left a single row wrong (its email used a
@@ -665,90 +614,6 @@ export default function TuroTripsPage() {
     onError: (error: any) => {
       toast({
         title: "Re-parse failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Fetch-by-reservation-ID: pull a specific trip from Gmail and create/update it.
-  // Used for booking emails the incremental sync missed.
-  const [fetchResId, setFetchResId] = React.useState("");
-  const [fetchResIdOpen, setFetchResIdOpen] = React.useState(false);
-  const fetchByReservationMutation = useMutation({
-    mutationFn: async (reservationId: string) => {
-      const response = await fetch(
-        buildApiUrl("/api/turo-trips/fetch-by-reservation"),
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ reservationId }),
-        },
-      );
-      const data = await response.json().catch(() => null);
-      if (!response.ok || !data?.success) {
-        const reason = data?.error || data?.message || `HTTP ${response.status}`;
-        throw new Error(reason);
-      }
-      return data;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/turo-trips"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/turo-trips/summary"] });
-      const action = data.action as string;
-      const actionLabel =
-        action === "created" ? "Created" :
-        action === "updated" ? "Dates updated" :
-        action === "unchanged" ? "Already up to date" :
-        action === "not_found" ? "Not found in Gmail" :
-        action === "parse_failed" ? "Email found but parse failed" :
-        action;
-      toast({
-        title: `Reservation #${data.data?.reservationId ?? fetchResId}: ${actionLabel}`,
-        description: data.message,
-        duration: 10000,
-      });
-      if (action === "created" || action === "updated") {
-        setFetchResId("");
-        setFetchResIdOpen(false);
-      }
-    },
-    onError: (error: any) => {
-      toast({ title: "Fetch failed", description: error.message, variant: "destructive" });
-    },
-  });
-
-  // Refresh-calendar mutation — pushes updated title/description into existing Google Calendar events.
-  // Useful after a format change (e.g. adding plate # or year/model to titles).
-  const refreshCalendarMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(
-        buildApiUrl("/api/turo-trips/refresh-calendar"),
-        { method: "POST", credentials: "include" },
-      );
-      const data = await response.json().catch(() => null);
-      if (!response.ok || !data?.success) {
-        const reason =
-          data?.error || data?.message || `HTTP ${response.status}`;
-        throw new Error(reason);
-      }
-      return data;
-    },
-    onSuccess: (data) => {
-      const d = data.data ?? {};
-      const seconds =
-        typeof d.durationMs === "number"
-          ? `${(d.durationMs / 1000).toFixed(1)}s`
-          : "—";
-      toast({
-        title: "Calendar refresh complete",
-        description: `${d.updated ?? 0} updated, ${d.skipped ?? 0} skipped, ${d.errors ?? 0} errors in ${seconds}.`,
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Calendar refresh failed",
         description: error.message,
         variant: "destructive",
       });
@@ -1070,79 +935,6 @@ export default function TuroTripsPage() {
     }
   };
 
-  // Parse the user's paste (tab or multi-space separated rows from Excel) and
-  // POST it to the bulk-import endpoint. We accept either a header row or none
-  // — column order is fixed: Reservation ID, Plate#, VIN#, Trip Start Odometer,
-  // Trip Ends Odometer.
-  const runImport = async () => {
-    const raw = importText.trim();
-    if (!raw) {
-      toast({
-        title: "Nothing to import",
-        description: "Paste rows from your Turo export first.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const rows: any[] = [];
-    for (const line of raw.split(/\r?\n/)) {
-      const trimmedLine = line.trim();
-      if (!trimmedLine) continue;
-      // Split on tabs first (Excel paste); fall back to runs of 2+ spaces.
-      const cols = trimmedLine.includes("\t")
-        ? trimmedLine.split("\t")
-        : trimmedLine.split(/ {2,}/);
-      const reservationId = (cols[0] ?? "").trim();
-      if (!reservationId) continue;
-      // Skip header row.
-      if (/reservation/i.test(reservationId)) continue;
-      // Plate may carry a leading '#' from the export — strip it.
-      const plateRaw = (cols[1] ?? "").trim();
-      const plateNumber = plateRaw === "" ? null : plateRaw.replace(/^#/, "");
-      const vinRaw = (cols[2] ?? "").trim();
-      const startRaw = (cols[3] ?? "").trim();
-      const endRaw = (cols[4] ?? "").trim();
-      const row: any = { reservationId };
-      // Only include fields the user actually filled in so we don't clobber
-      // existing values with blanks.
-      if (plateRaw !== "" && plateNumber !== null) row.plateNumber = plateNumber;
-      if (vinRaw !== "") row.vinNumber = vinRaw;
-      if (startRaw !== "") row.tripStartOdometer = startRaw;
-      if (endRaw !== "") row.tripEndOdometer = endRaw;
-      rows.push(row);
-    }
-
-    if (rows.length === 0) {
-      toast({ title: "No valid rows found", variant: "destructive" });
-      return;
-    }
-
-    setImporting(true);
-    try {
-      const data = await api.post<{ updated?: number; skipped?: unknown[] }>("/api/turo-trips/import", { rows }, {
-        fallbackMessage: "Import failed",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/turo-trips"] });
-      toast({
-        title: "Import complete",
-        description: data.skipped?.length
-          ? `Updated ${data.updated}. Skipped ${data.skipped.length} unknown reservation ID(s).`
-          : `Updated ${data.updated} trip(s).`,
-      });
-      setImportOpen(false);
-      setImportText("");
-    } catch (e: any) {
-      toast({
-        title: "Import failed",
-        description: e.message,
-        variant: "destructive",
-      });
-    } finally {
-      setImporting(false);
-    }
-  };
-
   const trips = tripsData?.data || [];
   const totalTrips = tripsData?.total || 0;
   const summary = summaryData?.data;
@@ -1302,77 +1094,6 @@ export default function TuroTripsPage() {
               )}
               {exporting ? "Exporting…" : "Export CSV"}
             </Button>
-            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setImportOpen(true)}>
-              <Upload className="w-4 h-4 mr-2" />
-              Import from Turo
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full sm:w-auto"
-              onClick={() => refreshCalendarMutation.mutate()}
-              disabled={refreshCalendarMutation.isPending}
-              title="Push updated title format (plate, year) into all existing Google Calendar events"
-            >
-              {refreshCalendarMutation.isPending ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Refreshing...
-                </>
-              ) : (
-                <>
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Refresh Calendar
-                </>
-              )}
-            </Button>
-            {/* Fetch by reservation ID — inline expandable form */}
-            {fetchResIdOpen ? (
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Input
-                  value={fetchResId}
-                  onChange={(e) => setFetchResId(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && fetchResId.trim()) {
-                      fetchByReservationMutation.mutate(fetchResId.trim());
-                    } else if (e.key === "Escape") {
-                      setFetchResIdOpen(false);
-                      setFetchResId("");
-                    }
-                  }}
-                  placeholder="Reservation ID…"
-                  className="h-9 w-[160px] sm:w-[180px]"
-                  autoFocus
-                />
-                <Button
-                  size="sm"
-                  onClick={() => fetchResId.trim() && fetchByReservationMutation.mutate(fetchResId.trim())}
-                  disabled={!fetchResId.trim() || fetchByReservationMutation.isPending}
-                >
-                  {fetchByReservationMutation.isPending ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    "Go"
-                  )}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => { setFetchResIdOpen(false); setFetchResId(""); }}
-                >
-                  ✕
-                </Button>
-              </div>
-            ) : (
-              <Button
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() => setFetchResIdOpen(true)}
-                title="Search Gmail for a specific reservation ID and add it to the database if missing"
-              >
-                <User className="w-4 h-4 mr-2" />
-                Fetch by ID
-              </Button>
-            )}
             <Button
               className="w-full sm:w-auto"
               onClick={() => syncMutation.mutate()}
@@ -1411,71 +1132,9 @@ export default function TuroTripsPage() {
                 </span>
                 {apiSyncStatus?.lastResult?.error && (
                   <span className="text-destructive">
-                    {apiSyncStatus.lastResult.error}
+                    {describeTuroSyncError(apiSyncStatus.lastResult.error)}
                   </span>
                 )}
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                {turoCookieOpen ? (
-                  <div className="flex flex-col gap-2 sm:min-w-[420px]">
-                    <Textarea
-                      value={turoCookieInput}
-                      onChange={(e) => setTuroCookieInput(e.target.value)}
-                      placeholder="Paste Turo Cookie header or copied cURL request"
-                      className="min-h-[78px] text-xs"
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => turoCookieMutation.mutate(turoCookieInput)}
-                        disabled={!turoCookieInput.trim() || turoCookieMutation.isPending}
-                      >
-                        {turoCookieMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          "Save Turo Path"
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setTuroCookieOpen(false);
-                          setTuroCookieInput("");
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <Button
-                    variant="outline"
-                    className="w-full sm:w-auto"
-                    onClick={() => setTuroCookieOpen(true)}
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Refresh Turo Path
-                  </Button>
-                )}
-                <Button
-                  variant="outline"
-                  className="w-full sm:w-auto"
-                  onClick={() => hostApiSyncMutation.mutate()}
-                  disabled={hostApiSyncMutation.isPending}
-                >
-                  {hostApiSyncMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Pulling...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      Host Sync
-                    </>
-                  )}
-                </Button>
               </div>
             </div>
           </CardContent>
@@ -3063,62 +2722,6 @@ export default function TuroTripsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Bulk import from Turo export. The user pastes rows straight from
-          their Excel export (tab-separated). We update plate # and odometers
-          by reservation_id; unknown reservation IDs are reported back. */}
-      <Dialog
-        open={importOpen}
-        onOpenChange={(open) => {
-          if (!importing) setImportOpen(open);
-        }}
-      >
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Import from Turo Export</DialogTitle>
-            <DialogDescription>
-              Paste rows directly from your Turo Excel export. Column order:
-              <span className="font-mono">
-                {" "}
-                Reservation ID, Plate#, VIN#, Trip Start Odometer, Trip Ends Odometer
-              </span>
-              . Plate # is required to fill the column; VIN# and odometer values are
-              optional and can be left blank. Unknown reservation IDs are
-              reported, not created.
-            </DialogDescription>
-          </DialogHeader>
-          <Textarea
-            value={importText}
-            onChange={(e) => setImportText(e.target.value)}
-            placeholder={
-              "41899967\t#G022VR\t1HGCM82633A004352\t\t\n43472991\t#H868CW\t\t\t\n49053682\t#H516HL\t\t23044\t23144"
-            }
-            className="font-mono text-xs h-64"
-            disabled={importing}
-          />
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              variant="outline"
-              onClick={() => setImportOpen(false)}
-              disabled={importing}
-            >
-              Cancel
-            </Button>
-            <Button onClick={runImport} disabled={importing}>
-              {importing ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Importing...
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Import
-                </>
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
       <AdminPageLinks />
     </AdminLayout>
   );
