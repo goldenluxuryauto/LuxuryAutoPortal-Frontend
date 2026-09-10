@@ -112,26 +112,6 @@ interface TripsSummary {
   totalMiles: number;
 }
 
-interface TuroApiSyncStatus {
-  auth?: {
-    hasJar: boolean;
-    hasRememberMe: boolean;
-    accessTokenExpiresAt: string | null;
-    expired: boolean;
-  };
-  lastSyncTime: string | null;
-  lastResult: {
-    success: boolean;
-    fetched: number;
-    reservations: number;
-    created: number;
-    updated: number;
-    unchanged: number;
-    errors: number;
-    error?: string;
-  } | null;
-}
-
 function calculateDaysRented(
   tripStart: string,
   tripEnd: string,
@@ -150,26 +130,6 @@ function calculateDaysRented(
   } catch {
     return null;
   }
-}
-
-/**
- * The host-feed sync surfaces raw transport failures (a 300-char slice of
- * whatever Turo returned). Turo fronts the feed with Cloudflare, so an expired
- * session comes back as a WAF block page rather than a clean 401 — dumping that
- * HTML at an admin tells them nothing actionable. Map the known shapes to the
- * action that actually fixes them; show anything unrecognised verbatim.
- */
-function describeTuroSyncError(raw: string): string {
-  if (/waf-block|Just a moment|cf-browser-verification/i.test(raw)) {
-    return "Turo session expired — the sync was blocked by Turo's bot protection. Paste a fresh Turo cookie to reconnect.";
-  }
-  if (/status=(401|403)/.test(raw)) {
-    return "Turo session expired — paste a fresh Turo cookie to reconnect.";
-  }
-  if (/cookie jar not configured/i.test(raw)) {
-    return "Turo is not connected — paste a Turo cookie to enable host sync.";
-  }
-  return raw;
 }
 
 export default function TuroTripsPage() {
@@ -453,22 +413,6 @@ export default function TuroTripsPage() {
       if (!response.ok) throw new Error("Failed to fetch summary");
       return response.json();
     },
-  });
-
-  const { data: apiSyncStatus } = useQuery<TuroApiSyncStatus>({
-    queryKey: ["/api/turo-trips/api-sync/status"],
-    queryFn: async () => {
-      const response = await fetch(buildApiUrl("/api/turo-trips/api-sync/status"), {
-        credentials: "include",
-      });
-      const data = await response.json().catch(() => null);
-      if (!response.ok) {
-        const reason = data?.error || data?.message || `HTTP ${response.status}`;
-        throw new Error(reason);
-      }
-      return data;
-    },
-    retry: false,
   });
 
   // Fetch cars so we can enrich Turo's bare "Make Model" string with the
@@ -1114,31 +1058,6 @@ export default function TuroTripsPage() {
           </div>
         </div>
 
-        <Card>
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex flex-wrap items-center gap-2 text-sm">
-                <Badge variant={apiSyncStatus?.auth?.hasJar ? "default" : "destructive"}>
-                  {apiSyncStatus?.auth?.hasJar ? "Turo Connected" : "Turo Disconnected"}
-                </Badge>
-                <Badge variant={apiSyncStatus?.auth?.expired ? "destructive" : "outline"}>
-                  {apiSyncStatus?.auth?.expired ? "Token Expired" : "Token Active"}
-                </Badge>
-                <span className="text-muted-foreground">
-                  Last host sync:{" "}
-                  {apiSyncStatus?.lastSyncTime
-                    ? new Date(apiSyncStatus.lastSyncTime).toLocaleString()
-                    : "Never"}
-                </span>
-                {apiSyncStatus?.lastResult?.error && (
-                  <span className="text-destructive">
-                    {describeTuroSyncError(apiSyncStatus.lastResult.error)}
-                  </span>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Summary Cards */}
         {summary && (
