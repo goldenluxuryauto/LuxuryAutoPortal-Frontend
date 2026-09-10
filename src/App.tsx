@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { queryClient, getApiBaseUrl } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -137,7 +138,11 @@ const NoticeBoardManagementPage = lazy(() => import("@/pages/admin/notice-board"
 const NotificationsPage = lazy(() => import("@/pages/admin/notifications"));
 
 function PageFallback() {
-  return <div className="p-6 text-sm text-muted-foreground">Loading...</div>;
+  return (
+    <div className="flex items-center justify-center py-16">
+      <Loader2 className="w-8 h-8 text-primary animate-spin" />
+    </div>
+  );
 }
 
 // Wrapper component for IncomeExpensesPage to handle Wouter route props
